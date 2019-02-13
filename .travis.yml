@@ -1,13 +1,14 @@
+# Config build
 language: python
 python:
-  - "3.6.6"
+  - "3.7.2"
 # command to install dependencies
 install:
   - pip install -r requirements.txt
 # Enabling the quiet flag can be useful if you’re trying to avoid log file size limit
 git:
   quiet: true
-# command to run tests
+# command to run scripts
 script:
   - python -m unittest discover
 # - pylint mlfinlab --rcfile=.pylintrc -f text
