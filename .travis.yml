@@ -10,4 +10,4 @@ git:
 # command to run tests
 script:
   - python -m unittest discover
-  - pylint mlfinlab
+  - pylint mlfinlab --rcfile=.pylintrc -f text
