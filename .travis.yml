@@ -1,7 +1,10 @@
 # Config build
 language: python
-python:
-  - "3.7.2"
+matrix:
+  include:
+    - python: 3.7.2
+      dist: xenial
+      sudo: true
 # command to install dependencies
 install:
   - pip install -r requirements.txt
