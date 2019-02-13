@@ -1,0 +1,13 @@
+language: python
+python:
+  - "3.6.6"
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+# Enabling the quiet flag can be useful if you’re trying to avoid log file size limit
+git:
+  quiet: true
+# command to run tests
+script:
+  - python -m unittest discover
+  -
