@@ -1,3 +1,4 @@
+coverage==4.5.1
 pandas==0.23.4
 pylint==2.2.2
 numpy==1.15.4
