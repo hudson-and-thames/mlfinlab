@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "----Running Code Coverage----"
 coverage run --concurrency=multiprocessing ./scripts/run_tests.py discover -v
 
