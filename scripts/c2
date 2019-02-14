@@ -1,5 +1,13 @@
 #!/bin/bash
 echo "----Running Code Coverage----"
+
+# Remove multiprocessing coverage files in case a previous combine wasn't performed
+rm .coverage.*
+rm -fR cover/
+# Remove the main coverage file (.coverage)
+coverage erase
+
+# Discover and run all tests
 coverage run --concurrency=multiprocessing ./scripts/run_tests.py discover -v
 
 coverage combine
@@ -17,4 +25,3 @@ then
   echo -e "Travis Build FAILURE: Coverage percentage failed"
   exit 1
 fi
-

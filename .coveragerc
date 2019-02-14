@@ -1,6 +1,5 @@
 [run]
-omit=
-     *__init__.py
+omit=*/__init__.py
      mlfinlab/tests/*
      scripts/*
      /opt/conda/*
