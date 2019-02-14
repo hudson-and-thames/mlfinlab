@@ -1,10 +1,11 @@
 [run]
-omit=mlfinlab/tests/*
+omit=
+     *__init__.py
+     mlfinlab/tests/*
      scripts/*
      /opt/conda/*
      # Ensure we exclude any files in .local
      */.local/*
-     */Users/*
 branch=True
 
 # This config option is in v4.0a5 only supported on the command line
