@@ -1,14 +1,12 @@
 [run]
-omit=*/__init__.py
+omit=*__init__*
      mlfinlab/tests/*
      scripts/*
      /opt/conda/*
+     */home/travis/virtualenv/python3.7.2/lib/python3.7/site-packages/xmlrunner/*
      # Ensure we exclude any files in .local
      */.local/*
 branch=True
-
-# This config option is in v4.0a5 only supported on the command line
-concurrency=multiprocessing
 
 [report]
 partial_branches=True
