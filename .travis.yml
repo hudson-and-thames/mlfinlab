@@ -15,4 +15,4 @@ git:
 script:
   - python -m unittest discover
   - pylint mlfinlab --rcfile=.pylintrc -f text
-  - scripts/coverage
+  - bash coverage

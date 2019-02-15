@@ -1,0 +1,25 @@
+[run]
+omit=*__init__*
+     mlfinlab/tests/*
+     scripts/*
+     /opt/conda/*
+     */home/travis/virtualenv/python3.7.2/lib/python3.7/site-packages/xmlrunner/*
+     # Ensure we exclude any files in .local
+     */.local/*
+branch=True
+
+[report]
+partial_branches=True
+show_missing=True
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
+    @abc.abstractmethod
+    @abc.abstractproperty
+    def _dependencies(self):
+
+[html]
+directory=cover
+
+[xml]
+
