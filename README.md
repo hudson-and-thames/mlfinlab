@@ -1,5 +1,5 @@
 # Machine Learning Financial Laboratory (mlfinlab)
-Package based on the work of Dr Marcos Lopez de Prado regarding his research with respect to Advances in Financial Machine Learning.
+Package based on the work of Dr Marcos Lopez de Prado, regarding his research with respect to Advances in Financial Machine Learning.
 
 ## How To Run Checks Locally
 On your local machine open the terminal and cd into the working dir. 
