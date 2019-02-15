@@ -10,12 +10,12 @@ class TestFunctions(unittest.TestCase):
     """
     Test demo functions
     """
-    # def test_addition(self):
-    #     """
-    #     Test addition
-    #     """
-    #     answer = 1 + 2
-    #     self.assertTrue(answer == code.addition(1, 2))
+    def test_addition(self):
+        """
+        Test addition
+        """
+        answer = 1 + 2
+        self.assertTrue(answer == code.addition(1, 2))
 
     def test_subtraction(self):
         """
