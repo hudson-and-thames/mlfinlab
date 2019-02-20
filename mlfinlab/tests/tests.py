@@ -3,7 +3,7 @@ Contains unit demo tests
 """
 
 import unittest
-import mlfinlab.data_structures.code as code
+import mlfinlab.data_structures.some_stuff as code
 
 
 class TestFunctions(unittest.TestCase):
