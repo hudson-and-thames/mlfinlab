@@ -1,5 +1,3 @@
-import time
-
 import pandas as pd
 import numpy as np
 
@@ -20,7 +18,7 @@ def update_counters(cache, flag):
     return cum_ticks, cum_dollar_value, cum_volume, high_price, low_price
 
 
-def create_bars(data, metric, threshold=50000, cache=[], flag=False):
+def __extract_bars(data, metric, threshold=50000, cache=[], flag=False):
     bars = []
     cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = update_counters(cache, flag)
 
@@ -60,48 +58,7 @@ def create_bars(data, metric, threshold=50000, cache=[], flag=False):
     return bars, cache
 
 
-
-def create_dollar_bars(data, threshold=50000, cache=[], flag=False):
-
-    bars = []
-    cum_dollar_value, cum_volume, high_price, low_price = update_counters(cache, flag)
-
-    # Iterate over rows
-    for row in data.values:
-        # Set variables
-        date_time = row[0]
-        price = np.float(row[1])
-        volume = row[2]
-
-        # Calculations
-        dollar_value = price * volume
-        cum_dollar_value = cum_dollar_value + dollar_value
-        cum_volume = cum_volume + volume
-
-        # Check min max
-        if price > high_price:
-            high_price = price
-        elif price <= low_price:
-            low_price = price
-
-        # Update cache
-        cache.append([date_time, price, low_price, high_price, cum_volume, cum_dollar_value])
-
-        # If threshold reached then take a sample
-        if cum_dollar_value >= threshold:
-            # Create bars
-            open_price = cache[0][1]
-            low_price = min(low_price, open_price)  # If only one data point in bars then the low price isn't added, this check corrects that
-            close_price = price
-
-            # Update bars & Reset counters
-            bars.append([date_time, open_price, high_price, low_price, close_price, cum_volume, cum_dollar_value])
-            cum_dollar_value, cum_volume, cache, high_price, low_price = 0, 0, [], -np.inf, np.inf
-
-    return bars, cache
-
-
-def get_dollar_bars(file_name, threshold=50000, chunksize=20000000):
+def __batch_run(file_name, metric, threshold=50000, chunksize=20000000):
 
     # Variables
     count = 0
@@ -112,7 +69,7 @@ def get_dollar_bars(file_name, threshold=50000, chunksize=20000000):
     # Read csv in batches
     for batch in pd.read_csv(file_name, chunksize=chunksize):
         print('Batch number:', count)
-        bars, price_cache = create_bars(batch, metric='cum_dollar_value', threshold=threshold, cache=cache, flag=flag)
+        bars, price_cache = __extract_bars(batch, metric=metric, threshold=threshold, cache=cache, flag=flag)
 
         # Append to bars list
         final_bars += bars
@@ -126,14 +83,35 @@ def get_dollar_bars(file_name, threshold=50000, chunksize=20000000):
     return df
 
 
+def get_dollar_bars(file_path, threshold=50000, chunksize=20000000):
+    bars = __batch_run(file_name=file_path, metric='cum_dollar_value', threshold=threshold, chunksize=chunksize)
+    return bars
+
+
+def get_volume_bars(file_path, threshold=50000, chunksize=20000000):
+    bars = __batch_run(file_name=file_path, metric='cum_volume', threshold=threshold, chunksize=chunksize)
+    return bars
+
+
+def get_tick_bars(file_path, threshold=50000, chunksize=20000000):
+    bars = __batch_run(file_name=file_path, metric='cum_ticks', threshold=threshold, chunksize=chunksize)
+    return bars
+
+
 if __name__ == '__main__':
 
-    print('Creating bars...')
-    bars = get_dollar_bars(file_name="big_es_dataEStrim.csv", threshold=50000, chunksize=20000000)
+    print('Creating Dollar Bars...')
+    bars = get_dollar_bars(file_path="big_es_dataEStrim.csv", threshold=2500000, chunksize=20000000)
     print('Writing to csv')
     bars.to_csv('dollar_bars.csv', index=False)
 
+    print('Creating Volume Bars...')
+    bars = get_volume_bars(file_path="big_es_dataEStrim.csv", threshold=1000, chunksize=20000000)
+    print('Writing to csv')
+    bars.to_csv('volume_bars.csv', index=False)
 
-    # Write to csv
-    # cols = ['date_time', 'open', 'high', 'low', 'close', 'cum_vol', 'cum_dollar']
-    # pd.DataFrame(final_bars, columns=cols).to_csv('dollar_bars.csv', index=False)
+    print('Creating Volume Bars...')
+    bars = get_tick_bars(file_path="big_es_dataEStrim.csv", threshold=500, chunksize=20000000)
+    print('Writing to csv')
+    bars.to_csv('tick_bars.csv', index=False)
+    print('Done!')
