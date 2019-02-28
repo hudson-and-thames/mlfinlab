@@ -28,7 +28,7 @@ def __update_counters(cache, flag):
     :return: Updated counters - cum_ticks, cum_dollar_value, cum_volume, high_price, low_price
     """
     # Check flag
-    if flag and len(cache) > 0:
+    if flag and cache:
         # Update variables based on cache
         cum_ticks = int(cache[-1][6])
         cum_dollar_value = np.float(cache[-1][5])
