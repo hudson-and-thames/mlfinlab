@@ -87,11 +87,12 @@ def __extract_bars(data, metric, threshold=50000, cache=None, flag=False):
         if eval(metric) >= threshold:   # pylint: disable=eval-used
             # Create bars
             open_price = cache[0][1]
-            low_price = min(low_price, open_price)  # If only one data point in bars then the low price isn't added, this check corrects that
+            low_price = min(low_price, open_price)
             close_price = price
 
             # Update bars & Reset counters
-            list_bars.append([date_time, open_price, high_price, low_price, close_price, cum_volume, cum_dollar_value, cum_ticks])
+            list_bars.append([date_time, open_price, high_price, low_price, close_price,
+                              cum_volume, cum_dollar_value, cum_ticks])
             cum_ticks, cum_dollar_value, cum_volume, cache, high_price, low_price = 0, 0, 0, [], -np.inf, np.inf
 
     return list_bars, cache
@@ -136,7 +137,8 @@ def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000):
     Creates the dollar bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
 
     Following the paper "The Volume Clock: Insights into the high frequency paradigm" by Lopez de Prado, et al,
-    it is suggested that using 1/50 of the average daily dollar value, would result in more desirable statistical properties.
+    it is suggested that using 1/50 of the average daily dollar value, would result in more desirable statistical
+    properties.
 
     :param file_path: File path pointing to csv data.
     :param threshold: A cumulative value above this threshold triggers a sample to be taken.
