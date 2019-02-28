@@ -19,7 +19,7 @@ import pandas as pd
 import numpy as np
 
 
-def __update_counters(cache, flag):
+def _update_counters(cache, flag):
     """
     Updates the counters by resetting them or making use of the cache to update them based on a previous batch.
 
@@ -42,7 +42,7 @@ def __update_counters(cache, flag):
     return cum_ticks, cum_dollar_value, cum_volume, high_price, low_price
 
 
-def __extract_bars(data, metric, threshold=50000, cache=None, flag=False):
+def _extract_bars(data, metric, threshold=50000, cache=None, flag=False):
     """
     For loop which compiles the various bars: dollar, volume, or tick.
 
@@ -59,7 +59,7 @@ def __extract_bars(data, metric, threshold=50000, cache=None, flag=False):
         cache = []
 
     list_bars = []
-    cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = __update_counters(cache, flag)
+    cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = _update_counters(cache, flag)
 
     # Iterate over rows
     for row in data.values:
@@ -98,9 +98,28 @@ def __extract_bars(data, metric, threshold=50000, cache=None, flag=False):
     return list_bars, cache
 
 
-def __batch_run(file_path, metric, threshold=50000, batch_size=20000000):
+def _assert_dataframe(test_batch):
+    """
+    Tests that the csv file read has the format: date_time, price, & volume.
+    If not then the user needs to create such a file. This format is in place to remove any unwanted overhead.
+
+    :param test_batch: DataFrame which will be tested.
+    """
+    assert test_batch.shape[1] == 3, 'Must have only 3 columns in csv: date_time, price, & volume.'
+    assert isinstance(test_batch.iloc[0, 1], float), 'price column in csv not float.'
+    assert isinstance(test_batch.iloc[0, 2], np.int64), 'volume column in csv not int.'
+
+    try:
+        pd.to_datetime(test_batch.iloc[0, 0])
+    except ValueError:
+        print('csv file, column 0, not a date time format:', test_batch.iloc[0, 0])
+
+
+def _batch_run(file_path, metric, threshold=50000, batch_size=20000000):
     """
     Reads a csv file in batches and then constructs the financial data structure in the form of a DataFrame.
+
+    The csv file must have only 3 columns: date_time, price, & volume.
 
     :param file_path: File path pointing to csv data.
     :param metric: cum_ticks, cum_dollar_value, cum_volume
@@ -109,16 +128,21 @@ def __batch_run(file_path, metric, threshold=50000, batch_size=20000000):
     :return: Financial data structure
     """
     print('Reading data in batches:')
+
     # Variables
     count = 0
     flag = False  # The first flag is false since the first batch doesn't use the cache
     cache = None
     final_bars = []
 
+    # Read in the first row & assert format
+    _assert_dataframe(pd.read_csv(file_path, nrows=1))
+
     # Read csv in batches
     for batch in pd.read_csv(file_path, chunksize=batch_size):
+
         print('Batch number:', count)
-        list_bars, cache = __extract_bars(data=batch, metric=metric, threshold=threshold, cache=cache, flag=flag)
+        list_bars, cache = _extract_bars(data=batch, metric=metric, threshold=threshold, cache=cache, flag=flag)
 
         # Append to bars list
         final_bars += list_bars
@@ -147,7 +171,7 @@ def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000):
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of dollar bars
     """
-    return __batch_run(file_path=file_path, metric='cum_dollar_value', threshold=threshold, batch_size=batch_size)
+    return _batch_run(file_path=file_path, metric='cum_dollar_value', threshold=threshold, batch_size=batch_size)
 
 
 def get_volume_bars(file_path, threshold=28224, batch_size=20000000):
@@ -162,7 +186,7 @@ def get_volume_bars(file_path, threshold=28224, batch_size=20000000):
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of volume bars
     """
-    return __batch_run(file_path=file_path, metric='cum_volume', threshold=threshold, batch_size=batch_size)
+    return _batch_run(file_path=file_path, metric='cum_volume', threshold=threshold, batch_size=batch_size)
 
 
 def get_tick_bars(file_path, threshold=2800, batch_size=20000000):
@@ -174,4 +198,4 @@ def get_tick_bars(file_path, threshold=2800, batch_size=20000000):
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of tick bars
     """
-    return __batch_run(file_path=file_path, metric='cum_ticks', threshold=threshold, batch_size=batch_size)
+    return _batch_run(file_path=file_path, metric='cum_ticks', threshold=threshold, batch_size=batch_size)

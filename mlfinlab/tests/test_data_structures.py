@@ -5,6 +5,7 @@ Tests the financial data structures
 import unittest
 import os
 import numpy as np
+import pandas as pd
 
 from mlfinlab.data_structures import data_structures as ds
 
@@ -103,3 +104,28 @@ class TestDataStructures(unittest.TestCase):
 
         # Assert cum dollar value greater than threshold
         self.assertTrue(np.all(db1['cum_ticks'] == threshold))
+
+    def test_csv_format(self):
+        """
+        Asserts that the csv data being passed is of the correct format.
+        """
+        wrong_date = ['2019-41-30', 200.00, np.int64(5)]
+        wrong_price = ['2019-01-30', 'asd', np.int64(5)]
+        wrong_volume = ['2019-01-30', 200.00, 1.5]
+        too_many_cols = ['2019-01-30', 200.00, np.int64(5), 'Limit order', 'B23']
+
+        # pylint: disable=protected-access
+        self.assertRaises(ValueError,
+                          ds._assert_dataframe(pd.DataFrame(wrong_date).T))
+        # pylint: disable=protected-access
+        self.assertRaises(AssertionError,
+                          ds._assert_dataframe,
+                          pd.DataFrame(too_many_cols).T)
+        # pylint: disable=protected-access
+        self.assertRaises(AssertionError,
+                          ds._assert_dataframe,
+                          pd.DataFrame(wrong_price).T)
+        # pylint: disable=protected-access
+        self.assertRaises(AssertionError,
+                          ds._assert_dataframe,
+                          pd.DataFrame(wrong_volume).T)
