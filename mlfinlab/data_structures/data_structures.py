@@ -108,6 +108,7 @@ def __batch_run(file_path, metric, threshold=50000, batch_size=20000000):
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Financial data structure
     """
+    print('Reading data in batches:')
     # Variables
     count = 0
     flag = False  # The first flag is false since the first batch doesn't use the cache
@@ -129,6 +130,7 @@ def __batch_run(file_path, metric, threshold=50000, batch_size=20000000):
     # Return a DataFrame
     cols = ['date_time', 'open', 'high', 'low', 'close', 'cum_vol', 'cum_dollar', 'cum_ticks']
     bars_df = pd.DataFrame(final_bars, columns=cols)
+    print('Returning bars \n')
     return bars_df
 
 

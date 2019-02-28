@@ -3,8 +3,8 @@ omit=*__init__*
      mlfinlab/tests/*
      scripts/*
      /opt/conda/*
-     */home/travis/virtualenv/python3.7.2/lib/python3.7/site-packages/xmlrunner/*
-     */home/travis/virtualenv/python3.7.2/lib/python3.7/site-packages/*
+     */home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/xmlrunner/*
+     */home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/*
      # Ensure we exclude any files in .local
      */.local/*
 branch=True

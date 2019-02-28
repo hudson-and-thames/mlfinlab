@@ -2,7 +2,7 @@
 language: python
 matrix:
   include:
-    - python: 3.7.2
+    - python: 3.7.1
       dist: xenial
       sudo: true
 # command to install dependencies
@@ -14,5 +14,5 @@ git:
 # command to run scripts
 script:
   - pylint mlfinlab --rcfile=.pylintrc -f text
-  - bash coverage
   - python -m unittest discover
+  - bash coverage
