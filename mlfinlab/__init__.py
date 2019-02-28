@@ -1,3 +1,3 @@
 """
-This is the test package.
+Machine Learning in Finance Laboratory (mlfinlab) package
 """

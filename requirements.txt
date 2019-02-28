@@ -1,3 +1,5 @@
+coverage==4.5.2
 pandas==0.23.4
+pylint==2.3.0
 numpy==1.15.4
 xmlrunner==1.7.7
