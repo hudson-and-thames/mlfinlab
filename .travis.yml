@@ -13,6 +13,6 @@ git:
   quiet: true
 # command to run scripts
 script:
-  - python -m unittest discover
   - pylint mlfinlab --rcfile=.pylintrc -f text
   - bash coverage
+  - python -m unittest discover
