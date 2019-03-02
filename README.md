@@ -12,7 +12,7 @@ Package based on the work of Dr Marcos Lopez de Prado, regarding his research wi
 
 ## Getting Started
 
-### Installation on Mac OS X
+### Installation on Mac OS X and Ubuntu Linux
 Make sure you install the latest version of the Anaconda 3 distribution. To do this you can follow the install and update instructions found on this link: https://www.anaconda.com/download/#mac
 
 From Terminal: go to the directory where you have saved the file, example: cd Desktop/mlfinlab/.
@@ -24,6 +24,9 @@ On your local machine open the terminal and cd into the working dir.
 1. Code style checks: ```./pylint```
 2. Unit tests: ```python -m unittest discover```
 3. Code coverage: ```bash coverage```
+
+### Installation on Windows
+We still have to write this section but Ashutosh uses Windows and it runs on his machine. 
 
 ## Built With
 * [Github](https://github.com/hudson-and-thames/mlfinlab) - Development platform and repo
