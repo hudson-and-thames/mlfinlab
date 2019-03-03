@@ -6,7 +6,7 @@ Package based on the work of Dr Marcos Lopez de Prado, regarding his research wi
 * Works on BIG csv files 25Gigs and up.
 * Purchased high quality raw tick data.
 * Email us if you would like a sample of the standard bars.
-* Next we are busy adding the code for the labeling. See [research repo](https://github.com/hudson-and-thames/research/tree/ch3/chapter3) for the Q&A work in progress for chapter 3.
+* Next we are busy adding the code for the labeling. See [research repo](https://github.com/hudson-and-thames/research/tree/ch3) for the Q&A work in progress for chapter 3.
 
 ---
 
