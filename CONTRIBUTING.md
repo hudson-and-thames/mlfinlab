@@ -1,7 +1,7 @@
-# Contributing to MLFinLab
+# Contributing to mlfinlab
 First off we wanted to thank you for taking the time to contribute to the project. 
 
-MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
+mlfinlab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
 Advances in Financial Machine Learning. This implementation started out as a platform for which Ashutosh and
 Jacques could base their research project on for their [Masters in Financial Engineering at WorldQuant University](https://wqu.org/).
 
