@@ -1,5 +1,28 @@
 # Machine Learning Financial Laboratory (mlfinlab)
-Package based on the work of Dr Marcos Lopez de Prado, regarding his research with respect to Advances in Financial Machine Learning.
+MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
+Advances in Financial Machine Learning. This implementation started out as a platform for which Ashutosh and
+Jacques could base their research project on for their [Masters in Financial Engineering at WorldQuant University](https://wqu.org/).
+
+As we were working through the book we saw the opportunity to code up the implementations as well answer the 
+questions at the back of every chapter. 
+
+## Barriers to Entry
+As most of you know, getting through the first 3 chapters of the book is challenging as it relies on HFT data to 
+create the new financial data structures. Sourcing the HFT data is very difficult and thus we have resorted to purchasing the
+full history of S&P500 Emini futures tick data from [TickData LLC](https://www.tickdata.com/).
+
+We are not affiliated with TickData in any way but would like to recommend others to make use of their service. The full history 
+cost us about $750 and is worth every penny. They have really done a great job at cleaning the data and providing it in 
+a user friendly manner. 
+
+### Sample Data
+TickData does offer about 20 days worth of raw tick data which can be sourced from their website [link](https://s3-us-west-2.amazonaws.com/tick-data-s3/downloads/ES_Sample.zip).
+
+For those of you interested in working with a one year sample of tick, volume, and dollar bars, it is provided for in this repo.
+
+You should be able to work on a few implementations of the code with this set. 
+
+---
 
 ## Notes
 * We just finished implementing the standard bar types (tick, volume, dollar). 
@@ -37,6 +60,12 @@ We still have to write this section but Ashutosh uses Windows and it runs on his
 * **Ashutosh Singh** - [LinkedIn](https://www.linkedin.com/in/ashusinghpenn/)
 * **Jacques Joubert** - [LinkedIn](https://www.linkedin.com/in/jacquesjoubert/)
 
+## Contact us
+At the moment the project is still rather small and thus I would recommend getting in touch with us over email so that we can further discuss the areas of contribution that interest you the most. As soon as we get to more than 4 maintainers we will switch over to a slack channel.
+
+For now you can get hold us at: hello@quantsportal.com
+
+Looking forward to hearing from you!
 
 ## License
 
