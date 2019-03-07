@@ -18,7 +18,7 @@ a user friendly manner.
 ### Sample Data
 TickData does offer about 20 days worth of raw tick data which can be sourced from their website [link](https://s3-us-west-2.amazonaws.com/tick-data-s3/downloads/ES_Sample.zip).
 
-For those of you interested in working with a one year sample of tick, volume, and dollar bars, it is provided for in this repo.
+For those of you interested in working with a two years of sample tick, volume, and dollar bars, it is provided for in the [research repo.](https://github.com/hudson-and-thames/research/tree/master/Sample-Data).
 
 You should be able to work on a few implementations of the code with this set. 
 
