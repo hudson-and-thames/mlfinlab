@@ -29,7 +29,7 @@ You should be able to work on a few implementations of the code with this set.
 * Works on BIG csv files 25Gigs and up.
 * Purchased high quality raw tick data.
 * Email us if you would like a sample of the standard bars.
-* Next we are busy adding the code for the labeling. See [research repo](https://github.com/hudson-and-thames/research/tree/ch3) for the Q&A work in progress for chapter 3.
+* Next we are busy adding the code for the labeling. See [research repo](https://github.com/hudson-and-thames/research) for the Q&A work in progress for chapter 3.
 
 ---
 
