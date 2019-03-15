@@ -22,6 +22,11 @@ For those of you interested in working with a two years of sample tick, volume, 
 
 You should be able to work on a few implementations of the code with this set. 
 
+### Additional Research Repo
+BlackArbsCEO has a great repo based on de Prado's research. It covers many of the questions at the back of every chapter and was the first source on Github to do so. It has also been a good source of inspiration for our research. 
+
+* [Adv Fin ML Exercises](https://github.com/BlackArbsCEO/Adv_Fin_ML_Exercises)
+
 ---
 
 ## Notes
