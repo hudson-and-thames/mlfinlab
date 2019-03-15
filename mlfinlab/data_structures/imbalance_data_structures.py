@@ -95,16 +95,17 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, imb_ewma_window=30000
         dollar_imb = tick_diff * volume
         cum_dollar_imb += dollar_imb
         imbalance_array.append(dollar_imb)
+
+        imb_flag = False
         if len(imbalance_array) < imb_ewma_window:
             print('training model')
-            exp_num_ticks = np.nan
+            exp_tick_imb = np.nan
         else:  # model check
             # expected imbalance per tick
             exp_tick_imb = ewma(
                 np.array(imbalance_array, dtype=float), window=imb_ewma_window)[-1]
-            flag = False
             if metric == 'dollar_imbalance':
-                flag = np.abs(cum_dollar_imb) >= exp_num_ticks * \
+                imb_flag = np.abs(cum_dollar_imb) >= exp_num_ticks * \
                     np.abs(exp_tick_imb)
 
         # Check min max
@@ -120,7 +121,7 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, imb_ewma_window=30000
                       cum_volume, cum_dollar_value, cum_ticks, cum_dollar_imb, exp_num_ticks, imbalance_array])
 
         # If threshold reached then take a sample
-        if flag is True:   # pylint: disable=eval-used
+        if imb_flag is True:   # pylint: disable=eval-used
             # Create bars
             open_price = cache[0][1]
             low_price = min(low_price, open_price)
@@ -149,7 +150,7 @@ def _assert_dataframe(test_batch):
     assert isinstance(test_batch.iloc[0, 1],
                       float), 'price column in csv not float.'
     assert isinstance(test_batch.iloc[0, 2],
-                      float), 'volume column in csv not int.'
+                      np.int64), 'volume column in csv not int.'
 
     try:
         pd.to_datetime(test_batch.iloc[0, 0])
