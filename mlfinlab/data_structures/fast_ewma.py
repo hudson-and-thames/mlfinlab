@@ -2,7 +2,9 @@ import numpy as np
 from numba import jit
 from numba import float64
 from numba import int64
-
+"""
+This module contains various implementations of ewma based on sample size
+"""
 
 @jit((float64[:], int64), nopython=True, nogil=True)
 def ewma(arr_in, window):
@@ -29,14 +31,14 @@ def ewma(arr_in, window):
     True
     """
     n = arr_in.shape[0]
-    ewma = np.empty(n, dtype=float64)
+    ewma_arr = np.empty(n, dtype=float64)
     alpha = 2 / float(window + 1)
     w = 1
     ewma_old = arr_in[0]
-    ewma[0] = ewma_old
+    ewma_arr[0] = ewma_old
     for i in range(1, n):
         w += (1 - alpha)**i
         ewma_old = ewma_old * (1 - alpha) + arr_in[i]
-        ewma[i] = ewma_old / w
+        ewma_arr[i] = ewma_old / w
 
-    return ewma
+    return ewma_arr

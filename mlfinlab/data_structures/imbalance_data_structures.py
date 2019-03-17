@@ -3,21 +3,19 @@ Advances in Financial Machine Learning, Marcos Lopez de Prado
 Chapter 2: Financial Data Structures
 
 This module contains the functions to help users create structured financial data from raw unstructured data,
-in the form of time, tick, volume, and dollar bars.
+in the form of tick, volume, and dollar imbalance bars.
 
 These bars are used throughout the text book (Advances in Financial Machine Learning, By Marcos Lopez de Prado, 2018, pg 25)
 to build the more interesting features for predicting financial time series data.
 
 These financial data structures have better statistical properties when compared to those based on fixed time interval sampling.
 A great paper to read more about this is titled: The Volume Clock: Insights into the high frequency paradigm, Lopez de Prado, et al
-
-Many of the projects going forward will require Dollar and Volume bars.
 """
 
 # Imports
+from collections import deque
 import pandas as pd
 import numpy as np
-from collections import deque
 from fast_ewma import ewma
 
 
@@ -27,6 +25,8 @@ def _update_counters(cache, flag, exp_num_ticks_init, ewma_window):
 
     :param cache: Contains information from the previous batch that is relevant in this batch.
     :param flag: A flag which signals to use the cache.
+    :param exp_num_ticks: Expected number of ticks per bar
+    :param ewma_window: ewma_window to estimate imbalance
     :return: Updated counters - cum_ticks, cum_dollar_value, cum_volume, high_price, low_price, exp_num_ticks, imbalance_array
     """
     # Check flag
@@ -44,13 +44,15 @@ def _update_counters(cache, flag, exp_num_ticks_init, ewma_window):
         imbalance_array = cache[-1][9]  # array of latest imbalances
     else:
         # Reset counters
-        cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, high_price, low_price, exp_num_ticks, imbalance_array = 0, 0, 0, 0, -np.inf, np.inf, exp_num_ticks_init, deque(
+        cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, high_price, \
+        low_price, exp_num_ticks, imbalance_array = 0, 0, 0, 0, -np.inf, np.inf, exp_num_ticks_init, deque(
             maxlen=ewma_window)
 
     return cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, high_price, low_price, exp_num_ticks, imbalance_array
 
 
-def _extract_bars(data, metric, exp_num_ticks_init=100000, imb_ewma_window=300000, num_ticks_ewma_window=20,  cache=None, flag=False, prev_price=None, num_ticks_bar=None, prev_tick_rule=None):
+def _extract_bars(data, metric, exp_num_ticks_init=100000, imb_ewma_window=300000, num_ticks_ewma_window=20,
+                  cache=None, flag=False, prev_price=None, num_ticks_bar=None, prev_tick_rule=None):
     """
     For loop which compiles the various imbalance bars: dollar, volume, or tick.
 
@@ -62,6 +64,7 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, imb_ewma_window=30000
     :param cache: contains information from the previous batch that is relevant in this batch.
     :param flag: A flag which signals to use the cache.
     :param prev_price: Previous price (we need previous batch price for price diff)
+    :param num_ticks_bar: Expected number of ticks per bar used to estimate the next bar
     :param prev_tick_rule: Previous tick rule (if price_diff == 0 => use previous tick rule)
     :return: The financial data structure with the cache of short term history.
     """
@@ -139,9 +142,6 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, imb_ewma_window=30000
             open_price = cache[0][1]
             low_price = min(low_price, open_price)
             close_price = price
-
-            assert high_price >= low_price, (row)
-
             num_ticks_bar.append(cum_ticks)
             expected_num_ticks_bar = ewma(
                 np.array(num_ticks_bar, dtype=float), num_ticks_ewma_window)[-1]
@@ -176,15 +176,17 @@ def _assert_dataframe(test_batch):
               test_batch.iloc[0, 0])
 
 
-def _batch_run(file_path, metric, exp_num_ticks_init, imb_ewma_window, num_ticks_ewma_window,  batch_size=20000000):
+def _batch_run(file_path, metric, exp_num_ticks_init, imb_ewma_window, num_ticks_ewma_window, batch_size=20000000):
     """
     Reads a csv file in batches and then constructs the financial data structure in the form of a DataFrame.
 
     The csv file must have only 3 columns: date_time, price, & volume.
 
     :param file_path: File path pointing to csv data.
-    :param metric: cum_ticks, cum_dollar_value, cum_volume
-    :param threshold: A cumulative value above this threshold triggers a sample to be taken.
+    :param metric: tick_imbalance, dollar_imbalance or volume_imbalance
+    :param exp_num_ticks_init: initial expetected number of ticks per bar
+    :imb_ewma_window: EWMA window for imbalance calculations
+    :num_ticks_ewma_window: EWMA window for expected number of ticks calculations
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Financial data structure
     """
@@ -226,14 +228,11 @@ def _batch_run(file_path, metric, exp_num_ticks_init, imb_ewma_window, num_ticks
 
 def get_dollar_imbalance_bars(file_path, exp_num_ticks_init, imb_ewma_window, num_ticks_ewma_window, batch_size=20000000):
     """
-    Creates the dollar bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
-
-    Following the paper "The Volume Clock: Insights into the high frequency paradigm" by Lopez de Prado, et al,
-    it is suggested that using 1/50 of the average daily dollar value, would result in more desirable statistical
-    properties.
-
+    Creates the dollar imbalace bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
     :param file_path: File path pointing to csv data.
-    :param threshold: A cumulative value above this threshold triggers a sample to be taken.
+    :param exp_num_ticks_init: initial expetected number of ticks per bar
+    :imb_ewma_window: EWMA window for imbalance calculations
+    :num_ticks_ewma_window: EWMA window for expected number of ticks calculations
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of dollar bars
     """
@@ -242,14 +241,11 @@ def get_dollar_imbalance_bars(file_path, exp_num_ticks_init, imb_ewma_window, nu
 
 def get_volume_imbalance_bars(file_path, exp_num_ticks_init, imb_ewma_window, num_ticks_ewma_window, batch_size=20000000):
     """
-    Creates the dollar bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
-
-    Following the paper "The Volume Clock: Insights into the high frequency paradigm" by Lopez de Prado, et al,
-    it is suggested that using 1/50 of the average daily dollar value, would result in more desirable statistical
-    properties.
-
+    Creates the volume imbalace bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
     :param file_path: File path pointing to csv data.
-    :param threshold: A cumulative value above this threshold triggers a sample to be taken.
+    :param exp_num_ticks_init: initial expetected number of ticks per bar
+    :imb_ewma_window: EWMA window for imbalance calculations
+    :num_ticks_ewma_window: EWMA window for expected number of ticks calculations
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of dollar bars
     """
@@ -258,14 +254,11 @@ def get_volume_imbalance_bars(file_path, exp_num_ticks_init, imb_ewma_window, nu
 
 def get_tick_imbalance_bars(file_path, exp_num_ticks_init, imb_ewma_window, num_ticks_ewma_window, batch_size=20000000):
     """
-    Creates the dollar bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
-
-    Following the paper "The Volume Clock: Insights into the high frequency paradigm" by Lopez de Prado, et al,
-    it is suggested that using 1/50 of the average daily dollar value, would result in more desirable statistical
-    properties.
-
+    Creates the tick imbalace bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
     :param file_path: File path pointing to csv data.
-    :param threshold: A cumulative value above this threshold triggers a sample to be taken.
+    :param exp_num_ticks_init: initial expetected number of ticks per bar
+    :imb_ewma_window: EWMA window for imbalance calculations
+    :num_ticks_ewma_window: EWMA window for expected number of ticks calculations
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of dollar bars
     """
