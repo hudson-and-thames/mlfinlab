@@ -13,13 +13,12 @@ A great paper to read more about this is titled: The Volume Clock: Insights into
 """
 
 # Imports
-from collections import deque
 import pandas as pd
 import numpy as np
 from fast_ewma import ewma
 
 
-def _update_counters(cache, flag, exp_num_ticks_init, ewma_window):
+def _update_counters(cache, flag, exp_num_ticks_init):
     """
     Updates the counters by resetting them or making use of the cache to update them based on a previous batch.
 
@@ -45,13 +44,13 @@ def _update_counters(cache, flag, exp_num_ticks_init, ewma_window):
     else:
         # Reset counters
         cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, high_price, \
-        low_price, exp_num_ticks, imbalance_array = 0, 0, 0, 0, -np.inf, np.inf, exp_num_ticks_init, deque(
-            maxlen=ewma_window)
+            low_price, exp_num_ticks, imbalance_array = 0, 0, 0, 0, - \
+            np.inf, np.inf, exp_num_ticks_init, []
 
     return cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, high_price, low_price, exp_num_ticks, imbalance_array
 
 
-def _extract_bars(data, metric, exp_num_ticks_init=100000, imb_ewma_window=300000, num_ticks_ewma_window=20,
+def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_ticks_ewma_window=20,
                   cache=None, flag=False, prev_price=None, num_ticks_bar=None, prev_tick_rule=None):
     """
     For loop which compiles the various imbalance bars: dollar, volume, or tick.
@@ -59,7 +58,7 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, imb_ewma_window=30000
     :param data: Contains 3 columns - date_time, price, and volume.
     :param metric: dollar_imbalance, volume_imbalance or tick_imbalance
     :param exp_num_ticks_init: initial guess of number of ticks in imbalance bar
-    :param imb_ewma_window: EWMA window for estimating expected imbalance (tick, volume or dollar)
+    :param num_prev_bars: Number of previous bars used for EWMA window (window=num_prev_bars * bar length) for estimating expected imbalance (tick, volume or dollar)
     :param num_ticks_ewma_window: EWMA window to estimate expected number of ticks in a bar from based on previous bars
     :param cache: contains information from the previous batch that is relevant in this batch.
     :param flag: A flag which signals to use the cache.
@@ -71,14 +70,14 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, imb_ewma_window=30000
     if cache is None:
         cache = []
 
-    if num_ticks_bar is None: # array of number of ticks from previous bars
+    if num_ticks_bar is None:  # array of number of ticks from previous bars
         num_ticks_bar = []
     if prev_tick_rule is None:
         prev_tick_rule = 0
 
     list_bars = []
     cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, high_price, low_price, exp_num_ticks, imbalance_array = _update_counters(
-        cache, flag, exp_num_ticks_init, imb_ewma_window)
+        cache, flag, exp_num_ticks_init)
 
     # Iterate over rows
     for row in data.values:
@@ -108,21 +107,23 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, imb_ewma_window=30000
 
         dollar_imb = tick_rule * volume * price
         volume_imb = tick_rule * volume
-        cum_dollar_imb += dollar_imb # cumulative dollar imbalance up till now (reset on every imbalance bar)
+        # cumulative dollar imbalance up till now (reset on every imbalance bar)
+        cum_dollar_imb += dollar_imb
         if metric == 'tick_imbalance':
             imbalance_array.append(tick_rule)
         elif metric == 'dollar_imbalance':
-            imbalance_array.append(dollar_imb) # latest relevant imbalances
+            imbalance_array.append(dollar_imb)  # latest relevant imbalances
         elif metric == 'volume_imbalance':
             imbalance_array.append(volume_imb)
 
         imb_flag = False
-        if len(imbalance_array) < imb_ewma_window:
-            exp_tick_imb = np.nan # waiting for array to fill for ewma
+        if len(imbalance_array) < exp_num_ticks:
+            exp_tick_imb = np.nan  # waiting for array to fill for ewma
         else:
             # expected imbalance per tick
+            ewma_window = int(exp_num_ticks * num_prev_bars)
             exp_tick_imb = ewma(
-                np.array(imbalance_array, dtype=float), window=imb_ewma_window)[-1]
+                np.array(imbalance_array, dtype=float)[-ewma_window:], window=ewma_window)[-1]
             if np.abs(cum_dollar_imb) > exp_num_ticks * np.abs(exp_tick_imb):
                 imb_flag = True
 
@@ -144,12 +145,14 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, imb_ewma_window=30000
             close_price = price
             num_ticks_bar.append(cum_ticks)
             expected_num_ticks_bar = ewma(
-                np.array(num_ticks_bar, dtype=float), num_ticks_ewma_window)[-1]
+                np.array(num_ticks_bar, dtype=float), num_ticks_ewma_window)[-1]  # expected number of ticks based on formed bars
 
+            #print('bar', expected_num_ticks_bar)
             # Update bars & Reset counters
             list_bars.append([date_time, open_price, high_price, low_price, close_price,
                               cum_volume, cum_dollar_value, cum_ticks])
-            cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, high_price, low_price, exp_num_ticks = 0, 0, 0, 0, -np.inf, np.inf, expected_num_ticks_bar
+            cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, high_price, low_price, exp_num_ticks = 0, 0, 0, 0, - \
+                np.inf, np.inf, expected_num_ticks_bar
         # Update cache
         cache.append([date_time, price, low_price, high_price,
                       cum_volume, cum_dollar_value, cum_ticks, cum_dollar_imb, exp_num_ticks, imbalance_array])
@@ -176,7 +179,7 @@ def _assert_dataframe(test_batch):
               test_batch.iloc[0, 0])
 
 
-def _batch_run(file_path, metric, exp_num_ticks_init, imb_ewma_window, num_ticks_ewma_window, batch_size=20000000):
+def _batch_run(file_path, metric, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=20000000):
     """
     Reads a csv file in batches and then constructs the financial data structure in the form of a DataFrame.
 
@@ -185,7 +188,7 @@ def _batch_run(file_path, metric, exp_num_ticks_init, imb_ewma_window, num_ticks
     :param file_path: File path pointing to csv data.
     :param metric: tick_imbalance, dollar_imbalance or volume_imbalance
     :param exp_num_ticks_init: initial expetected number of ticks per bar
-    :imb_ewma_window: EWMA window for imbalance calculations
+    :param num_prev_bars: Number of previous bars used for EWMA window (window=num_prev_bars * bar length) for estimating expected imbalance (tick, volume or dollar)
     :num_ticks_ewma_window: EWMA window for expected number of ticks calculations
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Financial data structure
@@ -209,7 +212,7 @@ def _batch_run(file_path, metric, exp_num_ticks_init, imb_ewma_window, num_ticks
 
         print('Batch number:', count)
         list_bars, cache, num_ticks_bar, prev_price, prev_tick_rule = _extract_bars(
-            data=batch, metric=metric, exp_num_ticks_init=exp_num_ticks_init, imb_ewma_window=imb_ewma_window, num_ticks_ewma_window=num_ticks_ewma_window,
+            data=batch, metric=metric, exp_num_ticks_init=exp_num_ticks_init, num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
             cache=cache, flag=flag, prev_price=prev_price, num_ticks_bar=num_ticks_bar, prev_tick_rule=prev_tick_rule)
         # Append to bars list
         final_bars += list_bars
@@ -226,41 +229,43 @@ def _batch_run(file_path, metric, exp_num_ticks_init, imb_ewma_window, num_ticks
     return bars_df
 
 
-def get_dollar_imbalance_bars(file_path, exp_num_ticks_init, imb_ewma_window, num_ticks_ewma_window, batch_size=20000000):
+def get_dollar_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=20000000):
     """
     Creates the dollar imbalace bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
     :param file_path: File path pointing to csv data.
     :param exp_num_ticks_init: initial expetected number of ticks per bar
-    :imb_ewma_window: EWMA window for imbalance calculations
+    :param num_prev_bars: Number of previous bars used for EWMA window (window=num_prev_bars * bar length) for estimating expected imbalance (tick, volume or dollar)
     :num_ticks_ewma_window: EWMA window for expected number of ticks calculations
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of dollar bars
     """
     return _batch_run(file_path=file_path, metric='dollar_imbalance', exp_num_ticks_init=exp_num_ticks_init,
-                      imb_ewma_window=imb_ewma_window, num_ticks_ewma_window=num_ticks_ewma_window, batch_size=batch_size)
+                      num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window, batch_size=batch_size)
 
-def get_volume_imbalance_bars(file_path, exp_num_ticks_init, imb_ewma_window, num_ticks_ewma_window, batch_size=20000000):
+
+def get_volume_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=20000000):
     """
     Creates the volume imbalace bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
     :param file_path: File path pointing to csv data.
     :param exp_num_ticks_init: initial expetected number of ticks per bar
-    :imb_ewma_window: EWMA window for imbalance calculations
+    :param num_prev_bars: Number of previous bars used for EWMA window (window=num_prev_bars * bar length) for estimating expected imbalance (tick, volume or dollar)
     :num_ticks_ewma_window: EWMA window for expected number of ticks calculations
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of dollar bars
     """
     return _batch_run(file_path=file_path, metric='volume_imbalance', exp_num_ticks_init=exp_num_ticks_init,
-                      imb_ewma_window=imb_ewma_window, num_ticks_ewma_window=num_ticks_ewma_window, batch_size=batch_size)
+                      num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window, batch_size=batch_size)
 
-def get_tick_imbalance_bars(file_path, exp_num_ticks_init, imb_ewma_window, num_ticks_ewma_window, batch_size=20000000):
+
+def get_tick_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=20000000):
     """
     Creates the tick imbalace bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
     :param file_path: File path pointing to csv data.
     :param exp_num_ticks_init: initial expetected number of ticks per bar
-    :imb_ewma_window: EWMA window for imbalance calculations
+    :param num_prev_bars: Number of previous bars used for EWMA window (window=num_prev_bars * bar length) for estimating expected imbalance (tick, volume or dollar)
     :num_ticks_ewma_window: EWMA window for expected number of ticks calculations
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of dollar bars
     """
     return _batch_run(file_path=file_path, metric='tick_imbalance', exp_num_ticks_init=exp_num_ticks_init,
-                      imb_ewma_window=imb_ewma_window, num_ticks_ewma_window=num_ticks_ewma_window, batch_size=batch_size)
+                      num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window, batch_size=batch_size)
