@@ -132,7 +132,7 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
             # expected imbalance per tick
             ewma_window = int(exp_num_ticks * num_prev_bars)
             exp_tick_imb = ewma(
-                np.array(imbalance_array, dtype=float)[-ewma_window:], window=ewma_window)[-1]
+                np.array(imbalance_array[-ewma_window:], dtype=float), window=ewma_window)[-1]
             if np.abs(theta_imb) > exp_num_ticks * np.abs(exp_tick_imb):
                 imb_flag = True
 
