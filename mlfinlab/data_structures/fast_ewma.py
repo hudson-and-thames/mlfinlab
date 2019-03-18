@@ -6,7 +6,7 @@ from numba import int64
 This module contains various implementations of ewma based on sample size
 """
 
-@jit((float64[:], int64), nopython=True, nogil=True, debug=True)
+@jit((float64[:], int64), nopython=False, nogil=True)
 def ewma(arr_in, window):
     """Exponentialy weighted moving average specified by a decay ``window``
     to provide better adjustments for small windows via:

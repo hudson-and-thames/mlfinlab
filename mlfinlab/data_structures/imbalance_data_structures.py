@@ -36,18 +36,20 @@ def _update_counters(cache, flag, exp_num_ticks_init):
         cum_volume = cache[-1][4]
         low_price = np.float(cache[-1][2])
         high_price = np.float(cache[-1][3])
-        # cumulative dollar imbalance (theta_t)
+        # cumulative imbalances
         cum_dollar_imb = np.float(cache[-1][7])
-        # expected number of ticks from prev bars
-        exp_num_ticks = np.float(cache[-1][8])
-        imbalance_array = cache[-1][9]  # array of latest imbalances
+        cum_tick_imb = np.float(cache[-1][8])
+        cum_volume_imb = np.float(cache[-1][9])
+        # expected number of ticks extracted from prev bars
+        exp_num_ticks = np.float(cache[-1][10])
+        imbalance_array = cache[-1][11]  # array of latest imbalances
     else:
         # Reset counters
-        cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, high_price, \
-            low_price, exp_num_ticks, imbalance_array = 0, 0, 0, 0, - \
-            np.inf, np.inf, exp_num_ticks_init, []
+        cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, cum_tick_imb, cum_volume_imb = 0, 0, 0, 0, 0, 0
+        high_price, low_price = -np.inf, np.inf
+        exp_num_ticks, imbalance_array = exp_num_ticks_init, []
 
-    return cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, high_price, low_price, exp_num_ticks, imbalance_array
+    return cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, cum_tick_imb, cum_volume_imb, high_price, low_price, exp_num_ticks, imbalance_array
 
 
 def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_ticks_ewma_window=20,
@@ -76,7 +78,7 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
         prev_tick_rule = 0
 
     list_bars = []
-    cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, high_price, low_price, exp_num_ticks, imbalance_array = _update_counters(
+    cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, cum_tick_imb, cum_volume_imb, high_price, low_price, exp_num_ticks, imbalance_array = _update_counters(
         cache, flag, exp_num_ticks_init)
 
     # Iterate over rows
@@ -108,13 +110,20 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
         dollar_imb = tick_rule * volume * price
         volume_imb = tick_rule * volume
         # cumulative dollar imbalance up till now (reset on every imbalance bar)
+
+        cum_tick_imb += tick_rule
         cum_dollar_imb += dollar_imb
+        cum_volume_imb += volume_imb
+
         if metric == 'tick_imbalance':
-            imbalance_array.append(tick_rule)
+            imbalance_array.append(tick_rule)  # latest relevant imbalances
+            theta_imb = cum_tick_imb
         elif metric == 'dollar_imbalance':
-            imbalance_array.append(dollar_imb)  # latest relevant imbalances
+            imbalance_array.append(dollar_imb)
+            theta_imb = cum_dollar_imb
         elif metric == 'volume_imbalance':
             imbalance_array.append(volume_imb)
+            theta_imb = cum_volume_imb
 
         imb_flag = False
         if len(imbalance_array) < exp_num_ticks:
@@ -124,7 +133,7 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
             ewma_window = int(exp_num_ticks * num_prev_bars)
             exp_tick_imb = ewma(
                 np.array(imbalance_array, dtype=float)[-ewma_window:], window=ewma_window)[-1]
-            if np.abs(cum_dollar_imb) > exp_num_ticks * np.abs(exp_tick_imb):
+            if np.abs(theta_imb) > exp_num_ticks * np.abs(exp_tick_imb):
                 imb_flag = True
 
         # Check min max
@@ -145,17 +154,18 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
             close_price = price
             num_ticks_bar.append(cum_ticks)
             expected_num_ticks_bar = ewma(
-                np.array(num_ticks_bar, dtype=float), num_ticks_ewma_window)[-1]  # expected number of ticks based on formed bars
+                np.array(num_ticks_bar[-num_ticks_ewma_window:], dtype=float), num_ticks_ewma_window)[-1]  # expected number of ticks based on formed bars
 
-            #print('bar', expected_num_ticks_bar)
             # Update bars & Reset counters
             list_bars.append([date_time, open_price, high_price, low_price, close_price,
                               cum_volume, cum_dollar_value, cum_ticks])
-            cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, high_price, low_price, exp_num_ticks = 0, 0, 0, 0, - \
-                np.inf, np.inf, expected_num_ticks_bar
+            cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, cum_tick_imb, cum_volume_imb = 0, 0, 0, 0, 0, 0
+            high_price, low_price = -np.inf, np.inf
+            exp_num_ticks = expected_num_ticks_bar
+
         # Update cache
         cache.append([date_time, price, low_price, high_price,
-                      cum_volume, cum_dollar_value, cum_ticks, cum_dollar_imb, exp_num_ticks, imbalance_array])
+                      cum_volume, cum_dollar_value, cum_ticks, cum_dollar_imb, cum_tick_imb, cum_volume_imb, exp_num_ticks, imbalance_array])
     return list_bars, cache, num_ticks_bar, prev_price, prev_tick_rule
 
 
