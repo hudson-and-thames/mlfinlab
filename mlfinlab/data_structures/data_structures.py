@@ -77,7 +77,7 @@ def _extract_bars(data, metric, threshold=50000, cache=None, flag=False):
         # Check min max
         if price > high_price:
             high_price = price
-        elif price <= low_price:
+        if price <= low_price:
             low_price = price
 
         # Update cache
