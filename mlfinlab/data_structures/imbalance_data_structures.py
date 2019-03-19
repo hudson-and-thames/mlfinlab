@@ -15,7 +15,8 @@ A great paper to read more about this is titled: The Volume Clock: Insights into
 # Imports
 import pandas as pd
 import numpy as np
-from fast_ewma import ewma
+#from fast_ewma import ewma
+from mlfinlab.data_structures.fast_ewma import ewma
 
 
 def _update_counters(cache, flag, exp_num_ticks_init):
@@ -155,7 +156,6 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
             num_ticks_bar.append(cum_ticks)
             expected_num_ticks_bar = ewma(
                 np.array(num_ticks_bar[-num_ticks_ewma_window:], dtype=float), num_ticks_ewma_window)[-1]  # expected number of ticks based on formed bars
-
             # Update bars & Reset counters
             list_bars.append([date_time, open_price, high_price, low_price, close_price,
                               cum_volume, cum_dollar_value, cum_ticks])
