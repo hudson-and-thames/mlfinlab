@@ -15,7 +15,6 @@ A great paper to read more about this is titled: The Volume Clock: Insights into
 # Imports
 import pandas as pd
 import numpy as np
-#from fast_ewma import ewma
 from mlfinlab.data_structures.fast_ewma import ewma
 
 

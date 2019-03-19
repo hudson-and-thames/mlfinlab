@@ -38,4 +38,4 @@ class TestDataStructures(unittest.TestCase):
         # Assert the first value of ewma equals to input array value
         self.assertTrue(ewma_res[0] == price_arr[0])
         # Assert next value check with tolerance of 1e-5
-        self.assertTrue(abs(ewma_res[1] - 1100.00)<1e-5)
+        self.assertTrue(abs(ewma_res[1] - 1100.00) < 1e-5)

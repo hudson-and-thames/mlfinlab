@@ -12,23 +12,10 @@ def ewma(arr_in, window):
     to provide better adjustments for small windows via:
         y[t] = (x[t] + (1-a)*x[t-1] + (1-a)^2*x[t-2] + ... + (1-a)^n*x[t-n]) /
                (1 + (1-a) + (1-a)^2 + ... + (1-a)^n).
-    Parameters
-    ----------
-    arr_in : np.ndarray, float64
-        A single dimenisional numpy array
-    window : int64
-        The decay window, or 'span'
-    Returns
-    -------
-    np.ndarray
-        The EWMA vector, same length / shape as ``arr_in``
-    Examples
-    --------
-    >>> import pandas as pd
-    >>> a = np.arange(5, dtype=float)
-    >>> exp = pd.DataFrame(a).ewm(span=10, adjust=True).mean()
-    >>> np.array_equal(_ewma_infinite_hist(a, 10), exp.values.ravel())
-    True
+
+    :param arr_in : np.ndarray, float64. A single dimenisional numpy array
+    :paran window : int64. The decay window, or 'span'
+    :return: np.ndarray. The EWMA vector, same length / shape as ``arr_in``
     """
     n = arr_in.shape[0]
     ewma_arr = np.empty(n, dtype=float64)
