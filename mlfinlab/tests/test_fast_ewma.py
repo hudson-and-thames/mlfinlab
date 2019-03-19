@@ -29,8 +29,8 @@ class TestDataStructures(unittest.TestCase):
         """
         Tests the imbalance dollar bars implementation.
         """
-        df = pd.read_csv(self.path)
-        price_arr = np.array(df.Price.values, dtype=float)
+        test_sample = pd.read_csv(self.path)
+        price_arr = np.array(test_sample.Price.values, dtype=float)
         ewma_res = ewma(price_arr, window=20)
 
         # Assert output array length equals input array length

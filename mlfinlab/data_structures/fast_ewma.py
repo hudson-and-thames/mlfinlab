@@ -1,10 +1,12 @@
+"""
+This module contains various implementations of ewma based on sample size
+"""
+# Imports
 import numpy as np
 from numba import jit
 from numba import float64
 from numba import int64
-"""
-This module contains various implementations of ewma based on sample size
-"""
+
 
 @jit((float64[:], int64), nopython=False, nogil=True)
 def ewma(arr_in, window):
@@ -17,15 +19,15 @@ def ewma(arr_in, window):
     :paran window : int64. The decay window, or 'span'
     :return: np.ndarray. The EWMA vector, same length / shape as ``arr_in``
     """
-    n = arr_in.shape[0]
-    ewma_arr = np.empty(n, dtype=float64)
+    arr_length = arr_in.shape[0]
+    ewma_arr = np.empty(arr_length, dtype=float64)
     alpha = 2 / float(window + 1)
-    w = 1
+    weight = 1
     ewma_old = arr_in[0]
     ewma_arr[0] = ewma_old
-    for i in range(1, n):
-        w += (1 - alpha)**i
+    for i in range(1, arr_length):
+        weight += (1 - alpha)**i
         ewma_old = ewma_old * (1 - alpha) + arr_in[i]
-        ewma_arr[i] = ewma_old / w
+        ewma_arr[i] = ewma_old / weight
 
     return ewma_arr
