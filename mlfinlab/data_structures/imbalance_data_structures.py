@@ -13,12 +13,13 @@ A great paper to read more about this is titled: The Volume Clock: Insights into
 """
 
 # Imports
+from collections import namedtuple
 import pandas as pd
 import numpy as np
 from mlfinlab.data_structures.fast_ewma import ewma
 
 
-def _update_counters(cache, flag, exp_num_ticks_init):
+def _get_updated_counters(cache, flag, exp_num_ticks_init):
     """
     Updates the counters by resetting them or making use of the cache to update them based on a previous batch.
 
@@ -31,18 +32,19 @@ def _update_counters(cache, flag, exp_num_ticks_init):
     # Check flag
     if flag and cache:
         # Update variables based on cache
-        cum_ticks = int(cache[-1][6])
-        cum_dollar_value = np.float(cache[-1][5])
-        cum_volume = cache[-1][4]
-        low_price = np.float(cache[-1][2])
-        high_price = np.float(cache[-1][3])
+        cum_ticks = int(cache[-1].cum_ticks)
+        cum_dollar_value = np.float(cache[-1].cum_dollar_value)
+        cum_volume = cache[-1].cum_volume
+        low_price = np.float(cache[-1].low)
+        high_price = np.float(cache[-1].high)
         # cumulative imbalances
-        cum_dollar_imb = np.float(cache[-1][7])
-        cum_tick_imb = np.float(cache[-1][8])
-        cum_volume_imb = np.float(cache[-1][9])
+        cum_dollar_imb = np.float(cache[-1].cum_dollar_imb)
+        cum_tick_imb = np.float(cache[-1].cum_tick_imb)
+        cum_volume_imb = np.float(cache[-1].cum_volume_imb)
         # expected number of ticks extracted from prev bars
-        exp_num_ticks = np.float(cache[-1][10])
-        imbalance_array = cache[-1][11]  # array of latest imbalances
+        exp_num_ticks = np.float(cache[-1].exp_num_ticks)
+        # array of latest imbalances
+        imbalance_array = cache[-1].imbalance_array
     else:
         # Reset counters
         cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, cum_tick_imb, cum_volume_imb = 0, 0, 0, 0, 0, 0
@@ -53,7 +55,7 @@ def _update_counters(cache, flag, exp_num_ticks_init):
 
 
 def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_ticks_ewma_window=20,
-                  cache=None, flag=False, prev_price=None, num_ticks_bar=None, prev_tick_rule=None):
+                  cache=None, flag=False, num_ticks_bar=None):
     """
     For loop which compiles the various imbalance bars: dollar, volume, or tick.
 
@@ -65,22 +67,20 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
     :param num_ticks_ewma_window: EWMA window to estimate expected number of ticks in a bar from based on previous bars
     :param cache: contains information from the previous batch that is relevant in this batch.
     :param flag: A flag which signals to use the cache.
-    :param prev_price: Previous price (we need previous batch price for price diff)
     :param num_ticks_bar: Expected number of ticks per bar used to estimate the next bar
     :param prev_tick_rule: Previous tick rule (if price_diff == 0 => use previous tick rule)
     :return: The financial data structure with the cache of short term history.
     """
+    cache_tup = namedtuple('CacheData', ['date_time', 'price', 'high', 'low', 'tick_rule', 'cum_volume', 'cum_dollar_value',
+                                         'cum_ticks', 'cum_dollar_imb', 'cum_tick_imb', 'cum_volume_imb', 'exp_num_ticks', 'imbalance_array'])
     if cache is None:
         cache = []
-
-    if num_ticks_bar is None:  # array of number of ticks from previous bars
-        num_ticks_bar = []
-    if prev_tick_rule is None:
-        prev_tick_rule = 0
+        prev_tick_rule = 0  # set the first tick rule with 0
+        num_ticks_bar = []  # array of number of ticks from previous bars
 
     list_bars = []
     cum_ticks, cum_dollar_value, cum_volume, cum_dollar_imb, cum_tick_imb, cum_volume_imb, \
-        high_price, low_price, exp_num_ticks, imbalance_array = _update_counters(
+        high_price, low_price, exp_num_ticks, imbalance_array = _get_updated_counters(
             cache, flag, exp_num_ticks_init)
 
     # Iterate over rows
@@ -97,10 +97,11 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
         cum_volume = cum_volume + volume
 
         # Imbalance calculations
-        if prev_price is None:
+        try:
+            tick_diff = price - cache[-1].price
+            prev_tick_rule = cache[-1].tick_rule
+        except IndexError:
             tick_diff = 0
-        else:
-            tick_diff = price - prev_price
 
         if tick_diff > 0:
             tick_rule = 1.0
@@ -127,7 +128,6 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
             imbalance_array.append(volume_imb)
             theta_imb = cum_volume_imb
 
-        imb_flag = False
         if len(imbalance_array) < exp_num_ticks:
             exp_tick_imb = np.nan  # waiting for array to fill for ewma
         else:
@@ -135,8 +135,6 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
             ewma_window = int(exp_num_ticks * num_prev_bars)
             exp_tick_imb = ewma(
                 np.array(imbalance_array[-ewma_window:], dtype=float), window=ewma_window)[-1]
-            if np.abs(theta_imb) > exp_num_ticks * np.abs(exp_tick_imb):
-                imb_flag = True
 
         # Check min max
         if price > high_price:
@@ -144,12 +142,9 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
         if price <= low_price:
             low_price = price
 
-        prev_price = price  # update prev_price
-        prev_tick_rule = tick_rule
-
         #print(date_time, cum_dollar_imb, exp_num_ticks, exp_tick_imb)
         # If threshold reached then take a sample
-        if imb_flag is True:   # pylint: disable=eval-used
+        if np.abs(theta_imb) > exp_num_ticks * np.abs(exp_tick_imb):   # pylint: disable=eval-used
             # Create bars
             open_price = cache[0][1]
             low_price = min(low_price, open_price)
@@ -165,9 +160,10 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
             exp_num_ticks = expected_num_ticks_bar
 
         # Update cache
-        cache.append([date_time, price, low_price, high_price,
-                      cum_volume, cum_dollar_value, cum_ticks, cum_dollar_imb, cum_tick_imb, cum_volume_imb, exp_num_ticks, imbalance_array])
-    return list_bars, cache, num_ticks_bar, prev_price, prev_tick_rule
+        cache_data = cache_tup(date_time, price, high_price, low_price, tick_rule, cum_volume, cum_dollar_value,
+                               cum_ticks, cum_dollar_imb, cum_tick_imb, cum_volume_imb, exp_num_ticks, imbalance_array)
+        cache.append(cache_data)
+    return list_bars, cache, num_ticks_bar
 
 
 def _assert_dataframe(test_batch):
@@ -190,7 +186,7 @@ def _assert_dataframe(test_batch):
               test_batch.iloc[0, 0])
 
 
-def _batch_run(file_path, metric, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=20000000):
+def _batch_run(file_path, metric, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=2e7):
     """
     Reads a csv file in batches and then constructs the financial data structure in the form of a DataFrame.
 
@@ -211,8 +207,6 @@ def _batch_run(file_path, metric, exp_num_ticks_init, num_prev_bars, num_ticks_e
     count = 0
     flag = False  # The first flag is false since the first batch doesn't use the cache
     cache = None
-    prev_price = None
-    prev_tick_rule = None
     num_ticks_bar = None
     final_bars = []
 
@@ -223,11 +217,12 @@ def _batch_run(file_path, metric, exp_num_ticks_init, num_prev_bars, num_ticks_e
     for batch in pd.read_csv(file_path, chunksize=batch_size):
 
         print('Batch number:', count)
-        list_bars, cache, num_ticks_bar, prev_price, prev_tick_rule = _extract_bars(
+        list_bars, cache, num_ticks_bar = _extract_bars(
             data=batch, metric=metric, exp_num_ticks_init=exp_num_ticks_init, num_prev_bars=num_prev_bars,
-            num_ticks_ewma_window=num_ticks_ewma_window, cache=cache, flag=flag, prev_price=prev_price,
-            num_ticks_bar=num_ticks_bar, prev_tick_rule=prev_tick_rule)
+            num_ticks_ewma_window=num_ticks_ewma_window, cache=cache, flag=flag,
+            num_ticks_bar=num_ticks_bar)
         # Append to bars list
+
         final_bars += list_bars
         count += 1
 
@@ -242,7 +237,7 @@ def _batch_run(file_path, metric, exp_num_ticks_init, num_prev_bars, num_ticks_e
     return bars_df
 
 
-def get_dollar_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=20000000):
+def get_dollar_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=2e7):
     """
     Creates the dollar imbalace bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
     :param file_path: File path pointing to csv data.
@@ -257,7 +252,7 @@ def get_dollar_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_
                       num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window, batch_size=batch_size)
 
 
-def get_volume_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=20000000):
+def get_volume_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=2e7):
     """
     Creates the volume imbalace bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
     :param file_path: File path pointing to csv data.
@@ -272,7 +267,7 @@ def get_volume_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_
                       num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window, batch_size=batch_size)
 
 
-def get_tick_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=20000000):
+def get_tick_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=2e7):
     """
     Creates the tick imbalace bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
     :param file_path: File path pointing to csv data.

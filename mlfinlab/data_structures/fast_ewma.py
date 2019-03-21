@@ -21,7 +21,7 @@ def ewma(arr_in, window):
     """
     arr_length = arr_in.shape[0]
     ewma_arr = np.empty(arr_length, dtype=float64)
-    alpha = 2 / float(window + 1)
+    alpha = 2 / (window + 1)
     weight = 1
     ewma_old = arr_in[0]
     ewma_arr[0] = ewma_old
