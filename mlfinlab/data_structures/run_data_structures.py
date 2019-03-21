@@ -37,19 +37,21 @@ def _get_updated_counters(cache, flag, exp_num_ticks_init):
         cum_volume = cache[-1].cum_volume
         low_price = np.float(cache[-1].low)
         high_price = np.float(cache[-1].high)
-        # cumulative imbalance for a particular imbalance calculation (theta_t in Prado book)
-        cum_theta = np.float(cache[-1].cum_theta)
+        # cumulative buy and sell imbalances for a particular run calculation (theta_t in Prado book)
+        cum_theta_buy = np.float(cache[-1].cum_theta_buy)
+        cum_theta_sell = np.float(cache[-1].cum_theta_sell)
         # expected number of ticks extracted from prev bars
         exp_num_ticks = np.float(cache[-1].exp_num_ticks)
         # array of latest imbalances
         imbalance_array = cache[-1].imbalance_array
     else:
         # Reset counters
-        cum_ticks, cum_dollar_value, cum_volume, cum_theta = 0, 0, 0, 0
+        cum_ticks, cum_dollar_value, cum_volume, cum_theta_buy, cum_theta_sell = 0, 0, 0, 0, 0
         high_price, low_price = -np.inf, np.inf
-        exp_num_ticks, imbalance_array = exp_num_ticks_init, []
+        exp_num_ticks, imbalance_array = exp_num_ticks_init, {
+            'buy': [], 'sell': []}
 
-    return cum_ticks, cum_dollar_value, cum_volume, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array
+    return cum_ticks, cum_dollar_value, cum_volume, cum_theta_buy, cum_theta_sell, high_price, low_price, exp_num_ticks, imbalance_array
 
 
 def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_ticks_ewma_window=20,
@@ -70,14 +72,14 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
     :return: The financial data structure with the cache of short term history.
     """
     cache_tup = namedtuple('CacheData', ['date_time', 'price', 'high', 'low', 'tick_rule', 'cum_volume', 'cum_dollar_value',
-                                         'cum_ticks', 'cum_theta', 'exp_num_ticks', 'imbalance_array'])
+                                         'cum_ticks', 'cum_theta_buy', 'cum_theta_sell', 'exp_num_ticks', 'imbalance_array'])
     if cache is None:
         cache = []
         prev_tick_rule = 0  # set the first tick rule with 0
         num_ticks_bar = []  # array of number of ticks from previous bars
 
     list_bars = []
-    cum_ticks, cum_dollar_value, cum_volume, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array = _get_updated_counters(
+    cum_ticks, cum_dollar_value, cum_volume, cum_theta_buy, cum_theta_sell, high_price, low_price, exp_num_ticks, imbalance_array = _get_updated_counters(
         cache, flag, exp_num_ticks_init)
 
     # Iterate over rows
@@ -102,23 +104,41 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
 
         tick_rule = np.sign(tick_diff) if tick_diff != 0 else prev_tick_rule
 
-        if metric == 'tick_imbalance':
+        if metric == 'tick_run':
             imbalance = tick_rule
-        elif metric == 'dollar_imbalance':
+        elif metric == 'dollar_run':
             imbalance = tick_rule * volume * price
-        elif metric == 'volume_imbalance':
+        elif metric == 'volume_run':
             imbalance = tick_rule * volume
 
-        imbalance_array.append(imbalance)
-        cum_theta += imbalance
+        if imbalance > 0:
+            imbalance_array['buy'].append(imbalance)
+            # set zero to keep buy and sell arrays synced
+            imbalance_array['sell'].append(0)
+            cum_theta_buy += imbalance
+        elif imbalance < 0:
+            imbalance_array['sell'].append(abs(imbalance))
+            imbalance_array['buy'].append(0)
+            cum_theta_sell += abs(imbalance)
 
-        if len(imbalance_array) < exp_num_ticks:
-            exp_tick_imb = np.nan  # waiting for array to fill for ewma
+        if len(imbalance_array['buy']) < exp_num_ticks:
+            exp_buy_proportion, exp_sell_proportion = np.nan, np.nan  # waiting for array to fill for ewma
         else:
             # expected imbalance per tick
             ewma_window = int(exp_num_ticks * num_prev_bars)
-            exp_tick_imb = ewma(
-                np.array(imbalance_array[-ewma_window:], dtype=float), window=ewma_window)[-1]
+            buy_sample = np.array(
+                imbalance_array['buy'][-ewma_window:], dtype=float)
+            sell_sample = np.array(
+                imbalance_array['sell'][-ewma_window:], dtype=float)
+            buy_and_sell_imb = sum(buy_sample) + sum(sell_sample)
+            exp_buy_proportion = ewma(
+                buy_sample, window=ewma_window)[-1] / buy_and_sell_imb
+            exp_sell_proportion = ewma(
+                sell_sample, window=ewma_window)[-1] / buy_and_sell_imb
+            assert cum_theta_sell >= 0
+            assert exp_sell_proportion >= 0
+            assert exp_buy_proportion <= 1
+            assert exp_sell_proportion <= 1
 
         # Check min max
         if price > high_price:
@@ -126,9 +146,11 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
         if price <= low_price:
             low_price = price
 
+
+
         #print(date_time, cum_dollar_imb, exp_num_ticks, exp_tick_imb)
         # If threshold reached then take a sample
-        if np.abs(cum_theta) > exp_num_ticks * np.abs(exp_tick_imb):   # pylint: disable=eval-used
+        if max(cum_theta_buy, cum_theta_sell) > exp_num_ticks * max(exp_buy_proportion, exp_sell_proportion):   # pylint: disable=eval-used
             # Create bars
             open_price = cache[0][1]
             low_price = min(low_price, open_price)
@@ -139,13 +161,13 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
             # Update bars & Reset counters
             list_bars.append([date_time, open_price, high_price, low_price, close_price,
                               cum_volume, cum_dollar_value, cum_ticks])
-            cum_ticks, cum_dollar_value, cum_volume, cum_theta = 0, 0, 0, 0
+            cum_ticks, cum_dollar_value, cum_volume, cum_theta_buy, cum_theta_sell = 0, 0, 0, 0, 0
             high_price, low_price = -np.inf, np.inf
             exp_num_ticks = expected_num_ticks_bar
 
         # Update cache
         cache_data = cache_tup(date_time, price, high_price, low_price, tick_rule, cum_volume, cum_dollar_value,
-                               cum_ticks, cum_theta, exp_num_ticks, imbalance_array)
+                               cum_ticks, cum_theta_buy, cum_theta_sell, exp_num_ticks, imbalance_array)
         cache.append(cache_data)
     return list_bars, cache, num_ticks_bar
 
@@ -221,7 +243,7 @@ def _batch_run(file_path, metric, exp_num_ticks_init, num_prev_bars, num_ticks_e
     return bars_df
 
 
-def get_dollar_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=2e7):
+def get_dollar_run_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=2e7):
     """
     Creates the dollar imbalace bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
     :param file_path: File path pointing to csv data.
@@ -232,11 +254,11 @@ def get_dollar_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of dollar bars
     """
-    return _batch_run(file_path=file_path, metric='dollar_imbalance', exp_num_ticks_init=exp_num_ticks_init,
+    return _batch_run(file_path=file_path, metric='dollar_run', exp_num_ticks_init=exp_num_ticks_init,
                       num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window, batch_size=batch_size)
 
 
-def get_volume_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=2e7):
+def get_volume_run_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=2e7):
     """
     Creates the volume imbalace bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
     :param file_path: File path pointing to csv data.
@@ -247,11 +269,11 @@ def get_volume_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of dollar bars
     """
-    return _batch_run(file_path=file_path, metric='volume_imbalance', exp_num_ticks_init=exp_num_ticks_init,
+    return _batch_run(file_path=file_path, metric='volume_run', exp_num_ticks_init=exp_num_ticks_init,
                       num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window, batch_size=batch_size)
 
 
-def get_tick_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=2e7):
+def get_tick_run_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=2e7):
     """
     Creates the tick imbalace bars: date_time, open, high, low, close, cum_vol, cum_dollar, and cum_ticks.
     :param file_path: File path pointing to csv data.
@@ -262,5 +284,5 @@ def get_tick_imbalance_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ti
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of dollar bars
     """
-    return _batch_run(file_path=file_path, metric='tick_imbalance', exp_num_ticks_init=exp_num_ticks_init,
+    return _batch_run(file_path=file_path, metric='tick_run', exp_num_ticks_init=exp_num_ticks_init,
                       num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window, batch_size=batch_size)
