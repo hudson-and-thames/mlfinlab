@@ -85,10 +85,15 @@ def _extract_bars(data, metric, threshold=50000, cache=None, flag=False):
         if price <= low_price:
             low_price = price
 
+        # Update cache
+        cache_data = cache_tup(date_time, price, high_price,
+                               low_price, cum_volume, cum_dollar_value, cum_ticks)
+        cache.append(cache_data)
+
         # If threshold reached then take a sample
         if eval(metric) >= threshold:   # pylint: disable=eval-used
             # Create bars
-            open_price = cache[0][1]
+            open_price = cache[0].price
             low_price = min(low_price, open_price)
             close_price = price
 
@@ -97,7 +102,7 @@ def _extract_bars(data, metric, threshold=50000, cache=None, flag=False):
                               cum_volume, cum_dollar_value, cum_ticks])
             cum_ticks, cum_dollar_value, cum_volume, cache, high_price, low_price = 0, 0, 0, [], -np.inf, np.inf
 
-        # Update cache
+        # Update cache after bar generation
         cache_data = cache_tup(date_time, price, high_price,
                                low_price, cum_volume, cum_dollar_value, cum_ticks)
         cache.append(cache_data)

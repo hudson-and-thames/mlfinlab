@@ -34,14 +34,14 @@ class TestDataStructures(unittest.TestCase):
         num_ticks_ewma_window = 10
 
         db1 = ds.get_dollar_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars,
-                                           num_ticks_ewma_window=num_ticks_ewma_window, batch_size=1000)
+                                     num_prev_bars=num_prev_bars,
+                                     num_ticks_ewma_window=num_ticks_ewma_window, batch_size=1000)
         db2 = ds.get_dollar_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars,
-                                           num_ticks_ewma_window=num_ticks_ewma_window, batch_size=50)
+                                     num_prev_bars=num_prev_bars,
+                                     num_ticks_ewma_window=num_ticks_ewma_window, batch_size=50)
         db3 = ds.get_dollar_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars,
-                                           num_ticks_ewma_window=num_ticks_ewma_window, batch_size=10)
+                                     num_prev_bars=num_prev_bars,
+                                     num_ticks_ewma_window=num_ticks_ewma_window, batch_size=10)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -55,7 +55,7 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(db1.loc[0, 'open'] == 1306.0)
         self.assertTrue(db1.loc[0, 'high'] == 1308.75)
         self.assertTrue(db1.loc[0, 'low'] == 1301.75)
-        self.assertTrue(db1.loc[0, 'close'] == 1304.75)
+        self.assertTrue(db1.loc[0, 'close'] == 1304.0)
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
 
     def test_run_volume_bars(self):
@@ -67,14 +67,14 @@ class TestDataStructures(unittest.TestCase):
         num_ticks_ewma_window = 10
 
         db1 = ds.get_volume_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars,
-                                           num_ticks_ewma_window=num_ticks_ewma_window, batch_size=1000)
+                                     num_prev_bars=num_prev_bars,
+                                     num_ticks_ewma_window=num_ticks_ewma_window, batch_size=1000)
         db2 = ds.get_volume_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars,
-                                           num_ticks_ewma_window=num_ticks_ewma_window, batch_size=50)
+                                     num_prev_bars=num_prev_bars,
+                                     num_ticks_ewma_window=num_ticks_ewma_window, batch_size=50)
         db3 = ds.get_volume_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars,
-                                           num_ticks_ewma_window=num_ticks_ewma_window, batch_size=10)
+                                     num_prev_bars=num_prev_bars,
+                                     num_ticks_ewma_window=num_ticks_ewma_window, batch_size=10)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -88,7 +88,7 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(db1.loc[0, 'open'] == 1306)
         self.assertTrue(db1.loc[0, 'high'] == 1308.75)
         self.assertTrue(db1.loc[0, 'low'] == 1301.75)
-        self.assertTrue(db1.loc[0, 'close'] == 1304.75)
+        self.assertTrue(db1.loc[0, 'close'] == 1304.0)
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
 
     def test_run_tick_bars(self):
@@ -100,14 +100,14 @@ class TestDataStructures(unittest.TestCase):
         num_ticks_ewma_window = 10
 
         db1 = ds.get_tick_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                         num_prev_bars=num_prev_bars,
-                                         num_ticks_ewma_window=num_ticks_ewma_window, batch_size=1000)
+                                   num_prev_bars=num_prev_bars,
+                                   num_ticks_ewma_window=num_ticks_ewma_window, batch_size=1000)
         db2 = ds.get_tick_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                         num_prev_bars=num_prev_bars,
-                                         num_ticks_ewma_window=num_ticks_ewma_window, batch_size=50)
+                                   num_prev_bars=num_prev_bars,
+                                   num_ticks_ewma_window=num_ticks_ewma_window, batch_size=50)
         db3 = ds.get_tick_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                         num_prev_bars=num_prev_bars,
-                                         num_ticks_ewma_window=num_ticks_ewma_window, batch_size=10)
+                                   num_prev_bars=num_prev_bars,
+                                   num_ticks_ewma_window=num_ticks_ewma_window, batch_size=10)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -120,8 +120,8 @@ class TestDataStructures(unittest.TestCase):
         # Assert OHLC is correct
         self.assertTrue(db1.loc[0, 'open'] == 1306)
         self.assertTrue(db1.loc[0, 'high'] == 1306.00)
-        self.assertTrue(db1.loc[0, 'low'] == 1304.25)
-        self.assertTrue(db1.loc[0, 'close'] == 1305.25)
+        self.assertTrue(db1.loc[0, 'low'] == 1303.5)
+        self.assertTrue(db1.loc[0, 'close'] == 1304.25)
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
 
     def test_csv_format(self):

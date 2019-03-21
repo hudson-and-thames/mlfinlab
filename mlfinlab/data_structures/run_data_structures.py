@@ -26,7 +26,6 @@ def _get_updated_counters(cache, flag, exp_num_ticks_init):
     :param cache: Contains information from the previous batch that is relevant in this batch.
     :param flag: A flag which signals to use the cache.
     :param exp_num_ticks: Expected number of ticks per bar
-    :param ewma_window: ewma_window to estimate imbalance
     :return: Updated counters - cum_ticks, cum_dollar_value, cum_volume, high_price, low_price, exp_num_ticks, imbalance_array
     """
     # Check flag
@@ -49,7 +48,7 @@ def _get_updated_counters(cache, flag, exp_num_ticks_init):
         cum_ticks, cum_dollar_value, cum_volume, cum_theta_buy, cum_theta_sell = 0, 0, 0, 0, 0
         high_price, low_price = -np.inf, np.inf
         exp_num_ticks, imbalance_array = exp_num_ticks_init, {
-            'buy': [], 'sell': []}
+            'buy': [], 'sell': []}  # in run bars we need to track both buy and sell imbalance
 
     return cum_ticks, cum_dollar_value, cum_volume, cum_theta_buy, cum_theta_sell, high_price, low_price, exp_num_ticks, imbalance_array
 
@@ -64,7 +63,7 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
     :param exp_num_ticks_init: initial guess of number of ticks in imbalance bar
     :param num_prev_bars: Number of previous bars used for EWMA window (window=num_prev_bars * bar length)
                           for estimating expected imbalance (tick, volume or dollar)
-    :param num_ticks_ewma_window: EWMA window to estimate expected number of ticks in a bar from based on previous bars
+    :param num_ticks_ewma_window: EWMA window to estimate expected number of ticks in a bar based on previous bars
     :param cache: contains information from the previous batch that is relevant in this batch.
     :param flag: A flag which signals to use the cache.
     :param num_ticks_bar: Expected number of ticks per bar used to estimate the next bar
@@ -122,7 +121,8 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
             cum_theta_sell += abs(imbalance)
 
         if len(imbalance_array['buy']) < exp_num_ticks:
-            exp_buy_proportion, exp_sell_proportion = np.nan, np.nan  # waiting for array to fill for ewma
+            # waiting for array to fill for ewma
+            exp_buy_proportion, exp_sell_proportion = np.nan, np.nan
         else:
             # expected imbalance per tick
             ewma_window = int(exp_num_ticks * num_prev_bars)
@@ -135,10 +135,6 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
                 buy_sample, window=ewma_window)[-1] / buy_and_sell_imb
             exp_sell_proportion = ewma(
                 sell_sample, window=ewma_window)[-1] / buy_and_sell_imb
-            assert cum_theta_sell >= 0
-            assert exp_sell_proportion >= 0
-            assert exp_buy_proportion <= 1
-            assert exp_sell_proportion <= 1
 
         # Check min max
         if price > high_price:
@@ -146,13 +142,15 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
         if price <= low_price:
             low_price = price
 
+        # Update cache
+        cache_data = cache_tup(date_time, price, high_price, low_price, tick_rule, cum_volume, cum_dollar_value,
+                               cum_ticks, cum_theta_buy, cum_theta_sell, exp_num_ticks, imbalance_array)
+        cache.append(cache_data)
 
-
-        #print(date_time, cum_dollar_imb, exp_num_ticks, exp_tick_imb)
-        # If threshold reached then take a sample
+        # Check expression for possible bar generation
         if max(cum_theta_buy, cum_theta_sell) > exp_num_ticks * max(exp_buy_proportion, exp_sell_proportion):   # pylint: disable=eval-used
             # Create bars
-            open_price = cache[0][1]
+            open_price = cache[0].price
             low_price = min(low_price, open_price)
             close_price = price
             num_ticks_bar.append(cum_ticks)
@@ -164,8 +162,9 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
             cum_ticks, cum_dollar_value, cum_volume, cum_theta_buy, cum_theta_sell = 0, 0, 0, 0, 0
             high_price, low_price = -np.inf, np.inf
             exp_num_ticks = expected_num_ticks_bar
+            cache = []
 
-        # Update cache
+        # Update cache after bar generation (exp_num_ticks was changed after bar generation)
         cache_data = cache_tup(date_time, price, high_price, low_price, tick_rule, cum_volume, cum_dollar_value,
                                cum_ticks, cum_theta_buy, cum_theta_sell, exp_num_ticks, imbalance_array)
         cache.append(cache_data)
@@ -265,7 +264,7 @@ def get_volume_run_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_
     :param exp_num_ticks_init: initial expetected number of ticks per bar
     :param num_prev_bars: Number of previous bars used for EWMA window (window=num_prev_bars * bar length)
                           for estimating expected imbalance (tick, volume or dollar)
-    :num_ticks_ewma_window: EWMA window for expected number of ticks calculations
+    :param num_ticks_ewma_window: EWMA window to estimate expected number of ticks in a bar based on previous bars
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of dollar bars
     """
@@ -280,7 +279,7 @@ def get_tick_run_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ew
     :param exp_num_ticks_init: initial expetected number of ticks per bar
     :param num_prev_bars: Number of previous bars used for EWMA window (window=num_prev_bars * bar length)
                           for estimating expected imbalance (tick, volume or dollar)
-    :num_ticks_ewma_window: EWMA window for expected number of ticks calculations
+    :param num_ticks_ewma_window: EWMA window to estimate expected number of ticks in a bar based on previous bars
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of dollar bars
     """

@@ -26,7 +26,6 @@ def _get_updated_counters(cache, flag, exp_num_ticks_init):
     :param cache: Contains information from the previous batch that is relevant in this batch.
     :param flag: A flag which signals to use the cache.
     :param exp_num_ticks: Expected number of ticks per bar
-    :param ewma_window: ewma_window to estimate imbalance
     :return: Updated counters - cum_ticks, cum_dollar_value, cum_volume, high_price, low_price, exp_num_ticks, imbalance_array
     """
     # Check flag
@@ -66,11 +65,10 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
     :param cache: contains information from the previous batch that is relevant in this batch.
     :param flag: A flag which signals to use the cache.
     :param num_ticks_bar: Expected number of ticks per bar used to estimate the next bar
-    :param prev_tick_rule: Previous tick rule (if price_diff == 0 => use previous tick rule)
     :return: The financial data structure with the cache of short term history.
     """
     cache_tup = namedtuple('CacheData', ['date_time', 'price', 'high', 'low', 'tick_rule', 'cum_volume', 'cum_dollar_value',
-                                         'cum_ticks', 'cum_theta', 'exp_num_ticks', 'imbalance_array'])
+                                         'cum_ticks', 'cum_theta', 'exp_num_ticks', 'imbalance_array'])  # named tuple for cache
     if cache is None:
         cache = []
         prev_tick_rule = 0  # set the first tick rule with 0
@@ -126,11 +124,15 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
         if price <= low_price:
             low_price = price
 
-        #print(date_time, cum_dollar_imb, exp_num_ticks, exp_tick_imb)
-        # If threshold reached then take a sample
+        # Update cache
+        cache_data = cache_tup(date_time, price, high_price, low_price, tick_rule, cum_volume, cum_dollar_value,
+                               cum_ticks, cum_theta, exp_num_ticks, imbalance_array)
+        cache.append(cache_data)
+
+        # Check expression for possible bar generation
         if np.abs(cum_theta) > exp_num_ticks * np.abs(exp_tick_imb):   # pylint: disable=eval-used
             # Create bars
-            open_price = cache[0][1]
+            open_price = cache[0].price
             low_price = min(low_price, open_price)
             close_price = price
             num_ticks_bar.append(cum_ticks)
@@ -142,8 +144,9 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
             cum_ticks, cum_dollar_value, cum_volume, cum_theta = 0, 0, 0, 0
             high_price, low_price = -np.inf, np.inf
             exp_num_ticks = expected_num_ticks_bar
+            cache = []  # reset cache
 
-        # Update cache
+        # Update cache after bar generation (exp_num_ticks was changed after bar generation)
         cache_data = cache_tup(date_time, price, high_price, low_price, tick_rule, cum_volume, cum_dollar_value,
                                cum_ticks, cum_theta, exp_num_ticks, imbalance_array)
         cache.append(cache_data)
