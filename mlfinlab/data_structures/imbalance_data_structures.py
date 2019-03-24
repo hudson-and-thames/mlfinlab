@@ -26,7 +26,8 @@ def _get_updated_counters(cache, flag, exp_num_ticks_init):
     :param cache: Contains information from the previous batch that is relevant in this batch.
     :param flag: A flag which signals to use the cache.
     :param exp_num_ticks: Expected number of ticks per bar
-    :return: Updated counters - cum_ticks, cum_dollar_value, cum_volume, high_price, low_price, exp_num_ticks, imbalance_array
+    :return: (Dictionary) updated counters - keys: cum_ticks, cum_dollar_value, cum_volume,
+            high_price, low_price, exp_num_ticks, imbalance_array.
     """
     # Check flag
     if flag and cache:
@@ -48,8 +49,12 @@ def _get_updated_counters(cache, flag, exp_num_ticks_init):
         high_price, low_price = -np.inf, np.inf
         exp_num_ticks, imbalance_array = exp_num_ticks_init, []
 
-    return cum_ticks, cum_dollar_value, cum_volume, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array
+    # Create a dictionary to hold the counters.
+    counters = {'cum_ticks': cum_ticks, 'cum_dollar_value': cum_dollar_value, 'cum_volume': cum_volume,
+                'cum_theta': cum_theta, 'high_price': high_price, 'low_price': low_price,
+                'exp_num_ticks': exp_num_ticks, 'imbalance_array': imbalance_array}
 
+    return counters
 
 def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_ticks_ewma_window=20,
                   cache=None, flag=False, num_ticks_bar=None):
@@ -67,16 +72,23 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
     :param num_ticks_bar: Expected number of ticks per bar used to estimate the next bar
     :return: The financial data structure with the cache of short term history.
     """
-    cache_tup = namedtuple('CacheData', ['date_time', 'price', 'high', 'low', 'tick_rule', 'cum_volume', 'cum_dollar_value',
-                                         'cum_ticks', 'cum_theta', 'exp_num_ticks', 'imbalance_array'])  # named tuple for cache
+
+    # named tuple for cache
+    cache_tuple = namedtuple('CacheData', ['date_time', 'price', 'high', 'low',
+                                           'tick_rule', 'cum_volume', 'cum_dollar_value',
+                                           'cum_ticks', 'cum_theta', 'exp_num_ticks',
+                                           'imbalance_array'])
     if cache is None:
         cache = []
         prev_tick_rule = 0  # set the first tick rule with 0
         num_ticks_bar = []  # array of number of ticks from previous bars
 
     list_bars = []
-    cum_ticks, cum_dollar_value, cum_volume, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array = _get_updated_counters(
-        cache, flag, exp_num_ticks_init)
+
+    counters = _get_updated_counters(cache, flag, exp_num_ticks_init)
+
+    cum_ticks, cum_dollar_value, cum_volume, cum_theta,\
+        high_price, low_price, exp_num_ticks, imbalance_array = counters.values()
 
     # Iterate over rows
     for row in data.values:
@@ -125,7 +137,7 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
             low_price = price
 
         # Update cache
-        cache_data = cache_tup(date_time, price, high_price, low_price, tick_rule, cum_volume, cum_dollar_value,
+        cache_data = cache_tuple(date_time, price, high_price, low_price, tick_rule, cum_volume, cum_dollar_value,
                                cum_ticks, cum_theta, exp_num_ticks, imbalance_array)
         cache.append(cache_data)
 
@@ -136,20 +148,24 @@ def _extract_bars(data, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_
             low_price = min(low_price, open_price)
             close_price = price
             num_ticks_bar.append(cum_ticks)
-            expected_num_ticks_bar = ewma(
-                np.array(num_ticks_bar[-num_ticks_ewma_window:], dtype=float), num_ticks_ewma_window)[-1]  # expected number of ticks based on formed bars
+
+            # Expected number of ticks based on formed bars
+            expected_num_ticks_bar = ewma(np.array(num_ticks_bar[-num_ticks_ewma_window:], dtype=float),
+                                          num_ticks_ewma_window)[-1]
+
             # Update bars & Reset counters
             list_bars.append([date_time, open_price, high_price, low_price, close_price,
                               cum_volume, cum_dollar_value, cum_ticks])
             cum_ticks, cum_dollar_value, cum_volume, cum_theta = 0, 0, 0, 0
             high_price, low_price = -np.inf, np.inf
             exp_num_ticks = expected_num_ticks_bar
-            cache = []  # reset cache
+            cache = []  # Reset cache
 
         # Update cache after bar generation (exp_num_ticks was changed after bar generation)
-        cache_data = cache_tup(date_time, price, high_price, low_price, tick_rule, cum_volume, cum_dollar_value,
+        cache_data = cache_tuple(date_time, price, high_price, low_price, tick_rule, cum_volume, cum_dollar_value,
                                cum_ticks, cum_theta, exp_num_ticks, imbalance_array)
         cache.append(cache_data)
+
     return list_bars, cache, num_ticks_bar
 
 
