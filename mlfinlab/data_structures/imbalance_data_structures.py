@@ -36,13 +36,15 @@ class ImbalanceBars:
         # batch_run properties
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
         self.cache = []
-        self.num_ticks_bar = None
+        self.num_ticks_bar = []  # List of number of ticks from previous bars
 
         # extract bars properties
         self.cache_tuple = namedtuple('CacheData', ['date_time', 'price', 'high', 'low',
                                                     'tick_rule', 'cum_volume', 'cum_dollar_value',
                                                     'cum_ticks', 'cum_theta', 'exp_num_ticks',
                                                     'imbalance_array'])
+
+        self.prev_tick_rule = 0  # Set the first tick rule with 0
 
     def _get_updated_counters(self):
         """
@@ -86,11 +88,6 @@ class ImbalanceBars:
         :return: The financial data structure with the cache of short term history.
         """
 
-        # Named tuple for cache
-        if not self.cache:
-            prev_tick_rule = 0  # set the first tick rule with 0
-            self.num_ticks_bar = []  # array of number of ticks from previous bars
-
         list_bars = []
 
         # Todo: should counter be an object of its own?
@@ -112,13 +109,13 @@ class ImbalanceBars:
             cum_volume = cum_volume + volume
 
             # Imbalance calculations
-            try:
+            if self.cache:
                 tick_diff = price - self.cache[-1].price
-                prev_tick_rule = self.cache[-1].tick_rule
-            except IndexError:
+                self.prev_tick_rule = self.cache[-1].tick_rule
+            else:
                 tick_diff = 0
 
-            tick_rule = np.sign(tick_diff) if tick_diff != 0 else prev_tick_rule
+            tick_rule = np.sign(tick_diff) if tick_diff != 0 else self.prev_tick_rule
 
             if self.metric == 'tick_imbalance':
                 imbalance = tick_rule
