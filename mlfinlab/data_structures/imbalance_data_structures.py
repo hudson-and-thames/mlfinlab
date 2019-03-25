@@ -25,6 +25,8 @@ class ImbalanceBars:
     def __init__(self, file_path, metric, exp_num_ticks_init=100000,
                  num_prev_bars=3, num_ticks_ewma_window=20, batch_size=2e7):
 
+        self.counters = {}
+
         # base properties
         self.file_path = file_path
         self.metric = metric
