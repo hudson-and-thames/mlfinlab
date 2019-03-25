@@ -42,8 +42,7 @@ class ImbalanceBars:
 
         # extract bars properties
         self.cache_tuple = namedtuple('CacheData', ['date_time', 'price', 'high', 'low',
-                                                    'tick_rule', 'cum_volume', 'cum_dollar_value',
-                                                    'cum_ticks', 'cum_theta', 'exp_num_ticks',
+                                                    'tick_rule', 'cum_ticks', 'cum_theta', 'exp_num_ticks',
                                                     'imbalance_array'])
 
         self.prev_tick_rule = 0  # Set the first tick rule with 0
@@ -59,8 +58,6 @@ class ImbalanceBars:
         if self.flag and self.cache:
             # Update variables based on cache
             cum_ticks = int(self.cache[-1].cum_ticks)
-            cum_dollar_value = np.float(self.cache[-1].cum_dollar_value)
-            cum_volume = self.cache[-1].cum_volume
             low_price = np.float(self.cache[-1].low)
             high_price = np.float(self.cache[-1].high)
             # cumulative imbalance for a particular imbalance calculation (theta_t in Prado book)
@@ -71,14 +68,13 @@ class ImbalanceBars:
             imbalance_array = self.cache[-1].imbalance_array
         else:
             # Reset counters
-            cum_ticks, cum_dollar_value, cum_volume, cum_theta = 0, 0, 0, 0
+            cum_ticks, cum_theta = 0, 0
             high_price, low_price = -np.inf, np.inf
             exp_num_ticks, imbalance_array = self.exp_num_tick_init, []
 
         # Create a dictionary to hold the counters.
-        self.counters = {'cum_ticks': cum_ticks, 'cum_dollar_value': cum_dollar_value, 'cum_volume': cum_volume,
-                         'cum_theta': cum_theta, 'high_price': high_price, 'low_price': low_price,
-                         'exp_num_ticks': exp_num_ticks, 'imbalance_array': imbalance_array}
+        self.counters = {'cum_ticks': cum_ticks, 'cum_theta': cum_theta, 'high_price': high_price,
+                         'low_price': low_price, 'exp_num_ticks': exp_num_ticks, 'imbalance_array': imbalance_array}
 
     def _extract_bars(self, data):
         """
@@ -92,61 +88,36 @@ class ImbalanceBars:
 
         # Todo: should counter be an object of its own?
         self.update_counters()
-        cum_ticks, cum_dollar_value, cum_volume, cum_theta, \
-        high_price, low_price, exp_num_ticks, imbalance_array = self.counters.values()
+        cum_ticks, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array = self.counters.values()
 
         # Iterate over rows
         for row in data.values:
             # Set variables
+            cum_ticks += 1
             date_time = row[0]
             price = np.float(row[1])
             volume = row[2]
 
-            # Calculations
-            cum_ticks += 1
-            dollar_value = price * volume
-            cum_dollar_value = cum_dollar_value + dollar_value
-            cum_volume = cum_volume + volume
-
-            # Imbalance calculations
-            if self.cache:
-                tick_diff = price - self.cache[-1].price
-                self.prev_tick_rule = self.cache[-1].tick_rule
-            else:
-                tick_diff = 0
-            tick_rule = np.sign(tick_diff) if tick_diff != 0 else self.prev_tick_rule
-
-            if self.metric == 'tick_imbalance':
-                imbalance = tick_rule
-            elif self.metric == 'dollar_imbalance':
-                imbalance = tick_rule * volume * price
-            else:
-                # volume imbalance (ok to have else here since metric is not user defined)
-                imbalance = tick_rule * volume
-
-            imbalance_array.append(imbalance)
-            cum_theta += imbalance
-
-            if len(imbalance_array) < exp_num_ticks:
-                exp_tick_imb = np.nan  # Waiting for array to fill for ewma
-            else:
-                # Expected imbalance per tick
-                ewma_window = int(exp_num_ticks * self.num_prev_bars)
-                exp_tick_imb = ewma(np.array(imbalance_array[-ewma_window:], dtype=float), window=ewma_window)[-1]
-
-            # Check min max
+            # Update high low prices
             if price > high_price:
                 high_price = price
             if price <= low_price:
                 low_price = price
 
+            # Imbalance calculations
+            signed_tick = self.apply_tick_rule(price)
+            imbalance = self.get_imbalance(price, signed_tick, volume)
+            imbalance_array.append(imbalance)
+            cum_theta += imbalance
+            expected_imbalance = self.get_expected_imbalance(exp_num_ticks, imbalance_array)
+
             # Update cache
-            cache_data = self.cache_tuple(date_time, price, high_price, low_price, tick_rule, cum_volume,
-                                          cum_dollar_value, cum_ticks, cum_theta, exp_num_ticks, imbalance_array)
+            cache_data = self.cache_tuple(date_time, price, high_price, low_price, signed_tick, cum_ticks, cum_theta,
+                                          exp_num_ticks, imbalance_array)
             self.cache.append(cache_data)
 
             # Check expression for possible bar generation
-            if np.abs(cum_theta) > exp_num_ticks * np.abs(exp_tick_imb):  # pylint: disable=eval-used
+            if np.abs(cum_theta) > exp_num_ticks * np.abs(expected_imbalance):  # pylint: disable=eval-used
                 # Create bars
                 open_price = self.cache[0].price
                 high_price = max(high_price, open_price)
@@ -159,21 +130,52 @@ class ImbalanceBars:
                                               self.num_ticks_ewma_window)[-1]
 
                 # Update bars
-                list_bars.append([date_time, open_price, high_price, low_price, close_price,
-                                  cum_volume, cum_dollar_value, cum_ticks])
+                list_bars.append([date_time, open_price, high_price, low_price, close_price, cum_ticks])
 
                 # Reset counters
-                cum_ticks, cum_dollar_value, cum_volume, cum_theta = 0, 0, 0, 0
+                cum_ticks, cum_theta = 0, 0
                 high_price, low_price = -np.inf, np.inf
                 exp_num_ticks = expected_num_ticks_bar
                 self.cache = []
 
             # Update cache after bar generation (exp_num_ticks was changed after bar generation)
-            cache_data = self.cache_tuple(date_time, price, high_price, low_price, tick_rule, cum_volume,
-                                          cum_dollar_value, cum_ticks, cum_theta, exp_num_ticks, imbalance_array)
+            cache_data = self.cache_tuple(date_time, price, high_price, low_price, signed_tick, cum_ticks, cum_theta,
+                                          exp_num_ticks, imbalance_array)
             self.cache.append(cache_data)
 
         return list_bars
+
+    def get_expected_imbalance(self, exp_num_ticks, imbalance_array):
+        if len(imbalance_array) < exp_num_ticks:
+            expected_imbalance = np.nan  # Waiting for array to fill for ewma
+        else:
+            # Expected imbalance per tick
+            ewma_window = int(exp_num_ticks * self.num_prev_bars)
+            expected_imbalance = ewma(np.array(imbalance_array[-ewma_window:], dtype=float), window=ewma_window)[-1]
+        return expected_imbalance
+
+    def get_imbalance(self, price, signed_tick, volume):
+        if self.metric == 'tick_imbalance':
+            imbalance = signed_tick
+        elif self.metric == 'dollar_imbalance':
+            imbalance = signed_tick * volume * price
+        else:  # volume imbalance
+            imbalance = signed_tick * volume
+        return imbalance
+
+    def apply_tick_rule(self, price):
+        if self.cache:
+            tick_diff = price - self.cache[-1].price
+            self.prev_tick_rule = self.cache[-1].tick_rule
+        else:
+            tick_diff = 0
+
+        if tick_diff != 0:
+            signed_tick = np.sign(tick_diff)
+        else:
+            signed_tick = self.prev_tick_rule
+
+        return signed_tick
 
     @staticmethod
     def _assert_csv(test_batch):
@@ -222,7 +224,7 @@ class ImbalanceBars:
             self.flag = True
 
         # Return a DataFrame
-        cols = ['date_time', 'open', 'high', 'low', 'close', 'cum_vol', 'cum_dollar', 'cum_ticks']
+        cols = ['date_time', 'open', 'high', 'low', 'close', 'cum_ticks']
         bars_df = pd.DataFrame(final_bars, columns=cols)
         print('Returning bars \n')
         return bars_df
