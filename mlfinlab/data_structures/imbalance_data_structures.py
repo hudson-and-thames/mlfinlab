@@ -46,7 +46,7 @@ class ImbalanceBars:
 
         self.prev_tick_rule = 0  # Set the first tick rule with 0
 
-    def _get_updated_counters(self):
+    def update_counters(self):
         """
         Updates the counters by resetting them or making use of the cache to update them based on a previous batch.
 
@@ -74,11 +74,9 @@ class ImbalanceBars:
             exp_num_ticks, imbalance_array = self.exp_num_tick_init, []
 
         # Create a dictionary to hold the counters.
-        counters = {'cum_ticks': cum_ticks, 'cum_dollar_value': cum_dollar_value, 'cum_volume': cum_volume,
-                    'cum_theta': cum_theta, 'high_price': high_price, 'low_price': low_price,
-                    'exp_num_ticks': exp_num_ticks, 'imbalance_array': imbalance_array}
-
-        return counters
+        self.counters = {'cum_ticks': cum_ticks, 'cum_dollar_value': cum_dollar_value, 'cum_volume': cum_volume,
+                         'cum_theta': cum_theta, 'high_price': high_price, 'low_price': low_price,
+                         'exp_num_ticks': exp_num_ticks, 'imbalance_array': imbalance_array}
 
     def _extract_bars(self, data):
         """
@@ -91,9 +89,9 @@ class ImbalanceBars:
         list_bars = []
 
         # Todo: should counter be an object of its own?
-        counters = self._get_updated_counters()
+        self.update_counters()
         cum_ticks, cum_dollar_value, cum_volume, cum_theta, \
-        high_price, low_price, exp_num_ticks, imbalance_array = counters.values()
+        high_price, low_price, exp_num_ticks, imbalance_array = self.counters.values()
 
         # Iterate over rows
         for row in data.values:
@@ -169,6 +167,7 @@ class ImbalanceBars:
         else:
             tick_diff = 0
         tick_rule = np.sign(tick_diff) if tick_diff != 0 else self.prev_tick_rule
+
         if self.metric == 'tick_imbalance':
             imbalance = tick_rule
         elif self.metric == 'dollar_imbalance':
@@ -176,14 +175,17 @@ class ImbalanceBars:
         else:
             # volume imbalance (ok to have else here since metric is not user defined)
             imbalance = tick_rule * volume
+
         imbalance_array.append(imbalance)
         cum_theta += imbalance
+
         if len(imbalance_array) < exp_num_ticks:
             exp_tick_imb = np.nan  # Waiting for array to fill for ewma
         else:
             # Expected imbalance per tick
             ewma_window = int(exp_num_ticks * self.num_prev_bars)
             exp_tick_imb = ewma(np.array(imbalance_array[-ewma_window:], dtype=float), window=ewma_window)[-1]
+
         return cum_theta, exp_tick_imb, tick_rule
 
     @staticmethod
