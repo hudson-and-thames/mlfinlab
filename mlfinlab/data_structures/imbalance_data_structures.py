@@ -108,10 +108,31 @@ class ImbalanceBars:
             cum_dollar_value = cum_dollar_value + dollar_value
             cum_volume = cum_volume + volume
 
-            # Calculate the imbalances
-            # Todo: Can improve this by using the counter dict
-            cum_theta, exp_tick_imb, tick_rule = self.get_imbalance(cum_theta, exp_num_ticks, imbalance_array, price,
-                                                                    volume)
+            # Imbalance calculations
+            if self.cache:
+                tick_diff = price - self.cache[-1].price
+                self.prev_tick_rule = self.cache[-1].tick_rule
+            else:
+                tick_diff = 0
+            tick_rule = np.sign(tick_diff) if tick_diff != 0 else self.prev_tick_rule
+
+            if self.metric == 'tick_imbalance':
+                imbalance = tick_rule
+            elif self.metric == 'dollar_imbalance':
+                imbalance = tick_rule * volume * price
+            else:
+                # volume imbalance (ok to have else here since metric is not user defined)
+                imbalance = tick_rule * volume
+
+            imbalance_array.append(imbalance)
+            cum_theta += imbalance
+
+            if len(imbalance_array) < exp_num_ticks:
+                exp_tick_imb = np.nan  # Waiting for array to fill for ewma
+            else:
+                # Expected imbalance per tick
+                ewma_window = int(exp_num_ticks * self.num_prev_bars)
+                exp_tick_imb = ewma(np.array(imbalance_array[-ewma_window:], dtype=float), window=ewma_window)[-1]
 
             # Check min max
             if price > high_price:
@@ -124,71 +145,35 @@ class ImbalanceBars:
                                           cum_dollar_value, cum_ticks, cum_theta, exp_num_ticks, imbalance_array)
             self.cache.append(cache_data)
 
-            cum_dollar_value, cum_theta, cum_ticks, cum_volume, exp_num_ticks, high_price, low_price = self.try_sample(
-                cum_dollar_value, cum_theta, cum_ticks, cum_volume, date_time, exp_num_ticks, exp_tick_imb, high_price,
-                imbalance_array, list_bars, low_price, price, tick_rule)
+            # Check expression for possible bar generation
+            if np.abs(cum_theta) > exp_num_ticks * np.abs(exp_tick_imb):  # pylint: disable=eval-used
+                # Create bars
+                open_price = self.cache[0].price
+                high_price = max(high_price, open_price)
+                low_price = min(low_price, open_price)
+                close_price = price
+                self.num_ticks_bar.append(cum_ticks)
+
+                # Expected number of ticks based on formed bars
+                expected_num_ticks_bar = ewma(np.array(self.num_ticks_bar[-self.num_ticks_ewma_window:], dtype=float),
+                                              self.num_ticks_ewma_window)[-1]
+
+                # Update bars
+                list_bars.append([date_time, open_price, high_price, low_price, close_price,
+                                  cum_volume, cum_dollar_value, cum_ticks])
+
+                # Reset counters
+                cum_ticks, cum_dollar_value, cum_volume, cum_theta = 0, 0, 0, 0
+                high_price, low_price = -np.inf, np.inf
+                exp_num_ticks = expected_num_ticks_bar
+                self.cache = []
+
+            # Update cache after bar generation (exp_num_ticks was changed after bar generation)
+            cache_data = self.cache_tuple(date_time, price, high_price, low_price, tick_rule, cum_volume,
+                                          cum_dollar_value, cum_ticks, cum_theta, exp_num_ticks, imbalance_array)
+            self.cache.append(cache_data)
 
         return list_bars
-
-    def try_sample(self, cum_dollar_value, cum_theta, cum_ticks, cum_volume, date_time, exp_num_ticks, exp_tick_imb,
-                   high_price, imbalance_array, list_bars, low_price, price, tick_rule):
-
-        # Check expression for possible bar generation
-        if np.abs(cum_theta) > exp_num_ticks * np.abs(exp_tick_imb):  # pylint: disable=eval-used
-            # Create bars
-            open_price = self.cache[0].price
-            high_price = max(high_price, open_price)
-            low_price = min(low_price, open_price)
-            close_price = price
-            self.num_ticks_bar.append(cum_ticks)
-
-            # Expected number of ticks based on formed bars
-            expected_num_ticks_bar = ewma(np.array(self.num_ticks_bar[-self.num_ticks_ewma_window:], dtype=float),
-                                          self.num_ticks_ewma_window)[-1]
-
-            # Update bars & Reset counters
-            list_bars.append([date_time, open_price, high_price, low_price, close_price,
-                              cum_volume, cum_dollar_value, cum_ticks])
-            cum_ticks, cum_dollar_value, cum_volume, cum_theta = 0, 0, 0, 0
-            high_price, low_price = -np.inf, np.inf
-            exp_num_ticks = expected_num_ticks_bar
-            self.cache = []  # Reset cache
-
-        # Update cache after bar generation (exp_num_ticks was changed after bar generation)
-        cache_data = self.cache_tuple(date_time, price, high_price, low_price, tick_rule, cum_volume,
-                                      cum_dollar_value, cum_ticks, cum_theta, exp_num_ticks, imbalance_array)
-        self.cache.append(cache_data)
-
-        return cum_dollar_value, cum_theta, cum_ticks, cum_volume, exp_num_ticks, high_price, low_price
-
-    def get_imbalance(self, cum_theta, exp_num_ticks, imbalance_array, price, volume):
-        # Imbalance calculations
-        if self.cache:
-            tick_diff = price - self.cache[-1].price
-            self.prev_tick_rule = self.cache[-1].tick_rule
-        else:
-            tick_diff = 0
-        tick_rule = np.sign(tick_diff) if tick_diff != 0 else self.prev_tick_rule
-
-        if self.metric == 'tick_imbalance':
-            imbalance = tick_rule
-        elif self.metric == 'dollar_imbalance':
-            imbalance = tick_rule * volume * price
-        else:
-            # volume imbalance (ok to have else here since metric is not user defined)
-            imbalance = tick_rule * volume
-
-        imbalance_array.append(imbalance)
-        cum_theta += imbalance
-
-        if len(imbalance_array) < exp_num_ticks:
-            exp_tick_imb = np.nan  # Waiting for array to fill for ewma
-        else:
-            # Expected imbalance per tick
-            ewma_window = int(exp_num_ticks * self.num_prev_bars)
-            exp_tick_imb = ewma(np.array(imbalance_array[-ewma_window:], dtype=float), window=ewma_window)[-1]
-
-        return cum_theta, exp_tick_imb, tick_rule
 
     @staticmethod
     def _assert_csv(test_batch):
