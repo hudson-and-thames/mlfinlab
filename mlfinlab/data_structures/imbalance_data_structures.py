@@ -43,8 +43,6 @@ class ImbalanceBars:
                                                     'tick_rule', 'cum_ticks', 'cum_theta', 'exp_num_ticks',
                                                     'imbalance_array'])
 
-        self.prev_tick_rule = 0  # Set the first tick rule with 0
-
     def update_counters(self):
         """
         Updates the counters by resetting them or making use of the cache to update them based on a previous batch.
@@ -81,6 +79,9 @@ class ImbalanceBars:
         """
         cum_ticks, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array = self.update_counters()
 
+        # Set the first tick rule with 0
+        prev_tick_rule = 0
+
         # Iterate over rows
         list_bars = []
         for row in data.values:
@@ -97,7 +98,7 @@ class ImbalanceBars:
                 low_price = price
 
             # Imbalance calculations
-            signed_tick = self.apply_tick_rule(price)
+            signed_tick, prev_tick_rule = self.apply_tick_rule(price, prev_tick_rule)
             imbalance = self.get_imbalance(price, signed_tick, volume)
             imbalance_array.append(imbalance)
             cum_theta += imbalance
@@ -161,19 +162,19 @@ class ImbalanceBars:
             imbalance = signed_tick * volume
         return imbalance
 
-    def apply_tick_rule(self, price):
+    def apply_tick_rule(self, price, prev_tick_rule):
         if self.cache:
             tick_diff = price - self.cache[-1].price
-            self.prev_tick_rule = self.cache[-1].tick_rule
+            prev_tick_rule = self.cache[-1].tick_rule
         else:
             tick_diff = 0
 
         if tick_diff != 0:
             signed_tick = np.sign(tick_diff)
         else:
-            signed_tick = self.prev_tick_rule
+            signed_tick = prev_tick_rule
 
-        return signed_tick
+        return signed_tick, prev_tick_rule
 
     @staticmethod
     def _assert_csv(test_batch):
