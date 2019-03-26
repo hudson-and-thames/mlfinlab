@@ -25,8 +25,6 @@ class ImbalanceBars:
     def __init__(self, file_path, metric, exp_num_ticks_init=100000,
                  num_prev_bars=3, num_ticks_ewma_window=20, batch_size=2e7):
 
-        self.counters = {}
-
         # base properties
         self.file_path = file_path
         self.metric = metric
@@ -72,9 +70,7 @@ class ImbalanceBars:
             high_price, low_price = -np.inf, np.inf
             exp_num_ticks, imbalance_array = self.exp_num_tick_init, []
 
-        # Create a dictionary to hold the counters.
-        self.counters = {'cum_ticks': cum_ticks, 'cum_theta': cum_theta, 'high_price': high_price,
-                         'low_price': low_price, 'exp_num_ticks': exp_num_ticks, 'imbalance_array': imbalance_array}
+        return cum_ticks, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array
 
     def _extract_bars(self, data):
         """
@@ -83,14 +79,10 @@ class ImbalanceBars:
         :param data: Contains 3 columns - date_time, price, and volume.
         :return: The financial data structure with the cache of short term history.
         """
-
-        list_bars = []
-
-        # Todo: should counter be an object of its own?
-        self.update_counters()
-        cum_ticks, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array = self.counters.values()
+        cum_ticks, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array = self.update_counters()
 
         # Iterate over rows
+        list_bars = []
         for row in data.values:
             # Set variables
             cum_ticks += 1
@@ -112,38 +104,44 @@ class ImbalanceBars:
             expected_imbalance = self.get_expected_imbalance(exp_num_ticks, imbalance_array)
 
             # Update cache
-            cache_data = self.cache_tuple(date_time, price, high_price, low_price, signed_tick, cum_ticks, cum_theta,
-                                          exp_num_ticks, imbalance_array)
-            self.cache.append(cache_data)
+            self.update_cache(date_time, price, low_price, high_price, signed_tick, cum_ticks, cum_theta, exp_num_ticks,
+                              imbalance_array)
 
             # Check expression for possible bar generation
             if np.abs(cum_theta) > exp_num_ticks * np.abs(expected_imbalance):  # pylint: disable=eval-used
-                # Create bars
-                open_price = self.cache[0].price
-                high_price = max(high_price, open_price)
-                low_price = min(low_price, open_price)
-                close_price = price
-                self.num_ticks_bar.append(cum_ticks)
+                self.create_bars(date_time, price, high_price, low_price, list_bars, cum_ticks)
 
                 # Expected number of ticks based on formed bars
-                expected_num_ticks_bar = ewma(np.array(self.num_ticks_bar[-self.num_ticks_ewma_window:], dtype=float),
-                                              self.num_ticks_ewma_window)[-1]
-
-                # Update bars
-                list_bars.append([date_time, open_price, high_price, low_price, close_price, cum_ticks])
+                exp_num_ticks = ewma(np.array(self.num_ticks_bar[-self.num_ticks_ewma_window:], dtype=float),
+                                     self.num_ticks_ewma_window)[-1]
 
                 # Reset counters
                 cum_ticks, cum_theta = 0, 0
                 high_price, low_price = -np.inf, np.inf
-                exp_num_ticks = expected_num_ticks_bar
                 self.cache = []
 
             # Update cache after bar generation (exp_num_ticks was changed after bar generation)
-            cache_data = self.cache_tuple(date_time, price, high_price, low_price, signed_tick, cum_ticks, cum_theta,
-                                          exp_num_ticks, imbalance_array)
-            self.cache.append(cache_data)
+            self.update_cache(date_time, price, low_price, high_price, signed_tick, cum_ticks, cum_theta, exp_num_ticks,
+                              imbalance_array)
 
         return list_bars
+
+    def create_bars(self, date_time, price, high_price, low_price, list_bars, cum_ticks):
+        # Create bars
+        open_price = self.cache[0].price
+        high_price = max(high_price, open_price)
+        low_price = min(low_price, open_price)
+        close_price = price
+        self.num_ticks_bar.append(cum_ticks)
+
+        # Update bars
+        list_bars.append([date_time, open_price, high_price, low_price, close_price, cum_ticks])
+
+    def update_cache(self, date_time, price, low_price, high_price, signed_tick, cum_ticks, cum_theta, exp_num_ticks,
+                     imbalance_array):
+        cache_data = self.cache_tuple(date_time, price, high_price, low_price, signed_tick, cum_ticks, cum_theta,
+                                      exp_num_ticks, imbalance_array)
+        self.cache.append(cache_data)
 
     def get_expected_imbalance(self, exp_num_ticks, imbalance_array):
         if len(imbalance_array) < exp_num_ticks:
