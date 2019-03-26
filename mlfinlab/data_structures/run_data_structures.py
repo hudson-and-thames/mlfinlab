@@ -16,7 +16,7 @@ A great paper to read more about this is titled: The Volume Clock: Insights into
 from collections import namedtuple
 import pandas as pd
 import numpy as np
-from mlfinlab.data_structures.fast_ewma import ewma
+from mlfinlab.util.fast_ewma import ewma
 
 
 def _get_updated_counters(cache, flag, exp_num_ticks_init):

@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from mlfinlab.data_structures import data_structures as ds
+from mlfinlab.data_structures import standard_data_structures as ds
 
 
 class TestDataStructures(unittest.TestCase):

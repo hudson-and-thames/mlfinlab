@@ -10,14 +10,15 @@ from numba import int64
 
 @jit((float64[:], int64), nopython=False, nogil=True)
 def ewma(arr_in, window):
-    """Exponentialy weighted moving average specified by a decay ``window``
-    to provide better adjustments for small windows via:
+    """
+    Exponentialy weighted moving average specified by a decay ``window`` to provide better adjustments for
+    small windows via:
         y[t] = (x[t] + (1-a)*x[t-1] + (1-a)^2*x[t-2] + ... + (1-a)^n*x[t-n]) /
                (1 + (1-a) + (1-a)^2 + ... + (1-a)^n).
 
-    :param arr_in : np.ndarray, float64. A single dimenisional numpy array
-    :paran window : int64. The decay window, or 'span'
-    :return: np.ndarray. The EWMA vector, same length / shape as ``arr_in``
+    :param arr_in: (np.ndarray), (float64) A single dimensional numpy array
+    :param window: (int64) The decay window, or 'span'
+    :return: (np.ndarray) The EWMA vector, same length / shape as ``arr_in``
     """
     arr_length = arr_in.shape[0]
     ewma_arr = np.empty(arr_length, dtype=float64)
