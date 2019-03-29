@@ -51,7 +51,7 @@ class RunBars(BaseBars):
 
         # Named tuple to help with storing the cache
         self.cache_tuple = namedtuple('CacheData',
-                                      ['date_time', 'price', 'high', 'low', 'tick_rule', 'cum_ticks', 'cum_theta_buy',
+                                      ['date_time', 'price', 'high', 'low', 'cum_ticks', 'cum_theta_buy',
                                        'cum_theta_sell', 'exp_num_ticks', 'imbalance_array'])
 
     def _extract_bars(self, data):
@@ -161,8 +161,9 @@ class RunBars(BaseBars):
         :param exp_num_ticks: E{T}
         :param imbalance_array: (numpy array) of the tick imbalances
         """
-        cache_data = self.cache_tuple(date_time, price, high_price, low_price, cum_ticks, cum_theta_buy, cum_theta_sell,
-                                      exp_num_ticks, imbalance_array)
+        cache_data = self.cache_tuple(date_time=date_time, price=price, high=high_price, low=low_price,
+                                      cum_ticks=cum_ticks, cum_theta_buy=cum_theta_buy, cum_theta_sell=cum_theta_sell,
+                                      exp_num_ticks=exp_num_ticks, imbalance_array=imbalance_array)
         self.cache.append(cache_data)
 
     def _get_expected_imbalance(self, exp_num_ticks, imbalance_array):

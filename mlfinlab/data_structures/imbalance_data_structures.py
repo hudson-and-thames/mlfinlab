@@ -51,7 +51,7 @@ class ImbalanceBars(BaseBars):
 
         # Named tuple to help with storing the cache
         self.cache_tuple = namedtuple('CacheData',
-                                      ['date_time', 'price', 'high', 'low', 'tick_rule', 'cum_ticks', 'cum_theta',
+                                      ['date_time', 'price', 'high', 'low', 'cum_ticks', 'cum_theta',
                                        'exp_num_ticks', 'imbalance_array'])
 
     def _extract_bars(self, data):
@@ -83,8 +83,7 @@ class ImbalanceBars(BaseBars):
             expected_imbalance = self._get_expected_imbalance(exp_num_ticks, imbalance_array)
 
             # Update cache
-            self._update_cache(date_time, price, low_price, high_price, signed_tick, cum_ticks, cum_theta,
-                               exp_num_ticks,
+            self._update_cache(date_time, price, low_price, high_price, cum_ticks, cum_theta, exp_num_ticks,
                                imbalance_array)
 
             # Check expression for possible bar generation
@@ -102,8 +101,7 @@ class ImbalanceBars(BaseBars):
                 self.cache = []
 
                 # Update cache after bar generation (exp_num_ticks was changed after bar generation)
-                self._update_cache(date_time, price, low_price, high_price, signed_tick, cum_ticks, cum_theta,
-                                   exp_num_ticks,
+                self._update_cache(date_time, price, low_price, high_price, cum_ticks, cum_theta, exp_num_ticks,
                                    imbalance_array)
 
         return list_bars
@@ -135,7 +133,7 @@ class ImbalanceBars(BaseBars):
 
         return cum_ticks, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array
 
-    def _update_cache(self, date_time, price, low_price, high_price, signed_tick, cum_ticks, cum_theta, exp_num_ticks,
+    def _update_cache(self, date_time, price, low_price, high_price, cum_ticks, cum_theta, exp_num_ticks,
                       imbalance_array):
         """
         Update the cache which is used to create a continuous flow of bars from one batch to the next.
@@ -144,14 +142,14 @@ class ImbalanceBars(BaseBars):
         :param price: The current price
         :param low_price: Lowest price in the period
         :param high_price: Highest price in the period
-        :param signed_tick: The signed tick as defined by the tick rule
         :param cum_ticks: Cumulative number of ticks
         :param cum_theta: Cumulative Theta sub t (pg 29)
         :param exp_num_ticks: E[T]
         :param imbalance_array: (numpy array) of the tick imbalances
         """
-        cache_data = self.cache_tuple(date_time, price, high_price, low_price, signed_tick, cum_ticks, cum_theta,
-                                      exp_num_ticks, imbalance_array)
+        cache_data = self.cache_tuple(date_time=date_time, price=price, high=high_price, low=low_price,
+                                      cum_ticks=cum_ticks, cum_theta=cum_theta, exp_num_ticks=exp_num_ticks,
+                                      imbalance_array=imbalance_array)
         self.cache.append(cache_data)
 
     def _get_expected_imbalance(self, exp_num_ticks, imbalance_array):

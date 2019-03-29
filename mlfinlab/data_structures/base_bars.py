@@ -140,12 +140,12 @@ class BaseBars(ABC):
         """
         if self.cache:
             tick_diff = price - self.cache[-1].price
-            self.prev_tick_rule = self.cache[-1].tick_rule
         else:
             tick_diff = 0
 
         if tick_diff != 0:
             signed_tick = np.sign(tick_diff)
+            self.prev_tick_rule = signed_tick
         else:
             signed_tick = self.prev_tick_rule
 

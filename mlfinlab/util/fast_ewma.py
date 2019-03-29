@@ -20,6 +20,7 @@ def ewma(arr_in, window):
     :param window: (int64) The decay window, or 'span'
     :return: (np.ndarray) The EWMA vector, same length / shape as ``arr_in``
     """
+    # Todo Did we get this from Maksim?
     arr_length = arr_in.shape[0]
     ewma_arr = np.empty(arr_length, dtype=float64)
     alpha = 2 / (window + 1)
