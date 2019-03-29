@@ -17,10 +17,10 @@ Lopez de Prado, et al
 from collections import namedtuple
 import numpy as np
 from mlfinlab.util.fast_ewma import ewma
-from mlfinlab.data_structures.information_bars import InformationBars
+from mlfinlab.data_structures.information_bars import BaseBars
 
 
-class RunBars(InformationBars):
+class RunBars(BaseBars):
     """
     Contains all of the logic to construct the run bars from chapter 2. This class shouldn't be used directly.
     We have added functions to the package such as get_dollar_run_bars which will create an instance of this
@@ -41,14 +41,18 @@ class RunBars(InformationBars):
         :param num_ticks_ewma_window: Window size for E[T]
         :param batch_size: Number of rows to read in from the csv, per batch.
         """
-        InformationBars.__init__(self, file_path, metric, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window,
-                                 batch_size)
+        BaseBars.__init__(self, file_path, metric, batch_size)
 
-        # Extract bars properties
+        # Information bar properties
+        self.exp_num_ticks_init = exp_num_ticks_init
+        self.num_prev_bars = num_prev_bars
+        self.num_ticks_ewma_window = num_ticks_ewma_window
+        self.num_ticks_bar = []  # List of number of ticks from previous bars
+
+        # Named tuple to help with storing the cache
         self.cache_tuple = namedtuple('CacheData',
-                                      ['date_time', 'price', 'high', 'low', 'tick_rule',
-                                       'cum_ticks', 'cum_theta_buy', 'cum_theta_sell', 'exp_num_ticks',
-                                       'imbalance_array'])
+                                      ['date_time', 'price', 'high', 'low', 'tick_rule', 'cum_ticks', 'cum_theta_buy',
+                                       'cum_theta_sell', 'exp_num_ticks', 'imbalance_array'])
 
     def _update_counters(self):
         """
@@ -89,7 +93,7 @@ class RunBars(InformationBars):
         :return: (List) of bars built using the current batch.
         """
         cum_ticks, cum_theta_buy, cum_theta_sell, high_price, low_price, \
-            exp_num_ticks, imbalance_array = self._update_counters()
+        exp_num_ticks, imbalance_array = self._update_counters()
 
         # Set the first tick rule with 0
         prev_tick_rule = 0
@@ -129,8 +133,9 @@ class RunBars(InformationBars):
             # Check expression for possible bar generation
             max_proportion = max(exp_buy_proportion, exp_sell_proportion)
             if max(cum_theta_buy, cum_theta_sell) > exp_num_ticks * max_proportion:
-                self._create_bars(date_time, price, high_price, low_price, list_bars, cum_ticks)
+                self._create_bars(date_time, price, high_price, low_price, list_bars)
 
+                self.num_ticks_bar.append(cum_ticks)
                 # Expected number of ticks based on formed bars
                 exp_num_ticks = ewma(np.array(self.num_ticks_bar[-self.num_ticks_ewma_window:], dtype=float),
                                      self.num_ticks_ewma_window)[-1]

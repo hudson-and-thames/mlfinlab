@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
 
+from abc import ABC, abstractmethod
 
-class InformationBars:
-    def __init__(self, file_path, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_ticks_ewma_window=20,
-                 batch_size=2e7):
+
+class BaseBars(ABC):
+    def __init__(self, file_path, metric, batch_size=2e7):
         """
         Constructor
 
@@ -18,15 +19,15 @@ class InformationBars:
         # Base properties
         self.file_path = file_path
         self.metric = metric
-        self.exp_num_ticks_init = exp_num_ticks_init
-        self.num_prev_bars = num_prev_bars
-        self.num_ticks_ewma_window = num_ticks_ewma_window
         self.batch_size = batch_size
 
         # Batch_run properties
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
         self.cache = []
-        self.num_ticks_bar = []  # List of number of ticks from previous bars
+
+    @abstractmethod
+    def _extract_bars(self, data):
+        pass
 
     def batch_run(self):
         """
@@ -56,9 +57,7 @@ class InformationBars:
             self.flag = True
 
         # Return a DataFrame
-        cols = ['date_time', 'open', 'high', 'low',
-                'close', 'cum_ticks']
-
+        cols = ['date_time', 'open', 'high', 'low', 'close']
         bars_df = pd.DataFrame(final_bars, columns=cols)
         print('Returning bars \n')
         return bars_df
@@ -81,7 +80,7 @@ class InformationBars:
 
         return high_price, low_price
 
-    def _create_bars(self, date_time, price, high_price, low_price, list_bars, cum_ticks):
+    def _create_bars(self, date_time, price, high_price, low_price, list_bars):
         """
         Given the inputs, construct a bar which has the following fields: date_time, open, high, low, close, cum_ticks.
         These bars are appended to the list_bars list, which is later used to construct the final imbalance bars
@@ -92,17 +91,15 @@ class InformationBars:
         :param high_price: Highest price in the period
         :param low_price: Lowest price in the period
         :param list_bars: List to which we append the bars
-        :param cum_ticks: Cumulative number of ticks
         """
         # Create bars
         open_price = self.cache[0].price
         high_price = max(high_price, open_price)
         low_price = min(low_price, open_price)
         close_price = price
-        self.num_ticks_bar.append(cum_ticks)
 
         # Update bars
-        list_bars.append([date_time, open_price, high_price, low_price, close_price, cum_ticks])
+        list_bars.append([date_time, open_price, high_price, low_price, close_price])
 
     def _apply_tick_rule(self, price, prev_tick_rule):
         """

@@ -20,159 +20,86 @@ from collections import namedtuple
 import pandas as pd
 import numpy as np
 
-
-def _update_counters(cache, flag):
-    """
-    Updates the counters by resetting them or making use of the cache to update them based on a previous batch.
-
-    :param cache: Contains information from the previous batch that is relevant in this batch.
-    :param flag: A flag which signals to use the cache.
-    :return: Updated counters - cum_ticks, cum_dollar_value, cum_volume, high_price, low_price
-    """
-    # Check flag
-    if flag and cache:
-        # Update variables based on cache
-        cum_ticks = int(cache[-1].cum_ticks)
-        cum_dollar_value = np.float(cache[-1].cum_dollar_value)
-        cum_volume = cache[-1].cum_volume
-        low_price = np.float(cache[-1].low)
-        high_price = np.float(cache[-1].high)
-    else:
-        # Reset counters
-        cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = 0, 0, 0, -np.inf, np.inf
-
-    return cum_ticks, cum_dollar_value, cum_volume, high_price, low_price
+from mlfinlab.data_structures.information_bars import BaseBars
 
 
-def _extract_bars(data, metric, threshold=50000, cache=None, flag=False):
-    """
-    For loop which compiles the various bars: dollar, volume, or tick.
+class StandardBars(BaseBars):
+    def __init__(self, file_path, metric, threshold=50000, batch_size=20000000):
 
-    We did investigate the use of trying to solve this in a vectorised manner but found that a For loop worked well.
+        BaseBars.__init__(self, file_path, metric, batch_size)
 
-    :param data: Contains 3 columns - date_time, price, and volume.
-    :param metric: cum_ticks, cum_dollar_value, cum_volume
-    :param threshold: A cumulative value above this threshold triggers a sample to be taken.
-    :param cache: contains information from the previous batch that is relevant in this batch.
-    :param flag: A flag which signals to use the cache.
-    :return: The financial data structure with the cache of short term history.
-    """
+        # Threshold at which to sample
+        self.threshold = threshold
+        # Named tuple to help with the cache
+        self.cache_tuple = namedtuple('CacheData',
+                                      ['date_time', 'price', 'high', 'low', 'cum_ticks', 'cum_volume', 'cum_dollar'])
 
-    cache_tup = namedtuple('CacheData', ['date_time', 'price', 'high', 'low', 'cum_volume', 'cum_dollar_value',
-                                         'cum_ticks'])
-    if cache is None:
-        cache = []
+    def _update_counters(self):
+        """
+        Updates the counters by resetting them or making use of the cache to update them based on a previous batch.
 
-    list_bars = []
-    cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = _update_counters(
-        cache, flag)
+        :return: Updated counters - cum_ticks, cum_dollar_value, cum_volume, high_price, low_price
+        """
+        # Check flag
+        if self.flag and self.cache:
+            last_entry = self.cache[-1]
 
-    # Iterate over rows
-    for row in data.values:
-        # Set variables
-        date_time = row[0]
-        price = np.float(row[1])
-        volume = row[2]
+            # Update variables based on cache
+            cum_ticks = int(last_entry.cum_ticks)
+            cum_dollar_value = np.float(last_entry.cum_dollar)
+            cum_volume = last_entry.cum_volume
+            low_price = np.float(last_entry.low)
+            high_price = np.float(last_entry.high)
+        else:
+            # Reset counters
+            cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = 0, 0, 0, -np.inf, np.inf
 
-        # Calculations
-        cum_ticks += 1
-        dollar_value = price * volume
-        cum_dollar_value = cum_dollar_value + dollar_value
-        cum_volume = cum_volume + volume
+        return cum_ticks, cum_dollar_value, cum_volume, high_price, low_price
 
-        # Check min max
-        if price > high_price:
-            high_price = price
-        if price <= low_price:
-            low_price = price
+    def _extract_bars(self, data):
+        """
+        For loop which compiles the various bars: dollar, volume, or tick.
+        We did investigate the use of trying to solve this in a vectorised manner but found that a For loop worked well.
 
-        # Update cache
-        cache_data = cache_tup(date_time, price, high_price,
-                               low_price, cum_volume, cum_dollar_value, cum_ticks)
-        cache.append(cache_data)
+        :param data: Contains 3 columns - date_time, price, and volume.
+        """
+        cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = self._update_counters()
 
-        # If threshold reached then take a sample
-        if eval(metric) >= threshold:   # pylint: disable=eval-used
-            # Create bars
-            open_price = cache[0].price
-            low_price = min(low_price, open_price)
-            close_price = price
+        # Iterate over rows
+        list_bars = []
+        for row in data.values:
+            # Set variables
+            date_time = row[0]
+            price = np.float(row[1])
+            volume = row[2]
 
-            # Update bars & Reset counters
-            list_bars.append([date_time, open_price, high_price, low_price, close_price,
-                              cum_volume, cum_dollar_value, cum_ticks])
-            cum_ticks, cum_dollar_value, cum_volume, cache, high_price, low_price = 0, 0, 0, [], -np.inf, np.inf
+            # Calculations
+            cum_ticks += 1
+            dollar_value = price * volume
+            cum_dollar_value = cum_dollar_value + dollar_value
+            cum_volume = cum_volume + volume
 
-        # Update cache after bar generation
-        cache_data = cache_tup(date_time, price, high_price,
-                               low_price, cum_volume, cum_dollar_value, cum_ticks)
-        cache.append(cache_data)
-    return list_bars, cache
+            # Update high low prices
+            high_price, low_price = self._update_high_low(high_price, low_price, price)
 
+            # Update cache
+            self._update_cache(date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_dollar_value)
 
-def _assert_dataframe(test_batch):
-    """
-    Tests that the csv file read has the format: date_time, price, & volume.
-    If not then the user needs to create such a file. This format is in place to remove any unwanted overhead.
+            # If threshold reached then take a sample
+            if eval(self.metric) >= self.threshold:  # pylint: disable=eval-used
+                self._create_bars(date_time, price, high_price, low_price, list_bars)
 
-    :param test_batch: DataFrame which will be tested.
-    """
-    assert test_batch.shape[1] == 3, 'Must have only 3 columns in csv: date_time, price, & volume.'
-    assert isinstance(test_batch.iloc[0, 1],
-                      float), 'price column in csv not float.'
-    assert isinstance(test_batch.iloc[0, 2],
-                      np.int64), 'volume column in csv not int.'
+                # Reset counters
+                cum_ticks, cum_dollar_value, cum_volume, cache, high_price, low_price = 0, 0, 0, [], -np.inf, np.inf
 
-    try:
-        pd.to_datetime(test_batch.iloc[0, 0])
-    except ValueError:
-        print('csv file, column 0, not a date time format:',
-              test_batch.iloc[0, 0])
+                # Update cache after bar generation
+                self._update_cache(date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_dollar_value)
 
+        return list_bars
 
-def _batch_run(file_path, metric, threshold=50000, batch_size=20000000):
-    """
-    Reads a csv file in batches and then constructs the financial data structure in the form of a DataFrame.
-
-    The csv file must have only 3 columns: date_time, price, & volume.
-
-    :param file_path: File path pointing to csv data.
-    :param metric: cum_ticks, cum_dollar_value, cum_volume
-    :param threshold: A cumulative value above this threshold triggers a sample to be taken.
-    :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
-    :return: Financial data structure
-    """
-    print('Reading data in batches:')
-
-    # Variables
-    count = 0
-    flag = False  # The first flag is false since the first batch doesn't use the cache
-    cache = None
-    final_bars = []
-
-    # Read in the first row & assert format
-    _assert_dataframe(pd.read_csv(file_path, nrows=1))
-
-    # Read csv in batches
-    for batch in pd.read_csv(file_path, chunksize=batch_size):
-
-        print('Batch number:', count)
-        list_bars, cache = _extract_bars(
-            data=batch, metric=metric, threshold=threshold, cache=cache, flag=flag)
-
-        # Append to bars list
-        final_bars += list_bars
-        count += 1
-
-        # Set flag to True: notify function to use cache
-        flag = True
-
-    # Return a DataFrame
-    cols = ['date_time', 'open', 'high', 'low',
-            'close', 'cum_vol', 'cum_dollar', 'cum_ticks']
-    bars_df = pd.DataFrame(final_bars, columns=cols)
-    print('Returning bars \n')
-    return bars_df
+    def _update_cache(self, date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_dollar_value):
+        cache_data = self.cache_tuple(date_time, price, high_price, low_price, cum_ticks, cum_volume, cum_dollar_value)
+        self.cache.append(cache_data)
 
 
 def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000):
@@ -188,7 +115,10 @@ def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000):
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of dollar bars
     """
-    return _batch_run(file_path=file_path, metric='cum_dollar_value', threshold=threshold, batch_size=batch_size)
+
+    bars = StandardBars(file_path=file_path, metric='cum_dollar_value', threshold=threshold, batch_size=batch_size)
+    dollar_bars = bars.batch_run()
+    return dollar_bars
 
 
 def get_volume_bars(file_path, threshold=28224, batch_size=20000000):
@@ -203,7 +133,9 @@ def get_volume_bars(file_path, threshold=28224, batch_size=20000000):
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of volume bars
     """
-    return _batch_run(file_path=file_path, metric='cum_volume', threshold=threshold, batch_size=batch_size)
+    bars = StandardBars(file_path, 'cum_volume', threshold, batch_size)
+    volume_bars = bars.batch_run()
+    return volume_bars
 
 
 def get_tick_bars(file_path, threshold=2800, batch_size=20000000):
@@ -215,4 +147,6 @@ def get_tick_bars(file_path, threshold=2800, batch_size=20000000):
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :return: Dataframe of tick bars
     """
-    return _batch_run(file_path=file_path, metric='cum_ticks', threshold=threshold, batch_size=batch_size)
+    bars = StandardBars(file_path, 'cum_ticks', threshold, batch_size)
+    tick_bars = bars.batch_run()
+    return tick_bars

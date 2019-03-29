@@ -48,9 +48,6 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(db1.loc[0, 'low'] == 1005.0)
         self.assertTrue(db1.loc[0, 'close'] == 1304.5)
 
-        # Assert cum dollar value greater than threshold
-        self.assertTrue(np.all(db1['cum_dollar'] >= threshold))
-
     def test_volume_bars(self):
         """
         Tests the volume bars implementation.
@@ -74,9 +71,6 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(db1.loc[0, 'high'] == 1904.75)
         self.assertTrue(db1.loc[0, 'low'] == 1005.0)
         self.assertTrue(db1.loc[0, 'close'] == 1304.75)
-
-        # Assert cum dollar value greater than threshold
-        self.assertTrue(np.all(db1['cum_dollar'] >= threshold))
 
     def test_tick_bars(self):
         """
@@ -102,9 +96,6 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(db1.loc[0, 'low'] == 1005.0)
         self.assertTrue(db1.loc[0, 'close'] == 1304.50)
 
-        # Assert cum dollar value greater than threshold
-        self.assertTrue(np.all(db1['cum_ticks'] == threshold))
-
     def test_csv_format(self):
         """
         Asserts that the csv data being passed is of the correct format.
@@ -116,16 +107,16 @@ class TestDataStructures(unittest.TestCase):
 
         # pylint: disable=protected-access
         self.assertRaises(ValueError,
-                          ds._assert_dataframe(pd.DataFrame(wrong_date).T))
+                          ds.StandardBars._assert_csv(pd.DataFrame(wrong_date).T))
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds._assert_dataframe,
+                          ds.StandardBars._assert_csv,
                           pd.DataFrame(too_many_cols).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds._assert_dataframe,
+                          ds.StandardBars._assert_csv,
                           pd.DataFrame(wrong_price).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds._assert_dataframe,
+                          ds.StandardBars._assert_csv,
                           pd.DataFrame(wrong_volume).T)

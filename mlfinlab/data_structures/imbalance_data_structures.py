@@ -17,10 +17,10 @@ frequency paradigm, Lopez de Prado, et al.
 from collections import namedtuple
 import numpy as np
 from mlfinlab.util.fast_ewma import ewma
-from mlfinlab.data_structures.information_bars import InformationBars
+from mlfinlab.data_structures.information_bars import BaseBars
 
 
-class ImbalanceBars(InformationBars):
+class ImbalanceBars(BaseBars):
     """
     Contains all of the logic to construct the imbalance bars from chapter 2. This class shouldn't be used directly.
     We have added functions to the package such as get_dollar_imbalance_bars which will create an instance of this
@@ -28,6 +28,7 @@ class ImbalanceBars(InformationBars):
 
     This is because we wanted to simplify the logic as much as possible, for the end user.
     """
+
     def __init__(self, file_path, metric, exp_num_ticks_init=100000,
                  num_prev_bars=3, num_ticks_ewma_window=20, batch_size=2e7):
         """
@@ -40,13 +41,18 @@ class ImbalanceBars(InformationBars):
         :param num_ticks_ewma_window: Window size for E[T]
         :param batch_size: Number of rows to read in from the csv, per batch.
         """
-        InformationBars.__init__(self, file_path, metric, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window,
-                                 batch_size)
+        BaseBars.__init__(self, file_path, metric, batch_size)
 
-        # Extract bars properties
-        self.cache_tuple = namedtuple('CacheData', ['date_time', 'price', 'high', 'low',
-                                                    'tick_rule', 'cum_ticks', 'cum_theta', 'exp_num_ticks',
-                                                    'imbalance_array'])
+        # Information bar properties
+        self.exp_num_ticks_init = exp_num_ticks_init
+        self.num_prev_bars = num_prev_bars
+        self.num_ticks_ewma_window = num_ticks_ewma_window
+        self.num_ticks_bar = []  # List of number of ticks from previous bars
+
+        # Named tuple to help with storing the cache
+        self.cache_tuple = namedtuple('CacheData',
+                                      ['date_time', 'price', 'high', 'low', 'tick_rule', 'cum_ticks', 'cum_theta',
+                                       'exp_num_ticks', 'imbalance_array'])
 
     def _extract_bars(self, data):
         """
@@ -80,13 +86,15 @@ class ImbalanceBars(InformationBars):
             expected_imbalance = self._get_expected_imbalance(exp_num_ticks, imbalance_array)
 
             # Update cache
-            self._update_cache(date_time, price, low_price, high_price, signed_tick, cum_ticks, cum_theta, exp_num_ticks,
+            self._update_cache(date_time, price, low_price, high_price, signed_tick, cum_ticks, cum_theta,
+                               exp_num_ticks,
                                imbalance_array)
 
             # Check expression for possible bar generation
             if np.abs(cum_theta) > exp_num_ticks * np.abs(expected_imbalance):
-                self._create_bars(date_time, price, high_price, low_price, list_bars, cum_ticks)
+                self._create_bars(date_time, price, high_price, low_price, list_bars)
 
+                self.num_ticks_bar.append(cum_ticks)
                 # Expected number of ticks based on formed bars
                 exp_num_ticks = ewma(np.array(self.num_ticks_bar[-self.num_ticks_ewma_window:], dtype=float),
                                      self.num_ticks_ewma_window)[-1]
@@ -97,7 +105,8 @@ class ImbalanceBars(InformationBars):
                 self.cache = []
 
                 # Update cache after bar generation (exp_num_ticks was changed after bar generation)
-                self._update_cache(date_time, price, low_price, high_price, signed_tick, cum_ticks, cum_theta, exp_num_ticks,
+                self._update_cache(date_time, price, low_price, high_price, signed_tick, cum_ticks, cum_theta,
+                                   exp_num_ticks,
                                    imbalance_array)
 
         return list_bars
