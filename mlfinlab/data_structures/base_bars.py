@@ -27,6 +27,7 @@ class BaseBars(ABC):
         self.file_path = file_path
         self.metric = metric
         self.batch_size = batch_size
+        self.prev_tick_rule = 0
 
         # Batch_run properties
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
@@ -130,26 +131,25 @@ class BaseBars(ABC):
         # Update bars
         list_bars.append([date_time, open_price, high_price, low_price, close_price])
 
-    def _apply_tick_rule(self, price, prev_tick_rule):
+    def _apply_tick_rule(self, price):
         """
         Applies the tick rule as defined on page 29.
 
         :param price: Price at time t.
-        :param prev_tick_rule: The previous tick rule
         :return: The signed tick as well as the updated previous tick rule.
         """
         if self.cache:
             tick_diff = price - self.cache[-1].price
-            prev_tick_rule = self.cache[-1].tick_rule
+            self.prev_tick_rule = self.cache[-1].tick_rule
         else:
             tick_diff = 0
 
         if tick_diff != 0:
             signed_tick = np.sign(tick_diff)
         else:
-            signed_tick = prev_tick_rule
+            signed_tick = self.prev_tick_rule
 
-        return signed_tick, prev_tick_rule
+        return signed_tick
 
     def _get_imbalance(self, price, signed_tick, volume):
         """

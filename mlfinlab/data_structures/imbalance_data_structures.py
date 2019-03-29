@@ -63,9 +63,6 @@ class ImbalanceBars(BaseBars):
         """
         cum_ticks, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array = self._update_counters()
 
-        # Set the first tick rule with 0
-        prev_tick_rule = 0
-
         # Iterate over rows
         list_bars = []
         for row in data.values:
@@ -79,7 +76,7 @@ class ImbalanceBars(BaseBars):
             high_price, low_price = self._update_high_low(high_price, low_price, price)
 
             # Imbalance calculations
-            signed_tick, prev_tick_rule = self._apply_tick_rule(price, prev_tick_rule)
+            signed_tick = self._apply_tick_rule(price)
             imbalance = self._get_imbalance(price, signed_tick, volume)
             imbalance_array.append(imbalance)
             cum_theta += imbalance

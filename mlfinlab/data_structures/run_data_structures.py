@@ -64,10 +64,6 @@ class RunBars(BaseBars):
         cum_ticks, cum_theta_buy, cum_theta_sell, high_price, low_price, \
         exp_num_ticks, imbalance_array = self._update_counters()
 
-        # Set the first tick rule with 0
-        # Todo: Prev tick rule is affected by batches and needs to be stored as an attribute
-        prev_tick_rule = 0
-
         # Iterate over rows
         list_bars = []
         for row in data.values:
@@ -81,23 +77,22 @@ class RunBars(BaseBars):
             high_price, low_price = self._update_high_low(high_price, low_price, price)
 
             # Imbalance calculations
-            signed_tick, prev_tick_rule = self._apply_tick_rule(price, prev_tick_rule)
+            signed_tick = self._apply_tick_rule(price)
             imbalance = self._get_imbalance(price, signed_tick, volume)
 
             if imbalance > 0:
                 imbalance_array['buy'].append(imbalance)
-                # set zero to keep buy and sell arrays synced
-                imbalance_array['sell'].append(0)
+                imbalance_array['sell'].append(0)  # Set zero to keep buy and sell arrays synced
                 cum_theta_buy += imbalance
             elif imbalance < 0:
                 imbalance_array['sell'].append(abs(imbalance))
-                imbalance_array['buy'].append(0)
+                imbalance_array['buy'].append(0)  # Set zero to keep buy and sell arrays synced
                 cum_theta_sell += abs(imbalance)
 
             exp_buy_proportion, exp_sell_proportion = self._get_expected_imbalance(exp_num_ticks, imbalance_array)
 
             # Update cache
-            self._update_cache(date_time, price, low_price, high_price, signed_tick, cum_theta_sell, cum_theta_buy,
+            self._update_cache(date_time, price, low_price, high_price, cum_theta_sell, cum_theta_buy,
                                cum_ticks, exp_num_ticks, imbalance_array)
 
             # Check expression for possible bar generation
@@ -116,7 +111,7 @@ class RunBars(BaseBars):
                 self.cache = []
 
                 # Update cache after bar generation (exp_num_ticks was changed after bar generation)
-                self._update_cache(date_time, price, low_price, high_price, signed_tick, cum_theta_sell, cum_theta_buy,
+                self._update_cache(date_time, price, low_price, high_price, cum_theta_sell, cum_theta_buy,
                                    cum_ticks, exp_num_ticks, imbalance_array)
         return list_bars
 
@@ -151,7 +146,7 @@ class RunBars(BaseBars):
 
         return cum_ticks, cum_theta_buy, cum_theta_sell, high_price, low_price, exp_num_ticks, imbalance_array
 
-    def _update_cache(self, date_time, price, low_price, high_price, signed_tick, cum_theta_sell, cum_theta_buy,
+    def _update_cache(self, date_time, price, low_price, high_price, cum_theta_sell, cum_theta_buy,
                       cum_ticks, exp_num_ticks, imbalance_array):
         """
         Update the cache which is used to create a continuous flow of bars from one batch to the next.
@@ -160,15 +155,14 @@ class RunBars(BaseBars):
         :param price: The current price
         :param low_price: Lowest price in the period
         :param high_price: Highest price in the period
-        :param signed_tick: The signed tick as defined by the tick rule
         :param cum_theta_sell: Cumulation of negative signed ticks
         :param cum_theta_buy: Cumulation of positive signed ticks
         :param cum_ticks: Cumulative number of ticks
         :param exp_num_ticks: E{T}
         :param imbalance_array: (numpy array) of the tick imbalances
         """
-        cache_data = self.cache_tuple(date_time, price, high_price, low_price, signed_tick,
-                                      cum_ticks, cum_theta_buy, cum_theta_sell, exp_num_ticks, imbalance_array)
+        cache_data = self.cache_tuple(date_time, price, high_price, low_price, cum_ticks, cum_theta_buy, cum_theta_sell,
+                                      exp_num_ticks, imbalance_array)
         self.cache.append(cache_data)
 
     def _get_expected_imbalance(self, exp_num_ticks, imbalance_array):
