@@ -9,7 +9,7 @@ from numba import int64
 
 
 @jit((float64[:], int64), nopython=False, nogil=True)
-def ewma(arr_in, window):
+def ewma(arr_in, window):  # pragma: no cover
     """
     Exponentialy weighted moving average specified by a decay ``window`` to provide better adjustments for
     small windows via:
