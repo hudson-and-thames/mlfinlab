@@ -1,6 +1,9 @@
 """
-This module contains various implementations of ewma based on sample size
+This module contains an implementation of an exponentially weighted moving average based on sample size.
+The inspiration and context for this code was from a blog post by writen by Maksim Ivanov:
+https://towardsdatascience.com/financial-machine-learning-part-0-bars-745897d4e4ba
 """
+
 # Imports
 import numpy as np
 from numba import jit
@@ -20,7 +23,6 @@ def ewma(arr_in, window):  # pragma: no cover
     :param window: (int64) The decay window, or 'span'
     :return: (np.ndarray) The EWMA vector, same length / shape as ``arr_in``
     """
-    # Todo Did we get this from Maksim?
     arr_length = arr_in.shape[0]
     ewma_arr = np.empty(arr_length, dtype=float64)
     alpha = 2 / (window + 1)

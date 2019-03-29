@@ -21,7 +21,7 @@ class BaseBars(ABC):
 
         :param file_path: (String) Path to the csv file containing raw tick data in the format[date_time, price, volume]
         :param metric: (String) type of imbalance bar to create. Example: dollar_imbalance.
-        :param batch_size: Number of rows to read in from the csv, per batch.
+        :param batch_size: (Int) Number of rows to read in from the csv, per batch.
         """
         # Base properties
         self.file_path = file_path
@@ -33,7 +33,7 @@ class BaseBars(ABC):
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
         self.cache = []
 
-    def batch_run(self):
+    def batch_run(self, verbose=True):
         """
         Reads a csv file in batches and then constructs the financial data structure in the form of a DataFrame.
         The csv file must have only 3 columns: date_time, price, & volume.
@@ -44,13 +44,16 @@ class BaseBars(ABC):
         first_row = pd.read_csv(self.file_path, nrows=1)
         self._assert_csv(first_row)
 
-        print('Reading data in batches:')
+        if verbose:
+            print('Reading data in batches:')
 
         # Read csv in batches
         count = 0
         final_bars = []
         for batch in pd.read_csv(self.file_path, chunksize=self.batch_size):
-            print('Batch number:', count)
+            if verbose:
+                print('Batch number:', count)
+
             list_bars = self._extract_bars(data=batch)
 
             # Append to bars list
@@ -63,7 +66,10 @@ class BaseBars(ABC):
         # Return a DataFrame
         cols = ['date_time', 'open', 'high', 'low', 'close']
         bars_df = pd.DataFrame(final_bars, columns=cols)
-        print('Returning bars \n')
+
+        if verbose:
+            print('Returning bars \n')
+
         return bars_df
 
     @abstractmethod
@@ -79,6 +85,8 @@ class BaseBars(ABC):
         """
         Tests that the csv file read has the format: date_time, price, and volume.
         If not then the user needs to create such a file. This format is in place to remove any unwanted overhead.
+
+        :param test_batch: (DataFrame) the first row of the dataset.
         """
         assert test_batch.shape[1] == 3, 'Must have only 3 columns in csv: date_time, price, & volume.'
         assert isinstance(test_batch.iloc[0, 1],
@@ -113,8 +121,7 @@ class BaseBars(ABC):
     def _create_bars(self, date_time, price, high_price, low_price, list_bars):
         """
         Given the inputs, construct a bar which has the following fields: date_time, open, high, low, close.
-        These bars are appended to the list_bars list, which is later used to construct the final bars
-        DataFrame.
+        These bars are appended to list_bars, which is later used to construct the final bars DataFrame.
 
         :param date_time: Timestamp of the bar
         :param price: The current price
@@ -135,8 +142,8 @@ class BaseBars(ABC):
         """
         Applies the tick rule as defined on page 29.
 
-        :param price: Price at time t.
-        :return: The signed tick as well as the updated previous tick rule.
+        :param price: Price at time t
+        :return: The signed tick
         """
         if self.cache:
             tick_diff = price - self.cache[-1].price
@@ -164,7 +171,7 @@ class BaseBars(ABC):
             imbalance = signed_tick
         elif self.metric == 'dollar_imbalance' or self.metric == 'dollar_run':
             imbalance = signed_tick * volume * price
-        else:  # volume imbalance | run
+        else:  # volume imbalance or volume run
             imbalance = signed_tick * volume
 
         return imbalance

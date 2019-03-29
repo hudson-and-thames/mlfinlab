@@ -30,9 +30,9 @@ class TestDataStructures(unittest.TestCase):
         """
         threshold = 100000
 
-        db1 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=1000)
-        db2 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=50)
-        db3 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=10)
+        db1 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
+        db2 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
+        db3 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -54,9 +54,9 @@ class TestDataStructures(unittest.TestCase):
         """
         threshold = 30
 
-        db1 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=1000)
-        db2 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=50)
-        db3 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=10)
+        db1 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
+        db2 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
+        db3 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -78,9 +78,9 @@ class TestDataStructures(unittest.TestCase):
         """
         threshold = 10
 
-        db1 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=1000)
-        db2 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=50)
-        db3 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=10)
+        db1 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
+        db2 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
+        db3 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)

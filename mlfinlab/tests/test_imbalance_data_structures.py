@@ -34,14 +34,14 @@ class TestDataStructures(unittest.TestCase):
         num_ticks_ewma_window = 10
 
         db1 = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars,
-                                           num_ticks_ewma_window=num_ticks_ewma_window, batch_size=1000)
+                                           num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                           batch_size=1000, verbose=False)
         db2 = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars,
-                                           num_ticks_ewma_window=num_ticks_ewma_window, batch_size=50)
+                                           num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                           batch_size=50, verbose=False)
         db3 = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars,
-                                           num_ticks_ewma_window=num_ticks_ewma_window, batch_size=10)
+                                           num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                           batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -67,14 +67,14 @@ class TestDataStructures(unittest.TestCase):
         num_ticks_ewma_window = 10
 
         db1 = ds.get_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars,
-                                           num_ticks_ewma_window=num_ticks_ewma_window, batch_size=1000)
+                                           num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                           batch_size=1000, verbose=False)
         db2 = ds.get_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars,
-                                           num_ticks_ewma_window=num_ticks_ewma_window, batch_size=50)
+                                           num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                           batch_size=50, verbose=False)
         db3 = ds.get_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars,
-                                           num_ticks_ewma_window=num_ticks_ewma_window, batch_size=10)
+                                           num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                           batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -100,14 +100,14 @@ class TestDataStructures(unittest.TestCase):
         num_ticks_ewma_window = 10
 
         db1 = ds.get_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                         num_prev_bars=num_prev_bars,
-                                         num_ticks_ewma_window=num_ticks_ewma_window, batch_size=1000)
+                                         num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                         batch_size=1000, verbose=False)
         db2 = ds.get_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                         num_prev_bars=num_prev_bars,
-                                         num_ticks_ewma_window=num_ticks_ewma_window, batch_size=50)
+                                         num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                         batch_size=50, verbose=False)
         db3 = ds.get_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                         num_prev_bars=num_prev_bars,
-                                         num_ticks_ewma_window=num_ticks_ewma_window, batch_size=10)
+                                         num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                         batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
