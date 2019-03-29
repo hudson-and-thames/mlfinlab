@@ -5,11 +5,12 @@ Chapter 2: Financial Data Structures
 This module contains the functions to help users create structured financial data from raw unstructured data,
 in the form of time, tick, volume, and dollar bars.
 
-These bars are used throughout the text book (Advances in Financial Machine Learning, By Marcos Lopez de Prado, 2018, pg 25)
-to build the more interesting features for predicting financial time series data.
+These bars are used throughout the text book (Advances in Financial Machine Learning, By Marcos Lopez de Prado, 2018,
+pg 25) to build the more interesting features for predicting financial time series data.
 
-These financial data structures have better statistical properties when compared to those based on fixed time interval sampling.
-A great paper to read more about this is titled: The Volume Clock: Insights into the high frequency paradigm, Lopez de Prado, et al
+These financial data structures have better statistical properties when compared to those based on fixed time interval
+sampling. A great paper to read more about this is titled: The Volume Clock: Insights into the high frequency paradigm,
+Lopez de Prado, et al.
 
 Many of the projects going forward will require Dollar and Volume bars.
 """
