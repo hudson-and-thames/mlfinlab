@@ -17,7 +17,7 @@ Lopez de Prado, et al
 from collections import namedtuple
 import numpy as np
 from mlfinlab.util.fast_ewma import ewma
-from mlfinlab.data_structures.information_bars import BaseBars
+from mlfinlab.data_structures.base_bars import BaseBars
 
 
 class RunBars(BaseBars):
@@ -54,37 +54,6 @@ class RunBars(BaseBars):
                                       ['date_time', 'price', 'high', 'low', 'tick_rule', 'cum_ticks', 'cum_theta_buy',
                                        'cum_theta_sell', 'exp_num_ticks', 'imbalance_array'])
 
-    def _update_counters(self):
-        """
-        Updates the counters by resetting them or making use of the cache to update them based on a previous batch.
-
-        :return: Updated cum_ticks, cum_theta_buy, cum_theta_sell, high_price, low_price, exp_num_ticks, imbalance_array
-        """
-        # Check flag
-        if self.flag and self.cache:
-            latest_entry = self.cache[-1]
-
-            # Update variables based on cache
-            cum_ticks = int(latest_entry.cum_ticks)
-            low_price = np.float(latest_entry.low)
-            high_price = np.float(latest_entry.high)
-            # Cumulative buy and sell imbalances for a particular run calculation (theta_t in Prado book)
-            cum_theta_buy = np.float(latest_entry.cum_theta_buy)
-            cum_theta_sell = np.float(latest_entry.cum_theta_sell)
-            # Expected number of ticks extracted from prev bars
-            exp_num_ticks = np.float(latest_entry.exp_num_ticks)
-            # Array of latest imbalances
-            imbalance_array = latest_entry.imbalance_array
-        else:
-            # Reset counters
-            cum_ticks, cum_theta_buy, cum_theta_sell = 0, 0, 0
-            high_price, low_price = -np.inf, np.inf
-            exp_num_ticks = self.exp_num_ticks_init
-            # In run bars we need to track both buy and sell imbalance
-            imbalance_array = {'buy': [], 'sell': []}
-
-        return cum_ticks, cum_theta_buy, cum_theta_sell, high_price, low_price, exp_num_ticks, imbalance_array
-
     def _extract_bars(self, data):
         """
         For loop which compiles the various run bars: dollar, volume, or tick.
@@ -96,6 +65,7 @@ class RunBars(BaseBars):
         exp_num_ticks, imbalance_array = self._update_counters()
 
         # Set the first tick rule with 0
+        # Todo: Prev tick rule is affected by batches and needs to be stored as an attribute
         prev_tick_rule = 0
 
         # Iterate over rows
@@ -149,6 +119,37 @@ class RunBars(BaseBars):
                 self._update_cache(date_time, price, low_price, high_price, signed_tick, cum_theta_sell, cum_theta_buy,
                                    cum_ticks, exp_num_ticks, imbalance_array)
         return list_bars
+
+    def _update_counters(self):
+        """
+        Updates the counters by resetting them or making use of the cache to update them based on a previous batch.
+
+        :return: Updated cum_ticks, cum_theta_buy, cum_theta_sell, high_price, low_price, exp_num_ticks, imbalance_array
+        """
+        # Check flag
+        if self.flag and self.cache:
+            latest_entry = self.cache[-1]
+
+            # Update variables based on cache
+            cum_ticks = int(latest_entry.cum_ticks)
+            low_price = np.float(latest_entry.low)
+            high_price = np.float(latest_entry.high)
+            # Cumulative buy and sell imbalances for a particular run calculation (theta_t in Prado book)
+            cum_theta_buy = np.float(latest_entry.cum_theta_buy)
+            cum_theta_sell = np.float(latest_entry.cum_theta_sell)
+            # Expected number of ticks extracted from prev bars
+            exp_num_ticks = np.float(latest_entry.exp_num_ticks)
+            # Array of latest imbalances
+            imbalance_array = latest_entry.imbalance_array
+        else:
+            # Reset counters
+            cum_ticks, cum_theta_buy, cum_theta_sell = 0, 0, 0
+            high_price, low_price = -np.inf, np.inf
+            exp_num_ticks = self.exp_num_ticks_init
+            # In run bars we need to track both buy and sell imbalance
+            imbalance_array = {'buy': [], 'sell': []}
+
+        return cum_ticks, cum_theta_buy, cum_theta_sell, high_price, low_price, exp_num_ticks, imbalance_array
 
     def _update_cache(self, date_time, price, low_price, high_price, signed_tick, cum_theta_sell, cum_theta_buy,
                       cum_ticks, exp_num_ticks, imbalance_array):

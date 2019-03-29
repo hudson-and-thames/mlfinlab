@@ -17,7 +17,7 @@ frequency paradigm, Lopez de Prado, et al.
 from collections import namedtuple
 import numpy as np
 from mlfinlab.util.fast_ewma import ewma
-from mlfinlab.data_structures.information_bars import BaseBars
+from mlfinlab.data_structures.base_bars import BaseBars
 
 
 class ImbalanceBars(BaseBars):

@@ -17,13 +17,19 @@ Many of the projects going forward will require Dollar and Volume bars.
 
 # Imports
 from collections import namedtuple
-import pandas as pd
 import numpy as np
 
-from mlfinlab.data_structures.information_bars import BaseBars
+from mlfinlab.data_structures.base_bars import BaseBars
 
 
 class StandardBars(BaseBars):
+    """
+    Contains all of the logic to construct the standard bars from chapter 2. This class shouldn't be used directly.
+    We have added functions to the package such as get_dollar_bars which will create an instance of this
+    class and then construct the standard bars, to return to the user.
+
+    This is because we wanted to simplify the logic as much as possible, for the end user.
+    """
     def __init__(self, file_path, metric, threshold=50000, batch_size=20000000):
 
         BaseBars.__init__(self, file_path, metric, batch_size)
@@ -33,6 +39,48 @@ class StandardBars(BaseBars):
         # Named tuple to help with the cache
         self.cache_tuple = namedtuple('CacheData',
                                       ['date_time', 'price', 'high', 'low', 'cum_ticks', 'cum_volume', 'cum_dollar'])
+
+    def _extract_bars(self, data):
+        """
+        For loop which compiles the various bars: dollar, volume, or tick.
+        We did investigate the use of trying to solve this in a vectorised manner but found that a For loop worked well.
+
+        :param data: Contains 3 columns - date_time, price, and volume.
+        """
+        cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = self._update_counters()
+
+        # Iterate over rows
+        list_bars = []
+        for row in data.values:
+            # Set variables
+            date_time = row[0]
+            price = np.float(row[1])
+            volume = row[2]
+
+            # Update high low prices
+            high_price, low_price = self._update_high_low(high_price, low_price, price)
+
+            # Calculations
+            cum_ticks += 1
+            dollar_value = price * volume
+            cum_dollar_value = cum_dollar_value + dollar_value
+            cum_volume = cum_volume + volume
+
+            # Update cache
+            self._update_cache(date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_dollar_value)
+
+            # If threshold reached then take a sample
+            if eval(self.metric) >= self.threshold:  # pylint: disable=eval-used
+                self._create_bars(date_time, price, high_price, low_price, list_bars)
+
+                # Reset counters
+                cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = 0, 0, 0, -np.inf, np.inf
+                self.cache = []
+
+                # Update cache after bar generation
+                self._update_cache(date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_dollar_value)
+
+        return list_bars
 
     def _update_counters(self):
         """
@@ -56,48 +104,18 @@ class StandardBars(BaseBars):
 
         return cum_ticks, cum_dollar_value, cum_volume, high_price, low_price
 
-    def _extract_bars(self, data):
-        """
-        For loop which compiles the various bars: dollar, volume, or tick.
-        We did investigate the use of trying to solve this in a vectorised manner but found that a For loop worked well.
-
-        :param data: Contains 3 columns - date_time, price, and volume.
-        """
-        cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = self._update_counters()
-
-        # Iterate over rows
-        list_bars = []
-        for row in data.values:
-            # Set variables
-            date_time = row[0]
-            price = np.float(row[1])
-            volume = row[2]
-
-            # Calculations
-            cum_ticks += 1
-            dollar_value = price * volume
-            cum_dollar_value = cum_dollar_value + dollar_value
-            cum_volume = cum_volume + volume
-
-            # Update high low prices
-            high_price, low_price = self._update_high_low(high_price, low_price, price)
-
-            # Update cache
-            self._update_cache(date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_dollar_value)
-
-            # If threshold reached then take a sample
-            if eval(self.metric) >= self.threshold:  # pylint: disable=eval-used
-                self._create_bars(date_time, price, high_price, low_price, list_bars)
-
-                # Reset counters
-                cum_ticks, cum_dollar_value, cum_volume, cache, high_price, low_price = 0, 0, 0, [], -np.inf, np.inf
-
-                # Update cache after bar generation
-                self._update_cache(date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_dollar_value)
-
-        return list_bars
-
     def _update_cache(self, date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_dollar_value):
+        """
+        Update the cache which is used to create a continuous flow of bars from one batch to the next.
+
+        :param date_time: Timestamp of the bar
+        :param price: The current price
+        :param low_price: Lowest price in the period
+        :param high_price: Highest price in the period
+        :param cum_ticks: Cumulative number of ticks
+        :param cum_volume: Cumulative volume
+        :param cum_dollar_value: Cumulative dollar value
+        """
         cache_data = self.cache_tuple(date_time, price, high_price, low_price, cum_ticks, cum_volume, cum_dollar_value)
         self.cache.append(cache_data)
 
