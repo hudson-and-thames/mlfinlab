@@ -44,14 +44,14 @@ class BaseBars(ABC):
         first_row = pd.read_csv(self.file_path, nrows=1)
         self._assert_csv(first_row)
 
-        if verbose:
+        if verbose:  # pragma: no cover
             print('Reading data in batches:')
 
         # Read csv in batches
         count = 0
         final_bars = []
         for batch in pd.read_csv(self.file_path, chunksize=self.batch_size):
-            if verbose:
+            if verbose:  # pragma: no cover
                 print('Batch number:', count)
 
             list_bars = self._extract_bars(data=batch)
@@ -67,7 +67,7 @@ class BaseBars(ABC):
         cols = ['date_time', 'open', 'high', 'low', 'close']
         bars_df = pd.DataFrame(final_bars, columns=cols)
 
-        if verbose:
+        if verbose:  # pragma: no cover
             print('Returning bars \n')
 
         return bars_df
