@@ -19,9 +19,10 @@ import numpy as np
 from mlfinlab.util.fast_ewma import ewma
 
 
-class RunBars:
-    def __init__(self, file_path, metric, exp_num_ticks_init=100000,
-                 num_prev_bars=3, num_ticks_ewma_window=20, batch_size=2e7):
+class InformationBars:
+    def __init__(self, file_path, metric, exp_num_ticks_init=100000, num_prev_bars=3, num_ticks_ewma_window=20,
+                 batch_size=2e7):
+
         # Base properties
         self.file_path = file_path
         self.metric = metric
@@ -34,6 +35,14 @@ class RunBars:
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
         self.cache = []
         self.num_ticks_bar = []  # List of number of ticks from previous bars
+
+
+class RunBars(InformationBars):
+    def __init__(self, file_path, metric, exp_num_ticks_init=100000,
+                 num_prev_bars=3, num_ticks_ewma_window=20, batch_size=2e7):
+
+        InformationBars.__init__(self, file_path, metric, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window,
+                                 batch_size)
 
         # Extract bars properties
         self.cache_tuple = namedtuple('CacheData',
@@ -148,6 +157,7 @@ class RunBars:
                                                                         exp_sell_proportion):  # pylint: disable=eval-used
                 # Create bars
                 open_price = self.cache[0].price
+                high_price = max(high_price, open_price)
                 low_price = min(low_price, open_price)
                 close_price = price
                 self.num_ticks_bar.append(cum_ticks)
@@ -255,7 +265,6 @@ def get_volume_run_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_
     volume_run_bars = bars.batch_run()
 
     return volume_run_bars
-
 
 
 def get_tick_run_bars(file_path, exp_num_ticks_init, num_prev_bars, num_ticks_ewma_window, batch_size=2e7):
