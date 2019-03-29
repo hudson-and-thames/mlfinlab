@@ -58,18 +58,19 @@ class RunBars(InformationBars):
         """
         # Check flag
         if self.flag and self.cache:
-            latest_row = self.cache[-1]
+            latest_entry = self.cache[-1]
+
             # Update variables based on cache
-            cum_ticks = int(latest_row.cum_ticks)
-            low_price = np.float(latest_row.low)
-            high_price = np.float(latest_row.high)
+            cum_ticks = int(latest_entry.cum_ticks)
+            low_price = np.float(latest_entry.low)
+            high_price = np.float(latest_entry.high)
             # Cumulative buy and sell imbalances for a particular run calculation (theta_t in Prado book)
-            cum_theta_buy = np.float(latest_row.cum_theta_buy)
-            cum_theta_sell = np.float(latest_row.cum_theta_sell)
+            cum_theta_buy = np.float(latest_entry.cum_theta_buy)
+            cum_theta_sell = np.float(latest_entry.cum_theta_sell)
             # Expected number of ticks extracted from prev bars
-            exp_num_ticks = np.float(latest_row.exp_num_ticks)
+            exp_num_ticks = np.float(latest_entry.exp_num_ticks)
             # Array of latest imbalances
-            imbalance_array = latest_row.imbalance_array
+            imbalance_array = latest_entry.imbalance_array
         else:
             # Reset counters
             cum_ticks, cum_theta_buy, cum_theta_sell = 0, 0, 0
