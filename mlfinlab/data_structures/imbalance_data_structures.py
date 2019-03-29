@@ -44,7 +44,7 @@ class ImbalanceBars:
         # Base properties
         self.file_path = file_path
         self.metric = metric
-        self.exp_num_tick_init = exp_num_ticks_init
+        self.exp_num_ticks_init = exp_num_ticks_init
         self.num_prev_bars = num_prev_bars
         self.num_ticks_ewma_window = num_ticks_ewma_window
         self.batch_size = batch_size
@@ -123,21 +123,23 @@ class ImbalanceBars:
         """
         # Check flag
         if self.flag and self.cache:
+            latest_entry = self.cache[-1]
+
             # Update variables based on cache
-            cum_ticks = int(self.cache[-1].cum_ticks)
-            low_price = np.float(self.cache[-1].low)
-            high_price = np.float(self.cache[-1].high)
+            cum_ticks = int(latest_entry.cum_ticks)
+            low_price = np.float(latest_entry.low)
+            high_price = np.float(latest_entry.high)
             # cumulative imbalance for a particular imbalance calculation (theta_t in Prado book)
-            cum_theta = np.float(self.cache[-1].cum_theta)
+            cum_theta = np.float(latest_entry.cum_theta)
             # expected number of ticks extracted from prev bars
-            exp_num_ticks = np.float(self.cache[-1].exp_num_ticks)
+            exp_num_ticks = np.float(latest_entry.exp_num_ticks)
             # array of latest imbalances
-            imbalance_array = self.cache[-1].imbalance_array
+            imbalance_array = latest_entry.imbalance_array
         else:
             # Reset counters
             cum_ticks, cum_theta = 0, 0
             high_price, low_price = -np.inf, np.inf
-            exp_num_ticks, imbalance_array = self.exp_num_tick_init, []
+            exp_num_ticks, imbalance_array = self.exp_num_ticks_init, []
 
         return cum_ticks, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array
 

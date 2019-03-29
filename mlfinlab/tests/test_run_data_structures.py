@@ -136,16 +136,16 @@ class TestDataStructures(unittest.TestCase):
 
         # pylint: disable=protected-access
         self.assertRaises(ValueError,
-                          ds._assert_dataframe(pd.DataFrame(wrong_date).T))
+                          ds.RunBars._assert_csv(pd.DataFrame(wrong_date).T))
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds._assert_dataframe,
+                          ds.RunBars._assert_csv,
                           pd.DataFrame(too_many_cols).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds._assert_dataframe,
+                          ds.RunBars._assert_csv,
                           pd.DataFrame(wrong_price).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds._assert_dataframe,
+                          ds.RunBars._assert_csv,
                           pd.DataFrame(wrong_volume).T)
