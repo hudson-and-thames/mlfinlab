@@ -139,9 +139,9 @@ class RunBars(InformationBars):
                 high_price, low_price = -np.inf, np.inf
                 self.cache = []
 
-            # Update cache after bar generation (exp_num_ticks was changed after bar generation)
-            self._update_cache(date_time, price, low_price, high_price, signed_tick, cum_theta_sell, cum_theta_buy,
-                               cum_ticks, exp_num_ticks, imbalance_array)
+                # Update cache after bar generation (exp_num_ticks was changed after bar generation)
+                self._update_cache(date_time, price, low_price, high_price, signed_tick, cum_theta_sell, cum_theta_buy,
+                                   cum_ticks, exp_num_ticks, imbalance_array)
         return list_bars
 
     def _update_cache(self, date_time, price, low_price, high_price, signed_tick, cum_theta_sell, cum_theta_buy,

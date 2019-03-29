@@ -96,9 +96,9 @@ class ImbalanceBars(InformationBars):
                 high_price, low_price = -np.inf, np.inf
                 self.cache = []
 
-            # Update cache after bar generation (exp_num_ticks was changed after bar generation)
-            self._update_cache(date_time, price, low_price, high_price, signed_tick, cum_ticks, cum_theta, exp_num_ticks,
-                               imbalance_array)
+                # Update cache after bar generation (exp_num_ticks was changed after bar generation)
+                self._update_cache(date_time, price, low_price, high_price, signed_tick, cum_ticks, cum_theta, exp_num_ticks,
+                                   imbalance_array)
 
         return list_bars
 
