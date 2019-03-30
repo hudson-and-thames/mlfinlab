@@ -34,14 +34,14 @@ class TestDataStructures(unittest.TestCase):
         num_ticks_ewma_window = 10
 
         db1 = ds.get_dollar_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                     num_prev_bars=num_prev_bars,
-                                     num_ticks_ewma_window=num_ticks_ewma_window, batch_size=1000)
+                                     num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                     batch_size=1000, verbose=False)
         db2 = ds.get_dollar_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                     num_prev_bars=num_prev_bars,
-                                     num_ticks_ewma_window=num_ticks_ewma_window, batch_size=50)
+                                     num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                     batch_size=50, verbose=False)
         db3 = ds.get_dollar_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                     num_prev_bars=num_prev_bars,
-                                     num_ticks_ewma_window=num_ticks_ewma_window, batch_size=10)
+                                     num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                     batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -67,14 +67,14 @@ class TestDataStructures(unittest.TestCase):
         num_ticks_ewma_window = 10
 
         db1 = ds.get_volume_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                     num_prev_bars=num_prev_bars,
-                                     num_ticks_ewma_window=num_ticks_ewma_window, batch_size=1000)
+                                     num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                     batch_size=1000, verbose=False)
         db2 = ds.get_volume_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                     num_prev_bars=num_prev_bars,
-                                     num_ticks_ewma_window=num_ticks_ewma_window, batch_size=50)
+                                     num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                     batch_size=50, verbose=False)
         db3 = ds.get_volume_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                     num_prev_bars=num_prev_bars,
-                                     num_ticks_ewma_window=num_ticks_ewma_window, batch_size=10)
+                                     num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                     batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -100,14 +100,14 @@ class TestDataStructures(unittest.TestCase):
         num_ticks_ewma_window = 10
 
         db1 = ds.get_tick_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                   num_prev_bars=num_prev_bars,
-                                   num_ticks_ewma_window=num_ticks_ewma_window, batch_size=1000)
+                                   num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                   batch_size=1000, verbose=False)
         db2 = ds.get_tick_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                   num_prev_bars=num_prev_bars,
-                                   num_ticks_ewma_window=num_ticks_ewma_window, batch_size=50)
+                                   num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                   batch_size=50, verbose=False)
         db3 = ds.get_tick_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                   num_prev_bars=num_prev_bars,
-                                   num_ticks_ewma_window=num_ticks_ewma_window, batch_size=10)
+                                   num_prev_bars=num_prev_bars, num_ticks_ewma_window=num_ticks_ewma_window,
+                                   batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -136,16 +136,16 @@ class TestDataStructures(unittest.TestCase):
 
         # pylint: disable=protected-access
         self.assertRaises(ValueError,
-                          ds._assert_dataframe(pd.DataFrame(wrong_date).T))
+                          ds.RunBars._assert_csv(pd.DataFrame(wrong_date).T))
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds._assert_dataframe,
+                          ds.RunBars._assert_csv,
                           pd.DataFrame(too_many_cols).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds._assert_dataframe,
+                          ds.RunBars._assert_csv,
                           pd.DataFrame(wrong_price).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds._assert_dataframe,
+                          ds.RunBars._assert_csv,
                           pd.DataFrame(wrong_volume).T)

@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from mlfinlab.data_structures.fast_ewma import ewma
+from mlfinlab.util.fast_ewma import ewma
 
 
 class TestDataStructures(unittest.TestCase):
