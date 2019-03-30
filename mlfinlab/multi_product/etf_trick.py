@@ -1,6 +1,6 @@
 """
-This module contains class for ETF trick generation, described in
-Marcos Lopez de Prado book 'Advances in Financial Machine Learning
+This module contains class for ETF trick generation and futures roll function, described in
+Marcos Lopez de Prado book 'Advances in Financial Machine Learning'
 ETF trick class can generate ETF trick series either from .csv files or from in memory pandas
 data frames
 """
@@ -110,7 +110,7 @@ class ETFTrick:
         :return: (pd.DataFrame): pandas data frame with columns in a format: component_1/asset_name_1, component_1/asset_name_2, ..., component_6/asset_name_n
         """
         if self.in_memory is False:
-            max_prev_index = self.cache['open'].index.max()
+            max_prev_index = self.cache['open'].index.max() # latest index from previous data_df(cache)
             second_max_prev_index = self.cache['open'].index[-2]
             # add the last row from previous data chunk to a new chunk
             open_df.loc[max_prev_index, :] = self.cache['open'].iloc[-1]
@@ -258,6 +258,33 @@ class ETFTrick:
             return self._in_memory_etf_series()
         else:
             return self._csv_file_etf_series()
+
+
+def get_futures_roll_series(df, open_col, close_col, sec_col, current_sec_col,  roll_backward=False):
+    """
+    Function for generating rolling futures series from data frame of multiple futures
+    :param df: (pd.DataFrame): pandas DataFrame containing price info, security name and  current active futures column
+    :param open_col: (string): open prices column name
+    :param close_col: (string): close prices column name
+    :param sec_col: (string): security name column name
+    :param current_sec_col: (string): current active security column name.
+                                      When value in this column changes it means rolling
+    :param roll_backward: (boolean): True for substracting final gap value from all values
+    :return (pd.Series): futures roll close price series
+    """
+    # filter out security data which is not used as current security
+    df = df[df[sec_col] == df[current_sec_col]]
+    df.sort_index(inplace=True)
+    # generate roll dates series based on curren_sec column value change
+    roll_dates = df[current_sec_col].drop_duplicates(keep='first').index
+    gaps = df[close_col] * 0  # roll gaps series
+    gaps.loc[roll_dates[1:]] = series[open_col].loc[roll_dates[1:]] - \
+        series[close_col].loc[roll_dates[1:] # on roll dates, gap equals open - close
+                              ]  # TODO: undertand why Marcos used iloc and list logic
+    if roll_backward:
+        gaps -= gaps.iloc[-1]  # roll backward
+    df[close_col] -= gaps
+    return df[close_col]
 
 
 open_df = pd.read_csv('../open_data.csv', index_col=0)
