@@ -59,27 +59,31 @@ class StandardBars(BaseBars):
             volume = row[2]
 
             # Update high low prices
-            high_price, low_price = self._update_high_low(high_price, low_price, price)
+            high_price, low_price = self._update_high_low(
+                high_price, low_price, price)
 
             # Calculations
             cum_ticks += 1
             dollar_value = price * volume
             cum_dollar_value = cum_dollar_value + dollar_value
-            cum_volume = cum_volume + volume
+            cum_volume += volume
 
             # Update cache
-            self._update_cache(date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_dollar_value)
+            self._update_cache(date_time, price, low_price,
+                               high_price, cum_ticks, cum_volume, cum_dollar_value)
 
             # If threshold reached then take a sample
             if eval(self.metric) >= self.threshold:  # pylint: disable=eval-used
-                self._create_bars(date_time, price, high_price, low_price, list_bars)
+                self._create_bars(date_time, price,
+                                  high_price, low_price, list_bars)
 
                 # Reset counters
                 cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = 0, 0, 0, -np.inf, np.inf
                 self.cache = []
 
                 # Update cache after bar generation
-                self._update_cache(date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_dollar_value)
+                self._update_cache(
+                    date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_dollar_value)
 
         return list_bars
 
@@ -117,7 +121,8 @@ class StandardBars(BaseBars):
         :param cum_volume: Cumulative volume
         :param cum_dollar_value: Cumulative dollar value
         """
-        cache_data = self.cache_tuple(date_time, price, high_price, low_price, cum_ticks, cum_volume, cum_dollar_value)
+        cache_data = self.cache_tuple(
+            date_time, price, high_price, low_price, cum_ticks, cum_volume, cum_dollar_value)
         self.cache.append(cache_data)
 
 
@@ -136,7 +141,8 @@ def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000, verbose=
     :return: Dataframe of dollar bars
     """
 
-    bars = StandardBars(file_path=file_path, metric='cum_dollar_value', threshold=threshold, batch_size=batch_size)
+    bars = StandardBars(file_path=file_path, metric='cum_dollar_value',
+                        threshold=threshold, batch_size=batch_size)
     dollar_bars = bars.batch_run(verbose=verbose)
     return dollar_bars
 

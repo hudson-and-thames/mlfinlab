@@ -15,6 +15,7 @@ class BaseBars(ABC):
     driven bars. There are some methods contained in here that would only be applicable to information bars but
     they are included here so as to avoid a complicated nested class structure.
     """
+
     def __init__(self, file_path, metric, batch_size=2e7):
         """
         Constructor
@@ -64,7 +65,7 @@ class BaseBars(ABC):
             self.flag = True
 
         # Return a DataFrame
-        cols = ['date_time', 'open', 'high', 'low', 'close']
+        cols = ['date_time', 'open', 'high', 'low', 'close', 'volume']
         bars_df = pd.DataFrame(final_bars, columns=cols)
 
         if verbose:  # pragma: no cover
@@ -134,9 +135,11 @@ class BaseBars(ABC):
         high_price = max(high_price, open_price)
         low_price = min(low_price, open_price)
         close_price = price
+        volume = self.cache[-1].cum_volume
 
         # Update bars
-        list_bars.append([date_time, open_price, high_price, low_price, close_price])
+        list_bars.append(
+            [date_time, open_price, high_price, low_price, close_price, volume])
 
     def _apply_tick_rule(self, price):
         """
