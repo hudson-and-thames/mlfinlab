@@ -34,15 +34,15 @@ class ImbalanceBars(BaseBars):
     This is because we wanted to simplify the logic as much as possible, for the end user.
     """
 
-    def __init__(self, file_path, metric, num_prev_bars=3, num_ticks_ewma_window=20, exp_num_ticks_init=100000,
+    def __init__(self, file_path, metric, num_prev_bars=3, imbalance_ewma_window=None, exp_num_ticks_init=100000,
                  batch_size=2e7):
         """
         Constructor
 
         :param file_path: (String) Path to the csv file containing raw tick data in the format[date_time, price, volume]
         :param metric: (String) type of imbalance bar to create. Example: "dollar_imbalance"
-        :param num_prev_bars: (Int) Number of previous bars to use in calculations
-        :param num_ticks_ewma_window: (Int) Window size for E[T]
+        :param num_prev_bars: (Int) Window size for E[T]s
+        :param imbalance_ewma_window: (Int) Window size for imblance calculation
         :param exp_num_ticks_init: (Int) Initial number of expected ticks
         :param batch_size: (Int) Number of rows to read in from the csv, per batch
         """
@@ -50,7 +50,7 @@ class ImbalanceBars(BaseBars):
 
         # Information bar properties
         self.num_prev_bars = num_prev_bars
-        self.num_ticks_ewma_window = num_ticks_ewma_window
+        self.imbalance_ewma_window = imbalance_ewma_window
         self.exp_num_ticks_init = exp_num_ticks_init
         self.num_ticks_bar = []  # List of number of ticks from previous bars
 
@@ -101,8 +101,8 @@ class ImbalanceBars(BaseBars):
 
                 self.num_ticks_bar.append(cum_ticks)
                 # Expected number of ticks based on formed bars
-                exp_num_ticks = ewma(np.array(self.num_ticks_bar[-self.num_ticks_ewma_window:], dtype=float),
-                                     self.num_ticks_ewma_window)[-1]
+                exp_num_ticks = ewma(np.array(self.num_ticks_bar[-self.num_prev_bars:], dtype=float),
+                                     self.num_prev_bars)[-1]
 
                 # Reset counters
                 cum_ticks, cum_volume, cum_theta = 0, 0, 0
@@ -177,73 +177,73 @@ class ImbalanceBars(BaseBars):
             expected_imbalance = np.nan
         else:
             # Expected imbalance per tick
-            ewma_window = int(exp_num_ticks * self.num_prev_bars)
+            if self.imbalance_ewma_window is None:
+                ewma_window = int(exp_num_ticks)
+            else:
+                ewma_window = self.imbalance_ewma_window
             expected_imbalance = ewma(
                 np.array(imbalance_array[-ewma_window:], dtype=float), window=ewma_window)[-1]
 
         return expected_imbalance
 
 
-def get_dollar_imbalance_bars(file_path, num_prev_bars, num_ticks_ewma_window, exp_num_ticks_init=100000,
+def get_dollar_imbalance_bars(file_path, num_prev_bars, imbalance_ewma_window=None, exp_num_ticks_init=100000,
                               batch_size=2e7, verbose=True):
     """
-    Creates the dollar imbalance bars: date_time, open, high, low, close.
+    Creates the dollar imbalance bars: date_time, open, high, low, close, volume.
 
     :param file_path: File path pointing to csv data.
-    :param num_prev_bars: Number of previous bars used for EWMA window (window=num_prev_bars * bar length)
-                          for estimating expected imbalance (tick, volume or dollar)
-    :param num_ticks_ewma_window: EWMA window for expected number of ticks calculations
+    :param num_prev_bars: Number of previous bars used for EWMA window expected # of ticks
+    :param imbalance_ewma_window: Window size for imbalance calculation
     :param exp_num_ticks_init: initial expected number of ticks per bar
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :return: Dataframe of dollar bars
     """
     bars = ImbalanceBars(file_path=file_path, metric='dollar_imbalance', num_prev_bars=num_prev_bars,
-                         num_ticks_ewma_window=num_ticks_ewma_window, exp_num_ticks_init=exp_num_ticks_init,
+                         imbalance_ewma_window=imbalance_ewma_window, exp_num_ticks_init=exp_num_ticks_init,
                          batch_size=batch_size)
     dollar_imbalance_bars = bars.batch_run(verbose=verbose)
 
     return dollar_imbalance_bars
 
 
-def get_volume_imbalance_bars(file_path, num_prev_bars, num_ticks_ewma_window, exp_num_ticks_init=100000,
+def get_volume_imbalance_bars(file_path, num_prev_bars, imbalance_ewma_window=None, exp_num_ticks_init=100000,
                               batch_size=2e7, verbose=True):
     """
-    Creates the volume imbalance bars: date_time, open, high, low, close.
+    Creates the volume imbalance bars: date_time, open, high, low, close, volume.
 
     :param file_path: File path pointing to csv data.
-    :param num_prev_bars: Number of previous bars used for EWMA window (window=num_prev_bars * bar length)
-                          for estimating expected imbalance (tick, volume or dollar)
-    :param num_ticks_ewma_window: EWMA window for expected number of ticks calculations
+    :param num_prev_bars: Number of previous bars used for EWMA window expected # of ticks
+    :param imbalance_ewma_window: Window size for imbalance calculation
     :param exp_num_ticks_init: initial expected number of ticks per bar
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :return: Dataframe of volume bars
     """
     bars = ImbalanceBars(file_path=file_path, metric='volume_imbalance', num_prev_bars=num_prev_bars,
-                         num_ticks_ewma_window=num_ticks_ewma_window, exp_num_ticks_init=exp_num_ticks_init,
+                         imbalance_ewma_window=imbalance_ewma_window, exp_num_ticks_init=exp_num_ticks_init,
                          batch_size=batch_size)
     volume_imbalance_bars = bars.batch_run(verbose=verbose)
 
     return volume_imbalance_bars
 
 
-def get_tick_imbalance_bars(file_path, num_prev_bars, num_ticks_ewma_window, exp_num_ticks_init=100000,
+def get_tick_imbalance_bars(file_path, num_prev_bars, imbalance_ewma_window=None, exp_num_ticks_init=100000,
                             batch_size=2e7, verbose=True):
     """
-    Creates the tick imbalance bars: date_time, open, high, low, close.
+    Creates the tick imbalance bars: date_time, open, high, low, close, volume.
 
-    ::param file_path: File path pointing to csv data.
-    :param num_prev_bars: Number of previous bars used for EWMA window (window=num_prev_bars * bar length)
-                          for estimating expected imbalance (tick, volume or dollar)
-    :param num_ticks_ewma_window: EWMA window for expected number of ticks calculations
+    :param file_path: File path pointing to csv data.
+    :param num_prev_bars: Number of previous bars used for EWMA window expected # of ticks
+    :param imbalance_ewma_window: Window size for imbalance calculation
     :param exp_num_ticks_init: initial expected number of ticks per bar
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :return: Dataframe of tick bars
     """
     bars = ImbalanceBars(file_path=file_path, metric='tick_imbalance', num_prev_bars=num_prev_bars,
-                         num_ticks_ewma_window=num_ticks_ewma_window, exp_num_ticks_init=exp_num_ticks_init,
+                         imbalance_ewma_window=imbalance_ewma_window, exp_num_ticks_init=exp_num_ticks_init,
                          batch_size=batch_size)
     tick_imbalance_bars = bars.batch_run(verbose=verbose)
 
