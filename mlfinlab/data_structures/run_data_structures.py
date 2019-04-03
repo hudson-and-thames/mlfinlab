@@ -209,7 +209,7 @@ class RunBars(BaseBars):
 
 
 def get_dollar_run_bars(file_path, num_prev_bars, imbalance_ewma_window=None, exp_num_ticks_init=100000,
-                        batch_size=2e7, verbose=True):
+                        batch_size=2e7, verbose=True, to_csv=False):
     """
     Creates the dollar run bars: date_time, open, high, low, close, volume.
 
@@ -219,19 +219,20 @@ def get_dollar_run_bars(file_path, num_prev_bars, imbalance_ewma_window=None, ex
     :param exp_num_ticks_init: initial expected number of ticks per bar
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
+    :param to_csv: Save bars to csv after every batch run (True or False)
     :return: Dataframe of dollar bars
     """
 
     bars = RunBars(file_path=file_path, metric='dollar_run',
                    num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
                    exp_num_ticks_init=exp_num_ticks_init, batch_size=batch_size)
-    dollar_run_bars = bars.batch_run(verbose=verbose)
+    dollar_run_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
 
     return dollar_run_bars
 
 
 def get_volume_run_bars(file_path, num_prev_bars, imbalance_ewma_window=None, exp_num_ticks_init=100000,
-                        batch_size=2e7, verbose=True):
+                        batch_size=2e7, verbose=True, to_csv=False):
     """
     Creates the volume run bars: date_time, open, high, low, close, volume.
 
@@ -241,18 +242,19 @@ def get_volume_run_bars(file_path, num_prev_bars, imbalance_ewma_window=None, ex
     :param exp_num_ticks_init: initial expected number of ticks per bar
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
+    :param to_csv: Save bars to csv after every batch run (True or False)
     :return: Dataframe of volume bars
     """
     bars = RunBars(file_path=file_path, metric='volume_run',
                    num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
                    exp_num_ticks_init=exp_num_ticks_init, batch_size=batch_size)
-    volume_run_bars = bars.batch_run(verbose=verbose)
+    volume_run_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
 
     return volume_run_bars
 
 
 def get_tick_run_bars(file_path, num_prev_bars, imbalance_ewma_window=None, exp_num_ticks_init=100000,
-                      batch_size=2e7, verbose=True):
+                      batch_size=2e7, verbose=True, to_csv=False):
     """
     Creates the tick run bars: date_time, open, high, low, close, volume.
 
@@ -262,11 +264,12 @@ def get_tick_run_bars(file_path, num_prev_bars, imbalance_ewma_window=None, exp_
     :param exp_num_ticks_init: initial expected number of ticks per bar
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
+    :param to_csv: Save bars to csv after every batch run (True or False)
     :return: Dataframe of tick bars
     """
     bars = RunBars(file_path=file_path, metric='tick_run',
                    num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
                    exp_num_ticks_init=exp_num_ticks_init, batch_size=batch_size)
-    tick_run_bars = bars.batch_run(verbose=verbose)
+    tick_run_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
 
     return tick_run_bars

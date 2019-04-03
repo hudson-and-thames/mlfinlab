@@ -34,7 +34,7 @@ class BaseBars(ABC):
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
         self.cache = []
 
-    def batch_run(self, verbose=True):
+    def batch_run(self, verbose=True, to_csv=False):
         """
         Reads a csv file in batches and then constructs the financial data structure in the form of a DataFrame.
         The csv file must have only 3 columns: date_time, price, & volume.
@@ -51,22 +51,29 @@ class BaseBars(ABC):
         # Read csv in batches
         count = 0
         final_bars = []
+        cols = ['date_time', 'open', 'high', 'low', 'close', 'volume']
         for batch in pd.read_csv(self.file_path, chunksize=self.batch_size):
             if verbose:  # pragma: no cover
                 print('Batch number:', count)
 
             list_bars = self._extract_bars(data=batch)
 
-            # Append to bars list
-            final_bars += list_bars
+            if to_csv is True:
+                pd.DataFrame(list_bars, columns=cols).to_csv(
+                    '{}.csv'.format(count))
+            else:
+                # Append to bars list
+                final_bars += list_bars
             count += 1
 
             # Set flag to True: notify function to use cache
             self.flag = True
 
         # Return a DataFrame
-        cols = ['date_time', 'open', 'high', 'low', 'close', 'volume']
-        bars_df = pd.DataFrame(final_bars, columns=cols)
+        if final_bars:
+            bars_df = pd.DataFrame(final_bars, columns=cols)
+        else:
+            return None
 
         if verbose:  # pragma: no cover
             print('Returning bars \n')

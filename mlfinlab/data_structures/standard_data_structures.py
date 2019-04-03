@@ -31,7 +31,7 @@ class StandardBars(BaseBars):
     This is because we wanted to simplify the logic as much as possible, for the end user.
     """
 
-    def __init__(self, file_path, metric, threshold=50000, batch_size=20000000):
+    def __init__(self, file_path, metric, threshold=50000, batch_size=20000000, to_csv=False):
 
         BaseBars.__init__(self, file_path, metric, batch_size)
 
@@ -126,7 +126,7 @@ class StandardBars(BaseBars):
         self.cache.append(cache_data)
 
 
-def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000, verbose=True):
+def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000, verbose=True, to_csv=False):
     """
     Creates the dollar bars: date_time, open, high, low, close.
 
@@ -138,16 +138,17 @@ def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000, verbose=
     :param threshold: A cumulative value above this threshold triggers a sample to be taken.
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
+    :param to_csv: Save bars to csv after every batch run (True or False)
     :return: Dataframe of dollar bars
     """
 
     bars = StandardBars(file_path=file_path, metric='cum_dollar_value',
                         threshold=threshold, batch_size=batch_size)
-    dollar_bars = bars.batch_run(verbose=verbose)
+    dollar_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
     return dollar_bars
 
 
-def get_volume_bars(file_path, threshold=28224, batch_size=20000000, verbose=True):
+def get_volume_bars(file_path, threshold=28224, batch_size=20000000, verbose=True, to_csv=False):
     """
     Creates the volume bars: date_time, open, high, low, close.
 
@@ -158,14 +159,15 @@ def get_volume_bars(file_path, threshold=28224, batch_size=20000000, verbose=Tru
     :param threshold: A cumulative value above this threshold triggers a sample to be taken.
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
+    :param to_csv: Save bars to csv after every batch run (True or False)
     :return: Dataframe of volume bars
     """
     bars = StandardBars(file_path, 'cum_volume', threshold, batch_size)
-    volume_bars = bars.batch_run(verbose=verbose)
+    volume_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
     return volume_bars
 
 
-def get_tick_bars(file_path, threshold=2800, batch_size=20000000, verbose=True):
+def get_tick_bars(file_path, threshold=2800, batch_size=20000000, verbose=True, to_csv=False):
     """
     Creates the tick bars: date_time, open, high, low, close.
 
@@ -173,8 +175,9 @@ def get_tick_bars(file_path, threshold=2800, batch_size=20000000, verbose=True):
     :param threshold: A cumulative value above this threshold triggers a sample to be taken.
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
+    :param to_csv: Save bars to csv after every batch run (True or False)
     :return: Dataframe of tick bars
     """
     bars = StandardBars(file_path, 'cum_ticks', threshold, batch_size)
-    tick_bars = bars.batch_run(verbose=verbose)
+    tick_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
     return tick_bars
