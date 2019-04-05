@@ -35,7 +35,7 @@ class RunBars(BaseBars):
     This is because we wanted to simplify the logic as much as possible, for the end user.
     """
 
-    def __init__(self, file_path, metric, num_prev_bars=3, imbalance_ewma_window=None, exp_num_ticks_init=100000,
+    def __init__(self, file_path, metric, num_prev_bars=3, exp_num_ticks_init=100000,
                  batch_size=2e7):
         """
         Constructor
@@ -52,7 +52,6 @@ class RunBars(BaseBars):
         # Information bar properties
         self.exp_num_ticks_init = exp_num_ticks_init
         self.num_prev_bars = num_prev_bars
-        self.imbalance_ewma_window = imbalance_ewma_window
         self.num_ticks_bar = []  # List of number of ticks from previous bars
 
         # Named tuple to help with storing the cache
@@ -99,8 +98,9 @@ class RunBars(BaseBars):
                 imbalance_array['buy'].append(0)
                 cum_theta_sell += abs(imbalance)
 
-            exp_buy_proportion, exp_sell_proportion = self._get_expected_imbalance(
-                exp_num_ticks, imbalance_array)
+            if len(list_bars) == 0:
+                exp_buy_proportion, exp_sell_proportion = self._get_expected_imbalance(
+                    exp_num_ticks, imbalance_array)
 
             # Update cache
             self._update_cache(date_time, price, low_price, high_price, cum_theta_sell, cum_theta_buy,
@@ -116,6 +116,8 @@ class RunBars(BaseBars):
                 # Expected number of ticks based on formed bars
                 exp_num_ticks = ewma(np.array(self.num_ticks_bar[-self.num_prev_bars:], dtype=float),
                                      self.num_prev_bars)[-1]
+                exp_buy_proportion, exp_sell_proportion = self._get_expected_imbalance(
+                    exp_num_ticks * self.num_prev_bars, imbalance_array)
 
                 # Reset counters
                 cum_ticks, cum_volume, cum_theta_buy, cum_theta_sell = 0, 0, 0, 0
@@ -179,33 +181,32 @@ class RunBars(BaseBars):
                                       cum_theta_sell=cum_theta_sell, exp_num_ticks=exp_num_ticks, imbalance_array=imbalance_array)
         self.cache.append(cache_data)
 
-    def _get_expected_imbalance(self, exp_num_ticks, imbalance_array):
+    def _get_expected_imbalance(self, window, imbalance_array):
         """
         Calculate the expected imbalance as defined on page 31 and 32.
-
-        :param exp_num_ticks: Expected number of ticks
+        :param window: EWMA window for calculation
         :param imbalance_array: numpy array of imbalances [buy, sell]
         :return: expected_buy_proportion and expected_sell_proportion
         """
-        if len(imbalance_array['buy']) < exp_num_ticks:
+        if len(imbalance_array['buy']) < self.exp_num_ticks_init:
             # Waiting for array to fill for ewma
             exp_buy_proportion, exp_sell_proportion = np.nan, np.nan
-        else:
-            # Expected imbalance per tick
-            if self.imbalance_ewma_window is None:
-                ewma_window = int(exp_num_ticks)
-            else:
-                ewma_window = self.imbalance_ewma_window
-            buy_sample = np.array(
-                imbalance_array['buy'][-ewma_window:], dtype=float)
-            sell_sample = np.array(
-                imbalance_array['sell'][-ewma_window:], dtype=float)
-            buy_and_sell_imb = sum(buy_sample) + sum(sell_sample)
-            exp_buy_proportion = ewma(
-                buy_sample, window=ewma_window)[-1] / buy_and_sell_imb
-            exp_sell_proportion = ewma(
-                sell_sample, window=ewma_window)[-1] / buy_and_sell_imb
-        return exp_buy_proportion, exp_sell_proportion
+        elif len(imbalance_array) < window:
+            window = min(len(imbalance_array), window)
+
+        ewma_window = int(window)
+        buy_sample = np.array(
+            imbalance_array['buy'][-ewma_window:], dtype=float)
+        sell_sample = np.array(
+            imbalance_array['sell'][-ewma_window:], dtype=float)
+        buy_and_sell_imb = sum(buy_sample) + sum(sell_sample)
+        exp_buy_proportion = ewma(
+            buy_sample, window=ewma_window)[-1] / buy_and_sell_imb
+        exp_sell_proportion = ewma(
+            sell_sample, window=ewma_window)[-1] / buy_and_sell_imb
+
+
+return exp_buy_proportion, exp_sell_proportion
 
 
 def get_dollar_run_bars(file_path, num_prev_bars, imbalance_ewma_window=None, exp_num_ticks_init=100000,
