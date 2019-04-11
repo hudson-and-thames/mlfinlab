@@ -186,7 +186,7 @@ class RunBars(BaseBars):
         if len(imbalance_array['buy']) < self.exp_num_ticks_init:
             # Waiting for array to fill for ewma
             return np.nan, np.nan
-        else len(imbalance_array) < window:
+        else:
             window = min(len(imbalance_array), window)
 
         ewma_window = int(window)
