@@ -38,6 +38,8 @@ class TestDataStructures(unittest.TestCase):
                                            num_prev_bars=num_prev_bars, batch_size=50, verbose=False)
         db3 = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                            num_prev_bars=num_prev_bars, batch_size=10, verbose=False)
+        db4 = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+                                           num_prev_bars=num_prev_bars, batch_size=2e7, verbose=False, to_csv=True)
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
         self.assertTrue(db1.shape == db3.shape)
@@ -52,6 +54,11 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(db1.loc[0, 'low'] == 1304.25)
         self.assertTrue(db1.loc[0, 'close'] == 1304.5)
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
+
+        # Assert to_csv option returns None
+        self.assertTrue(db4 is None)
+        # delete generated csv file (if it wasn't generated test would fail)
+        os.remove('0.csv')
 
     def test_imbalance_volume_bars(self):
         """

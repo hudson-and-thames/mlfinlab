@@ -185,20 +185,22 @@ class RunBars(BaseBars):
         """
         if len(imbalance_array['buy']) < self.exp_num_ticks_init:
             # Waiting for array to fill for ewma
-            return np.nan, np.nan
+            ewma_window = np.nan
         else:
-            window = min(len(imbalance_array), window)
+            ewma_window = int(min(len(imbalance_array), window))
 
-        ewma_window = int(window)
-        buy_sample = np.array(
-            imbalance_array['buy'][-ewma_window:], dtype=float)
-        sell_sample = np.array(
-            imbalance_array['sell'][-ewma_window:], dtype=float)
-        buy_and_sell_imb = sum(buy_sample) + sum(sell_sample)
-        exp_buy_proportion = ewma(
-            buy_sample, window=ewma_window)[-1] / buy_and_sell_imb
-        exp_sell_proportion = ewma(
-            sell_sample, window=ewma_window)[-1] / buy_and_sell_imb
+        if np.isnan(ewma_window):
+            exp_buy_proportion, exp_sell_proportion = np.nan, np.nan
+        else:
+            buy_sample = np.array(
+                imbalance_array['buy'][-ewma_window:], dtype=float)
+            sell_sample = np.array(
+                imbalance_array['sell'][-ewma_window:], dtype=float)
+            buy_and_sell_imb = sum(buy_sample) + sum(sell_sample)
+            exp_buy_proportion = ewma(
+                buy_sample, window=ewma_window)[-1] / buy_and_sell_imb
+            exp_sell_proportion = ewma(
+                sell_sample, window=ewma_window)[-1] / buy_and_sell_imb
 
         return exp_buy_proportion, exp_sell_proportion
 
