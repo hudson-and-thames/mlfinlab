@@ -31,17 +31,13 @@ class TestDataStructures(unittest.TestCase):
         """
         exp_num_ticks_init = 10000
         num_prev_bars = 3
-        imbalance_ewma_window = None
 
         db1 = ds.get_dollar_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                     num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                     batch_size=1000, verbose=False)
+                                     num_prev_bars=num_prev_bars, batch_size=1000, verbose=False)
         db2 = ds.get_dollar_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                     num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                     batch_size=50, verbose=False)
+                                     num_prev_bars=num_prev_bars, batch_size=50, verbose=False)
         db3 = ds.get_dollar_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                     num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                     batch_size=10, verbose=False)
+                                     num_prev_bars=num_prev_bars, batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -64,17 +60,13 @@ class TestDataStructures(unittest.TestCase):
         """
         exp_num_ticks_init = 10000
         num_prev_bars = 3
-        imbalance_ewma_window = None
 
         db1 = ds.get_volume_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                     num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                     batch_size=1000, verbose=False)
+                                     num_prev_bars=num_prev_bars, batch_size=1000, verbose=False)
         db2 = ds.get_volume_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                     num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                     batch_size=50, verbose=False)
+                                     num_prev_bars=num_prev_bars, batch_size=50, verbose=False)
         db3 = ds.get_volume_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                     num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                     batch_size=10, verbose=False)
+                                     num_prev_bars=num_prev_bars, batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -97,17 +89,13 @@ class TestDataStructures(unittest.TestCase):
         """
         exp_num_ticks_init = 1000
         num_prev_bars = 3
-        imbalance_ewma_window = None
 
         db1 = ds.get_tick_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                   num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                   batch_size=1000, verbose=False)
+                                   num_prev_bars=num_prev_bars, batch_size=1000, verbose=False)
         db2 = ds.get_tick_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                   num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                   batch_size=50, verbose=False)
+                                   num_prev_bars=num_prev_bars, batch_size=50, verbose=False)
         db3 = ds.get_tick_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                   num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                   batch_size=10, verbose=False)
+                                   num_prev_bars=num_prev_bars, batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)

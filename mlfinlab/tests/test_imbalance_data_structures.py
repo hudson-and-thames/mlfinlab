@@ -29,20 +29,15 @@ class TestDataStructures(unittest.TestCase):
         """
         Tests the imbalance dollar bars implementation.
         """
-        exp_num_ticks_init = 100
+        exp_num_ticks_init = 1000
         num_prev_bars = 3
-        imbalance_ewma_window = None
 
         db1 = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                           batch_size=1000, verbose=False)
+                                           num_prev_bars=num_prev_bars, batch_size=2e7, verbose=False)
         db2 = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                           batch_size=50, verbose=False)
+                                           num_prev_bars=num_prev_bars, batch_size=50, verbose=False)
         db3 = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                           batch_size=10, verbose=False)
-
+                                           num_prev_bars=num_prev_bars, batch_size=10, verbose=False)
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
         self.assertTrue(db1.shape == db3.shape)
@@ -54,8 +49,8 @@ class TestDataStructures(unittest.TestCase):
         # Assert OHLC is correct
         self.assertTrue(db1.loc[0, 'open'] == 1306.0)
         self.assertTrue(db1.loc[0, 'high'] == 1306.00)
-        self.assertTrue(db1.loc[0, 'low'] == 1305.25)
-        self.assertTrue(db1.loc[0, 'close'] == 1306.00)
+        self.assertTrue(db1.loc[0, 'low'] == 1304.25)
+        self.assertTrue(db1.loc[0, 'close'] == 1304.5)
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
 
     def test_imbalance_volume_bars(self):
@@ -64,17 +59,13 @@ class TestDataStructures(unittest.TestCase):
         """
         exp_num_ticks_init = 100
         num_prev_bars = 3
-        imbalance_ewma_window = None
 
         db1 = ds.get_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                           batch_size=1000, verbose=False)
+                                           num_prev_bars=num_prev_bars, batch_size=1000, verbose=False)
         db2 = ds.get_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                           batch_size=50, verbose=False)
+                                           num_prev_bars=num_prev_bars, batch_size=50, verbose=False)
         db3 = ds.get_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                           num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                           batch_size=10, verbose=False)
+                                           num_prev_bars=num_prev_bars, batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -87,8 +78,8 @@ class TestDataStructures(unittest.TestCase):
         # Assert OHLC is correct
         self.assertTrue(db1.loc[0, 'open'] == 1306.0)
         self.assertTrue(db1.loc[0, 'high'] == 1306.00)
-        self.assertTrue(db1.loc[0, 'low'] == 1305.25)
-        self.assertTrue(db1.loc[0, 'close'] == 1306.00)
+        self.assertTrue(db1.loc[0, 'low'] == 1305.75)
+        self.assertTrue(db1.loc[0, 'close'] == 1305.75)
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
 
     def test_imbalance_tick_bars(self):
@@ -97,17 +88,13 @@ class TestDataStructures(unittest.TestCase):
         """
         exp_num_ticks_init = 100
         num_prev_bars = 3
-        imbalance_ewma_window = None
 
         db1 = ds.get_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                         num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                         batch_size=1000, verbose=False)
+                                         num_prev_bars=num_prev_bars, batch_size=1000, verbose=False)
         db2 = ds.get_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                         num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                         batch_size=50, verbose=False)
+                                         num_prev_bars=num_prev_bars, batch_size=50, verbose=False)
         db3 = ds.get_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                         num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
-                                         batch_size=10, verbose=False)
+                                         num_prev_bars=num_prev_bars, batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -120,8 +107,8 @@ class TestDataStructures(unittest.TestCase):
         # Assert OHLC is correct
         self.assertTrue(db1.loc[0, 'open'] == 1306.0)
         self.assertTrue(db1.loc[0, 'high'] == 1306.00)
-        self.assertTrue(db1.loc[0, 'low'] == 1305.25)
-        self.assertTrue(db1.loc[0, 'close'] == 1306.00)
+        self.assertTrue(db1.loc[0, 'low'] == 1305.75)
+        self.assertTrue(db1.loc[0, 'close'] == 1305.75)
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
 
     def test_csv_format(self):

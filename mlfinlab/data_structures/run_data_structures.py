@@ -57,7 +57,9 @@ class RunBars(BaseBars):
         # Named tuple to help with storing the cache
         self.cache_tuple = namedtuple('CacheData',
                                       ['date_time', 'price', 'high', 'low', 'cum_ticks', 'cum_volume',
-                                       'cum_theta_buy', 'cum_theta_sell', 'exp_num_ticks', 'imbalance_array'])
+                                       'cum_theta_buy', 'cum_theta_sell', 'exp_num_ticks'])
+        self.imbalance_array = {'buy': [], 'sell': []}
+        self.exp_buy_proportion, self.exp_sell_proportion = np.nan, np.nan
 
     def _extract_bars(self, data):
         """
@@ -67,7 +69,7 @@ class RunBars(BaseBars):
         :return: (List) of bars built using the current batch.
         """
         cum_ticks, cum_volume, cum_theta_buy, cum_theta_sell, high_price, low_price, \
-            exp_num_ticks, imbalance_array = self._update_counters()
+            exp_num_ticks = self._update_counters()
 
         # Iterate over rows
         list_bars = []
@@ -88,26 +90,26 @@ class RunBars(BaseBars):
             imbalance = self._get_imbalance(price, signed_tick, volume)
 
             if imbalance > 0:
-                imbalance_array['buy'].append(imbalance)
+                self.imbalance_array['buy'].append(imbalance)
                 # Set zero to keep buy and sell arrays synced
-                imbalance_array['sell'].append(0)
+                self.imbalance_array['sell'].append(0)
                 cum_theta_buy += imbalance
             elif imbalance < 0:
-                imbalance_array['sell'].append(abs(imbalance))
+                self.imbalance_array['sell'].append(abs(imbalance))
                 # Set zero to keep buy and sell arrays synced
-                imbalance_array['buy'].append(0)
+                self.imbalance_array['buy'].append(0)
                 cum_theta_sell += abs(imbalance)
 
-            if len(list_bars) == 0:
-                exp_buy_proportion, exp_sell_proportion = self._get_expected_imbalance(
-                    exp_num_ticks, imbalance_array)
+            if not list_bars and np.isnan(self.exp_buy_proportion):
+                self.exp_buy_proportion, self.exp_sell_proportion = self._get_expected_imbalance(
+                    exp_num_ticks, self.imbalance_array)
 
             # Update cache
             self._update_cache(date_time, price, low_price, high_price, cum_theta_sell, cum_theta_buy,
-                               cum_ticks, cum_volume, exp_num_ticks, imbalance_array)
+                               cum_ticks, cum_volume, exp_num_ticks)
 
             # Check expression for possible bar generation
-            max_proportion = max(exp_buy_proportion, exp_sell_proportion)
+            max_proportion = max(self.exp_buy_proportion, self.exp_sell_proportion)
             if max(cum_theta_buy, cum_theta_sell) > exp_num_ticks * max_proportion:
                 self._create_bars(date_time, price,
                                   high_price, low_price, list_bars)
@@ -116,8 +118,8 @@ class RunBars(BaseBars):
                 # Expected number of ticks based on formed bars
                 exp_num_ticks = ewma(np.array(self.num_ticks_bar[-self.num_prev_bars:], dtype=float),
                                      self.num_prev_bars)[-1]
-                exp_buy_proportion, exp_sell_proportion = self._get_expected_imbalance(
-                    exp_num_ticks * self.num_prev_bars, imbalance_array)
+                self.exp_buy_proportion, self.exp_sell_proportion = self._get_expected_imbalance(
+                    exp_num_ticks * self.num_prev_bars, self.imbalance_array)
 
                 # Reset counters
                 cum_ticks, cum_volume, cum_theta_buy, cum_theta_sell = 0, 0, 0, 0
@@ -126,7 +128,7 @@ class RunBars(BaseBars):
 
                 # Update cache after bar generation (exp_num_ticks was changed after bar generation)
                 self._update_cache(date_time, price, low_price, high_price, cum_theta_sell, cum_theta_buy,
-                                   cum_ticks, cum_volume, exp_num_ticks, imbalance_array)
+                                   cum_ticks, cum_volume, exp_num_ticks)
         return list_bars
 
     def _update_counters(self):
@@ -149,20 +151,16 @@ class RunBars(BaseBars):
             cum_theta_sell = np.float(latest_entry.cum_theta_sell)
             # Expected number of ticks extracted from prev bars
             exp_num_ticks = np.float(latest_entry.exp_num_ticks)
-            # Array of latest imbalances
-            imbalance_array = latest_entry.imbalance_array
         else:
             # Reset counters
             cum_ticks, cum_volume, cum_theta_buy, cum_theta_sell = 0, 0, 0, 0
             high_price, low_price = -np.inf, np.inf
             exp_num_ticks = self.exp_num_ticks_init
-            # In run bars we need to track both buy and sell imbalance
-            imbalance_array = {'buy': [], 'sell': []}
 
-        return cum_ticks, cum_volume, cum_theta_buy, cum_theta_sell, high_price, low_price, exp_num_ticks, imbalance_array
+        return cum_ticks, cum_volume, cum_theta_buy, cum_theta_sell, high_price, low_price, exp_num_ticks
 
     def _update_cache(self, date_time, price, low_price, high_price, cum_theta_sell, cum_theta_buy,
-                      cum_ticks, cum_volume, exp_num_ticks, imbalance_array):
+                      cum_ticks, cum_volume, exp_num_ticks):
         """
         Update the cache which is used to create a continuous flow of bars from one batch to the next.
 
@@ -178,7 +176,7 @@ class RunBars(BaseBars):
         """
         cache_data = self.cache_tuple(date_time=date_time, price=price, high=high_price, low=low_price,
                                       cum_ticks=cum_ticks, cum_volume=cum_volume, cum_theta_buy=cum_theta_buy,
-                                      cum_theta_sell=cum_theta_sell, exp_num_ticks=exp_num_ticks, imbalance_array=imbalance_array)
+                                      cum_theta_sell=cum_theta_sell, exp_num_ticks=exp_num_ticks)
         self.cache.append(cache_data)
 
     def _get_expected_imbalance(self, window, imbalance_array):
@@ -190,7 +188,7 @@ class RunBars(BaseBars):
         """
         if len(imbalance_array['buy']) < self.exp_num_ticks_init:
             # Waiting for array to fill for ewma
-            exp_buy_proportion, exp_sell_proportion = np.nan, np.nan
+            return np.nan, np.nan
         elif len(imbalance_array) < window:
             window = min(len(imbalance_array), window)
 
@@ -205,18 +203,16 @@ class RunBars(BaseBars):
         exp_sell_proportion = ewma(
             sell_sample, window=ewma_window)[-1] / buy_and_sell_imb
 
+        return exp_buy_proportion, exp_sell_proportion
 
-return exp_buy_proportion, exp_sell_proportion
 
-
-def get_dollar_run_bars(file_path, num_prev_bars, imbalance_ewma_window=None, exp_num_ticks_init=100000,
+def get_dollar_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
                         batch_size=2e7, verbose=True, to_csv=False):
     """
     Creates the dollar run bars: date_time, open, high, low, close, volume.
 
     :param file_path: File path pointing to csv data.
     :param num_prev_bars: Number of previous bars used for EWMA window expected # of ticks
-    :param imbalance_ewma_window: Window size for imbalance calculation
     :param exp_num_ticks_init: initial expected number of ticks per bar
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
@@ -224,52 +220,47 @@ def get_dollar_run_bars(file_path, num_prev_bars, imbalance_ewma_window=None, ex
     :return: Dataframe of dollar bars
     """
 
-    bars = RunBars(file_path=file_path, metric='dollar_run',
-                   num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
+    bars = RunBars(file_path=file_path, metric='dollar_run', num_prev_bars=num_prev_bars,
                    exp_num_ticks_init=exp_num_ticks_init, batch_size=batch_size)
     dollar_run_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
 
     return dollar_run_bars
 
 
-def get_volume_run_bars(file_path, num_prev_bars, imbalance_ewma_window=None, exp_num_ticks_init=100000,
+def get_volume_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
                         batch_size=2e7, verbose=True, to_csv=False):
     """
     Creates the volume run bars: date_time, open, high, low, close, volume.
 
     :param file_path: File path pointing to csv data.
     :param num_prev_bars: Number of previous bars used for EWMA window expected # of ticks
-    :param imbalance_ewma_window: Window size for imbalance calculation
     :param exp_num_ticks_init: initial expected number of ticks per bar
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :param to_csv: Save bars to csv after every batch run (True or False)
     :return: Dataframe of volume bars
     """
-    bars = RunBars(file_path=file_path, metric='volume_run',
-                   num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
+    bars = RunBars(file_path=file_path, metric='volume_run', num_prev_bars=num_prev_bars,
                    exp_num_ticks_init=exp_num_ticks_init, batch_size=batch_size)
     volume_run_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
 
     return volume_run_bars
 
 
-def get_tick_run_bars(file_path, num_prev_bars, imbalance_ewma_window=None, exp_num_ticks_init=100000,
+def get_tick_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
                       batch_size=2e7, verbose=True, to_csv=False):
     """
     Creates the tick run bars: date_time, open, high, low, close, volume.
 
     :param file_path: File path pointing to csv data.
     :param num_prev_bars: Number of previous bars used for EWMA window expected # of ticks
-    :param imbalance_ewma_window: Window size for imbalance calculation
     :param exp_num_ticks_init: initial expected number of ticks per bar
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :param to_csv: Save bars to csv after every batch run (True or False)
     :return: Dataframe of tick bars
     """
-    bars = RunBars(file_path=file_path, metric='tick_run',
-                   num_prev_bars=num_prev_bars, imbalance_ewma_window=imbalance_ewma_window,
+    bars = RunBars(file_path=file_path, metric='tick_run', num_prev_bars=num_prev_bars,
                    exp_num_ticks_init=exp_num_ticks_init, batch_size=batch_size)
     tick_run_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
 

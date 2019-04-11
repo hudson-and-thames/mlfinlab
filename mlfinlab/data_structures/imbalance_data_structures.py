@@ -56,7 +56,9 @@ class ImbalanceBars(BaseBars):
         # Named tuple to help with storing the cache
         self.cache_tuple = namedtuple('CacheData',
                                       ['date_time', 'price', 'high', 'low', 'cum_ticks', 'cum_volume', 'cum_theta', 'exp_num_ticks',
-                                       'imbalance_array'])
+                                       ])
+        self.expected_imbalance = np.nan
+        self.imbalance_array = []
 
     def _extract_bars(self, data):
         """
@@ -65,7 +67,7 @@ class ImbalanceBars(BaseBars):
         :param data: (DataFrame) Contains 3 columns - date_time, price, and volume.
         :return: (List) of bars built using the current batch.
         """
-        cum_ticks, cum_volume, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array = self._update_counters()
+        cum_ticks, cum_volume, cum_theta, high_price, low_price, exp_num_ticks = self._update_counters()
 
         # Iterate over rows
         list_bars = []
@@ -84,19 +86,19 @@ class ImbalanceBars(BaseBars):
             # Imbalance calculations
             signed_tick = self._apply_tick_rule(price)
             imbalance = self._get_imbalance(price, signed_tick, volume)
-            imbalance_array.append(imbalance)
+            self.imbalance_array.append(imbalance)
             cum_theta += imbalance
 
-            if len(list_bars) == 0:
-                expected_imbalance = self._get_expected_imbalance(
-                    exp_num_ticks, imbalance_array)
+            if not list_bars and np.isnan(self.expected_imbalance):
+                self.expected_imbalance = self._get_expected_imbalance(
+                    exp_num_ticks, self.imbalance_array)
 
             # Update cache
             self._update_cache(date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_theta, exp_num_ticks,
-                               imbalance_array)
+                               )
 
             # Check expression for possible bar generation
-            if np.abs(cum_theta) > exp_num_ticks * np.abs(expected_imbalance):
+            if np.abs(cum_theta) > exp_num_ticks * np.abs(self.expected_imbalance):
                 self._create_bars(date_time, price,
                                   high_price, low_price, list_bars)
 
@@ -105,8 +107,8 @@ class ImbalanceBars(BaseBars):
                 exp_num_ticks = ewma(np.array(self.num_ticks_bar[-self.num_prev_bars:], dtype=float),
                                      self.num_prev_bars)[-1]
 
-                expected_imbalance = self._get_expected_imbalance(
-                    exp_num_ticks * self.num_prev_bars, imbalance_array)
+                self.expected_imbalance = self._get_expected_imbalance(
+                    exp_num_ticks * self.num_prev_bars, self.imbalance_array)
                 # Reset counters
                 cum_ticks, cum_volume, cum_theta = 0, 0, 0
                 high_price, low_price = -np.inf, np.inf
@@ -114,8 +116,7 @@ class ImbalanceBars(BaseBars):
 
                 # Update cache after bar generation (exp_num_ticks was changed after bar generation)
                 self._update_cache(date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_theta, exp_num_ticks,
-                                   imbalance_array)
-
+                                   )
         return list_bars
 
     def _update_counters(self):
@@ -137,18 +138,16 @@ class ImbalanceBars(BaseBars):
             cum_theta = np.float(latest_entry.cum_theta)
             # expected number of ticks extracted from prev bars
             exp_num_ticks = np.float(latest_entry.exp_num_ticks)
-            # array of latest imbalances
-            imbalance_array = latest_entry.imbalance_array
         else:
             # Reset counters
             cum_ticks, cum_theta, cum_volume = 0, 0, 0
             high_price, low_price = -np.inf, np.inf
             exp_num_ticks, imbalance_array = self.exp_num_ticks_init, []
 
-        return cum_ticks, cum_volume, cum_theta, high_price, low_price, exp_num_ticks, imbalance_array
+        return cum_ticks, cum_volume, cum_theta, high_price, low_price, exp_num_ticks
 
     def _update_cache(self, date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_theta, exp_num_ticks,
-                      imbalance_array):
+                      ):
         """
         Update the cache which is used to create a continuous flow of bars from one batch to the next.
 
@@ -164,7 +163,7 @@ class ImbalanceBars(BaseBars):
         """
         cache_data = self.cache_tuple(date_time=date_time, price=price, high=high_price, low=low_price,
                                       cum_ticks=cum_ticks, cum_volume=cum_volume, cum_theta=cum_theta, exp_num_ticks=exp_num_ticks,
-                                      imbalance_array=imbalance_array)
+                                      )
         self.cache.append(cache_data)
 
     def _get_expected_imbalance(self, window, imbalance_array):

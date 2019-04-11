@@ -31,7 +31,7 @@ class StandardBars(BaseBars):
     This is because we wanted to simplify the logic as much as possible, for the end user.
     """
 
-    def __init__(self, file_path, metric, threshold=50000, batch_size=20000000, to_csv=False):
+    def __init__(self, file_path, metric, threshold=50000, batch_size=20000000):
 
         BaseBars.__init__(self, file_path, metric, batch_size)
 
