@@ -170,7 +170,7 @@ class ImbalanceBars(BaseBars):
         if len(imbalance_array) < self.exp_num_ticks_init:
             # Waiting for array to fill for ewma
             return np.nan
-        elif len(imbalance_array) < window:
+        else len(imbalance_array) < window:
             window = min(len(imbalance_array), window)
 
         ewma_window = int(window)
