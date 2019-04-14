@@ -194,6 +194,7 @@ def get_dollar_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=10000
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :param to_csv: Save bars to csv after every batch run (True or False)
+    :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of dollar bars
     """
     bars = ImbalanceBars(file_path=file_path, metric='dollar_imbalance', num_prev_bars=num_prev_bars,
@@ -215,6 +216,7 @@ def get_volume_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=10000
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :param to_csv: Save bars to csv after every batch run (True or False)
+    :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of volume bars
     """
     bars = ImbalanceBars(file_path=file_path, metric='volume_imbalance', num_prev_bars=num_prev_bars,
@@ -236,6 +238,7 @@ def get_tick_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :param to_csv: Save bars to csv after every batch run (True or False)
+    :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of tick bars
     """
     bars = ImbalanceBars(file_path=file_path, metric='tick_imbalance', num_prev_bars=num_prev_bars,

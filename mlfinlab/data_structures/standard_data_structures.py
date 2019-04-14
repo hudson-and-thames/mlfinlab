@@ -144,8 +144,7 @@ def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000, verbose=
 
     bars = StandardBars(file_path=file_path, metric='cum_dollar_value',
                         threshold=threshold, batch_size=batch_size)
-    dollar_bars = bars.batch_run(
-        verbose=verbose, to_csv=to_csv, output_path=output_path)
+    dollar_bars = bars.batch_run(verbose=verbose, to_csv=to_csv, output_path=output_path)
     return dollar_bars
 
 
@@ -165,8 +164,7 @@ def get_volume_bars(file_path, threshold=28224, batch_size=20000000, verbose=Tru
     """
     bars = StandardBars(file_path=file_path, metric='cum_volume',
                         threshold=threshold, batch_size=batch_size)
-    volume_bars = bars.batch_run(
-        verbose=verbose, to_csv=to_csv, output_path=output_path)
+    volume_bars = bars.batch_run(verbose=verbose, to_csv=to_csv, output_path=output_path)
     return volume_bars
 
 
@@ -183,6 +181,5 @@ def get_tick_bars(file_path, threshold=2800, batch_size=20000000, verbose=True, 
     """
     bars = StandardBars(file_path=file_path, metric='cum_ticks',
                         threshold=threshold, batch_size=batch_size)
-    tick_bars = bars.batch_run(
-        verbose=verbose, to_csv=to_csv, output_path=output_path)
+    tick_bars = bars.batch_run(verbose=verbose, to_csv=to_csv, output_path=output_path)
     return tick_bars

@@ -135,7 +135,7 @@ class RunBars(BaseBars):
         """
         Updates the counters by resetting them or making use of the cache to update them based on a previous batch.
 
-        :return: Updated cum_ticks, cum_volume, cum_theta_buy, cum_theta_sell, high_price, low_price, exp_num_ticks
+        :return: Updated cum_ticks, cum_volume, cum_theta_buy, cum_theta_sell, high_price, low_price
         """
         # Check flag
         if self.flag and self.cache:
@@ -186,6 +186,8 @@ class RunBars(BaseBars):
             # Waiting for array to fill for ewma
             ewma_window = np.nan
         else:
+            # ewma window can be either the window specified in a function call
+            # or it is len of imbalance_array if window > len(imbalance_array)
             ewma_window = int(min(len(imbalance_array), window))
 
         if np.isnan(ewma_window):
@@ -215,6 +217,7 @@ def get_dollar_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :param to_csv: Save bars to csv after every batch run (True or False)
+    :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of dollar bars
     """
 
@@ -237,6 +240,7 @@ def get_volume_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :param to_csv: Save bars to csv after every batch run (True or False)
+    :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of volume bars
     """
     bars = RunBars(file_path=file_path, metric='volume_run', num_prev_bars=num_prev_bars,
@@ -258,6 +262,7 @@ def get_tick_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :param to_csv: Save bars to csv after every batch run (True or False)
+    :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of tick bars
     """
     bars = RunBars(file_path=file_path, metric='tick_run', num_prev_bars=num_prev_bars,

@@ -38,8 +38,11 @@ class BaseBars(ABC):
         """
         Reads a csv file in batches and then constructs the financial data structure in the form of a DataFrame.
         The csv file must have only 3 columns: date_time, price, & volume.
+        :param verbose: (Boolean) Flag whether to print message on each processed batch or not
+        :param to_csv: (Boolean) Flag for writing the results of bars generation to local csv file, or to in-memory DataFrame
+        :param output_path: (Boolean) Path to results file, if to_csv = True
 
-        :return: (DataFrame) Financial data structure
+        :return: (DataFrame or None) Financial data structure
         """
         # Read in the first row & assert format
         first_row = pd.read_csv(self.file_path, nrows=1)
@@ -78,7 +81,7 @@ class BaseBars(ABC):
         if final_bars:
             bars_df = pd.DataFrame(final_bars, columns=cols)
         else:
-            return None
+            return None # processed data frame is stored in .csv file, return None
 
         if verbose:  # pragma: no cover
             print('Returning bars \n')
@@ -150,8 +153,7 @@ class BaseBars(ABC):
         volume = self.cache[-1].cum_volume
 
         # Update bars
-        list_bars.append([date_time, open_price, high_price,
-                          low_price, close_price, volume])
+        list_bars.append([date_time, open_price, high_price, low_price, close_price, volume])
 
     def _apply_tick_rule(self, price):
         """
