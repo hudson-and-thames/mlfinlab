@@ -20,11 +20,11 @@ class ETFTrick:
         """
         Constructor
         Creates class object, for csv based files reads the first data chunk.
-        :param open_df: (pd.DataFrame or string): open prices data frame or path to csv file
-        :param close_df: (pd.DataFrame or string): close prices data frame or path to csv file
-        :param alloc_df: (pd.DataFrame or string): asset allocations data frame or path to csv file (in # of contracts)
-        :param costs_df: (pd.DataFrame or string): rebalance, carry and dividend costs of holding/rebalancing the position
-        :param rates_df: (pd.DataFrame or string): dollar value of one point move of contract(includes exchange rate, futures contracts multiplies).
+        :param open_df: (pd.DataFrame or string): open prices data frame or path to csv file, corresponds to o(t) from the book
+        :param close_df: (pd.DataFrame or string): close prices data frame or path to csv file, corresponds to p(t)
+        :param alloc_df: (pd.DataFrame or string): asset allocations data frame or path to csv file (in # of contracts), corresponds to w(t)
+        :param costs_df: (pd.DataFrame or string): rebalance, carry and dividend costs of holding/rebalancing the position, corresponds to d(t)
+        :param rates_df: (pd.DataFrame or string): dollar value of one point move of contract(includes exchange rate, futures contracts multiplies). Corresponds to phi(t)
                          For example, 1$ in VIX index, equals 1000$ in VIX futures contract value. If None then trivial (all values equal 1.0) is generated
         :param in_memory: (boolean): boolean flag of whether data frames are stored in memory or in csv files
         :param batch_size: (int): number of rows to per batch. Used for csv stored data frames
@@ -61,11 +61,12 @@ class ETFTrick:
                     rates_df, iterator=True, index_col=self.index_col, parse_dates=[self.index_col])
                 rates_df = self.rates_iter.get_chunk(batch_size)
 
-        self.securities = alloc_df.columns  # get all securities columns
         if rates_df is None:
             rates_df = open_df.copy()
             # set trivial(1.0) exchange rate if no data is provided
             rates_df[self.securities] = 1.0
+
+        self.securities = alloc_df.columns  # get all securities columns
 
         # align all securities columns in one order
         open_df = open_df[self.securities]
@@ -110,7 +111,8 @@ class ETFTrick:
         :return: (pd.DataFrame): pandas data frame with columns in a format: component_1/asset_name_1, component_1/asset_name_2, ..., component_6/asset_name_n
         """
         if self.in_memory is False:
-            max_prev_index = self.cache['open'].index.max() # latest index from previous data_df(cache)
+            # latest index from previous data_df(cache)
+            max_prev_index = self.cache['open'].index.max()
             second_max_prev_index = self.cache['open'].index[-2]
             # add the last row from previous data chunk to a new chunk
             open_df.loc[max_prev_index, :] = self.cache['open'].iloc[-1]
@@ -148,10 +150,14 @@ class ETFTrick:
         close_open_diff = close_df.sub(open_df)  # close - open data frame
         alloc_df['abs_w_sum'] = alloc_df.abs().sum(
             axis=1)  # for each row generate absolute values sum for all assets
-        delever_df = (next_open_df.mul(rates_df)).mul(
-            alloc_df['abs_w_sum'], axis='index')  # deleverage component for h_i_t calculation
-        h_without_k = alloc_df.div(
-            delever_df)  # generate calculated h_t values for each row. For complete h_t calculation multiplying by current K_t is needed(can be vectorised)
+        # allocations deleverage component
+        delever_df = alloc_df.div(alloc_df['abs_w_sum'], axis='index')
+        next_open_mul_rates_df = next_open_df.mul(
+            rates_df, axis='index')  # o(t+1) * phi(t)
+
+        # generate calculated h_t values for each row
+        # for complete h_t calculation multiplying by current K_t is needed(can't be vectorised)
+        h_without_k = delever_df.div(next_open_mul_rates_df)
 
         weights_df = alloc_df[self.securities]  # allign all securities columns
         h_without_k = h_without_k[self.securities]
@@ -178,9 +184,10 @@ class ETFTrick:
                 row, 6)  # split row in corresponding values for ETF trick
             # replaces nan to zeros in allocations vector
             weights_arr = np.nan_to_num(weights_arr)
+
             # convert np.bool to bool
             # boolean flag of allocations vector change
-            allocs_change = bool(~(self.prev_allocs == weights_arr).all())
+            allocs_change = bool(~(self.prev_allocs == weights_arr).all()) # not(all elements in prev_w equal current_w)
             if self.prev_allocs_change is True:
                 delta = close_open  # delta from book algorithm
             else:
@@ -279,7 +286,7 @@ def get_futures_roll_series(df, open_col, close_col, sec_col, current_sec_col,  
     roll_dates = df[current_sec_col].drop_duplicates(keep='first').index
     gaps = df[close_col] * 0  # roll gaps series
     gaps.loc[roll_dates[1:]] = series[open_col].loc[roll_dates[1:]] - \
-        series[close_col].loc[roll_dates[1:] # on roll dates, gap equals open - close
+        series[close_col].loc[roll_dates[1:]  # on roll dates, gap equals open - close
                               ]  # TODO: undertand why Marcos used iloc and list logic
     if roll_backward:
         gaps -= gaps.iloc[-1]  # roll backward
