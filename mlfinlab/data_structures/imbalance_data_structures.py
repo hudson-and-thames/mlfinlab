@@ -34,8 +34,7 @@ class ImbalanceBars(BaseBars):
     This is because we wanted to simplify the logic as much as possible, for the end user.
     """
 
-    def __init__(self, file_path, metric, num_prev_bars=3, exp_num_ticks_init=100000,
-                 batch_size=2e7):
+    def __init__(self, file_path, metric, num_prev_bars=3, exp_num_ticks_init=100000, batch_size=2e7):
         """
         Constructor
 
@@ -136,7 +135,6 @@ class ImbalanceBars(BaseBars):
             high_price = np.float(latest_entry.high)
             # cumulative imbalance for a particular imbalance calculation (theta_t in Prado book)
             cum_theta = np.float(latest_entry.cum_theta)
-            # expected number of ticks extracted from prev bars
         else:
             # Reset counters
             cum_ticks, cum_theta, cum_volume = 0, 0, 0
@@ -171,9 +169,12 @@ class ImbalanceBars(BaseBars):
             # Waiting for array to fill for ewma
             ewma_window = np.nan
         else:
+            # ewma window can be either the window specified in a function call
+            # or it is len of imbalance_array if window > len(imbalance_array)
             ewma_window = int(min(len(imbalance_array), window))
 
         if np.isnan(ewma_window):
+            # return nan, wait until len(imbalance_array) >= self.exp_num_ticks_init
             expected_imbalance = np.nan
         else:
             expected_imbalance = ewma(
@@ -183,7 +184,7 @@ class ImbalanceBars(BaseBars):
 
 
 def get_dollar_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
-                              batch_size=2e7, verbose=True, to_csv=False):
+                              batch_size=2e7, verbose=True, to_csv=False, output_path=None):
     """
     Creates the dollar imbalance bars: date_time, open, high, low, close, volume.
 
@@ -197,13 +198,14 @@ def get_dollar_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=10000
     """
     bars = ImbalanceBars(file_path=file_path, metric='dollar_imbalance', num_prev_bars=num_prev_bars,
                          exp_num_ticks_init=exp_num_ticks_init, batch_size=batch_size)
-    dollar_imbalance_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
+    dollar_imbalance_bars = bars.batch_run(
+        verbose=verbose, to_csv=to_csv, output_path=output_path)
 
     return dollar_imbalance_bars
 
 
 def get_volume_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
-                              batch_size=2e7, verbose=True, to_csv=False):
+                              batch_size=2e7, verbose=True, to_csv=False, output_path=None):
     """
     Creates the volume imbalance bars: date_time, open, high, low, close, volume.
 
@@ -217,13 +219,14 @@ def get_volume_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=10000
     """
     bars = ImbalanceBars(file_path=file_path, metric='volume_imbalance', num_prev_bars=num_prev_bars,
                          exp_num_ticks_init=exp_num_ticks_init, batch_size=batch_size)
-    volume_imbalance_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
+    volume_imbalance_bars = bars.batch_run(
+        verbose=verbose, to_csv=to_csv, output_path=output_path)
 
     return volume_imbalance_bars
 
 
 def get_tick_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
-                            batch_size=2e7, verbose=True, to_csv=False):
+                            batch_size=2e7, verbose=True, to_csv=False, output_path=None):
     """
     Creates the tick imbalance bars: date_time, open, high, low, close, volume.
 
@@ -237,6 +240,7 @@ def get_tick_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
     """
     bars = ImbalanceBars(file_path=file_path, metric='tick_imbalance', num_prev_bars=num_prev_bars,
                          exp_num_ticks_init=exp_num_ticks_init, batch_size=batch_size)
-    tick_imbalance_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
+    tick_imbalance_bars = bars.batch_run(
+        verbose=verbose, to_csv=to_csv, output_path=output_path)
 
     return tick_imbalance_bars

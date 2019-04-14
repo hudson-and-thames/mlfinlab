@@ -126,7 +126,7 @@ class StandardBars(BaseBars):
         self.cache.append(cache_data)
 
 
-def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000, verbose=True, to_csv=False):
+def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000, verbose=True, to_csv=False, output_path=None):
     """
     Creates the dollar bars: date_time, open, high, low, close.
 
@@ -144,11 +144,12 @@ def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000, verbose=
 
     bars = StandardBars(file_path=file_path, metric='cum_dollar_value',
                         threshold=threshold, batch_size=batch_size)
-    dollar_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
+    dollar_bars = bars.batch_run(
+        verbose=verbose, to_csv=to_csv, output_path=output_path)
     return dollar_bars
 
 
-def get_volume_bars(file_path, threshold=28224, batch_size=20000000, verbose=True, to_csv=False):
+def get_volume_bars(file_path, threshold=28224, batch_size=20000000, verbose=True, to_csv=False, output_path=None):
     """
     Creates the volume bars: date_time, open, high, low, close.
 
@@ -162,12 +163,14 @@ def get_volume_bars(file_path, threshold=28224, batch_size=20000000, verbose=Tru
     :param to_csv: Save bars to csv after every batch run (True or False)
     :return: Dataframe of volume bars
     """
-    bars = StandardBars(file_path, 'cum_volume', threshold, batch_size)
-    volume_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
+    bars = StandardBars(file_path=file_path, metric='cum_volume',
+                        threshold=threshold, batch_size=batch_size)
+    volume_bars = bars.batch_run(
+        verbose=verbose, to_csv=to_csv, output_path=output_path)
     return volume_bars
 
 
-def get_tick_bars(file_path, threshold=2800, batch_size=20000000, verbose=True, to_csv=False):
+def get_tick_bars(file_path, threshold=2800, batch_size=20000000, verbose=True, to_csv=False, output_path=None):
     """
     Creates the tick bars: date_time, open, high, low, close.
 
@@ -178,6 +181,8 @@ def get_tick_bars(file_path, threshold=2800, batch_size=20000000, verbose=True, 
     :param to_csv: Save bars to csv after every batch run (True or False)
     :return: Dataframe of tick bars
     """
-    bars = StandardBars(file_path, 'cum_ticks', threshold, batch_size)
-    tick_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
+    bars = StandardBars(file_path=file_path, metric='cum_ticks',
+                        threshold=threshold, batch_size=batch_size)
+    tick_bars = bars.batch_run(
+        verbose=verbose, to_csv=to_csv, output_path=output_path)
     return tick_bars

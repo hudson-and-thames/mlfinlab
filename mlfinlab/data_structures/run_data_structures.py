@@ -35,8 +35,7 @@ class RunBars(BaseBars):
     This is because we wanted to simplify the logic as much as possible, for the end user.
     """
 
-    def __init__(self, file_path, metric, num_prev_bars=3, exp_num_ticks_init=100000,
-                 batch_size=2e7):
+    def __init__(self, file_path, metric, num_prev_bars=3, exp_num_ticks_init=100000, batch_size=2e7):
         """
         Constructor
 
@@ -206,7 +205,7 @@ class RunBars(BaseBars):
 
 
 def get_dollar_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
-                        batch_size=2e7, verbose=True, to_csv=False):
+                        batch_size=2e7, verbose=True, to_csv=False, output_path=None):
     """
     Creates the dollar run bars: date_time, open, high, low, close, volume.
 
@@ -221,13 +220,14 @@ def get_dollar_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
 
     bars = RunBars(file_path=file_path, metric='dollar_run', num_prev_bars=num_prev_bars,
                    exp_num_ticks_init=exp_num_ticks_init, batch_size=batch_size)
-    dollar_run_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
+    dollar_run_bars = bars.batch_run(
+        verbose=verbose, to_csv=to_csv, output_path=output_path)
 
     return dollar_run_bars
 
 
 def get_volume_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
-                        batch_size=2e7, verbose=True, to_csv=False):
+                        batch_size=2e7, verbose=True, to_csv=False, output_path=None):
     """
     Creates the volume run bars: date_time, open, high, low, close, volume.
 
@@ -241,13 +241,14 @@ def get_volume_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
     """
     bars = RunBars(file_path=file_path, metric='volume_run', num_prev_bars=num_prev_bars,
                    exp_num_ticks_init=exp_num_ticks_init, batch_size=batch_size)
-    volume_run_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
+    volume_run_bars = bars.batch_run(
+        verbose=verbose, to_csv=to_csv, output_path=output_path)
 
     return volume_run_bars
 
 
 def get_tick_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
-                      batch_size=2e7, verbose=True, to_csv=False):
+                      batch_size=2e7, verbose=True, to_csv=False, output_path=None):
     """
     Creates the tick run bars: date_time, open, high, low, close, volume.
 
@@ -261,6 +262,7 @@ def get_tick_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
     """
     bars = RunBars(file_path=file_path, metric='tick_run', num_prev_bars=num_prev_bars,
                    exp_num_ticks_init=exp_num_ticks_init, batch_size=batch_size)
-    tick_run_bars = bars.batch_run(verbose=verbose, to_csv=to_csv)
+    tick_run_bars = bars.batch_run(
+        verbose=verbose, to_csv=to_csv, output_path=output_path)
 
     return tick_run_bars

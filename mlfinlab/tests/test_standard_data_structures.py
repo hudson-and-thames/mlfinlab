@@ -37,20 +37,28 @@ class TestDataStructures(unittest.TestCase):
             self.path, threshold=threshold, batch_size=50, verbose=False)
         db3 = ds.get_dollar_bars(
             self.path, threshold=threshold, batch_size=10, verbose=False)
+        ds.get_dollar_bars(self.path, threshold=threshold, batch_size=50,
+                           verbose=False, to_csv=True, output_path='test.csv')
+        db4 = pd.read_csv('test.csv')
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
         self.assertTrue(db1.shape == db3.shape)
+        self.assertTrue(db4.shape == db1.shape)
 
         # Assert same values
         self.assertTrue(np.all(db1.values == db2.values))
         self.assertTrue(np.all(db1.values == db3.values))
+        self.assertTrue(np.all(db4.values == db1.values))
 
         # Assert OHLC is correct
         self.assertTrue(db1.loc[0, 'open'] == 1205)
         self.assertTrue(db1.loc[0, 'high'] == 1904.75)
         self.assertTrue(db1.loc[0, 'low'] == 1005.0)
         self.assertTrue(db1.loc[0, 'close'] == 1304.5)
+
+        # delete generated csv file (if it wasn't generated test would fail)
+        os.remove('test.csv')
 
     def test_volume_bars(self):
         """
@@ -64,20 +72,28 @@ class TestDataStructures(unittest.TestCase):
             self.path, threshold=threshold, batch_size=50, verbose=False)
         db3 = ds.get_volume_bars(
             self.path, threshold=threshold, batch_size=10, verbose=False)
+        ds.get_volume_bars(self.path, threshold=threshold, batch_size=50,
+                           verbose=False, to_csv=True, output_path='test.csv')
+        db4 = pd.read_csv('test.csv')
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
         self.assertTrue(db1.shape == db3.shape)
+        self.assertTrue(db4.shape == db1.shape)
 
         # Assert same values
         self.assertTrue(np.all(db1.values == db2.values))
         self.assertTrue(np.all(db1.values == db3.values))
+        self.assertTrue(np.all(db4.values == db1.values))
 
         # Assert OHLC is correct
         self.assertTrue(db1.loc[0, 'open'] == 1205)
         self.assertTrue(db1.loc[0, 'high'] == 1904.75)
         self.assertTrue(db1.loc[0, 'low'] == 1005.0)
         self.assertTrue(db1.loc[0, 'close'] == 1304.75)
+
+        # delete generated csv file (if it wasn't generated test would fail)
+        os.remove('test.csv')
 
     def test_tick_bars(self):
         """
@@ -91,20 +107,28 @@ class TestDataStructures(unittest.TestCase):
             self.path, threshold=threshold, batch_size=50, verbose=False)
         db3 = ds.get_tick_bars(
             self.path, threshold=threshold, batch_size=10, verbose=False)
+        ds.get_tick_bars(self.path, threshold=threshold, batch_size=50,
+                         verbose=False, to_csv=True, output_path='test.csv')
+        db4 = pd.read_csv('test.csv')
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
         self.assertTrue(db1.shape == db3.shape)
+        self.assertTrue(db4.shape == db1.shape)
 
         # Assert same values
         self.assertTrue(np.all(db1.values == db2.values))
         self.assertTrue(np.all(db1.values == db3.values))
+        self.assertTrue(np.all(db4.values == db1.values))
 
         # Assert OHLC is correct
         self.assertTrue(db1.loc[0, 'open'] == 1205)
         self.assertTrue(db1.loc[0, 'high'] == 1904.75)
         self.assertTrue(db1.loc[0, 'low'] == 1005.0)
         self.assertTrue(db1.loc[0, 'close'] == 1304.50)
+
+        # delete generated csv file (if it wasn't generated test would fail)
+        os.remove('test.csv')
 
     def test_csv_format(self):
         """

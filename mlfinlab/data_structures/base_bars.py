@@ -34,7 +34,7 @@ class BaseBars(ABC):
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
         self.cache = []
 
-    def batch_run(self, verbose=True, to_csv=False):
+    def batch_run(self, verbose=True, to_csv=False, output_path=None):
         """
         Reads a csv file in batches and then constructs the financial data structure in the form of a DataFrame.
         The csv file must have only 3 columns: date_time, price, & volume.
@@ -44,6 +44,10 @@ class BaseBars(ABC):
         # Read in the first row & assert format
         first_row = pd.read_csv(self.file_path, nrows=1)
         self._assert_csv(first_row)
+
+        if to_csv is True:
+            header = True  # if to_csv is True, header should written on the first batch only
+            open(output_path, 'w').close()  # clean output csv file
 
         if verbose:  # pragma: no cover
             print('Reading data in batches:')
@@ -60,7 +64,8 @@ class BaseBars(ABC):
 
             if to_csv is True:
                 pd.DataFrame(list_bars, columns=cols).to_csv(
-                    '{}.csv'.format(count))
+                    output_path, header=header, index=False, mode='a')
+                header = False
             else:
                 # Append to bars list
                 final_bars += list_bars
@@ -145,8 +150,8 @@ class BaseBars(ABC):
         volume = self.cache[-1].cum_volume
 
         # Update bars
-        list_bars.append(
-            [date_time, open_price, high_price, low_price, close_price, volume])
+        list_bars.append([date_time, open_price, high_price,
+                          low_price, close_price, volume])
 
     def _apply_tick_rule(self, price):
         """
