@@ -16,7 +16,8 @@ class ETFTrick:
     All data frames, files should be processed in a specific format, described in examples
     """
 
-    def __init__(self, open_df, close_df, alloc_df, costs_df, rates_df=None, in_memory=True, batch_size=5000, index_col=0):
+    def __init__(self, open_df, close_df, alloc_df, costs_df, rates_df=None, in_memory=True, batch_size=5000,
+                 index_col=0):
         """
         Constructor
         Creates class object, for csv based files reads the first data chunk.
@@ -36,7 +37,7 @@ class ETFTrick:
         self.index_col = index_col
         self.prev_k = 1.0  # init with 1$ as initial value
         # we need to track allocations vector change on previous step
-        # previous allocation change is needede for delta component calculation
+        # previous allocation change is needed for delta component calculation
         self.prev_allocs_change = False
 
         if in_memory is False:
@@ -75,7 +76,8 @@ class ETFTrick:
         costs_df = costs_df[self.securities]
         rates_df = rates_df[self.securities]
 
-        self.cache = {'open': open_df.iloc[-2:], 'close': close_df.iloc[-2:], 'alloc': alloc_df.iloc[-2:], 'costs': costs_df.iloc[-2:],
+        self.cache = {'open': open_df.iloc[-2:], 'close': close_df.iloc[-2:], 'alloc': alloc_df.iloc[-2:],
+                      'costs': costs_df.iloc[-2:],
                       'rates': rates_df.iloc[-2:]}  # cache is used to recalculate previous row after next chunk load
 
         # check if all data frames have the same index
@@ -84,7 +86,8 @@ class ETFTrick:
                 raise ValueError('DataFrames indices are different')
 
         self.data_df = self.generate_trick_components(
-            open_df, close_df, alloc_df, costs_df, rates_df)  # get all possible etf trick calculations which can be vectorised
+            open_df, close_df, alloc_df, costs_df,
+            rates_df)  # get all possible etf trick calculations which can be vectorised
         # delete first nans (first row of close price difference is nan)
         self.data_df = self.data_df.iloc[1:]
         self.prev_allocs = np.array(
@@ -123,7 +126,7 @@ class ETFTrick:
 
             # to recalculate latest row we need close price differences
             close_df.loc[second_max_prev_index,
-                         :] = self.cache['close'].loc[second_max_prev_index, :]
+            :] = self.cache['close'].loc[second_max_prev_index, :]
             # that is why close_df needs 2 previous chunk rows to omit first row nans
             # sort data frames after all appends
             open_df.sort_index(inplace=True)
@@ -168,8 +171,8 @@ class ETFTrick:
 
         return pd.concat([weights_df, h_without_k, close_open_diff, price_diff, costs_df, rates_df], axis=1,
                          keys=[
-            'w', 'h_t', 'close_open', 'price_diff', 'costs',
-            'rate'])  # generate data frame with all pregenerated info needed for ETF trick
+                             'w', 'h_t', 'close_open', 'price_diff', 'costs',
+                             'rate'])  # generate data frame with all pregenerated info needed for ETF trick
 
     def _chunk_loop(self):
         """
@@ -187,7 +190,8 @@ class ETFTrick:
 
             # convert np.bool to bool
             # boolean flag of allocations vector change
-            allocs_change = bool(~(self.prev_allocs == weights_arr).all()) # not(all elements in prev_w equal current_w)
+            allocs_change = bool(
+                ~(self.prev_allocs == weights_arr).all())  # not(all elements in prev_w equal current_w)
             if self.prev_allocs_change is True:
                 delta = close_open  # delta from book algorithm
             else:
@@ -198,13 +202,15 @@ class ETFTrick:
                 # K is equal to 1 on the first iteration
                 etf_series[index] = self.prev_k
             else:
+                if self.prev_allocs_change is True:
+                    # h_t is equal to previous h_t, or h_t * k if allocations vector changes (roll dates)
+                    self.prev_h = h_t * self.prev_k
+
                 k = self.prev_k + \
                     np.nansum(self.prev_h * rate * (delta + costs))
                 etf_series[index] = k
                 self.prev_k = k
-                if allocs_change == True:
-                    # h_t is equal to previous h_t, or h_t * k if allocations vector changes (roll dates)
-                    self.prev_h = h_t * k
+
                 # update previous allocation vector change
                 self.prev_allocs_change = allocs_change
                 self.prev_allocs = weights_arr
@@ -267,7 +273,7 @@ class ETFTrick:
             return self._csv_file_etf_series()
 
 
-def get_futures_roll_series(df, open_col, close_col, sec_col, current_sec_col,  roll_backward=False):
+def get_futures_roll_series(df, open_col, close_col, sec_col, current_sec_col, roll_backward=False):
     """
     Function for generating rolling futures series from data frame of multiple futures
     :param df: (pd.DataFrame): pandas DataFrame containing price info, security name and  current active futures column
@@ -286,8 +292,8 @@ def get_futures_roll_series(df, open_col, close_col, sec_col, current_sec_col,  
     roll_dates = df[current_sec_col].drop_duplicates(keep='first').index
     gaps = df[close_col] * 0  # roll gaps series
     gaps.loc[roll_dates[1:]] = series[open_col].loc[roll_dates[1:]] - \
-        series[close_col].loc[roll_dates[1:]  # on roll dates, gap equals open - close
-                              ]  # TODO: undertand why Marcos used iloc and list logic
+                               series[close_col].loc[roll_dates[1:]  # on roll dates, gap equals open - close
+                               ]  # TODO: undertand why Marcos used iloc and list logic
     if roll_backward:
         gaps -= gaps.iloc[-1]  # roll backward
     df[close_col] -= gaps
@@ -299,7 +305,6 @@ close_df = pd.read_csv('../close_data.csv', index_col=0)
 alloc_df = pd.read_csv('../alloc_data.csv', index_col=0)
 costs_df = pd.read_csv('../costs_data.csv', index_col=0)
 rates_df = pd.read_csv('../rates_data.csv', index_col=0)
-
 
 open_df.index = pd.to_datetime(open_df.index)
 close_df.index = pd.to_datetime(close_df.index)
