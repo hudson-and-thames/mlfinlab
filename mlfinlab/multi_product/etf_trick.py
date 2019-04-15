@@ -16,8 +16,7 @@ class ETFTrick(object):
     All data frames, files should be processed in a specific format, described in examples
     """
 
-    def __init__(self, open_df, close_df, alloc_df, costs_df, rates_df=None, in_memory=True, batch_size=5000,
-                 index_col=0):
+    def __init__(self, open_df, close_df, alloc_df, costs_df, rates_df=None, index_col=0):
         """
         Constructor
         Creates class object, for csv based files reads the first data chunk.
@@ -28,21 +27,21 @@ class ETFTrick(object):
         :param rates_df: (pd.DataFrame or string): dollar value of one point move of contract
                                                    includes exchange rate, futures contracts multiplies). Corresponds to phi(t)
                          For example, 1$ in VIX index, equals 1000$ in VIX futures contract value. If None then trivial (all values equal 1.0) is generated
-        :param in_memory: (boolean): boolean flag of whether data frames are stored in memory or in csv files
-        :param batch_size: (int): number of rows to per batch. Used for csv stored data frames
         :param index_col: (int): positional index of index column. Used for to determine index column in csv files
 
         """
-        self.in_memory = in_memory
-        self.batch_size = batch_size
         self.index_col = index_col
         self.prev_k = 1.0  # init with 1$ as initial value
         # we need to track allocations vector change on previous step
         # previous allocation change is needed for delta component calculation
         self.prev_allocs_change = False
+        self.prev_h = None  # to find current etf_trick value we need previous h value
+        self.data_df = None  # data frame which contains all precomputed info for etf trick
+
         self.data_dict = dict.fromkeys(['open', 'close', 'alloc', 'costs', 'rates'], None)
 
-        if in_memory is False:
+        if isinstance(alloc_df, str):
+            # string values for open, close, alloc, costs and rates mean that we generate ETF trick from csv files
             self.iter_dict = dict.fromkeys(['open', 'close', 'alloc', 'costs', 'rates'], None)
             # create file iterators
             self.iter_dict['open'] = pd.read_csv(
@@ -53,46 +52,35 @@ class ETFTrick(object):
                 alloc_df, iterator=True, index_col=self.index_col, parse_dates=[self.index_col])
             self.iter_dict['costs'] = pd.read_csv(
                 costs_df, iterator=True, index_col=self.index_col, parse_dates=[self.index_col])
-
-            # get initial data chunk from file iterator
-            self.data_dict['open'] = self.iter_dict['open'].get_chunk(self.batch_size)
-            self.data_dict['close'] = self.iter_dict['close'].get_chunk(self.batch_size)
-            self.data_dict['alloc'] = self.iter_dict['alloc'].get_chunk(self.batch_size)
-            self.data_dict['costs'] = self.iter_dict['costs'].get_chunk(self.batch_size)
-
             if rates_df is not None:
                 self.iter_dict['rates'] = pd.read_csv(
                     rates_df, iterator=True, index_col=self.index_col, parse_dates=[self.index_col])
-                self.data_dict['rates'] = self.iter_dict['rates'].get_chunk(batch_size)
+            # get headers(column names) from csv files (except index col) which correspond to security names
+            self.securities = list(pd.read_csv(alloc_df, nrows=0, header=0, index_col=self.index_col))
+        elif isinstance(alloc_df, pd.DataFrame):
+            self.data_dict['open'] = open_df
+            self.data_dict['close'] = close_df
+            self.data_dict['alloc'] = alloc_df
+            self.data_dict['costs'] = costs_df
+            self.data_dict['rates'] = rates_df
+            self.securities = self.data_dict['alloc'].columns  # get all securities columns
 
-        self.securities = self.data_dict['alloc'].columns  # get all securities columns
+            if rates_df is None:
+                self.data_dict['rates'] = open_df.copy()
+                # set trivial(1.0) exchange rate if no data is provided
+                self.data_dict['rates'][self.securities] = 1.0
 
-        if rates_df is None:
-            self.data_dict['rates'] = open_df.copy()
-            # set trivial(1.0) exchange rate if no data is provided
-            self.data_dict['rates'][self.securities] = 1.0
+            # align all securities columns in one order
+            for df_name in self.data_dict.keys():
+                self.data_dict[df_name] = self.data_dict[df_name][self.securities]
 
-        # align all securities columns in one order
-        for df_name in self.data_dict.keys():
-            self.data_dict[df_name] = self.data_dict[df_name][self.securities]
+            self._index_check()
+        else:
+            raise TypeError('Wrong input to ETFTrick class. Either strings with paths to csv files, or pd.DataFrames')
 
-        # cache is used to recalculate previous row after next chunk load
-        self.cache = self._update_cache()
+        self.prev_allocs = np.array([np.nan for _ in range(0, len(self.securities))])  # init weights with nan values
 
-        # check if all data frames have the same index
-        for temp_df in self.data_dict.values():
-            if self.data_dict['open'].index.difference(temp_df.index).shape[0] != 0:
-                raise ValueError('DataFrames indices are different')
-
-        self.data_df = self.generate_trick_components()  # get all possible etf trick calculations which can be vectorised
-        # delete first nans (first row of close price difference is nan)
-        self.data_df = self.data_df.iloc[1:]
-        self.prev_allocs = np.array(
-            [np.nan for _ in range(0, len(self.securities))])  # init weights with nan values
-
-        self.prev_h = None  # to find current etf_trick value we need previous h value
-
-    def generate_trick_components(self):
+    def generate_trick_components(self, cache=None):
         """
         Calculates all etf trick operations which can be vectorised. Outputs multilevel pandas data frame.
         Generated components:
@@ -102,20 +90,21 @@ class ETFTrick(object):
         'price_diff': close price differences
         'costs': costs_df
         'rate': rates_df
+        :param cache: (dict of pd.DataFrames): dictionary which contains latest 2 rows of open, close, rates, alloc, costs, rates data
         :return: (pd.DataFrame): pandas data frame with columns in a format: component_1/asset_name_1, component_1/asset_name_2, ..., component_6/asset_name_n
         """
-        if self.in_memory is False:
+        if cache:
             # latest index from previous data_df(cache)
-            max_prev_index = self.cache['open'].index.max()
-            second_max_prev_index = self.cache['open'].index[-2]
+            max_prev_index = cache['open'].index.max()
+            second_max_prev_index = cache['open'].index[-2]
             # add the last row from previous data chunk to a new chunk
             for df_name in self.data_dict.keys():
                 temp_df = self.data_dict[df_name]
-                temp_df.loc[max_prev_index, :] = self.cache[df_name].iloc[-1]
+                temp_df.loc[max_prev_index, :] = cache[df_name].iloc[-1]
                 self.data_dict[df_name] = temp_df
 
             # to recalculate latest row we need close price differences
-            self.data_dict['close'].loc[second_max_prev_index, :] = self.cache['close'].loc[second_max_prev_index, :]
+            self.data_dict['close'].loc[second_max_prev_index, :] = cache['close'].loc[second_max_prev_index, :]
             # that is why close_df needs 2 previous chunk rows to omit first row nans
 
             for df_name in self.data_dict.keys():
@@ -149,26 +138,34 @@ class ETFTrick(object):
         close_open_diff = close_open_diff[self.securities]
         price_diff = price_diff[self.securities]
 
-        return pd.concat([weights_df, h_without_k, close_open_diff, price_diff, self.costs_df, self.rates_df], axis=1,
-                         keys=[
-                             'w', 'h_t', 'close_open', 'price_diff', 'costs',
-                             'rate'])  # generate data frame with all pregenerated info needed for ETF trick
+        return pd.concat(
+            [weights_df, h_without_k, close_open_diff, price_diff, self.data_dict['costs'], self.data_dict['rates']],
+            axis=1,
+            keys=[
+                'w', 'h_t', 'close_open', 'price_diff', 'costs',
+                'rate'])  # generate data frame with all pregenerated info needed for ETF trick
 
     def _update_cache(self):
+        """
+        Updates cache (two previous rows) when new data batch is read into the memory. Cache is used to
+        recalculate ETF trick value which corresponds to previous batch last row. That is why we need 2 previous rows
+        for close price difference calculation
+        :return: (dict): dictionary with open, close, alloc, costs and rates last 2 rows
+        """
         cache_dict = {'open': self.data_dict['open'].iloc[-2:], 'close': self.data_dict['close'].iloc[-2:],
                       'alloc': self.data_dict['alloc'].iloc[-2:], 'costs': self.data_dict['costs'].iloc[-2:],
                       'rates': self.data_dict['rates'].iloc[-2:]}
         return cache_dict
 
-    def _chunk_loop(self):
+    def _chunk_loop(self, data_df):
         """
-        Single ETF trick iteration for currently stored data set in memory.
+        Single ETF trick iteration for currently stored(with needed components) data set in memory (data_df).
         For in-memory data set would yield complete ETF trick series, for csv based
         would generate ETF trick series for current batch.
-        :return: (pd.Series): pandas Series with ETF trick values starting from 1.0
+        :return: (pd.Series): pandas Series with ETF trick values
         """
         etf_series = pd.Series()
-        for index, row in zip(self.data_df.index, self.data_df.values):
+        for index, row in zip(data_df.index, data_df.values):
             weights_arr, h_t, close_open, price_diff, costs, rate = np.array_split(
                 row, 6)  # split row in corresponding values for ETF trick
             # replaces nan to zeros in allocations vector
@@ -202,40 +199,65 @@ class ETFTrick(object):
                 self.prev_allocs = weights_arr
         return etf_series
 
-    def _csv_file_etf_series(self):
+    def _index_check(self):
+        """
+        Interal check for all price,rates and allocations data frames have the same index
+        :return: None, or raises ValueError if indexes are different
+        """
+        # check if all data frames have the same index
+        for temp_df in self.data_dict.values():
+            if self.data_dict['open'].index.difference(temp_df.index).shape[0] != 0:
+                raise ValueError('DataFrames indices are different')
+
+    def _get_batch_from_csv(self, batch_size):
+        """
+        Reads the next batch of data sets from csv files and puts them in class variable data_dict
+        :param batch_size: number of rows to read
+        :return: None
+        """
+        # read the next batch
+        self.data_dict['open'] = self.iter_dict['open'].get_chunk(batch_size)
+        self.data_dict['close'] = self.iter_dict['close'].get_chunk(batch_size)
+        self.data_dict['alloc'] = self.iter_dict['alloc'].get_chunk(batch_size)
+        self.data_dict['costs'] = self.iter_dict['costs'].get_chunk(batch_size)
+
+        if self.iter_dict['rates'] is not None:
+            # if there is rates_df iterator, get the next chunk
+            self.data_dict['rates'] = self.data_dict['rates'].get_chunk(batch_size)
+        else:
+            # if no iterator is available, generate trivial rates_df (1.0 for all securities)
+            self.data_dict['rates'] = self.data_dict['open'].copy()
+            # set trivial(1.0) exchange rate if no data is provided
+            self.data_dict['rates'][self.securities] = 1.0
+
+        # align all securities columns in one order
+        for df_name in self.data_dict.keys():
+            self.data_dict[df_name] = self.data_dict[df_name][self.securities]
+
+        self._index_check()
+
+    def _csv_file_etf_series(self, batch_size):
         """
         Csv based ETF trick series generation
         :return: (pd.Series): pandas Series with ETF trick values starting from 1.0
         """
         etf_series = pd.Series()
+        self._get_batch_from_csv(batch_size)
+        data_df = self.generate_trick_components(cache=None)  # cache is empty on the first batch run
+        cache = self._update_cache()
+        # delete first nans (first row of close price difference is nan)
+        data_df = data_df.iloc[1:]
+
         # read data in batch until StopIteration exception is raised
         while True:
             try:
-                # generate ETF trick values for read data chunk
-                chunk_etf_series = self._chunk_loop()
+                chunk_etf_series = self._chunk_loop(data_df)
                 etf_series = etf_series.append(chunk_etf_series)
-
-                # read the next batch
-                self.data_dict['open'] = self.iter_dict['open'].get_chunk(self.batch_size)
-                self.data_dict['close'] = self.iter_dict['close'].get_chunk(self.batch_size)
-                self.data_dict['alloc'] = self.iter_dict['alloc'].get_chunk(self.batch_size)
-                self.data_dict['costs'] = self.iter_dict['costs'].get_chunk(self.batch_size)
-
-                if self.iter_dict['rates'] is not None:
-                    # if there is rates_df iterator, get the next chunk
-                    self.data_dict['rates'] = self.data_dict['rates'].get_chunk(self.batch_size)
-                else:
-                    # if no iterator is available, generate trivial ratest_df (1.0 for all securities)
-                    self.data_dict['rates'] = self.data_dict['open'].copy()
-                    # set trivial(1.0) exchange rate if no data is provided
-                    self.data_dict['rates'][self.securities] = 1.0
-
-                next_data_df = self.generate_trick_components()
-                self.cache = self._update_cache()
-                next_data_df.sort_index(inplace=True)
-                self.data_df = next_data_df  # update data_df for ETF trick calculation
+                self._get_batch_from_csv(batch_size)
+                data_df = self.generate_trick_components(cache)  # update data_df for ETF trick calculation
                 # reset prev_k for previous row calculation
                 self.prev_k = etf_series.iloc[-2]
+                cache = self._update_cache()  # update cache
             except StopIteration:
                 return etf_series
 
@@ -244,24 +266,27 @@ class ETFTrick(object):
         In-memory based ETF trick series generation
         :return: (pd.Series): pandas Series with ETF trick values starting from 1.0
         """
-        return self._chunk_loop()
+        data_df = self.generate_trick_components()  # get all possible etf trick calculations which can be vectorised
+        # delete first nans (first row of close price difference is nan)
+        data_df = data_df.iloc[1:]
+        return self._chunk_loop(data_df)
 
-    def get_etf_series(self):
+    def get_etf_series(self, in_memory=True, batch_size=None):
         """
         External method which defines which etf trick method to use based on in_memory field value
         :return: (pd.Series): pandas Series with ETF trick values starting from 1.0
         """
-        if self.in_memory is True:
+        if in_memory is True:
             etf_trick_series = self._in_memory_etf_series()
         else:
-            etf_trick_series = self._csv_file_etf_series()
+            etf_trick_series = self._csv_file_etf_series(batch_size)
         return etf_trick_series
 
 
 def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_col, roll_backward=False):
     """
     Function for generating rolling futures series from data frame of multiple futures
-    :param data_df: (pd.DataFrame): pandas DataFrame containing price info, security name and  current active futures column
+    :param data_df: (pd.DataFrame): pandas DataFrame containing price info, security name and  current active asset column
     :param open_col: (string): open prices column name
     :param close_col: (string): close prices column name
     :param sec_col: (string): security name column name
