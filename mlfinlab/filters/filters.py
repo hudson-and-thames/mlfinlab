@@ -6,7 +6,6 @@ to some event horizon, say a day.
 
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 
 
 # Snippet 2.4, page 39, The Symmetric CUSUM Filter.
@@ -36,17 +35,15 @@ def get_t_events(raw_price, threshold):
     :return: (datetime index vector) vector of datetimes when the events occurred. This is used later to sample.
     """
 
-    print('Applying Symmetric CUSUM filter.')
-
     t_events = []
     s_pos = 0
     s_neg = 0
 
     # log returns
-    diff = np.log(raw_price).diff().dropna()
+    diff = np.log(raw_price).diff()
 
     # Get event time stamps for the entire series
-    for i in tqdm(diff.index[1:]):
+    for i in diff.index[1:]:
         pos = float(s_pos + diff.loc[i])
         neg = float(s_neg + diff.loc[i])
         s_pos = max(0.0, pos)

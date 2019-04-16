@@ -39,7 +39,6 @@ def nested_parts(num_atoms, num_threads, upper_triangle=False):
     This function enables parallelization of nested loops.
     """
     # Partition of atoms with an inner loop
-    # todo: parts = [0]
     parts = [0]
     num_threads_ = min(num_threads, num_atoms)
 

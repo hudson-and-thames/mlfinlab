@@ -29,8 +29,6 @@ def get_daily_vol(close, lookback=100):
     :param lookback: lookback period to compute volatility
     :return: series of daily volatility value
     """
-    print('Calculating daily volatility for dynamic thresholds')
-
     # daily vol re-indexed to close
     df0 = close.index.searchsorted(close.index - pd.Timedelta(days=1))
     df0 = df0[df0 > 0]
@@ -42,7 +40,7 @@ def get_daily_vol(close, lookback=100):
 
 
 # Snippet 3.2, page 45, Triple Barrier Labeling Method
-def apply_pt_sl_on_t1(close, events, pt_sl, molecule):
+def apply_pt_sl_on_t1(close, events, pt_sl, molecule):  # pragma: no cover
     """
     Snippet 3.2, page 45, Triple Barrier Labeling Method
 
