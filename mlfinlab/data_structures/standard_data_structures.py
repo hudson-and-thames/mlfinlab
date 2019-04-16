@@ -139,11 +139,11 @@ def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000, verbose=
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :param to_csv: Save bars to csv after every batch run (True or False)
+    :param output_path: Path to csv file, if to_csv is True
     :return: Dataframe of dollar bars
     """
 
-    bars = StandardBars(file_path=file_path, metric='cum_dollar_value',
-                        threshold=threshold, batch_size=batch_size)
+    bars = StandardBars(file_path=file_path, metric='cum_dollar_value', threshold=threshold, batch_size=batch_size)
     dollar_bars = bars.batch_run(verbose=verbose, to_csv=to_csv, output_path=output_path)
     return dollar_bars
 
@@ -160,6 +160,7 @@ def get_volume_bars(file_path, threshold=28224, batch_size=20000000, verbose=Tru
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :param to_csv: Save bars to csv after every batch run (True or False)
+    :param output_path: Path to csv file, if to_csv is True
     :return: Dataframe of volume bars
     """
     bars = StandardBars(file_path=file_path, metric='cum_volume',
@@ -177,6 +178,7 @@ def get_tick_bars(file_path, threshold=2800, batch_size=20000000, verbose=True, 
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: Print out batch numbers (True or False)
     :param to_csv: Save bars to csv after every batch run (True or False)
+    :param output_path: Path to csv file, if to_csv is True
     :return: Dataframe of tick bars
     """
     bars = StandardBars(file_path=file_path, metric='cum_ticks',

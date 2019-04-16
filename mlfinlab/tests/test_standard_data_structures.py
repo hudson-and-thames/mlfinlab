@@ -98,7 +98,8 @@ class TestDataStructures(unittest.TestCase):
         db1 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
         db2 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
         db3 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
-        ds.get_tick_bars(self.path, threshold=threshold, batch_size=50, verbose=False, to_csv=True, output_path='test.csv')
+        ds.get_tick_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
+                         to_csv=True, output_path='test.csv')
         db4 = pd.read_csv('test.csv')
 
         # Assert diff batch sizes have same number of bars
@@ -127,8 +128,7 @@ class TestDataStructures(unittest.TestCase):
         wrong_date = ['2019-41-30', 200.00, np.int64(5)]
         wrong_price = ['2019-01-30', 'asd', np.int64(5)]
         wrong_volume = ['2019-01-30', 200.00, 1.5]
-        too_many_cols = ['2019-01-30', 200.00,
-                         np.int64(5), 'Limit order', 'B23']
+        too_many_cols = ['2019-01-30', 200.00, np.int64(5), 'Limit order', 'B23']
 
         # pylint: disable=protected-access
         self.assertRaises(ValueError,
