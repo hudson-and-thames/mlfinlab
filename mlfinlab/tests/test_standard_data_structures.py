@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from mlfinlab.data_structures import data_structures as ds
+from mlfinlab.data_structures import standard_data_structures as ds
 
 
 class TestDataStructures(unittest.TestCase):
@@ -17,6 +17,7 @@ class TestDataStructures(unittest.TestCase):
     2. Volume bars
     3. Tick bars
     """
+
     def setUp(self):
         """
         Set the file path for the tick data csv
@@ -30,17 +31,22 @@ class TestDataStructures(unittest.TestCase):
         """
         threshold = 100000
 
-        db1 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=1000)
-        db2 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=50)
-        db3 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=10)
+        db1 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
+        db2 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
+        db3 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
+        ds.get_dollar_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
+                           to_csv=True, output_path='test.csv')
+        db4 = pd.read_csv('test.csv')
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
         self.assertTrue(db1.shape == db3.shape)
+        self.assertTrue(db4.shape == db1.shape)
 
         # Assert same values
         self.assertTrue(np.all(db1.values == db2.values))
         self.assertTrue(np.all(db1.values == db3.values))
+        self.assertTrue(np.all(db4.values == db1.values))
 
         # Assert OHLC is correct
         self.assertTrue(db1.loc[0, 'open'] == 1205)
@@ -48,8 +54,8 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(db1.loc[0, 'low'] == 1005.0)
         self.assertTrue(db1.loc[0, 'close'] == 1304.5)
 
-        # Assert cum dollar value greater than threshold
-        self.assertTrue(np.all(db1['cum_dollar'] >= threshold))
+        # delete generated csv file (if it wasn't generated test would fail)
+        os.remove('test.csv')
 
     def test_volume_bars(self):
         """
@@ -57,17 +63,22 @@ class TestDataStructures(unittest.TestCase):
         """
         threshold = 30
 
-        db1 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=1000)
-        db2 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=50)
-        db3 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=10)
+        db1 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
+        db2 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
+        db3 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
+        ds.get_volume_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
+                           to_csv=True, output_path='test.csv')
+        db4 = pd.read_csv('test.csv')
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
         self.assertTrue(db1.shape == db3.shape)
+        self.assertTrue(db4.shape == db1.shape)
 
         # Assert same values
         self.assertTrue(np.all(db1.values == db2.values))
         self.assertTrue(np.all(db1.values == db3.values))
+        self.assertTrue(np.all(db4.values == db1.values))
 
         # Assert OHLC is correct
         self.assertTrue(db1.loc[0, 'open'] == 1205)
@@ -75,8 +86,8 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(db1.loc[0, 'low'] == 1005.0)
         self.assertTrue(db1.loc[0, 'close'] == 1304.75)
 
-        # Assert cum dollar value greater than threshold
-        self.assertTrue(np.all(db1['cum_dollar'] >= threshold))
+        # delete generated csv file (if it wasn't generated test would fail)
+        os.remove('test.csv')
 
     def test_tick_bars(self):
         """
@@ -84,17 +95,22 @@ class TestDataStructures(unittest.TestCase):
         """
         threshold = 10
 
-        db1 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=1000)
-        db2 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=50)
-        db3 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=10)
+        db1 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
+        db2 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
+        db3 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
+        ds.get_tick_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
+                         to_csv=True, output_path='test.csv')
+        db4 = pd.read_csv('test.csv')
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
         self.assertTrue(db1.shape == db3.shape)
+        self.assertTrue(db4.shape == db1.shape)
 
         # Assert same values
         self.assertTrue(np.all(db1.values == db2.values))
         self.assertTrue(np.all(db1.values == db3.values))
+        self.assertTrue(np.all(db4.values == db1.values))
 
         # Assert OHLC is correct
         self.assertTrue(db1.loc[0, 'open'] == 1205)
@@ -102,8 +118,8 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(db1.loc[0, 'low'] == 1005.0)
         self.assertTrue(db1.loc[0, 'close'] == 1304.50)
 
-        # Assert cum dollar value greater than threshold
-        self.assertTrue(np.all(db1['cum_ticks'] == threshold))
+        # delete generated csv file (if it wasn't generated test would fail)
+        os.remove('test.csv')
 
     def test_csv_format(self):
         """
@@ -116,16 +132,16 @@ class TestDataStructures(unittest.TestCase):
 
         # pylint: disable=protected-access
         self.assertRaises(ValueError,
-                          ds._assert_dataframe(pd.DataFrame(wrong_date).T))
+                          ds.StandardBars._assert_csv(pd.DataFrame(wrong_date).T))
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds._assert_dataframe,
+                          ds.StandardBars._assert_csv,
                           pd.DataFrame(too_many_cols).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds._assert_dataframe,
+                          ds.StandardBars._assert_csv,
                           pd.DataFrame(wrong_price).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds._assert_dataframe,
+                          ds.StandardBars._assert_csv,
                           pd.DataFrame(wrong_volume).T)
