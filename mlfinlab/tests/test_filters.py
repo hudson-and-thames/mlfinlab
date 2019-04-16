@@ -17,7 +17,7 @@ class TestCUSUMFilter(unittest.TestCase):
 
     def setUp(self):
         """
-        Set the file path for the tick data csv
+        Set the file path for the sample dollar bars data.
         """
         project_path = os.path.dirname(__file__)
         self.path = project_path + '/test_data/dollar_bar_sample.csv'
