@@ -36,9 +36,9 @@ class ETFTrick(object):
         # previous allocation change is needed for delta component calculation
         self.prev_allocs_change = False
         self.prev_h = None  # to find current etf_trick value we need previous h value
-        self.data_df = None  # data frame which contains all precomputed info for etf trick
 
         self.data_dict = dict.fromkeys(['open', 'close', 'alloc', 'costs', 'rates'], None)
+        self.iter_dict = None  # dictionary of csv files iterators, None for in_memory ETF trick calculation
 
         if isinstance(alloc_df, str):
             # string values for open, close, alloc, costs and rates mean that we generate ETF trick from csv files
@@ -133,7 +133,7 @@ class ETFTrick(object):
         # for complete h_t calculation multiplying by current K_t is needed(can't be vectorised)
         h_without_k = delever_df.div(next_open_mul_rates_df)
 
-        weights_df = self.data_dict['alloc'][self.securities]  # allign all securities columns
+        weights_df = self.data_dict['alloc'][self.securities]  # align all securities columns
         h_without_k = h_without_k[self.securities]
         close_open_diff = close_open_diff[self.securities]
         price_diff = price_diff[self.securities]
@@ -143,7 +143,7 @@ class ETFTrick(object):
             axis=1,
             keys=[
                 'w', 'h_t', 'close_open', 'price_diff', 'costs',
-                'rate'])  # generate data frame with all pregenerated info needed for ETF trick
+                'rate'])  # generate data frame with all precomputed info needed for ETF trick
 
     def _update_cache(self):
         """
@@ -243,7 +243,7 @@ class ETFTrick(object):
         one step back, recalculate ETF trick value for the last row from previous batch using open price from latest
         batch received. This function rewinds values needed for ETF trick calculation
         recalculate
-        :param data_df: data, df
+        :param alloc_df:
         :param etf_series:
         :return:
         """
@@ -258,6 +258,7 @@ class ETFTrick(object):
         """
         etf_series = pd.Series()
         self._get_batch_from_csv(batch_size)
+        # data frame which contains all precomputed info for etf trick
         data_df = self.generate_trick_components(cache=None)  # cache is empty on the first batch run
         cache = self._update_cache()
         # delete first nans (first row of close price difference is nan)
@@ -284,17 +285,17 @@ class ETFTrick(object):
         In-memory based ETF trick series generation
         :return: (pd.Series): pandas Series with ETF trick values starting from 1.0
         """
-        data_df = self.generate_trick_components()  # get all possible etf trick calculations which can be vectorised
+        data_df = self.generate_trick_components()  # data frame which contains all precomputed info for etf trick
         # delete first nans (first row of close price difference is nan)
         data_df = data_df.iloc[1:]
         return self._chunk_loop(data_df)
 
-    def get_etf_series(self, in_memory=True, batch_size=None):
+    def get_etf_series(self, batch_size=1e5):
         """
         External method which defines which etf trick method to use based on in_memory field value
         :return: (pd.Series): pandas Series with ETF trick values starting from 1.0
         """
-        if in_memory is True:
+        if self.iter_dict is None:
             etf_trick_series = self._in_memory_etf_series()
         else:
             if batch_size < 3:
@@ -313,7 +314,7 @@ def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_c
     :param sec_col: (string): security name column name
     :param current_sec_col: (string): current active security column name.
                                       When value in this column changes it means rolling
-    :param roll_backward: (boolean): True for substracting final gap value from all values
+    :param roll_backward: (boolean): True for subtracting final gap value from all values
     :return (pd.Series): futures roll close price series
     """
     # filter out security data which is not used as current security
