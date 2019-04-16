@@ -223,7 +223,7 @@ class ETFTrick(object):
 
         if self.iter_dict['rates'] is not None:
             # if there is rates_df iterator, get the next chunk
-            self.data_dict['rates'] = self.data_dict['rates'].get_chunk(batch_size)
+            self.data_dict['rates'] = self.iter_dict['rates'].get_chunk(batch_size)
         else:
             # if no iterator is available, generate trivial rates_df (1.0 for all securities)
             self.data_dict['rates'] = self.data_dict['open'].copy()
@@ -247,17 +247,21 @@ class ETFTrick(object):
         cache = self._update_cache()
         # delete first nans (first row of close price difference is nan)
         data_df = data_df.iloc[1:]
+        omit_last_row = False  # drop last row value from previous batch
 
         # read data in batch until StopIteration exception is raised
         while True:
             try:
                 chunk_etf_series = self._chunk_loop(data_df)
+                if omit_last_row is True:
+                    etf_series = etf_series.iloc[:-1]
                 etf_series = etf_series.append(chunk_etf_series)
                 self._get_batch_from_csv(batch_size)
                 data_df = self.generate_trick_components(cache)  # update data_df for ETF trick calculation
                 # reset prev_k for previous row calculation
                 self.prev_k = etf_series.iloc[-2]
                 cache = self._update_cache()  # update cache
+                omit_last_row = True
             except StopIteration:
                 return etf_series
 
@@ -279,6 +283,8 @@ class ETFTrick(object):
         if in_memory is True:
             etf_trick_series = self._in_memory_etf_series()
         else:
+            if batch_size < 3:
+                raise ValueError('Batch size should be >= 3') # we use latest 2 elements from prev batch, so minimum batch is 3
             etf_trick_series = self._csv_file_etf_series(batch_size)
         return etf_trick_series
 
@@ -308,3 +314,9 @@ def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_c
         gaps -= gaps.iloc[-1]  # roll backward
     data_df[close_col] -= gaps
     return data_df[close_col]
+
+trick = ETFTrick('../tests/test_data/open_df.csv', '../tests/test_data/close_df.csv', '../tests/test_data/alloc_df.csv',
+                '../tests/test_data/costs_df.csv', '../tests/test_data/rates_df.csv')
+
+
+trick_series = trick.get_etf_series(in_memory=False, batch_size=3)
