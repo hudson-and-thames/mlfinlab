@@ -16,7 +16,7 @@ class ETFTrick(object):
     All data frames, files should be processed in a specific format, described in examples
     """
 
-    def __init__(self, open_df, close_df, alloc_df, costs_df, rates_df=None, index_col=0):
+    def __init__(self, open_df, close_df, alloc_df, costs_df, rates_df=None, index_col=0, **kwargs):
         """
         Constructor
         Creates class object, for csv based files reads the first data chunk.
@@ -39,9 +39,13 @@ class ETFTrick(object):
 
         self.data_dict = dict.fromkeys(['open', 'close', 'alloc', 'costs', 'rates'], None)
         self.iter_dict = None  # dictionary of csv files iterators, None for in_memory ETF trick calculation
+        self.init_fields = None  # dictionary of initial fields values, needed to call reset method
 
         if isinstance(alloc_df, str):
             # string values for open, close, alloc, costs and rates mean that we generate ETF trick from csv files
+            # remember constructor fields for possible reset() method call
+            self.init_fields = {'open_df': open_df, 'close_df': close_df,  'alloc_df': alloc_df, 'costs_df': costs_df,
+                                'rates_df': rates_df, 'index_col': index_col}
             self.iter_dict = dict.fromkeys(['open', 'close', 'alloc', 'costs', 'rates'], None)
             # create file iterators
             self.iter_dict['open'] = pd.read_csv(
@@ -201,7 +205,7 @@ class ETFTrick(object):
 
     def _index_check(self):
         """
-        Interal check for all price,rates and allocations data frames have the same index
+        Internal check for all price, rates and allocations data frames have the same index
         :return: None, or raises ValueError if indexes are different
         """
         # check if all data frames have the same index
@@ -243,8 +247,8 @@ class ETFTrick(object):
         one step back, recalculate ETF trick value for the last row from previous batch using open price from latest
         batch received. This function rewinds values needed for ETF trick calculation
         recalculate
-        :param alloc_df:
-        :param etf_series:
+        :param alloc_df: (pd.DataFrame): data frame with allocations vectors
+        :param etf_series (pd.Series): current computed ETF trick series
         :return:
         """
         self.prev_k = etf_series.iloc[-2]  # reset prev_k for previous row calculation
@@ -292,7 +296,7 @@ class ETFTrick(object):
 
     def get_etf_series(self, batch_size=1e5):
         """
-        External method which defines which etf trick method to use based on in_memory field value
+        External method which defines which etf trick method to use
         :return: (pd.Series): pandas Series with ETF trick values starting from 1.0
         """
         if self.iter_dict is None:
@@ -304,23 +308,29 @@ class ETFTrick(object):
             etf_trick_series = self._csv_file_etf_series(batch_size)
         return etf_trick_series
 
+    def reset(self):
+        """
+        Reinits class object. This methods can be used to reset file iterators for multiple etf trick object calls
+        :return:
+        """
+        self.__init__(**self.init_fields)
+
 
 def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_col, roll_backward=False):
     """
-    Function for generating rolling futures series from data frame of multiple futures
+    Function for generating rolling futures series from data frame of multiple futures (
     :param data_df: (pd.DataFrame): pandas DataFrame containing price info, security name and current active futures column
     :param open_col: (string): open prices column name
     :param close_col: (string): close prices column name
     :param sec_col: (string): security name column name
-    :param current_sec_col: (string): current active security column name.
-                                      When value in this column changes it means rolling
+    :param current_sec_col: (string): current active security column name. When value in this column changes it means rolling
     :param roll_backward: (boolean): True for subtracting final gap value from all values
     :return (pd.Series): futures roll close price series
     """
     # filter out security data which is not used as current security
     filtered_df = data_df[data_df[sec_col] == data_df[current_sec_col]]
     filtered_df.sort_index(inplace=True)
-    # generate roll dates series based on curren_sec column value change
+    # generate roll dates series based on current_sec column value change
     roll_dates = filtered_df[current_sec_col].drop_duplicates(keep='first').index
     gaps = filtered_df[close_col] * 0  # roll gaps series
     # on roll dates, gap equals open - close
