@@ -44,6 +44,7 @@ class BaseBars(ABC):
 
         :return: (DataFrame or None) Financial data structure
         """
+
         # Read in the first row & assert format
         first_row = pd.read_csv(self.file_path, nrows=1)
         self._assert_csv(first_row)
@@ -66,8 +67,7 @@ class BaseBars(ABC):
             list_bars = self._extract_bars(data=batch)
 
             if to_csv is True:
-                pd.DataFrame(list_bars, columns=cols).to_csv(
-                    output_path, header=header, index=False, mode='a')
+                pd.DataFrame(list_bars, columns=cols).to_csv(output_path, header=header, index=False, mode='a')
                 header = False
             else:
                 # Append to bars list
@@ -77,16 +77,16 @@ class BaseBars(ABC):
             # Set flag to True: notify function to use cache
             self.flag = True
 
-        # Return a DataFrame
-        if final_bars:
-            bars_df = pd.DataFrame(final_bars, columns=cols)
-        else:
-            return None # processed data frame is stored in .csv file, return None
-
         if verbose:  # pragma: no cover
             print('Returning bars \n')
 
-        return bars_df
+        # Return a DataFrame
+        if final_bars:
+            bars_df = pd.DataFrame(final_bars, columns=cols)
+            return bars_df
+
+        # Processed DataFrame is stored in .csv file, return None
+        return None
 
     @abstractmethod
     def _extract_bars(self, data):
