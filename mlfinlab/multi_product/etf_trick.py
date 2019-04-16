@@ -236,6 +236,21 @@ class ETFTrick(object):
 
         self._index_check()
 
+    def _rewind_etf_trick(self, alloc_df, etf_series):
+        """
+        ETF trick uses next open price information, when we process csv file in batches the last row in batch will have
+        next open price value as nan, that is why when new batch comes, we need to rewind ETF trick values
+        one step back, recalculate ETF trick value for the last row from previous batch using open price from latest
+        batch received. This function rewinds values needed for ETF trick calculation
+        recalculate
+        :param data_df: data, df
+        :param etf_series:
+        :return:
+        """
+        self.prev_k = etf_series.iloc[-2]  # reset prev_k for previous row calculation
+        self.prev_allocs = alloc_df.iloc[-2]  # reset previous allocations vector
+        self.prev_allocs_change = bool(~(self.prev_allocs == alloc_df.iloc[-3]).all())
+
     def _csv_file_etf_series(self, batch_size):
         """
         Csv based ETF trick series generation
@@ -247,19 +262,18 @@ class ETFTrick(object):
         cache = self._update_cache()
         # delete first nans (first row of close price difference is nan)
         data_df = data_df.iloc[1:]
-        omit_last_row = False  # drop last row value from previous batch
+        omit_last_row = False  # drop last row value from previous batch (this row needs to be recalculated using new data)
 
         # read data in batch until StopIteration exception is raised
         while True:
             try:
                 chunk_etf_series = self._chunk_loop(data_df)
                 if omit_last_row is True:
-                    etf_series = etf_series.iloc[:-1]
+                    etf_series = etf_series.iloc[:-1]  # delete last row (chunk_etf_series stores updated row value)
                 etf_series = etf_series.append(chunk_etf_series)
                 self._get_batch_from_csv(batch_size)
+                self._rewind_etf_trick(data_df['w'], etf_series)  # rewind etf series one step back
                 data_df = self.generate_trick_components(cache)  # update data_df for ETF trick calculation
-                # reset prev_k for previous row calculation
-                self.prev_k = etf_series.iloc[-2]
                 cache = self._update_cache()  # update cache
                 omit_last_row = True
             except StopIteration:
@@ -284,7 +298,8 @@ class ETFTrick(object):
             etf_trick_series = self._in_memory_etf_series()
         else:
             if batch_size < 3:
-                raise ValueError('Batch size should be >= 3') # we use latest 2 elements from prev batch, so minimum batch is 3
+                # we use latest 2 elements from prev batch, so minimum batch is 3
+                raise ValueError('Batch size should be >= 3')
             etf_trick_series = self._csv_file_etf_series(batch_size)
         return etf_trick_series
 
@@ -292,7 +307,7 @@ class ETFTrick(object):
 def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_col, roll_backward=False):
     """
     Function for generating rolling futures series from data frame of multiple futures
-    :param data_df: (pd.DataFrame): pandas DataFrame containing price info, security name and  current active asset column
+    :param data_df: (pd.DataFrame): pandas DataFrame containing price info, security name and current active futures column
     :param open_col: (string): open prices column name
     :param close_col: (string): close prices column name
     :param sec_col: (string): security name column name
@@ -314,9 +329,3 @@ def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_c
         gaps -= gaps.iloc[-1]  # roll backward
     data_df[close_col] -= gaps
     return data_df[close_col]
-
-trick = ETFTrick('../tests/test_data/open_df.csv', '../tests/test_data/close_df.csv', '../tests/test_data/alloc_df.csv',
-                '../tests/test_data/costs_df.csv', '../tests/test_data/rates_df.csv')
-
-
-trick_series = trick.get_etf_series(in_memory=False, batch_size=3)
