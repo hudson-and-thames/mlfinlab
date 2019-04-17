@@ -47,12 +47,14 @@ def apply_pt_sl_on_t1(close, events, pt_sl, molecule):  # pragma: no cover
     This function applies the triple-barrier labeling method. It works on a set of
     datetime index values (molecule). This allows the program to parallelize the processing.
 
+    Mainly it returns a DataFrame of timestamps regarding the time when the first barriers were reached.
+
     :param close: (series) close prices
     :param events: (series) of indices that signify "events" (see get_t_events function
     for more details)
     :param pt_sl: (array) element 0, indicates the profit taking level; element 1 is stop loss level
     :param molecule: (an array) a set of datetime index values for processing
-    :return: Dataframe of timestamps of when first barrier was touched
+    :return: DataFrame of timestamps of when first barrier was touched
     """
     # Apply stop loss/profit taking, if it takes place before t1 (end of event)
     events_ = events.loc[molecule]
@@ -98,11 +100,17 @@ def add_vertical_barrier(t_events, close, num_days=1):
     :param num_days: (int) maximum number of days a trade can be active
     :return: (series) timestamps of vertical barriers
     """
+    # Find index to closest to vertical barrier
+    nearest_index = close.index.searchsorted(t_events + pd.Timedelta(days=num_days))
 
-    vertical_barriers = close.index.searchsorted(t_events + pd.Timedelta(days=num_days))
-    vertical_barriers = vertical_barriers[vertical_barriers < close.shape[0]]
-    vertical_barriers = pd.Series(close.index[vertical_barriers],
-                                  index=t_events[:vertical_barriers.shape[0]])  # NaNs at end
+    # Exclude indexes which are outside the range of close price index
+    nearest_index = nearest_index[nearest_index < close.shape[0]]
+
+    # Find price index closest to vertical barrier time stamp
+    nearest_timestamp = close.index[nearest_index]
+    filtered_events = t_events[:nearest_index.shape[0]]
+
+    vertical_barriers = pd.Series(data=nearest_timestamp, index=filtered_events)
     return vertical_barriers
 
 
