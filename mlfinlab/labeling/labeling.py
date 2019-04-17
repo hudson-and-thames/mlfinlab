@@ -115,7 +115,7 @@ def add_vertical_barrier(t_events, close, num_days=1):
 
 
 # Snippet 3.3 -> 3.6 page 50, Getting the Time of the First Touch, with Meta Labels
-def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_barrier_times=False, side=None):
+def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_barrier_times=False, side_prediction=None):
     """
     Snippet 3.6 page 50, Getting the Time of the First Touch, with Meta Labels
 
@@ -134,7 +134,7 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
     :param num_threads: (int) The number of threads concurrently used by the function.
     :param vertical_barrier_times: (series) A pandas series with the timestamps of the vertical barriers.
         We pass a False when we want to disable vertical barriers.
-    :param side: (series) Side of the bet (long/short) as decided by the primary model
+    :param side_prediction: (series) Side of the bet (long/short) as decided by the primary model
     :return: (data frame) of events
             -events.index is event's starttime
             -events['t1'] is event's endtime
@@ -151,11 +151,11 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
         vertical_barrier_times = pd.Series(pd.NaT, index=t_events)
 
     # 3) Form events object, apply stop loss on vertical barrier
-    if side is None:
+    if side_prediction is None:
         side_ = pd.Series(1., index=target.index)
         pt_sl_ = [pt_sl[0], pt_sl[0]]
     else:
-        side_ = side.loc[target.index]
+        side_ = side_prediction.loc[target.index]
         pt_sl_ = pt_sl[:2]
 
     events = pd.concat({'t1': vertical_barrier_times, 'trgt': target, 'side': side_},
@@ -172,7 +172,7 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
 
     events['t1'] = df0.dropna(how='all').min(axis=1)  # pd.min ignores nan
 
-    if side is None:
+    if side_prediction is None:
         events = events.drop('side', axis=1)
 
     return events
@@ -191,7 +191,6 @@ def barrier_touched(out_df):
     :param out_df: (DataFrame) containing the returns and target
     :return: (DataFrame) containing returns, target, and labels
     """
-    # Todo: Assert that this works as advertised
     store = []
     for i in np.arange(len(out_df)):
         date_time = out_df.index[i]

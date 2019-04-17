@@ -70,7 +70,7 @@ class TestChapter3(unittest.TestCase):
                                            min_ret=0.005,
                                            num_threads=3,
                                            vertical_barrier_times=vertical_barriers,
-                                           side=None)
+                                           side_prediction=None)
 
         # Test that the events are the same as expected (naive test)
         self.assertTrue(triple_barrier_events.shape == (8, 2))  # Assert shape
@@ -92,7 +92,7 @@ class TestChapter3(unittest.TestCase):
                                          min_ret=0.005,
                                          num_threads=3,
                                          vertical_barrier_times=vertical_barriers,
-                                         side=self.data['side'])
+                                         side_prediction=self.data['side'])
 
         # Assert that the two different events are the the same as they are generated using same data
         self.assertTrue(np.all(meta_labeled_events['t1'] == triple_barrier_events['t1']))
@@ -110,7 +110,7 @@ class TestChapter3(unittest.TestCase):
                                         min_ret=0.005,
                                         num_threads=3,
                                         vertical_barrier_times=False,
-                                        side=None)
+                                        side_prediction=None)
 
         # Assert targets match other events trgts
         self.assertTrue(np.all(triple_barrier_events['trgt'] == no_vertical_events['trgt']))
@@ -137,7 +137,7 @@ class TestChapter3(unittest.TestCase):
                                            min_ret=0.005,
                                            num_threads=3,
                                            vertical_barrier_times=vertical_barriers,
-                                           side=None)
+                                           side_prediction=None)
 
         triple_labels = get_bins(triple_barrier_events, self.data['close'])
         self.assertTrue(np.all(triple_labels[np.abs(triple_labels['ret']) < triple_labels['trgt']]['bin'] == 0))
@@ -152,7 +152,7 @@ class TestChapter3(unittest.TestCase):
                                            min_ret=0.005,
                                            num_threads=3,
                                            vertical_barrier_times=vertical_barriers,
-                                           side=self.data['side'])
+                                           side_prediction=self.data['side'])
 
         triple_labels = get_bins(triple_barrier_events, self.data['close'])
 
@@ -178,7 +178,7 @@ class TestChapter3(unittest.TestCase):
                                            min_ret=0.005,
                                            num_threads=3,
                                            vertical_barrier_times=vertical_barriers,
-                                           side=None)
+                                           side_prediction=None)
         triple_labels = get_bins(triple_barrier_events, self.data['close'])
 
         # Drop the 2 zero labels in the set since they are "rare"
