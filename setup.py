@@ -1,3 +1,6 @@
+# Great link to learn to build a package:
+# https://packaging.python.org/guides/distributing-packages-using-setuptools/#choosing-a-versioning-scheme
+
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
 from os import path
