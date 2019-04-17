@@ -178,6 +178,7 @@ setup(
     #         'sample=sample:main',
     #     ],
     # },
+    platforms='any',
 
     # List additional URLs that are relevant to your project as a dict.
     #
