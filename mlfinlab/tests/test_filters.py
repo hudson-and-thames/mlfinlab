@@ -32,20 +32,22 @@ class TestCUSUMFilter(unittest.TestCase):
 
         # Check all events for various threshold levels
         for threshold in [0.005, 0.007, 0.01, 0.015, 0.02, 0.03, 0.04]:
-            cusum_events = cusum_filter(self.data['close'], threshold=threshold)
+            for timestamp in [True, False]:
 
-            for i in range(1, cusum_events.shape[0]):
-                event_1 = self.data.index.get_loc(cusum_events[i-1])
-                event_2 = self.data.index.get_loc(cusum_events[i])
+                cusum_events = cusum_filter(self.data['close'], threshold=threshold, time_stamps=timestamp)
 
-                date_range = self.data.iloc[event_1:event_2 + 1]['close']
-                last = np.log(date_range[-1])
-                minimum = np.log(date_range.min())
-                maximum = np.log(date_range.max())
+                for i in range(1, len(cusum_events)):
+                    event_1 = self.data.index.get_loc(cusum_events[i-1])
+                    event_2 = self.data.index.get_loc(cusum_events[i])
 
-                # Calculate CUSUM
-                spos = last - minimum
-                sneg = last - maximum
-                cusum = max(np.abs(sneg), spos)
+                    date_range = self.data.iloc[event_1:event_2 + 1]['close']
+                    last = np.log(date_range[-1])
+                    minimum = np.log(date_range.min())
+                    maximum = np.log(date_range.max())
 
-                self.assertTrue(cusum >= threshold)
+                    # Calculate CUSUM
+                    spos = last - minimum
+                    sneg = last - maximum
+                    cusum = max(np.abs(sneg), spos)
+
+                    self.assertTrue(cusum >= threshold)
