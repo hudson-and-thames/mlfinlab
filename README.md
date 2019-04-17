@@ -22,7 +22,8 @@ You should be able to work on a few implementations of the code with this set.
 ---
 
 ## Notes
-* We just finished implementing the standard bar types (tick, volume, dollar). 
+* Added Imbalance and Run bars.
+* Added standard bar types (tick, volume, dollar). 
 * Works on BIG csv files 25Gigs and up.
 * Purchased high quality raw tick data.
 * Email us if you would like a sample of the standard bars.
