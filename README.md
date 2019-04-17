@@ -22,6 +22,7 @@ You should be able to work on a few implementations of the code with this set.
 ---
 
 ## Notes
+* Added Chapter 3 code (Labeling)
 * Added Imbalance and Run bars.
 * Added standard bar types (tick, volume, dollar). 
 * Works on BIG csv files 25Gigs and up.
@@ -87,4 +88,4 @@ Looking forward to hearing from you!
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.txt](./LICENSE.txt) file for details
+This project is licensed under the MIT License - see the [LICENSE.txt](https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt) file for details
