@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from mlfinlab.filters.filters import get_t_events
+from mlfinlab.filters.filters import cusum_filter
 
 
 class TestCUSUMFilter(unittest.TestCase):
@@ -32,7 +32,7 @@ class TestCUSUMFilter(unittest.TestCase):
 
         # Check all events for various threshold levels
         for threshold in [0.005, 0.007, 0.01, 0.015, 0.02, 0.03, 0.04]:
-            cusum_events = get_t_events(self.data['close'], threshold=threshold)
+            cusum_events = cusum_filter(self.data['close'], threshold=threshold)
 
             for i in range(1, cusum_events.shape[0]):
                 event_1 = self.data.index.get_loc(cusum_events[i-1])

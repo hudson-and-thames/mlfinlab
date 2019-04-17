@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from mlfinlab.filters.filters import get_t_events
+from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_daily_vol, add_vertical_barrier, get_events, get_bins, drop_labels
 
 
@@ -43,7 +43,7 @@ class TestChapter3(unittest.TestCase):
         """
         Assert that the vertical barrier returns the timestamp x amount of days after the event.
         """
-        cusum_events = get_t_events(self.data['close'], threshold=0.02)
+        cusum_events = cusum_filter(self.data['close'], threshold=0.02)
 
         # Compute vertical barrier
         for days in [1, 2, 3, 4, 5]:
@@ -59,7 +59,7 @@ class TestChapter3(unittest.TestCase):
         Assert that trgts are the same for all 3 methods.
         """
         daily_vol = get_daily_vol(close=self.data['close'], lookback=100)
-        cusum_events = get_t_events(self.data['close'], threshold=0.02)
+        cusum_events = cusum_filter(self.data['close'], threshold=0.02)
         vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], num_days=1)
 
         # No meta-labeling
@@ -125,7 +125,7 @@ class TestChapter3(unittest.TestCase):
         reached, then a 0 class label is assigned (in the case of standard labeling).
         """
         daily_vol = get_daily_vol(close=self.data['close'], lookback=100)
-        cusum_events = get_t_events(self.data['close'], threshold=0.02)
+        cusum_events = cusum_filter(self.data['close'], threshold=0.02)
         vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], num_days=1)
 
         # ----------------------
@@ -169,7 +169,7 @@ class TestChapter3(unittest.TestCase):
         Assert that drop_labels removes rare class labels.
         """
         daily_vol = get_daily_vol(close=self.data['close'], lookback=100)
-        cusum_events = get_t_events(self.data['close'], threshold=0.02)
+        cusum_events = cusum_filter(self.data['close'], threshold=0.02)
         vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], num_days=1)
         triple_barrier_events = get_events(close=self.data['close'],
                                            t_events=cusum_events,
