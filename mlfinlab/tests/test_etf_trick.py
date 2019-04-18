@@ -114,7 +114,7 @@ class TestETFTrick(unittest.TestCase):
 
     def test_input_exceptions(self):
         """
-        Tests
+        Tests input data frames internal checks
         """
         try:
             ETFTrick(dict(), dict(), dict(), self.costs_df_path, None)
