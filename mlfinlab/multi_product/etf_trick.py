@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 
 
-class ETFTrick(object):
+class ETFTrick:
     """
     Contains logic of vectorised ETF trick implementaion. Can used for both memory data frames (pd.DataFrame) and csv files.
     All data frames, files should be processed in a specific format, described in examples
@@ -37,7 +37,7 @@ class ETFTrick(object):
         self.prev_allocs_change = False
         self.prev_h = None  # to find current etf_trick value we need previous h value
 
-        self.data_dict = dict.fromkeys(['open', 'close', 'alloc', 'costs', 'rates'], None)
+        self.data_dict = dict.fromkeys(['open', 'close', 'alloc', 'costs', 'rates'], pd.DataFrame())
         self.iter_dict = None  # dictionary of csv files iterators, None for in_memory ETF trick calculation
         self.init_fields = None  # dictionary of initial fields values, needed to call reset method
 
@@ -75,7 +75,7 @@ class ETFTrick(object):
                 self.data_dict['rates'][self.securities] = 1.0
 
             # align all securities columns in one order
-            for df_name in self.data_dict.keys():
+            for df_name in self.data_dict:
                 self.data_dict[df_name] = self.data_dict[df_name][self.securities]
 
             self._index_check()
@@ -102,7 +102,7 @@ class ETFTrick(object):
             max_prev_index = cache['open'].index.max()
             second_max_prev_index = cache['open'].index[-2]
             # add the last row from previous data chunk to a new chunk
-            for df_name in self.data_dict.keys():
+            for df_name in self.data_dict:
                 temp_df = self.data_dict[df_name]
                 temp_df.loc[max_prev_index, :] = cache[df_name].iloc[-1]
                 self.data_dict[df_name] = temp_df
@@ -111,7 +111,7 @@ class ETFTrick(object):
             self.data_dict['close'].loc[second_max_prev_index, :] = cache['close'].loc[second_max_prev_index, :]
             # that is why close_df needs 2 previous chunk rows to omit first row nans
 
-            for df_name in self.data_dict.keys():
+            for df_name in self.data_dict:
                 self.data_dict[df_name].sort_index(inplace=True)  # sort data frames after all appends
                 self.data_dict[df_name] = self.data_dict[df_name][
                     self.securities]  # align all securities columns in one order
@@ -234,7 +234,7 @@ class ETFTrick(object):
             self.data_dict['rates'][self.securities] = 1.0
 
         # align all securities columns in one order
-        for df_name in self.data_dict.keys():
+        for df_name in self.data_dict:
             self.data_dict[df_name] = self.data_dict[df_name][self.securities]
 
         self._index_check()
