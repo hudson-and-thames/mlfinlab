@@ -16,7 +16,7 @@ class ETFTrick(object):
     All data frames, files should be processed in a specific format, described in examples
     """
 
-    def __init__(self, open_df, close_df, alloc_df, costs_df, rates_df=None, index_col=0, **kwargs):
+    def __init__(self, open_df, close_df, alloc_df, costs_df, rates_df=None, index_col=0):
         """
         Constructor
         Creates class object, for csv based files reads the first data chunk.
@@ -44,7 +44,7 @@ class ETFTrick(object):
         if isinstance(alloc_df, str):
             # string values for open, close, alloc, costs and rates mean that we generate ETF trick from csv files
             # remember constructor fields for possible reset() method call
-            self.init_fields = {'open_df': open_df, 'close_df': close_df,  'alloc_df': alloc_df, 'costs_df': costs_df,
+            self.init_fields = {'open_df': open_df, 'close_df': close_df, 'alloc_df': alloc_df, 'costs_df': costs_df,
                                 'rates_df': rates_df, 'index_col': index_col}
             self.iter_dict = dict.fromkeys(['open', 'close', 'alloc', 'costs', 'rates'], None)
             # create file iterators
@@ -206,18 +206,17 @@ class ETFTrick(object):
     def _index_check(self):
         """
         Internal check for all price, rates and allocations data frames have the same index
-        :return: None, or raises ValueError if indexes are different
         """
         # check if all data frames have the same index
         for temp_df in self.data_dict.values():
-            if self.data_dict['open'].index.difference(temp_df.index).shape[0] != 0:
+            if self.data_dict['open'].index.difference(temp_df.index).shape[0] != 0 or \
+                    self.data_dict['open'].shape != temp_df.shape:
                 raise ValueError('DataFrames indices are different')
 
     def _get_batch_from_csv(self, batch_size):
         """
         Reads the next batch of data sets from csv files and puts them in class variable data_dict
         :param batch_size: number of rows to read
-        :return: None
         """
         # read the next batch
         self.data_dict['open'] = self.iter_dict['open'].get_chunk(batch_size)
@@ -310,8 +309,7 @@ class ETFTrick(object):
 
     def reset(self):
         """
-        Reinits class object. This methods can be used to reset file iterators for multiple etf trick object calls
-        :return:
+        Reinits class object. This methods can be used to reset file iterators for multiple get_etf_trick() calls
         """
         self.__init__(**self.init_fields)
 
@@ -336,7 +334,7 @@ def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_c
     # on roll dates, gap equals open - close
     gaps.loc[roll_dates[1:]] = filtered_df[open_col].loc[roll_dates[1:]] - filtered_df[close_col].loc[
         roll_dates[1:]]  # TODO: understand why Marcos used iloc and list logic
+    gaps = gaps.cumsum()
     if roll_backward:
         gaps -= gaps.iloc[-1]  # roll backward
-    data_df[close_col] -= gaps
-    return data_df[close_col]
+    return data_df[close_col] - gaps

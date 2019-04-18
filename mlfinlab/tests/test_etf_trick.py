@@ -23,13 +23,13 @@ class TestETFTrick(unittest.TestCase):
         Set the file path for the tick data csv
         """
         project_path = os.path.dirname(__file__)
-        self.path = project_path + '/test_data'
+        path = project_path + '/test_data'
 
-        self.open_df_path = '{}/open_df.csv'.format(self.path)
-        self.close_df_path = '{}/close_df.csv'.format(self.path)
-        self.alloc_df_path = '{}/alloc_df.csv'.format(self.path)
-        self.costs_df_path = '{}/costs_df.csv'.format(self.path)
-        self.rates_df_path = '{}/rates_df.csv'.format(self.path)
+        self.open_df_path = '{}/open_df.csv'.format(path)
+        self.close_df_path = '{}/close_df.csv'.format(path)
+        self.alloc_df_path = '{}/alloc_df.csv'.format(path)
+        self.costs_df_path = '{}/costs_df.csv'.format(path)
+        self.rates_df_path = '{}/rates_df.csv'.format(path)
 
         self.open_df = pd.read_csv(self.open_df_path, index_col=0, parse_dates=[0])
         self.close_df = pd.read_csv(self.close_df_path, index_col=0, parse_dates=[0])
@@ -111,3 +111,26 @@ class TestETFTrick(unittest.TestCase):
         self.assertTrue(np.all(in_memory_trick_series.values == csv_trick_series_4.values))
         self.assertTrue(np.all(in_memory_trick_series.values == csv_trick_series_100.values))
         self.assertTrue(np.all(in_memory_trick_series.values == csv_trick_series_all.values))
+
+    def test_input_exceptions(self):
+        """
+        Tests
+        """
+        try:
+            ETFTrick(dict(), dict(), dict(), self.costs_df_path, None)
+        except TypeError:
+            pass
+
+        modified_open_df = self.open_df.copy(deep=True)
+        # add extra timestamp, to generate exception on _index_check()
+        modified_open_df.loc[pd.Timestamp(2020, 1, 1), :] = 4
+        try:
+            ETFTrick(modified_open_df, self.close_df, self.alloc_df, self.costs_df, None)
+        except ValueError:
+            pass
+
+        csv_etf_trick = ETFTrick(self.open_df_path, self.close_df_path, self.alloc_df_path, self.costs_df_path, None)
+        try:
+            csv_etf_trick.get_etf_series(batch_size=2)
+        except ValueError:
+            pass
