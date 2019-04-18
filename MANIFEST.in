@@ -1,0 +1,7 @@
+include *.md
+include *.txt
+include .coveragerc
+include coverage
+include pylint
+recursive-include mlfinlab *.csv
+recursive-include scripts *.py

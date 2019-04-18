@@ -1,6 +1,6 @@
 [run]
 omit=*__init__*
-     mlfinlab/tests/*
+     tests/*
      mlfinlab/util/multiprocess.py
      scripts/*
      /opt/conda/*
