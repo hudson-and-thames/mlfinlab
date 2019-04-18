@@ -15,7 +15,6 @@ Many of the projects going forward will require Dollar and Volume bars.
 """
 
 # Imports
-from collections import namedtuple
 import pandas as pd
 import numpy as np
 
@@ -31,11 +30,11 @@ def _update_counters(cache, flag):
     # Check flag
     if flag and cache:
         # Update variables based on cache
-        cum_ticks = int(cache[-1].cum_ticks)
-        cum_dollar_value = np.float(cache[-1].cum_dollar_value)
-        cum_volume = cache[-1].cum_volume
-        low_price = np.float(cache[-1].low)
-        high_price = np.float(cache[-1].high)
+        cum_ticks = int(cache[-1][6])
+        cum_dollar_value = np.float(cache[-1][5])
+        cum_volume = cache[-1][4]
+        low_price = np.float(cache[-1][2])
+        high_price = np.float(cache[-1][3])
     else:
         # Reset counters
         cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = 0, 0, 0, -np.inf, np.inf
@@ -56,15 +55,11 @@ def _extract_bars(data, metric, threshold=50000, cache=None, flag=False):
     :param flag: A flag which signals to use the cache.
     :return: The financial data structure with the cache of short term history.
     """
-
-    cache_tup = namedtuple('CacheData', ['date_time', 'price', 'high', 'low', 'cum_volume', 'cum_dollar_value',
-                                         'cum_ticks'])
     if cache is None:
         cache = []
 
     list_bars = []
-    cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = _update_counters(
-        cache, flag)
+    cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = _update_counters(cache, flag)
 
     # Iterate over rows
     for row in data.values:
@@ -82,18 +77,16 @@ def _extract_bars(data, metric, threshold=50000, cache=None, flag=False):
         # Check min max
         if price > high_price:
             high_price = price
-        if price <= low_price:
+        elif price <= low_price:
             low_price = price
 
         # Update cache
-        cache_data = cache_tup(date_time, price, high_price,
-                               low_price, cum_volume, cum_dollar_value, cum_ticks)
-        cache.append(cache_data)
+        cache.append([date_time, price, low_price, high_price, cum_volume, cum_dollar_value, cum_ticks])
 
         # If threshold reached then take a sample
         if eval(metric) >= threshold:   # pylint: disable=eval-used
             # Create bars
-            open_price = cache[0].price
+            open_price = cache[0][1]
             low_price = min(low_price, open_price)
             close_price = price
 
@@ -102,10 +95,6 @@ def _extract_bars(data, metric, threshold=50000, cache=None, flag=False):
                               cum_volume, cum_dollar_value, cum_ticks])
             cum_ticks, cum_dollar_value, cum_volume, cache, high_price, low_price = 0, 0, 0, [], -np.inf, np.inf
 
-        # Update cache after bar generation
-        cache_data = cache_tup(date_time, price, high_price,
-                               low_price, cum_volume, cum_dollar_value, cum_ticks)
-        cache.append(cache_data)
     return list_bars, cache
 
 
@@ -117,16 +106,13 @@ def _assert_dataframe(test_batch):
     :param test_batch: DataFrame which will be tested.
     """
     assert test_batch.shape[1] == 3, 'Must have only 3 columns in csv: date_time, price, & volume.'
-    assert isinstance(test_batch.iloc[0, 1],
-                      float), 'price column in csv not float.'
-    assert isinstance(test_batch.iloc[0, 2],
-                      np.int64), 'volume column in csv not int.'
+    assert isinstance(test_batch.iloc[0, 1], float), 'price column in csv not float.'
+    assert isinstance(test_batch.iloc[0, 2], np.int64), 'volume column in csv not int.'
 
     try:
         pd.to_datetime(test_batch.iloc[0, 0])
     except ValueError:
-        print('csv file, column 0, not a date time format:',
-              test_batch.iloc[0, 0])
+        print('csv file, column 0, not a date time format:', test_batch.iloc[0, 0])
 
 
 def _batch_run(file_path, metric, threshold=50000, batch_size=20000000):
@@ -156,8 +142,7 @@ def _batch_run(file_path, metric, threshold=50000, batch_size=20000000):
     for batch in pd.read_csv(file_path, chunksize=batch_size):
 
         print('Batch number:', count)
-        list_bars, cache = _extract_bars(
-            data=batch, metric=metric, threshold=threshold, cache=cache, flag=flag)
+        list_bars, cache = _extract_bars(data=batch, metric=metric, threshold=threshold, cache=cache, flag=flag)
 
         # Append to bars list
         final_bars += list_bars
@@ -167,8 +152,7 @@ def _batch_run(file_path, metric, threshold=50000, batch_size=20000000):
         flag = True
 
     # Return a DataFrame
-    cols = ['date_time', 'open', 'high', 'low',
-            'close', 'cum_vol', 'cum_dollar', 'cum_ticks']
+    cols = ['date_time', 'open', 'high', 'low', 'close', 'cum_vol', 'cum_dollar', 'cum_ticks']
     bars_df = pd.DataFrame(final_bars, columns=cols)
     print('Returning bars \n')
     return bars_df

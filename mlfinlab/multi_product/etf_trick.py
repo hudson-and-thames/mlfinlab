@@ -170,8 +170,8 @@ class ETFTrick(object):
         """
         etf_series = pd.Series()
         for index, row in zip(data_df.index, data_df.values):
-            weights_arr, h_t, close_open, price_diff, costs, rate = np.array_split(
-                row, 6)  # split row in corresponding values for ETF trick
+            # split row in corresponding values for ETF trick
+            weights_arr, h_t, close_open, price_diff, costs, rate = np.array_split(row, 6)  # pylint: disable=unbalanced-tuple-unpacking
             # replaces nan to zeros in allocations vector
             weights_arr = np.nan_to_num(weights_arr)
 
