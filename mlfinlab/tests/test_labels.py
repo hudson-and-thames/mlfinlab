@@ -8,7 +8,8 @@ import numpy as np
 import pandas as pd
 
 from mlfinlab.filters.filters import cusum_filter
-from mlfinlab.labeling.labeling import get_daily_vol, add_vertical_barrier, get_events, get_bins, drop_labels
+from mlfinlab.labeling.labeling import add_vertical_barrier, get_events, get_bins, drop_labels
+from mlfinlab.util.utils import get_daily_vol
 
 
 class TestChapter3(unittest.TestCase):
