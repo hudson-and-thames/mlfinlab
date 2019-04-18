@@ -22,6 +22,7 @@ You should be able to work on a few implementations of the code with this set.
 ---
 
 ## Notes
+* Added Chapter 3 code (Labeling)
 * Added Imbalance and Run bars.
 * Added standard bar types (tick, volume, dollar). 
 * Works on BIG csv files 25Gigs and up.
@@ -37,7 +38,14 @@ Recommended versions:
 * Anaconda 3
 * Python 3.6
 
-### Installation on Mac OS X and Ubuntu Linux
+### Installation for users
+The package can be installed from the PyPi index via the console:
+ 1. Launch the terminal and run: ```pip install mlfinlab```
+
+### Installation for developers
+Clone the [package repo](https://github.com/hudson-and-thames/mlfinlab) to your local machine then follow the steps below.
+
+#### Installation on Mac OS X and Ubuntu Linux
 1. Make sure you install the latest version of the Anaconda 3 distribution. To do this you can follow the install and update instructions found on this link: https://www.anaconda.com/download/#mac
 2. Launch a terminal
 3. Create a New Conda Environment. From terminal: ```conda create -n <env name> python=3.6 anaconda``` accept all the requests to install.
@@ -45,13 +53,7 @@ Recommended versions:
 5. From Terminal: go to the directory where you have saved the file, example: cd Desktop/mlfinlab/.
 6. Install Python requirements, by running the command: ```pip install -r requirements.txt```
 
-### How To Run Checks Locally
-On your local machine open the terminal and cd into the working dir. 
-1. Code style checks: ```./pylint```
-2. Unit tests: ```python -m unittest discover```
-3. Code coverage: ```bash coverage```
-
-### Installation on Windows
+#### Installation on Windows
 1. Download and install the latest version of [Anaconda 3](https://www.anaconda.com/distribution/#download-section)
 2. Launch Anaconda Navigator
 3. Click Environments, choose an environment name, select Python 3.6, and click Create
@@ -59,6 +61,12 @@ On your local machine open the terminal and cd into the working dir.
 5. Launch Anaconda Prompt and activate the environment: ```conda activate <env name>```
 6. From Anaconda Prompt: go to the directory where you have saved the file, example: cd Desktop/mlfinlab/.
 7. Install Python requirements, by running the command: ```pip install -r requirements.txt```
+
+### How To Run Checks Locally
+On your local machine open the terminal and cd into the working dir. 
+1. Code style checks: ```./pylint```
+2. Unit tests: ```python -m unittest discover```
+3. Code coverage: ```bash coverage```
 
 ## Built With
 * [Github](https://github.com/hudson-and-thames/mlfinlab) - Development platform and repo
@@ -68,6 +76,10 @@ On your local machine open the terminal and cd into the working dir.
 
 * **Ashutosh Singh** - [LinkedIn](https://www.linkedin.com/in/ashusinghpenn/)
 * **Jacques Joubert** - [LinkedIn](https://www.linkedin.com/in/jacquesjoubert/)
+
+## Core Contributors
+
+* **Oleksandr Proskurin** - [LinkedIn](https://www.linkedin.com/in/proskurinolexandr/)
 
 ## Additional Research Repo
 BlackArbsCEO has a great repo based on de Prado's research. It covers many of the questions at the back of every chapter and was the first source on Github to do so. It has also been a good source of inspiration for our research. 
@@ -83,4 +95,4 @@ Looking forward to hearing from you!
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.txt](https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt) file for details

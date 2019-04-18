@@ -1,6 +1,7 @@
 [run]
 omit=*__init__*
-     mlfinlab/tests/*
+     tests/*
+     mlfinlab/util/multiprocess.py
      scripts/*
      /opt/conda/*
      */home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/xmlrunner/*

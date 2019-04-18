@@ -1,5 +1,6 @@
 coverage==4.5.2
-pandas==0.23.4
+pandas==0.24.2
 pylint==2.3.0
-numpy==1.15.4
+numpy==1.16.2
 xmlrunner==1.7.7
+numba==0.43.0
