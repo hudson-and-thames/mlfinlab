@@ -56,16 +56,16 @@ class TestETFTrick(unittest.TestCase):
         self.assertTrue(in_memory_trick_series.shape == csv_trick_series_100.shape)
         self.assertTrue(in_memory_trick_series.shape == csv_trick_series_all.shape)
 
-        # value check
+        # Value check
         self.assertTrue(abs(in_memory_trick_series.iloc[20] - 0.9933502) < 1e-6)
 
-        # assert the first value equal to 1
+        # Assert the first value equal to 1
         self.assertTrue(in_memory_trick_series.iloc[0] == 1.0)
         self.assertTrue(csv_trick_series_4.iloc[0] == 1.0)
         self.assertTrue(csv_trick_series_100.iloc[0] == 1.0)
         self.assertTrue(csv_trick_series_all.iloc[0] == 1.0)
 
-        # assert the last values are equal
+        # Assert the last values are equal
         self.assertTrue(in_memory_trick_series.iloc[-1] == csv_trick_series_4.iloc[-1])
         self.assertTrue(in_memory_trick_series.iloc[-1] == csv_trick_series_100.iloc[-1])
         self.assertTrue(in_memory_trick_series.iloc[-1] == csv_trick_series_all.iloc[-1])
@@ -93,16 +93,16 @@ class TestETFTrick(unittest.TestCase):
         self.assertTrue(in_memory_trick_series.shape == csv_trick_series_100.shape)
         self.assertTrue(in_memory_trick_series.shape == csv_trick_series_all.shape)
 
-        # value check
+        # Value check
         self.assertTrue(abs(in_memory_trick_series.iloc[20] - 0.9933372) < 1e-6)
 
-        # assert the first value equal to 1
+        # Assert the first value equal to 1
         self.assertTrue(in_memory_trick_series.iloc[0] == 1)
         self.assertTrue(csv_trick_series_4.iloc[0] == 1)
         self.assertTrue(csv_trick_series_100.iloc[0] == 1)
         self.assertTrue(csv_trick_series_all.iloc[0] == 1)
 
-        # assert the last values are equal
+        # Assert the last values are equal
         self.assertTrue(in_memory_trick_series.iloc[-1] == csv_trick_series_4.iloc[-1])
         self.assertTrue(in_memory_trick_series.iloc[-1] == csv_trick_series_100.iloc[-1])
         self.assertTrue(in_memory_trick_series.iloc[-1] == csv_trick_series_all.iloc[-1])
@@ -122,7 +122,7 @@ class TestETFTrick(unittest.TestCase):
             pass
 
         modified_open_df = self.open_df.copy(deep=True)
-        # add extra timestamp, to generate exception on _index_check()
+        # Add extra timestamp, to generate exception on _index_check()
         modified_open_df.loc[pd.Timestamp(2020, 1, 1), :] = 4
         try:
             ETFTrick(modified_open_df, self.close_df, self.alloc_df, self.costs_df, None)
