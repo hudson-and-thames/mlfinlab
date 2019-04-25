@@ -1,8 +1,7 @@
 """
-This module contains class for ETF trick generation and futures roll function, described in
-Marcos Lopez de Prado book 'Advances in Financial Machine Learning'
-ETF trick class can generate ETF trick series either from .csv files or from in memory pandas
-data frames
+This module contains class for ETF trick generation and futures roll function, described in Marcos Lopez de Prado's
+book 'Advances in Financial Machine Learning' ETF trick class can generate ETF trick series either from .csv files
+or from in memory pandas DataFrames
 """
 
 # Imports
@@ -19,62 +18,83 @@ class ETFTrick:
     def __init__(self, open_df, close_df, alloc_df, costs_df, rates_df=None, index_col=0):
         """
         Constructor
+
         Creates class object, for csv based files reads the first data chunk.
-        :param open_df: (pd.DataFrame or string): open prices data frame or path to csv file, corresponds to o(t) from the book
+        :param open_df: (pd.DataFrame or string): open prices data frame or path to csv file,
+         corresponds to o(t) from the book
         :param close_df: (pd.DataFrame or string): close prices data frame or path to csv file, corresponds to p(t)
-        :param alloc_df: (pd.DataFrame or string): asset allocations data frame or path to csv file (in # of contracts), corresponds to w(t)
-        :param costs_df: (pd.DataFrame or string): rebalance, carry and dividend costs of holding/rebalancing the position, corresponds to d(t)
-        :param rates_df: (pd.DataFrame or string): dollar value of one point move of contract
-                                                   includes exchange rate, futures contracts multiplies). Corresponds to phi(t)
-                         For example, 1$ in VIX index, equals 1000$ in VIX futures contract value. If None then trivial (all values equal 1.0) is generated
+        :param alloc_df: (pd.DataFrame or string): asset allocations data frame or path to csv file (in # of contracts),
+         corresponds to w(t)
+        :param costs_df: (pd.DataFrame or string): rebalance, carry and dividend costs of holding/rebalancing the
+         position, corresponds to d(t)
+        :param rates_df: (pd.DataFrame or string): dollar value of one point move of contract includes exchange rate,
+         futures contracts multiplies). Corresponds to phi(t)
+         For example, 1$ in VIX index, equals 1000$ in VIX futures contract value.
+         If None then trivial (all values equal 1.0) is generated
         :param index_col: (int): positional index of index column. Used for to determine index column in csv files
 
         """
         self.index_col = index_col
-        self.prev_k = 1.0  # init with 1$ as initial value
-        # we need to track allocations vector change on previous step
-        # previous allocation change is needed for delta component calculation
-        self.prev_allocs_change = False
-        self.prev_h = None  # to find current etf_trick value we need previous h value
+        self.prev_k = 1.0  # init with $1 as initial value
 
-        self.data_dict = dict.fromkeys(['open', 'close', 'alloc', 'costs', 'rates'], pd.DataFrame())
-        self.iter_dict = None  # dictionary of csv files iterators, None for in_memory ETF trick calculation
-        self.init_fields = None  # dictionary of initial fields values, needed to call reset method
+        # We need to track allocations vector change on previous step
+        # Previous allocation change is needed for delta component calculation
+        self.prev_allocs_change = False
+        self.prev_h = None  # To find current etf_trick value we need previous h value
+
+        # self.data_dict = dict.fromkeys(['open', 'close', 'alloc', 'costs', 'rates'], pd.DataFrame())
+        self.data_dict = {}
+        self.iter_dict = None  # Dictionary of csv files iterators, None for in_memory ETF trick calculation
+        self.init_fields = None  # Dictionary of initial fields values, needed to call reset method
 
         if isinstance(alloc_df, str):
-            # string values for open, close, alloc, costs and rates mean that we generate ETF trick from csv files
-            # remember constructor fields for possible reset() method call
+            # String values for open, close, alloc, costs and rates mean that we generate ETF trick from csv files
+            # Remember constructor fields for possible reset() method call
             self.init_fields = {'open_df': open_df, 'close_df': close_df, 'alloc_df': alloc_df, 'costs_df': costs_df,
                                 'rates_df': rates_df, 'index_col': index_col}
             self.iter_dict = dict.fromkeys(['open', 'close', 'alloc', 'costs', 'rates'], None)
-            # create file iterators
-            self.iter_dict['open'] = pd.read_csv(
-                open_df, iterator=True, index_col=self.index_col, parse_dates=[self.index_col])
-            self.iter_dict['close'] = pd.read_csv(
-                close_df, iterator=True, index_col=self.index_col, parse_dates=[self.index_col])
-            self.iter_dict['alloc'] = pd.read_csv(
-                alloc_df, iterator=True, index_col=self.index_col, parse_dates=[self.index_col])
-            self.iter_dict['costs'] = pd.read_csv(
-                costs_df, iterator=True, index_col=self.index_col, parse_dates=[self.index_col])
+
+            # Create file iterators
+            self.iter_dict['open'] = pd.read_csv(open_df,
+                                                 iterator=True,
+                                                 index_col=self.index_col,
+                                                 parse_dates=[self.index_col])
+            self.iter_dict['close'] = pd.read_csv(close_df,
+                                                  iterator=True,
+                                                  index_col=self.index_col,
+                                                  parse_dates=[self.index_col])
+            self.iter_dict['alloc'] = pd.read_csv(alloc_df,
+                                                  iterator=True,
+                                                  index_col=self.index_col,
+                                                  parse_dates=[self.index_col])
+            self.iter_dict['costs'] = pd.read_csv(costs_df,
+                                                  iterator=True,
+                                                  index_col=self.index_col,
+                                                  parse_dates=[self.index_col])
+
             if rates_df is not None:
-                self.iter_dict['rates'] = pd.read_csv(
-                    rates_df, iterator=True, index_col=self.index_col, parse_dates=[self.index_col])
-            # get headers(column names) from csv files (except index col) which correspond to security names
+                self.iter_dict['rates'] = pd.read_csv(rates_df,
+                                                      iterator=True,
+                                                      index_col=self.index_col,
+                                                      parse_dates=[self.index_col])
+
+            # Get headers(column names) from csv files (except index col) which correspond to security names
             self.securities = list(pd.read_csv(alloc_df, nrows=0, header=0, index_col=self.index_col))
+
         elif isinstance(alloc_df, pd.DataFrame):
             self.data_dict['open'] = open_df
             self.data_dict['close'] = close_df
             self.data_dict['alloc'] = alloc_df
             self.data_dict['costs'] = costs_df
             self.data_dict['rates'] = rates_df
-            self.securities = self.data_dict['alloc'].columns  # get all securities columns
+            self.securities = self.data_dict['alloc'].columns  # Get all securities columns
 
             if rates_df is None:
                 self.data_dict['rates'] = open_df.copy()
-                # set trivial(1.0) exchange rate if no data is provided
+                # Set trivial(1.0) exchange rate if no data is provided
                 self.data_dict['rates'][self.securities] = 1.0
 
-            # align all securities columns in one order
+            # Align all securities columns in one order
             for df_name in self.data_dict:
                 self.data_dict[df_name] = self.data_dict[df_name][self.securities]
 
@@ -246,6 +266,7 @@ class ETFTrick:
         one step back, recalculate ETF trick value for the last row from previous batch using open price from latest
         batch received. This function rewinds values needed for ETF trick calculation
         recalculate
+
         :param alloc_df: (pd.DataFrame): data frame with allocations vectors
         :param etf_series (pd.Series): current computed ETF trick series
         :return:
@@ -285,17 +306,20 @@ class ETFTrick:
 
     def _in_memory_etf_series(self):
         """
-        In-memory based ETF trick series generation
+        In-memory based ETF trick series generation.
+
         :return: (pd.Series): pandas Series with ETF trick values starting from 1.0
         """
         data_df = self.generate_trick_components()  # data frame which contains all precomputed info for etf trick
-        # delete first nans (first row of close price difference is nan)
+
+        # Delete first nans (first row of close price difference is nan)
         data_df = data_df.iloc[1:]
         return self._chunk_loop(data_df)
 
     def get_etf_series(self, batch_size=1e5):
         """
-        External method which defines which etf trick method to use
+        External method which defines which etf trick method to use.
+
         :return: (pd.Series): pandas Series with ETF trick values starting from 1.0
         """
         if self.iter_dict is None:
@@ -309,14 +333,15 @@ class ETFTrick:
 
     def reset(self):
         """
-        Reinits class object. This methods can be used to reset file iterators for multiple get_etf_trick() calls
+        Reinits class object. This methods can be used to reset file iterators for multiple get_etf_trick() calls.
         """
         self.__init__(**self.init_fields)
 
 
 def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_col, roll_backward=False):
     """
-    Function for generating rolling futures series from data frame of multiple futures (
+    Function for generating rolling futures series from data frame of multiple futures.
+
     :param data_df: (pd.DataFrame): pandas DataFrame containing price info, security name and current active futures column
     :param open_col: (string): open prices column name
     :param close_col: (string): close prices column name
@@ -325,16 +350,20 @@ def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_c
     :param roll_backward: (boolean): True for subtracting final gap value from all values
     :return (pd.Series): futures roll close price series
     """
-    # filter out security data which is not used as current security
+    # Filter out security data which is not used as current security
     filtered_df = data_df[data_df[sec_col] == data_df[current_sec_col]]
     filtered_df.sort_index(inplace=True)
-    # generate roll dates series based on current_sec column value change
+
+    # Generate roll dates series based on current_sec column value change
     roll_dates = filtered_df[current_sec_col].drop_duplicates(keep='first').index
     gaps = filtered_df[close_col] * 0  # roll gaps series
-    # on roll dates, gap equals open - close
+
+    # On roll dates, gap equals open - close
     gaps.loc[roll_dates[1:]] = filtered_df[open_col].loc[roll_dates[1:]] - filtered_df[close_col].loc[
         roll_dates[1:]]  # TODO: understand why Marcos used iloc and list logic
     gaps = gaps.cumsum()
+
     if roll_backward:
-        gaps -= gaps.iloc[-1]  # roll backward
+        gaps -= gaps.iloc[-1]  # Roll backward
+
     return data_df[close_col] - gaps
