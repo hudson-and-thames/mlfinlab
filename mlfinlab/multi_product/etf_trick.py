@@ -360,7 +360,7 @@ def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_c
 
     # On roll dates, gap equals open - close
     gaps.loc[roll_dates[1:]] = filtered_df[open_col].loc[roll_dates[1:]] - filtered_df[close_col].loc[
-        roll_dates[1:]]  # TODO: understand why Marcos used iloc and list logic
+        roll_dates[1:]]
     gaps = gaps.cumsum()
 
     if roll_backward:
