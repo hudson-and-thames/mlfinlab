@@ -5,9 +5,9 @@ or from in memory pandas DataFrames
 """
 
 # Imports
+import warnings
 import pandas as pd
 import numpy as np
-import warnings
 
 
 class ETFTrick:
