@@ -7,6 +7,7 @@ or from in memory pandas DataFrames
 # Imports
 import pandas as pd
 import numpy as np
+import warnings
 
 
 class ETFTrick:
@@ -34,6 +35,8 @@ class ETFTrick:
         :param index_col: (int): positional index of index column. Used for to determine index column in csv files
 
         """
+
+        warnings.warn("This a beta version of ETF trick. Please proof check the results", DeprecationWarning)
         self.index_col = index_col
         self.prev_k = 1.0  # Init with $1 as initial value
 
@@ -103,6 +106,37 @@ class ETFTrick:
 
         self.prev_allocs = np.array([np.nan for _ in range(0, len(self.securities))])  # Init weights with nan values
 
+    def _append_previous_rows(self, cache):
+        """
+        Uses latest two rows from cache to append into current data. Used for csv based ETF trick, when the next
+        batch is loaded and we need to recalculate K value which corresponds to previous batch.
+        :param cache: (dict): dictionary which pd.DataFrames with latest 2 rows of open, close, alloc, costs, rates
+        :return: (pd.DataFrame): data frame with close price differences (updates self.data_dict)
+        """
+        # Latest index from previous data_df(cache)
+        max_prev_index = cache['open'].index.max()
+        second_max_prev_index = cache['open'].index[-2]
+        # Add the last row from previous data chunk to a new chunk
+        for df_name in self.data_dict:
+            temp_df = self.data_dict[df_name]
+            temp_df.loc[max_prev_index, :] = cache[df_name].iloc[-1]
+            self.data_dict[df_name] = temp_df
+
+        # To recalculate latest row we need close price differences
+        self.data_dict['close'].loc[second_max_prev_index, :] = cache['close'].loc[second_max_prev_index, :]
+        # that is why close_df needs 2 previous chunk rows to omit first row nans
+
+        for df_name in self.data_dict:
+            self.data_dict[df_name].sort_index(inplace=True)  # Sort data frames after all appends
+            self.data_dict[df_name] = self.data_dict[df_name][
+                self.securities]  # Align all securities columns in one order
+
+        # Get price diffs, take values from the second row (first is nan)
+        price_diff = self.data_dict['close'].diff().iloc[1:]
+        # Delete second max row from previous data chunk in close_df
+        self.data_dict['close'] = self.data_dict['close'].iloc[1:]
+        return price_diff
+
     def generate_trick_components(self, cache=None):
         """
         Calculates all etf trick operations which can be vectorised. Outputs multilevel pandas data frame.
@@ -117,28 +151,7 @@ class ETFTrick:
         :return: (pd.DataFrame): pandas data frame with columns in a format: component_1/asset_name_1, component_1/asset_name_2, ..., component_6/asset_name_n
         """
         if cache:
-            # Latest index from previous data_df(cache)
-            max_prev_index = cache['open'].index.max()
-            second_max_prev_index = cache['open'].index[-2]
-            # Add the last row from previous data chunk to a new chunk
-            for df_name in self.data_dict:
-                temp_df = self.data_dict[df_name]
-                temp_df.loc[max_prev_index, :] = cache[df_name].iloc[-1]
-                self.data_dict[df_name] = temp_df
-
-            # To recalculate latest row we need close price differences
-            self.data_dict['close'].loc[second_max_prev_index, :] = cache['close'].loc[second_max_prev_index, :]
-            # that is why close_df needs 2 previous chunk rows to omit first row nans
-
-            for df_name in self.data_dict:
-                self.data_dict[df_name].sort_index(inplace=True)  # Sort data frames after all appends
-                self.data_dict[df_name] = self.data_dict[df_name][
-                    self.securities]  # Align all securities columns in one order
-
-            # Get price diffs, take values from the second row (first is nan)
-            price_diff = self.data_dict['close'].diff().iloc[1:]
-            # Delete second max row from previous data chunk in close_df
-            self.data_dict['close'] = self.data_dict['close'].iloc[1:]
+            price_diff = self._append_previous_rows(cache)
         else:
             price_diff = self.data_dict['close'].diff()
 
