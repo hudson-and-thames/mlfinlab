@@ -12,10 +12,10 @@ import pandas as pd
 def get_weights(diff_amt, size):
 	"""
 	Source: Chapter 5, AFML (section 5.4.2)
-	The helper function generates weights that are used to compute fractionally differentiated series.
-	It computes the weights that get used in the computation of  fractionally
-	differentiated series.  This generates a non-terminating series that
-	approaches zero asymptotically.  The side effect of this function is that
+	The helper function generates weights that are used to compute fractionally
+	differentiated series. It computes the weights that get used in the computation
+	of  fractionally differentiated series.  This generates a non-terminating series
+	that approaches zero asymptotically.  The side effect of this function is that
 	it leads to negative drift "caused by an expanding window's added weights"
 	(see page 83 AFML)
 

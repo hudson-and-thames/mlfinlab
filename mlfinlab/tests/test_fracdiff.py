@@ -13,7 +13,7 @@ from mlfinlab.features import fracdiff
 
 class TestFractionalDifferentiation(unittest.TestCase):
     """
-    Test get_weights, get_weights_ffd, frac_diff, frac_diff_ffd
+    Test get_weights, get_weights_ffd, frac_diff, and frac_diff_ffd
     """
 
     def setUp(self):
