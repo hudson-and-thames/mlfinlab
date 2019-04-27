@@ -1,7 +1,7 @@
 """
 Fractional differentiation is a technique to make a time series stationary but also
 retain as much memory as possible.  This is done by differencing by a positive real
-number.  Fractionally differenced series can be used as a feature in machine learning
+number. Fractionally differenced series can be used as a feature in machine learning
 process.
 """
 
