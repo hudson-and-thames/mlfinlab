@@ -81,7 +81,7 @@ def frac_diff(series, diff_amt, thresh=0.01):
         for iloc in range(skip, series_f.shape[0]):
             loc = series_f.index[iloc]
 
-            # at this point all entries are non-NAs so no need for the following check
+            # At this point all entries are non-NAs so no need for the following check
             # if np.isfinite(series.loc[loc, name]):
             output_df_[loc] = np.dot(weights[-(iloc + 1):, :].T, series_f.loc[:loc])[0, 0]
 

@@ -90,4 +90,4 @@ class TestFractionalDifferentiation(unittest.TestCase):
             fd_series = fracdiff.frac_diff_ffd(data_series, diff_amt=diff_amt)
             self.assertTrue(fd_series.shape[0] == len(data_series))
             self.assertTrue(isinstance(fd_series['close'][0], np.float64) and math.isnan(fd_series['close'][0]))
-            # self.assertTrue(type(fd_series['close'][0]) is np.float64 and math.isnan(fd_series['close'][0]))
+            #  self.assertTrue(type(fd_series['close'][0]) is np.float64 and math.isnan(fd_series['close'][0]))
