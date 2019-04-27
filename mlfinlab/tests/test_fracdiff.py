@@ -35,15 +35,15 @@ class TestFractionalDifferentiation(unittest.TestCase):
         2. The length of the weights vector is same as the requested length
         """
 
-        d = 0.9
-        n = 100
-        weights = fracdiff.get_weights(d, size=n)
+        diff_amt = 0.9
+        number_ele = 100
+        weights = fracdiff.get_weights(diff_amt, size=number_ele)
 
         # Last value in the set is still the same
         self.assertTrue(weights[-1] == 1.0)
 
         # Size matches
-        self.assertTrue(weights.shape[0] == n)
+        self.assertTrue(weights.shape[0] == number_ele)
 
     def test_get_weights_ffd(self):
         """
@@ -54,10 +54,10 @@ class TestFractionalDifferentiation(unittest.TestCase):
 
         """
 
-        d = 0.9
-        n = 100
+        diff_amt = 0.9
+        number_ele = 100
         thresh = 1e-3
-        weights = fracdiff.get_weights_ffd(d, thresh=thresh, lim=n)
+        weights = fracdiff.get_weights_ffd(diff_amt, thresh=thresh, lim=number_ele)
 
         # Last value in the set is still the same
         self.assertTrue(weights[-1] == 1.0)
