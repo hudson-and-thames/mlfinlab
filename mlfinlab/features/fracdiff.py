@@ -1,13 +1,15 @@
+"""
+Fractional differentiation is a technique to make a time series stationary but also
+retain as much memory as possible.  This is done by differencing by a positive real
+number.  Fractionally differenced series can be used as a feature in machine learning
+process.
+"""
 
 import numpy as np
 import pandas as pd
 
 
-# from: http://www.mirzatrokic.ca/FILES/codes/fracdiff.py
-# small modification: wrapped 2**np.ceil(...) around int()
-# https://github.com/SimonOuellette35/FractionalDiff/blob/master/question2.py
-
-def get_weights(d, size):
+def get_weights(diff_amt, size):
     """
     Source: Chapter 5, AFML (section 5.4.2)
     The helper function generates weights that are used to compute fractionally differentiated series.
@@ -25,21 +27,21 @@ def get_weights(d, size):
     selected more than once or as many times as one chooses (multisets with
     unbounded multiplicity) - see http://faculty.uml.edu/jpropp/msri-up12.pdf.
 
-    :param d: (float) differencing amount
+    :param diff_amt: (float) differencing amount
     :param size: (int) length of the series
     :return: (ndarray) weight vector
     """
-    # thresh > 0 drops insignificant weights
-    w = [1.]
+
+    weights = [1.]
     for k in range(1, size):
-        w_ = -w[-1] / k * (d - k + 1)
-        w.append(w_)
+        weights_ = -weights[-1] / k * (diff_amt - k + 1)
+        weights.append(weights_)
 
-    w = np.array(w[::-1]).reshape(-1, 1)
-    return w
+    weights = np.array(weights[::-1]).reshape(-1, 1)
+    return weights
 
 
-def frac_diff(series, d, thresh=0.01):
+def frac_diff(series, diff_amt, thresh=0.01):
     """
     Source: Chapter 5, AFML (section 5.5);
 
@@ -54,40 +56,40 @@ def frac_diff(series, d, thresh=0.01):
 
     This is the expanding window variant of the fracDiff algorithm
     Note 1: For thresh-1, nothing is skipped
-    Note 2: d can be any positive fractional, not necessarility bounded [0, 1]
+    Note 2: diff_amt can be any positive fractional, not necessarility bounded [0, 1]
 
     :param series: (pd.Series) a time series that needs to be differenced
-    :param d: (float) Differencing amount
+    :param diff_amt: (float) Differencing amount
     :param thresh: (float) threshold or epsilon
     :return: (pd.DataFrame) data frame of differenced series
     """
 
     # 1. Compute weights for the longest series
-    w = get_weights(d, series.shape[0])
+    weights = get_weights(diff_amt, series.shape[0])
 
     # 2. Determine initial calculations to be skipped based on weight-loss threshold
-    w_ = np.cumsum(abs(w))
-    w_ /= w_[-1]
-    skip = w_[w_ > thresh].shape[0]
+    weights_ = np.cumsum(abs(weights))
+    weights_ /= weights_[-1]
+    skip = weights_[weights_ > thresh].shape[0]
 
     # 3. Apply weights to values
-    df = {}
+    output_df = {}
     for name in series.columns:
         series_f = series[[name]].fillna(method='ffill').dropna()
-        df_ = pd.Series(index=series.index)
+        output_df_ = pd.Series(index=series.index)
 
         for iloc in range(skip, series_f.shape[0]):
             loc = series_f.index[iloc]
             if not np.isfinite(series.loc[loc, name]):
                 continue  # exclude NAs
             else:
-                df_[loc] = np.dot(w[-(iloc + 1):, :].T, series_f.loc[:loc])[0, 0]
-        df[name] = df_.copy(deep=True)
-    df = pd.concat(df, axis=1)
-    return df
+                output_df_[loc] = np.dot(weights[-(iloc + 1):, :].T, series_f.loc[:loc])[0, 0]
+        output_df[name] = output_df_.copy(deep=True)
+    output_df = pd.concat(output_df, axis=1)
+    return output_df
 
 
-def get_weights_ffd(d, thresh, lim):
+def get_weights_ffd(diff_amt, thresh, lim):
     """
     Source: Chapter 5, AFML (section 5.4.2)
     The helper function generates weights that are used to compute fractionally differentiated series.
@@ -101,28 +103,28 @@ def get_weights_ffd(d, thresh, lim):
     The discussion of positive and negative d is similar to that in get_weights
     (see the function get_weights)
 
-    :param d: (float) differencing amount
+    :param diff_amt: (float) differencing amount
     :param thresh: (float) threshold for minimum weight
     :param lim: (int) maximum length of the weight vector
     :return: (ndarray) weight vector
     """
 
-    w, k = [1.], 1
+    weights, k = [1.], 1
     ctr = 0
     while True:
-        w_ = -w[-1] / k * (d - k + 1)
-        if abs(w_) < thresh:
+        weights_ = -weights[-1] / k * (diff_amt - k + 1)
+        if abs(weights_) < thresh:
             break
-        w.append(w_)
+        weights.append(weights_)
         k += 1
         ctr += 1
         if ctr == lim - 1:
             break
-    w = np.array(w[::-1]).reshape(-1, 1)
-    return w
+    weights = np.array(weights[::-1]).reshape(-1, 1)
+    return weights
 
 
-def frac_diff_ffd(series, d, thresh=1e-5):
+def frac_diff_ffd(series, diff_amt, thresh=1e-5):
     """
     Source: Chapter 5, AFML (section 5.5);
     References:
@@ -136,31 +138,30 @@ def frac_diff_ffd(series, d, thresh=1e-5):
 
     Constant width window (new solution)
     Note 1: thresh determines the cut-off weight for the window
-    Note 2: d can be any positive fractional, not necessarity bounded [0, 1].
+    Note 2: diff_amt can be any positive fractional, not necessarity bounded [0, 1].
 
     :param series: (pd.Series)
-    :param d: (float) differencing amount
+    :param diff_amt: (float) differencing amount
     :param thresh: (float) threshold for minimum weight
     :return: (pd.DataFrame) a data frame of differenced series
     """
 
     # 1) Compute weights for the longest series
-    w = get_weights_ffd(d, thresh, series.shape[0])
-    width = len(w) - 1
+    weights = get_weights_ffd(diff_amt, thresh, series.shape[0])
+    width = len(weights) - 1
 
     # 2) Apply weights to values
-    df = {}
+    output_df = {}
     for name in series.columns:
         series_f = series[[name]].fillna(method='ffill').dropna()
-        df_ = pd.Series(index=series.index)
+        temp_df_ = pd.Series(index=series.index)
         for iloc1 in range(width, series_f.shape[0]):
             loc0 = series_f.index[iloc1 - width]
             loc1 = series.index[iloc1]
             if not np.isfinite(series.loc[loc1, name]):
                 continue  # exclude NAs
             else:
-                df_[loc1] = np.dot(w.T, series_f.loc[loc0:loc1])[0, 0]
-        df[name] = df_.copy(deep=True)
-    df = pd.concat(df, axis=1)
-    return df
-
+                temp_df_[loc1] = np.dot(weights.T, series_f.loc[loc0:loc1])[0, 0]
+        output_df[name] = temp_df_.copy(deep=True)
+    output_df = pd.concat(output_df, axis=1)
+    return output_df

@@ -74,7 +74,7 @@ class TestFractionalDifferentiation(unittest.TestCase):
         data_series = self.data['close'].to_frame()
 
         for d in np.arange(0.1, 1, 0.1):
-            fd = fracdiff.frac_diff(data_series, d=d)
+            fd = fracdiff.frac_diff(data_series, diff_amt=d)
             self.assertTrue(fd.shape[0] == len(data_series))
             self.assertTrue(type(fd['close'][0]) is np.float64 and math.isnan(fd['close'][0]))
 
@@ -87,6 +87,6 @@ class TestFractionalDifferentiation(unittest.TestCase):
         data_series = self.data['close'].to_frame()
 
         for d in np.arange(0.1, 1, 0.1):
-            fd = fracdiff.frac_diff_ffd(data_series, d=d)
+            fd = fracdiff.frac_diff_ffd(data_series, diff_amt=d)
             self.assertTrue(fd.shape[0] == len(data_series))
             self.assertTrue(type(fd['close'][0]) is np.float64 and math.isnan(fd['close'][0]))
