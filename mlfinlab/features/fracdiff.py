@@ -19,7 +19,7 @@ def get_weights(diff_amt, size):
     it leads to negative drift "caused by an expanding window's added weights"
     (see page 83 AFML)
 
-    When d is real (non-integer) positive number then it preserves memory.
+    When diff_amt is real (non-integer) positive number then it preserves memory.
 
     The book does not discuss what should be expected if d is a negative real
     number.  Conceptually (from set theory) negative d leads to set of negative
