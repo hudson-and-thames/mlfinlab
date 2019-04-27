@@ -81,8 +81,9 @@ def frac_diff(series, diff_amt, thresh=0.01):
         for iloc in range(skip, series_f.shape[0]):
             loc = series_f.index[iloc]
 
-            if np.isfinite(series.loc[loc, name]):
-                output_df_[loc] = np.dot(weights[-(iloc + 1):, :].T, series_f.loc[:loc])[0, 0]
+            # at this point all entries are non-NAs so no need for the following check
+            # if np.isfinite(series.loc[loc, name]):
+            output_df_[loc] = np.dot(weights[-(iloc + 1):, :].T, series_f.loc[:loc])[0, 0]
 
         output_df[name] = output_df_.copy(deep=True)
     output_df = pd.concat(output_df, axis=1)
@@ -159,8 +160,9 @@ def frac_diff_ffd(series, diff_amt, thresh=1e-5):
             loc0 = series_f.index[iloc1 - width]
             loc1 = series.index[iloc1]
 
-            if np.isfinite(series.loc[loc1, name]):
-                temp_df_[loc1] = np.dot(weights.T, series_f.loc[loc0:loc1])[0, 0]
+            # At this point all entries are non-NAs, hence no need for the following check
+            # if np.isfinite(series.loc[loc1, name]):
+            temp_df_[loc1] = np.dot(weights.T, series_f.loc[loc0:loc1])[0, 0]
 
         output_df[name] = temp_df_.copy(deep=True)
     output_df = pd.concat(output_df, axis=1)

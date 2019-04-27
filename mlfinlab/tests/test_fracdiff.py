@@ -21,7 +21,8 @@ class TestFractionalDifferentiation(unittest.TestCase):
         Set the file path for the sample dollar bars data.
         """
         project_path = os.path.dirname(__file__)
-        self.path = project_path + '/test_data/dollar_bar_sample.csv'
+        # self.path = project_path + '/test_data/dollar_bar_sample.csv'
+        self.path = project_path + '/test_data/dollar_bars.csv'
         self.data = pd.read_csv(self.path, index_col='date_time')
         self.data.index = pd.to_datetime(self.data.index)
 
@@ -75,7 +76,7 @@ class TestFractionalDifferentiation(unittest.TestCase):
         for diff_amt in np.arange(0.1, 1, 0.1):
             fd_series = fracdiff.frac_diff(data_series, diff_amt=diff_amt)
             self.assertTrue(fd_series.shape[0] == len(data_series))
-            self.assertTrue(type(fd_series['close'][0]) is np.float64 and math.isnan(fd_series['close'][0]))
+            self.assertTrue(isinstance(fd_series['close'][0], np.float64) and math.isnan(fd_series['close'][0]))
 
     def test_frac_diff_ffd(self):
         """
@@ -88,4 +89,5 @@ class TestFractionalDifferentiation(unittest.TestCase):
         for diff_amt in np.arange(0.1, 1, 0.1):
             fd_series = fracdiff.frac_diff_ffd(data_series, diff_amt=diff_amt)
             self.assertTrue(fd_series.shape[0] == len(data_series))
-            self.assertTrue(type(fd_series['close'][0]) is np.float64 and math.isnan(fd_series['close'][0]))
+            self.assertTrue(isinstance(fd_series['close'][0], np.float64) and math.isnan(fd_series['close'][0]))
+            # self.assertTrue(type(fd_series['close'][0]) is np.float64 and math.isnan(fd_series['close'][0]))
