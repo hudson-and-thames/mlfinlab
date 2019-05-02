@@ -22,6 +22,7 @@ You should be able to work on a few implementations of the code with this set.
 ---
 
 ## Notes
+* Added Chapter 5 code (Frac Diff)
 * Added Chapter 3 code (Labeling)
 * Added Imbalance and Run bars.
 * Added standard bar types (tick, volume, dollar). 
