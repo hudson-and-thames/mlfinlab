@@ -28,7 +28,6 @@ class TestFractionalDifferentiation(unittest.TestCase):
     def test_get_weights(self):
         """
         get_weights as implemented here matches the code in the book (Snippet 5.1).
-
         We test:
         1. if the first element of the weights vector is 1.0
         2. The length of the weights vector is same as the requested length
@@ -89,4 +88,3 @@ class TestFractionalDifferentiation(unittest.TestCase):
             fd_series = fracdiff.frac_diff_ffd(data_series, diff_amt=diff_amt)
             self.assertTrue(fd_series.shape[0] == len(data_series))
             self.assertTrue(isinstance(fd_series['close'][0], np.float64) and math.isnan(fd_series['close'][0]))
-            #  self.assertTrue(type(fd_series['close'][0]) is np.float64 and math.isnan(fd_series['close'][0]))
