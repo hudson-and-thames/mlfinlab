@@ -13,9 +13,6 @@ class FractionalDifferentiation:
     """ FractionalDifferentiation class encapsulates the functions that can
     be used to compute fractionally differentiated series.
     """
-    def __init__(self):
-        pass
-
     @staticmethod
     def get_weights(diff_amt, size):
         """
