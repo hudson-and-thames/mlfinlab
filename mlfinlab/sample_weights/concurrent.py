@@ -1,3 +1,7 @@
+"""
+Logic regarding concurrent labels from chapter 4.
+"""
+
 import pandas as pd
 import numpy as np
 from mlfinlab.util.multiprocess import mp_pandas_obj
@@ -29,7 +33,7 @@ def num_concurrent_events(close_series, label_endtime, molecule):
 
 def _get_average_uniqueness(label_endtime, num_conc_events, molecule):
     """
-    Snippet 4.1, page 62, Estimating the Average Uniqueness of a Label
+    Snippet 4.2, page 62, Estimating the Average Uniqueness of a Label
     This function uses close series prices and label endtime (when the first barrier is touched) to compute the number
     of concurrent events per bar.
     :param label_endtime: (pd.Series) label endtime series (t1 for triple barrier events)
