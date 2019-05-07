@@ -10,11 +10,11 @@ def get_ind_matrix(bar_index, label_endtime):
     """
     Snippet 4.3, page 64, Build an Indicator Matrix
     Get indicator matrix
-    :param bar_index: (pd.Series): index of bars
-    :param label_endtime: (pd.Series) label endtime series (t1 for triple barrier events)
+    :param bar_index: (pd.Series): Index of bars
+    :param label_endtime: (pd.Series) Label endtime series (t1 for triple barrier events)
     :return: (pd.DataFrame) indicator binary matrix indicating what (price) bars influence the label for each observation
     """
-    ind_mat = pd.DataFrame(0, index=bar_index, columns=range(label_endtime.shape[0]))
+    ind_mat = pd.DataFrame(0, index=bar_index, columns=range(label_endtime.shape[0]))  # zero indicator matrix
     for i, (t0, t1) in enumerate(label_endtime.iteritems()):
         ind_mat.loc[t0:t1, i] = 1
     return ind_mat
@@ -66,4 +66,4 @@ def seq_bootstrap(bar_index, label_endtime, sample_length=None, compare=False):
         sequential_unq = _get_ind_mat_average_uniqueness(ind_mat[phi].mean())
         print('Standard uniqueness: {}\n Sequential uniqueness: {}'.format(standard_unq, sequential_unq))
 
-        return phi
+    return phi
