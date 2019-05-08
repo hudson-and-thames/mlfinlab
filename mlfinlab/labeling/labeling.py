@@ -56,7 +56,7 @@ def apply_pt_sl_on_t1(close, events, pt_sl, molecule):  # pragma: no cover
 
 
 # Snippet 3.4 page 49, Adding a Vertical Barrier
-def add_vertical_barrier(t_events, close, num_days=1):
+def add_vertical_barrier(t_events, close, timedelta):
     """
     Snippet 3.4 page 49, Adding a Vertical Barrier
 
@@ -67,11 +67,11 @@ def add_vertical_barrier(t_events, close, num_days=1):
 
     :param t_events: (series) series of events (symmetric CUSUM filter)
     :param close: (series) close prices
-    :param num_days: (int) maximum number of days a trade can be active
+    :param timedelta: (pd.Timedelta) maximum time a trade can be active
     :return: (series) timestamps of vertical barriers
     """
     # Find index to closest to vertical barrier
-    nearest_index = close.index.searchsorted(t_events + pd.Timedelta(days=num_days))
+    nearest_index = close.index.searchsorted(t_events + timedelta)
 
     # Exclude indexes which are outside the range of close price index
     nearest_index = nearest_index[nearest_index < close.shape[0]]

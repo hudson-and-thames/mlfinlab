@@ -54,12 +54,13 @@ def get_av_uniqueness_from_tripple_barrier(triple_barrier_events, close_series, 
     :param triple_barrier_events: (data frame) of events from labeling.get_events()
     :param close_series: (pd.Series) close prices.
     :param num_threads: (int) The number of threads concurrently used by the function.
-    :return: (pd.Series) average uniqueness over event's lifespan for each sample in triple_barrier_events
+    :return: (pd.Series) average uniqueness over event's lifespan for each index in triple_barrier_events
     """
-    out = pd.Dataframe()
+    out = pd.DataFrame()
     num_conc_events = mp_pandas_obj(num_concurrent_events, ('molecule', triple_barrier_events.index), num_threads,
                                     close_series=close_series.index, label_endtime=triple_barrier_events['t1'])
     num_conc_events = num_conc_events.loc[~num_conc_events.index.duplicated(keep='last')]
     num_conc_events = num_conc_events.reindex(close_series.index).fillna(0)
     out['tW'] = mp_pandas_obj(_get_average_uniqueness, ('molecule', triple_barrier_events.index), num_threads,
                               label_endtime=triple_barrier_events['t1'], num_conc_events=num_conc_events)
+    return out

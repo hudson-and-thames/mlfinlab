@@ -58,7 +58,8 @@ def seq_bootstrap(bar_index, label_endtime, sample_length=None, compare=False):
             ind_mat_reduced = ind_mat[phi + [1]]  # reduce ind_mat
             avg_unique.loc[i] = _get_ind_mat_average_uniqueness(ind_mat_reduced).iloc[-1]
         prob = avg_unique / avg_unique.sum()  # draw prob
-    phi += [np.random.choice(ind_mat.columns, p=prob)]
+        phi += [np.random.choice(ind_mat.columns, p=prob)]
+        print(len(phi))
 
     if compare is True:
         standard_indx = np.random.choice(ind_mat.columns, size=ind_mat.shape[1])

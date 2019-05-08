@@ -5,6 +5,7 @@ Logic regarding return and time decay attribution for sample weights from chapte
 import pandas as pd
 import numpy as np
 from mlfinlab.util.multiprocess import mp_pandas_obj
+from mlfinlab.sampling.concurrent import num_concurrent_events, get_av_uniqueness_from_tripple_barrier
 
 
 def _apply_weight_by_return(label_endtime, num_conc_events, close_series, molecule):
@@ -27,17 +28,17 @@ def _apply_weight_by_return(label_endtime, num_conc_events, close_series, molecu
     return weights.abs()
 
 
-def get_weights_by_return(triple_barrier_events, num_conc_events, close_series, molecule, num_threads):
+def get_weights_by_return(triple_barrier_events, close_series, num_threads):
     """
     Snippet 4.10(part 2), page 69, Determination of Sample Weight by Absolute Return Attribution
     This function is orchestrator for generating sample weights based on return using mp_pandas_obj.
     :param triple_barrier_events: (data frame) of events from labeling.get_events()
-    :param num_conc_events: (pd.Series) number of concurrent labels (output from num_concurrent_events function).
     :param close_series: (pd.Series) close prices
-    :param molecule: (an array) a set of datetime index values for processing.
     :param num_threads: (int) the number of threads concurrently used by the function.
     :return: (pd.Series) of sample weights based on number return and concurrency
     """
+    num_conc_events = mp_pandas_obj(num_concurrent_events, ('molecule', triple_barrier_events.index), num_threads,
+                                    close_series=close_series.index, label_endtime=triple_barrier_events['t1'])
     weights = mp_pandas_obj(_apply_weight_by_return, ('molecule', triple_barrier_events.index), num_threads,
                             label_endtime=triple_barrier_events['t1'], num_conc_events=num_conc_events,
                             close_series=close_series)
@@ -45,10 +46,12 @@ def get_weights_by_return(triple_barrier_events, num_conc_events, close_series, 
     return weights
 
 
-def get_weights_by_time_decay(av_uniqueness, decay=1):
+def get_weights_by_time_decay(triple_barrier_events, close_series, num_threads, decay=1):
     """
     Snippet 4.11, page 70, Implementation of Time Decay Factors
-    :param av_uniqueness: (pd.Series) average uniqueness over events from triple barrier method,  result of get_av_uniqueness_from_tripple_barrier
+    :param triple_barrier_events: (data frame) of events from labeling.get_events()
+    :param close_series: (pd.Series) close prices
+    :param num_threads: (int) the number of threads concurrently used by the function.
     :param decay: (int) decay factor
         - decay = 1 means there is no time decay
         - 0 < decay < 1 means that weights decay linearly over time, but every observation still receives a strictly positive weight, regadless of how old
@@ -58,9 +61,12 @@ def get_weights_by_time_decay(av_uniqueness, decay=1):
     """
     # apply piecewise-linear decay to observed uniqueness
     # newest observation gets weight=1, oldest observation gets weight=decay
+    av_uniqueness = get_av_uniqueness_from_tripple_barrier(triple_barrier_events, close_series, num_threads)
     decay_w = av_uniqueness['tW'].sort_index().cumsum()
     if decay >= 0:
         slope = (1 - decay) / decay_w.iloc[-1]
+    else:
+        slope = 1/((decay + 1) * decay_w.iloc[-1])
     const = 1 - slope * decay_w.iloc[-1]
     decay_w = const + slope * decay_w
     decay_w[decay_w < 0] = 0  # weights can't be negative
