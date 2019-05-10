@@ -55,14 +55,14 @@ def seq_bootstrap(bar_index, label_endtime, sample_length=None, compare=False):
     while len(phi) < sample_length:
         avg_unique = pd.Series()
         for i in ind_mat:
-            ind_mat_reduced = ind_mat[phi + [1]]  # reduce ind_mat
+            ind_mat_reduced = ind_mat[phi + [i]]  # reduce ind_mat
             avg_unique.loc[i] = _get_ind_mat_average_uniqueness(ind_mat_reduced).iloc[-1]
         prob = avg_unique / avg_unique.sum()  # draw prob
         phi += [np.random.choice(ind_mat.columns, p=prob)]
-        print(len(phi))
+        print(prob.iloc[0])
 
     if compare is True:
-        standard_indx = np.random.choice(ind_mat.columns, size=ind_mat.shape[1])
+        standard_indx = np.random.choice(ind_mat.columns, size=sample_length)
         standard_unq = _get_ind_mat_average_uniqueness(ind_mat[standard_indx].mean())
         sequential_unq = _get_ind_mat_average_uniqueness(ind_mat[phi].mean())
         print('Standard uniqueness: {}\n Sequential uniqueness: {}'.format(standard_unq, sequential_unq))
