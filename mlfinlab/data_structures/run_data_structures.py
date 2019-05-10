@@ -99,7 +99,9 @@ class RunBars(BaseBars):
                 self.imbalance_array['sell'].append(abs(imbalance))
                 cum_theta_sell += abs(imbalance)
 
-            if not list_bars and np.isnan([self.exp_imbalance['buy'], self.exp_imbalance['sell']]).any():
+            imbalances_are_counted_flag = np.isnan([self.exp_imbalance['buy'], self.exp_imbalance[
+                'sell']]).any()  # flag indicating that both buy and sell imbalances are counted
+            if not list_bars and imbalances_are_counted_flag:
                 self.exp_imbalance['buy'] = self._get_expected_imbalance(self.exp_num_ticks,
                                                                          self.imbalance_array['buy'])
                 self.exp_imbalance['sell'] = self._get_expected_imbalance(self.exp_num_ticks,

@@ -13,9 +13,9 @@ from mlfinlab.data_structures import run_data_structures as ds
 class TestDataStructures(unittest.TestCase):
     """
     Test the various financial data structures:
-    1. Imbalance Dollar bars
-    2. Imbalance Volume bars
-    3. Imbalance Tick bars
+    1. Run Dollar bars
+    2. Run Volume bars
+    3. Run Tick bars
     """
 
     def setUp(self):
@@ -27,7 +27,7 @@ class TestDataStructures(unittest.TestCase):
 
     def test_run_dollar_bars(self):
         """
-        Tests the imbalance dollar bars implementation.
+        Tests the run dollar bars implementation.
         """
         exp_num_ticks_init = 10
         num_prev_bars = 3
@@ -65,7 +65,7 @@ class TestDataStructures(unittest.TestCase):
 
     def test_run_volume_bars(self):
         """
-        Tests the imbalance volume bars implementation.
+        Tests the run volume bars implementation.
         """
         exp_num_ticks_init = 10
         num_prev_bars = 3
@@ -103,7 +103,7 @@ class TestDataStructures(unittest.TestCase):
 
     def test_run_tick_bars(self):
         """
-        Tests the imbalance tick bars implementation.
+        Tests the run tick bars implementation.
         """
         exp_num_ticks_init = 10
         num_prev_bars = 3
