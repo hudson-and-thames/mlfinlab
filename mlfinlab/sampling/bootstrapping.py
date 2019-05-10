@@ -34,17 +34,22 @@ def _get_ind_mat_average_uniqueness(ind_mat):
     return avg_unique
 
 
-def seq_bootstrap(bar_index, label_endtime, sample_length=None, compare=False):
+def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False):
     """
     Snippet 4.5, Snippet 4.6, page 65, Return Sample from Sequential Bootstrap
     Generate a sample via sequential bootstrap
 
-    :param bar_index: (pd.Series): Index of bars
-    :param label_endtime: (pd.Series) Label endtime series (t1 for triple barrier events)
+    :param triple_barrier_events: (data frame) of events from labeling.get_events()
     :param sample_length: (int) Length of bootstrapped sample
     :param compare: (boolean) flag to print standard bootstrap uniqueness vs sequential bootstrap uniqueness
     :return: (array) of bootstrapped samples indexes
     """
+
+    label_endtime = triple_barrier_events.t1
+
+    bar_index = list(triple_barrier_events.index)  # generate index for indicator matrix from t1 and index
+    bar_index.extend(triple_barrier_events.t1)
+    bar_index = sorted(list(set(bar_index)))
 
     ind_mat = get_ind_matrix(bar_index, label_endtime)
 
@@ -59,12 +64,11 @@ def seq_bootstrap(bar_index, label_endtime, sample_length=None, compare=False):
             avg_unique.loc[i] = _get_ind_mat_average_uniqueness(ind_mat_reduced).iloc[-1]
         prob = avg_unique / avg_unique.sum()  # draw prob
         phi += [np.random.choice(ind_mat.columns, p=prob)]
-        print(prob.iloc[0])
 
     if compare is True:
         standard_indx = np.random.choice(ind_mat.columns, size=sample_length)
-        standard_unq = _get_ind_mat_average_uniqueness(ind_mat[standard_indx].mean())
-        sequential_unq = _get_ind_mat_average_uniqueness(ind_mat[phi].mean())
-        print('Standard uniqueness: {}\n Sequential uniqueness: {}'.format(standard_unq, sequential_unq))
+        standard_unq = _get_ind_mat_average_uniqueness(ind_mat[standard_indx]).mean()
+        sequential_unq = _get_ind_mat_average_uniqueness(ind_mat[phi]).mean()
+        print('Standard uniqueness: {}\nSequential uniqueness: {}'.format(standard_unq, sequential_unq))
 
     return phi
