@@ -22,13 +22,14 @@ def _apply_weight_by_return(label_endtime, num_conc_events, close_series, molecu
 
     ret = np.log(close_series).diff()  # log-returns, so that they are additive
     weights = pd.Series(index=molecule)
+
     for t_in, t_out in label_endtime.loc[weights.index].iteritems():
         weights.loc[t_in] = (ret.loc[t_in:t_out] / num_conc_events.loc[
-                                                  t_in:t_out]) / sum()  # weights depend on returns and label concurrency
+                                                   t_in:t_out]).sum()  # weights depend on returns and label concurrency
     return weights.abs()
 
 
-def get_weights_by_return(triple_barrier_events, close_series, num_threads):
+def get_weights_by_return(triple_barrier_events, close_series, num_threads=5):
     """
     Snippet 4.10(part 2), page 69, Determination of Sample Weight by Absolute Return Attribution
     This function is orchestrator for generating sample weights based on return using mp_pandas_obj.
@@ -39,6 +40,8 @@ def get_weights_by_return(triple_barrier_events, close_series, num_threads):
     """
     num_conc_events = mp_pandas_obj(num_concurrent_events, ('molecule', triple_barrier_events.index), num_threads,
                                     close_series=close_series.index, label_endtime=triple_barrier_events['t1'])
+    num_conc_events = num_conc_events.loc[~num_conc_events.index.duplicated(keep='last')]
+    num_conc_events = num_conc_events.reindex(close_series.index).fillna(0)
     weights = mp_pandas_obj(_apply_weight_by_return, ('molecule', triple_barrier_events.index), num_threads,
                             label_endtime=triple_barrier_events['t1'], num_conc_events=num_conc_events,
                             close_series=close_series)
@@ -46,7 +49,7 @@ def get_weights_by_return(triple_barrier_events, close_series, num_threads):
     return weights
 
 
-def get_weights_by_time_decay(triple_barrier_events, close_series, num_threads, decay=1):
+def get_weights_by_time_decay(triple_barrier_events, close_series, num_threads=5, decay=1):
     """
     Snippet 4.11, page 70, Implementation of Time Decay Factors
     :param triple_barrier_events: (data frame) of events from labeling.get_events()
@@ -66,7 +69,7 @@ def get_weights_by_time_decay(triple_barrier_events, close_series, num_threads, 
     if decay >= 0:
         slope = (1 - decay) / decay_w.iloc[-1]
     else:
-        slope = 1/((decay + 1) * decay_w.iloc[-1])
+        slope = 1 / ((decay + 1) * decay_w.iloc[-1])
     const = 1 - slope * decay_w.iloc[-1]
     decay_w = const + slope * decay_w
     decay_w[decay_w < 0] = 0  # weights can't be negative
