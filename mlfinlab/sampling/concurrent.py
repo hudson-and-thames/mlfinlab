@@ -20,14 +20,14 @@ def num_concurrent_events(close_series, label_endtime, molecule):
     # Find events that span the period [molecule[0], molecule[1]]
     label_endtime = label_endtime.fillna(close_series[-1])  # unclosed events still must impact other weights
     label_endtime = label_endtime[label_endtime >= molecule[0]]  # events that end at or after molecule[0]
-    label_endtime = label_endtime.loc[
-                    :label_endtime[molecule].max()]  # events that start at or before t1[molecule].max()
+    # events that start at or before t1[molecule].max()
+    label_endtime = label_endtime.loc[:label_endtime[molecule].max()]
 
     # Count events spanning a bar
     nearest_index = close_series.searchsorted(np.array([label_endtime.index[0], label_endtime.max()]))
     count = pd.Series(0, index=close_series[nearest_index[0]:nearest_index[1] + 1])
-    for tIn, tOut in label_endtime.iteritems():
-        count.loc[tIn:tOut] += 1
+    for t_in, t_out in label_endtime.iteritems():
+        count.loc[t_in:t_out] += 1
     return count.loc[molecule[0]:label_endtime[molecule].max()]
 
 
@@ -43,8 +43,8 @@ def _get_average_uniqueness(label_endtime, num_conc_events, molecule):
     """
     # Derive average uniqueness over the event's lifespan
     wght = pd.Series(index=molecule)
-    for tIn, tOut in label_endtime.loc[wght.index].iteritems():
-        wght.loc[tIn] = (1. / num_conc_events.loc[tIn:tOut].mean())
+    for t_in, t_out in label_endtime.loc[wght.index].iteritems():
+        wght.loc[t_in] = (1. / num_conc_events.loc[t_in:t_out].mean())
     return wght
 
 

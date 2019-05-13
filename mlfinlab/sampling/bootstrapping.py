@@ -15,8 +15,8 @@ def get_ind_matrix(bar_index, label_endtime):
     :return: (pd.DataFrame) indicator binary matrix indicating what (price) bars influence the label for each observation
     """
     ind_mat = pd.DataFrame(0, index=bar_index, columns=range(label_endtime.shape[0]))  # zero indicator matrix
-    for i, (t0, t1) in enumerate(label_endtime.iteritems()):
-        ind_mat.loc[t0:t1, i] = 1
+    for i, (t_0, t_1) in enumerate(label_endtime.iteritems()):
+        ind_mat.loc[t_0:t_1, i] = 1
     return ind_mat
 
 
