@@ -26,15 +26,13 @@ def get_ind_mat_average_uniqueness(ind_mat):
     """
     Snippet 4.4. page 65, Compute Average Uniqueness
     Average uniqueness from indicator matrix
-    Note: Initial code snippet has a bug, avg_unique should be a number, not series, as it is implemented in the book
 
-    :param ind_mat: (pd.Dataframe) indicator binary matrix
-    :return: (float) average uniqueness
+    :param ind_mat: (np.matrix) indicator binary matrix
+    :return: (np.matrix) matrix with label uniqueness
     """
     conc = ind_mat.sum(axis=1)  # concurrency
     unique = ind_mat / conc[:, None]
-    avg_unique = unique[unique > 0].mean()  # average uniqueness
-    return avg_unique
+    return unique.T
 
 
 def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False):
@@ -67,15 +65,21 @@ def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False):
     while len(phi) < sample_length:
         avg_unique = np.array([])
         for i in ind_mat:  # TODO: for performance increase, this can be parallelized
-            ind_mat_reduced = ind_mat[phi + [i]]  # reduce ind_mat
-            avg_unique = np.append(avg_unique, get_ind_mat_average_uniqueness(ind_mat_reduced.values))
+            ind_mat_reduced = ind_mat[phi + [i]]  # reduce ind_mat (append i label as last column)
+            # get i label uniqueness vector (which corresponds to the last column of get_ind_mat_average_uniqueness)
+            label_uniqueness = get_ind_mat_average_uniqueness(ind_mat_reduced.values)[-1]
+            label_av_uniqueness = label_uniqueness[label_uniqueness > 0].mean()  # get average label uniqueness
+            avg_unique = np.append(avg_unique, label_av_uniqueness)
         prob = avg_unique / avg_unique.sum()  # draw prob
         phi += [np.random.choice(ind_mat.columns, p=prob)]
 
     if compare is True:
         standard_indx = np.random.choice(ind_mat.columns, size=sample_length)
-        standard_unq = get_ind_mat_average_uniqueness(ind_mat[standard_indx].values)
+        standart_unq = get_ind_mat_average_uniqueness(ind_mat[standard_indx].values)
+        standard_unq_mean = standart_unq[standart_unq > 0].mean()
+
         sequential_unq = get_ind_mat_average_uniqueness(ind_mat[phi].values)
-        print('Standard uniqueness: {}\nSequential uniqueness: {}'.format(standard_unq, sequential_unq))
+        sequential_unq_mean = sequential_unq[sequential_unq > 0].mean()
+        print('Standard uniqueness: {}\nSequential uniqueness: {}'.format(standard_unq_mean, sequential_unq_mean))
 
     return phi
