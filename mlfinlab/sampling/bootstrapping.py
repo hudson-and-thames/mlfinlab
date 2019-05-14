@@ -26,12 +26,13 @@ def get_ind_mat_average_uniqueness(ind_mat):
     """
     Snippet 4.4. page 65, Compute Average Uniqueness
     Average uniqueness from indicator matrix
+    Note: Initial code snippet has a bug, avg_unique should be a number, not series, as it is implemented in the book
 
     :param ind_mat: (pd.Dataframe) indicator binary matrix
     :return: (float) average uniqueness
     """
     conc = ind_mat.sum(axis=1)  # concurrency
-    unique = ind_mat.div(conc, axis=0)
+    unique = ind_mat / conc[:, None]
     avg_unique = unique[unique > 0].mean()  # average uniqueness
     return avg_unique
 
@@ -39,7 +40,8 @@ def get_ind_mat_average_uniqueness(ind_mat):
 def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False):
     """
     Snippet 4.5, Snippet 4.6, page 65, Return Sample from Sequential Bootstrap
-    Generate a sample via sequential bootstrap
+    Generate a sample via sequential bootstrap.
+    Note: Moved from pd.DataFrame to np.matrix for performance increase
 
     :param triple_barrier_events: (data frame) of events from labeling.get_events()
     :param sample_length: (int) Length of bootstrapped sample
@@ -54,7 +56,7 @@ def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False):
 
     bar_index = list(triple_barrier_events.index)  # generate index for indicator matrix from t1 and index
     bar_index.extend(triple_barrier_events.t1)
-    bar_index = sorted(list(set(bar_index)))
+    bar_index = sorted(list(set(bar_index)))  # drop duplicates and sort
 
     ind_mat = get_ind_matrix(bar_index, label_endtime)
 
@@ -63,17 +65,17 @@ def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False):
 
     phi = []
     while len(phi) < sample_length:
-        avg_unique = pd.Series()
-        for i in ind_mat:
+        avg_unique = np.array([])
+        for i in ind_mat:  # TODO: for performance increase, this can be parallelized
             ind_mat_reduced = ind_mat[phi + [i]]  # reduce ind_mat
-            avg_unique.loc[i] = get_ind_mat_average_uniqueness(ind_mat_reduced).iloc[-1]
+            avg_unique = np.append(avg_unique, get_ind_mat_average_uniqueness(ind_mat_reduced.values))
         prob = avg_unique / avg_unique.sum()  # draw prob
         phi += [np.random.choice(ind_mat.columns, p=prob)]
 
     if compare is True:
         standard_indx = np.random.choice(ind_mat.columns, size=sample_length)
-        standard_unq = get_ind_mat_average_uniqueness(ind_mat[standard_indx]).mean()
-        sequential_unq = get_ind_mat_average_uniqueness(ind_mat[phi]).mean()
+        standard_unq = get_ind_mat_average_uniqueness(ind_mat[standard_indx].values)
+        sequential_unq = get_ind_mat_average_uniqueness(ind_mat[phi].values)
         print('Standard uniqueness: {}\nSequential uniqueness: {}'.format(standard_unq, sequential_unq))
 
     return phi
