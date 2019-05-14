@@ -38,8 +38,12 @@ def get_weights_by_return(triple_barrier_events, close_series, num_threads=5):
     :param num_threads: (int) the number of threads concurrently used by the function.
     :return: (pd.Series) of sample weights based on number return and concurrency
     """
+    if bool(triple_barrier_events.isnull().values.any()) is True or bool(
+            triple_barrier_events.index.isnull().any()) is True:
+        raise ValueError('NaN values in triple_barrier_events, delete nans')
+
     num_conc_events = mp_pandas_obj(num_concurrent_events, ('molecule', triple_barrier_events.index), num_threads,
-                                    close_series=close_series.index, label_endtime=triple_barrier_events['t1'])
+                                    close_series_index=close_series.index, label_endtime=triple_barrier_events['t1'])
     num_conc_events = num_conc_events.loc[~num_conc_events.index.duplicated(keep='last')]
     num_conc_events = num_conc_events.reindex(close_series.index).fillna(0)
     weights = mp_pandas_obj(_apply_weight_by_return, ('molecule', triple_barrier_events.index), num_threads,
@@ -62,6 +66,10 @@ def get_weights_by_time_decay(triple_barrier_events, close_series, num_threads=5
         - decay < 0 means that the oldes portion c of the observations receive zero weight (i.e they are erased from memory)
     :return: (pd.Series) of sample weights based on time decay factors
     """
+    if bool(triple_barrier_events.isnull().values.any()) is True or bool(
+            triple_barrier_events.index.isnull().any()) is True:
+        raise ValueError('NaN values in triple_barrier_events, delete nans')
+
     # apply piecewise-linear decay to observed uniqueness
     # newest observation gets weight=1, oldest observation gets weight=decay
     av_uniqueness = get_av_uniqueness_from_tripple_barrier(triple_barrier_events, close_series, num_threads)

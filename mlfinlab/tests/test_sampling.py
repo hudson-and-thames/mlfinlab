@@ -4,7 +4,6 @@ Test various functions regarding chapter 4: Sampling (Bootstrapping, Concurrency
 
 import unittest
 import os
-import numpy as np
 import pandas as pd
 
 from mlfinlab.filters.filters import cusum_filter
@@ -81,7 +80,7 @@ class TestSampling(unittest.TestCase):
 
         ind_mat = pd.DataFrame()
         try:
-            print(get_ind_matrix(bar_index, label_endtime))  # bar index contains NaN, which must be handled
+            get_ind_matrix(bar_index, label_endtime)  # bar index contains NaN, which must be handled
         except ValueError:
             non_nan_meta_labels = self.meta_labeled_events.dropna()
             label_endtime = non_nan_meta_labels.t1
@@ -91,5 +90,10 @@ class TestSampling(unittest.TestCase):
             ind_mat = get_ind_matrix(bar_index, label_endtime)
         self.assertTrue(ind_mat.shape == (13, 7))
 
-        bootstrapped_samples = seq_bootstrap(non_nan_meta_labels, compare=True, sample_length=None)
+        try:
+            bootstrapped_samples = seq_bootstrap(self.meta_labeled_events, compare=True, sample_length=None)
+        except ValueError:
+            bootstrapped_samples = seq_bootstrap(non_nan_meta_labels, compare=True, sample_length=None)
+
         self.assertTrue(len(bootstrapped_samples) == non_nan_meta_labels.shape[0])
+        self.assertTrue(len(seq_bootstrap(non_nan_meta_labels, compare=False, sample_length=10)) == 10)
