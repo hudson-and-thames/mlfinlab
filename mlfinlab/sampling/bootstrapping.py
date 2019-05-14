@@ -31,8 +31,8 @@ def get_ind_mat_average_uniqueness(ind_mat):
     :return: (np.matrix) matrix with label uniqueness
     """
     conc = ind_mat.sum(axis=1)  # concurrency
-    unique = ind_mat / conc[:, None]
-    return unique.T
+    average = ind_mat / conc[:, None]
+    return average.T
 
 
 def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False):
