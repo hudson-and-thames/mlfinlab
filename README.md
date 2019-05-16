@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/hudson-and-thames/mlfinlab/blob/add_badges/.github/logo/hudson_and_thames_logo.png" height="300"><br>
+  <img src="https://github.com/hudson-and-thames/mlfinlab/blob/master/.github/logo/hudson_and_thames_logo.png" height="300"><br>
 </div>
 
 -----------------
