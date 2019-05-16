@@ -4,10 +4,14 @@
 
 -----------------
 # Machine Learning Financial Laboratory (mlfinlab)
-
 [![Build Status](https://travis-ci.com/hudson-and-thames/mlfinlab.svg?branch=master)](https://travis-ci.com/hudson-and-thames/mlfinlab)
 [![codecov](https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg)](https://codecov.io/gh/hudson-and-thames/mlfinlab)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![pylint Score](https://mperlet.github.io/pybadge/badges/10.svg)
+[![License: MIT](https://img.shields.io/github/license/hudson-and-thames/mlfinlab.svg)](https://opensource.org/licenses/MIT)
+
+[![PyPi](https://img.shields.io/pypi/v/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
+[![Downloads](https://img.shields.io/pypi/dm/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
+[![Python](https://img.shields.io/pypi/pyversions/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
 
 ## What is it?
 MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
