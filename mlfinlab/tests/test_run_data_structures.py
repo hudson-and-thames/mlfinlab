@@ -13,9 +13,9 @@ from mlfinlab.data_structures import run_data_structures as ds
 class TestDataStructures(unittest.TestCase):
     """
     Test the various financial data structures:
-    1. Imbalance Dollar bars
-    2. Imbalance Volume bars
-    3. Imbalance Tick bars
+    1. Run Dollar bars
+    2. Run Volume bars
+    3. Run Tick bars
     """
 
     def setUp(self):
@@ -27,9 +27,9 @@ class TestDataStructures(unittest.TestCase):
 
     def test_run_dollar_bars(self):
         """
-        Tests the imbalance dollar bars implementation.
+        Tests the run dollar bars implementation.
         """
-        exp_num_ticks_init = 10000
+        exp_num_ticks_init = 10
         num_prev_bars = 3
 
         db1 = ds.get_dollar_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
@@ -55,9 +55,9 @@ class TestDataStructures(unittest.TestCase):
 
         # Assert OHLC is correct
         self.assertTrue(db1.loc[0, 'open'] == 1306.0)
-        self.assertTrue(db1.loc[0, 'high'] == 1308.75)
-        self.assertTrue(db1.loc[0, 'low'] == 1301.75)
-        self.assertTrue(db1.loc[0, 'close'] == 1304.0)
+        self.assertTrue(db1.loc[0, 'high'] == 1306.0)
+        self.assertTrue(db1.loc[0, 'low'] == 1305.25)
+        self.assertTrue(db1.loc[0, 'close'] == 1305.5)
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
 
         # delete generated csv file (if it wasn't generated test would fail)
@@ -65,9 +65,9 @@ class TestDataStructures(unittest.TestCase):
 
     def test_run_volume_bars(self):
         """
-        Tests the imbalance volume bars implementation.
+        Tests the run volume bars implementation.
         """
-        exp_num_ticks_init = 10000
+        exp_num_ticks_init = 10
         num_prev_bars = 3
 
         db1 = ds.get_volume_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
@@ -92,10 +92,10 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(np.all(db1.values == db4.values))
 
         # Assert OHLC is correct
-        self.assertTrue(db1.loc[0, 'open'] == 1306)
-        self.assertTrue(db1.loc[0, 'high'] == 1308.75)
-        self.assertTrue(db1.loc[0, 'low'] == 1301.75)
-        self.assertTrue(db1.loc[0, 'close'] == 1304.0)
+        self.assertTrue(db1.loc[0, 'open'] == 1306.0)
+        self.assertTrue(db1.loc[0, 'high'] == 1306.0)
+        self.assertTrue(db1.loc[0, 'low'] == 1305.25)
+        self.assertTrue(db1.loc[0, 'close'] == 1305.5)
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
 
         # delete generated csv file (if it wasn't generated test would fail)
@@ -103,9 +103,9 @@ class TestDataStructures(unittest.TestCase):
 
     def test_run_tick_bars(self):
         """
-        Tests the imbalance tick bars implementation.
+        Tests the run tick bars implementation.
         """
-        exp_num_ticks_init = 1000
+        exp_num_ticks_init = 10
         num_prev_bars = 3
 
         db1 = ds.get_tick_run_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
@@ -130,10 +130,10 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(np.all(db1.values == db4.values))
 
         # Assert OHLC is correct
-        self.assertTrue(db1.loc[0, 'open'] == 1306)
-        self.assertTrue(db1.loc[0, 'high'] == 1306.00)
-        self.assertTrue(db1.loc[0, 'low'] == 1303.5)
-        self.assertTrue(db1.loc[0, 'close'] == 1304.25)
+        self.assertTrue(db1.loc[0, 'open'] == 1306.0)
+        self.assertTrue(db1.loc[0, 'high'] == 1306.0)
+        self.assertTrue(db1.loc[0, 'low'] == 1305.25)
+        self.assertTrue(db1.loc[0, 'close'] == 1305.5)
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
 
         # delete generated csv file (if it wasn't generated test would fail)
