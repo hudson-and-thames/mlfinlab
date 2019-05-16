@@ -1,3 +1,4 @@
+codecov==2.0.15
 coverage==4.5.2
 pandas==0.24.2
 pylint==2.3.0
