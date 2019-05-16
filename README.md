@@ -7,7 +7,6 @@
 [![Build Status](https://travis-ci.com/hudson-and-thames/mlfinlab.svg?branch=master)](https://travis-ci.com/hudson-and-thames/mlfinlab)
 [![codecov](https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg)](https://codecov.io/gh/hudson-and-thames/mlfinlab)
 ![pylint Score](https://mperlet.github.io/pybadge/badges/10.svg)
-[![License: BSD](https://img.shields.io/github/license/hudson-and-thames/mlfinlab.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 [![PyPi](https://img.shields.io/pypi/v/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
 [![Downloads](https://img.shields.io/pypi/dm/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
