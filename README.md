@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/hudson-and-thames/mlfinlab.svg?branch=master)](https://travis-ci.com/hudson-and-thames/mlfinlab)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Machine Learning Financial Laboratory (mlfinlab)
 MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
