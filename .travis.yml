@@ -16,3 +16,5 @@ script:
   - pylint mlfinlab --rcfile=.pylintrc -f text
   - python -m unittest discover
   - bash coverage
+after_success:
+  - codecov

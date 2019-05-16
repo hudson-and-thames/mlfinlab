@@ -1,4 +1,18 @@
+<div align="center">
+  <img src="https://github.com/hudson-and-thames/mlfinlab/blob/master/.github/logo/hudson_and_thames_logo.png" height="300"><br>
+</div>
+
+-----------------
 # Machine Learning Financial Laboratory (mlfinlab)
+[![Build Status](https://travis-ci.com/hudson-and-thames/mlfinlab.svg?branch=master)](https://travis-ci.com/hudson-and-thames/mlfinlab)
+[![codecov](https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg)](https://codecov.io/gh/hudson-and-thames/mlfinlab)
+![pylint Score](https://mperlet.github.io/pybadge/badges/10.svg)
+[![License: MIT](https://img.shields.io/github/license/hudson-and-thames/mlfinlab.svg)](https://opensource.org/licenses/MIT)
+
+[![PyPi](https://img.shields.io/pypi/v/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
+[![Downloads](https://img.shields.io/pypi/dm/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
+[![Python](https://img.shields.io/pypi/pyversions/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
+
 MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
 Advances in Financial Machine Learning. This implementation started out as a platform for which Ashutosh and
 Jacques could base their research project on for their [Masters in Financial Engineering at WorldQuant University](https://wqu.org/).
@@ -22,6 +36,7 @@ You should be able to work on a few implementations of the code with this set.
 ---
 
 ## Notes
+* Added Chapter 5 code (Frac Diff)
 * Added Chapter 3 code (Labeling)
 * Added Imbalance and Run bars.
 * Added standard bar types (tick, volume, dollar). 
