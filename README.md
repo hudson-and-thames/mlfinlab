@@ -1,8 +1,15 @@
+<div align="center">
+  <img src="https://github.com/hudson-and-thames/mlfinlab/blob/add_badges/.github/logo/hudson_and_thames_logo.png"><br>
+</div>
+
+-----------------
+# Machine Learning Financial Laboratory (mlfinlab)
+
 [![Build Status](https://travis-ci.com/hudson-and-thames/mlfinlab.svg?branch=master)](https://travis-ci.com/hudson-and-thames/mlfinlab)
 [![codecov](https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg)](https://codecov.io/gh/hudson-and-thames/mlfinlab)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# Machine Learning Financial Laboratory (mlfinlab)
+## What is it?
 MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
 Advances in Financial Machine Learning. This implementation started out as a platform for which Ashutosh and
 Jacques could base their research project on for their [Masters in Financial Engineering at WorldQuant University](https://wqu.org/).
