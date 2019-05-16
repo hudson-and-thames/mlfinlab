@@ -13,7 +13,6 @@
 [![Downloads](https://img.shields.io/pypi/dm/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
 [![Python](https://img.shields.io/pypi/pyversions/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
 
-## What is it?
 MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
 Advances in Financial Machine Learning. This implementation started out as a platform for which Ashutosh and
 Jacques could base their research project on for their [Masters in Financial Engineering at WorldQuant University](https://wqu.org/).
