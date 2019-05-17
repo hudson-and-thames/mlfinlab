@@ -1,12 +1,19 @@
+import threading
 import numpy as np
+from abc import ABCMeta, abstractmethod
+from sklearn.base import ClassifierMixin, RegressorMixin, MultiOutputMixin
+from sklearn.ensemble.base import BaseEnsemble, _partition_estimators
+from sklearn.ensemble.forest import _accumulate_prediction
 from scipy.sparse import issparse
+from scipy.sparse import hstack as sparse_hstack
 from warnings import catch_warnings, simplefilter, warn
-from sklearn.ensemble.forest import BaseForest, ForestClassifier, ForestRegressor
 from sklearn.utils.fixes import parallel_helper, _joblib_parallel_args
 from sklearn.utils import check_random_state, check_array, compute_sample_weight
 from sklearn.tree._tree import DTYPE, DOUBLE
 from sklearn.exceptions import DataConversionWarning
 from sklearn.utils._joblib import Parallel, delayed
+from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.multiclass import check_classification_targets
 from sklearn.tree import (DecisionTreeClassifier, DecisionTreeRegressor,
                     ExtraTreeClassifier, ExtraTreeRegressor)
 from sklearn.metrics import r2_score
@@ -15,8 +22,9 @@ from mlfinlab.sampling.bootstrapping import seq_bootstrap
 MAX_INT = np.iinfo(np.int32).max
 
 
-class SequentialBaseForest(BaseForest):
+class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
 
+    @abstractmethod
     def __init__(self,
                  base_estimator,
                  n_estimators=100,
@@ -28,24 +36,41 @@ class SequentialBaseForest(BaseForest):
                  verbose=0,
                  warm_start=False,
                  class_weight=None):
-        super().__init__(self,
-                         base_estimator,
-                         n_estimators,
-                         estimator_params,
-                         bootstrap,
-                         oob_score,
-                         n_jobs,
-                         random_state,
-                         verbose,
-                         warm_start,
-                         class_weight
-                         )
+        super().__init__(
+            base_estimator=base_estimator,
+            n_estimators=n_estimators,
+            estimator_params=estimator_params)
+
+        self.bootstrap = bootstrap
+        self.oob_score = oob_score
+        self.n_jobs = n_jobs
+        self.random_state = random_state
+        self.verbose = verbose
+        self.warm_start = warm_start
+        self.class_weight = class_weight
 
     def apply(self, X):
-        super().apply(X)
+        X = self._validate_X_predict(X)
+        results = Parallel(n_jobs=self.n_jobs, verbose=self.verbose,
+                           **_joblib_parallel_args(prefer="threads"))(
+            delayed(parallel_helper)(tree, 'apply', X, check_input=False)
+            for tree in self.estimators_)
+
+        return np.array(results).T
 
     def decision_path(self, X):
-        super().decision_path(X)
+        X = self._validate_X_predict(X)
+        indicators = Parallel(n_jobs=self.n_jobs, verbose=self.verbose,
+                              **_joblib_parallel_args(prefer='threads'))(
+            delayed(parallel_helper)(tree, 'decision_path', X,
+                                     check_input=False)
+            for tree in self.estimators_)
+
+        n_nodes = [0]
+        n_nodes.extend([i.shape[1] for i in indicators])
+        n_nodes_ptr = np.array(n_nodes).cumsum()
+
+        return sparse_hstack(indicators).tocsr(), n_nodes_ptr
 
     def generate_sample_indices(self, triple_barrier_events, random_state, n_samples):
         """Private function used to _parallel_build_trees function."""
@@ -195,29 +220,54 @@ class SequentialBaseForest(BaseForest):
 
         return self
 
+    @abstractmethod
     def _set_oob_score(self, X, y, triple_barrier_events):
         """Calculate out of bag predictions and score."""
 
     def _validate_y_class_weight(self, y):
-        super()._validate_y_class_weight(y)
+        return y, None
 
     def _validate_X_predict(self, X):
         """Validate X whenever one tries to predict, apply, predict_proba"""
-        super()._validate_X_predict(X)
+        check_is_fitted(self, 'estimators_')
 
+        return self.estimators_[0]._validate_X_predict(X, check_input=True)
+
+    @property
     def feature_importances_(self):
+        """Return the feature importances (the higher, the more important the
+           feature).
+
+        Returns
+        -------
+        feature_importances_ : array, shape = [n_features]
+            The values of this array sum to 1, unless all trees are single node
+            trees consisting of only the root node, in which case it will be an
+            array of zeros.
         """
-        """
-        super().feature_importances
+        check_is_fitted(self, 'estimators_')
+
+        all_importances = Parallel(n_jobs=self.n_jobs,
+                                   **_joblib_parallel_args(prefer='threads'))(
+            delayed(getattr)(tree, 'feature_importances_')
+            for tree in self.estimators_ if tree.tree_.node_count > 1)
+
+        if not all_importances:
+            return np.zeros(self.n_features_, dtype=np.float64)
+
+        all_importances = np.mean(all_importances,
+                                  axis=0, dtype=np.float64)
+        return all_importances / np.sum(all_importances)
 
 
-class SequentialForestClassifier(ForestClassifier, SequentialBaseForest):
+class SequentialForestClassifier(SequentialBaseForest, ClassifierMixin, metaclass=ABCMeta):
     """Base class for forest of trees-based classifiers.
 
     Warning: This class should not be used directly. Use derived classes
     instead.
     """
 
+    @abstractmethod
     def __init__(self,
                  base_estimator,
                  n_estimators=100,
@@ -229,17 +279,17 @@ class SequentialForestClassifier(ForestClassifier, SequentialBaseForest):
                  verbose=0,
                  warm_start=False,
                  class_weight=None):
-        super().__init__(self,
-                         base_estimator,
-                         n_estimators=n_estimators,
-                         estimator_params=estimator_params,
-                         bootstrap=bootstrap,
-                         oob_score=oob_score,
-                         n_jobs=n_jobs,
-                         random_state=random_state,
-                         verbose=verbose,
-                         warm_start=warm_start,
-                         class_weight=class_weight)
+        super().__init__(
+            base_estimator,
+            n_estimators=n_estimators,
+            estimator_params=estimator_params,
+            bootstrap=bootstrap,
+            oob_score=oob_score,
+            n_jobs=n_jobs,
+            random_state=random_state,
+            verbose=verbose,
+            warm_start=warm_start,
+            class_weight=class_weight)
 
     def _set_oob_score(self, X, y, triple_barrier_events):
         """Compute out-of-bag score"""
@@ -285,22 +335,177 @@ class SequentialForestClassifier(ForestClassifier, SequentialBaseForest):
         self.oob_score_ = oob_score / self.n_outputs_
 
     def _validate_y_class_weight(self, y):
-        super()._validate_y_class_weight(y)
+        check_classification_targets(y)
+
+        y = np.copy(y)
+        expanded_class_weight = None
+
+        if self.class_weight is not None:
+            y_original = np.copy(y)
+
+        self.classes_ = []
+        self.n_classes_ = []
+
+        y_store_unique_indices = np.zeros(y.shape, dtype=np.int)
+        for k in range(self.n_outputs_):
+            classes_k, y_store_unique_indices[:, k] = np.unique(y[:, k], return_inverse=True)
+            self.classes_.append(classes_k)
+            self.n_classes_.append(classes_k.shape[0])
+        y = y_store_unique_indices
+
+        if self.class_weight is not None:
+            valid_presets = ('balanced', 'balanced_subsample')
+            if isinstance(self.class_weight, str):
+                if self.class_weight not in valid_presets:
+                    raise ValueError('Valid presets for class_weight include '
+                                     '"balanced" and "balanced_subsample". Given "%s".'
+                                     % self.class_weight)
+                if self.warm_start:
+                    warn('class_weight presets "balanced" or "balanced_subsample" are '
+                         'not recommended for warm_start if the fitted data '
+                         'differs from the full dataset. In order to use '
+                         '"balanced" weights, use compute_class_weight("balanced", '
+                         'classes, y). In place of y you can use a large '
+                         'enough sample of the full training set target to '
+                         'properly estimate the class frequency '
+                         'distributions. Pass the resulting weights as the '
+                         'class_weight parameter.')
+
+            if (self.class_weight != 'balanced_subsample' or
+                    not self.bootstrap):
+                if self.class_weight == "balanced_subsample":
+                    class_weight = "balanced"
+                else:
+                    class_weight = self.class_weight
+                expanded_class_weight = compute_sample_weight(class_weight,
+                                                              y_original)
+
+        return y, expanded_class_weight
 
     def predict(self, X):
-        super().predict(X)
+        """Predict class for X.
+
+        The predicted class of an input sample is a vote by the trees in
+        the forest, weighted by their probability estimates. That is,
+        the predicted class is the one with highest mean probability
+        estimate across the trees.
+
+        Parameters
+        ----------
+        X : array-like or sparse matrix of shape = [n_samples, n_features]
+            The input samples. Internally, its dtype will be converted to
+            ``dtype=np.float32``. If a sparse matrix is provided, it will be
+            converted into a sparse ``csr_matrix``.
+
+        Returns
+        -------
+        y : array of shape = [n_samples] or [n_samples, n_outputs]
+            The predicted classes.
+        """
+        proba = self.predict_proba(X)
+
+        if self.n_outputs_ == 1:
+            return self.classes_.take(np.argmax(proba, axis=1), axis=0)
+
+        else:
+            n_samples = proba[0].shape[0]
+            # all dtypes should be the same, so just take the first
+            class_type = self.classes_[0].dtype
+            predictions = np.empty((n_samples, self.n_outputs_),
+                                   dtype=class_type)
+
+            for k in range(self.n_outputs_):
+                predictions[:, k] = self.classes_[k].take(np.argmax(proba[k],
+                                                                    axis=1),
+                                                          axis=0)
+
+            return predictions
 
     def predict_proba(self, X):
-        super().predict_proba(X)
+        """Predict class probabilities for X.
+
+        The predicted class probabilities of an input sample are computed as
+        the mean predicted class probabilities of the trees in the forest. The
+        class probability of a single tree is the fraction of samples of the same
+        class in a leaf.
+
+        Parameters
+        ----------
+        X : array-like or sparse matrix of shape = [n_samples, n_features]
+            The input samples. Internally, its dtype will be converted to
+            ``dtype=np.float32``. If a sparse matrix is provided, it will be
+            converted into a sparse ``csr_matrix``.
+
+        Returns
+        -------
+        p : array of shape = [n_samples, n_classes], or a list of n_outputs
+            such arrays if n_outputs > 1.
+            The class probabilities of the input samples. The order of the
+            classes corresponds to that in the attribute `classes_`.
+        """
+        check_is_fitted(self, 'estimators_')
+        # Check data
+        X = self._validate_X_predict(X)
+
+        # Assign chunk of trees to jobs
+        n_jobs, _, _ = _partition_estimators(self.n_estimators, self.n_jobs)
+
+        # avoid storing the output of every estimator by summing them here
+        all_proba = [np.zeros((X.shape[0], j), dtype=np.float64)
+                     for j in np.atleast_1d(self.n_classes_)]
+        lock = threading.Lock()
+        Parallel(n_jobs=n_jobs, verbose=self.verbose,
+                 **_joblib_parallel_args(require="sharedmem"))(
+            delayed(_accumulate_prediction)(e.predict_proba, X, all_proba,
+                                            lock)
+            for e in self.estimators_)
+
+        for proba in all_proba:
+            proba /= len(self.estimators_)
+
+        if len(all_proba) == 1:
+            return all_proba[0]
+        else:
+            return all_proba
 
     def predict_log_proba(self, X):
-        super().predict_log_proba(X)
+        """Predict class log-probabilities for X.
+
+        The predicted class log-probabilities of an input sample is computed as
+        the log of the mean predicted class probabilities of the trees in the
+        forest.
+
+        Parameters
+        ----------
+        X : array-like or sparse matrix of shape = [n_samples, n_features]
+            The input samples. Internally, its dtype will be converted to
+            ``dtype=np.float32``. If a sparse matrix is provided, it will be
+            converted into a sparse ``csr_matrix``.
+
+        Returns
+        -------
+        p : array of shape = [n_samples, n_classes], or a list of n_outputs
+            such arrays if n_outputs > 1.
+            The class probabilities of the input samples. The order of the
+            classes corresponds to that in the attribute `classes_`.
+        """
+        proba = self.predict_proba(X)
+
+        if self.n_outputs_ == 1:
+            return np.log(proba)
+
+        else:
+            for k in range(self.n_outputs_):
+                proba[k] = np.log(proba[k])
+
+            return proba
 
 
-class SequentialForestRegressor(ForestRegressor, SequentialBaseForest):
+class SequentialForestRegressor(SequentialBaseForest, RegressorMixin, metaclass=ABCMeta):
     """
     """
 
+    @abstractmethod
     def __init__(self,
                  base_estimator,
                  n_estimators=100,
