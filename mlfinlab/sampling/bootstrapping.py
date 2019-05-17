@@ -35,13 +35,14 @@ def get_ind_mat_average_uniqueness(ind_mat):
     return average.T
 
 
-def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False):
+def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False, random_state=None):
     """
     Snippet 4.5, Snippet 4.6, page 65, Return Sample from Sequential Bootstrap
     Generate a sample via sequential bootstrap.
     Note: Moved from pd.DataFrame to np.matrix for performance increase
 
     :param triple_barrier_events: (data frame) of events from labeling.get_events()
+    :param random_state: (np.mtrand.RandomState) random state object for generating random numbers
     :param sample_length: (int) Length of bootstrapped sample
     :param compare: (boolean) flag to print standard bootstrap uniqueness vs sequential bootstrap uniqueness
     :return: (array) of bootstrapped samples indexes
@@ -49,6 +50,9 @@ def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False):
     if bool(triple_barrier_events.isnull().values.any()) is True or bool(
             triple_barrier_events.index.isnull().any()) is True:
         raise ValueError('NaN values in triple_barrier_events, delete nans')
+
+    if random_state is None:
+        random_state = np.random.mtrand._rand
 
     label_endtime = triple_barrier_events.t1
 
@@ -71,7 +75,7 @@ def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False):
             label_av_uniqueness = label_uniqueness[label_uniqueness > 0].mean()  # get average label uniqueness
             avg_unique = np.append(avg_unique, label_av_uniqueness)
         prob = avg_unique / avg_unique.sum()  # draw prob
-        phi += [np.random.choice(ind_mat.columns, p=prob)]
+        phi += [random_state.choice(ind_mat.columns, p=prob)]
 
     if compare is True:
         standard_indx = np.random.choice(ind_mat.columns, size=sample_length)
