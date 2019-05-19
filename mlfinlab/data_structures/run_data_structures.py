@@ -188,7 +188,7 @@ class RunBars(BaseBars):
         else:
             # ewma window can be either the window specified in a function call
             # or it is len of imbalance_array if window > len(imbalance_array)
-            ewma_window = int(min(len(imbalance_array), window))
+            ewma_window = int(min(len(imbalance_array['buy']), window))
 
         if np.isnan(ewma_window):
             exp_buy_proportion, exp_sell_proportion = np.nan, np.nan
