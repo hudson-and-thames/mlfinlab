@@ -15,7 +15,7 @@ from sklearn.utils._joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils.multiclass import check_classification_targets
 from sklearn.tree import (DecisionTreeClassifier, DecisionTreeRegressor,
-                    ExtraTreeClassifier, ExtraTreeRegressor)
+                          ExtraTreeClassifier, ExtraTreeRegressor)
 from sklearn.metrics import r2_score
 from mlfinlab.sampling.bootstrapping import seq_bootstrap
 
@@ -23,6 +23,15 @@ MAX_INT = np.iinfo(np.int32).max
 
 
 class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
+    """
+    Sequential Bootstrapping extension of BaseForest from sklearn (https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/ensemble/forest.py)
+    BaseForest class is authored by:
+        Gilles Louppe <g.louppe@gmail.com>
+        Brian Holt <bdholt1@gmail.com>
+        Joly Arnaud <arnaud.v.joly@gmail.com>
+        Fares Hedayati <fares.hedayati@gmail.com>
+        License: BSD 3 clause
+    """
 
     @abstractmethod
     def __init__(self,
@@ -50,6 +59,11 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
         self.class_weight = class_weight
 
     def apply(self, X):
+        """
+        apply function from BaseForest sklearn
+        https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/ensemble/forest.py
+        """
+
         X = self._validate_X_predict(X)
         results = Parallel(n_jobs=self.n_jobs, verbose=self.verbose,
                            **_joblib_parallel_args(prefer="threads"))(
@@ -59,6 +73,10 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
         return np.array(results).T
 
     def decision_path(self, X):
+        """
+        decision path function from sklearn
+        https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/ensemble/forest.py
+        """
         X = self._validate_X_predict(X)
         indicators = Parallel(n_jobs=self.n_jobs, verbose=self.verbose,
                               **_joblib_parallel_args(prefer='threads'))(
@@ -73,7 +91,15 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
         return sparse_hstack(indicators).tocsr(), n_nodes_ptr
 
     def generate_sample_indices(self, triple_barrier_events, random_state, n_samples):
-        """Private function used to _parallel_build_trees function."""
+        """
+        This function applies Sequential Bootstrapping to generate samples for ensemble models.
+        Uses mlfinlab.sampling.bootstrapping import seq_bootstrap which implements Sequential Bootstrapping described in
+        the book.
+        :param triple_barrier_events: (pd.Series): triple-barrier events from labeling.get_events function
+        :param random_state: (np.random.RandomState): random state object
+        :param n_samples: number of bootstrapped samples
+        :return: sequentially bootstrapped samples based on label concurrency
+        """
         random_instance = check_random_state(random_state)
         # Sequential Bootstrapping
         sample_indices = seq_bootstrap(triple_barrier_events, random_state=random_instance, sample_length=n_samples)
@@ -91,7 +117,10 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
 
     def parallel_build_trees(self, tree, forest, X, y, triple_barrier_events, sample_weight, tree_idx, n_trees,
                              verbose=0, class_weight=None):
-        """Private function used to fit a single tree in parallel."""
+        """
+        parallel_build_trees from sklearn
+        (https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/ensemble/forest.py)
+        """
         if verbose > 1:
             print("building tree %d of %d" % (tree_idx + 1, n_trees))
 
@@ -122,6 +151,8 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
 
     def fit(self, X, y, triple_barrier_events, sample_weight=None):
         """
+        This is a copy of fit function from sklearn. The only difference is instead of using
+        standard bootstrapping method Sequential Bootstrapping is used instead
         """
         # Validate or convert input data
         X = check_array(X, accept_sparse="csc", dtype=DTYPE)
@@ -222,28 +253,26 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
 
     @abstractmethod
     def _set_oob_score(self, X, y, triple_barrier_events):
-        """Calculate out of bag predictions and score."""
+        """_set_oob_score function from sklearn copy"""
 
     def _validate_y_class_weight(self, y):
+        """
+        _validate_y_class_weight from sklearn copy
+        """
         return y, None
 
     def _validate_X_predict(self, X):
-        """Validate X whenever one tries to predict, apply, predict_proba"""
+        """
+        _validate_X_predict from sklearn copy()
+        """
         check_is_fitted(self, 'estimators_')
 
         return self.estimators_[0]._validate_X_predict(X, check_input=True)
 
     @property
     def feature_importances_(self):
-        """Return the feature importances (the higher, the more important the
-           feature).
-
-        Returns
-        -------
-        feature_importances_ : array, shape = [n_features]
-            The values of this array sum to 1, unless all trees are single node
-            trees consisting of only the root node, in which case it will be an
-            array of zeros.
+        """
+        feature_importances_ from sklearn copy
         """
         check_is_fitted(self, 'estimators_')
 
@@ -261,8 +290,9 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
 
 
 class SequentialForestClassifier(SequentialBaseForest, ClassifierMixin, metaclass=ABCMeta):
-    """Base class for forest of trees-based classifiers.
-
+    """Base class for forest of trees-based classifiers which use Sequential Bootstrapping
+    The most part of code is copied from ForestClassifier from sklearn
+    https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/ensemble/forest.py
     Warning: This class should not be used directly. Use derived classes
     instead.
     """
@@ -292,7 +322,9 @@ class SequentialForestClassifier(SequentialBaseForest, ClassifierMixin, metaclas
             class_weight=class_weight)
 
     def _set_oob_score(self, X, y, triple_barrier_events):
-        """Compute out-of-bag score"""
+        """
+        _set_oob_score function copy from sklearn
+        """
         X = check_array(X, dtype=DTYPE, accept_sparse='csr')
 
         n_classes_ = self.n_classes_
@@ -335,6 +367,9 @@ class SequentialForestClassifier(SequentialBaseForest, ClassifierMixin, metaclas
         self.oob_score_ = oob_score / self.n_outputs_
 
     def _validate_y_class_weight(self, y):
+        """
+        _validate_y_class_weight function copy from sklearn
+        """
         check_classification_targets(y)
 
         y = np.copy(y)
@@ -383,24 +418,8 @@ class SequentialForestClassifier(SequentialBaseForest, ClassifierMixin, metaclas
         return y, expanded_class_weight
 
     def predict(self, X):
-        """Predict class for X.
-
-        The predicted class of an input sample is a vote by the trees in
-        the forest, weighted by their probability estimates. That is,
-        the predicted class is the one with highest mean probability
-        estimate across the trees.
-
-        Parameters
-        ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The input samples. Internally, its dtype will be converted to
-            ``dtype=np.float32``. If a sparse matrix is provided, it will be
-            converted into a sparse ``csr_matrix``.
-
-        Returns
-        -------
-        y : array of shape = [n_samples] or [n_samples, n_outputs]
-            The predicted classes.
+        """
+        predict function copy from sklearn
         """
         proba = self.predict_proba(X)
 
@@ -422,26 +441,8 @@ class SequentialForestClassifier(SequentialBaseForest, ClassifierMixin, metaclas
             return predictions
 
     def predict_proba(self, X):
-        """Predict class probabilities for X.
-
-        The predicted class probabilities of an input sample are computed as
-        the mean predicted class probabilities of the trees in the forest. The
-        class probability of a single tree is the fraction of samples of the same
-        class in a leaf.
-
-        Parameters
-        ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The input samples. Internally, its dtype will be converted to
-            ``dtype=np.float32``. If a sparse matrix is provided, it will be
-            converted into a sparse ``csr_matrix``.
-
-        Returns
-        -------
-        p : array of shape = [n_samples, n_classes], or a list of n_outputs
-            such arrays if n_outputs > 1.
-            The class probabilities of the input samples. The order of the
-            classes corresponds to that in the attribute `classes_`.
+        """
+        predict_proba method copy from sklearn
         """
         check_is_fitted(self, 'estimators_')
         # Check data
@@ -469,25 +470,8 @@ class SequentialForestClassifier(SequentialBaseForest, ClassifierMixin, metaclas
             return all_proba
 
     def predict_log_proba(self, X):
-        """Predict class log-probabilities for X.
-
-        The predicted class log-probabilities of an input sample is computed as
-        the log of the mean predicted class probabilities of the trees in the
-        forest.
-
-        Parameters
-        ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The input samples. Internally, its dtype will be converted to
-            ``dtype=np.float32``. If a sparse matrix is provided, it will be
-            converted into a sparse ``csr_matrix``.
-
-        Returns
-        -------
-        p : array of shape = [n_samples, n_classes], or a list of n_outputs
-            such arrays if n_outputs > 1.
-            The class probabilities of the input samples. The order of the
-            classes corresponds to that in the attribute `classes_`.
+        """
+        predict_log_proba method copy from sklearn
         """
         proba = self.predict_proba(X)
 
@@ -503,6 +487,11 @@ class SequentialForestClassifier(SequentialBaseForest, ClassifierMixin, metaclas
 
 class SequentialForestRegressor(SequentialBaseForest, RegressorMixin, metaclass=ABCMeta):
     """
+    Base class for forest of trees-based regressors which use Sequential Bootstrapping
+    The most part of code is copied from ForestClassifier from sklearn
+    https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/ensemble/forest.py
+    Warning: This class should not be used directly. Use derived classes
+    instead.
     """
 
     @abstractmethod
@@ -528,22 +517,8 @@ class SequentialForestRegressor(SequentialBaseForest, RegressorMixin, metaclass=
             warm_start=warm_start)
 
     def predict(self, X):
-        """Predict regression target for X.
-
-        The predicted regression target of an input sample is computed as the
-        mean predicted regression targets of the trees in the forest.
-
-        Parameters
-        ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The input samples. Internally, its dtype will be converted to
-            ``dtype=np.float32``. If a sparse matrix is provided, it will be
-            converted into a sparse ``csr_matrix``.
-
-        Returns
-        -------
-        y : array of shape = [n_samples] or [n_samples, n_outputs]
-            The predicted values.
+        """
+        predict method copy from sklearn
         """
         check_is_fitted(self, 'estimators_')
         # Check data
@@ -570,7 +545,9 @@ class SequentialForestRegressor(SequentialBaseForest, RegressorMixin, metaclass=
         return y_hat
 
     def _set_oob_score(self, X, y, triple_barrier_events):
-        """Compute out-of-bag scores"""
+        """
+        _set_oob_score from sklearn
+        """
         X = check_array(X, dtype=DTYPE, accept_sparse='csr')
 
         n_samples = y.shape[0]
@@ -614,6 +591,7 @@ class SequentialForestRegressor(SequentialBaseForest, RegressorMixin, metaclass=
 
 class SequentialBootstrappingRandomForestClassifier(SequentialForestClassifier):
     """
+    RandomForestClassifier from sklearn with Sequential Bootstrapping instead of standard random bootstrapping
     """
 
     def __init__(self,
@@ -663,6 +641,7 @@ class SequentialBootstrappingRandomForestClassifier(SequentialForestClassifier):
 
 class SequentialBootstrappingRandomForestRegressor(SequentialForestRegressor):
     """
+    RandomForestRegressor from sklearn with Sequential Bootstrapping instead of standard random bootstrapping
     """
 
     def __init__(self,
@@ -710,6 +689,7 @@ class SequentialBootstrappingRandomForestRegressor(SequentialForestRegressor):
 
 class SequentialBootstrappingExtraTreesClassifier(SequentialForestClassifier):
     """
+    ExtraTreesClassifier from sklearn with Sequential Bootstrapping instead of standard random bootstrapping
     """
 
     def __init__(self,
@@ -759,6 +739,7 @@ class SequentialBootstrappingExtraTreesClassifier(SequentialForestClassifier):
 
 class SequentialBootstrappingExtraTreesRegressor(SequentialForestRegressor):
     """
+    ExtraTreesRegressor from sklearn with Sequential Bootstrapping instead of standard random bootstrapping
     """
 
     def __init__(self,
