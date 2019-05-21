@@ -67,7 +67,7 @@ class BaseBars(ABC):
             list_bars = self._extract_bars(data=batch)
 
             if to_csv is True:
-                pd.DataFrame(list_bars, columns=cols).to_csv(output_path, header=header, index=False, mode='a')
+                pd.DataFrame(list_bars, columns=cols).to_csv(output_path, header=header, index=False, mode='a', float_format='%.5f')
                 header = False
             else:
                 # Append to bars list
