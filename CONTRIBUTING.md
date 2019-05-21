@@ -25,7 +25,7 @@ For those of you interested in working with a one year sample of tick, volume, a
 You should be able to work on a few implementations of the code with this set. 
 
 ## Areas of Contribution
-Currently we have a [live project board](https://github.com/orgs/hudson-and-thames/projects/1) that follows the principles of Agile Project Management. This board is available to the public
+Currently we have a [live project board](https://github.com/orgs/hudson-and-thames/projects) that follows the principles of Agile Project Management. This board is available to the public
 and lets everyone know what the maintainers are currently working on. The board has an ice bucket filled with new features and documentation 
 that have priority. 
 

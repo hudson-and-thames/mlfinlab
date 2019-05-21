@@ -52,14 +52,17 @@ class RunBars(BaseBars):
         # Expected number of ticks extracted from prev bars
         self.exp_num_ticks = self.exp_num_ticks_init
         self.num_prev_bars = num_prev_bars
-        self.num_ticks_bar = []  # List of number of ticks from previous bars
+        self.num_ticks_bar = {'cum_ticks': [],
+                              'buy_proportion': []}  # Dict of number of ticks, number of buy ticks from previous bars
 
         # Named tuple to help with storing the cache
         self.cache_tuple = namedtuple('CacheData',
-                                      ['date_time', 'price', 'high', 'low', 'cum_ticks', 'cum_volume',
+                                      ['date_time', 'price', 'high', 'low', 'cum_ticks', 'buy_ticks', 'cum_volume',
                                        'cum_theta_buy', 'cum_theta_sell'])
         self.imbalance_array = {'buy': [], 'sell': []}
-        self.exp_buy_proportion, self.exp_sell_proportion = np.nan, np.nan
+        self.warm_up = True  # boolean flag for warm-up period
+        self.exp_imbalance = {'buy': np.nan, 'sell': np.nan}
+        self.exp_buy_ticks_proportion = np.nan
 
     def _extract_bars(self, data):
         """
@@ -68,7 +71,7 @@ class RunBars(BaseBars):
         :param data: (DataFrame) Contains 3 columns - date_time, price, and volume.
         :return: (List) of bars built using the current batch.
         """
-        cum_ticks, cum_volume, cum_theta_buy, cum_theta_sell, high_price, low_price = self._update_counters()
+        cum_ticks, buy_ticks, cum_volume, cum_theta_buy, cum_theta_sell, high_price, low_price = self._update_counters()
 
         # Iterate over rows
         list_bars = []
@@ -90,45 +93,57 @@ class RunBars(BaseBars):
 
             if imbalance > 0:
                 self.imbalance_array['buy'].append(imbalance)
-                # Set zero to keep buy and sell arrays synced
-                self.imbalance_array['sell'].append(0)
                 cum_theta_buy += imbalance
+                buy_ticks += 1
             elif imbalance < 0:
                 self.imbalance_array['sell'].append(abs(imbalance))
-                # Set zero to keep buy and sell arrays synced
-                self.imbalance_array['buy'].append(0)
                 cum_theta_sell += abs(imbalance)
 
-            if not list_bars and np.isnan(self.exp_buy_proportion):
-                self.exp_buy_proportion, self.exp_sell_proportion = self._get_expected_imbalance(
-                    self.exp_num_ticks, self.imbalance_array)
+            imbalances_are_counted_flag = np.isnan([self.exp_imbalance['buy'], self.exp_imbalance[
+                'sell']]).any()  # flag indicating that both buy and sell imbalances are counted
+            if not list_bars and imbalances_are_counted_flag:
+                self.exp_imbalance['buy'] = self._get_expected_imbalance(self.exp_num_ticks,
+                                                                         self.imbalance_array['buy'])
+                self.exp_imbalance['sell'] = self._get_expected_imbalance(self.exp_num_ticks,
+                                                                          self.imbalance_array['sell'])
+                if bool(np.isnan([self.exp_imbalance['buy'], self.exp_imbalance['sell']]).any()) is False:
+                    self.exp_buy_ticks_proportion = buy_ticks / cum_ticks
+                    cum_theta_buy, cum_theta_sell = 0, 0  # reset theta after warm-up period
+                    self.warm_up = False
 
             # Update cache
             self._update_cache(date_time, price, low_price, high_price, cum_theta_sell, cum_theta_buy,
-                               cum_ticks, cum_volume)
+                               cum_ticks, buy_ticks, cum_volume)
 
             # Check expression for possible bar generation
-            max_proportion = max(self.exp_buy_proportion,
-                                 self.exp_sell_proportion)
-            if max(cum_theta_buy, cum_theta_sell) > self.exp_num_ticks * max_proportion:
+            max_proportion = max(self.exp_imbalance['buy'] * self.exp_buy_ticks_proportion,
+                                 self.exp_imbalance['sell'] * (1 - self.exp_buy_ticks_proportion))
+            if max(cum_theta_buy, cum_theta_sell) > self.exp_num_ticks * max_proportion and self.warm_up is False:
                 self._create_bars(date_time, price,
                                   high_price, low_price, list_bars)
 
-                self.num_ticks_bar.append(cum_ticks)
+                self.num_ticks_bar['cum_ticks'].append(cum_ticks)
+                self.num_ticks_bar['buy_proportion'].append(buy_ticks / cum_ticks)
                 # Expected number of ticks based on formed bars
-                self.exp_num_ticks = ewma(np.array(self.num_ticks_bar[-self.num_prev_bars:], dtype=float),
+                self.exp_num_ticks = ewma(np.array(self.num_ticks_bar['cum_ticks'][-self.num_prev_bars:], dtype=float),
                                           self.num_prev_bars)[-1]
-                self.exp_buy_proportion, self.exp_sell_proportion = self._get_expected_imbalance(
-                    self.exp_num_ticks * self.num_prev_bars, self.imbalance_array)
+                # Expected buy ticks proportion based on formed bars
+                self.exp_buy_ticks_proportion = \
+                    ewma(np.array(self.num_ticks_bar['buy_proportion'][-self.num_prev_bars:], dtype=float),
+                         self.num_prev_bars)[-1]
+                self.exp_imbalance['buy'] = self._get_expected_imbalance(self.exp_num_ticks * self.num_prev_bars,
+                                                                         self.imbalance_array['buy'])
+                self.exp_imbalance['sell'] = self._get_expected_imbalance(self.exp_num_ticks * self.num_prev_bars,
+                                                                          self.imbalance_array['sell'])
 
                 # Reset counters
-                cum_ticks, cum_volume, cum_theta_buy, cum_theta_sell = 0, 0, 0, 0
+                cum_ticks, buy_ticks, cum_volume, cum_theta_buy, cum_theta_sell = 0, 0, 0, 0, 0
                 high_price, low_price = -np.inf, np.inf
                 self.cache = []
 
                 # Update cache after bar generation (exp_num_ticks was changed after bar generation)
                 self._update_cache(date_time, price, low_price, high_price, cum_theta_sell, cum_theta_buy,
-                                   cum_ticks, cum_volume)
+                                   cum_ticks, buy_ticks, cum_volume)
         return list_bars
 
     def _update_counters(self):
@@ -143,6 +158,7 @@ class RunBars(BaseBars):
 
             # Update variables based on cache
             cum_ticks = int(latest_entry.cum_ticks)
+            buy_ticks = int(latest_entry.buy_ticks)
             cum_volume = int(latest_entry.cum_volume)
             low_price = np.float(latest_entry.low)
             high_price = np.float(latest_entry.high)
@@ -152,13 +168,13 @@ class RunBars(BaseBars):
 
         else:
             # Reset counters
-            cum_ticks, cum_volume, cum_theta_buy, cum_theta_sell = 0, 0, 0, 0
+            cum_ticks, buy_ticks, cum_volume, cum_theta_buy, cum_theta_sell = 0, 0, 0, 0, 0
             high_price, low_price = -np.inf, np.inf
 
-        return cum_ticks, cum_volume, cum_theta_buy, cum_theta_sell, high_price, low_price
+        return cum_ticks, buy_ticks, cum_volume, cum_theta_buy, cum_theta_sell, high_price, low_price
 
     def _update_cache(self, date_time, price, low_price, high_price, cum_theta_sell, cum_theta_buy,
-                      cum_ticks, cum_volume):
+                      cum_ticks, buy_ticks, cum_volume):
         """
         Update the cache which is used to create a continuous flow of bars from one batch to the next.
 
@@ -171,18 +187,19 @@ class RunBars(BaseBars):
         :param cum_ticks: Cumulative number of ticks
         """
         cache_data = self.cache_tuple(date_time=date_time, price=price, high=high_price, low=low_price,
-                                      cum_ticks=cum_ticks, cum_volume=cum_volume, cum_theta_buy=cum_theta_buy,
+                                      cum_ticks=cum_ticks, buy_ticks=buy_ticks, cum_volume=cum_volume,
+                                      cum_theta_buy=cum_theta_buy,
                                       cum_theta_sell=cum_theta_sell)
         self.cache.append(cache_data)
 
     def _get_expected_imbalance(self, window, imbalance_array):
         """
-        Calculate the expected imbalance as defined on page 31 and 32.
+        Calculate the expected imbalance: 2P[b_t=1]-1, using a EWMA, pg 29
         :param window: EWMA window for calculation
-        :param imbalance_array: numpy array of imbalances [buy, sell]
-        :return: expected_buy_proportion and expected_sell_proportion
+        :param imbalance_array: (numpy array) of the tick imbalances
+        :return: expected_imbalance: 2P[b_t=1]-1, approximated using a EWMA
         """
-        if len(imbalance_array['buy']) < self.exp_num_ticks_init:
+        if len(imbalance_array) < self.exp_num_ticks_init:
             # Waiting for array to fill for ewma
             ewma_window = np.nan
         else:
@@ -191,19 +208,13 @@ class RunBars(BaseBars):
             ewma_window = int(min(len(imbalance_array), window))
 
         if np.isnan(ewma_window):
-            exp_buy_proportion, exp_sell_proportion = np.nan, np.nan
+            # return nan, wait until len(imbalance_array) >= self.exp_num_ticks_init
+            expected_imbalance = np.nan
         else:
-            buy_sample = np.array(
-                imbalance_array['buy'][-ewma_window:], dtype=float)
-            sell_sample = np.array(
-                imbalance_array['sell'][-ewma_window:], dtype=float)
-            buy_and_sell_imb = sum(buy_sample) + sum(sell_sample)
-            exp_buy_proportion = ewma(
-                buy_sample, window=ewma_window)[-1] / buy_and_sell_imb
-            exp_sell_proportion = ewma(
-                sell_sample, window=ewma_window)[-1] / buy_and_sell_imb
+            expected_imbalance = ewma(
+                np.array(imbalance_array[-ewma_window:], dtype=float), window=ewma_window)[-1]
 
-        return exp_buy_proportion, exp_sell_proportion
+        return expected_imbalance
 
 
 def get_dollar_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
