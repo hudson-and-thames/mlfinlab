@@ -1,7 +1,3 @@
-"""
-Logic regarding sequential bootstrapping from chapter 4.
-"""
-
 import pandas as pd
 import numpy as np
 
@@ -26,7 +22,6 @@ def get_ind_mat_average_uniqueness(ind_mat):
     """
     Snippet 4.4. page 65, Compute Average Uniqueness
     Average uniqueness from indicator matrix
-
     :param ind_mat: (np.matrix) indicator binary matrix
     :return: (np.matrix) matrix with label uniqueness
     """
@@ -40,7 +35,6 @@ def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False, rand
     Snippet 4.5, Snippet 4.6, page 65, Return Sample from Sequential Bootstrap
     Generate a sample via sequential bootstrap.
     Note: Moved from pd.DataFrame to np.matrix for performance increase
-
     :param triple_barrier_events: (data frame) of events from labeling.get_events()
     :param random_state: (np.mtrand.RandomState) random state object for generating random numbers
     :param sample_length: (int) Length of bootstrapped sample
@@ -52,7 +46,7 @@ def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False, rand
         raise ValueError('NaN values in triple_barrier_events, delete nans')
 
     if random_state is None:
-        random_state = np.random.mtrand._rand
+        random_state = np.random.mtrand.RandomState()
 
     label_endtime = triple_barrier_events.t1
 
