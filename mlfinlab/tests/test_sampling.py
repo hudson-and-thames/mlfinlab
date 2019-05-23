@@ -4,6 +4,7 @@ Test various functions regarding chapter 4: Sampling (Bootstrapping, Concurrency
 
 import unittest
 import os
+import numpy as np
 import pandas as pd
 
 from mlfinlab.filters.filters import cusum_filter
@@ -94,6 +95,8 @@ class TestSampling(unittest.TestCase):
             bootstrapped_samples = seq_bootstrap(self.meta_labeled_events, compare=True, sample_length=None)
         except ValueError:
             bootstrapped_samples = seq_bootstrap(non_nan_meta_labels, compare=True, sample_length=None)
+            bootstrapped_samples_rand_state = seq_bootstrap(non_nan_meta_labels, compare=True, sample_length=None,
+                                                            random_state=np.random.mtrand.RandomState(seed=100))
 
         self.assertTrue(len(bootstrapped_samples) == non_nan_meta_labels.shape[0])
         self.assertTrue(len(seq_bootstrap(non_nan_meta_labels, compare=False, sample_length=10)) == 10)

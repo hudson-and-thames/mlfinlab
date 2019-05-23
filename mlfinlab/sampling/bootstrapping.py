@@ -52,7 +52,7 @@ def seq_bootstrap(triple_barrier_events, sample_length=None, compare=False, rand
         raise ValueError('NaN values in triple_barrier_events, delete nans')
 
     if random_state is None:
-        random_state = np.random.mtrand._rand
+        random_state = np.random.mtrand.RandomState()
 
     label_endtime = triple_barrier_events.t1
 
