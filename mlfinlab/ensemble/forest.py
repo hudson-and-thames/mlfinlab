@@ -1,12 +1,14 @@
 import threading
+from warnings import catch_warnings, simplefilter, warn
 import numpy as np
 from abc import ABCMeta, abstractmethod
+
+from scipy.sparse import issparse
+from scipy.sparse import hstack as sparse_hstack
+
 from sklearn.base import ClassifierMixin, RegressorMixin, MultiOutputMixin
 from sklearn.ensemble.base import BaseEnsemble, _partition_estimators
 from sklearn.ensemble.forest import _accumulate_prediction
-from scipy.sparse import issparse
-from scipy.sparse import hstack as sparse_hstack
-from warnings import catch_warnings, simplefilter, warn
 from sklearn.utils.fixes import parallel_helper, _joblib_parallel_args
 from sklearn.utils import check_random_state, check_array, compute_sample_weight
 from sklearn.tree._tree import DTYPE, DOUBLE
@@ -17,6 +19,7 @@ from sklearn.utils.multiclass import check_classification_targets
 from sklearn.tree import (DecisionTreeClassifier, DecisionTreeRegressor,
                           ExtraTreeClassifier, ExtraTreeRegressor)
 from sklearn.metrics import r2_score
+
 from mlfinlab.sampling.bootstrapping import seq_bootstrap
 
 MAX_INT = np.iinfo(np.int32).max
