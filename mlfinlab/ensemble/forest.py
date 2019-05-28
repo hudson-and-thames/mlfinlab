@@ -24,8 +24,6 @@ from sklearn.tree import (DecisionTreeClassifier, DecisionTreeRegressor,
                           ExtraTreeClassifier, ExtraTreeRegressor)
 from sklearn.metrics import r2_score
 
-from mlfinlab.sampling.bootstrapping import seq_bootstrap
-
 MAX_INT = np.iinfo(np.int32).max
 
 
@@ -109,8 +107,8 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
         """
         random_instance = check_random_state(random_state)
         # Sequential Bootstrapping
-        random_idx = random_instance.choice(bootstrapped_events, p=prob)
-        return bootstrapped_events[random_idx]
+        random_sample = random_instance.choice(bootstrapped_events, p=prob)
+        return random_sample
 
     def generate_unsampled_indices(self, bootstrapped_events, prob, n_samples, random_state):
         """Private function used to forest._set_oob_score function."""
