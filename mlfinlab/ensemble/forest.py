@@ -1,3 +1,7 @@
+"""
+Implementing scikit-learn RandomForest/ExtraTrees Classifiers/Regressors with Sequential Bootstrapping
+"""
+
 import threading
 from warnings import catch_warnings, simplefilter, warn
 import numpy as np
@@ -93,24 +97,24 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
 
         return sparse_hstack(indicators).tocsr(), n_nodes_ptr
 
-    def generate_sample_indices(self, triple_barrier_events, random_state, n_samples):
+    def generate_sample_indices(self, bootstrapped_events, prob, random_state):
         """
         This function applies Sequential Bootstrapping to generate samples for ensemble models.
         Uses mlfinlab.sampling.bootstrapping import seq_bootstrap which implements Sequential Bootstrapping described in
         the book.
-        :param triple_barrier_events: (pd.Series): triple-barrier events from labeling.get_events function
+        :param bootstrapped_events: (list): array of bootstrapped random indices
+        :param prob: (list): probability of drawing corresponding sample array from bootstrapped_events
         :param random_state: (np.random.RandomState): random state object
-        :param n_samples: number of bootstrapped samples
-        :return: sequentially bootstrapped samples based on label concurrency
+        :return: samples from bootstrapped_events array of samples
         """
         random_instance = check_random_state(random_state)
         # Sequential Bootstrapping
-        sample_indices = seq_bootstrap(triple_barrier_events, random_state=random_instance, sample_length=n_samples)
-        return sample_indices
+        random_idx = random_instance.choice(bootstrapped_events, p=prob)
+        return bootstrapped_events[random_idx]
 
-    def generate_unsampled_indices(self, triple_barrier_events, random_state, n_samples):
+    def generate_unsampled_indices(self, bootstrapped_events, prob, n_samples, random_state):
         """Private function used to forest._set_oob_score function."""
-        sample_indices = self.generate_sample_indices(triple_barrier_events, random_state, n_samples)
+        sample_indices = self.generate_sample_indices(bootstrapped_events, prob, random_state)
         sample_counts = np.bincount(sample_indices, minlength=n_samples)
         unsampled_mask = sample_counts == 0
         indices_range = np.arange(n_samples)
@@ -118,7 +122,7 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
 
         return unsampled_indices
 
-    def parallel_build_trees(self, tree, forest, X, y, triple_barrier_events, sample_weight, tree_idx, n_trees,
+    def parallel_build_trees(self, tree, forest, X, y, bootstrapped_events, prob, sample_weight, tree_idx, n_trees,
                              verbose=0, class_weight=None):
         """
         parallel_build_trees from sklearn
@@ -134,8 +138,8 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
             else:
                 curr_sample_weight = sample_weight.copy()
 
-            # Sequential Bootstrapping part
-            indices = self.generate_sample_indices(triple_barrier_events, tree.random_state, n_samples)
+            # Choose samples from pregenerated bootstrapped samples
+            indices = self.generate_sample_indices(bootstrapped_events, prob, tree.random_state)
             sample_counts = np.bincount(indices, minlength=n_samples)
             curr_sample_weight *= sample_counts
 
@@ -152,7 +156,7 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
 
         return tree
 
-    def fit(self, X, y, triple_barrier_events, sample_weight=None):
+    def fit(self, X, y, bootstrapped_events, prob, sample_weight=None):
         """
         This is a copy of fit function from sklearn. The only difference is instead of using
         standard bootstrapping method Sequential Bootstrapping is used instead
@@ -237,7 +241,7 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
             trees = Parallel(n_jobs=self.n_jobs, verbose=self.verbose,
                              **_joblib_parallel_args(prefer='threads'))(
                 delayed(self.parallel_build_trees)(
-                    t, self, X, y, triple_barrier_events, sample_weight, i, len(trees),
+                    t, self, X, y, bootstrapped_events, prob, sample_weight, i, len(trees),
                     verbose=self.verbose, class_weight=self.class_weight)
                 for i, t in enumerate(trees))
 
@@ -245,7 +249,7 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
             self.estimators_.extend(trees)
 
         if self.oob_score:
-            self._set_oob_score(X, y, triple_barrier_events)
+            self._set_oob_score(X, y, bootstrapped_events, prob)
 
         # Decapsulate classes_ attributes
         if hasattr(self, "classes_") and self.n_outputs_ == 1:
@@ -255,7 +259,7 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
         return self
 
     @abstractmethod
-    def _set_oob_score(self, X, y, triple_barrier_events):
+    def _set_oob_score(self, X, y, bootstrapped_events, prob):
         """_set_oob_score function from sklearn copy"""
 
     def _validate_y_class_weight(self, y):
@@ -324,7 +328,7 @@ class SequentialForestClassifier(SequentialBaseForest, ClassifierMixin, metaclas
             warm_start=warm_start,
             class_weight=class_weight)
 
-    def _set_oob_score(self, X, y, triple_barrier_events):
+    def _set_oob_score(self, X, y, bootstrapped_events, prob):
         """
         _set_oob_score function copy from sklearn
         """
@@ -339,8 +343,8 @@ class SequentialForestClassifier(SequentialBaseForest, ClassifierMixin, metaclas
                        for k in range(self.n_outputs_)]
 
         for estimator in self.estimators_:
-            unsampled_indices = super().generate_unsampled_indices(triple_barrier_events, estimator.random_state,
-                                                                   n_samples)
+            unsampled_indices = super().generate_unsampled_indices(bootstrapped_events, prob, n_samples,
+                                                                   estimator.random_state)
             p_estimator = estimator.predict_proba(X[unsampled_indices, :],
                                                   check_input=False)
 
@@ -547,7 +551,7 @@ class SequentialForestRegressor(SequentialBaseForest, RegressorMixin, metaclass=
 
         return y_hat
 
-    def _set_oob_score(self, X, y, triple_barrier_events):
+    def _set_oob_score(self, X, y, bootstrapped_events, prob):
         """
         _set_oob_score from sklearn
         """
@@ -559,8 +563,8 @@ class SequentialForestRegressor(SequentialBaseForest, RegressorMixin, metaclass=
         n_predictions = np.zeros((n_samples, self.n_outputs_))
 
         for estimator in self.estimators_:
-            unsampled_indices = super().generate_unsampled_indices(triple_barrier_events, estimator.random_state,
-                                                                   n_samples)
+            unsampled_indices = super().generate_unsampled_indices(bootstrapped_events, prob, n_samples,
+                                                                   estimator.random_state)
             p_estimator = estimator.predict(
                 X[unsampled_indices, :], check_input=False)
 
