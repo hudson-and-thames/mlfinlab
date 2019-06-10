@@ -127,7 +127,7 @@ class TestDataStructures(unittest.TestCase):
         """
         wrong_date = ['2019-41-30', 200.00, np.int64(5)]
         wrong_price = ['2019-01-30', 'asd', np.int64(5)]
-        wrong_volume = ['2019-01-30', 200.00, 1.5]
+        wrong_volume = ['2019-01-30', 200.00, '1.5']
         too_many_cols = ['2019-01-30', 200.00, np.int64(5), 'Limit order', 'B23']
 
         # pylint: disable=protected-access
