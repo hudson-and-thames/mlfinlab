@@ -2,14 +2,15 @@
 Test various functions regarding chapter 4: Return/Time attribution
 """
 
-import unittest
 import os
+import unittest
+
 import pandas as pd
 
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier
-from mlfinlab.util.utils import get_daily_vol
 from mlfinlab.sample_weights.attribution import get_weights_by_return, get_weights_by_time_decay
+from mlfinlab.util.utils import get_daily_vol
 
 
 class TestSampling(unittest.TestCase):
@@ -29,7 +30,7 @@ class TestSampling(unittest.TestCase):
         daily_vol = get_daily_vol(close=self.data['close'], lookback=100)
         cusum_events = cusum_filter(self.data['close'], threshold=0.02)
         vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'],
-                                                 timedelta=pd.Timedelta('2D'))
+                                                 num_days=2)
 
         self.data['side'] = 1
         self.meta_labeled_events = get_events(close=self.data['close'],
@@ -45,11 +46,8 @@ class TestSampling(unittest.TestCase):
         """
         Assert that return attribution length equals triple barrier length, check particular values
         """
-        try:
-            get_weights_by_return(self.meta_labeled_events, self.data['close'])
-        except ValueError:
-            non_nan_meta_labels = self.meta_labeled_events.dropna()
-            ret_weights = get_weights_by_return(non_nan_meta_labels, self.data['close'])
+        non_nan_meta_labels = self.meta_labeled_events.dropna()
+        ret_weights = get_weights_by_return(non_nan_meta_labels, self.data['close'])
         self.assertTrue(ret_weights.shape[0] == non_nan_meta_labels.shape[0])
         self.assertTrue(abs(ret_weights.iloc[0] - 0.781807) <= 1e5)
         self.assertTrue(abs(ret_weights.iloc[3] - 1.627944) <= 1e5)
@@ -58,15 +56,12 @@ class TestSampling(unittest.TestCase):
         """
         Assert that time decay weights length equals triple barrier length, check particular values
         """
-        try:
-            get_weights_by_time_decay(self.meta_labeled_events, self.data['close'], decay=0.5)
-        except ValueError:
-            non_nan_meta_labels = self.meta_labeled_events.dropna()
-            standard_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=0.5)
-            no_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=1)
-            neg_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=-0.5)
-            converge_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=0)
-            pos_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=1.5)
+        non_nan_meta_labels = self.meta_labeled_events.dropna()
+        standard_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=0.5)
+        no_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=1)
+        neg_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=-0.5)
+        converge_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=0)
+        pos_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=1.5)
 
         self.assertTrue(standard_decay.shape == no_decay.shape)
         self.assertTrue(standard_decay.shape == neg_decay.shape)
@@ -84,3 +79,9 @@ class TestSampling(unittest.TestCase):
         # in positive decay, weights decrease with increasing label time
         self.assertTrue(pos_decay.iloc[0] == pos_decay.max())
         self.assertTrue(pos_decay.iloc[-2] >= pos_decay.iloc[-1])
+
+    def test_value_error_raise(self):
+        self.assertRaises(AssertionError,
+                          get_weights_by_return(self.meta_labeled_events, self.data['close']))
+        self.assertRaises(AssertionError,
+                          get_weights_by_time_decay(self.meta_labeled_events, self.data['close'], decay=0.5))

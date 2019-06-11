@@ -2,8 +2,9 @@
 Test various functions regarding chapter 3: Labels.
 """
 
-import unittest
 import os
+import unittest
+
 import numpy as np
 import pandas as pd
 
@@ -48,7 +49,7 @@ class TestChapter3(unittest.TestCase):
 
         # Compute vertical barrier
         for days in [1, 2, 3, 4, 5]:
-            vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], timedelta=pd.Timedelta('{}D'.format(days)))
+            vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], num_days=days)
 
             # For each row assert the time delta is correct
             for start_date, end_date in vertical_barriers.iteritems():
@@ -61,7 +62,7 @@ class TestChapter3(unittest.TestCase):
         """
         daily_vol = get_daily_vol(close=self.data['close'], lookback=100)
         cusum_events = cusum_filter(self.data['close'], threshold=0.02)
-        vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], timedelta=pd.Timedelta('1D'))
+        vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], num_days=1)
 
         # No meta-labeling
         triple_barrier_events = get_events(close=self.data['close'],
@@ -127,7 +128,7 @@ class TestChapter3(unittest.TestCase):
         """
         daily_vol = get_daily_vol(close=self.data['close'], lookback=100)
         cusum_events = cusum_filter(self.data['close'], threshold=0.02)
-        vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], timedelta=pd.Timedelta('1D'))
+        vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], num_days=1)
 
         # ----------------------
         # Assert 0 labels are generated if vertical barrier hit
@@ -171,7 +172,7 @@ class TestChapter3(unittest.TestCase):
         """
         daily_vol = get_daily_vol(close=self.data['close'], lookback=100)
         cusum_events = cusum_filter(self.data['close'], threshold=0.02)
-        vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], timedelta=pd.Timedelta('1D'))
+        vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], num_days=1)
         triple_barrier_events = get_events(close=self.data['close'],
                                            t_events=cusum_events,
                                            pt_sl=[1, 1],
