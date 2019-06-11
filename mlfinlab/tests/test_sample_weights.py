@@ -81,6 +81,9 @@ class TestSampling(unittest.TestCase):
         self.assertTrue(pos_decay.iloc[-2] >= pos_decay.iloc[-1])
 
     def test_value_error_raise(self):
+        """
+        Test seq_bootstrap and ind_matrix functions for raising ValueError on nan values
+        """
         self.assertRaises(AssertionError,
                           get_weights_by_return(self.meta_labeled_events, self.data['close']))
         self.assertRaises(AssertionError,

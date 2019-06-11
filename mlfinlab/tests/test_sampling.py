@@ -82,6 +82,10 @@ class TestSampling(unittest.TestCase):
         bar_index = sorted(list(set(bar_index)))
         ind_mat = get_ind_matrix(bar_index, label_endtime)
         self.assertTrue(ind_mat.shape == (13, 7))
+        self.assertTrue(bool((ind_mat[0].values == [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
+        self.assertTrue(bool((ind_mat[2].values == [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
+        self.assertTrue(bool((ind_mat[4].values == [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0]).all()) is True)
+        self.assertTrue(bool((ind_mat[6].values == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1]).all()) is True)
 
         bootstrapped_samples = seq_bootstrap(non_nan_meta_labels, compare=True, sample_length=None)
         bootstrapped_samples_rand_sample = seq_bootstrap(non_nan_meta_labels, compare=True, sample_length=20,
