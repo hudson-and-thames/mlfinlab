@@ -2,7 +2,6 @@
 Logic regarding sequential bootstrapping from chapter 4.
 """
 
-import pandas as pd
 import numpy as np
 
 
@@ -11,7 +10,7 @@ def get_ind_matrix(triple_barrier_events):
     Snippet 4.3, page 64, Build an Indicator Matrix
     Get indicator matrix
     :param triple_barrier_events: (pd.DataFrame): triple barrier events from labeling.get_events
-    :return: (pd.DataFrame) indicator binary matrix indicating what (price) bars influence the label for each observation
+    :return: (np.array) indicator binary matrix indicating what (price) bars influence the label for each observation
     """
     if bool(triple_barrier_events.isnull().values.any()) is True or bool(
             triple_barrier_events.index.isnull().any()) is True:
@@ -22,10 +21,19 @@ def get_ind_matrix(triple_barrier_events):
     bar_index.extend(triple_barrier_events.t1)
     bar_index = sorted(list(set(bar_index)))  # drop duplicates and sort
 
-    ind_mat = pd.DataFrame(0, index=bar_index, columns=range(label_endtime.shape[0]))  # zero indicator matrix
-    for i, (t_0, t_1) in enumerate(
-            label_endtime.iteritems()):  # TODO: make for loop faster (move away from pd.DataFrame and loc)
-        ind_mat.loc[t_0:t_1, i] = 1
+    sorted_timestamps = dict(
+        zip(sorted(bar_index), range(len(bar_index))))  # get sorted timestamps with index in sorted array
+
+    tokenized_endtimes = np.column_stack((label_endtime.index.map(sorted_timestamps), label_endtime.map(
+        sorted_timestamps).values))  # create array of arrays: [label_index_position, label_endtime_position]
+
+    ind_mat = np.zeros((len(bar_index), len(label_endtime)))  # init indicator matrix
+    for sample_num, label_array in enumerate(tokenized_endtimes):
+        label_index = label_array[0]
+        label_endtime = label_array[1]
+        ones_array = np.ones(
+            (1, label_endtime - label_index + 1))  # ones array which corresponds to number of 1 to insert
+        ind_mat[label_index:label_endtime + 1, sample_num] = ones_array
     return ind_mat
 
 
