@@ -11,7 +11,7 @@ from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier
 from mlfinlab.util.utils import get_daily_vol
 from mlfinlab.sampling.concurrent import get_av_uniqueness_from_tripple_barrier, num_concurrent_events
-from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix
+from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix, get_ind_mat_average_uniqueness
 
 
 class TestSampling(unittest.TestCase):
@@ -74,29 +74,23 @@ class TestSampling(unittest.TestCase):
         Test sequential bootstrapping length, indicator matrix length and NaN checks
         """
         # Test get_ind_matrix function
-        label_endtime = self.meta_labeled_events.t1
-        bar_index = list(self.meta_labeled_events.index)  # generate index for indicator matrix from t1 and index
-        bar_index.extend(self.meta_labeled_events.t1)
-        bar_index = sorted(list(set(bar_index)))
-
-        ind_mat = pd.DataFrame()
         try:
-            get_ind_matrix(bar_index, label_endtime)  # bar index contains NaN, which must be handled
+            get_ind_matrix(self.meta_labeled_events)  # bar index contains NaN, which must be handled
         except ValueError:
             non_nan_meta_labels = self.meta_labeled_events.dropna()
-            label_endtime = non_nan_meta_labels.t1
-            bar_index = list(non_nan_meta_labels.index)
-            bar_index.extend(non_nan_meta_labels.t1)
-            bar_index = sorted(list(set(bar_index)))
-            ind_mat = get_ind_matrix(bar_index, label_endtime)
+            ind_mat = get_ind_matrix(non_nan_meta_labels)
         self.assertTrue(ind_mat.shape == (13, 7))
 
-        try:
-            bootstrapped_samples = seq_bootstrap(self.meta_labeled_events, compare=True, sample_length=None)
-        except ValueError:
-            bootstrapped_samples = seq_bootstrap(non_nan_meta_labels, compare=True, sample_length=None)
-            bootstrapped_samples_rand_sample = seq_bootstrap(non_nan_meta_labels, compare=True, sample_length=20,
-                                                             random_state=np.random.mtrand.RandomState(seed=100))
+        self.assertTrue((ind_mat[2].values == np.array([0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0])).all())
 
+        bootstrapped_samples = seq_bootstrap(ind_mat, compare=False)
+        bootstrapped_samples_1000 = seq_bootstrap(ind_mat, compare=True, sample_length=100)
         self.assertTrue(len(bootstrapped_samples) == non_nan_meta_labels.shape[0])
-        self.assertTrue(len(bootstrapped_samples_rand_sample) == 20)
+        self.assertTrue(len(bootstrapped_samples_1000) == 100)
+
+        # check average uniqueness value
+        sequential_unq = get_ind_mat_average_uniqueness(ind_mat[bootstrapped_samples_1000].values)
+        sequential_unq_mean = sequential_unq[sequential_unq > 0].mean()
+
+        self.assertTrue(abs(0.05 - sequential_unq_mean) <= 1e-2)  # sequential uniqueness should be higher
+
