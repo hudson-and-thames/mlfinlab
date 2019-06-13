@@ -107,8 +107,8 @@ class SequentialBaseForest(BaseEnsemble, MultiOutputMixin, metaclass=ABCMeta):
         """
         random_instance = check_random_state(random_state)
         # Sequential Bootstrapping
-        random_sample = random_instance.choice(bootstrapped_events, p=prob)
-        return random_sample
+        random_sample_index = random_instance.choice(range(len(bootstrapped_events)), p=prob)
+        return bootstrapped_events[random_sample_index]
 
     def generate_unsampled_indices(self, bootstrapped_events, prob, n_samples, random_state):
         """Private function used to forest._set_oob_score function."""

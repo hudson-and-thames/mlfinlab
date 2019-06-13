@@ -65,7 +65,7 @@ def bootstrap_loop_run(ind_mat, prev_uniqueness):
                 average_uniqueness = (prev_average_uniqueness * number_of_elements + new_el) / (number_of_elements + 1)
                 number_of_elements += 1
                 prev_average_uniqueness = average_uniqueness
-                avg_unique[i] = average_uniqueness
+        avg_unique[i] = average_uniqueness
     return avg_unique
 
 
