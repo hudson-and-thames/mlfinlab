@@ -3,6 +3,7 @@ Logic regarding sequential bootstrapping from chapter 4.
 """
 
 import numpy as np
+from numba import jit, prange
 
 
 def get_ind_matrix(triple_barrier_events):
@@ -50,18 +51,22 @@ def get_ind_mat_average_uniqueness(ind_mat):
     return average.T
 
 
-def _get_label_uniqueness(ind_mat_label, prev_uniqueness):
-    """
-    Snippet 4.4. page 65, Compute Average Uniqueness
-    Average uniqueness from indicator matrix
+@jit(parallel=True, nopython=True)
+def bootstrap_loop_run(ind_mat, prev_uniqueness):
+    avg_unique = np.zeros(ind_mat.shape[1])  # array of label uniqueness
 
-    :param ind_mat_label: (np.array) column from ind_mat which corresponds to label for which we need to get uniqueness
-    :param prev_uniqueness: (np.array) concurrency array of sums of previously recorded sample from seq_bootstrap
-    :return: (np.array) matrix with label uniqueness
-    """
-    mat = np.array([ind_mat_label, prev_uniqueness])
-    mat = mat[:, mat[0, :] > 0]
-    return np.divide(mat[0, :], (np.add(mat[0, :], mat[1, :])))
+    for i in prange(ind_mat.shape[1]):
+        prev_average_uniqueness = 0
+        number_of_elements = 0
+        reduced_mat = ind_mat[:, i]
+        for j in range(len(reduced_mat)):
+            if reduced_mat[j] > 0:
+                new_el = reduced_mat[j] / (reduced_mat[j] + prev_uniqueness[j])
+                average_uniqueness = (prev_average_uniqueness * number_of_elements + new_el) / (number_of_elements + 1)
+                number_of_elements += 1
+                prev_average_uniqueness = average_uniqueness
+                avg_unique[i] = average_uniqueness
+    return avg_unique
 
 
 def seq_bootstrap(ind_mat, sample_length=None, compare=False):
@@ -82,18 +87,13 @@ def seq_bootstrap(ind_mat, sample_length=None, compare=False):
         sample_length = ind_mat.shape[1]
 
     phi = []
-    prev_uniqueness = np.zeros(ind_mat.shape[0])
+    prev_concurrency = np.zeros(ind_mat.shape[0])  # init with zeros (phi is empty)
     while len(phi) < sample_length:
-        avg_unique = np.array([])
-        for i in range(ind_mat.shape[1]):  # TODO: for performance increase, this can be parallelized
-            # get i label uniqueness vector (which corresponds to the last column of get_ind_mat_average_uniqueness)
-            label_uniqueness = _get_label_uniqueness(ind_mat[:, i], prev_uniqueness)
-            label_av_uniqueness = label_uniqueness.mean()  # get average label uniqueness
-            avg_unique = np.append(avg_unique, label_av_uniqueness)
-        prob = avg_unique / avg_unique.sum()  # draw prob
+        avg_unique = bootstrap_loop_run(ind_mat, prev_concurrency)
+        prob = avg_unique / sum(avg_unique)  # draw prob
         choice = random_state.choice(range(ind_mat.shape[1]), p=prob)
         phi += [choice]
-        prev_uniqueness += ind_mat[:, choice]
+        prev_concurrency += ind_mat[:, choice]  # add recorded label array from ind_mat
 
     if compare is True:
         standard_indx = np.random.choice(ind_mat.shape[1], size=sample_length)
