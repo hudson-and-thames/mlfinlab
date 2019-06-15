@@ -47,8 +47,8 @@ def get_ind_mat_average_uniqueness(ind_mat):
     :return: (np.matrix) matrix with label uniqueness
     """
     conc = ind_mat.sum(axis=1)  # concurrency
-    average = ind_mat / conc[:, None]
-    return average.T
+    average = ind_mat.T / conc
+    return average
 
 
 @jit(parallel=True, nopython=True)
