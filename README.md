@@ -33,6 +33,11 @@ For those of you interested in working with a two years of sample tick, volume, 
 
 You should be able to work on a few implementations of the code with this set. 
 
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/hudson-and-thames/research/master/Chapter3/readme_image.png" height="350"><br>
+</div>
+
 ---
 
 ## Notes
