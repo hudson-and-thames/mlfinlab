@@ -69,7 +69,7 @@ def bootstrap_loop_run(ind_mat, prev_uniqueness):
     return avg_unique
 
 
-def seq_bootstrap(ind_mat, sample_length=None, compare=False):
+def seq_bootstrap(ind_mat, sample_length=None, warmup_samples = [], compare=False, verbose=False):
     """
     Snippet 4.5, Snippet 4.6, page 65, Return Sample from Sequential Bootstrap
     Generate a sample via sequential bootstrap.
@@ -77,7 +77,9 @@ def seq_bootstrap(ind_mat, sample_length=None, compare=False):
 
     :param ind_mat: (data frame) indicator matrix from triple barrier events
     :param sample_length: (int) Length of bootstrapped sample
+    :param warmup_samples: (list) list of previously drawn samples
     :param compare: (boolean) flag to print standard bootstrap uniqueness vs sequential bootstrap uniqueness
+    :param verbose: (boolean) flag to print updated probabilities on each step
     :return: (array) of bootstrapped samples indexes
     """
 
@@ -86,14 +88,20 @@ def seq_bootstrap(ind_mat, sample_length=None, compare=False):
     if sample_length is None:
         sample_length = ind_mat.shape[1]
 
-    phi = []
+    phi = [] # boostrapped samples
     prev_concurrency = np.zeros(ind_mat.shape[0])  # init with zeros (phi is empty)
     while len(phi) < sample_length:
         avg_unique = bootstrap_loop_run(ind_mat, prev_concurrency)
         prob = avg_unique / sum(avg_unique)  # draw prob
-        choice = random_state.choice(range(ind_mat.shape[1]), p=prob)
+        try:
+            choice = warmup_samples.pop(0) # it would get samples from warmup until it is empty
+            # if it is empty from the beginning it would get samples based on prob from the first iteration
+        except IndexError:
+            choice = random_state.choice(range(ind_mat.shape[1]), p=prob)
         phi += [choice]
         prev_concurrency += ind_mat[:, choice]  # add recorded label array from ind_mat
+        if verbose is True:
+            print(prob)
 
     if compare is True:
         standard_indx = np.random.choice(ind_mat.shape[1], size=sample_length)
