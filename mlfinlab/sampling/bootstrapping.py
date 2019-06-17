@@ -52,7 +52,14 @@ def get_ind_mat_average_uniqueness(ind_mat):
 
 
 @jit(parallel=True, nopython=True)
-def bootstrap_loop_run(ind_mat, prev_uniqueness):
+def _bootstrap_loop_run(ind_mat, prev_concurrency):
+    """
+    Part of Sequential Bootstrapping for-loop. Using previously accumulated concurrency array, loops through all samples
+    and generates averages uniqueness array of label based on previously accumulated concurrency
+    :param ind_mat (np.array): indicator matrix from get_ind_matrix function
+    :param prev_concurrency (np.array): accumulated concurrency from previous iterations of sequential bootstrapping
+    :return: (np.array): label average uniqueness based on prev_concurrency
+    """
     avg_unique = np.zeros(ind_mat.shape[1])  # array of label uniqueness
 
     for i in prange(ind_mat.shape[1]):
@@ -61,7 +68,7 @@ def bootstrap_loop_run(ind_mat, prev_uniqueness):
         reduced_mat = ind_mat[:, i]
         for j in range(len(reduced_mat)):
             if reduced_mat[j] > 0:
-                new_el = reduced_mat[j] / (reduced_mat[j] + prev_uniqueness[j])
+                new_el = reduced_mat[j] / (reduced_mat[j] + prev_concurrency[j])
                 average_uniqueness = (prev_average_uniqueness * number_of_elements + new_el) / (number_of_elements + 1)
                 number_of_elements += 1
                 prev_average_uniqueness = average_uniqueness
@@ -69,7 +76,7 @@ def bootstrap_loop_run(ind_mat, prev_uniqueness):
     return avg_unique
 
 
-def seq_bootstrap(ind_mat, sample_length=None, warmup_samples = [], compare=False, verbose=False):
+def seq_bootstrap(ind_mat, sample_length=None, warmup_samples=None, compare=False, verbose=False):
     """
     Snippet 4.5, Snippet 4.6, page 65, Return Sample from Sequential Bootstrap
     Generate a sample via sequential bootstrap.
@@ -88,18 +95,21 @@ def seq_bootstrap(ind_mat, sample_length=None, warmup_samples = [], compare=Fals
     if sample_length is None:
         sample_length = ind_mat.shape[1]
 
-    phi = [] # boostrapped samples
-    prev_concurrency = np.zeros(ind_mat.shape[0])  # init with zeros (phi is empty)
+    if warmup_samples is None:
+        warmup_samples = []
+
+    phi = []  # Bootstrapped samples
+    prev_concurrency = np.zeros(ind_mat.shape[0])  # Init with zeros (phi is empty)
     while len(phi) < sample_length:
-        avg_unique = bootstrap_loop_run(ind_mat, prev_concurrency)
-        prob = avg_unique / sum(avg_unique)  # draw prob
+        avg_unique = _bootstrap_loop_run(ind_mat, prev_concurrency)
+        prob = avg_unique / sum(avg_unique)  # Draw prob
         try:
-            choice = warmup_samples.pop(0) # it would get samples from warmup until it is empty
-            # if it is empty from the beginning it would get samples based on prob from the first iteration
+            choice = warmup_samples.pop(0)  # It would get samples from warmup until it is empty
+            # If it is empty from the beginning it would get samples based on prob from the first iteration
         except IndexError:
             choice = random_state.choice(range(ind_mat.shape[1]), p=prob)
         phi += [choice]
-        prev_concurrency += ind_mat[:, choice]  # add recorded label array from ind_mat
+        prev_concurrency += ind_mat[:, choice]  # Add recorded label array from ind_mat
         if verbose is True:
             print(prob)
 
