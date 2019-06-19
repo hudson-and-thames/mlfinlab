@@ -52,7 +52,7 @@ class TestSampling(unittest.TestCase):
 
         num_conc_events = num_concurrent_events(self.data['close'].index, self.meta_labeled_events['t1'],
                                                 self.meta_labeled_events.index)
-        # assert for each label we have concurrency value
+        # Assert for each label we have concurrency value
         self.assertTrue(num_conc_events[self.meta_labeled_events.index].shape[0] == self.meta_labeled_events.shape[0])
         self.assertTrue(num_conc_events.value_counts()[0] == 186)
         self.assertTrue(num_conc_events.value_counts()[1] == 505)
@@ -64,7 +64,7 @@ class TestSampling(unittest.TestCase):
         """
 
         av_un = get_av_uniqueness_from_tripple_barrier(self.meta_labeled_events, self.data['close'], num_threads=4)
-        # assert for each label we have uniqueness value
+        # Assert for each label we have uniqueness value
         self.assertTrue(av_un.shape[0] == self.meta_labeled_events.shape[0])
         self.assertTrue(av_un['tW'].iloc[0] == 1)
         self.assertTrue(av_un['tW'].iloc[4] == 0.5)
@@ -78,7 +78,8 @@ class TestSampling(unittest.TestCase):
 
         non_nan_meta_labels = self.meta_labeled_events.dropna()
         ind_mat = get_ind_matrix(non_nan_meta_labels)
-        self.assertTrue(ind_mat.shape == (13, 7))
+        self.assertTrue(ind_mat.shape == (13, 7))  # Indicator matrix shape should be (meta_label_index+t1, t1)
+        # Check indicator matrix values for specific labels
         self.assertTrue(bool((ind_mat[:, 0] == [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
         self.assertTrue(bool((ind_mat[:, 2] == [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
         self.assertTrue(bool((ind_mat[:, 4] == [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0]).all()) is True)
@@ -89,7 +90,7 @@ class TestSampling(unittest.TestCase):
         self.assertTrue(len(bootstrapped_samples) == non_nan_meta_labels.shape[0])
         self.assertTrue(len(bootstrapped_samples_1000) == 100)
 
-        # test sequential bootstrapping on example from a book
+        # Test sequential bootstrapping on example from a book
         ind_mat = pd.DataFrame(index=range(0, 6), columns=range(0, 3))
         ind_mat.loc[:, 0] = [1, 1, 1, 0, 0, 0]
         ind_mat.loc[:, 1] = [0, 0, 1, 1, 0, 0]
@@ -98,7 +99,7 @@ class TestSampling(unittest.TestCase):
 
         seq_bootstrap(ind_mat, sample_length=3, verbose=True, warmup_samples=[1])  # Show printed probabilities
 
-        # perform Monte-Carlo test
+        # Perform Monte-Carlo test
         standard_unq_array = np.zeros(1000) * np.nan
         seq_unq_array = np.zeros(1000) * np.nan
         for i in range(0, 1000):
