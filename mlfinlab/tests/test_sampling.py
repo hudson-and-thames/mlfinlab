@@ -2,8 +2,8 @@
 Test various functions regarding chapter 4: Sampling (Bootstrapping, Concurrency).
 """
 
-import unittest
 import os
+import unittest
 import numpy as np
 import pandas as pd
 
@@ -32,7 +32,7 @@ class TestSampling(unittest.TestCase):
         daily_vol = get_daily_vol(close=self.data['close'], lookback=100)
         cusum_events = cusum_filter(self.data['close'], threshold=0.02)
         vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'],
-                                                 timedelta=pd.Timedelta('2D'))
+                                                 num_days=2)
 
         self.data['side'] = 1
         self.meta_labeled_events = get_events(close=self.data['close'],
@@ -74,13 +74,18 @@ class TestSampling(unittest.TestCase):
         """
         Test sequential bootstrapping length, indicator matrix length and NaN checks
         """
-        # Test get_ind_matrix function
-        try:
-            get_ind_matrix(self.meta_labeled_events)  # bar index contains NaN, which must be handled
-        except ValueError:
-            non_nan_meta_labels = self.meta_labeled_events.dropna()
-            ind_mat = get_ind_matrix(non_nan_meta_labels)
+
+        non_nan_meta_labels = self.meta_labeled_events.dropna()
+        label_endtime = non_nan_meta_labels.t1
+        bar_index = list(non_nan_meta_labels.index)
+        bar_index.extend(non_nan_meta_labels.t1)
+        bar_index = sorted(list(set(bar_index)))
+        ind_mat = get_ind_matrix(bar_index, label_endtime)
         self.assertTrue(ind_mat.shape == (13, 7))
+        self.assertTrue(bool((ind_mat[0].values == [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
+        self.assertTrue(bool((ind_mat[2].values == [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
+        self.assertTrue(bool((ind_mat[4].values == [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0]).all()) is True)
+        self.assertTrue(bool((ind_mat[6].values == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1]).all()) is True)
 
         self.assertTrue((ind_mat[:, 2] == np.array([0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0])).all())
 
@@ -140,6 +145,9 @@ class TestSampling(unittest.TestCase):
             abs(labels_av_uniqueness[labels_av_uniqueness > 0].mean() - 0.8571) <= 1e-4)  # Test matrix av.uniqueness
 
     def test_bootstrap_loop_run(self):
+        """
+        Test one loop iteration of Sequential Bootstrapping
+        """
         ind_mat = pd.DataFrame(index=range(0, 6), columns=range(0, 3))
         ind_mat.loc[:, 0] = [1, 1, 1, 0, 0, 0]
         ind_mat.loc[:, 1] = [0, 0, 1, 1, 0, 0]
@@ -156,3 +164,18 @@ class TestSampling(unittest.TestCase):
         second_iteration_prob = second_iteration / second_iteration.sum()
 
         self.assertTrue(abs((second_iteration_prob - np.array([0.35714286, 0.21428571, 0.42857143])).sum()) <= 1e-8)
+
+    def test_value_error_raise(self):
+        """
+        Test seq_bootstrap and ind_matrix functions for raising ValueError on nan values
+        """
+
+        label_endtime = self.meta_labeled_events.t1
+        bar_index = list(self.meta_labeled_events.index)  # generate index for indicator matrix from t1 and index
+        bar_index.extend(self.meta_labeled_events.t1)
+        bar_index = sorted(list(set(bar_index)))
+
+        with self.assertRaises(AssertionError):
+            get_ind_matrix(bar_index, label_endtime)
+        with self.assertRaises(AssertionError):
+            seq_bootstrap(self.meta_labeled_events, compare=True, sample_length=None)
