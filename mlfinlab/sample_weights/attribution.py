@@ -41,8 +41,10 @@ def get_weights_by_return(triple_barrier_events, close_series, num_threads=5):
     :param num_threads: (int) the number of threads concurrently used by the function.
     :return: (pd.Series) of sample weights based on number return and concurrency
     """
-    assert bool(triple_barrier_events.isnull().values.any()) is False and bool(
-        triple_barrier_events.index.isnull().any()) is False, 'NaN values in triple_barrier_events, delete nans'
+
+    has_null_events = bool(triple_barrier_events.isnull().values.any())
+    has_null_index = bool(triple_barrier_events.index.isnull().any())
+    assert has_null_events is False and has_null_index is False, 'NaN values in triple_barrier_events, delete nans'
 
     num_conc_events = mp_pandas_obj(num_concurrent_events, ('molecule', triple_barrier_events.index), num_threads,
                                     close_series_index=close_series.index, label_endtime=triple_barrier_events['t1'])

@@ -84,7 +84,9 @@ class TestSampling(unittest.TestCase):
         """
         Test seq_bootstrap and ind_matrix functions for raising ValueError on nan values
         """
-        self.assertRaises(AssertionError,
-                          get_weights_by_return(self.meta_labeled_events, self.data['close']))
-        self.assertRaises(AssertionError,
-                          get_weights_by_time_decay(self.meta_labeled_events, self.data['close'], decay=0.5))
+
+        with self.assertRaises(AssertionError):
+            get_weights_by_return(self.meta_labeled_events, self.data['close'])
+
+        with self.assertRaises(AssertionError):
+            get_weights_by_time_decay(self.meta_labeled_events, self.data['close'], decay=0.5)

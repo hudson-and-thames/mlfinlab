@@ -104,5 +104,7 @@ class TestSampling(unittest.TestCase):
         bar_index.extend(self.meta_labeled_events.t1)
         bar_index = sorted(list(set(bar_index)))
 
-        self.assertRaises(AssertionError, get_ind_matrix(bar_index, label_endtime))
-        self.assertRaises(AssertionError, seq_bootstrap(self.meta_labeled_events, compare=True, sample_length=None))
+        with self.assertRaises(AssertionError):
+            get_ind_matrix(bar_index, label_endtime)
+        with self.assertRaises(AssertionError):
+            seq_bootstrap(self.meta_labeled_events, compare=True, sample_length=None)
