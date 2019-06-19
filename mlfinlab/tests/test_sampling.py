@@ -4,15 +4,16 @@ Test various functions regarding chapter 4: Sampling (Bootstrapping, Concurrency
 
 import os
 import unittest
+
 import numpy as np
 import pandas as pd
 
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier
-from mlfinlab.util.utils import get_daily_vol
-from mlfinlab.sampling.concurrent import get_av_uniqueness_from_tripple_barrier, num_concurrent_events
 from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix, get_ind_mat_average_uniqueness, \
     _bootstrap_loop_run  # pylint: disable=protected-access
+from mlfinlab.sampling.concurrent import get_av_uniqueness_from_tripple_barrier, num_concurrent_events
+from mlfinlab.util.utils import get_daily_vol
 
 
 class TestSampling(unittest.TestCase):
@@ -76,18 +77,12 @@ class TestSampling(unittest.TestCase):
         """
 
         non_nan_meta_labels = self.meta_labeled_events.dropna()
-        label_endtime = non_nan_meta_labels.t1
-        bar_index = list(non_nan_meta_labels.index)
-        bar_index.extend(non_nan_meta_labels.t1)
-        bar_index = sorted(list(set(bar_index)))
-        ind_mat = get_ind_matrix(bar_index, label_endtime)
+        ind_mat = get_ind_matrix(non_nan_meta_labels)
         self.assertTrue(ind_mat.shape == (13, 7))
-        self.assertTrue(bool((ind_mat[0].values == [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
-        self.assertTrue(bool((ind_mat[2].values == [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
-        self.assertTrue(bool((ind_mat[4].values == [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0]).all()) is True)
-        self.assertTrue(bool((ind_mat[6].values == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1]).all()) is True)
-
-        self.assertTrue((ind_mat[:, 2] == np.array([0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0])).all())
+        self.assertTrue(bool((ind_mat[:, 0] == [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
+        self.assertTrue(bool((ind_mat[:, 2] == [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
+        self.assertTrue(bool((ind_mat[:, 4] == [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0]).all()) is True)
+        self.assertTrue(bool((ind_mat[:, 6] == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1]).all()) is True)
 
         bootstrapped_samples = seq_bootstrap(ind_mat, compare=False, verbose=True, warmup_samples=None)
         bootstrapped_samples_1000 = seq_bootstrap(ind_mat, compare=True, sample_length=100)
@@ -101,7 +96,7 @@ class TestSampling(unittest.TestCase):
         ind_mat.loc[:, 2] = [0, 0, 0, 0, 1, 1]
         ind_mat = ind_mat.values
 
-        seq_bootstrap(ind_mat, sample_length=3, verbose=True, warmup_samples=[1]) # Show printed probabilities
+        seq_bootstrap(ind_mat, sample_length=3, verbose=True, warmup_samples=[1])  # Show printed probabilities
 
         # perform Monte-Carlo test
         standard_unq_array = np.zeros(1000) * np.nan
@@ -170,12 +165,5 @@ class TestSampling(unittest.TestCase):
         Test seq_bootstrap and ind_matrix functions for raising ValueError on nan values
         """
 
-        label_endtime = self.meta_labeled_events.t1
-        bar_index = list(self.meta_labeled_events.index)  # generate index for indicator matrix from t1 and index
-        bar_index.extend(self.meta_labeled_events.t1)
-        bar_index = sorted(list(set(bar_index)))
-
-        with self.assertRaises(AssertionError):
-            get_ind_matrix(bar_index, label_endtime)
-        with self.assertRaises(AssertionError):
-            seq_bootstrap(self.meta_labeled_events, compare=True, sample_length=None)
+        with self.assertRaises(ValueError):
+            get_ind_matrix(self.meta_labeled_events)
