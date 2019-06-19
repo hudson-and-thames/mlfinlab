@@ -52,7 +52,7 @@ def get_ind_mat_average_uniqueness(ind_mat):
 
 
 @jit(parallel=True, nopython=True)
-def _bootstrap_loop_run(ind_mat, prev_concurrency):
+def _bootstrap_loop_run(ind_mat, prev_concurrency):  # pragma: no cover
     """
     Part of Sequential Bootstrapping for-loop. Using previously accumulated concurrency array, loops through all samples
     and generates averages uniqueness array of label based on previously accumulated concurrency
@@ -60,13 +60,13 @@ def _bootstrap_loop_run(ind_mat, prev_concurrency):
     :param prev_concurrency (np.array): accumulated concurrency from previous iterations of sequential bootstrapping
     :return: (np.array): label average uniqueness based on prev_concurrency
     """
-    avg_unique = np.zeros(ind_mat.shape[1])  # array of label uniqueness
+    avg_unique = np.zeros(ind_mat.shape[1])  # Array of label uniqueness
 
-    for i in prange(ind_mat.shape[1]):
+    for i in prange(ind_mat.shape[1]):  # pylint: disable=not-an-iterable
         prev_average_uniqueness = 0
         number_of_elements = 0
         reduced_mat = ind_mat[:, i]
-        for j in range(len(reduced_mat)):
+        for j in range(len(reduced_mat)):  # pylint: disable=consider-using-enumerate
             if reduced_mat[j] > 0:
                 new_el = reduced_mat[j] / (reduced_mat[j] + prev_concurrency[j])
                 average_uniqueness = (prev_average_uniqueness * number_of_elements + new_el) / (number_of_elements + 1)
