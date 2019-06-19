@@ -90,7 +90,7 @@ def seq_bootstrap(ind_mat, sample_length=None, warmup_samples=None, compare=Fals
     :return: (array) of bootstrapped samples indexes
     """
 
-    random_state = np.random.mtrand.RandomState()
+    random_state = np.random.RandomState()
 
     if sample_length is None:
         sample_length = ind_mat.shape[1]
@@ -115,8 +115,8 @@ def seq_bootstrap(ind_mat, sample_length=None, warmup_samples=None, compare=Fals
 
     if compare is True:
         standard_indx = np.random.choice(ind_mat.shape[1], size=sample_length)
-        standart_unq = get_ind_mat_average_uniqueness(ind_mat[:, standard_indx])
-        standard_unq_mean = standart_unq[standart_unq > 0].mean()
+        standard_unq = get_ind_mat_average_uniqueness(ind_mat[:, standard_indx])
+        standard_unq_mean = standard_unq[standard_unq > 0].mean()
 
         sequential_unq = get_ind_mat_average_uniqueness(ind_mat[:, phi])
         sequential_unq_mean = sequential_unq[sequential_unq > 0].mean()
