@@ -49,7 +49,7 @@ class TestETFTrick(unittest.TestCase):
                                                            'futures_3'))
 
         res = get_futures_roll_series(combined_df, 'open', 'close', 'current_futures', 'current_futures')
-        combined_df.loc[res.index, 'roll_gap'] = combined_df.close.values - res.values
+        combined_df.loc[res.index, 'roll_gap'] = res.values
         combined_df['open_diff_close'] = combined_df.open - combined_df.close
 
         # Test number of gaps (should be 2 => number of unique gaps should be 3 (0 added)
@@ -59,4 +59,6 @@ class TestETFTrick(unittest.TestCase):
                                                roll_backward=True)
 
         # Test difference between backward and forward roll equal latest cumulative gap
-        self.assertTrue(np.all(res_backward - res == 33.75))
+        self.assertTrue(np.all(res.iloc[-1] == 33.75))
+        self.assertTrue(np.all(res_backward.iloc[0] == -33.75))
+        self.assertTrue(np.all(res.unique() == [0, 26.75, 33.75]))

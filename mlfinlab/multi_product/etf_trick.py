@@ -378,4 +378,4 @@ def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_c
     if roll_backward:
         gaps -= gaps.iloc[-1]  # Roll backward
 
-    return data_df[close_col] - gaps
+    return gaps

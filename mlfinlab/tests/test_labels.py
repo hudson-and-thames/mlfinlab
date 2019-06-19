@@ -2,8 +2,9 @@
 Test various functions regarding chapter 3: Labels.
 """
 
-import unittest
 import os
+import unittest
+
 import numpy as np
 import pandas as pd
 
@@ -53,6 +54,32 @@ class TestChapter3(unittest.TestCase):
             # For each row assert the time delta is correct
             for start_date, end_date in vertical_barriers.iteritems():
                 self.assertTrue((end_date - start_date).days >= 1)
+
+        # Check hourly barriers
+        for hours in [1, 2, 3, 4, 5]:
+            vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], num_hours=hours)
+
+            # For each row assert the time delta is correct
+            for start_date, end_date in vertical_barriers.iteritems():
+                self.assertTrue((end_date - start_date).seconds >= 3600)
+
+        # Check minute barriers
+        for minutes in [1, 2, 3, 4, 5]:
+            vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'],
+                                                     num_minutes=minutes)
+
+            # For each row assert the time delta is correct
+            for start_date, end_date in vertical_barriers.iteritems():
+                self.assertTrue((end_date - start_date).seconds >= 60)
+
+        # Check seconds barriers
+        for seconds in [1, 2, 3, 4, 5]:
+            vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'],
+                                                     num_seconds=seconds)
+
+            # For each row assert the time delta is correct
+            for start_date, end_date in vertical_barriers.iteritems():
+                self.assertTrue((end_date - start_date).seconds >= 1)
 
     def test_triple_barrier_events(self):
         """
