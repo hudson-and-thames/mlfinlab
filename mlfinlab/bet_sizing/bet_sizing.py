@@ -9,9 +9,6 @@ based on bet sizing approaches described in Chapter 10.
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
-from mlfinlab.bet_sizing.ef3m import M2N
-from mlfinlab.bet_sizing.ch10_snippets import (get_signal, avg_active_signals,
-    discrete_signal)
 
 
 def bet_size_probability(events, prob, pred, num_classes, step_size=0.0,
@@ -30,15 +27,8 @@ def bet_size_probability(events, prob, pred, num_classes, step_size=0.0,
         multiprocessing, default value is 1.
     :return: (pandas.Series) The bet size.
     """
-    signal_0 = get_signal(events, prob, pred, num_classes)
-    df_0 = signal_0.to_frame('signal').join(events['t1'], how='left')
-
-    if average_active:
-        df_0 = avg_active_signals(df_0, num_threads)
-    if step_size > 0:
-        df_0 = discrete_signal(signal0=df_0, step_size=step_size)
     
-    return df_0
+    return events
 
 
 def bet_size_dynamic(data, market_price, forecast_price, func='sigmoid'):
@@ -54,6 +44,7 @@ def bet_size_dynamic(data, market_price, forecast_price, func='sigmoid'):
         'power'
     :return: (pandas.DataFrame) with the added bet size column
     """
+
     return data
 
 
@@ -72,4 +63,5 @@ def bet_size_budget(data, ts, t_end, mixed_gaussian=False):
     bet size (p. 142)
     :return: (pandas.DataFrame) with the added bet size column
     """
+
     return data
