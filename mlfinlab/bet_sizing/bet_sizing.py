@@ -9,74 +9,36 @@ based on bet sizing approaches described in Chapter 10.
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
-from ef3m import M2N
+from mlfinlab.bet_sizing.ef3m import M2N
+from mlfinlab.bet_sizing.ch10_snippets import (get_signal, avg_active_signals,
+    discrete_signal)
 
 
-def get_bet_size(data, ts=None, t_end=None, p=None, algorithm=None,
-    mixed_gaussian=False, discretize=0.0, average_active=False,
-    func='sigmoid', forecast_price=None, market_price=None):
-    """
-    Returns a DataFrame with an added column for bet size.
-
-    :param data: (pandas.DataFrame) containing data for bet sizing
-    :param ts: (string) column name of timestamp, 'index' uses the
-    index of the DataFrame
-    :param p: (string) column name of bet side probability from prediction
-    :param algorithm: (string) algorithm to use for finding bet size, valid
-    options are:
-        'probability' - determine bet size based on bet side probability (p. 142)
-        'dynamic' - dynamic calculation of bet size (p. 145)
-        'budget' - based on the number of concurrent long and short bets (p. 142)
-    :param mixed_gaussian: (bool) when using algorithm 'budget', setting this
-    option will use a mixture of two Gaussian distribution to calculate the
-    bet size (p. 142)
-    :param discretize: (float) when using algorithm 'probability', this option
-    will determine the step size, between 0 and 1, to discretize the bet
-    size. Default value is 0.0 which will result in a continuous 
-    bet size (no discretization)
-    :param average_active: (bool) when using algorithm 'probability', setting
-    this option will average the size of all active bets
-    :param func: (string) function to use for dynamic calculation. Valid
-    options are:
-        'sigmoid'
-        'power'
-    :return: (pandas.DataFrame) with the added bet size column
-    """
-    if algorithm == 'probability':
-        # check for necessary options to execute 'probability' algorithm
-        # return bet_size calculated using predicted probability
-        data = bet_size_probability(data, p, discretize, average_active)
-    
-    elif algorithm == 'dynamic':
-        # check for necessary options to execute 'dynamic' algorithm
-        # return dynamic bet sizes
-        data = bet_size_dynamic(data, market_price, forecast_price, func)
-    
-    elif algorithm == 'budget':
-        # check for necessary options to execute 'budget' algorithm
-        # return bet sizes based on budget calculations
-        data = bet_size_budget(data, ts, t_end, mixed_gaussian)
-    
-    else:
-        # handle case where there is no algorithm
-        raise ValueError("Argument 'algorithm' must have a valid value, "
-                          "can be one of: 'probability', 'dynamic', 'budget'")
-
-    return data
-
-
-def bet_size_probability(data, p, discretize=0.0, average_active=False):
+def bet_size_probability(events, prob, pred, num_classes, step_size=0.0,
+    average_active=False, num_threads=1):
     """
     Calculates the bet size using the predicted probability.
 
-    :param data: (pandas.DataFrame) containing data for bet sizing
-    :param p: (string) the column name of the predicted probability
-    :param discretize: (float) the step size at which the bet size is 
-    discretized, default is 0.0 which imposes no discretization
-    :param average_active: (bool) option to average the size of active bets
-    :return: (pandas.DataFrame) with the added bet size column
+    :param events: (pandas.DataFrame)
+    :param prob: (pandas.Series) The predicted probabiility.
+    :param pred: (pandas.Series)
+    :param num_classes: (int)
+    :param step_size: (float) The step size at which the bet size is 
+        discretized, default is 0.0 which imposes no discretization.
+    :param average_active: (bool) Option to average the size of active bets.
+    :param num_threads: (int) The number of processing threads to utilize for
+        multiprocessing, default value is 1.
+    :return: (pandas.Series) The bet size.
     """
-    return data
+    signal_0 = get_signal(events, prob, pred, num_classes)
+    df_0 = signal_0.to_frame('signal').join(events['t1'], how='left')
+
+    if average_active:
+        df_0 = avg_active_signals(df_0, num_threads)
+    if step_size > 0:
+        df_0 = discrete_signal(signal0=df_0, step_size=step_size)
+    
+    return df_0
 
 
 def bet_size_dynamic(data, market_price, forecast_price, func='sigmoid'):
@@ -93,6 +55,7 @@ def bet_size_dynamic(data, market_price, forecast_price, func='sigmoid'):
     :return: (pandas.DataFrame) with the added bet size column
     """
     return data
+
 
 def bet_size_budget(data, ts, t_end, mixed_gaussian=False):
     """
