@@ -1,1 +1,4 @@
 .idea/*
+__pycache__
+test_reports
+.coverage
