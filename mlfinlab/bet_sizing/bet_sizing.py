@@ -17,28 +17,32 @@ from mlfinlab.bet_sizing.ch10_snippets import (get_signal, avg_active_signals,
 def bet_size_probability(events, prob, pred, num_classes, step_size=0.0,
     average_active=False, num_threads=1):
     """
-    Calculates the bet size using the predicted probability.
+    Calculates the bet size using the predicted probability. Note that if
+    'average_active' is True, the returned pandas.Series will be twice
+    the length of the orginal since the average is calculated at each
+    bet's open and close.
 
-    :param events: (pandas.DataFrame)
     :param prob: (pandas.Series) The predicted probabiility.
-    :param pred: (pandas.Series)
-    :param num_classes: (int)
+    :param pred: (pd.Series) The predicted bet side. 
+    :param num_classes: (int) The number of predicted bet sides.
     :param step_size: (float) The step size at which the bet size is 
         discretized, default is 0.0 which imposes no discretization.
     :param average_active: (bool) Option to average the size of active bets.
     :param num_threads: (int) The number of processing threads to utilize for
         multiprocessing, default value is 1.
-    :return: (pandas.Series) The bet size.
+    :return: (pandas.Series) The bet size, with the time index.
     """
-    signal_0 = get_signal(events, prob, pred, num_classes)
+    signal_0 = get_signal(prob, pred, num_classes)
     df_0 = signal_0.to_frame('signal').join(events['t1'], how='left')
 
     if average_active:
-        df_0 = avg_active_signals(df_0, num_threads)
+        ser_0 = avg_active_signals(df_0, num_threads)
+    else:
+        ser_0 = df_0.signal
     if step_size > 0:
-        df_0 = discrete_signal(signal0=df_0, step_size=step_size)
+        ser_0 = discrete_signal(signal0=ser_0, step_size=step_size)
     
-    return df_0
+    return ser_0
 
 
 def bet_size_dynamic(data, market_price, forecast_price, func='sigmoid'):

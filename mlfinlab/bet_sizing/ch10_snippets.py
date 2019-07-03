@@ -15,15 +15,18 @@ from scipy.stats import norm
 from mlfinlab.util.multiprocess import mp_pandas_obj
 
 
-def get_signal(events, prob, pred, num_classes):
+def get_signal(prob, pred, num_classes):
     """
     SNIPPET 10.1 - FROM PROBABILITIES TO BET SIZE
-    
-    :param events: (pandas.DataFrame)
-    :param prob: (???)
-    :param pred: (???)
-    :param num_classes: (int)
-    :return: (pd.Series)
+    Calculates the given size of the bet given the side and the
+    probability (i.e. confidence) of the prediction. In this
+    representation, the probability will always be between
+    1/num_classes and 1.0.
+
+    :param prob: (pd.Series) The probability of the predicted bet side.
+    :param pred: (pd.Series) The predicted bet side. 
+    :param num_classes: (int) The number of predicted bet sides.
+    :return: (pd.Series) The bet size.
     """
     # get signals from predictions
     if prob.shape[0] == 0:
@@ -31,11 +34,13 @@ def get_signal(events, prob, pred, num_classes):
     # 1) generate signals from multinomial classification (one-vs-rest)
     signal0 = (prob - 1/num_classes) / (prob * (1 - prob))**0.5
     signal0 = pred * (2 * norm.cdf(signal0) - 1)  # signal = side * size
-
-    if 'side' in events:
-        signal0 *= events.loc[signal0.index, 'side']  # meta-labeling
     
-    # Note: In the book, this function includes the averaging and
+    # Note 1: In the book, this function contains a conditional
+    # statment checking for a column named 'side', then executes
+    # what is essentially the above line. This has been removed
+    # as it appears to be redundant and simplifies the function.
+
+    # Note 2: In the book, this function includes the averaging and
     # discretization steps, which are omitted here. The functions
     # for performing these are included in this file, and can be
     # applied as options in the user-level functions in bet_sizing.py.
@@ -67,7 +72,6 @@ def avg_active_signals(signals, num_threads=1):
 def mp_avg_active_signals(signals, molecule):
     """
     Part of SNIPPET 10.2
-
     A function to be passed to the 'mp_pandas_obj' function to allow the
     bet sizes to be averaged using multiprocessing.
 
@@ -98,7 +102,6 @@ def mp_avg_active_signals(signals, molecule):
 def discrete_signal(signal0, step_size):
     """
     SNIPPET 10.3 - SIZE DISCRETIZATION TO PREVENT OVERTRADING
-
     Discretizes the bet size signal based on the step size given.
 
     :param signal0: (pandas.Series)
