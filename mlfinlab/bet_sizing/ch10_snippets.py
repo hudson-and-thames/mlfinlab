@@ -9,13 +9,12 @@ originally used, but is otherwise unaltered.
 
 
 # imports
-import numpy as np
 import pandas as pd
 from scipy.stats import norm
 from mlfinlab.util.multiprocess import mp_pandas_obj
 
 
-def get_signal(prob, pred, num_classes):
+def get_signal(prob, num_classes, pred=None):
     """
     SNIPPET 10.1 - FROM PROBABILITIES TO BET SIZE
     Calculates the given size of the bet given the side and the
@@ -24,8 +23,10 @@ def get_signal(prob, pred, num_classes):
     1/num_classes and 1.0.
 
     :param prob: (pd.Series) The probability of the predicted bet side.
-    :param pred: (pd.Series) The predicted bet side. 
     :param num_classes: (int) The number of predicted bet sides.
+    :param pred: (pd.Series) The predicted bet side. Default value is None
+        which will return a relative bet size (i.e. without multiplying
+        by the side).
     :return: (pd.Series) The bet size.
     """
     # get signals from predictions
@@ -33,8 +34,15 @@ def get_signal(prob, pred, num_classes):
         return pd.Series()
     # 1) generate signals from multinomial classification (one-vs-rest)
     signal0 = (prob - 1/num_classes) / (prob * (1 - prob))**0.5
-    signal0 = pred * (2 * norm.cdf(signal0) - 1)  # signal = side * size
-    
+
+    # allow for bet size to be returned with or without side
+    if not isinstance(pred, type(None)):
+        # signal = side * size
+        signal0 = pred * (2 * norm.cdf(signal0) - 1)
+    else:
+        # signal = size only
+        signal0 = signal0.apply(lambda s: 2 * norm.cdf(s) - 1)
+
     # Note 1: In the book, this function contains a conditional
     # statment checking for a column named 'side', then executes
     # what is essentially the above line. This has been removed
@@ -53,8 +61,11 @@ def avg_active_signals(signals, num_threads=1):
     SNIPPET 10.2 - BETS ARE AVERAGED AS LONG AS THEY ARE STILL ACTIVE
     Function averages the bet sizes of all concurrently active bets.
     This function makes use of multiprocessing.
-    
-    :param signals: (pandas.Series) The bet sizes.
+
+    :param signals: (pandas.DataFrame) Contains at least the following
+        columns:
+            'signal' - the bet size
+            't1' - the closing time of the bet
     :param num_threads: (int) Number of threads to use in multiprocessing,
         default value is 1.
     :return: (pandas.Series) The averaged bet sizes.
@@ -81,16 +92,20 @@ def mp_avg_active_signals(signals, molecule):
         b) loc is before the signal's end time, or end time is still
             unknown (NaT).
 
-    :param signals: (list)
-    :param molecule: 
-    :return: (pandas.DataFrame)
+    :param signals: (pandas.DataFrame) Contains at least the following
+        columns:
+            'signal' - the bet size
+            't1' - the closing time of the bet
+    :param molecule: (list) Indivisible tasks to be passed to 'mp_pandas_obj',
+        in this case a list of datetimes.
+    :return: (pandas.Series) The averaged bet size sub-series.
     """
     out = pd.Series()
     for loc in molecule:
         df0 = (signals.index.to_numpy() <= loc)&\
             ((loc < signals['t1'])|pd.isnull(signals['t1']))
         act = signals[df0].index
-        if len(act) > 0:
+        if act.size > 0:
             # average active signals
             out[loc] = signals.loc[act, 'signal'].mean()
         else:
@@ -104,11 +119,11 @@ def discrete_signal(signal0, step_size):
     SNIPPET 10.3 - SIZE DISCRETIZATION TO PREVENT OVERTRADING
     Discretizes the bet size signal based on the step size given.
 
-    :param signal0: (pandas.Series)
-    :param step_size: (float) Step size between (0, 1].
-    :return: (pandas.Series)
+    :param signal0: (pandas.Series) The signal to discretize.
+    :param step_size: (float) Step size.
+    :return: (pandas.Series) The discretized signal.
     """
-    signal1 = (signal0 / step_size).round()*step_size
-    signal1[signal1>1] = 1  # cap
-    signal1[signal1<-1] = -1  # floor
+    signal1 = (signal0 / step_size).round() * step_size
+    signal1[signal1 > 1] = 1  # cap
+    signal1[signal1 < -1] = -1  # floor
     return signal1
