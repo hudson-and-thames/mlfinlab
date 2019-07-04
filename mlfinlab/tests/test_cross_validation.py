@@ -138,11 +138,8 @@ class TestCrossValidation(unittest.TestCase):  # pragma: no cover
             PurgedKFold(n_splits=3, info_sets=infosets, pct_embargo=0.)
         except ValueError:
             pass
-        except Exception as e:
-            self.fail(f"Unexpected exception raised: {e}")
         else:
             self.fail("ValueError not raised")
-        self.assertTrue(True)
 
     def test_purgedkfold_02(self):
         """
@@ -168,11 +165,8 @@ class TestCrossValidation(unittest.TestCase):  # pragma: no cover
                 pass
         except ValueError:
             pass
-        except Exception as e:
-            self.fail(f"Unexpected exception raised: {e}")
         else:
             self.fail("ValueError not raised")
-        self.assertTrue(True)
 
     def test_purgedkfold_1(self):
         """
