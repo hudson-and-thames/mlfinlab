@@ -11,7 +11,7 @@ from mlfinlab.cross_validation.cross_validation import \
     PurgedKFold
 
 
-class TestCrossValidation(unittest.TestCase):  # pragma: no cover
+class TestCrossValidation(unittest.TestCase):
     """
     Test the functionality of the time series cross validation technique
     """
