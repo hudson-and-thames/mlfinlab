@@ -129,7 +129,7 @@ def bet_size_sigmoid(w, x):
     :param x: (float) Price divergence, forecast price - market price.
     :return: (float) The bet size.
     """
-    return x * (w + x**2)**(-0.5)
+    return x * ((w + x**2)**(-0.5))
 
 def get_t_pos_sigmoid(w, f, m_p, max_pos):
     """
@@ -172,8 +172,9 @@ def limit_price_sigmoid(t_pos, pos, f, w, max_pos):
     sgn = np.sign(t_pos-pos)
     l_p = 0
     for j in range(abs(pos+sgn), abs(t_pos+1)):
+        #print(j, inv_price_sigmoid(f, w, j/float(max_pos)))
         l_p += inv_price_sigmoid(f, w, j/float(max_pos))
-    l_p = l_p / (t_pos-pos)
+    l_p = l_p / abs(t_pos-pos)
     return l_p
 
 def get_w_sigmoid(x, m):
@@ -187,7 +188,7 @@ def get_w_sigmoid(x, m):
     :return: (float) Inverse of bet size with respect to the
         regulating coefficient.
     """
-    return (x**2) * ((m**-2) - 1)
+    return (x**2) * ((m**(-2)) - 1)
 
 # ==============================================================================
 # Bet size calculations based on a power function.
@@ -201,8 +202,11 @@ def bet_size_power(w, x):
     :param x: (float) Price divergence, f - m_p
     :return: (float) The bet size.
     """
-    sgn = np.sign(x)
-    return sgn * abs(x)**w
+    if x == 0.0:
+        return 0.0
+    else:
+        sgn = np.sign(x)
+        return sgn * abs(x)**w
 
 def get_t_pos_power(w, f, m_p, max_pos):
     """
@@ -230,8 +234,10 @@ def inv_price_power(f, w, m):
     :param max_pos: (float) Maximum absolute position size.
     :return: (float) Limit price.
     """
-    sgn = np.sign(m)
-    return f - sgn*abs(m)**(1/w)
+    if m == 0.0:
+        return f
+    else:
+        return f - np.sign(m) * abs(m)**(1/w)
 
 def limit_price_power(t_pos, pos, f, w, max_pos):
     """
@@ -247,8 +253,9 @@ def limit_price_power(t_pos, pos, f, w, max_pos):
     sgn = np.sign(t_pos-pos)
     l_p = 0
     for j in range(abs(pos+sgn), abs(t_pos+1)):
+        #print(j, f, w, j/float(max_pos), inv_price_power(f, w, j/float(max_pos)))
         l_p += inv_price_power(f, w, j/float(max_pos))
-    l_p = l_p / (t_pos-pos)
+    l_p = l_p / abs(t_pos-pos)
     return l_p
 
 def get_w_power(x, m):
@@ -262,7 +269,10 @@ def get_w_power(x, m):
     :return: (float) Inverse of bet size with respect to the
         regulating coefficient.
     """
-    return np.log(abs(m)) / np.log(abs(x))
+    if x >= 0:
+        return np.sign(x) * (np.log(abs(m)) / np.log(abs(x)))
+    else:
+        return np.log(abs(m)) / np.log(abs(x))
 
 # ==============================================================================
 # Bet size calculation functions, power and sigmoid packaged together
@@ -340,7 +350,6 @@ def limit_price(t_pos, pos, f, w, max_pos, func):
     :return: (float) Inverse of bet size with respect to the
         regulating coefficient.
     """
-    print(t_pos, pos, f, w, max_pos, func)
     if func == 'sigmoid':
         return limit_price_sigmoid(t_pos, pos, f, w, max_pos)
     elif func == 'power':
