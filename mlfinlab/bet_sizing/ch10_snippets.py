@@ -140,8 +140,8 @@ def get_t_pos_sigmoid(w, f, m_p, max_pos):
     :param w: (float) Coefficient regulating the width of the bet size function.
     :param f: (float) Forecast price.
     :param m_p: (float) Market price.
-    :param max_pos: (float) Maximum absolute position size.
-    :return: (float) Target position.
+    :param max_pos: (int) Maximum absolute position size.
+    :return: (int) Target position.
     """
     return int(bet_size_sigmoid(w, f-m_p) * max_pos)
 
@@ -162,20 +162,24 @@ def limit_price_sigmoid(t_pos, pos, f, w, max_pos):
     Part of SNIPPET 10.4
     Calculates the limit price.
 
-    :param t_pos: (float) Target position.
-    :param pos: (float) Current position.
+    :param t_pos: (int) Target position.
+    :param pos: (int) Current position.
     :param f: (float) Forecast price.
     :param w: (float) Coefficient regulating the width of the bet size function.
-    :param max_pos: (float) Maximum absolute position size.
+    :param max_pos: (int) Maximum absolute position size.
     :return: (float) Limit price.
     """
-    sgn = np.sign(t_pos-pos)
-    l_p = 0
-    for j in range(abs(pos+sgn), abs(t_pos+1)):
-        #print(j, inv_price_sigmoid(f, w, j/float(max_pos)))
-        l_p += inv_price_sigmoid(f, w, j/float(max_pos))
-    l_p = l_p / abs(t_pos-pos)
-    return l_p
+    if t_pos == pos:
+        # return NaN is the current and target positions are the same
+        # to avoid divide-by-zero error
+        return np.nan
+    else:
+        sgn = np.sign(t_pos-pos)
+        l_p = 0
+        for j in range(abs(pos+sgn), abs(t_pos+1)):
+            l_p += inv_price_sigmoid(f, w, j/float(max_pos))
+        l_p = l_p / abs(t_pos-pos)
+        return l_p
 
 def get_w_sigmoid(x, m):
     """
@@ -208,7 +212,7 @@ def bet_size(w, x, func):
     if func == 'sigmoid':
         return bet_size_sigmoid(w, x)
     else:
-        raise ValueError("Argument 'func' must be one of: 'sigmoid', 'power'")
+        raise ValueError("Argument 'func' must be one of: 'sigmoid'")
 
 def get_t_pos(w, f, m_p, max_pos, func):
     """
@@ -219,36 +223,17 @@ def get_t_pos(w, f, m_p, max_pos, func):
     :param w: (float) Coefficient regulating the width of the bet size function.
     :param f: (float) Forecast price.
     :param m_p: (float) Market price.
-    :param max_pos: (float) Maximum absolute position size.
+    :param max_pos: (int) Maximum absolute position size.
     :param func: (string) Function to use for dynamic calculation. Valid
         options are: 'sigmoid'.
-    :return: (float) Target position.
+    :return: (int) Target position.
     """
     if func == 'sigmoid':
         return get_t_pos_sigmoid(w, f, m_p, max_pos)
     else:
-        raise ValueError("Argument 'func' must be one of: 'sigmoid', 'power'")
+        raise ValueError("Argument 'func' must be one of: 'sigmoid'")
 
 def inv_price(f, w, m, func):
-    """
-    Derived from SNIPPET 10.4
-    Calculates the limit price.
-
-    :param t_pos: (float) Target position.
-    :param pos: (float) Current position.
-    :param f: (float) Forecast price.
-    :param w: (float) Coefficient regulating the width of the bet size function.
-    :param max_pos: (float) Maximum absolute position size.
-    :param func: (string) Function to use for dynamic calculation. Valid
-        options are: 'sigmoid'.
-    :return: (float) Limit price.
-    """
-    if func == 'sigmoid':
-        return inv_price_sigmoid(f, w, m)
-    else:
-        raise ValueError("Argument 'func' must be one of: 'sigmoid', 'power'")
-
-def limit_price(t_pos, pos, f, w, max_pos, func):
     """
     Derived from SNIPPET 10.4
     Calculates the inverse of the bet size with respect to the
@@ -262,9 +247,28 @@ def limit_price(t_pos, pos, f, w, max_pos, func):
         regulating coefficient.
     """
     if func == 'sigmoid':
-        return limit_price_sigmoid(t_pos, pos, f, w, max_pos)
+        return inv_price_sigmoid(f, w, m)
     else:
         raise ValueError("Argument 'func' must be one of: 'sigmoid', 'power'")
+
+def limit_price(t_pos, pos, f, w, max_pos, func):
+    """
+    Derived from SNIPPET 10.4
+    Calculates the limit price.
+
+    :param t_pos: (int) Target position.
+    :param pos: (int) Current position.
+    :param f: (float) Forecast price.
+    :param w: (float) Coefficient regulating the width of the bet size function.
+    :param max_pos: (int) Maximum absolute position size.
+    :param func: (string) Function to use for dynamic calculation. Valid
+        options are: 'sigmoid'.
+    :return: (float) Limit price.
+    """
+    if func == 'sigmoid':
+        return limit_price_sigmoid(int(t_pos), int(pos), f, w, max_pos)
+    else:
+        raise ValueError("Argument 'func' must be one of: 'sigmoid'")
 
 def get_w(x, m, func):
     """
@@ -283,3 +287,5 @@ def get_w(x, m, func):
         return get_w_sigmoid(x, m)
     else:
         raise ValueError("Argument 'func' must be one of: 'sigmoid', 'power'")
+
+        raise ValueError("Argument 'func' must be one of: 'sigmoid'")
