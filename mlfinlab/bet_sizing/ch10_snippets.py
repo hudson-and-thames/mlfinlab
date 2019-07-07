@@ -191,91 +191,8 @@ def get_w_sigmoid(x, m):
     return (x**2) * ((m**(-2)) - 1)
 
 # ==============================================================================
-# Bet size calculations based on a power function.
-def bet_size_power(w, x):
-    """
-    Derived from SNIPPET 10.4
-    Calculates the bet size from the price divergence and
-    a regulating coefficient.
-
-    :param w: (float) Coefficient regulating the width of the bet size function.
-    :param x: (float) Price divergence, f - m_p
-    :return: (float) The bet size.
-    """
-    if x == 0.0:
-        return 0.0
-    else:
-        sgn = np.sign(x)
-        return sgn * abs(x)**w
-
-def get_t_pos_power(w, f, m_p, max_pos):
-    """
-    Derived from SNIPPET 10.4
-    Calculates the target position given the forecast price, market price,
-    maximum position size, and a regulating coefficient.
-
-    :param w: (float) Coefficient regulating the width of the bet size function.
-    :param f: (float) Forecast price.
-    :param m_p: (float) Market price.
-    :param max_pos: (float) Maximum absolute position size.
-    :return: (float) Target position.
-    """
-    return int(bet_size_power(w, f-m_p) * max_pos)
-
-def inv_price_power(f, w, m):
-    """
-    Derived from SNIPPET 10.4
-    Calculates the limit price.
-
-    :param t_pos: (float) Target position.
-    :param pos: (float) Current position.
-    :param f: (float) Forecast price.
-    :param w: (float) Coefficient regulating the width of the bet size function.
-    :param max_pos: (float) Maximum absolute position size.
-    :return: (float) Limit price.
-    """
-    if m == 0.0:
-        return f
-    else:
-        return f - np.sign(m) * abs(m)**(1/w)
-
-def limit_price_power(t_pos, pos, f, w, max_pos):
-    """
-    Derived from SNIPPET 10.4
-    Calculates the inverse of the bet size with respect to the
-    regulating coefficient 'w'.
-
-    :param x: (float) Price divergence, forecast price - market price.
-    :param m: (float) Bet size.
-    :return: (float) Inverse of bet size with respect to the
-        regulating coefficient.
-    """
-    sgn = np.sign(t_pos-pos)
-    l_p = 0
-    for j in range(abs(pos+sgn), abs(t_pos+1)):
-        #print(j, f, w, j/float(max_pos), inv_price_power(f, w, j/float(max_pos)))
-        l_p += inv_price_power(f, w, j/float(max_pos))
-    l_p = l_p / abs(t_pos-pos)
-    return l_p
-
-def get_w_power(x, m):
-    """
-    Derived from SNIPPET 10.4
-    Calculates the inverse of the bet size with respect to the
-    regulating coefficient 'w'.
-
-    :param x: (float) Price divergence, forecast price - market price.
-    :param m: (float) Bet size.
-    :return: (float) Inverse of bet size with respect to the
-        regulating coefficient.
-    """
-    if x >= 0:
-        return np.sign(x) * (np.log(abs(m)) / np.log(abs(x)))
-    else:
-        return np.log(abs(m)) / np.log(abs(x))
-
-# ==============================================================================
-# Bet size calculation functions, power and sigmoid packaged together
+# Bet size calculation functions, power and sigmoid packaged together.
+# This is useful as more bet sizing function options are added.
 def bet_size(w, x, func):
     """
     Derived from SNIPPET 10.4
@@ -285,13 +202,11 @@ def bet_size(w, x, func):
     :param w: (float) Coefficient regulating the width of the bet size function.
     :param x: (float) Price divergence, f - m_p
     :param func: (string) Function to use for dynamic calculation. Valid
-        options are: 'sigmoid', 'power'.
+        options are: 'sigmoid'.
     :return: (float) The bet size.
     """
     if func == 'sigmoid':
         return bet_size_sigmoid(w, x)
-    elif func == 'power':
-        return bet_size_power(w, x)
     else:
         raise ValueError("Argument 'func' must be one of: 'sigmoid', 'power'")
 
@@ -306,13 +221,11 @@ def get_t_pos(w, f, m_p, max_pos, func):
     :param m_p: (float) Market price.
     :param max_pos: (float) Maximum absolute position size.
     :param func: (string) Function to use for dynamic calculation. Valid
-        options are: 'sigmoid', 'power'.
+        options are: 'sigmoid'.
     :return: (float) Target position.
     """
     if func == 'sigmoid':
         return get_t_pos_sigmoid(w, f, m_p, max_pos)
-    elif func == 'power':
-        return get_t_pos_power(w, f, m_p, max_pos)
     else:
         raise ValueError("Argument 'func' must be one of: 'sigmoid', 'power'")
 
@@ -327,13 +240,11 @@ def inv_price(f, w, m, func):
     :param w: (float) Coefficient regulating the width of the bet size function.
     :param max_pos: (float) Maximum absolute position size.
     :param func: (string) Function to use for dynamic calculation. Valid
-        options are: 'sigmoid', 'power'.
+        options are: 'sigmoid'.
     :return: (float) Limit price.
     """
     if func == 'sigmoid':
         return inv_price_sigmoid(f, w, m)
-    elif func == 'power':
-        return inv_price_power(f, w, m)
     else:
         raise ValueError("Argument 'func' must be one of: 'sigmoid', 'power'")
 
@@ -346,14 +257,12 @@ def limit_price(t_pos, pos, f, w, max_pos, func):
     :param x: (float) Price divergence, forecast price - market price.
     :param m: (float) Bet size.
     :param func: (string) Function to use for dynamic calculation. Valid
-        options are: 'sigmoid', 'power'.
+        options are: 'sigmoid'.
     :return: (float) Inverse of bet size with respect to the
         regulating coefficient.
     """
     if func == 'sigmoid':
         return limit_price_sigmoid(t_pos, pos, f, w, max_pos)
-    elif func == 'power':
-        return limit_price_power(t_pos, pos, f, w, max_pos)
     else:
         raise ValueError("Argument 'func' must be one of: 'sigmoid', 'power'")
 
@@ -366,13 +275,11 @@ def get_w(x, m, func):
     :param x: (float) Price divergence, forecast price - market price.
     :param m: (float) Bet size.
     :param func: (string) Function to use for dynamic calculation. Valid
-        options are: 'sigmoid', 'power'.
+        options are: 'sigmoid'.
     :return: (float) Inverse of bet size with respect to the
         regulating coefficient.
     """
     if func == 'sigmoid':
         return get_w_sigmoid(x, m)
-    elif func == 'power':
-        return get_w_power(x, m)
     else:
         raise ValueError("Argument 'func' must be one of: 'sigmoid', 'power'")
