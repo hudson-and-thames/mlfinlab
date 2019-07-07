@@ -105,10 +105,8 @@ class BaseBars(ABC):
         :param test_batch: (DataFrame) the first row of the dataset.
         """
         assert test_batch.shape[1] == 3, 'Must have only 3 columns in csv: date_time, price, & volume.'
-        assert isinstance(test_batch.iloc[0, 1],
-                          float), 'price column in csv not float.'
-        assert isinstance(test_batch.iloc[0, 2],
-                          np.int64), 'volume column in csv not int.'
+        assert isinstance(test_batch.iloc[0, 1], float), 'price column in csv not float.'
+        assert not isinstance(test_batch.iloc[0, 2], str), 'volume column in csv not int or float.'
 
         try:
             pd.to_datetime(test_batch.iloc[0, 0])

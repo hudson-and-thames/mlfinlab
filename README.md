@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/hudson-and-thames/mlfinlab/blob/master/.github/logo/hudson_and_thames_logo.png" height="300"><br>
+  <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/.github/logo/hudson_and_thames_logo.png" height="300"><br>
 </div>
 
 -----------------
@@ -32,6 +32,11 @@ TickData does offer about 20 days worth of raw tick data which can be sourced fr
 For those of you interested in working with a two years of sample tick, volume, and dollar bars, it is provided for in the [research repo.](https://github.com/hudson-and-thames/research/tree/master/Sample-Data).
 
 You should be able to work on a few implementations of the code with this set. 
+
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/hudson-and-thames/research/master/Chapter3/readme_image.png" height="350"><br>
+</div>
 
 ---
 
@@ -91,10 +96,8 @@ On your local machine open the terminal and cd into the working dir.
 
 * **Ashutosh Singh** - [LinkedIn](https://www.linkedin.com/in/ashusinghpenn/)
 * **Jacques Joubert** - [LinkedIn](https://www.linkedin.com/in/jacquesjoubert/)
-
-## Core Contributors
-
 * **Oleksandr Proskurin** - [LinkedIn](https://www.linkedin.com/in/proskurinolexandr/)
+
 
 ## Additional Research Repo
 BlackArbsCEO has a great repo based on de Prado's research. It covers many of the questions at the back of every chapter and was the first source on Github to do so. It has also been a good source of inspiration for our research. 
