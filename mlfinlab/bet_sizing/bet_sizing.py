@@ -6,9 +6,7 @@ based on bet sizing approaches described in Chapter 10.
 
 
 # imports
-from mlfinlab.bet_sizing.ef3m import M2N
-from mlfinlab.bet_sizing.ch10_snippets import (get_signal, avg_active_signals,
-                                               discrete_signal)
+from mlfinlab.bet_sizing.ch10_snippets import get_signal, avg_active_signals, discrete_signal
 
 
 def bet_size_probability(events, prob, num_classes, pred=None, step_size=0.0,
@@ -43,37 +41,3 @@ def bet_size_probability(events, prob, num_classes, pred=None, step_size=0.0,
         ser_0 = discrete_signal(signal0=ser_0, step_size=step_size)
 
     return ser_0
-
-
-def bet_size_dynamic(data, market_price, forecast_price, func='sigmoid'):
-    """
-    Calculates the bet sizes as the market price and forecast price fluctuate.
-
-    :param data: (pandas.DataFrame) containing data for bet sizing
-    :param market_price: (string) column name of the market price
-    :param forecast_price: (string) column name of the forecast price
-    :param func: (string) function to use for dynamic calculation. Valid
-    options are:
-        'sigmoid'
-        'power'
-    :return: (pandas.DataFrame) with the added bet size column
-    """
-    return data
-
-
-def bet_size_budget(data, ts, t_end, mixed_gaussian=False):
-    """
-    Calculates the bet sizes based on a budgeting approach. Optionally
-    fits a mixture of 2 Gaussians to the distribution of the number of
-    concurrent long and short bets and uses the CDF of the mixture to
-    calculate bet size.
-
-    :param data: (pandas.DataFrame) containing data for bet sizing
-    :param ts: (string) column name of the timestamp, default 'index'
-    uses the index of the DataFrame
-    :param mixed_gaussian: (bool) when using algorithm 'budget', setting this
-    option will use a mixture of two Gaussian distribution to calculate the
-    bet size (p. 142)
-    :return: (pandas.DataFrame) with the added bet size column
-    """
-    return data

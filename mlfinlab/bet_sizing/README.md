@@ -5,5 +5,4 @@ This folder contains classes and functions for sizing bets based on a given inve
 
 ## Contents
 1. `__init__.py` - init file for the bet sizing module
-2. `ef3m.py` - Python file containing an implementation of the EF3M algorithm
-3. `bet_sizing.py` - Python file containing functions for bet sizing
+2. `bet_sizing.py` - Python file containing functions for bet sizing
