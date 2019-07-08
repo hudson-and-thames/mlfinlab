@@ -29,13 +29,13 @@ def get_signal(prob, num_classes, pred=None):
         by the side).
     :return: (pd.Series) The bet size.
     """
-    # get signals from predictions
+    # Get signals from predictions.
     if prob.shape[0] == 0:
         return pd.Series()
-    # 1) generate signals from multinomial classification (one-vs-rest)
+    # 1) Generate signals from multinomial classification (one-vs-rest).
     signal0 = (prob - 1/num_classes) / (prob * (1 - prob))**0.5
 
-    # allow for bet size to be returned with or without side
+    # Allow for bet size to be returned with or without side.
     if not isinstance(pred, type(None)):
         # signal = side * size
         signal0 = pred * (2 * norm.cdf(signal0) - 1)
@@ -70,7 +70,7 @@ def avg_active_signals(signals, num_threads=1):
         default value is 1.
     :return: (pandas.Series) The averaged bet sizes.
     """
-    # 1) time points where signals change (either one start or one ends)
+    # 1) Time points where signals change (either one start or one ends).
     t_pnts = set(signals['t1'].dropna().to_numpy())
     t_pnts = t_pnts.union(signals.index.to_numpy())
     t_pnts = list(t_pnts)
@@ -106,10 +106,10 @@ def mp_avg_active_signals(signals, molecule):
             ((loc < signals['t1'])|pd.isnull(signals['t1']))
         act = signals[df0].index
         if act.size > 0:
-            # average active signals
+            # Average active signals if they exist.
             out[loc] = signals.loc[act, 'signal'].mean()
         else:
-            # no signals active at this time
+            # Return zero if no signals are active at this time step.
             out[loc] = 0
     return out
 
