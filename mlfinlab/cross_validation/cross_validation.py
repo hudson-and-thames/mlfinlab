@@ -52,11 +52,10 @@ class PurgedKFold(KFold):
                 (X.index == self.info_sets.index).sum() != len(self.info_sets):
             raise ValueError('X and the `info_sets` series param must have the same index')
 
-        indices = np.arange(X.shape[0])
-        embargo = int(X.shape[0] * self.pct_embargo)
+        indices: np.ndarray = np.arange(X.shape[0])
+        embargo: int = int(X.shape[0] * self.pct_embargo)
 
-        test_ranges = [(i[0], i[-1] + 1)
-                       for i in np.array_split(np.arange(X.shape[0]), self.n_splits)]
+        test_ranges: [(int, int)] = [(ix[0], ix[-1] + 1) for ix in np.array_split(np.arange(X.shape[0]), self.n_splits)]
         for start_ix, end_ix in test_ranges:
             test_indices = indices[start_ix:end_ix]
 
