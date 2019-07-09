@@ -9,8 +9,7 @@ from mlfinlab.bet_sizing.ch10_snippets import get_signal, avg_active_signals, di
 import numpy as np
 import pandas as pd
 
-from mlfinlab.bet_sizing.ch10_snippets import (get_w, get_t_pos, limit_price,
-                                               bet_size)
+from mlfinlab.bet_sizing.ch10_snippets import get_w, get_t_pos, limit_price, bet_size
 
 def bet_size_probability(events, prob, num_classes, pred=None, step_size=0.0, average_active=False, num_threads=1):
     Calculates the bet size using the predicted probability. Note that if 'average_active' is True, the returned
