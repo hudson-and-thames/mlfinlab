@@ -43,7 +43,7 @@ def bet_size_dynamic(current_pos, max_pos, market_price, forecast_price,
     Calculates the bet sizes, target position, and limit price as the
     market price and forecast price fluctuate. The current position, maximum
     position, market price, and forecast price can be passed as separate
-    pandas.Series (with a commmon index), as individual numbers, or a 
+    pandas.Series (with a commmon index), as individual numbers, or a
     combination thereof. If any one of the afforementioned arguments is a
     pandas.Series, the other arguments will be broadcast to a pandas.Series
     of the same length and index.
@@ -59,11 +59,53 @@ def bet_size_dynamic(current_pos, max_pos, market_price, forecast_price,
     :return: (pandas.DataFrame) Bet size (bet_size), target position (t_pos),
         and limit price (l_p).
     """
-    # create a dictionary of bet size variables for handling
-    d_vars = {'current_pos': current_pos,
+    # Create a dictionary of bet size variables for easier handling.
+    d_vars = {'pos': current_pos,
               'max_pos': max_pos,
-              'market_price': market_price,
-              'forecast_price': forecast_price}
+              'm_p': market_price,
+              'f': forecast_price}
+    events_0 = confirm_and_cast_to_df(d_vars)
+
+    # Calibrate w.
+    w_param = get_w(cal_divergence, cal_bet_size, func)
+    # Compute the target bet position.
+    events_0['t_pos'] = events_0.apply(lambda x: get_t_pos(w_param,
+                                                           x.f,
+                                                           x.m_p,
+                                                           x.max_pos,
+                                                           func),
+                                       axis=1)
+    # Compute the break even limit price.
+    events_0['l_p'] = events_0.apply(lambda x: limit_price(x.t_pos,
+                                                           x.pos,
+                                                           x.f,
+                                                           w_param,
+                                                           x.max_pos,
+                                                           func),
+                                     axis=1)
+    # Compute the bet size.
+    events_0['bet_size'] = events_0.apply(lambda x: bet_size(w_param,
+                                                             x.f-x.m_p,
+                                                             func),
+                                          axis=1)
+
+    return events_0[['bet_size', 't_pos', 'l_p']]
+
+
+def confirm_and_cast_to_df(d_vars):
+    """
+    Accepts either pandas.Series (with a common index) or integer/float
+    values, casts all non-pandas.Series values to Series, and returns
+    a pandas.DataFrame for further calculations.
+    This is a helper function to the 'bet_size_dynamic' function.
+
+    :param d_vars: (dict) A dictionary where the values are either pandas.Series
+        or single int/float values. All pandas.Series passed are assumed to
+        have the same index. The keys of the dictionary will be used for
+        column names in the returned pandas.DataFrame.
+    :param events: (pandas.DataFrame) The values from the input dictionary in
+        pandas.DataFrame format, with dictionary keys as column names.
+    """
     any_series = False  # are any variables a pandas.Series?
     all_series = True  # are all variables a pandas.Series?
     ser_len = 0
@@ -73,11 +115,11 @@ def bet_size_dynamic(current_pos, max_pos, market_price, forecast_price,
         if isinstance(var, pd.Series):
             ser_len = var.size
             idx = var.index
-    # handle data types if there are no pandas.Series variables
+    # Handle data types if there are no pandas.Series variables.
     if not any_series:
         for k in d_vars:
             d_vars[k] = pd.Series(data=[d_vars[k]], index=[0])
-    # handle data types if some but not all variables are pandas.Series
+    # Handle data types if some but not all variables are pandas.Series.
     if any_series and not all_series:
         for k in d_vars:
             if not isinstance(d_vars[k], pd.Series):
@@ -85,23 +127,9 @@ def bet_size_dynamic(current_pos, max_pos, market_price, forecast_price,
                 d_vars[k] = pd.Series(data=np.array([d_vars[k] for i
                                                      in range(ser_len)]),
                                       index=idx)
-    # combine Series to DataFrame
-    df = pd.concat([d_vars['current_pos'], d_vars['max_pos'],
-                    d_vars['market_price'], d_vars['forecast_price']],
-                   axis=1)
-    df = df.rename(columns={0: 'pos',  # current position
-                            1: 'max_pos',  # maximum position
-                            2: 'm_p',  # market price
-                            3: 'f'})  # forecast price
-    # calibrate w
-    w = get_w(cal_divergence, cal_bet_size, func)
-    # compute target position
-    df['t_pos'] = df.apply(lambda x: get_t_pos(w, x.f, x.m_p, x.max_pos, func),
-                           axis=1)
-    # compute limit price
-    df['l_p'] = df.apply(lambda x: limit_price(x.t_pos, x.pos, x.f, w,
-                                               x.max_pos, func), axis=1)
-    # compute bet size
-    df['bet_size'] = df.apply(lambda x: bet_size(w, x.f-x.m_p, func), axis=1)
+    # Combine Series to form a DataFrame.
+    events = pd.concat([d_vars.values()], axis=1)
+    d_col_names = {i: k_i for i, k_i in enumerate(d_vars.keys())}
+    events = events.rename(columns=d_col_names)
 
-    return df[['bet_size', 't_pos', 'l_p']]
+    return events
