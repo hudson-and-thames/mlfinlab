@@ -31,13 +31,13 @@ def bet_size_probability(events, prob, num_classes, pred=None, step_size=0.0,
     :return: (pandas.Series) The bet size, with the time index.
     """
     signal_0 = get_signal(prob, num_classes, pred)
-    df_0 = signal_0.to_frame('signal').join(events['t1'], how='left')
+    events_0 = signal_0.to_frame('signal').join(events['t1'], how='left')
 
     if average_active:
-        ser_0 = avg_active_signals(df_0, num_threads)
+        signal_1 = avg_active_signals(events_0, num_threads)
     else:
-        ser_0 = df_0.signal
+        signal_1 = events_0.signal
     if step_size > 0:
-        ser_0 = discrete_signal(signal0=ser_0, step_size=step_size)
+        signal_1 = discrete_signal(signal0=signal_1, step_size=step_size)
 
-    return ser_0
+    return signal_1
