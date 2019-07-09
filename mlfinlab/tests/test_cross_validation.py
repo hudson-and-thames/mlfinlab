@@ -5,9 +5,12 @@ import unittest
 import os
 import pandas as pd
 import numpy as np
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import TimeSeriesSplit
 
 from mlfinlab.cross_validation.cross_validation import \
-    get_train_times, \
+    ml_get_train_times, \
+    ml_cross_val_score, \
     PurgedKFold
 
 
@@ -50,7 +53,6 @@ class TestCrossValidation(unittest.TestCase):
             index=pd.date_range(start='2019-01-01 00:00:00', periods=10, freq='T'),
             data=pd.date_range(start='2019-01-01 00:02:00', periods=10, freq='T'),
         )
-        self.log(self.infosets)
 
     def test_get_train_times_1(self):
         """
@@ -61,7 +63,7 @@ class TestCrossValidation(unittest.TestCase):
             data=pd.date_range(start='2019-01-01 00:02:00', periods=1, freq='T'),
         )
         self.log(f"test_times=\n{test_times}")
-        train_times_ret = get_train_times(self.infosets, test_times)
+        train_times_ret = ml_get_train_times(self.infosets, test_times)
         self.log(f"train_times_ret=\n{train_times_ret}")
 
         train_times_ok = pd.Series(
@@ -81,7 +83,7 @@ class TestCrossValidation(unittest.TestCase):
             data=pd.date_range(start='2019-01-01 00:11:00', periods=1, freq='T'),
         )
         self.log(f"test_times=\n{test_times}")
-        train_times_ret = get_train_times(self.infosets, test_times)
+        train_times_ret = ml_get_train_times(self.infosets, test_times)
         self.log(f"train_times_ret=\n{train_times_ret}")
 
         train_times_ok = pd.Series(
@@ -101,7 +103,7 @@ class TestCrossValidation(unittest.TestCase):
             data=pd.date_range(start='2019-01-01 00:08:00', periods=1, freq='T'),
         )
         self.log(f"test_times=\n{test_times}")
-        train_times_ret = get_train_times(self.infosets, test_times)
+        train_times_ret = ml_get_train_times(self.infosets, test_times)
         self.log(f"train_times_ret=\n{train_times_ret}")
 
         train_times_ok1 = pd.Series(
@@ -170,7 +172,7 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_purgedkfold_03_simple(self):
         """
-        Test PurgedKFold class using the get_train_times method. Get the test range from PurgedKFold
+        Test PurgedKFold class using the ml_get_train_times method. Get the test range from PurgedKFold
         and then make sure the train range is exactly the same using the two methods.
         This is the test with no embargo.
         :return:
@@ -201,7 +203,7 @@ class TestCrossValidation(unittest.TestCase):
             )
 
             self.log(f"test_times_gtt=\n{test_times_gtt}")
-            train_times_gtt = get_train_times(infosets, test_times_gtt)
+            train_times_gtt = ml_get_train_times(infosets, test_times_gtt)
             self.log(f"train_times_gtt=\n{train_times_gtt}")
             self.log("-" * 100)
 
@@ -241,7 +243,7 @@ class TestCrossValidation(unittest.TestCase):
             )
             self.log(f"test_times_gtt=\n{test_times_gtt}")
 
-            train_times_gtt = get_train_times(infosets, test_times_gtt)
+            train_times_gtt = ml_get_train_times(infosets, test_times_gtt)
 
             # if test set is at the beginning, drop pct_points_test records from beginning of train dataset
             if test_times_ret.index[0] == dataset.index[0]:
@@ -256,3 +258,141 @@ class TestCrossValidation(unittest.TestCase):
             self.log(f"train_times_gtt=\n{train_times_gtt}")
             self.log("-" * 100)
             self.assertTrue(train_times_ret.equals(train_times_gtt), "dataset don't match")
+
+    def _test_ml_cross_val_score__data(self):
+        """
+        Get data structures for next few tests
+        :return:
+        """
+        sample_size = 1000
+
+        infosets = pd.Series(
+            index=pd.date_range(start='2019-01-01 00:00:00', periods=sample_size, freq='T'),
+            data=pd.date_range(start='2019-01-01 00:02:00', periods=sample_size, freq='T'),
+        )
+
+        records = pd.DataFrame(
+            index=infosets.index,
+            data={
+                'even': np.arange(0, sample_size),
+                'odd': np.arange(1, sample_size+1)
+            },
+        )
+        labels = pd.Series(
+            index=infosets.index,
+            data=np.arange(0, sample_size)
+        )
+        labels[records['even'] % 2 == 0] = 1
+        labels[records['even'] % 2 != 0] = 0
+        self.log(f"y=\n{labels[:10]}")
+
+        random_state = np.random.RandomState(seed=12345)
+        sample_weights = pd.Series(
+            index=infosets.index,
+            data=random_state.random_sample(sample_size)
+        )
+
+        decision_tree = DecisionTreeClassifier(random_state=0)
+        return infosets, records, labels, sample_weights, decision_tree
+
+    def test_ml_cross_val_score_00_exception(self):
+        """
+        Test the ml_cross_val_score function with an artificial dataset
+        the case where we give it the wrong scoring method - jaccard_score
+        :return:
+        """
+        infosets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
+        try:
+            ml_cross_val_score(
+                classifier=decision_tree,
+                X=records,
+                y=labels,
+                sample_weight=sample_weights,
+                scoring='jaccard_score',
+                info_sets=infosets,
+                n_splits=3,
+                cv_gen=None,
+                pct_embargo=0.01
+            )
+        except ValueError:
+            pass
+        else:
+            self.fail("ValueError not raised")
+
+    def test_ml_cross_val_score_01_accuracy(self):
+        """
+        Test the ml_cross_val_score function with an artificial dataset
+        :return:
+        """
+        infosets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
+        scores = ml_cross_val_score(
+            classifier=decision_tree,
+            X=records,
+            y=labels,
+            sample_weight=sample_weights,
+            scoring='accuracy',
+            info_sets=infosets,
+            n_splits=3,
+            cv_gen=None,
+            pct_embargo=0.01
+        )
+        self.log(f"score1= {scores}")
+
+        should_be = np.array([0.5186980141893885, 0.4876916232189882, 0.4966185791847402])
+        self.assertTrue(
+            np.array_equal(scores, should_be),
+            # self.assertListEqual(scores.tolist(), should_be.tolist()),
+            "score lists don't match"
+        )
+
+    def test_ml_cross_val_score_02_neg_log_loss(self):
+        """
+        Test the ml_cross_val_score function with an artificial dataset
+        :return:
+        """
+        infosets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
+        scores = ml_cross_val_score(
+            classifier=decision_tree,
+            X=records,
+            y=labels,
+            sample_weight=sample_weights,
+            scoring='neg_log_loss',
+            info_sets=infosets,
+            n_splits=3,
+            cv_gen=None,
+            pct_embargo=0.01
+        )
+        self.log(f"scores= {scores}")
+
+        should_be = np.array([-16.623581666339184, -17.694504470879014, -17.386178334890698])
+        self.assertTrue(
+            np.array_equal(scores, should_be),
+            # self.assertListEqual(scores.tolist(), should_be.tolist()),
+            "score lists don't match"
+        )
+
+    def test_ml_cross_val_score_03_other_cv_gen(self):
+        """
+        Test the ml_cross_val_score function with an artificial dataset
+        :return:
+        """
+        infosets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
+        scores = ml_cross_val_score(
+            classifier=decision_tree,
+            X=records,
+            y=labels,
+            sample_weight=sample_weights,
+            scoring='neg_log_loss',
+            info_sets=infosets,
+            n_splits=3,
+            cv_gen=TimeSeriesSplit(max_train_size=None, n_splits=3),
+            pct_embargo=0.01
+        )
+        self.log(f"scores= {scores}")
+
+        should_be = np.array([-17.520701311460694, -18.25536255165772, -16.964650471071668])
+        self.assertTrue(
+            np.array_equal(scores, should_be),
+            # self.assertListEqual(scores.tolist(), should_be.tolist()),
+            "score lists don't match"
+        )
