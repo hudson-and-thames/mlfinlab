@@ -1,6 +1,6 @@
 """
 This module contains functionality for determining bet sizes for
-investments based on machine learning predicetions. These implementations are
+investments based on machine learning predictions. These implementations are
 based on bet sizing approaches described in Chapter 10.
 """
 
