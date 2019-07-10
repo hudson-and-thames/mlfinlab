@@ -106,7 +106,3 @@ class TestCh10Snippets(unittest.TestCase):
         """
         test_bet_discrete = discrete_signal(signal0=self.bet_size, step_size=0.1)
         self.assertEqual(self.bet_size_d.equals(test_bet_discrete), True)
-
-
-if __name__ == '__main__':
-    unittest.main()
