@@ -14,11 +14,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
 
 MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
-Advances in Financial Machine Learning. This implementation started out as a platform for which Ashutosh and
-Jacques could base their research project on for their [Masters in Financial Engineering at WorldQuant University](https://wqu.org/).
-
-As we were working through the book we saw the opportunity to code up the implementations as well answer the 
-questions at the back of every chapter. 
+Advances in Financial Machine Learning. This implementation started out as a spring board for a research project in the [Masters in Financial Engineering programme at WorldQuant University](https://wqu.org/) and has grown into a mini research group called Hudson and Thames (not affiliated with the university).
 
 ## Barriers to Entry
 As most of you know, getting through the first 3 chapters of the book is challenging as it relies on HFT data to 
@@ -41,14 +37,20 @@ You should be able to work on a few implementations of the code with this set.
 ---
 
 ## Notes
-* Added Chapter 5 code (Frac Diff)
-* Added Chapter 3 code (Labeling)
-* Added Imbalance and Run bars.
-* Added standard bar types (tick, volume, dollar). 
-* Works on BIG csv files 25Gigs and up.
+
+Part 3: Backtesting
+* Working on Chapter 10 (Lee)
+
+Part 2: Modelling
+* Working on Chapter 7 (Mihai)
+
+Part 1: Data Analysis
+* Done Chapter 5
+* Done Chapter 4
+* Done Chapter 3
+* Done Chapter 2
 * Purchased high quality raw tick data.
 * Email us if you would like a sample of the standard bars.
-* Next we are busy adding the code for the labeling. See [research repo](https://github.com/hudson-and-thames/research) for the Q&A work in progress for chapter 3.
 
 ---
 
@@ -105,7 +107,7 @@ BlackArbsCEO has a great repo based on de Prado's research. It covers many of th
 * [Adv Fin ML Exercises](https://github.com/BlackArbsCEO/Adv_Fin_ML_Exercises)
 
 ## Contact us
-At the moment the project is still rather small and thus I would recommend getting in touch with us over email so that we can further discuss the areas of contribution that interest you the most. As soon as we get to more than 4 maintainers we will switch over to a slack channel.
+At the moment the project is still rather small and thus I would recommend getting in touch with us over email so that we can further discuss the areas of contribution that interest you the most.
 
 For now you can get hold us at: hudsonthames19@gmail.com
 
