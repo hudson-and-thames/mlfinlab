@@ -5,3 +5,4 @@ pylint==2.3.0
 numpy==1.16.2
 xmlrunner==1.7.7
 numba==0.43.0
+scipy==1.2.1
