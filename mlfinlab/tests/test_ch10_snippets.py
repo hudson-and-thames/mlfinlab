@@ -38,12 +38,8 @@ class TestCh10Snippets(unittest.TestCase):
         shift_dt = np.array([dt.timedelta(days=d) for d in shift_list])
         dates_shifted = dates + shift_dt
 
-        # Define other function inputs for test use.
-        self.n_classes = 2
-        self.step_size = 0.1
-
         # Calculate the test statistic and bet size.
-        z_test = (prob_arr - 0.5) /  (prob_arr*(1-prob_arr))**0.5
+        z_test = (prob_arr - 0.5) / (prob_arr*(1-prob_arr))**0.5
         m_signal = side_arr * (2 * norm.cdf(z_test) - 1)
         m_discrete = np.array([max(-1, min(1, m_i))
                                for m_i in np.round(m_signal/0.1, 0)*0.1])
@@ -80,12 +76,12 @@ class TestCh10Snippets(unittest.TestCase):
         Tests calculating the bet size from probability.
         """
         # Test get_signal when supplying a value to argument 'pred'.
-        test_bet_size_1 = get_signal(prob=self.prob, num_classes=self.n_classes,
+        test_bet_size_1 = get_signal(prob=self.prob, num_classes=2,
                                      pred=self.side)
         self.assertEqual(self.bet_size.equals(test_bet_size_1), True)
 
         # Test get_signal when no value provided for 'pred'.
-        test_bet_size_2 = get_signal(prob=self.prob, num_classes=self.n_classes)
+        test_bet_size_2 = get_signal(prob=self.prob, num_classes=2)
         self.assertEqual(self.bet_size.abs().equals(test_bet_size_2), True)
 
     def test_avg_active_signals(self):
@@ -108,8 +104,9 @@ class TestCh10Snippets(unittest.TestCase):
         """
         Tests the discrete_signal function.
         """
-        test_bet_discrete = discrete_signal(self.bet_size, self.step_size)
+        test_bet_discrete = discrete_signal(signal0=self.bet_size, step_size=0.1)
         self.assertEqual(self.bet_size_d.equals(test_bet_discrete), True)
+
 
 if __name__ == '__main__':
     unittest.main()
