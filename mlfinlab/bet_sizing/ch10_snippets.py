@@ -52,10 +52,9 @@ def avg_active_signals(signals, num_threads=1):
     SNIPPET 10.2 - BETS ARE AVERAGED AS LONG AS THEY ARE STILL ACTIVE
     Function averages the bet sizes of all concurrently active bets. This function makes use of multiprocessing.
 
-    :param signals: (pandas.DataFrame) Contains at least the following
-        columns:
-            'signal' - the bet size
-            't1' - the closing time of the bet
+    :param signals: (pandas.DataFrame) Contains at least the following columns:
+        'signal' - the bet size
+        't1' - the closing time of the bet
     :param num_threads: (int) Number of threads to use in multiprocessing, default value is 1.
     :return: (pandas.Series) The averaged bet sizes.
     """
@@ -65,8 +64,7 @@ def avg_active_signals(signals, num_threads=1):
     t_pnts = t_pnts.union(signals.index.to_numpy())
     t_pnts = list(t_pnts)
     t_pnts.sort()
-    out = mp_pandas_obj(mp_avg_active_signals, ('molecule', t_pnts),
-                        num_threads, signals=signals)
+    out = mp_pandas_obj(mp_avg_active_signals, ('molecule', t_pnts), num_threads, signals=signals)
     return out
 
 
@@ -81,17 +79,15 @@ def mp_avg_active_signals(signals, molecule):
         b) loc is before the signal's end time, or end time is still
             unknown (NaT).
 
-    :param signals: (pandas.DataFrame) Contains at least the following
-        columns:
-            'signal' - the bet size
-            't1' - the closing time of the bet
+    :param signals: (pandas.DataFrame) Contains at least the following columns:
+        'signal' - the bet size
+        't1' - the closing time of the bet
     :param molecule: (list) Indivisible tasks to be passed to 'mp_pandas_obj', in this case a list of datetimes.
     :return: (pandas.Series) The averaged bet size sub-series.
     """
     out = pd.Series()
     for loc in molecule:
-        df0 = (signals.index.to_numpy() <= loc)&\
-            ((loc < signals['t1'])|pd.isnull(signals['t1']))
+        df0 = (signals.index.to_numpy() <= loc)&((loc < signals['t1'])|pd.isnull(signals['t1']))
         act = signals[df0].index
         if act.size > 0:
             # Average active signals if they exist.
