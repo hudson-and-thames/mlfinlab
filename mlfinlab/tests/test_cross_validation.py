@@ -8,10 +8,11 @@ import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import TimeSeriesSplit
 
-from mlfinlab.cross_validation.cross_validation import \
-    ml_get_train_times, \
-    ml_cross_val_score, \
+from mlfinlab.cross_validation.cross_validation import (
+    ml_get_train_times,
+    ml_cross_val_score,
     PurgedKFold
+)
 
 
 class TestCrossValidation(unittest.TestCase):

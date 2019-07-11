@@ -9,18 +9,25 @@ from sklearn.metrics import log_loss, accuracy_score
 from sklearn.model_selection import KFold
 
 
-def ml_get_train_times(info_sets: pd.Series, test_times: pd.Series) -> pd.Series:  # pragma: no cover
+def ml_get_train_times(info_sets: pd.Series, test_times: pd.Series) -> pd.Series:
+    # pylint: disable=invalid-name
     """
+    Snippet 7.1, page 106,  Purging observations in the training set
+
+    This function find the training set indexes given the information on which each record is based
+    and the range for the test set.
+
     Given test_times, find the times of the training observations.
-    —overlap.index: Time when the information extraction started.
-    —overlap.value: Time when the information extraction ended.
-    —test_times: Times for the test dataset.
+    :param info_sets: The information on which each record is constructed from
+        -info_sets.index: Time when the information extraction started.
+        -info_sets.value: Time when the information extraction ended.
+    :param test_times: Times for the test dataset.
     """
     train = info_sets.copy(deep=True)
     for start_ix, end_ix in test_times.iteritems():
-        df0 = train[(start_ix <= train.index) & (train.index <= end_ix)].index  # train starts within test
-        df1 = train[(start_ix <= train) & (train <= end_ix)].index  # train ends within test
-        df2 = train[(train.index <= start_ix) & (end_ix <= train)].index  # train envelops test
+        df0 = train[(start_ix <= train.index) & (train.index <= end_ix)].index  # Train starts within test
+        df1 = train[(start_ix <= train) & (train <= end_ix)].index  # Train ends within test
+        df2 = train[(train.index <= start_ix) & (end_ix <= train)].index  # Train envelops test
         train = train.drop(df0.union(df1).union(df2))
     return train
 
@@ -93,7 +100,7 @@ def ml_cross_val_score(classifier, X, y, sample_weight, scoring='neg_log_loss', 
     if scoring not in ['neg_log_loss', 'accuracy']:
         raise ValueError('wrong scoring method.')
     if cv_gen is None:
-        cv_gen = PurgedKFold(n_splits=n_splits, info_sets=info_sets, pct_embargo=pct_embargo)  # purged
+        cv_gen = PurgedKFold(n_splits=n_splits, info_sets=info_sets, pct_embargo=pct_embargo)
     ret_scores = []
     for train, test in cv_gen.split(X=X):
         fit = classifier.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight.iloc[train].values)
