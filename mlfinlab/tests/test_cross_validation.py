@@ -146,7 +146,7 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_purgedkfold_02_exception(self):
         """
-        Test exception is raised when passing in a dataset with a different index
+        Test exception is raised when passing in a dataset with a different length
         than the infosets used in the constructor
         :return:
         """
@@ -230,7 +230,9 @@ class TestCrossValidation(unittest.TestCase):
         self.log(f"pct_points_test= {pct_points_test}")
 
         pkf = PurgedKFold(n_splits=3, info_sets=infosets, pct_embargo=0.01*pct_points_test)
-        for train_indices, test_indices in pkf.split(dataset):
+
+        # Also test that X can be an np.ndarray by passing in the .values of the pd.DataFrame
+        for train_indices, test_indices in pkf.split(dataset.values):
 
             train_times_ret = infosets.iloc[train_indices]
             self.log(f"train_times_ret=\n{train_times_ret}")

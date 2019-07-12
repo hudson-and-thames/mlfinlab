@@ -56,9 +56,8 @@ class PurgedKFold(KFold):
 
     # noinspection PyPep8Naming
     def split(self, X, y=None, groups=None):
-        if len(X.index) != len(self.info_sets.index) or \
-                (X.index == self.info_sets.index).sum() != len(self.info_sets):
-            raise ValueError('X and the `info_sets` series param must have the same index')
+        if X.shape[0] != self.info_sets.shape[0]:
+            raise ValueError("X and the 'info_sets' series param must be the same length")
 
         indices: np.ndarray = np.arange(X.shape[0])
         embargo: int = int(X.shape[0] * self.pct_embargo)
