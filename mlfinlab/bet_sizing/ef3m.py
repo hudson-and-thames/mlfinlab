@@ -230,6 +230,7 @@ class M2N:
         df_out = df_out.sort_values('error')
         return df_out
 
+
 # === Helper functions, outside the m2n class. === #
 def centered_moment(moments, order):
     """
@@ -267,6 +268,7 @@ def raw_moment(central_moments, dist_mean):
         moment_n = sum(moment_n_parts)
         raw_moments.append(moment_n)
     return raw_moments
+
 
 def most_likely_parameters(data, ignore_columns='error', res=10_000):
     """
