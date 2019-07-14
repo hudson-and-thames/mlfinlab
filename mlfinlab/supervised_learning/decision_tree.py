@@ -68,7 +68,7 @@ class DecisionTree(object):
         """ Build decision tree """
         self.one_dim = len(np.shape(y)) == 1
         self.root = self._build_tree(X, y)
-        self.loss=None
+        self.loss = None
 
     def _build_tree(self, X, y, current_depth=0):
         """ Recursive method which builds out the decision tree and splits X and respective y
@@ -185,7 +185,6 @@ class DecisionTree(object):
             self.print_tree(tree.false_branch, indent + indent)
 
 
-
 class XGBoostRegressionTree(DecisionTree):
     """
     Regression tree for XGBoost
@@ -253,6 +252,7 @@ class RegressionTree(DecisionTree):
         self._impurity_calculation = self._calculate_variance_reduction
         self._leaf_value_calculation = self._mean_of_y
         super(RegressionTree, self).fit(X, y)
+
 
 class ClassificationTree(DecisionTree):
     def _calculate_information_gain(self, y, y1, y2):

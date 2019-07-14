@@ -4,25 +4,25 @@ import math
 import sys
 
 
-def calculate_entropy(y):
-    """ Calculate the entropy of label array y """
+def calculate_entroptarget(target):
+    """ Calculate the entropy of label array target """
     log2 = lambda x: math.log(x) / math.log(2)
-    unique_labels = np.unique(y)
+    unique_labels = np.unique(target)
     entropy = 0
     for label in unique_labels:
-        count = len(y[y == label])
-        p = count / len(y)
+        count = len(target[target == label])
+        p = count / len(target)
         entropy += -p * log2(p)
     return entropy
 
 
-def calculate_gini_index(y):
+def calculate_gini_index(target):
     """ Calculate gini index for label array y """
-    unique_labels = np.unique(y)
+    unique_labels = np.unique(target)
     gini_index = 0 
     for label in unique_labels:
-        count = len(y[y == label])
-        p = count / len(y)
+        count = len(target[target == label])
+        p = count / len(target)
         gini_index += p**2
     gini_index = 1 - gini_index
     return gini_index
