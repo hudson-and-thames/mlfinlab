@@ -11,6 +11,7 @@ import pandas as pd
 import dask.dataframe as dd
 from dask import delayed
 from scipy.special import comb
+from scipy.stats import gaussian_kde
 
 
 class M2N:
@@ -266,3 +267,25 @@ def raw_moment(central_moments, dist_mean):
         moment_n = sum(moment_n_parts)
         raw_moments.append(moment_n)
     return raw_moments
+
+def most_likely_parameters(data, ignore_columns='error', res=10_000):
+    """
+    Determines the most likely parameter estimate using a KDE
+    
+    :param data: (pandas.DataFrame) Contains parameter estimates from all runs.
+    :param ignore_columns: (string, list) Column or columns to exclude from analysis.
+    :param res: (int) Resolution of the kernel density estimate.
+    :return: (dict) Labels and most likely estimates for parameters.
+    """
+    df = data.copy()
+    if isinstance(ignore_columns, str):
+        ignore_columns = [ignore_columns]
+    columns = [c for c in df.columns if c not in ignore_columns]
+    d_results = {}
+    for col in columns:
+        x_range = np.linspace(df[col].min(), df[col].max(), num=res)
+        kde = gaussian_kde(df[col].to_numpy())
+        y_kde = kde.evaluate(x_range)
+        top_value = round(x_range[np.argmax(y_kde)], 5)
+        d_results[col] = top_value
+    return d_results
