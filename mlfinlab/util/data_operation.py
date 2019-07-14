@@ -4,7 +4,7 @@ import math
 import sys
 
 
-def calculate_entroptarget(target):
+def calculate_entropy(target):
     """ Calculate the entropy of label array target """
     log2 = lambda x: math.log(x) / math.log(2)
     unique_labels = np.unique(target)
