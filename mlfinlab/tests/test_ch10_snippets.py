@@ -10,6 +10,9 @@ import pandas as pd
 from scipy.stats import norm
 
 from mlfinlab.bet_sizing.ch10_snippets import get_signal, avg_active_signals, mp_avg_active_signals, discrete_signal
+from mlfinlab.bet_sizing.ch10_snippets import (bet_size_sigmoid, bet_size_power, bet_size, get_t_pos_sigmoid, get_t_pos_power, get_t_pos,
+                                               inv_price_sigmoid, inv_price_power, inv_price, limit_price_sigmoid, limit_price_power, limit_price,
+                                               get_w_sigmoid, get_w_power, get_w)
 
 
 class TestCh10Snippets(unittest.TestCase):
@@ -100,3 +103,16 @@ class TestCh10Snippets(unittest.TestCase):
         """
         test_bet_discrete = discrete_signal(signal0=self.bet_size, step_size=0.1)
         self.assertEqual(self.bet_size_d.equals(test_bet_discrete), True)
+
+
+# =====================================================================================================================
+# Test cases for functions used in calculating dynamic bet size.
+class TestBetSize(unittest.TestCase):
+    """
+    Test case for bet_size, bet_size_sigmoid, and bet_size_power.
+    """
+    def test_bet_size_sigmoid(self):
+        x_div = 15
+        w_param = 7.5
+        m_test = x_div / np.sqrt(w_param + x_div*x_div)
+        self.assertEqual(m_test, bet_size_sigmoid(w_param, x_div))
