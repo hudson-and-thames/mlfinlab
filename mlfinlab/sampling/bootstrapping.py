@@ -54,6 +54,19 @@ def get_ind_mat_average_uniqueness(ind_mat):
     return avg_uniqueness
 
 
+def get_ind_mat_uniqueness(ind_mat):
+    """
+    An adaption of Snippet 4.4. page 65, which returns the indicator matrix element uniqueness.
+
+    :param ind_mat: (np.matrix) indicator binary matrix
+    :return: (np.matrix) element uniqueness
+    """
+    concurrency = ind_mat.sum(axis=1)
+    uniqueness = ind_mat.T / concurrency
+
+    return uniqueness
+
+
 @jit(parallel=True, nopython=True)
 def _bootstrap_loop_run(ind_mat, prev_concurrency):  # pragma: no cover
     """
