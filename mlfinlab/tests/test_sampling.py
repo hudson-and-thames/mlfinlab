@@ -11,7 +11,7 @@ import pandas as pd
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier
 from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix, get_ind_mat_average_uniqueness, \
-    _bootstrap_loop_run, get_ind_mat_uniqueness  # pylint: disable=protected-access
+    _bootstrap_loop_run, get_ind_mat_label_uniqueness  # pylint: disable=protected-access
 from mlfinlab.sampling.concurrent import get_av_uniqueness_from_tripple_barrier, num_concurrent_events
 from mlfinlab.util.utils import get_daily_vol
 
@@ -140,7 +140,7 @@ class TestSampling(unittest.TestCase):
         ind_mat.loc[:, 2] = [0, 0, 0, 0, 1, 1]
         ind_mat = ind_mat.values
 
-        labels_av_uniqueness = get_ind_mat_uniqueness(ind_mat)
+        labels_av_uniqueness = get_ind_mat_label_uniqueness(ind_mat)
         first_sample_unq = labels_av_uniqueness[0]
         second_sample_unq = labels_av_uniqueness[1]
         third_sample_unq = labels_av_uniqueness[2]

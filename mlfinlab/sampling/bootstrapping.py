@@ -54,7 +54,7 @@ def get_ind_mat_average_uniqueness(ind_mat):
     return avg_uniqueness
 
 
-def get_ind_mat_uniqueness(ind_mat):
+def get_ind_mat_label_uniqueness(ind_mat):
     """
     An adaption of Snippet 4.4. page 65, which returns the indicator matrix element uniqueness.
 
