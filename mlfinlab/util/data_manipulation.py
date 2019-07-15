@@ -1,69 +1,76 @@
+"""
+Utilities functions for data manipulation
+"""
 from __future__ import division
 from itertools import combinations_with_replacement
 import numpy as np
-import math
-import sys
 
 
-def shuffle_data(X, y, seed=None):
-    """ Random shuffle of the samples in X and y """
+def shuffle_data(feat, trg, seed=None):
+    """ Random shuffle of the samples in feat and trg """
     if seed:
         np.random.seed(seed)
-    idx = np.arange(X.shape[0])
+    idx = np.arange(feat.shape[0])
     np.random.shuffle(idx)
-    return X[idx], y[idx]
+    return feat[idx], trg[idx]
 
 
-def batch_iterator(X, y=None, batch_size=64):
+def batch_iterator(feat, trg=None, batch_size=64):
     """ Simple batch generator """
-    n_samples = X.shape[0]
+    n_samples = feat.shape[0]
     for i in np.arange(0, n_samples, batch_size):
         begin, end = i, min(i+batch_size, n_samples)
-        if y is not None:
-            yield X[begin:end], y[begin:end]
+        if trg is not None:
+            yield feat[begin:end], trg[begin:end]
         else:
-            yield X[begin:end]
+            yield feat[begin:end]
 
 
-def divide_on_feature(X, feature_i, threshold):
+def divide_on_feature(feat, feature_i, threshold):
     """ Divide dataset based on if sample value on feature index is larger than
         the given threshold """
     split_func = None
-    if isinstance(threshold, int) or isinstance(threshold, float):
+    if isinstance(threshold, (int, float)):
         split_func = lambda sample: sample[feature_i] >= threshold
     else:
         split_func = lambda sample: sample[feature_i] == threshold
 
-    X_1 = np.array([sample for sample in X if split_func(sample)])
-    X_2 = np.array([sample for sample in X if not split_func(sample)])
+    feat_1 = np.array([sample for sample in feat if split_func(sample)])
+    feat_2 = np.array([sample for sample in feat if not split_func(sample)])
 
-    return np.array([X_1, X_2])
+    return np.array([feat_1, feat_2])
 
 
-def polynomial_features(X, degree):
-    n_samples, n_features = np.shape(X)
+def polynomial_features(feat, degree):
+    """
+    Create polynomial features.
+    :param feat:
+    :param degree:
+    :return:
+    """
+    n_samples, n_features = np.shape(feat)
 
     def index_combinations():
         combs = [combinations_with_replacement(range(n_features), i) for i in range(0, degree + 1)]
         flat_combs = [item for sublist in combs for item in sublist]
         return flat_combs
-    
+
     combinations = index_combinations()
     n_output_features = len(combinations)
-    X_new = np.empty((n_samples, n_output_features))
-    
-    for i, index_combs in enumerate(combinations):  
-        X_new[:, i] = np.prod(X[:, index_combs], axis=1)
+    feat_new = np.empty((n_samples, n_output_features))
 
-    return X_new
+    for i, index_combs in enumerate(combinations):
+        feat_new[:, i] = np.prod(feat[:, index_combs], axis=1)
+
+    return feat_new
 
 
-def get_random_subsets(X, y, n_subsets, replacements=True):
+def get_random_subsets(feat, trg, n_subsets, replacements=True):
     """ Return random subsets (with replacements) of the data """
-    n_samples = np.shape(X)[0]
-    # Concatenate x and y and do a random shuffle
-    X_y = np.concatenate((X, y.reshape((1, len(y))).T), axis=1)
-    np.random.shuffle(X_y)
+    n_samples = np.shape(feat)[0]
+    # Concatenate feat and trg and do a random shuffle
+    feat_trg = np.concatenate((feat, trg.reshape((1, len(trg))).T), axis=1)
+    np.random.shuffle(feat_trg)
     subsets = []
 
     # Uses 50% of training samples without replacements
@@ -76,92 +83,92 @@ def get_random_subsets(X, y, n_subsets, replacements=True):
             range(n_samples),
             size=np.shape(range(subsample_size)),
             replace=replacements)
-        X = X_y[idx][:, :-1]
-        y = X_y[idx][:, -1]
-        subsets.append([X, y])
+        feat = feat_trg[idx][:, :-1]
+        trg = feat_trg[idx][:, -1]
+        subsets.append([feat, trg])
     return subsets
 
 
-def normalize(X, axis=-1, order=2):
-    """ Normalize the dataset X """
-    l2 = np.atleast_1d(np.linalg.norm(X, order, axis))
-    l2[l2 == 0] = 1
-    return X / np.expand_dims(l2, axis)
+def normalize(feat, axis=-1, order=2):
+    """ Normalize the dataset feat """
+    norm_l2 = np.atleast_1d(np.linalg.norm(feat, order, axis))
+    norm_l2[norm_l2 == 0] = 1
+    return feat / np.expand_dims(norm_l2, axis)
 
 
-def standardize(X):
-    """ Standardize the dataset X """
-    X_std = X
-    mean = X.mean(axis=0)
-    std = X.std(axis=0)
-    for col in range(np.shape(X)[1]):
+def standardize(feat):
+    """ Standardize the dataset feat """
+    feat_std = feat
+    mean = feat.mean(axis=0)
+    std = feat.std(axis=0)
+    for col in range(np.shape(feat)[1]):
         if std[col]:
-            X_std[:, col] = (X_std[:, col] - mean[col]) / std[col]
-    # X_std = (X - X.mean(axis=0)) / X.std(axis=0)
-    return X_std
+            feat_std[:, col] = (feat_std[:, col] - mean[col]) / std[col]
+    # feat_std = (feat - feat.mean(axis=0)) / feat.std(axis=0)
+    return feat_std
 
 
-def train_test_split(X, y, test_size=0.5, shuffle=True, seed=None):
+def train_test_split(feat, trg, test_size=0.5, shuffle=True, seed=None):
     """ Split the data into train and test sets """
     if shuffle:
-        X, y = shuffle_data(X, y, seed)
+        feat, trg = shuffle_data(feat, trg, seed)
     # Split the training data from test data in the ratio specified in
     # test_size
-    split_i = len(y) - int(len(y) // (1 / test_size))
-    X_train, X_test = X[:split_i], X[split_i:]
-    y_train, y_test = y[:split_i], y[split_i:]
+    split_i = len(trg) - int(len(trg) // (1 / test_size))
+    train_feat, test_feat = feat[:split_i], feat[split_i:]
+    train_trg, test_trg = trg[:split_i], trg[split_i:]
 
-    return X_train, X_test, y_train, y_test
+    return train_feat, test_feat, train_trg, test_trg
 
 
-def k_fold_cross_validation_sets(X, y, k, shuffle=True):
+def k_fold_cross_validation_sets(feat, trg, k, shuffle=True):
     """ Split the data into k sets of training / test data """
     if shuffle:
-        X, y = shuffle_data(X, y)
+        feat, trg = shuffle_data(feat, trg)
 
-    n_samples = len(y)
+    n_samples = len(trg)
     left_overs = {}
     n_left_overs = (n_samples % k)
     if n_left_overs != 0:
-        left_overs["X"] = X[-n_left_overs:]
-        left_overs["y"] = y[-n_left_overs:]
-        X = X[:-n_left_overs]
-        y = y[:-n_left_overs]
+        left_overs["feat"] = feat[-n_left_overs:]
+        left_overs["trg"] = trg[-n_left_overs:]
+        feat = feat[:-n_left_overs]
+        trg = trg[:-n_left_overs]
 
-    X_split = np.split(X, k)
-    y_split = np.split(y, k)
+    feat_split = np.split(feat, k)
+    y_split = np.split(trg, k)
     sets = []
     for i in range(k):
-        X_test, y_test = X_split[i], y_split[i]
-        X_train = np.concatenate(X_split[:i] + X_split[i + 1:], axis=0)
-        y_train = np.concatenate(y_split[:i] + y_split[i + 1:], axis=0)
-        sets.append([X_train, X_test, y_train, y_test])
+        test_feat, test_trg = feat_split[i], y_split[i]
+        train_feat = np.concatenate(feat_split[:i] + feat_split[i + 1:], axis=0)
+        train_trg = np.concatenate(y_split[:i] + y_split[i + 1:], axis=0)
+        sets.append([train_feat, test_feat, train_trg, test_trg])
 
     # Add left over samples to last set as training samples
     if n_left_overs != 0:
-        np.append(sets[-1][0], left_overs["X"], axis=0)
-        np.append(sets[-1][2], left_overs["y"], axis=0)
+        np.append(sets[-1][0], left_overs["feat"], axis=0)
+        np.append(sets[-1][2], left_overs["trg"], axis=0)
 
     return np.array(sets)
 
 
-def to_categorical(x, n_col=None):
+def to_categorical(data, n_col=None):
     """ One-hot encoding of nominal values """
     if not n_col:
-        n_col = np.amax(x) + 1
-    one_hot = np.zeros((x.shape[0], n_col))
-    one_hot[np.arange(x.shape[0]), x] = 1
+        n_col = np.amax(data) + 1
+    one_hot = np.zeros((data.shape[0], n_col))
+    one_hot[np.arange(data.shape[0]), data] = 1
     return one_hot
 
 
-def to_nominal(x):
+def to_nominal(data):
     """ Conversion from one-hot encoding to nominal """
-    return np.argmax(x, axis=1)
+    return np.argmax(data, axis=1)
 
 
-def make_diagonal(x):
+def make_diagonal(data):
     """ Converts a vector into an diagonal matrix """
-    m = np.zeros((len(x), len(x)))
-    for i in range(len(m[0])):
-        m[i, i] = x[i]
-    return m
+    matrix = np.zeros((len(data), len(data)))
+    for i in range(len(matrix[0])):
+        matrix[i, i] = data[i]
+    return matrix

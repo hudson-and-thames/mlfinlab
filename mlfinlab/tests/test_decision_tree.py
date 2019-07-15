@@ -3,16 +3,11 @@ Tests decision tree class and models
 """
 
 import unittest
-import os
 import numpy as np
-import pandas as pd
-
-from mlfinlab.supervised_learning.decision_tree import ClassificationTree
-from mlfinlab.util.data_manipulation import train_test_split, standardize
-from mlfinlab.util.data_operation import mean_squared_error, calculate_variance, accuracy_score
-from mlfinlab.util.misc import Plot
-
 from sklearn import datasets
+from mlfinlab.supervised_learning.decision_tree import ClassificationTree
+from mlfinlab.util.data_manipulation import train_test_split
+from mlfinlab.util.data_operation import accuracy_score
 
 
 class TestDecisionTree(unittest.TestCase):
@@ -20,44 +15,26 @@ class TestDecisionTree(unittest.TestCase):
     Test decision tree class and methods:
     1. Gini criterion
     """
-    def __init__(self):
-        self.setUp()
-
-
-    def setUp(self):
-        """
-        Set the file path for the tick data csv
-        """
-        project_path = os.path.dirname(__file__)
-        self.path = project_path + '/test_data/tick_data.csv'
-
-    def load_data(self):
-        df = pd.read_csv(self.path)
-        self.data = df
-
     def test_classification_tree(self):
+        """
+        Test ClassificationTree class by training the model and measuring accuracy.
+        :return:
+        """
         print("-- Classification Tree --")
 
         data = datasets.load_iris()
-        X = data.data
-        y = data.target
+        features = data.data
+        target = data.target
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4)
+        train_features, test_features, train_target, test_target = train_test_split(features, target, test_size=0.4)
 
         clf = ClassificationTree()
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
+        clf.fit(train_features, train_target)
+        pred_target = clf.predict(test_features)
 
-        accuracy = accuracy_score(y_test, y_pred)
+        self.assertTrue(len(pred_target) == test_features.shape[0])
+
+        accuracy = accuracy_score(test_target, pred_target)
 
         print("Accuracy:", accuracy)
 
-        Plot().plot_in_2d(X_test, y_pred,
-                          title="Decision Tree",
-                          accuracy=accuracy,
-                          legend_labels=data.target_names)
-
-if __name__ == '__main__':
-    np.random.seed(111)
-    testTree = TestDecisionTree()
-    testTree.test_classification_tree()
