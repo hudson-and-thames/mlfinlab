@@ -11,7 +11,7 @@ import pandas as pd
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier
 from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix, get_ind_mat_average_uniqueness, \
-    _bootstrap_loop_run  # pylint: disable=protected-access
+    _bootstrap_loop_run, get_ind_mat_label_uniqueness  # pylint: disable=protected-access
 from mlfinlab.sampling.concurrent import get_av_uniqueness_from_tripple_barrier, num_concurrent_events
 from mlfinlab.util.utils import get_daily_vol
 
@@ -107,13 +107,10 @@ class TestSampling(unittest.TestCase):
             random_samples = np.random.choice(ind_mat.shape[1], size=3)
 
             random_unq = get_ind_mat_average_uniqueness(ind_mat[:, random_samples])
-            random_unq_mean = random_unq[random_unq > 0].mean()
-
             sequential_unq = get_ind_mat_average_uniqueness(ind_mat[:, bootstrapped_samples])
-            sequential_unq_mean = sequential_unq[sequential_unq > 0].mean()
 
-            standard_unq_array[i] = random_unq_mean
-            seq_unq_array[i] = sequential_unq_mean
+            standard_unq_array[i] = random_unq
+            seq_unq_array[i] = sequential_unq
 
         self.assertTrue(np.mean(seq_unq_array) >= np.mean(standard_unq_array))
         self.assertTrue(np.median(seq_unq_array) >= np.median(standard_unq_array))
@@ -130,15 +127,29 @@ class TestSampling(unittest.TestCase):
         ind_mat = ind_mat.values
 
         labels_av_uniqueness = get_ind_mat_average_uniqueness(ind_mat)
+        self.assertTrue(abs(labels_av_uniqueness - 0.8571) <= 1e-4)  # Test matrix av.uniqueness
+
+    def test_get_ind_mat_uniqueness(self):
+        """
+        Tests get_ind_mat_uniqueness function using indicator matrix from the book example
+        """
+
+        ind_mat = pd.DataFrame(index=range(0, 6), columns=range(0, 3))
+        ind_mat.loc[:, 0] = [1, 1, 1, 0, 0, 0]
+        ind_mat.loc[:, 1] = [0, 0, 1, 1, 0, 0]
+        ind_mat.loc[:, 2] = [0, 0, 0, 0, 1, 1]
+        ind_mat = ind_mat.values
+
+        labels_av_uniqueness = get_ind_mat_label_uniqueness(ind_mat)
         first_sample_unq = labels_av_uniqueness[0]
         second_sample_unq = labels_av_uniqueness[1]
         third_sample_unq = labels_av_uniqueness[2]
 
-        self.assertTrue(abs(first_sample_unq[first_sample_unq > 0].mean() - 0.8333) <= 1e-4)  # First sample uniqueness
+        self.assertTrue(abs(first_sample_unq[first_sample_unq > 0].mean() - 0.8333) <= 1e-4)
         self.assertTrue(abs(second_sample_unq[second_sample_unq > 0].mean() - 0.75) <= 1e-4)
         self.assertTrue(abs(third_sample_unq[third_sample_unq > 0].mean() - 1.0) <= 1e-4)
-        self.assertTrue(
-            abs(labels_av_uniqueness[labels_av_uniqueness > 0].mean() - 0.8571) <= 1e-4)  # Test matrix av.uniqueness
+        # Test matrix av.uniqueness
+        self.assertTrue(abs(labels_av_uniqueness[labels_av_uniqueness > 0].mean() - 0.8571) <= 1e-4)
 
     def test_bootstrap_loop_run(self):
         """
