@@ -115,8 +115,7 @@ class TestBetSize(unittest.TestCase):
         """
         Tests successful execution of 'bet_size_sigmoid'.
         """
-        x_div = 15
-        w_param = 7.5
+        x_div, w_param = 15, 7.5
         m_test = x_div / np.sqrt(w_param + x_div*x_div)
         self.assertAlmostEqual(m_test, bet_size_sigmoid(w_param, x_div), 7)
 
@@ -124,12 +123,11 @@ class TestBetSize(unittest.TestCase):
         """
         Tests successful execution of 'bet_size_power'.
         """
-        x_div = 0.4
-        w_param = 1.5
+        x_div, w_param = 0.4, 1.5
         m_test = np.sign(x_div) * abs(x_div)**w_param
         self.assertAlmostEqual(m_test, bet_size_power(w_param, x_div), 7)
 
-    def test_bet_size_power_error(self):
+    def test_bet_size_power_value_error(self):
         """
         Tests successful raising of ValueError in 'bet_size_power'.
         """
@@ -139,16 +137,14 @@ class TestBetSize(unittest.TestCase):
         """
         Test excution in all function modes of 'bet_size'.
         """
-        x_div_sig = 25
-        w_param_sig = 3.5
+        x_div_sig, w_param_sig = 25, 3.5
         m_test_sig = x_div_sig / np.sqrt(w_param_sig + x_div_sig*x_div_sig)
         self.assertAlmostEqual(m_test_sig, bet_size(w_param_sig, x_div_sig, 'sigmoid'), 7)
-        x_div_pow = 0.7
-        w_param_pow = 2.1
+        x_div_pow, w_param_pow = 0.7, 2.1
         m_test_pow = np.sign(x_div_pow) * abs(x_div_pow)**w_param_pow
         self.assertAlmostEqual(m_test_pow, bet_size(w_param_pow, x_div_pow, 'power'), 7)
 
-    def test_bet_size_error(self):
+    def test_bet_size_key_error(self):
         """
         Tests for the KeyError in the event that an invalid function is provided to 'func'.
         """
@@ -198,7 +194,7 @@ class TestGetTPos(unittest.TestCase):
         pos_test_pow = int(max_pos_pow*(np.sign(x_div_pow) * abs(x_div_pow)**w_param_pow))
         self.assertAlmostEqual(pos_test_pow, get_t_pos(w_param_pow, f_i_pow, m_p_pow, max_pos_pow, 'power'), 7)
 
-    def test_get_t_pos_error(self):
+    def test_get_t_pos_key_error(self):
         """
         Tests for the KeyError in 'get_t_pos' in the case that an invalid value for 'func' is passed.
         """
@@ -211,14 +207,103 @@ class TestInvPrice(unittest.TestCase):
     """
     def test_inv_price_sigmoid(self):
         """
-        Tests for the successful execution of 'inv_price_sigmoid'.
+        Test for the successful execution of 'inv_price_sigmoid'.
         """
-        f_i_sig = 35.19
-        w_sig = 9.32
-        m_sig = 0.72
+        f_i_sig, w_sig, m_sig = 35.19, 9.32, 0.72
         inv_p_sig = f_i_sig - m_sig * np.sqrt(w_sig/(1-m_sig*m_sig))
         self.assertAlmostEqual(inv_p_sig, inv_price_sigmoid(f_i_sig, w_sig, m_sig), 7)
 
+    def test_inv_price_power(self):
+        """
+        Test for the successful execution of 'inv_price_sigmoid'.
+        """
+        f_i_pow, w_pow, m_pow = 35.19, 3.32, 0.72
+        inv_p_pow = f_i_pow - np.sign(m_pow) * abs(m_pow)**(1/w_pow)
+        self.assertAlmostEqual(inv_p_pow, inv_price_power(f_i_pow, w_pow, m_pow), 7)
+        self.assertEqual(f_i_pow, inv_price_power(f_i_pow, w_pow, 0.0))
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_inv_price(self):
+        """
+        Test for successful execution of 'inv_price' function under different function options.
+        """
+        f_i_sig, w_sig, m_sig = 87.19, 7.34, 0.82
+        inv_p_sig = f_i_sig - m_sig * np.sqrt(w_sig/(1-m_sig*m_sig))
+        self.assertAlmostEqual(inv_p_sig, inv_price(f_i_sig, w_sig, m_sig, 'sigmoid'), 7)
+        f_i_pow, w_pow, m_pow = 129.19, 4.02, 0.81
+        inv_p_pow = f_i_pow - np.sign(m_pow) * abs(m_pow)**(1/w_pow)
+        self.assertAlmostEqual(inv_p_pow, inv_price(f_i_pow, w_pow, m_pow, 'power'), 7)
+
+    def test_inv_price_key_error(self):
+        """
+        Test for successful raising of KeyError in response to invalid choice of 'func' argument.
+        """
+        self.assertRaises(KeyError, inv_price, 12, 1.5, 0.7, 'NotAFunction')
+
+class TestLimitPrice(unittest.TestCase):
+    """
+    Tests the functions 'limit_price_sigmoid', 'limit_price_power', and 'limit_price'.
+    """
+    def test_limit_price_sigmoid(self):
+        """
+        Test successful execution of 'limit_price_sigmoid' function.
+        """
+        t_pos_sig, pos_sig, f_sig, w_sig, max_pos_sig = 124, 112, 165.50, 8.44, 150
+        sum_inv_price_sig = sum([inv_price_sigmoid(f_sig, w_sig, j/float(max_pos_sig))
+                                 for j in range(abs(pos_sig+np.sign(t_pos_sig-pos_sig)), abs(t_pos_sig+1))])
+        limit_p_sig = (1/abs(t_pos_sig-pos_sig)) * sum_inv_price_sig
+        self.assertAlmostEqual(limit_p_sig, limit_price_sigmoid(t_pos_sig, pos_sig, f_sig, w_sig, max_pos_sig), 7)
+
+    def test_limit_price_power(self):
+        """
+        Test successful execution of 'limit_price_power' function.
+        """
+        t_pos_pow, pos_pow, f_pow, w_pow, max_pos_pow = 101, 95, 195.70, 3.44, 130
+        sum_inv_price_pow = sum([inv_price_power(f_pow, w_pow, j/float(max_pos_pow))
+                                 for j in range(abs(pos_pow+np.sign(t_pos_pow-pos_pow)), abs(t_pos_pow+1))])
+        limit_p_pow = (1/abs(t_pos_pow-pos_pow)) * sum_inv_price_pow
+        self.assertAlmostEqual(limit_p_pow, limit_price_power(t_pos_pow, pos_pow, f_pow, w_pow, max_pos_pow), 7)
+
+    def test_limit_price_key_error(self):
+        """
+        Tests raising of the KeyError due to invalid choice of 'func' argument.
+        """
+        self.assertRaises(KeyError, limit_price, 231, 221, 110, 3.4, 250, 'NotAFunction')
+
+class TestGetW(unittest.TestCase):
+    """
+    Tests the functions 'get_w_sigmoid', 'get_w_power', and 'get_w'.
+    """
+    def test_get_w_sigmoid(self):
+        """
+        Tests successful execution of 'get_w_sigmoid' function.
+        """
+        x_sig, m_sig = 24.2, 0.98
+        w_sig = x_sig**2 * (m_sig**-2 - 1)
+        self.assertAlmostEqual(w_sig, get_w_sigmoid(x_sig, m_sig), 7)
+
+    def test_get_w_power(self):
+        """
+        Tests successful execution of 'get_w_power' function.
+        """
+        x_pow, m_pow = 0.9, 0.76
+        w_pow = np.log(m_pow/np.sign(x_pow)) / np.log(abs(x_pow))
+        self.assertAlmostEqual(w_pow, get_w_power(x_pow, m_pow), 7)
+
+    def test_get_w_power_value_error(self):
+        """
+        Tests that a ValueError is raised if the price divergence 'x' is not between -1 and 1, inclusive.
+        """
+        self.assertRaises(ValueError, get_w_power, 1.2, 0.8)
+
+    def test_get_w_power_warning(self):
+        """
+        Tests that a Warning is raised if 'w' is calcualted to be less than zero, and returns a zero.
+        """
+        self.assertWarns(Warning, get_w_power, -0.9, 0.9)
+        self.assertEqual(0, get_w_power(-0.9, 0.9))
+
+    def test_get_w_key_error(self):
+        """
+        Tests that a KeyError is raised if an invalid function is passed to argument 'func'.
+        """
+        self.assertRaises(KeyError, get_w, 0.6, 0.9, 'NotAFunction')

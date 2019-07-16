@@ -267,6 +267,8 @@ def get_w_power(x, m):
     :param m: (float) Bet size.
     :return: (float) Inverse of bet size with respect to the regulating coefficient.
     """
+    if not -1 <= x <= 1:
+        raise ValueError("Price divergence argument 'x' must be between -1 and 1, inclusive when using function 'power'.")
     w_calc = np.log(m/np.sign(x)) / np.log(abs(x))
     if w_calc < 0:
         warnings.warn("'w' parameter evaluates to less than zero. Zero is returned.")
