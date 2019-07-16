@@ -203,7 +203,8 @@ class ETFTrick:
         etf_series = pd.Series()
         for index, row in zip(data_df.index, data_df.values):
             # Split row in corresponding values for ETF trick
-            weights_arr, h_t, close_open, price_diff, costs, rate = np.array_split(row, 6)  # pylint: disable=unbalanced-tuple-unpacking
+            weights_arr, h_t, close_open, price_diff, costs, rate = np.array_split(row,
+                                                                                   6)  # pylint: disable=unbalanced-tuple-unpacking
             # Replaces nan to zeros in allocations vector
             weights_arr = np.nan_to_num(weights_arr)
 
@@ -350,16 +351,17 @@ class ETFTrick:
         self.__init__(**self.init_fields)
 
 
-def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_col, roll_backward=False):
+def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_col, roll_backward=False,
+                            method='absolute'):
     """
     Function for generating rolling futures series from data frame of multiple futures.
-
     :param data_df: (pd.DataFrame): pandas DataFrame containing price info, security name and current active futures column
     :param open_col: (string): open prices column name
     :param close_col: (string): close prices column name
     :param sec_col: (string): security name column name
     :param current_sec_col: (string): current active security column name. When value in this column changes it means rolling
     :param roll_backward: (boolean): True for subtracting final gap value from all values
+    :param method: (string): what returns user wants to preserve, 'absolute' or 'relative'
     :return (pd.Series): futures roll close price series
     """
     # Filter out security data which is not used as current security
@@ -368,14 +370,25 @@ def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_c
 
     # Generate roll dates series based on current_sec column value change
     roll_dates = filtered_df[current_sec_col].drop_duplicates(keep='first').index
-    gaps = filtered_df[close_col] * 0  # roll gaps series
+    timestamps = list(filtered_df.index)  # list of timestamps
+    prev_roll_dates_index = [timestamps.index(i) - 1 for i in roll_dates]  # Dates before rolling date index (int)
 
-    # On roll dates, gap equals open - close
-    gaps.loc[roll_dates[1:]] = filtered_df[open_col].loc[roll_dates[1:]] - filtered_df[close_col].loc[
-        roll_dates[1:]]
-    gaps = gaps.cumsum()
+    # On roll dates, gap equals open - close or open/close
+    if method == 'absolute':
+        gaps = filtered_df[close_col] * 0  # roll gaps series
+        gaps.loc[roll_dates[1:]] = filtered_df[open_col].loc[roll_dates[1:]] - filtered_df[close_col].iloc[
+            prev_roll_dates_index[1:]].values
+        gaps = gaps.cumsum()
 
-    if roll_backward:
-        gaps -= gaps.iloc[-1]  # Roll backward
+        if roll_backward:
+            gaps -= gaps.iloc[-1]  # Roll backward diff
+    elif method == 'relative':
+        gaps = filtered_df[close_col] * 0 + 1  # Roll gaps series
+        gaps.loc[roll_dates[1:]] = filtered_df[open_col].loc[roll_dates[1:]] / filtered_df[close_col].iloc[
+            prev_roll_dates_index[1:]].values
+        gaps = gaps.cumprod()
+
+        if roll_backward:
+            gaps /= gaps.iloc[-1]  # Roll backward div
 
     return gaps
