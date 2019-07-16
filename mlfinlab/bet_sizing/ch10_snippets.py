@@ -123,8 +123,8 @@ def discrete_signal(signal0, step_size):
 def bet_size_sigmoid(w_param, x_div):
     """
     Part of SNIPPET 10.4
-    Calculates the bet size from the price divergence and
-    a regulating coefficient.
+    Calculates the bet size from the price divergence and a regulating coefficient.
+    Based on a sigmoid function for a bet size algorithm.
 
     :param w_param: (float) Coefficient regulating the width of the bet size function.
     :param x_div: (float) Price divergence, forecast price - market price.
@@ -135,8 +135,8 @@ def bet_size_sigmoid(w_param, x_div):
 def get_t_pos_sigmoid(w_param, f_i, m_p, max_pos):
     """
     Part of SNIPPET 10.4
-    Calculates the target position given the forecast price, market price,
-    maximum position size, and a regulating coefficient.
+    Calculates the target position given the forecast price, market price, maximum position size, and a regulating coefficient.
+    Based on a sigmoid function for a bet size algorithm.
 
     :param w_param: (float) Coefficient regulating the width of the bet size function.
     :param f_i: (float) Forecast price.
@@ -150,6 +150,7 @@ def inv_price_sigmoid(f_i, w_param, m_bet):
     """
     Part of SNIPPET 10.4
     Calculates the inverse of the bet size with respect to the market price.
+    Based on a sigmoid function for a bet size algorithm.
 
     :param f_i: (float) Forecast price.
     :param w_param: (float) Coefficient regulating the width of the bet size function.
@@ -162,6 +163,7 @@ def limit_price_sigmoid(t_pos, pos, f_i, w_param, max_pos):
     """
     Part of SNIPPET 10.4
     Calculates the limit price.
+    Based on a sigmoid function for a bet size algorithm.
 
     :param t_pos: (int) Target position.
     :param pos: (int) Current position.
@@ -183,8 +185,8 @@ def limit_price_sigmoid(t_pos, pos, f_i, w_param, max_pos):
 def get_w_sigmoid(x_div, m_bet):
     """
     Part of SNIPPET 10.4
-    Calculates the inverse of the bet size with respect to the
-    regulating coefficient 'w'.
+    Calculates the inverse of the bet size with respect to the regulating coefficient 'w'.
+    Based on a sigmoid function for a bet size algorithm.
 
     :param x_div: (float) Price divergence, forecast price - market price.
     :param m_bet: (float) Bet size.
@@ -198,8 +200,8 @@ def get_w_sigmoid(x_div, m_bet):
 def bet_size_power(w_param, x_div):
     """
     Derived from SNIPPET 10.4
-    Calculates the bet size from the price divergence and
-    a regulating coefficient.
+    Calculates the bet size from the price divergence and a regulating coefficient.
+    Based on a power function for a bet size algorithm.
 
     :param w_param: (float) Coefficient regulating the width of the bet size function.
     :param x_div: (float) Price divergence, f - m_p, must be between -1 and 1, inclusive.
@@ -215,6 +217,7 @@ def get_t_pos_power(w_param, f_i, m_p, max_pos):
     """
     Derived from SNIPPET 10.4
     Calculates the target position given the forecast price, market price, maximum position size, and a regulating coefficient.
+    Based on a power function for a bet size algorithm.
 
     :param w_param: (float) Coefficient regulating the width of the bet size function.
     :param f_i: (float) Forecast price.
@@ -228,6 +231,7 @@ def inv_price_power(f_i, w_param, m_bet):
     """
     Derived from SNIPPET 10.4
     Calculates the inverse of the bet size with respect to the market price.
+    Based on a power function for a bet size algorithm.
 
     :param f_i: (float) Forecast price.
     :param w_param: (float) Coefficient regulating the width of the bet size function.
@@ -241,7 +245,7 @@ def inv_price_power(f_i, w_param, m_bet):
 def limit_price_power(t_pos, pos, f_i, w_param, max_pos):
     """
     Derived from SNIPPET 10.4
-    Calculates the limit price.
+    Calculates the limit price. Based on a power function for a bet size algorithm.
 
     :param t_pos: (float) Target position.
     :param pos: (float) Current position.
@@ -262,6 +266,7 @@ def get_w_power(x_div, m_bet):
     Derived from SNIPPET 10.4
     Calculates the inverse of the bet size with respect to the regulating coefficient 'w'.
     The 'w' coefficient must be greater than or equal to zero.
+    Based on a power function for a bet size algorithm.
 
     :param x_div: (float) Price divergence, forecast price - market price.
     :param m_bet: (float) Bet size.
