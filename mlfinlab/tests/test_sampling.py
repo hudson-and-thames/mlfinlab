@@ -58,6 +58,12 @@ class TestSampling(unittest.TestCase):
         self.assertTrue(num_conc_events.value_counts()[1] == 505)
         self.assertTrue(num_conc_events.value_counts()[2] == 92)
 
+    def book_ind_mat_implementation(self, bar_index, t1):
+        ind_mat = pd.DataFrame(0, index=bar_index, columns=range(t1.shape[0]))
+        for i, (t0, t1) in enumerate(t1.iteritems()):
+            ind_mat.loc[t0:t1, i] = 1.
+        return ind_mat
+
     def test_get_av_uniqueness(self):
         """
         Assert that average event uniqueness is available for all labels and equals to particular values
@@ -78,6 +84,14 @@ class TestSampling(unittest.TestCase):
 
         non_nan_meta_labels = self.meta_labeled_events.dropna()
         ind_mat = get_ind_matrix(non_nan_meta_labels)
+
+        label_endtime = non_nan_meta_labels.t1
+        bar_index = list(non_nan_meta_labels.index)  # generate index for indicator matrix from t1 and index
+        bar_index.extend(non_nan_meta_labels.t1)
+        bar_index = sorted(list(set(bar_index)))  # drop duplicates and sort
+        ind_mat_book_implementation = self.book_ind_mat_implementation(bar_index, label_endtime)
+
+        self.assertTrue(bool((ind_mat_book_implementation.values == ind_mat).all()) is True)
         self.assertTrue(ind_mat.shape == (13, 7))  # Indicator matrix shape should be (meta_label_index+t1, t1)
         # Check indicator matrix values for specific labels
         self.assertTrue(bool((ind_mat[:, 0] == [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
