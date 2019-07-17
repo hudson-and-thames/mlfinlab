@@ -20,7 +20,6 @@ def book_ind_mat_implementation(bar_index, label_endtime):
     """
     Book implementation of get_ind_matrix function
     """
-    
     ind_mat = pd.DataFrame(0, index=bar_index, columns=range(label_endtime.shape[0]))
     for i, (start, end) in enumerate(label_endtime.iteritems()):
         ind_mat.loc[start:end, i] = 1.
@@ -93,7 +92,7 @@ class TestSampling(unittest.TestCase):
         bar_index = list(non_nan_meta_labels.index)  # generate index for indicator matrix from t1 and index
         bar_index.extend(non_nan_meta_labels.t1)
         bar_index = sorted(list(set(bar_index)))  # drop duplicates and sort
-        ind_mat_book_implementation = self.book_ind_mat_implementation(bar_index, label_endtime)
+        ind_mat_book_implementation = book_ind_mat_implementation(bar_index, label_endtime)
 
         self.assertTrue(bool((ind_mat_book_implementation.values == ind_mat).all()) is True)
         self.assertTrue(ind_mat.shape == (13, 7))  # Indicator matrix shape should be (meta_label_index+t1, t1)
