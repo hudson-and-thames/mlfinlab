@@ -16,6 +16,16 @@ from mlfinlab.sampling.concurrent import get_av_uniqueness_from_tripple_barrier,
 from mlfinlab.util.utils import get_daily_vol
 
 
+def book_ind_mat_implementation(bar_index, label_endtime):
+    """
+    Book implementation of get_ind_matrix function
+    """
+    
+    ind_mat = pd.DataFrame(0, index=bar_index, columns=range(label_endtime.shape[0]))
+    for i, (start, end) in enumerate(label_endtime.iteritems()):
+        ind_mat.loc[start:end, i] = 1.
+    return ind_mat
+
 class TestSampling(unittest.TestCase):
     """
     Test Triple barrier, meta-labeling, dropping rare labels, and daily volatility.
@@ -57,12 +67,6 @@ class TestSampling(unittest.TestCase):
         self.assertTrue(num_conc_events.value_counts()[0] == 186)
         self.assertTrue(num_conc_events.value_counts()[1] == 505)
         self.assertTrue(num_conc_events.value_counts()[2] == 92)
-
-    def book_ind_mat_implementation(self, bar_index, t1):
-        ind_mat = pd.DataFrame(0, index=bar_index, columns=range(t1.shape[0]))
-        for i, (t0, t1) in enumerate(t1.iteritems()):
-            ind_mat.loc[t0:t1, i] = 1.
-        return ind_mat
 
     def test_get_av_uniqueness(self):
         """
