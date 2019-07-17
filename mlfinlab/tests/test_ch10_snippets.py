@@ -3,6 +3,7 @@ Tests the unit functions in ch10_snippets.py for calculating bet size.
 """
 
 import unittest
+import warnings
 import datetime as dt
 import numpy as np
 import pandas as pd
@@ -10,7 +11,7 @@ import pandas as pd
 from scipy.stats import norm
 
 from mlfinlab.bet_sizing.ch10_snippets import get_signal, avg_active_signals, mp_avg_active_signals, discrete_signal
-from mlfinlab.bet_sizing.ch10_snippets import (bet_size_sigmoid, bet_size_power, bet_size, get_t_pos_sigmoid, get_t_pos_power, get_t_pos,
+from mlfinlab.bet_sizing.ch10_snippets import (bet_size_sigmoid, bet_size_power, bet_size, get_target_pos_sigmoid, get_target_pos_power, get_target_pos,
                                                inv_price_sigmoid, inv_price_power, inv_price, limit_price_sigmoid, limit_price_power, limit_price,
                                                get_w_sigmoid, get_w_power, get_w)
 
@@ -82,6 +83,12 @@ class TestCh10Snippets(unittest.TestCase):
         test_bet_size_2 = get_signal(prob=self.prob, num_classes=2)
         self.assertEqual(self.bet_size.abs().equals(test_bet_size_2), True)
 
+        # Test for prob.shape[0] == 0.
+        df_empty = pd.DataFrame({'a': []})
+        return_val = get_signal(df_empty, 2)
+        self.assertIsInstance(return_val, pd.Series)
+        self.assertEqual(0, len(return_val))
+
     def test_avg_active_signals(self):
         """
         Tests the avg_active_signals function. Also implicitly tests the
@@ -133,6 +140,12 @@ class TestBetSize(unittest.TestCase):
         """
         self.assertRaises(ValueError, bet_size_power, 2, 1.5)
 
+    def test_bet_size_power_return_zero(self):
+        """
+        Tests that the function returns zero if the price divergence provided is zero.
+        """
+        self.assertEqual(0.0, bet_size_power(2, 0.0))
+
     def test_bet_size(self):
         """
         Test excution in all function modes of 'bet_size'.
@@ -153,52 +166,52 @@ class TestBetSize(unittest.TestCase):
 
 class TestGetTPos(unittest.TestCase):
     """
-    Test case for get_t_pos, get_t_pos_sigmoid, and get_t_pos_power.
+    Test case for get_target_pos, get_target_pos_sigmoid, and get_target_pos_power.
     """
-    def test_get_t_pos_sigmoid(self):
+    def test_get_target_pos_sigmoid(self):
         """
-        Tests successful execution of 'get_t_pos_sigmoid'.
+        Tests successful execution of 'get_target_pos_sigmoid'.
         """
         f_i, m_p = 34.6, 21.9
         x_div = f_i - m_p
         w_param = 2.5
         max_pos = 200
         pos_test = int(max_pos*(x_div / np.sqrt(w_param + x_div*x_div)))
-        self.assertAlmostEqual(pos_test, get_t_pos_sigmoid(w_param, f_i, m_p, max_pos), 7)
+        self.assertAlmostEqual(pos_test, get_target_pos_sigmoid(w_param, f_i, m_p, max_pos), 7)
 
-    def test_get_t_pos_power(self):
+    def test_get_target_pos_power(self):
         """
-        Tests successful execution of 'get_t_pos_power'.
+        Tests successful execution of 'get_target_pos_power'.
         """
         f_i, m_p = 34.6, 34.1
         x_div = f_i - m_p
         w_param = 2.1
         max_pos = 100
         pos_test = int(max_pos*(np.sign(x_div) * abs(x_div)**w_param))
-        self.assertAlmostEqual(pos_test, get_t_pos_power(w_param, f_i, m_p, max_pos), 7)
+        self.assertAlmostEqual(pos_test, get_target_pos_power(w_param, f_i, m_p, max_pos), 7)
 
-    def test_get_t_pos(self):
+    def test_get_target_pos(self):
         """
-        Tests successful execution in 'sigmoid' and 'power' function variants of 'get_t_pos'.
+        Tests successful execution in 'sigmoid' and 'power' function variants of 'get_target_pos'.
         """
         f_i_sig, m_p_sig = 31.6, 22.9
         x_div_sig = f_i_sig - m_p_sig
         w_param_sig = 2.6
         max_pos_sig = 220
         pos_test_sig = int(max_pos_sig*(x_div_sig / np.sqrt(w_param_sig + x_div_sig*x_div_sig)))
-        self.assertAlmostEqual(pos_test_sig, get_t_pos(w_param_sig, f_i_sig, m_p_sig, max_pos_sig, 'sigmoid'), 7)
+        self.assertAlmostEqual(pos_test_sig, get_target_pos(w_param_sig, f_i_sig, m_p_sig, max_pos_sig, 'sigmoid'), 7)
         f_i_pow, m_p_pow = 34.8, 34.1
         x_div_pow = f_i_pow - m_p_pow
         w_param_pow = 2.9
         max_pos_pow = 175
         pos_test_pow = int(max_pos_pow*(np.sign(x_div_pow) * abs(x_div_pow)**w_param_pow))
-        self.assertAlmostEqual(pos_test_pow, get_t_pos(w_param_pow, f_i_pow, m_p_pow, max_pos_pow, 'power'), 7)
+        self.assertAlmostEqual(pos_test_pow, get_target_pos(w_param_pow, f_i_pow, m_p_pow, max_pos_pow, 'power'), 7)
 
-    def test_get_t_pos_key_error(self):
+    def test_get_target_pos_key_error(self):
         """
-        Tests for the KeyError in 'get_t_pos' in the case that an invalid value for 'func' is passed.
+        Tests for the KeyError in 'get_target_pos' in the case that an invalid value for 'func' is passed.
         """
-        self.assertRaises(KeyError, get_t_pos, 1, 2, 1, 5, 'NotAFunction')
+        self.assertRaises(KeyError, get_target_pos, 1, 2, 1, 5, 'NotAFunction')
 
 
 class TestInvPrice(unittest.TestCase):
@@ -253,6 +266,13 @@ class TestLimitPrice(unittest.TestCase):
         limit_p_sig = (1/abs(t_pos_sig-pos_sig)) * sum_inv_price_sig
         self.assertAlmostEqual(limit_p_sig, limit_price_sigmoid(t_pos_sig, pos_sig, f_sig, w_sig, max_pos_sig), 7)
 
+    def test_limit_price_sigmoid_return_nan(self):
+        """
+        Tests for the successful return of np.nan in the case that the target position is the same as the
+        current position.
+        """
+        self.assertTrue(np.isnan(limit_price_sigmoid(1, 1, 123, 21, 234)))
+
     def test_limit_price_power(self):
         """
         Test successful execution of 'limit_price_power' function.
@@ -297,10 +317,15 @@ class TestGetW(unittest.TestCase):
 
     def test_get_w_power_warning(self):
         """
-        Tests that a Warning is raised if 'w' is calcualted to be less than zero, and returns a zero.
+        Tests that a UserWarning is raised if 'w' is calcualted to be less than zero, and returns a zero.
         """
-        self.assertWarns(Warning, get_w_power, -0.9, 0.9)
-        self.assertEqual(0, get_w_power(-0.9, 0.9))
+        with warnings.catch_warnings(record=True) as warn_catch:
+            warnings.simplefilter("always")
+            w_param = get_w_power(0.1, 2)
+            print(warn_catch[0].category)
+            self.assertTrue(len(warn_catch) == 1)
+            self.assertEqual(0, w_param)
+            self.assertTrue('User' in str(warn_catch[0].category))
 
     def test_get_w_key_error(self):
         """
