@@ -7,7 +7,7 @@ These implementations are based on bet sizing approaches described in Chapter 10
 import numpy as np
 import pandas as pd
 from mlfinlab.bet_sizing.ch10_snippets import get_signal, avg_active_signals, discrete_signal
-from mlfinlab.bet_sizing.ch10_snippets import get_w, get_t_pos, limit_price, bet_size
+from mlfinlab.bet_sizing.ch10_snippets import get_w, get_target_pos, limit_price, bet_size
 
 
 def bet_size_probability(events, prob, num_classes, pred=None, step_size=0.0, average_active=False, num_threads=1):
@@ -60,7 +60,7 @@ def bet_size_dynamic(current_pos, max_pos, market_price, forecast_price, cal_div
     # Calibrate w.
     w_param = get_w(cal_divergence, cal_bet_size, func)
     # Compute the target bet position.
-    events_0['t_pos'] = events_0.apply(lambda x: get_t_pos(w_param, x.f, x.m_p, x.max_pos, func), axis=1)
+    events_0['t_pos'] = events_0.apply(lambda x: get_target_pos(w_param, x.f, x.m_p, x.max_pos, func), axis=1)
     # Compute the break even limit price.
     events_0['l_p'] = events_0.apply(lambda x: limit_price(x.t_pos, x.pos, x.f, w_param, x.max_pos, func), axis=1)
     # Compute the bet size.
