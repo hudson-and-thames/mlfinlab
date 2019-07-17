@@ -16,6 +16,15 @@ from mlfinlab.sampling.concurrent import get_av_uniqueness_from_tripple_barrier,
 from mlfinlab.util.utils import get_daily_vol
 
 
+def book_ind_mat_implementation(bar_index, label_endtime):
+    """
+    Book implementation of get_ind_matrix function
+    """
+    ind_mat = pd.DataFrame(0, index=bar_index, columns=range(label_endtime.shape[0]))
+    for i, (start, end) in enumerate(label_endtime.iteritems()):
+        ind_mat.loc[start:end, i] = 1.
+    return ind_mat
+
 class TestSampling(unittest.TestCase):
     """
     Test Triple barrier, meta-labeling, dropping rare labels, and daily volatility.
@@ -78,6 +87,14 @@ class TestSampling(unittest.TestCase):
 
         non_nan_meta_labels = self.meta_labeled_events.dropna()
         ind_mat = get_ind_matrix(non_nan_meta_labels)
+
+        label_endtime = non_nan_meta_labels.t1
+        bar_index = list(non_nan_meta_labels.index)  # generate index for indicator matrix from t1 and index
+        bar_index.extend(non_nan_meta_labels.t1)
+        bar_index = sorted(list(set(bar_index)))  # drop duplicates and sort
+        ind_mat_book_implementation = book_ind_mat_implementation(bar_index, label_endtime)
+
+        self.assertTrue(bool((ind_mat_book_implementation.values == ind_mat).all()) is True)
         self.assertTrue(ind_mat.shape == (13, 7))  # Indicator matrix shape should be (meta_label_index+t1, t1)
         # Check indicator matrix values for specific labels
         self.assertTrue(bool((ind_mat[:, 0] == [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
