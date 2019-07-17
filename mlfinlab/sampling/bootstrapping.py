@@ -44,11 +44,27 @@ def get_ind_mat_average_uniqueness(ind_mat):
     Average uniqueness from indicator matrix
 
     :param ind_mat: (np.matrix) indicator binary matrix
-    :return: (np.matrix) matrix with label uniqueness
+    :return: (float) average uniqueness
     """
-    conc = ind_mat.sum(axis=1)  # concurrency
-    average = ind_mat.T / conc
-    return average
+    concurrency = ind_mat.sum(axis=1)
+    uniqueness = ind_mat.T / concurrency
+
+    avg_uniqueness = uniqueness[uniqueness > 0].mean()
+
+    return avg_uniqueness
+
+
+def get_ind_mat_label_uniqueness(ind_mat):
+    """
+    An adaption of Snippet 4.4. page 65, which returns the indicator matrix element uniqueness.
+
+    :param ind_mat: (np.matrix) indicator binary matrix
+    :return: (np.matrix) element uniqueness
+    """
+    concurrency = ind_mat.sum(axis=1)
+    uniqueness = ind_mat.T / concurrency
+
+    return uniqueness
 
 
 @jit(parallel=True, nopython=True)
@@ -116,10 +132,7 @@ def seq_bootstrap(ind_mat, sample_length=None, warmup_samples=None, compare=Fals
     if compare is True:
         standard_indx = np.random.choice(ind_mat.shape[1], size=sample_length)
         standard_unq = get_ind_mat_average_uniqueness(ind_mat[:, standard_indx])
-        standard_unq_mean = standard_unq[standard_unq > 0].mean()
-
         sequential_unq = get_ind_mat_average_uniqueness(ind_mat[:, phi])
-        sequential_unq_mean = sequential_unq[sequential_unq > 0].mean()
-        print('Standard uniqueness: {}\nSequential uniqueness: {}'.format(standard_unq_mean, sequential_unq_mean))
+        print('Standard uniqueness: {}\nSequential uniqueness: {}'.format(standard_unq, sequential_unq))
 
     return phi
