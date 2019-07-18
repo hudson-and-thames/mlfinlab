@@ -50,7 +50,7 @@ class M2N:
             elif variant == 2:
                 parameters_new = self.iter_5(mu_2, p_1, self.moments)  # second variant
             else:
-                raise ValueError("Value of 'variant' must be either 1 or 2.")
+                raise ValueError("Value of argument 'variant' must be either 1 or 2.")
             if not parameters_new:
                 # An empty list returned means an invalid value was found in iter4 or iter5.
                 return None
@@ -99,32 +99,42 @@ class M2N:
          an empty list is returned.
         """
         m_1, m_2, m_3, m_4 = moments[0:4]  # for clarity
-        # mu_1, Equation (22)
-        mu_1 = (m_1 - (1-p_1)*mu_2) / p_1
-        # sigma_2, Equation (24)
-        if (3*(1-p_1)*(mu_2-mu_1)) == 0:
-            # check for divide-by-zero
-            return []
-        sigma_2_squared = ((m_3 + 2*p_1*mu_1**3 + (p_1-1)*mu_2**3 - 3*mu_1*(m_2 + mu_2**2*(p_1-1))) / (3*(1-p_1)*(mu_2-mu_1)))
-        if sigma_2_squared < 0:
-            return []
-        sigma_2 = sigma_2_squared**(.5)
-        # sigma_1, Equation (23)
-        sigma_1_squared = ((m_2 - sigma_2**2 - mu_2**2)/p_1 + sigma_2**2 + mu_2**2 - mu_1**2)
-        if sigma_1_squared < 0:
-            return []
-        sigma_1 = sigma_1_squared**(.5)
-        if np.iscomplex(sigma_1) or np.iscomplex(sigma_2) or \
-            np.isnan(sigma_1) or np.isnan(sigma_2):
-            return []  # returns empty list sigma_1 or sigma_2 are invalid
-        # adjust guess for p_1, Equation (25)
-        p_1_deno = (3*(sigma_1**4 - sigma_2**4) + 6*(sigma_1**2*mu_1**2 - sigma_2**2*mu_2**2) + mu_1**4 - mu_2**4)
-        if p_1_deno == 0:
-            return []  # return empty list if about to divide by zero
-        p_1 = (m_4 - 3*sigma_2**4 - 6*sigma_2**2*mu_2**2 - mu_2**4) / p_1_deno
-        if (p_1 < 0) or (p_1 > 1):
-            return []
-        return [mu_1, mu_2, sigma_1, sigma_2, p_1]
+        param_list = []
+        # Using a single for-loop here to be able to use 'break' functionality.
+        # We need to stop the calculation at any given step to avoid throwing warnings or errors,
+        # and be in control of our return values. I'm open to other suggestions, but multiple return
+        # statements isn't one of them.
+        for calc_step in [1]:
+            # mu_1, Equation (22)
+            mu_1 = (m_1 - (1-p_1)*mu_2) / p_1
+            # sigma_2, Equation (24)
+            if (3*(1-p_1)*(mu_2-mu_1)) == 0:
+                # check for divide-by-zero
+                return []
+            sigma_2_squared = ((m_3 + 2*p_1*mu_1**3 + (p_1-1)*mu_2**3 - 3*mu_1*(m_2 + mu_2**2*(p_1-1))) / (3*(1-p_1)*(mu_2-mu_1)))
+            if sigma_2_squared < 0:
+                return []
+            sigma_2 = sigma_2_squared**(.5)
+            # sigma_1, Equation (23)
+            sigma_1_squared = ((m_2 - sigma_2**2 - mu_2**2)/p_1 + sigma_2**2 + mu_2**2 - mu_1**2)
+            if sigma_1_squared < 0:
+                return []
+            sigma_1 = sigma_1_squared**(.5)
+            if np.iscomplex(sigma_1) or np.iscomplex(sigma_2) or \
+                np.isnan(sigma_1) or np.isnan(sigma_2):
+                return []  # returns empty list sigma_1 or sigma_2 are invalid
+            # adjust guess for p_1, Equation (25)
+            p_1_deno = (3*(sigma_1**4 - sigma_2**4) + 6*(sigma_1**2*mu_1**2 - sigma_2**2*mu_2**2) + mu_1**4 - mu_2**4)
+            if p_1_deno == 0:
+                return []  # return empty list if about to divide by zero
+            p_1 = (m_4 - 3*sigma_2**4 - 6*sigma_2**2*mu_2**2 - mu_2**4) / p_1_deno
+            if (p_1 < 0) or (p_1 > 1):
+                return []
+        # Check to see if every value made it through.
+        if len(param_list) < 5:
+            param_list = []
+        #return [mu_1, mu_2, sigma_1, sigma_2, p_1]
+        return param_list
 
     def iter_5(self, mu_2, p_1, moments):
         """
