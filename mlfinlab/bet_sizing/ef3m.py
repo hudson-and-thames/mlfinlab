@@ -273,20 +273,20 @@ def raw_moment(central_moments, dist_mean):
 def most_likely_parameters(data, ignore_columns='error', res=10_000):
     """
     Determines the most likely parameter estimate using a KDE
-    
+
     :param data: (pandas.DataFrame) Contains parameter estimates from all runs.
     :param ignore_columns: (string, list) Column or columns to exclude from analysis.
     :param res: (int) Resolution of the kernel density estimate.
     :return: (dict) Labels and most likely estimates for parameters.
     """
-    df = data.copy()
+    df_results = data.copy()
     if isinstance(ignore_columns, str):
         ignore_columns = [ignore_columns]
-    columns = [c for c in df.columns if c not in ignore_columns]
+    columns = [c for c in df_results.columns if c not in ignore_columns]
     d_results = {}
     for col in columns:
-        x_range = np.linspace(df[col].min(), df[col].max(), num=res)
-        kde = gaussian_kde(df[col].to_numpy())
+        x_range = np.linspace(df_results[col].min(), df_results[col].max(), num=res)
+        kde = gaussian_kde(df_results[col].to_numpy())
         y_kde = kde.evaluate(x_range)
         top_value = round(x_range[np.argmax(y_kde)], 5)
         d_results[col] = top_value
