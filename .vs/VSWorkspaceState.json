@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\mlfinlab",
+    "\\mlfinlab\\supervised_learning",
+    "\\mlfinlab\\tests",
+    "\\mlfinlab\\tests\\test_data",
+    "\\mlfinlab\\util",
+    "\\scripts"
+  ],
+  "SelectedNode": "\\mlfinlab\\tests\\test_decision_tree.py",
+  "PreviewInSolutionExplorer": false
+}
