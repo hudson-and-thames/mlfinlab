@@ -63,6 +63,11 @@ class HierarchicalRiskParity:
                 self.weights[left_cluster] *= alloc_factor
                 self.weights[right_cluster] *= 1 - alloc_factor
 
+    def plot_clusters(self, height = 10, width = 10):
+        plt.figure(figsize = (width, height))
+        dendrogram(self.clusters)
+        plt.show()
+
     def allocate(self, X):
         if type(X) != pd.DataFrame:
             X = pd.DataFrame(X)
