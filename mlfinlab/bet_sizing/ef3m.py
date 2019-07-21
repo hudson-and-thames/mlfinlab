@@ -29,7 +29,8 @@ class M2N:
             parameters = [mu_1, mu_2, sigma_1, sigma_2, p_1]
         """
         self.moments = moments
-        self.parameters = [0 for i in range(5)]  # initialize parameter list
+        self.new_moments = [0 for i in range(5)]  # Initialize the new moment list to zeroes.
+        self.parameters = [0 for i in range(5)]  # Initialize the parameter list to zeroes.
         self.error = sum([moments[i]**2 for i in range(len(moments))])
 
     def fit(self, mu_2, epsilon, variant=1, max_iter=100_000):
@@ -46,29 +47,29 @@ class M2N:
         while True:
             num_iter += 1
             if variant == 1:
-                parameters_new = self.iter_4(mu_2, p_1, self.moments)  # first variant
+                parameters_new = self.iter_4(mu_2, p_1)  # First variant, using the first 4 moments.
             elif variant == 2:
-                parameters_new = self.iter_5(mu_2, p_1, self.moments)  # second variant
+                parameters_new = self.iter_5(mu_2, p_1)  # Second variant, using all 5 moments.
             else:
                 raise ValueError("Value of argument 'variant' must be either 1 or 2.")
             if not parameters_new:
-                # An empty list returned means an invalid value was found in iter4 or iter5.
+                # An empty list returned means an invalid value was found in iter_4 or iter_5.
                 return None
             parameters = parameters_new.copy()
-            moments = self.get_moments(parameters)
-            error = sum([(self.moments[i]-moments[i])**2 for i in range(len(moments))])
+            self.get_moments(parameters)
+            error = sum([(self.moments[i]-self.new_moments[i])**2 for i in range(len(self.new_moments))])
             if error < self.error:
-                # update with new best parameters, error
+                # Update with new best parameters, error.
                 self.parameters = parameters
                 self.error = error
             if abs(p_1 - parameters[4]) < epsilon:
-                # stopping condition
+                # Stopping condition.
                 break
             if num_iter > max_iter:
-                # max_iter reached, convergence not fast enough
+                # max_iter reached without p_1 reaching a stable enough value (dictated by epsilon).
                 return None
             p_1 = parameters[4]
-            mu_2 = parameters[1]  # for the 5th moments convergence
+            mu_2 = parameters[1]  # Update for the 5th moments convergence.
         self.parameters = parameters
         return None
 
@@ -86,9 +87,9 @@ class M2N:
         m_3 = p_1*(3*s_1**2*u_1 + u_1**3) + p_2*(3*s_2**2*u_2 + u_2**3)  # Eq. (8)
         m_4 = p_1*(3*s_1**4 + 6*s_1**2*u_1**2 + u_1**4) + p_2*(3*s_2**4 + 6*s_2**2*u_2**2 + u_2**4)  # Eq. (9)
         m_5 = p_1*(15*s_1**4*u_1 + 10*s_1**2*u_1**3 + u_1**5) + p_2*(15*s_2**4*u_2 + 10*s_2**2*u_2**3 + u_2**5)  # Eq. (10)
-        return [m_1, m_2, m_3, m_4, m_5]
+        self.new_moments = [m_1, m_2, m_3, m_4, m_5]
 
-    def iter_4(self, mu_2, p_1, moments):
+    def iter_4(self, mu_2, p_1):
         """
         Evaluation of the set of equations that make up variant #1 of the EF3M algorithm (fitting using the first four moments).
 
@@ -98,45 +99,50 @@ class M2N:
         :return: (list) List of estimated parameter if no invalid values are encountered (e.g. complex values, divide-by-zero), otherwise
          an empty list is returned.
         """
-        m_1, m_2, m_3, m_4 = moments[0:4]  # for clarity
+        m_1, m_2, m_3, m_4 = self.moments[0:4]  # for clarity
         param_list = []
-        # Using a single for-loop here to be able to use 'break' functionality.
+        # Using a while-loop here to be able to use 'break' functionality.
         # We need to stop the calculation at any given step to avoid throwing warnings or errors,
         # and be in control of our return values. I'm open to other suggestions, but multiple return
         # statements isn't one of them.
-        for calc_step in [1]:
+        while True:
             # mu_1, Equation (22)
             mu_1 = (m_1 - (1-p_1)*mu_2) / p_1
             # sigma_2, Equation (24)
             if (3*(1-p_1)*(mu_2-mu_1)) == 0:
-                # check for divide-by-zero
-                return []
+                # Check for divide-by-zero.
+                break
             sigma_2_squared = ((m_3 + 2*p_1*mu_1**3 + (p_1-1)*mu_2**3 - 3*mu_1*(m_2 + mu_2**2*(p_1-1))) / (3*(1-p_1)*(mu_2-mu_1)))
             if sigma_2_squared < 0:
-                return []
+                break
             sigma_2 = sigma_2_squared**(.5)
             # sigma_1, Equation (23)
             sigma_1_squared = ((m_2 - sigma_2**2 - mu_2**2)/p_1 + sigma_2**2 + mu_2**2 - mu_1**2)
             if sigma_1_squared < 0:
-                return []
+                break
             sigma_1 = sigma_1_squared**(.5)
             if np.iscomplex(sigma_1) or np.iscomplex(sigma_2) or \
                 np.isnan(sigma_1) or np.isnan(sigma_2):
-                return []  # returns empty list sigma_1 or sigma_2 are invalid
-            # adjust guess for p_1, Equation (25)
+                # Break loop if sigma_1 or sigma_2 are invalid.
+                break
+            # Adjust guess for p_1, Equation (25)
             p_1_deno = (3*(sigma_1**4 - sigma_2**4) + 6*(sigma_1**2*mu_1**2 - sigma_2**2*mu_2**2) + mu_1**4 - mu_2**4)
             if p_1_deno == 0:
-                return []  # return empty list if about to divide by zero
+                # Break if about to divide by zero.
+                break
             p_1 = (m_4 - 3*sigma_2**4 - 6*sigma_2**2*mu_2**2 - mu_2**4) / p_1_deno
             if (p_1 < 0) or (p_1 > 1):
-                return []
+                # The probabilty must be between zero and one.
+                break
+            param_list = [mu_1, mu_2, sigma_1, sigma_2, p_1]  # Add all new parameter estimates to the return list if no break has occured before now.
+            # We only want this to execute once at most, so call a final break if one hasn't been called yet.
+            break
         # Check to see if every value made it through.
         if len(param_list) < 5:
-            param_list = []
-        #return [mu_1, mu_2, sigma_1, sigma_2, p_1]
+            return []
         return param_list
 
-    def iter_5(self, mu_2, p_1, moments):
+    def iter_5(self, mu_2, p_1):
         """
         Evaluation of the set of equations that make up variant #2 of the EF3M algorithm (fitting using the first five moments).
 
@@ -146,48 +152,61 @@ class M2N:
         :return: (list) List of estimated parameter if no invalid values are encountered (e.g. complex values, divide-by-zero), otherwise
          an empty list is returned.
         """
-        m_1, m_2, m_3, m_4, m_5 = moments  # for clarity
-        # mu_1, Equation (22)
-        mu_1 = (m_1 - (1-p_1)*mu_2) / p_1
-        if (3*(1-p_1)*(mu_2-mu_1)) == 0:
+        m_1, m_2, m_3, m_4, m_5 = self.moments  # for clarity
+        # Using a while-loop here to be able to use 'break' functionality.
+        # We need to stop the calculation at any given step to avoid throwing warnings or errors,
+        # and be in control of our return values. I'm open to other suggestions, but multiple return
+        # statements isn't one of them.
+        param_list = []
+        while True:
+            # Calculate mu_1, Equation (22).
+            mu_1 = (m_1 - (1-p_1)*mu_2) / p_1
+            if (3*(1-p_1)*(mu_2-mu_1)) == 0:
+                break
+            # Calculate sigma_2, Equation (24).
+            if (3*(1-p_1)*(mu_2-mu_1)) == 0:
+                # Check for divide by zero.
+                break
+            sigma_2_squared = ((m_3 + 2*p_1*mu_1**3 + (p_1-1)*mu_2**3 - 3*mu_1*(m_2 + mu_2**2*(p_1-1))) / (3*(1-p_1)*(mu_2-mu_1)))
+            if sigma_2_squared < 0:
+                break
+            sigma_2 = sigma_2_squared**(.5)
+            # Calculate sigma_1, Equation (23).
+            sigma_1_squared = ((m_2 - sigma_2**2 - mu_2**2)/p_1 + sigma_2**2 + mu_2**2 - mu_1**2)
+            if sigma_1_squared < 0:
+                break
+            sigma_1 = sigma_1_squared**(.5)
+            # Last check for sigma_1 and sigma_2 validity.
+            if np.iscomplex(sigma_1) or np.iscomplex(sigma_2) or np.isnan(sigma_1) or np.isnan(sigma_2):
+                break
+            # Adjust the guess for mu_2, Equation (27).
+            if (1-p_1) < 1e-4:
+                # Break to prevent divide by zero.
+                break
+            a_1 = (6*sigma_2**4 + (m_4-p_1*(3*sigma_1**4+6*sigma_1**2*mu_1**2+mu_1**4)) / (1-p_1))**.5
+            print("a_1", a_1)
+            mu_2_squared = (a_1 - 3*sigma_2**2)
+            if np.iscomplex(mu_2_squared) or mu_2 < 0:
+                break
+            mu_2 = mu_2_squared**.5
+            if np.iscomplex(mu_2):
+                break
+            # Adjust guess for p_1, Equation (28, 29).
+            a_2 = 15*sigma_1**4*mu_1+10*sigma_1**2*mu_1**3+mu_1**5
+            b_2 = 15*sigma_2**4*mu_2+10*sigma_2**2*mu_2**3+mu_2**5
+            if (a_2-b_2) == 0:
+                # Break if about to divide by zero.
+                break
+            p_1 = (m_5-b_2) / (a_2-b_2)
+            if (p_1 < 0) or (p_1 > 1):
+                break
+            param_list = [mu_1, mu_2, sigma_1, sigma_2, p_1]  # Add all new parameter estimates to the return list if no break has occured before now.
+            # We only want this to execute once at most, so call a final break if one hasn't been called yet.
+            break
+        # Check to see if every value made it through.
+        if len(param_list) < 5:
             return []
-        # sigma_2, Equation (24)
-        if (3*(1-p_1)*(mu_2-mu_1)) == 0:
-            # check for divide-by-zero
-            return []
-        sigma_2_squared = ((m_3 + 2*p_1*mu_1**3 + (p_1-1)*mu_2**3 - 3*mu_1*(m_2 + mu_2**2*(p_1-1))) / (3*(1-p_1)*(mu_2-mu_1)))
-        if sigma_2_squared < 0:
-            return []
-        sigma_2 = sigma_2_squared**(.5)
-        # sigma_1, Equation (23)
-        sigma_1_squared = ((m_2 - sigma_2**2 - mu_2**2)/p_1 + sigma_2**2 + mu_2**2 - mu_1**2)
-        if sigma_1_squared < 0:
-            return []
-        sigma_1 = sigma_1_squared**(.5)
-        # last check for sigma_1 and sigma_2 validity
-        if np.iscomplex(sigma_1) or np.iscomplex(sigma_2) or np.isnan(sigma_1) or np.isnan(sigma_2):
-            return []
-        # adjust the guess for mu_2, Equation (27)
-        if (1-p_1) < 1e-4:
-            return []
-        a_1 = (6*sigma_2**4 + (m_4-p_1*(3*sigma_1**4+6*sigma_1**2*mu_1**2+mu_1**4)) / (1-p_1))**.5
-        mu_2_squared = (a_1 - 3*sigma_2**2)
-        if np.iscomplex(mu_2_squared) or mu_2 < 0:
-            return []
-        #if mu_2_squared < 0:
-        #    return []
-        mu_2 = mu_2_squared**.5
-        if np.iscomplex(mu_2):
-            return []
-        # adjust guess for p_1, Equation (28, 29)
-        a_2 = 15*sigma_1**4*mu_1+10*sigma_1**2*mu_1**3+mu_1**5
-        b_2 = 15*sigma_2**4*mu_2+10*sigma_2**2*mu_2**3+mu_2**5
-        if (a_2-b_2) == 0:
-            return []  # return empty list if about to divide by zero
-        p_1 = (m_5-b_2) / (a_2-b_2)
-        if (p_1 < 0) or (p_1 > 1):
-            return []
-        return [mu_1, mu_2, sigma_1, sigma_2, p_1]
+        return param_list
 
     def single_fit_loop(self, epsilon=10**-5, factor=5, variant=1, max_iter=100_000):
         """
