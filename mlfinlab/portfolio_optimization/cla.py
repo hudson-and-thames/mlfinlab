@@ -21,24 +21,27 @@ class CLA:
         :raises TypeError: if ``expected_returns`` is not a series, list or array
         :raises TypeError: if ``cov_matrix`` is not a dataframe or array
         """
-        # Initialize the class
+        
         self.mean = np.array(expected_returns).reshape((len(expected_returns), 1))
         if (self.mean == np.ones(self.mean.shape) * self.mean.mean()).all():
             self.mean[-1, 0] += 1e-5
         self.expected_returns = self.mean.reshape((len(self.mean),))
         self.cov_matrix = np.asarray(cov_matrix)
+        
         if isinstance(weight_bounds[0], numbers.Real):
-            self.lB = np.ones(self.mean.shape) * weight_bounds[0]
+            self.lower_bounds = np.ones(self.mean.shape) * weight_bounds[0]
         else:
-            self.lB = np.array(weight_bounds[0]).reshape(self.mean.shape)
+            self.lower_bounds = np.array(weight_bounds[0]).reshape(self.mean.shape)
+        
         if isinstance(weight_bounds[0], numbers.Real):
-            self.uB = np.ones(self.mean.shape) * weight_bounds[1]
+            self.upper_bounds = np.ones(self.mean.shape) * weight_bounds[1]
         else:
-            self.uB = np.array(weight_bounds[1]).reshape(self.mean.shape)
-        self.w = []  # solution
-        self.ls = []  # lambdas
-        self.g = []  # gammas
-        self.f = []  # free weights
+            self.upper_bounds = np.array(weight_bounds[1]).reshape(self.mean.shape)
+        
+        self.weights = []  # solution
+        self.lambdas = []  # lambdas
+        self.gammas = []  # gammas
+        self.free_weights = []  # free weights
 
         if isinstance(expected_returns, pd.Series):
             tickers = list(expected_returns.index)
@@ -59,10 +62,10 @@ class CLA:
         b = np.sort(a, order="mu")
 
         # 3) First free weight
-        i, w = b.shape[0], np.copy(self.lB)
+        i, w = b.shape[0], np.copy(self.lower_bounds)
         while sum(w) < 1:
             i -= 1
-            w[b[i][0]] = self.uB[b[i][0]]
+            w[b[i][0]] = self.upper_bounds[b[i][0]]
         w[b[i][0]] += 1 - sum(w)
         return [b[i][0]], w
 
@@ -79,18 +82,18 @@ class CLA:
         g1 = np.dot(np.dot(onesF.T, covarF_inv), meanF)
         g2 = np.dot(np.dot(onesF.T, covarF_inv), onesF)
         if wB is None:
-            g, w1 = float(-self.ls[-1] * g1 / g2 + 1 / g2), 0
+            g, w1 = float(-self.lambdas[-1] * g1 / g2 + 1 / g2), 0
         else:
             onesB = np.ones(wB.shape)
             g3 = np.dot(onesB.T, wB)
             g4 = np.dot(covarF_inv, covarFB)
             w1 = np.dot(g4, wB)
             g4 = np.dot(onesF.T, w1)
-            g = float(-self.ls[-1] * g1 / g2 + (1 - g3 + g4) / g2)
+            g = float(-self.lambdas[-1] * g1 / g2 + (1 - g3 + g4) / g2)
         # 2) compute weights
         w2 = np.dot(covarF_inv, onesF)
         w3 = np.dot(covarF_inv, meanF)
-        return -w1 + g * w2 + self.ls[-1] * w3, g
+        return -w1 + g * w2 + self.lambdas[-1] * w3, g
 
     def _compute_lambda(self, covarF_inv, covarFB, meanF, wB, i, bi):
         # 1) C
@@ -123,7 +126,7 @@ class CLA:
         meanF = self._reduce_matrix(self.mean, f, [0])
         b = self._get_b(f)
         covarFB = self._reduce_matrix(self.cov_matrix, f, b)
-        wB = self._reduce_matrix(self.w[-1], b, [0])
+        wB = self._reduce_matrix(self.weights[-1], b, [0])
         return covarF, covarFB, meanF, wB
 
     def _get_b(self, f):
@@ -153,23 +156,23 @@ class CLA:
         i = 0
         while True:
             flag = False
-            if i == len(self.w):
+            if i == len(self.weights):
                 break
-            if abs(sum(self.w[i]) - 1) > tol:
+            if abs(sum(self.weights[i]) - 1) > tol:
                 flag = True
             else:
-                for j in range(self.w[i].shape[0]):
+                for j in range(self.weights[i].shape[0]):
                     if (
-                        self.w[i][j] - self.lB[j] < -tol
-                        or self.w[i][j] - self.uB[j] > tol
+                        self.weights[i][j] - self.lower_bounds[j] < -tol
+                        or self.weights[i][j] - self.upper_bounds[j] > tol
                     ):
                         flag = True
                         break
             if flag is True:
-                del self.w[i]
-                del self.ls[i]
-                del self.g[i]
-                del self.f[i]
+                del self.weights[i]
+                del self.lambdas[i]
+                del self.gammas[i]
+                del self.free_weights[i]
             else:
                 i += 1
 
@@ -179,21 +182,21 @@ class CLA:
         while True:
             if repeat is False:
                 i += 1
-            if i == len(self.w) - 1:
+            if i == len(self.weights) - 1:
                 break
-            w = self.w[i]
+            w = self.weights[i]
             mu = np.dot(w.T, self.mean)[0, 0]
             j, repeat = i + 1, False
             while True:
-                if j == len(self.w):
+                if j == len(self.weights):
                     break
-                w = self.w[j]
+                w = self.weights[j]
                 mu_ = np.dot(w.T, self.mean)[0, 0]
                 if mu < mu_:
-                    del self.w[i]
-                    del self.ls[i]
-                    del self.g[i]
-                    del self.f[i]
+                    del self.weights[i]
+                    del self.lambdas[i]
+                    del self.gammas[i]
+                    del self.free_weights[i]
                     repeat = True
                     break
                 else:
@@ -250,7 +253,7 @@ class CLA:
             j = 0
             for i in f:
                 l, bi = self._compute_lambda(
-                    covarF_inv, covarFB, meanF, wB, j, [self.lB[i], self.uB[i]]
+                    covarF_inv, covarFB, meanF, wB, j, [self.lower_bounds[i], self.upper_bounds[i]]
                 )
                 if _infnone(l) > _infnone(l_in):
                     l_in, i_in, bi_in = l, i, bi
@@ -271,20 +274,20 @@ class CLA:
                     meanF,
                     wB,
                     meanF.shape[0] - 1,
-                    self.w[-1][i],
+                    self.weights[-1][i],
                 )
-                if (self.ls[-1] is None or l < self.ls[-1]) and l > _infnone(l_out):
+                if (self.lambdas[-1] is None or l < self.lambdas[-1]) and l > _infnone(l_out):
                     l_out, i_out = l, i
         return l_out, i_out
 
-    def _solve(self):
+    def allocate(self):
 
         # Compute the turning points,free sets and weights
         f, w = self._init_algo()
-        self.w.append(np.copy(w))  # store solution
-        self.ls.append(None)
-        self.g.append(None)
-        self.f.append(f[:])
+        self.weights.append(np.copy(w))  # store solution
+        self.lambdas.append(None)
+        self.gammas.append(None)
+        self.free_weights.append(f[:])
         while True:
 
             # 1) Bound one free weight
@@ -295,18 +298,18 @@ class CLA:
 
             if (l_in is None or l_in < 0) and (l_out is None or l_out < 0):
                 # 3) Compute minimum variance solution
-                self.ls.append(0)
+                self.lambdas.append(0)
                 covarF, covarFB, meanF, wB = self._get_matrices(f)
                 covarF_inv = np.linalg.inv(covarF)
                 meanF = np.zeros(meanF.shape)
             else:
                 # 4) Decide lambda
                 if _infnone(l_in) > _infnone(l_out):
-                    self.ls.append(l_in)
+                    self.lambdas.append(l_in)
                     f.remove(i_in)
                     w[i_in] = bi_in  # set value at the correct boundary
                 else:
-                    self.ls.append(l_out)
+                    self.lambdas.append(l_out)
                     f.append(i_out)
                 covarF, covarFB, meanF, wB = self._get_matrices(f)
                 covarF_inv = np.linalg.inv(covarF)
@@ -315,10 +318,10 @@ class CLA:
             wF, g = self._compute_w(covarF_inv, covarFB, meanF, wB)
             for i in range(len(f)):
                 w[f[i]] = wF[i]
-            self.w.append(np.copy(w))  # store solution
-            self.g.append(g)
-            self.f.append(f[:])
-            if self.ls[-1] == 0:
+            self.weights.append(np.copy(w))  # store solution
+            self.gammas.append(g)
+            self.free_weights.append(f[:])
+            if self.lambdas[-1] == 0:
                 break
 
         # 6) Purge turning points
@@ -327,32 +330,29 @@ class CLA:
 
     def max_sharpe(self):
         """Get the max Sharpe ratio portfolio"""
-        if not self.w:
-            self._solve()
+        if not self.weights:
+            self.allocate()
         # 1) Compute the local max SR portfolio between any two neighbor turning points
         w_sr, sr = [], []
-        for i in range(len(self.w) - 1):
-            w0 = np.copy(self.w[i])
-            w1 = np.copy(self.w[i + 1])
+        for i in range(len(self.weights) - 1):
+            w0 = np.copy(self.weights[i])
+            w1 = np.copy(self.weights[i + 1])
             kargs = {"minimum": False, "args": (w0, w1)}
             a, b = self._golden_section(self._eval_sr, 0, 1, **kargs)
             w_sr.append(a * w0 + (1 - a) * w1)
             sr.append(b)
-        # return max(sr), w_sr[sr.index(max(sr))]
-        self.weights = w_sr[sr.index(max(sr))].reshape((self.n_assets,))
-        return dict(zip(self.tickers, self.weights))
+        return max(sr), w_sr[sr.index(max(sr))]
 
     def min_volatility(self):
         """Get the minimum variance solution"""
-        if not self.w:
-            self._solve()
+        if not self.weights:
+            self.allocate()
         var = []
-        for w in self.w:
+        for w in self.weights:
             a = np.dot(np.dot(w.T, self.cov_matrix), w)
             var.append(a)
-        # return min(var)**.5, self.w[var.index(min(var))]
-        self.weights = self.w[var.index(min(var))].reshape((self.n_assets,))
-        return dict(zip(self.tickers, self.weights))
+        min_var = min(var)
+        return min_var**.5, self.weights[var.index(min_var)]
 
     def efficient_frontier(self, points=100):
         """
@@ -363,18 +363,18 @@ class CLA:
         :return: return list, std list, weight list
         :rtype: (float list, float list, np.ndarray list)
         """
-        if not self.w:
+        if not self.weights:
             raise ValueError("Weights not yet computed")
 
         mu, sigma, weights = [], [], []
         # remove the 1, to avoid duplications
-        a = np.linspace(0, 1, points // len(self.w))[:-1]
-        b = list(range(len(self.w) - 1))
+        a = np.linspace(0, 1, points // len(self.weights))[:-1]
+        b = list(range(len(self.weights) - 1))
         for i in b:
-            w0, w1 = self.w[i], self.w[i + 1]
+            w0, w1 = self.weights[i], self.weights[i + 1]
             if i == b[-1]:
                 # include the 1 in the last iteration
-                a = np.linspace(0, 1, points // len(self.w))
+                a = np.linspace(0, 1, points // len(self.weights))
             for j in a:
                 w = w1 * j + (1 - j) * w0
                 weights.append(np.copy(w))
