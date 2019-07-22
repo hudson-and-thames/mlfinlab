@@ -73,11 +73,12 @@ class M2N:
         self.parameters = parameters
         return None
 
-    def get_moments(self, parameters):
+    def get_moments(self, parameters, return_result=False):
         """
         Calculates and returns the first five (1...5) raw moments corresponding to the newly esitmated parameters.
 
         :param parameters: (list) List of parameters if the specific order [mu_1, mu_2, sigma_1, sigma_2, p_1]
+        :param return_result: (bool) If True, method returns a result instead of setting the 'self.new_moments' attribute.
         :return: (list) List of the first five moments
         """
         u_1, u_2, s_1, s_2, p_1 = parameters  # for clarity
@@ -87,6 +88,8 @@ class M2N:
         m_3 = p_1*(3*s_1**2*u_1 + u_1**3) + p_2*(3*s_2**2*u_2 + u_2**3)  # Eq. (8)
         m_4 = p_1*(3*s_1**4 + 6*s_1**2*u_1**2 + u_1**4) + p_2*(3*s_2**4 + 6*s_2**2*u_2**2 + u_2**4)  # Eq. (9)
         m_5 = p_1*(15*s_1**4*u_1 + 10*s_1**2*u_1**3 + u_1**5) + p_2*(15*s_2**4*u_2 + 10*s_2**2*u_2**3 + u_2**5)  # Eq. (10)
+        if return_result:
+            return [m_1, m_2, m_3, m_4, m_5]
         self.new_moments = [m_1, m_2, m_3, m_4, m_5]
 
     def iter_4(self, mu_2, p_1):
@@ -108,31 +111,32 @@ class M2N:
         while True:
             # mu_1, Equation (22)
             mu_1 = (m_1 - (1-p_1)*mu_2) / p_1
-            # sigma_2, Equation (24)
+            # Calculate sigma_2, Equation (24)
             if (3*(1-p_1)*(mu_2-mu_1)) == 0:
-                # Check for divide-by-zero.
+                # Validity check 1: Check for divide-by-zero.
                 break
             sigma_2_squared = ((m_3 + 2*p_1*mu_1**3 + (p_1-1)*mu_2**3 - 3*mu_1*(m_2 + mu_2**2*(p_1-1))) / (3*(1-p_1)*(mu_2-mu_1)))
             if sigma_2_squared < 0:
+                # Validity check 2: Prevent potential complex values.
                 break
             sigma_2 = sigma_2_squared**(.5)
-            # sigma_1, Equation (23)
+            # Calculate sigma_1, Equation (23)
             sigma_1_squared = ((m_2 - sigma_2**2 - mu_2**2)/p_1 + sigma_2**2 + mu_2**2 - mu_1**2)
             if sigma_1_squared < 0:
+                # Validity check 3: Prevent potential complex values.
                 break
             sigma_1 = sigma_1_squared**(.5)
-            if np.iscomplex(sigma_1) or np.iscomplex(sigma_2) or \
-                np.isnan(sigma_1) or np.isnan(sigma_2):
-                # Break loop if sigma_1 or sigma_2 are invalid.
+            if np.iscomplex(sigma_1) or np.iscomplex(sigma_2) or np.isnan(sigma_1) or np.isnan(sigma_2):
+                # Validity check 4: Break loop if sigma_1 or sigma_2 are invalid.
                 break
             # Adjust guess for p_1, Equation (25)
             p_1_deno = (3*(sigma_1**4 - sigma_2**4) + 6*(sigma_1**2*mu_1**2 - sigma_2**2*mu_2**2) + mu_1**4 - mu_2**4)
             if p_1_deno == 0:
-                # Break if about to divide by zero.
+                # Validity check 5: Break if about to divide by zero.
                 break
             p_1 = (m_4 - 3*sigma_2**4 - 6*sigma_2**2*mu_2**2 - mu_2**4) / p_1_deno
             if (p_1 < 0) or (p_1 > 1):
-                # The probabilty must be between zero and one.
+                # Validity check 6: The probabilty must be between zero and one.
                 break
             param_list = [mu_1, mu_2, sigma_1, sigma_2, p_1]  # Add all new parameter estimates to the return list if no break has occured before now.
             # We only want this to execute once at most, so call a final break if one hasn't been called yet.
@@ -164,9 +168,6 @@ class M2N:
             if (3*(1-p_1)*(mu_2-mu_1)) == 0:
                 break
             # Calculate sigma_2, Equation (24).
-            if (3*(1-p_1)*(mu_2-mu_1)) == 0:
-                # Check for divide by zero.
-                break
             sigma_2_squared = ((m_3 + 2*p_1*mu_1**3 + (p_1-1)*mu_2**3 - 3*mu_1*(m_2 + mu_2**2*(p_1-1))) / (3*(1-p_1)*(mu_2-mu_1)))
             if sigma_2_squared < 0:
                 break
@@ -183,14 +184,16 @@ class M2N:
             if (1-p_1) < 1e-4:
                 # Break to prevent divide by zero.
                 break
-            a_1 = (6*sigma_2**4 + (m_4-p_1*(3*sigma_1**4+6*sigma_1**2*mu_1**2+mu_1**4)) / (1-p_1))**.5
-            print("a_1", a_1)
+            a_1_squared = (6*sigma_2**4 + (m_4-p_1*(3*sigma_1**4+6*sigma_1**2*mu_1**2+mu_1**4)) / (1-p_1))
+            if a_1_squared < 0:
+                # Break to avoid taking the square root of negative number.
+                break
+            a_1 = a_1_squared**.5
+            #print("a_1", a_1)
             mu_2_squared = (a_1 - 3*sigma_2**2)
-            if np.iscomplex(mu_2_squared) or mu_2 < 0:
+            if np.iscomplex(mu_2_squared) or mu_2_squared < 0:
                 break
             mu_2 = mu_2_squared**.5
-            if np.iscomplex(mu_2):
-                break
             # Adjust guess for p_1, Equation (28, 29).
             a_2 = 15*sigma_1**4*mu_1+10*sigma_1**2*mu_1**3+mu_1**5
             b_2 = 15*sigma_2**4*mu_2+10*sigma_2**2*mu_2**3+mu_2**5
