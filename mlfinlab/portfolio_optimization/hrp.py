@@ -11,11 +11,24 @@ class HierarchicalRiskParity:
         return
 
     def _tree_clustering(self, correlation, method = 'single'):
+        '''
+
+        :param correlation:
+        :param method:
+        :return:
+        '''
+
         distances = np.sqrt((1 - correlation) / 2)
         clusters = linkage(squareform(distances.values), method = method)
         return distances, clusters
 
     def _quasi_diagnalization(self, N, curr_index):
+        '''
+
+        :param N:
+        :param curr_index:
+        :return:
+        '''
 
         if curr_index < N:
             return [curr_index]
@@ -26,6 +39,13 @@ class HierarchicalRiskParity:
         return (self._quasi_diagnalization(N, left) + self._quasi_diagnalization(N, right))
 
     def _get_seriated_matrix(self, N, ordered_indices):
+        '''
+
+        :param N:
+        :param ordered_indices:
+        :return:
+        '''
+
         seriated_dist = np.zeros((N, N))
         a, b = np.triu_indices(N, k = 1)
         seriated_dist[a, b] = self.distances[[ordered_indices[i] for i in a], [ordered_indices[j] for j in b]]
@@ -33,6 +53,13 @@ class HierarchicalRiskParity:
         return seriated_dist
 
     def _recursive_bisection(self, covariances, ordered_indices):
+        '''
+
+        :param covariances:
+        :param ordered_indices:
+        :return:
+        '''
+
         self.weights = pd.Series(1, index = ordered_indices)
         clustered_alphas = [ordered_indices]
 
@@ -64,11 +91,24 @@ class HierarchicalRiskParity:
                 self.weights[right_cluster] *= 1 - alloc_factor
 
     def plot_clusters(self, height = 10, width = 10):
+        '''
+
+        :param height:
+        :param width:
+        :return:
+        '''
+
         plt.figure(figsize = (width, height))
         dendrogram(self.clusters)
         plt.show()
 
     def allocate(self, X):
+        '''
+
+        :param X:
+        :return:
+        '''
+
         if type(X) != pd.DataFrame:
             X = pd.DataFrame(X)
 
