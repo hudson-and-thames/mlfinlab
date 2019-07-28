@@ -6,20 +6,26 @@ import numpy as np
 from numba import jit, prange
 
 
-def get_ind_matrix(triple_barrier_events):
+def get_ind_matrix(triple_barrier_events, price_bars):
     """
     Snippet 4.3, page 64, Build an Indicator Matrix
     Get indicator matrix
     :param triple_barrier_events: (pd.DataFrame): triple barrier events from labeling.get_events
+    :param price_bars: (pd.DataFrame): price bars which were used to form triple barrier events
     :return: (np.array) indicator binary matrix indicating what (price) bars influence the label for each observation
     """
     if bool(triple_barrier_events.isnull().values.any()) is True or bool(
             triple_barrier_events.index.isnull().any()) is True:
         raise ValueError('NaN values in triple_barrier_events, delete nans')
 
+    # take only period covered in triple_barrier_events
+    trimmed_price_bars_index = price_bars[(price_bars.index >= triple_barrier_events.index.min()) & (
+            price_bars.index <= triple_barrier_events.t1.max())].index
+
     label_endtime = triple_barrier_events.t1
     bar_index = list(triple_barrier_events.index)  # generate index for indicator matrix from t1 and index
     bar_index.extend(triple_barrier_events.t1)
+    bar_index.extend(trimmed_price_bars_index)  # add price bars index
     bar_index = sorted(list(set(bar_index)))  # drop duplicates and sort
 
     sorted_timestamps = dict(
@@ -42,13 +48,27 @@ def get_ind_mat_average_uniqueness(ind_mat):
     """
     Snippet 4.4. page 65, Compute Average Uniqueness
     Average uniqueness from indicator matrix
-
     :param ind_mat: (np.matrix) indicator binary matrix
-    :return: (np.matrix) matrix with label uniqueness
+    :return: (float) average uniqueness
     """
-    conc = ind_mat.sum(axis=1)  # concurrency
-    average = ind_mat.T / conc
-    return average
+    concurrency = ind_mat.sum(axis=1)
+    uniqueness = ind_mat.T / concurrency
+
+    avg_uniqueness = uniqueness[uniqueness > 0].mean()
+
+    return avg_uniqueness
+
+
+def get_ind_mat_label_uniqueness(ind_mat):
+    """
+    An adaption of Snippet 4.4. page 65, which returns the indicator matrix element uniqueness.
+    :param ind_mat: (np.matrix) indicator binary matrix
+    :return: (np.matrix) element uniqueness
+    """
+    concurrency = ind_mat.sum(axis=1)
+    uniqueness = ind_mat.T / concurrency
+
+    return uniqueness
 
 
 @jit(parallel=True, nopython=True)
