@@ -8,18 +8,32 @@ def _infnone(x):
     return float("-inf") if x is None else x
 
 class CLA:
-    def __init__(self, expected_returns, cov_matrix, weight_bounds = (0, 1)):
+    def __init__(self, asset_prices, weight_bounds = (0, 1), calculate_returns = "mean"):
+        '''
+        CLA class implements the famous Critical Line Algorithm for mean-variance portfolio
+        optimisation.
+
+        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (adj closed)
+        :param weight_bounds: (tuple) a tuple specifying the lower and upper bound ranges for the portfolio weights
+        :param calculate_returns: (str) the method to use for calculation of expected returns.
+                                        Currently supports "mean" and "exponential"
         '''
 
-        :param expected_returns:
-        :param cov_matrix:
-        :param weight_bounds:
-        '''
-        
-        self.expected_returns = np.array(expected_returns).reshape((len(expected_returns), 1))
+        # Handle non-dataframes
+        if not isinstance(asset_prices, pd.DataFrame):
+            asset_prices = pd.DataFrame(asset_prices)
+
+        # Calculate the expected returns
+        if calculate_returns == "mean":
+            self.expected_returns = self._calculate_mean_historical_returns(X = asset_prices)
+        else:
+            self.expected_returns = self._calculate_exponential_historical_returns(X = asset_prices)
+        self.expected_returns = np.array(self.expected_returns).reshape((len(self.expected_returns), 1))
         if (self.expected_returns == np.ones(self.expected_returns.shape) * self.expected_returns.mean()).all():
             self.expected_returns[-1, 0] += 1e-5
-        self.cov_matrix = np.asarray(cov_matrix)
+
+        # Calculate the covariance matrix
+        self.cov_matrix = np.asarray(asset_prices.corr())
         
         if isinstance(weight_bounds[0], numbers.Real):
             self.lower_bounds = np.ones(self.expected_returns.shape) * weight_bounds[0]
@@ -30,16 +44,43 @@ class CLA:
             self.upper_bounds = np.ones(self.expected_returns.shape) * weight_bounds[1]
         else:
             self.upper_bounds = np.array(weight_bounds[1]).reshape(self.expected_returns.shape)
-        
-        self.weights = []  # solution
-        self.lambdas = []  # lambdas
-        self.gammas = []  # gammas
-        self.free_weights = []  # free weights
+
+        # Initialise arrays
+        self.weights = []
+        self.lambdas = []
+        self.gammas = []
+        self.free_weights = []
+
+    def _calculate_mean_historical_returns(self, X, frequency = 252):
+        '''
+        Calculate the annualised mean historical returns from asset price data
+
+        :param X: (pd.DataFrame) asset price data
+        :return: (np.array) returns per asset
+        '''
+
+        returns = X.pct_change().dropna(how = "all")
+        returns = returns.mean() * frequency
+        return returns
+
+    def _calculate_exponential_historical_returns(self, X, frequency = 252, span = 500):
+        '''
+        Calculate the exponentially-weighted mean of (daily) historical returns, giving
+        higher weight to more recent data.
+
+        :param X: (pd.DataFrame) asset price data
+        :return: (np.array) returns per asset
+        '''
+
+        returns = X.pct_change().dropna(how = "all")
+        returns = returns.ewm(span = span).mean().iloc[-1] * frequency
+        return returns
 
     def _init_algo(self):
         '''
+        Initial setting up of the algorithm. Calculates the first free weight of the first turning point.
 
-        :return:
+        :return: (list, list) asset index and the corresponding free weight value
         '''
 
         # Form structured array
@@ -54,18 +95,23 @@ class CLA:
 
         # First free weight
         i, w = b.shape[0], np.copy(self.lower_bounds)
-        while sum(w) < 1:
+        while np.sum(w) < 1:
             i -= 1
+
+            # Set weights one by one to the upper bounds
             w[b[i][0]] = self.upper_bounds[b[i][0]]
-        w[b[i][0]] += 1 - sum(w)
+        w[b[i][0]] += 1 - np.sum(w)
         return [b[i][0]], w
 
     def _compute_bi(self, c, bi):
         '''
+        Calculates which bound value to assign to a bounded weight - lower bound or upper bound.
 
-        :param c:
-        :param bi:
-        :return:
+        :param c: (float) a value calculated using the covariance matrices of free weights.
+                          Refer to https://pdfs.semanticscholar.org/4fb1/2c1129ba5389bafe47b03e595d098d0252b9.pdf for
+                          more information.
+        :param bi: (list) a list containing the lower and upper bound values for the ith weight
+        :return: bounded weight value
         '''
 
         if c > 0:
@@ -76,12 +122,14 @@ class CLA:
 
     def _compute_w(self, covarF_inv, covarFB, meanF, wB):
         '''
+        Compute the turning point associated with the current set of free weights F
 
-        :param covarF_inv:
-        :param covarFB:
-        :param meanF:
-        :param wB:
-        :return:
+        :param covarF_inv: (np.array) inverse of covariance matrix of free assets
+        :param covarFB: (np.array) covariance matrix between free assets and bounded assets
+        :param meanF: (np.array) expected returns of free assets
+        :param wB: (np.array) bounded asset weight values
+
+        :return: (array, array) list of turning point weights and gamma value from the langrange equation
         '''
 
         # 1) compute gamma
@@ -104,14 +152,15 @@ class CLA:
 
     def _compute_lambda(self, covarF_inv, covarFB, meanF, wB, i, bi):
         '''
+        Calculate the lambda value in the langrange optimsation equation
 
-        :param covarF_inv:
-        :param covarFB:
-        :param meanF:
-        :param wB:
-        :param i:
-        :param bi:
-        :return:
+        :param covarF_inv: (np.array) inverse of covariance matrix of free assets
+        :param covarFB: (np.array) covariance matrix between free assets and bounded assets
+        :param meanF: (np.array) expected returns of free assets
+        :param wB: (np.array) bounded asset weight values
+        :param i: (int) asset index
+        :param bi: (list) list of upper and lower bounded weight values
+        :return: (float) lambda value
         '''
 
         # 1) C
@@ -142,10 +191,12 @@ class CLA:
 
     def _get_matrices(self, f):
         '''
+        Calculate the required matrices between free and bounded assets
 
-        :param f:
-        :return:
+        :param f: (list) list of free assets/weights
+        :return: (tuple of np.array matrices) the corresponding matrices
         '''
+
         covarF = self._reduce_matrix(self.cov_matrix, f, f)
         meanF = self._reduce_matrix(self.expected_returns, f, [0])
         b = self._get_b(f)
@@ -154,33 +205,36 @@ class CLA:
         return covarF, covarFB, meanF, wB
 
     def _get_b(self, f):
+        '''
+        Compute the list of bounded assets
+
+        :param f: (np.array) list of free weights/assets
+        :return: (np.array) list of bounded assets/weights
+        '''
+
         return self._diff_lists(list(range(self.expected_returns.shape[0])), f)
 
     @staticmethod
     def _diff_lists(list1, list2):
         '''
-
-        :param list1:
-        :param list2:
-        :return:
+        Calculate the set difference between two lists
         '''
+
         return list(set(list1) - set(list2))
 
     @staticmethod
     def _reduce_matrix(matrix, listX, listY):
         '''
-        Reduce a matrix to the provided list of rows and columns
-
-        :param matrix:
-        :param listX:
-        :param listY:
-        :return:
+        Reduce a matrix to the provided set of rows and columns
         '''
 
         return matrix[np.ix_(listX, listY)]
 
     def _purge_num_err(self, tol):
-        # Purge violations of inequality constraints (associated with ill-conditioned cov matrix)
+        '''
+        Purge violations of inequality constraints (associated with ill-conditioned cov matrix)
+        '''
+
         i = 0
         while True:
             flag = False
@@ -205,7 +259,10 @@ class CLA:
                 i += 1
 
     def _purge_excess(self):
-        # Remove violations of the convex hull
+        '''
+        Remove violations of the convex hull
+        '''
+
         i, repeat = 0, False
         while True:
             if repeat is False:
@@ -231,7 +288,10 @@ class CLA:
                     j += 1
 
     def _golden_section(self, obj, a, b, **kargs):
-        # Golden section method. Maximum if kargs['minimum']==False is passed
+        '''
+        Golden section method. Maximum if kargs['minimum']==False is passed
+        '''
+
         tol, sign, args = 1.0e-9, 1, None
         if "minimum" in kargs and kargs["minimum"] is False:
             sign = -1
@@ -240,11 +300,13 @@ class CLA:
         numIter = int(ceil(-2.078087 * log(tol / abs(b - a))))
         r = 0.618033989
         c = 1.0 - r
+
         # Initialize
         x1 = r * a + c * b
         x2 = c * a + r * b
         f1 = sign * obj(x1, *args)
         f2 = sign * obj(x2, *args)
+
         # Loop
         for i in range(numIter):
             if f1 > f2:
@@ -267,11 +329,6 @@ class CLA:
     def _eval_sr(self, a, w0, w1):
         '''
         Evaluate SR of the portfolio within the convex combination
-
-        :param a:
-        :param w0:
-        :param w1:
-        :return:
         '''
 
         w = a * w0 + (1 - a) * w1
@@ -281,9 +338,7 @@ class CLA:
 
     def _bound_free_weight(self, free_weights):
         '''
-
-        :param free_weights:
-        :return:
+        Add a free weight to list of bounded weights
         '''
 
         lambda_in = None
@@ -304,9 +359,7 @@ class CLA:
 
     def _free_bound_weight(self, free_weights):
         '''
-
-        :param free_weights:
-        :return:
+        Add a bounded weight to list of free weights
         '''
 
         lambda_out = None
@@ -330,8 +383,7 @@ class CLA:
 
     def allocate(self):
         '''
-
-        :return:
+        Calculate the solution of turning points satisfying the weight bounds
         '''
 
         # Compute the turning points,free sets and weights
@@ -382,8 +434,9 @@ class CLA:
 
     def max_sharpe(self):
         '''
+        Compute the maximum sharpe portfolio allocation
 
-        :return:
+        :return: (float, np.array) tuple of max. sharpe value and the set of weight allocations
         '''
 
         if not self.weights:
@@ -402,8 +455,9 @@ class CLA:
 
     def min_volatility(self):
         '''
+        Compute minimum volatility portfolio allocation
 
-        :return:
+        :return: (float, np.array) tuple of minimum variance value and the set of weight allocations
         '''
 
         if not self.weights:
@@ -417,9 +471,10 @@ class CLA:
 
     def efficient_frontier(self, points = 100):
         '''
+        Compute the entire efficient frontier solution
 
-        :param points:
-        :return:
+        :param points: (int) number of efficient frontier points to be calculated
+        :return: tuple of mean, variance amd weights of the frontier solutions
         '''
 
         if not self.weights:

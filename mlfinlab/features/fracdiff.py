@@ -10,9 +10,11 @@ import pandas as pd
 
 
 class FractionalDifferentiation:
-    """ FractionalDifferentiation class encapsulates the functions that can
+    """
+    FractionalDifferentiation class encapsulates the functions that can
     be used to compute fractionally differentiated series.
     """
+
     @staticmethod
     def get_weights(diff_amt, size):
         """
