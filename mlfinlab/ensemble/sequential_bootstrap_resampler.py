@@ -20,15 +20,14 @@ class SequentialBootstrappingSampler(BaseUnderSampler):
         self.return_indices = return_indices
         self.sample_indices_ = None
 
-    def fit_resample(self, X, triple_barrier_events):
-        y = triple_barrier_events.side.values
+    def fit_resample(self, X, y, **kwargs):
         check_classification_targets(y)
         X, y, binarize_y = self._check_X_y(X, y)
 
         self.sampling_strategy_ = check_sampling_strategy(
             self.sampling_strategy, y, self._sampling_type)
 
-        output = self._fit_resample(X, triple_barrier_events)
+        output = self._fit_resample(X, y, **kwargs)
 
         if binarize_y:
             y_sampled = label_binarize(output[1], np.unique(y))
@@ -37,11 +36,12 @@ class SequentialBootstrappingSampler(BaseUnderSampler):
             return output[0], y_sampled, output[2]
         return output
 
-    def _fit_resample(self, X, triple_barrier_events):
-        y = triple_barrier_events.side.values
+    def _fit_resample(self, X, y, **kwargs):
+        print(kwargs)
+        triple_barrier_events = kwargs['triple_barrier_events']
         random_state = check_random_state(self.random_state)
         ind_matrix = get_ind_matrix(triple_barrier_events)
-        num_samples_to_draw = None
+        num_samples_to_draw = None # this feature will be added in the future
         bootstrapped_samples_idx = seq_bootstrap(ind_matrix, sample_length=num_samples_to_draw,
                                                  )
 
