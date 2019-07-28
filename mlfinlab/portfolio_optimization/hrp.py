@@ -12,10 +12,11 @@ class HierarchicalRiskParity:
 
     def _tree_clustering(self, correlation, method = 'single'):
         '''
+        Perform the traditional heirarchical tree clustering
 
-        :param correlation:
-        :param method:
-        :return:
+        :param correlation: (np.array) correlation matrix of the assets
+        :param method: (str) the type of clustering to be done
+        :return: distance matrix and clusters
         '''
 
         distances = np.sqrt((1 - correlation) / 2)
@@ -24,10 +25,11 @@ class HierarchicalRiskParity:
 
     def _quasi_diagnalization(self, N, curr_index):
         '''
+        Rearrange the assets to reorder them according to hierarchical tree clustering order.
 
-        :param N:
-        :param curr_index:
-        :return:
+        :param N: (int) index of element in the cluster list
+        :param curr_index: (int) current index
+        :return: (list) the assets rearranged according to hierarchical clustering
         '''
 
         if curr_index < N:
@@ -40,6 +42,8 @@ class HierarchicalRiskParity:
 
     def _get_seriated_matrix(self, N, ordered_indices):
         '''
+        Based on the quasi-diagnalization, reorder the original distance matrix, so that assets within
+        the same cluster are grouped together.
 
         :param N:
         :param ordered_indices:
@@ -54,10 +58,10 @@ class HierarchicalRiskParity:
 
     def _recursive_bisection(self, covariances, ordered_indices):
         '''
+        Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets
 
-        :param covariances:
-        :param ordered_indices:
-        :return:
+        :param covariances: (np.array) the covariance matrix
+        :param ordered_indices: (list) asset list reordered according to tree clustering
         '''
 
         self.weights = pd.Series(1, index = ordered_indices)
@@ -92,28 +96,28 @@ class HierarchicalRiskParity:
 
     def plot_clusters(self, height = 10, width = 10):
         '''
+        Plot a dendrogram of the hierarchical clusters
 
-        :param height:
-        :param width:
-        :return:
+        :param height: (int) height of the plot
+        :param width: (int) width of the plot
         '''
 
         plt.figure(figsize = (width, height))
         dendrogram(self.clusters)
         plt.show()
 
-    def allocate(self, X):
+    def allocate(self, asset_prices):
+        '''
+        Calculate asset allocations using HRP algorithm
+
+        :param asset_prices: (pd.Dataframe/np.array) the matrix of historical asset prices (daily close)
         '''
 
-        :param X:
-        :return:
-        '''
+        if type(asset_prices) != pd.DataFrame:
+            asset_prices = pd.DataFrame(asset_prices)
 
-        if type(X) != pd.DataFrame:
-            X = pd.DataFrame(X)
-
-        N = X.shape[1]
-        cov, corr = X.cov(), X.corr()
+        N = asset_prices.shape[1]
+        cov, corr = asset_prices.cov(), asset_prices.corr()
 
         # Step-1: Tree Clustering
         self.distances, self.clusters = self._tree_clustering(correlation = corr)
