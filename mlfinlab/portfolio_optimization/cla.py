@@ -1,3 +1,9 @@
+'''
+CLA class implements the famous Critical Line Algorithm for mean-variance portfolio
+optimisation. It is taken from the following open-source implementation provided by
+Marcos López de Prado and David Bailey.
+'''
+
 import numbers
 import numpy as np
 import pandas as pd
@@ -10,8 +16,7 @@ def _infnone(x):
 class CLA:
     def __init__(self, asset_prices, weight_bounds = (0, 1), calculate_returns = "mean"):
         '''
-        CLA class implements the famous Critical Line Algorithm for mean-variance portfolio
-        optimisation.
+        Initialise the storage arrays and some preprocessing.
 
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (adj closed)
         :param weight_bounds: (tuple) a tuple specifying the lower and upper bound ranges for the portfolio weights
