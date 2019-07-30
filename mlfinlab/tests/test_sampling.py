@@ -89,8 +89,8 @@ class TestSampling(unittest.TestCase):
         ind_mat = get_ind_matrix(non_nan_meta_labels, self.data)
 
         label_endtime = non_nan_meta_labels.t1
-        trimmed_price_bars_index = self.data[(self.data.index >= non_nan_meta_labels.index.min()) & (
-                self.data.index <= non_nan_meta_labels.t1.max())].index
+        trimmed_price_bars_index = self.data[(self.data.index >= non_nan_meta_labels.index.min()) &
+                                             (self.data.index <= non_nan_meta_labels.t1.max())].index
         bar_index = list(non_nan_meta_labels.index)  # generate index for indicator matrix from t1 and index
         bar_index.extend(non_nan_meta_labels.t1)
         bar_index.extend(trimmed_price_bars_index)

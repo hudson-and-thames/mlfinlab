@@ -53,8 +53,8 @@ def _get_average_uniqueness(label_endtime, num_conc_events, molecule):
 
 def get_av_uniqueness_from_tripple_barrier(triple_barrier_events, close_series, num_threads):
     """
-    This function is the orchestrator to derive average sample uniqueness from a dateset labeled by the triple
-    barrier method.
+    This function is the orchestrator to derive average sample uniqueness from a dateset labeled by the triple barrier
+    method.
 
     :param triple_barrier_events: (data frame) of events from labeling.get_events()
     :param close_series: (pd.Series) close prices.

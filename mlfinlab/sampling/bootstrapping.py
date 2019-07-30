@@ -19,8 +19,8 @@ def get_ind_matrix(triple_barrier_events, price_bars):
         raise ValueError('NaN values in triple_barrier_events, delete nans')
 
     # take only period covered in triple_barrier_events
-    trimmed_price_bars_index = price_bars[(price_bars.index >= triple_barrier_events.index.min()) & (
-            price_bars.index <= triple_barrier_events.t1.max())].index
+    trimmed_price_bars_index = price_bars[(price_bars.index >= triple_barrier_events.index.min()) &
+                                          (price_bars.index <= triple_barrier_events.t1.max())].index
 
     label_endtime = triple_barrier_events.t1
     bar_index = list(triple_barrier_events.index)  # generate index for indicator matrix from t1 and index
@@ -62,6 +62,7 @@ def get_ind_mat_average_uniqueness(ind_mat):
 def get_ind_mat_label_uniqueness(ind_mat):
     """
     An adaption of Snippet 4.4. page 65, which returns the indicator matrix element uniqueness.
+
     :param ind_mat: (np.matrix) indicator binary matrix
     :return: (np.matrix) element uniqueness
     """
@@ -136,10 +137,7 @@ def seq_bootstrap(ind_mat, sample_length=None, warmup_samples=None, compare=Fals
     if compare is True:
         standard_indx = np.random.choice(ind_mat.shape[1], size=sample_length)
         standard_unq = get_ind_mat_average_uniqueness(ind_mat[:, standard_indx])
-        standard_unq_mean = standard_unq[standard_unq > 0].mean()
-
         sequential_unq = get_ind_mat_average_uniqueness(ind_mat[:, phi])
-        sequential_unq_mean = sequential_unq[sequential_unq > 0].mean()
-        print('Standard uniqueness: {}\nSequential uniqueness: {}'.format(standard_unq_mean, sequential_unq_mean))
+        print('Standard uniqueness: {}\nSequential uniqueness: {}'.format(standard_unq, sequential_unq))
 
     return phi
