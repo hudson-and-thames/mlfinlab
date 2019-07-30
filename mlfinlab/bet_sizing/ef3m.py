@@ -91,6 +91,7 @@ class M2N:
         if return_result:
             return [m_1, m_2, m_3, m_4, m_5]
         self.new_moments = [m_1, m_2, m_3, m_4, m_5]
+        return None
 
     def iter_4(self, mu_2, p_1):
         """
