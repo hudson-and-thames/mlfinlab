@@ -14,47 +14,17 @@ def _infnone(x):
     return float("-inf") if x is None else x
 
 class CLA:
-    def __init__(self, asset_prices, weight_bounds = (0, 1), calculate_returns = "mean"):
+    def __init__(self, weight_bounds = (0, 1), calculate_returns = "mean"):
         '''
         Initialise the storage arrays and some preprocessing.
 
-        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (adj closed)
         :param weight_bounds: (tuple) a tuple specifying the lower and upper bound ranges for the portfolio weights
         :param calculate_returns: (str) the method to use for calculation of expected returns.
                                         Currently supports "mean" and "exponential"
         '''
 
-        # Handle non-dataframes
-        if not isinstance(asset_prices, pd.DataFrame):
-            asset_prices = pd.DataFrame(asset_prices)
-
-        # Calculate the expected returns
-        if calculate_returns == "mean":
-            self.expected_returns = self._calculate_mean_historical_returns(X = asset_prices)
-        else:
-            self.expected_returns = self._calculate_exponential_historical_returns(X = asset_prices)
-        self.expected_returns = np.array(self.expected_returns).reshape((len(self.expected_returns), 1))
-        if (self.expected_returns == np.ones(self.expected_returns.shape) * self.expected_returns.mean()).all():
-            self.expected_returns[-1, 0] += 1e-5
-
-        # Calculate the covariance matrix
-        self.cov_matrix = np.asarray(asset_prices.corr())
-        
-        if isinstance(weight_bounds[0], numbers.Real):
-            self.lower_bounds = np.ones(self.expected_returns.shape) * weight_bounds[0]
-        else:
-            self.lower_bounds = np.array(weight_bounds[0]).reshape(self.expected_returns.shape)
-        
-        if isinstance(weight_bounds[0], numbers.Real):
-            self.upper_bounds = np.ones(self.expected_returns.shape) * weight_bounds[1]
-        else:
-            self.upper_bounds = np.array(weight_bounds[1]).reshape(self.expected_returns.shape)
-
-        # Initialise arrays
-        self.weights = []
-        self.lambdas = []
-        self.gammas = []
-        self.free_weights = []
+        self.weight_bounds = weight_bounds
+        self.calculate_returns = calculate_returns
 
     def _calculate_mean_historical_returns(self, X, frequency = 252):
         '''
@@ -386,10 +356,108 @@ class CLA:
                     lambda_out, i_out = l, i
         return lambda_out, i_out
 
-    def allocate(self):
+    def _initialise(self, asset_prices):
+
+        # Handle non-dataframes
+        if not isinstance(asset_prices, pd.DataFrame):
+            asset_prices = pd.DataFrame(asset_prices)
+
+        # Calculate the expected returns
+        if self.calculate_returns == "mean":
+            self.expected_returns = self._calculate_mean_historical_returns(X = asset_prices)
+        else:
+            self.expected_returns = self._calculate_exponential_historical_returns(X = asset_prices)
+        self.expected_returns = np.array(self.expected_returns).reshape((len(self.expected_returns), 1))
+        if (self.expected_returns == np.ones(self.expected_returns.shape) * self.expected_returns.mean()).all():
+            self.expected_returns[-1, 0] += 1e-5
+
+        # Calculate the covariance matrix
+        self.cov_matrix = np.asarray(asset_prices.corr())
+
+        if isinstance(self.weight_bounds[0], numbers.Real):
+            self.lower_bounds = np.ones(self.expected_returns.shape) * self.weight_bounds[0]
+        else:
+            self.lower_bounds = np.array(self.weight_bounds[0]).reshape(self.expected_returns.shape)
+
+        if isinstance(self.weight_bounds[0], numbers.Real):
+            self.upper_bounds = np.ones(self.expected_returns.shape) * self.weight_bounds[1]
+        else:
+            self.upper_bounds = np.array(self.weight_bounds[1]).reshape(self.expected_returns.shape)
+
+        # Initialise storage buffers
+        self.weights = []
+        self.lambdas = []
+        self.gammas = []
+        self.free_weights = []
+
+    def _max_sharpe(self):
+        '''
+        Compute the maximum sharpe portfolio allocation
+
+        :return: (float, np.array) tuple of max. sharpe value and the set of weight allocations
+        '''
+
+        # 1) Compute the local max SR portfolio between any two neighbor turning points
+        w_sr, sr = [], []
+        for i in range(len(self.weights) - 1):
+            w0 = np.copy(self.weights[i])
+            w1 = np.copy(self.weights[i + 1])
+            kargs = {"minimum": False, "args": (w0, w1)}
+            a, b = self._golden_section(self._eval_sr, 0, 1, **kargs)
+            w_sr.append(a * w0 + (1 - a) * w1)
+            sr.append(b)
+        return max(sr), w_sr[sr.index(max(sr))]
+
+    def _min_volatility(self):
+        '''
+        Compute minimum volatility portfolio allocation
+
+        :return: (float, np.array) tuple of minimum variance value and the set of weight allocations
+        '''
+
+        var = []
+        for w in self.weights:
+            a = np.dot(np.dot(w.T, self.cov_matrix), w)
+            var.append(a)
+        min_var = min(var)
+        return min_var ** .5, self.weights[var.index(min_var)]
+
+    def _efficient_frontier(self, points=100):
+        '''
+        Compute the entire efficient frontier solution
+
+        :param points: (int) number of efficient frontier points to be calculated
+        :return: tuple of mean, variance amd weights of the frontier solutions
+        '''
+
+        mu, sigma, weights = [], [], []
+
+        # remove the 1, to avoid duplications
+        a = np.linspace(0, 1, points // len(self.weights))[:-1]
+        b = list(range(len(self.weights) - 1))
+        for i in b:
+            w0, w1 = self.weights[i], self.weights[i + 1]
+            if i == b[-1]:
+                # include the 1 in the last iteration
+                a = np.linspace(0, 1, points // len(self.weights))
+            for j in a:
+                w = w1 * j + (1 - j) * w0
+                weights.append(np.copy(w))
+                mu.append(np.dot(w.T, self.expected_returns)[0, 0])
+                sigma.append(np.dot(np.dot(w.T, self.cov_matrix), w)[0, 0] ** 0.5)
+        return mu, sigma, weights
+
+    def allocate(self, asset_prices, solution = "cla_turning_points"):
         '''
         Calculate the solution of turning points satisfying the weight bounds
+
+        :param asset_prices: (pd.Dataframe/np.array) a dataframe of historical asset prices (adj closed)
+        :param solution: (str) specify the type of solution to compute. Options are: cla_turning_points, max_sharpe,
+                               min_volatility, efficient_frontier
         '''
+
+        # Some initial steps before the algorithm runs
+        self._initialise(asset_prices = asset_prices)
 
         # Compute the turning points,free sets and weights
         free_weights, w = self._init_algo()
@@ -437,67 +505,15 @@ class CLA:
         self._purge_num_err(10e-10)
         self._purge_excess()
 
-    def max_sharpe(self):
-        '''
-        Compute the maximum sharpe portfolio allocation
-
-        :return: (float, np.array) tuple of max. sharpe value and the set of weight allocations
-        '''
-
-        if not self.weights:
-            self.allocate()
-
-        # 1) Compute the local max SR portfolio between any two neighbor turning points
-        w_sr, sr = [], []
-        for i in range(len(self.weights) - 1):
-            w0 = np.copy(self.weights[i])
-            w1 = np.copy(self.weights[i + 1])
-            kargs = {"minimum": False, "args": (w0, w1)}
-            a, b = self._golden_section(self._eval_sr, 0, 1, **kargs)
-            w_sr.append(a * w0 + (1 - a) * w1)
-            sr.append(b)
-        return max(sr), w_sr[sr.index(max(sr))]
-
-    def min_volatility(self):
-        '''
-        Compute minimum volatility portfolio allocation
-
-        :return: (float, np.array) tuple of minimum variance value and the set of weight allocations
-        '''
-
-        if not self.weights:
-            self.allocate()
-        var = []
-        for w in self.weights:
-            a = np.dot(np.dot(w.T, self.cov_matrix), w)
-            var.append(a)
-        min_var = min(var)
-        return min_var**.5, self.weights[var.index(min_var)]
-
-    def efficient_frontier(self, points = 100):
-        '''
-        Compute the entire efficient frontier solution
-
-        :param points: (int) number of efficient frontier points to be calculated
-        :return: tuple of mean, variance amd weights of the frontier solutions
-        '''
-
-        if not self.weights:
-            self.allocate()
-
-        mu, sigma, weights = [], [], []
-
-        # remove the 1, to avoid duplications
-        a = np.linspace(0, 1, points // len(self.weights))[:-1]
-        b = list(range(len(self.weights) - 1))
-        for i in b:
-            w0, w1 = self.weights[i], self.weights[i + 1]
-            if i == b[-1]:
-                # include the 1 in the last iteration
-                a = np.linspace(0, 1, points // len(self.weights))
-            for j in a:
-                w = w1 * j + (1 - j) * w0
-                weights.append(np.copy(w))
-                mu.append(np.dot(w.T, self.expected_returns)[0, 0])
-                sigma.append(np.dot(np.dot(w.T, self.cov_matrix), w)[0, 0] ** 0.5)
-        return mu, sigma, weights
+        # Compute the specified corresponding solution
+        if solution == "max_sharpe":
+            self.max_sharpe, self.weights = self._max_sharpe()
+        elif solution == "min_volatility":
+            self.min_var, self.weights = self._min_volatility()
+        elif solution == "efficient_frontier":
+            self.mu, self.sigma, self.weights = self._efficient_frontier()
+        else:
+            # Reshape the weight matrix
+            weights_copy = self.weights.copy()
+            for i, turning_point in enumerate(weights_copy):
+                self.weights[i] = turning_point.reshape(1, -1)[0]
