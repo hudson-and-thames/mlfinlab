@@ -157,7 +157,7 @@ class TestM2NIter5(unittest.TestCase):
         Tests 'iter_5' method's 'Validity check 5' breakpoint condition.
         """
         moments_test = [0.0, 0.1, 0.0, 0.0, 0.0]
-        mu_2_test, p_1_test = 0.1, 0.999
+        mu_2_test, p_1_test = 0.1, 0.99999
         m2n_test = M2N(moments_test)
         param_results = m2n_test.iter_5(mu_2_test, p_1_test)
         self.assertTrue(not param_results)
@@ -262,8 +262,9 @@ class TestM2NFit(unittest.TestCase):
         Tests that the 'fit' method successfully exits due to p_1 converging.
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
-        mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e6, 1, 10_000
+        mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e8, 1, 10_000
         m2n_test = M2N(moments_test)
+        m2n_test.error = 1e-12
         m2n_test.fit(mu_2_test, epsilon_test, variant_test, max_iter_test)
         self.assertTrue(len(m2n_test.parameters) == 5)
 
@@ -274,9 +275,9 @@ class TestM2NFit(unittest.TestCase):
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
         mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e-5, 1, 5
         m2n_test = M2N(moments_test)
+        m2n_test.error = 1e-12
         m2n_test.fit(mu_2_test, epsilon_test, variant_test, max_iter_test)
         self.assertTrue(len(m2n_test.parameters) == 5)
-
 
 class TestM2NSingleFitLoop(unittest.TestCase):
     """
@@ -366,4 +367,26 @@ class TestMostLikelyParameters(unittest.TestCase):
                                'sigma_2': 1.00012,
                                'p_1': 0.09942}
         d_results = most_likely_parameters(data=df_test)
+        self.assertTrue(np.allclose(list(d_results.values()), list(most_likely_correct.values()), 1e-7))
+
+    def test_most_likely_parameters_list_arg(self):
+        """
+        Tests the helper function 'most_likely_parameters' when passing a list to 'ignore_columns'.
+        """
+        mu_1_list = [-2.074149682208028, -2.1464760973734522, -1.7318027625411423, -1.7799163398785354, -1.9766582333677596]
+        mu_2_list = [0.9958122958772418, 0.9927128514876395, 1.013574632526087, 1.0065707257309104, 1.009533655971151]
+        sigma_1_list = [1.9764097851543956, 1.9516780127056625, 2.080573657129795, 2.071328499049906, 1.9988591140726848]
+        sigma_2_list = [1.002964090440232, 1.0054392587806025, 0.9872577865302316, 0.9909001363163131, 0.9971327048101786]
+        p_1_list = [0.09668610445835334, 0.09379917992315062, 0.11351960785118335, 0.10993400151299484, 0.10264463363929438]
+        df_test = pd.DataFrame.from_dict({'mu_1': mu_1_list,
+                                          'mu_2': mu_2_list,
+                                          'sigma_1': sigma_1_list,
+                                          'sigma_2': sigma_2_list,
+                                          'p_1': p_1_list})
+        most_likely_correct = {'mu_1': -2.03765,
+                               'mu_2': 1.00863,
+                               'sigma_1': 1.9832,
+                               'sigma_2': 1.00012,
+                               'p_1': 0.09942}
+        d_results = most_likely_parameters(data=df_test, ignore_columns=['error'])
         self.assertTrue(np.allclose(list(d_results.values()), list(most_likely_correct.values()), 1e-7))
