@@ -6,4 +6,4 @@ numpy==1.16.2
 xmlrunner==1.7.7
 numba==0.43.0
 scipy==1.2.1
-dask==1.1.4
+dask==2.1.0

@@ -27,6 +27,7 @@ class TestM2NConstructor(unittest.TestCase):
         self.assertEqual(m2n_test.parameters, [0, 0, 0, 0, 0])
         self.assertEqual(m2n_test.error, sum([moments_test[i]**2 for i in range(len(moments_test))]))
 
+
 class TestM2NGetMoments(unittest.TestCase):
     """
     Tests the 'get_moments' method of the M2N class.
@@ -52,6 +53,7 @@ class TestM2NGetMoments(unittest.TestCase):
         # Check the function when 'return_value' is True.
         result_mmnts = m2n_test.get_moments(test_params, return_result=True)
         self.assertEqual(test_mmnts, result_mmnts)
+
 
 class TestM2NIter4(unittest.TestCase):
     """
@@ -112,6 +114,7 @@ class TestM2NIter4(unittest.TestCase):
         m2n_test = M2N(moments_test)
         param_results = m2n_test.iter_4(1, 0.2)
         self.assertTrue(len(param_results) == 5)
+
 
 class TestM2NIter5(unittest.TestCase):
     """
@@ -209,6 +212,7 @@ class TestM2NIter5(unittest.TestCase):
         param_results = m2n_test.iter_5(mu_2_test, p_1_test)
         self.assertTrue(len(param_results) == 5)
 
+
 class TestM2NFit(unittest.TestCase):
     """
     Tets the 'fit' method of the M2N class.
@@ -273,6 +277,7 @@ class TestM2NFit(unittest.TestCase):
         m2n_test.fit(mu_2_test, epsilon_test, variant_test, max_iter_test)
         self.assertTrue(len(m2n_test.parameters) == 5)
 
+
 class TestM2NSingleFitLoop(unittest.TestCase):
     """
     Tests the 'single_fit_loop' method.
@@ -287,6 +292,7 @@ class TestM2NSingleFitLoop(unittest.TestCase):
         df_results = m2n_test.single_fit_loop(epsilon_test, factor_test, variant_test, max_iter_test)
         self.assertTrue(isinstance(df_results, pd.DataFrame))
 
+
 class TestM2NMpFit(unittest.TestCase):
     """
     Tests the 'mp_fit' method.
@@ -300,6 +306,7 @@ class TestM2NMpFit(unittest.TestCase):
         m2n_test = M2N(moments_test)
         df_results = m2n_test.mp_fit(epsilon_test, factor_test, runs_test, variant_test, max_iter_test, num_workers_test)
         self.assertTrue(isinstance(df_results, pd.DataFrame))
+
 
 class TestCenteredMoment(unittest.TestCase):
     """
@@ -320,6 +327,7 @@ class TestCenteredMoment(unittest.TestCase):
         centered_5th_test = centered_moment(raw_test, 5)
         self.assertAlmostEqual(centered_5th_test, centered_5th_correct, 7)
 
+
 class TestRawMoment(unittest.TestCase):
     """
     Tests the helper function 'raw_moment'.
@@ -332,6 +340,7 @@ class TestRawMoment(unittest.TestCase):
         raw_result = raw_moment(centered_test, 0.7)
         raw_correct = [0.7, 2.6, 0.4, 25, -59.8]
         self.assertTrue(np.allclose(raw_result, raw_correct, 1e-7))
+
 
 class TestMostLikelyParameters(unittest.TestCase):
     """
