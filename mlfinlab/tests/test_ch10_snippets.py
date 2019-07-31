@@ -252,6 +252,7 @@ class TestInvPrice(unittest.TestCase):
         """
         self.assertRaises(KeyError, inv_price, 12, 1.5, 0.7, 'NotAFunction')
 
+
 class TestLimitPrice(unittest.TestCase):
     """
     Tests the functions 'limit_price_sigmoid', 'limit_price_power', and 'limit_price'.
@@ -288,6 +289,7 @@ class TestLimitPrice(unittest.TestCase):
         Tests raising of the KeyError due to invalid choice of 'func' argument.
         """
         self.assertRaises(KeyError, limit_price, 231, 221, 110, 3.4, 250, 'NotAFunction')
+
 
 class TestGetW(unittest.TestCase):
     """
