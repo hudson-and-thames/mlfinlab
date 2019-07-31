@@ -262,9 +262,8 @@ class TestM2NFit(unittest.TestCase):
         Tests that the 'fit' method successfully exits due to p_1 converging.
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
-        mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e8, 1, 10_000
+        mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e12, 1, 10_000
         m2n_test = M2N(moments_test)
-        m2n_test.error = 1e-12
         m2n_test.fit(mu_2_test, epsilon_test, variant_test, max_iter_test)
         self.assertTrue(len(m2n_test.parameters) == 5)
 
@@ -273,10 +272,10 @@ class TestM2NFit(unittest.TestCase):
         Tests that the 'fit' method successfully exits due to the maximum number of iterations being reached.
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
-        mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e8, 1, 1
+        np.random.seed(12)
+        mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e-12, 1, 1
         m2n_test = M2N(moments_test)
-        m2n_test.error = 1e-12
-        m2n_test.fit(mu_2_test, epsilon_test, variant_test, max_iter_test)
+        m2n_test.fit(mu_2=mu_2_test, epsilon=epsilon_test, variant=variant_test, max_iter=max_iter_test)
         self.assertTrue(len(m2n_test.parameters) == 5)
 
 class TestM2NSingleFitLoop(unittest.TestCase):
