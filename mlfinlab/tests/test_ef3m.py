@@ -273,7 +273,7 @@ class TestM2NFit(unittest.TestCase):
         Tests that the 'fit' method successfully exits due to the maximum number of iterations being reached.
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
-        mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e-5, 1, 1
+        mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e8, 1, 1
         m2n_test = M2N(moments_test)
         m2n_test.error = 1e-12
         m2n_test.fit(mu_2_test, epsilon_test, variant_test, max_iter_test)
