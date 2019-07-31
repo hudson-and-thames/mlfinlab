@@ -9,3 +9,4 @@ scikit-learn==0.21
 scipy==1.2.1
 dask==2.1.0
 toolz==0.10.0  # Needed for dask
+cloudpickle==1.2.1  # Needed for dask
