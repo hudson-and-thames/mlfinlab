@@ -1,7 +1,9 @@
+import matplotlib
 import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 
@@ -40,32 +42,31 @@ class HierarchicalRiskParity:
 
         return (self._quasi_diagnalization(N, left) + self._quasi_diagnalization(N, right))
 
-    def _get_seriated_matrix(self, N, ordered_indices):
+    def _get_seriated_matrix(self, N):
         '''
         Based on the quasi-diagnalization, reorder the original distance matrix, so that assets within
         the same cluster are grouped together.
 
-        :param N:
-        :param ordered_indices:
-        :return:
+        :param N: (int) total number of assets
+        :return: (np.array) re-arranged distance matrix based on tree clusters
         '''
 
         seriated_dist = np.zeros((N, N))
         a, b = np.triu_indices(N, k = 1)
-        seriated_dist[a, b] = self.distances[[ordered_indices[i] for i in a], [ordered_indices[j] for j in b]]
+        distances_np = self.distances.values
+        seriated_dist[a, b] = distances_np[[self.ordered_indices[i] for i in a], [self.ordered_indices[j] for j in b]]
         seriated_dist[b, a] = seriated_dist[a, b]
         return seriated_dist
 
-    def _recursive_bisection(self, covariances, ordered_indices):
+    def _recursive_bisection(self, covariances):
         '''
         Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets
 
         :param covariances: (np.array) the covariance matrix
-        :param ordered_indices: (list) asset list reordered according to tree clustering
         '''
 
-        self.weights = pd.Series(1, index = ordered_indices)
-        clustered_alphas = [ordered_indices]
+        self.weights = pd.Series(1, index = self.ordered_indices)
+        clustered_alphas = [self.ordered_indices]
 
         while len(clustered_alphas) > 0:
             clustered_alphas = [cluster[start:end]
@@ -123,8 +124,8 @@ class HierarchicalRiskParity:
         self.distances, self.clusters = self._tree_clustering(correlation = corr)
 
         # Step-2: Quasi Diagnalization
-        ordered_indices = self._quasi_diagnalization(N, 2*N - 2)
-        self.seriated_distances = self._get_seriated_matrix(N = N, ordered_indices = ordered_indices)
+        self.ordered_indices = self._quasi_diagnalization(N, 2*N - 2)
+        self.seriated_distances = self._get_seriated_matrix(N = N)
 
         # Step-3: Recursive Bisection
-        self._recursive_bisection(covariances = cov, ordered_indices = ordered_indices)
+        self._recursive_bisection(covariances = cov)
