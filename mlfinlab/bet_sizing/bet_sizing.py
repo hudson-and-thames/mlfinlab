@@ -15,6 +15,8 @@ def bet_size_probability(events, prob, num_classes, pred=None, step_size=0.0, av
     Calculates the bet size using the predicted probability. Note that if 'average_active' is True, the returned
     pandas.Series will be twice the length of the original since the average is calculated at each bet's open and close.
 
+    :param events: (pandas.DataFrame) Contains at least the column 't1', the expiry datetime of the product, with
+     a datetime index, the datetime the position was taken.
     :param prob: (pandas.Series) The predicted probability.
     :param num_classes: (int) The number of predicted bet sides.
     :param pred: (pd.Series) The predicted bet side. Default value is None which will return a relative bet size
@@ -112,3 +114,50 @@ def confirm_and_cast_to_df(d_vars):
     events = events.rename(columns=d_col_names)
 
     return events
+
+def get_concurrent_sides(events_t1, sides):
+    """
+    Given the side of the position along with its start and end timestamps, this function returns two pandas.Series
+    indicating the number of concurrent long and short bets at each timestamp.
+
+    :param events_t1: (pandas.Series) The end datetime of the position with the start datetime as the index.
+    :param sides: (pandas.Series) The side of the bet with the start datetime as index. Index must match the
+     'events_t1' argument exactly. Bet sides less than zero are interpretted as short, bet sides greater than zero
+     are interpretted as long.
+    :return: (pandas.DataFrame) The 'events_t1' and 'sides' arguments as columns, with two additional columns
+     indicating the number of concurrent active long and active short bets at each timestamp.
+    """
+    events_0 = pd.DataFrame({'t1':events_t1, 'side':sides})
+    events_0['active_long'] = 0
+    events_0['active_short'] = 0
+
+    for idx in events_0.index:
+        # A bet side greater than zero indicates a long position.
+        df_long_active_idx = set(events_0[(events_0.index <= idx) & (events_0['t1'] > idx) & (events_0['side'] > 0)].index)
+        events_0.loc[idx, 'active_long'] = len(df_long_active_idx)
+        # A bet side less than zero indicates a short position.
+        df_short_active_idx = set(events_0[(events_0.index <= idx) & (events_0['t1'] > idx) & (events_0['side'] < 0)].index)
+        events_0.loc[idx, 'active_short'] = len(df_short_active_idx)
+
+    return events_0
+
+def bet_size_budget(events_t1, sides):
+    """
+    Calculates a bet size from the bet sides and start and end times. These sequences are used to determine the
+    number of concurrent long and short bets, and the resulting strategy-independent bet sizes are the difference
+    between the average long and short bets at any given time. This strategy is based on the section 10.2
+    in "Advances in Financial Machine Learning".
+
+    :param events_t1: (pandas.Series) The end datetime of the position with the start datetime as the index.
+    :param sides: (pandas.Series) The side of the bet with the start datetime as index. Index must match the
+     'events_t1' argument exactly. Bet sides less than zero are interpretted as short, bet sides greater than zero
+     are interpretted as long.
+    :return: (pandas.DataFrame) The 'events_t1' and 'sides' arguments as columns, with the number of concurrent
+     active long and short bets, as well as the bet size, in additional columns.
+    """
+    events_1 = get_concurrent_sides(events_t1, sides)
+    avg_active_long = events_1['active_long'] / events_1['active_long'].max()
+    avg_active_short = events_1['active_short'] / events_1['active_short'].max()
+    events_1['bet_size'] = avg_active_long - avg_active_short
+
+    return events_1
