@@ -263,6 +263,7 @@ class TestM2NFit(unittest.TestCase):
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
         mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e12, 1, 10_000
+        np.random.seed(12)
         m2n_test = M2N(moments_test)
         m2n_test.fit(mu_2_test, epsilon_test, variant_test, max_iter_test)
         self.assertTrue(len(m2n_test.parameters) == 5)
@@ -288,6 +289,7 @@ class TestM2NSingleFitLoop(unittest.TestCase):
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
         epsilon_test, factor_test, variant_test, max_iter_test = 1e-5, 5, 2, 10_000
+        np.random.seed(12)
         m2n_test = M2N(moments_test)
         df_results = m2n_test.single_fit_loop(epsilon_test, factor_test, variant_test, max_iter_test)
         self.assertTrue(isinstance(df_results, pd.DataFrame))
