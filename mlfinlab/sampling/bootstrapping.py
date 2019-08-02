@@ -18,28 +18,28 @@ def get_ind_matrix(triple_barrier_events, price_bars):
             triple_barrier_events.index.isnull().any()) is True:
         raise ValueError('NaN values in triple_barrier_events, delete nans')
 
-    # take only period covered in triple_barrier_events
+    # Take only period covered in triple_barrier_events
     trimmed_price_bars_index = price_bars[(price_bars.index >= triple_barrier_events.index.min()) &
                                           (price_bars.index <= triple_barrier_events.t1.max())].index
 
     label_endtime = triple_barrier_events.t1
-    bar_index = list(triple_barrier_events.index)  # generate index for indicator matrix from t1 and index
+    bar_index = list(triple_barrier_events.index)  # Generate index for indicator matrix from t1 and index
     bar_index.extend(triple_barrier_events.t1)
-    bar_index.extend(trimmed_price_bars_index)  # add price bars index
-    bar_index = sorted(list(set(bar_index)))  # drop duplicates and sort
+    bar_index.extend(trimmed_price_bars_index)  # Add price bars index
+    bar_index = sorted(list(set(bar_index)))  # Drop duplicates and sort
 
     sorted_timestamps = dict(
         zip(sorted(bar_index), range(len(bar_index))))  # get sorted timestamps with index in sorted array
 
     tokenized_endtimes = np.column_stack((label_endtime.index.map(sorted_timestamps), label_endtime.map(
-        sorted_timestamps).values))  # create array of arrays: [label_index_position, label_endtime_position]
+        sorted_timestamps).values))  # Create array of arrays: [label_index_position, label_endtime_position]
 
-    ind_mat = np.zeros((len(bar_index), len(label_endtime)))  # init indicator matrix
+    ind_mat = np.zeros((len(bar_index), len(label_endtime)))  # Init indicator matrix
     for sample_num, label_array in enumerate(tokenized_endtimes):
         label_index = label_array[0]
         label_endtime = label_array[1]
         ones_array = np.ones(
-            (1, label_endtime - label_index + 1))  # ones array which corresponds to number of 1 to insert
+            (1, label_endtime - label_index + 1))  # Ones array which corresponds to number of 1 to insert
         ind_mat[label_index:label_endtime + 1, sample_num] = ones_array
     return ind_mat
 

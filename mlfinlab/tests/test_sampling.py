@@ -91,10 +91,10 @@ class TestSampling(unittest.TestCase):
         label_endtime = non_nan_meta_labels.t1
         trimmed_price_bars_index = self.data[(self.data.index >= non_nan_meta_labels.index.min()) &
                                              (self.data.index <= non_nan_meta_labels.t1.max())].index
-        bar_index = list(non_nan_meta_labels.index)  # generate index for indicator matrix from t1 and index
+        bar_index = list(non_nan_meta_labels.index)  # Generate index for indicator matrix from t1 and index
         bar_index.extend(non_nan_meta_labels.t1)
         bar_index.extend(trimmed_price_bars_index)
-        bar_index = sorted(list(set(bar_index)))  # drop duplicates and sort
+        bar_index = sorted(list(set(bar_index)))  # Drop duplicates and sort
         ind_mat_book_implementation = book_ind_mat_implementation(bar_index, label_endtime)
 
         self.assertTrue(bool((ind_mat_book_implementation.values == ind_mat).all()) is True)
