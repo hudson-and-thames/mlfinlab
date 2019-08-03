@@ -8,8 +8,10 @@ from numba import jit, prange
 
 def get_ind_matrix(triple_barrier_events, price_bars):
     """
-    Snippet 4.3, page 64, Build an Indicator Matrix
-    Get indicator matrix
+    Snippet 4.3, page 65, Build an Indicator Matrix
+    Get indicator matrix. The book implementation uses bar_index as input, however there is no explanation
+    how to form it. We decided that using triple_barrier_events and price bars by analogy with concurrency
+    is the best option.
     :param triple_barrier_events: (pd.DataFrame): triple barrier events from labeling.get_events
     :param price_bars: (pd.DataFrame): price bars which were used to form triple barrier events
     :return: (np.array) indicator binary matrix indicating what (price) bars influence the label for each observation
@@ -28,8 +30,8 @@ def get_ind_matrix(triple_barrier_events, price_bars):
     bar_index.extend(trimmed_price_bars_index)  # Add price bars index
     bar_index = sorted(list(set(bar_index)))  # Drop duplicates and sort
 
-    sorted_timestamps = dict(
-        zip(sorted(bar_index), range(len(bar_index))))  # get sorted timestamps with index in sorted array
+    # Get sorted timestamps with index in sorted array
+    sorted_timestamps = dict(zip(sorted(bar_index), range(len(bar_index))))
 
     tokenized_endtimes = np.column_stack((label_endtime.index.map(sorted_timestamps), label_endtime.map(
         sorted_timestamps).values))  # Create array of arrays: [label_index_position, label_endtime_position]

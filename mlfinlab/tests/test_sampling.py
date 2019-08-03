@@ -98,11 +98,13 @@ class TestSampling(unittest.TestCase):
         ind_mat_book_implementation = book_ind_mat_implementation(bar_index, label_endtime)
 
         self.assertTrue(bool((ind_mat_book_implementation.values == ind_mat).all()) is True)
-        self.assertTrue(
-            ind_mat.shape == (782, 7))  # Indicator matrix shape should be (unique(meta_label_index+t1+bars_index), t1)
+        # Indicator matrix shape should be (unique(meta_label_index+t1+price_bars_index), t1)
+        self.assertTrue(ind_mat.shape == (782, 7))
+
         # Check indicator matrix values for specific labels
         self.assertTrue(bool((ind_mat[:100, 0] == np.ones(100)).all()) is True)
         self.assertTrue(bool((ind_mat[191:340, 2] == np.ones(149)).all()) is True)
+        self.assertTrue(bool((ind_mat[191:340, 2] == np.zeros(100)).all()) is True)
         self.assertTrue(bool((ind_mat[406:412, 4] == np.ones(6)).all()) is True)
         self.assertTrue(bool((ind_mat[662:, 6] == np.ones(120)).all()) is True)
 
