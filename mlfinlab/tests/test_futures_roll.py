@@ -56,6 +56,9 @@ class TestETFTrick(unittest.TestCase):
                                                           'current_futures', method='absolute', roll_backward=True)
         gaps_rel_with_backward = get_futures_roll_series(combined_df, 'open', 'close', 'current_futures',
                                                          'current_futures', method='relative', roll_backward=True)
+        with self.assertRaises(ValueError):
+            get_futures_roll_series(combined_df, 'open', 'close', 'current_futures',
+                                    'current_futures', method='unknown', roll_backward=True)
 
         # Test number of gaps (should be 2 => number of unique gaps should be 3 (0 added)
         self.assertTrue(len(gaps_diff_no_backward.unique()) == len(roll_dates) + 1)
@@ -70,5 +73,5 @@ class TestETFTrick(unittest.TestCase):
         # Assert values of relative method Futures Roll Trick
         self.assertTrue(gaps_rel_no_backward.iloc[0] == 1)
         self.assertTrue(abs(gaps_rel_no_backward.iloc[-1] - 0.999294) < 1e-6)
-        self.assertTrue(abs(gaps_rel_with_backward.iloc[0] - 1/0.999294) < 1e-6)
+        self.assertTrue(abs(gaps_rel_with_backward.iloc[0] - 1 / 0.999294) < 1e-6)
         self.assertTrue(gaps_rel_with_backward.iloc[-1] == 1)

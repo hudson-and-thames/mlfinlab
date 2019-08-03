@@ -379,8 +379,6 @@ def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_c
     :param method: (string): what returns user wants to preserve, 'absolute' or 'relative'
     :return (pd.Series): futures roll close price series
     """
-    # Assert method is absolute or relative
-    assert method in ['absolute', 'relative'], 'The method must be either absolute or relative, Check spelling.'
 
     # Filter out security data which is not used as current security
     filtered_df = data_df[data_df[sec_col] == data_df[current_sec_col]]
@@ -408,5 +406,7 @@ def get_futures_roll_series(data_df, open_col, close_col, sec_col, current_sec_c
 
         if roll_backward:
             gaps /= gaps.iloc[-1]  # Roll backward div
+    else:
+        raise ValueError('The method must be either absolute or relative, Check spelling.')
 
     return gaps
