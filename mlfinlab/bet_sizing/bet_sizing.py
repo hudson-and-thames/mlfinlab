@@ -5,9 +5,11 @@ These implementations are based on bet sizing approaches described in Chapter 10
 
 import numpy as np
 import pandas as pd
+from scipy.stats import norm, moment
 
 from mlfinlab.bet_sizing.ch10_snippets import get_signal, avg_active_signals, discrete_signal
 from mlfinlab.bet_sizing.ch10_snippets import get_w, get_target_pos, limit_price, bet_size
+from mlfinlab.bet_sizing.ef3m import M2N, raw_moment, most_likely_parameters
 
 
 def bet_size_probability(events, prob, num_classes, pred=None, step_size=0.0, average_active=False, num_threads=1):
@@ -72,6 +74,76 @@ def bet_size_dynamic(current_pos, max_pos, market_price, forecast_price, cal_div
 
     return events_0[['bet_size', 't_pos', 'l_p']]
 
+def bet_size_budget(events_t1, sides):
+    """
+    Calculates a bet size from the bet sides and start and end times. These sequences are used to determine the
+    number of concurrent long and short bets, and the resulting strategy-independent bet sizes are the difference
+    between the average long and short bets at any given time. This strategy is based on the section 10.2
+    in "Advances in Financial Machine Learning". This creates a linear bet sizing scheme that is aligned to the
+    expected number of concurrent bets in the dataset.
+
+    :param events_t1: (pandas.Series) The end datetime of the position with the start datetime as the index.
+    :param sides: (pandas.Series) The side of the bet with the start datetime as index. Index must match the
+     'events_t1' argument exactly. Bet sides less than zero are interpretted as short, bet sides greater than zero
+     are interpretted as long.
+    :return: (pandas.DataFrame) The 'events_t1' and 'sides' arguments as columns, with the number of concurrent
+     active long and short bets, as well as the bet size, in additional columns.
+    """
+    events_1 = get_concurrent_sides(events_t1, sides)
+    avg_active_long = events_1['active_long'] / events_1['active_long'].max()
+    avg_active_short = events_1['active_short'] / events_1['active_short'].max()
+    events_1['bet_size'] = avg_active_long - avg_active_short
+
+    return events_1
+
+def bet_size_reserve(events_t1, sides, fit_runs=100, epsilon=1e-5, factor=5, variant=2, max_iter=10_000,
+                     num_workers=1, return_parameters=False):
+    """
+    Calculates the bet size from bet sides and start and end times. These sequences are used to determine the number
+    of concurrent long and short bets, and the difference between the two at each time step, c_t. A mixture of two
+    Gaussian distributions is fit to the distribution of c_t, which is then used to determine the bet size. This
+    strategy results in a sigmoid-shaped bet sizing response aligned to the expected number of concurrent long
+    and short bets in the dataset.
+
+    Note that this function creates a <mlfinlab.bet_sizing.ef3m.M2N> object and makes use of the parallel fitting
+    functionality. As such, this function accepts and passes fitting parameters to the
+    mlfinlab.bet_sizing.ef3m.M2N.mp_fit() method.
+
+    :param events_t1: (pandas.Series) The end datetime of the position with the start datetime as the index.
+    :param sides: (pandas.Series) The side of the bet with the start datetime as index. Index must match the
+     'events_t1' argument exactly. Bet sides less than zero are interpretted as short, bet sides greater than zero
+     are interpretted as long.
+    :param fit_runs: (int) Number of runs to execute when trying to fit the distribution.
+    :param epsilon: (float) Error tolerance.
+    :param factor: (float) Lambda factor from equations.
+    :param variant: (int) Which algorithm variant to use, 1 or 2.
+    :param max_iter: (int) Maximum number of iterations after which to terminate loop.
+    :param num_workers: (int) Number of CPU cores to use for multiprocessing execution, set to -1 to use all
+     CPU cores. Default is 1.
+    :param return_parameters: (bool) If True, function also returns a dictionary of the fited mixture parameters.
+    :return: (pandas.DataFrame) The 'events_t1' and 'sides' arguments as columns, with the number of concurrent
+     active long, short bets, the difference between long and short, and the bet size in additional columns.
+     Also returns the mixture parameters if 'return_parameters' is set to True.
+    """
+    events_active = get_concurrent_sides(events_t1, sides)
+    # Calculate the concurrent difference in active bets: c_t = <current active long> - <current active short>
+    events_active['c_t'] = events_active['active_long'] - events_active['active_short']
+    # Calculate the first 5 centered and raw moments from the c_t distribution.
+    central_mmnts = [moment(events_active['c_t'].to_numpy(), moment=i) for i in range(1, 6)]
+    raw_mmnts = raw_moment(central_moments=central_mmnts, dist_mean=events_active['c_t'].mean())
+    # Fit the mixture of distributions.
+    m2n = M2N(raw_mmnts)
+    df_fit_results = m2n.mp_fit(epsilon=epsilon, factor=factor, n_runs=fit_runs,
+                                variant=variant, max_iter=max_iter, num_workers=num_workers)
+    fit_params = most_likely_parameters(df_fit_results)
+    print(fit_params)
+    params_list = [fit_params[key] for key in ['mu_1', 'mu_2', 'sigma_1', 'sigma_2', 'p_1']]
+    # Calculate the bet size.
+    events_active['bet_size'] = events_active['c_t'].apply(lambda c: bet_size_mixed(c, params_list))
+
+    if return_parameters:
+        return events_active, fit_params
+    return events_active
 
 def confirm_and_cast_to_df(d_vars):
     """
@@ -141,23 +213,28 @@ def get_concurrent_sides(events_t1, sides):
 
     return events_0
 
-def bet_size_budget(events_t1, sides):
+def cdf_mixture(x_val, parameters):
     """
-    Calculates a bet size from the bet sides and start and end times. These sequences are used to determine the
-    number of concurrent long and short bets, and the resulting strategy-independent bet sizes are the difference
-    between the average long and short bets at any given time. This strategy is based on the section 10.2
-    in "Advances in Financial Machine Learning".
+    The cumulative distribution function of a mixture of 2 normal distributions, evaluated at x_val.
 
-    :param events_t1: (pandas.Series) The end datetime of the position with the start datetime as the index.
-    :param sides: (pandas.Series) The side of the bet with the start datetime as index. Index must match the
-     'events_t1' argument exactly. Bet sides less than zero are interpretted as short, bet sides greater than zero
-     are interpretted as long.
-    :return: (pandas.DataFrame) The 'events_t1' and 'sides' arguments as columns, with the number of concurrent
-     active long and short bets, as well as the bet size, in additional columns.
+    :param x_val: (float) Value at which to evaluate the CDF.
+    :param parameters: (list) The parameters of the mixture, [mu_1, mu_2, sigma_1, sigma_2, p_1]
+    :return: (float) CDF of the mixture.
     """
-    events_1 = get_concurrent_sides(events_t1, sides)
-    avg_active_long = events_1['active_long'] / events_1['active_long'].max()
-    avg_active_short = events_1['active_short'] / events_1['active_short'].max()
-    events_1['bet_size'] = avg_active_long - avg_active_short
+    mu_1, mu_2, sigma_1, sigma_2, p_1 = parameters  # Parameters reassigned for clarity.
+    return p_1*norm.cdf(x_val, mu_1, sigma_1) + (1-p_1)*norm.cdf(x_val, mu_2, sigma_2)
 
-    return events_1
+def bet_size_mixed(c_t, parameters):
+    """
+    Returns the single bet size based on the description provided in question 10.4(c), provided the difference in
+    concurrent long and short positions, c_t, and the fitted parameters of the mixture of two Gaussain distributions.
+
+    :param c_t: (int) The difference in the number of concurrent long bets minus short bets.
+    :param parameters: (list) The parameters of the mixture, [mu_1, mu_2, sigma_1, sigma_2, p_1]
+    :return: (float) Bet size.
+    """
+    if c_t >= 0:
+        single_bet_size = (cdf_mixture(c_t, parameters) - cdf_mixture(0, parameters)) / (1 - cdf_mixture(0, parameters))
+    else:
+        single_bet_size = (cdf_mixture(c_t, parameters) - cdf_mixture(0, parameters)) / cdf_mixture(0, parameters)
+    return single_bet_size
