@@ -86,21 +86,27 @@ class TestSampling(unittest.TestCase):
         """
 
         non_nan_meta_labels = self.meta_labeled_events.dropna()
-        ind_mat = get_ind_matrix(non_nan_meta_labels)
+        ind_mat = get_ind_matrix(non_nan_meta_labels, self.data)
 
         label_endtime = non_nan_meta_labels.t1
-        bar_index = list(non_nan_meta_labels.index)  # generate index for indicator matrix from t1 and index
+        trimmed_price_bars_index = self.data[(self.data.index >= non_nan_meta_labels.index.min()) &
+                                             (self.data.index <= non_nan_meta_labels.t1.max())].index
+        bar_index = list(non_nan_meta_labels.index)  # Generate index for indicator matrix from t1 and index
         bar_index.extend(non_nan_meta_labels.t1)
-        bar_index = sorted(list(set(bar_index)))  # drop duplicates and sort
+        bar_index.extend(trimmed_price_bars_index)
+        bar_index = sorted(list(set(bar_index)))  # Drop duplicates and sort
         ind_mat_book_implementation = book_ind_mat_implementation(bar_index, label_endtime)
 
         self.assertTrue(bool((ind_mat_book_implementation.values == ind_mat).all()) is True)
-        self.assertTrue(ind_mat.shape == (13, 7))  # Indicator matrix shape should be (meta_label_index+t1, t1)
+        # Indicator matrix shape should be (unique(meta_label_index+t1+price_bars_index), t1)
+        self.assertTrue(ind_mat.shape == (782, 7))
+
         # Check indicator matrix values for specific labels
-        self.assertTrue(bool((ind_mat[:, 0] == [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
-        self.assertTrue(bool((ind_mat[:, 2] == [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]).all()) is True)
-        self.assertTrue(bool((ind_mat[:, 4] == [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0]).all()) is True)
-        self.assertTrue(bool((ind_mat[:, 6] == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1]).all()) is True)
+        self.assertTrue(bool((ind_mat[:100, 0] == np.ones(100)).all()) is True)
+        self.assertTrue(bool((ind_mat[191:340, 2] == np.ones(149)).all()) is True)
+        self.assertTrue(bool((ind_mat[341:420, 2] == np.zeros(79)).all()) is True)
+        self.assertTrue(bool((ind_mat[406:412, 4] == np.ones(6)).all()) is True)
+        self.assertTrue(bool((ind_mat[662:, 6] == np.ones(120)).all()) is True)
 
         bootstrapped_samples = seq_bootstrap(ind_mat, compare=False, verbose=True, warmup_samples=None)
         bootstrapped_samples_1000 = seq_bootstrap(ind_mat, compare=True, sample_length=100)
@@ -195,4 +201,4 @@ class TestSampling(unittest.TestCase):
         """
 
         with self.assertRaises(ValueError):
-            get_ind_matrix(self.meta_labeled_events)
+            get_ind_matrix(self.meta_labeled_events, self.data)
