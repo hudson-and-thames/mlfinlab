@@ -1,5 +1,5 @@
 """
-Tests for the CLA module
+Tests for the HRP module
 """
 
 import unittest
