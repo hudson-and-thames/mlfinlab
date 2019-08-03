@@ -98,7 +98,7 @@ def _bootstrap_loop_run(ind_mat, prev_concurrency):  # pragma: no cover
 
 
 def seq_bootstrap(ind_mat, sample_length=None, warmup_samples=None, compare=False, verbose=False,
-                  random_state=np.random.RandomState):
+                  random_state=np.random.RandomState()):
     """
     Snippet 4.5, Snippet 4.6, page 65, Return Sample from Sequential Bootstrap
     Generate a sample via sequential bootstrap.
