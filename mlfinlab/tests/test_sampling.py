@@ -104,7 +104,7 @@ class TestSampling(unittest.TestCase):
         # Check indicator matrix values for specific labels
         self.assertTrue(bool((ind_mat[:100, 0] == np.ones(100)).all()) is True)
         self.assertTrue(bool((ind_mat[191:340, 2] == np.ones(149)).all()) is True)
-        self.assertTrue(bool((ind_mat[191:340, 2] == np.zeros(100)).all()) is True)
+        self.assertTrue(bool((ind_mat[341:420, 2] == np.zeros(79)).all()) is True)
         self.assertTrue(bool((ind_mat[406:412, 4] == np.ones(6)).all()) is True)
         self.assertTrue(bool((ind_mat[662:, 6] == np.ones(120)).all()) is True)
 
