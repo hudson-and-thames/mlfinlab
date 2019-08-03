@@ -97,7 +97,8 @@ def _bootstrap_loop_run(ind_mat, prev_concurrency):  # pragma: no cover
     return avg_unique
 
 
-def seq_bootstrap(ind_mat, sample_length=None, warmup_samples=None, compare=False, verbose=False):
+def seq_bootstrap(ind_mat, sample_length=None, warmup_samples=None, compare=False, verbose=False,
+                  random_state=np.random.RandomState):
     """
     Snippet 4.5, Snippet 4.6, page 65, Return Sample from Sequential Bootstrap
     Generate a sample via sequential bootstrap.
@@ -108,10 +109,9 @@ def seq_bootstrap(ind_mat, sample_length=None, warmup_samples=None, compare=Fals
     :param warmup_samples: (list) list of previously drawn samples
     :param compare: (boolean) flag to print standard bootstrap uniqueness vs sequential bootstrap uniqueness
     :param verbose: (boolean) flag to print updated probabilities on each step
+    :param random_state: (np.random.RandomState) random state
     :return: (array) of bootstrapped samples indexes
     """
-
-    random_state = np.random.RandomState()
 
     if sample_length is None:
         sample_length = ind_mat.shape[1]
