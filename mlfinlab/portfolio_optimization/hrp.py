@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
+
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
@@ -12,7 +13,7 @@ class HierarchicalRiskParity:
     def __init__(self):
         return
 
-    def _tree_clustering(self, correlation, method = 'single'):
+    def _tree_clustering(self, correlation, method='single'):
         '''
         Perform the traditional heirarchical tree clustering
 
@@ -22,7 +23,7 @@ class HierarchicalRiskParity:
         '''
 
         distances = np.sqrt((1 - correlation) / 2)
-        clusters = linkage(squareform(distances.values), method = method)
+        clusters = linkage(squareform(distances.values), method=method)
         return distances, clusters
 
     def _quasi_diagnalization(self, N, curr_index):
@@ -52,7 +53,7 @@ class HierarchicalRiskParity:
         '''
 
         seriated_dist = np.zeros((N, N))
-        a, b = np.triu_indices(N, k = 1)
+        a, b = np.triu_indices(N, k=1)
         distances_np = self.distances.values
         seriated_dist[a, b] = distances_np[[self.ordered_indices[i] for i in a], [self.ordered_indices[j] for j in b]]
         seriated_dist[b, a] = seriated_dist[a, b]
@@ -65,7 +66,7 @@ class HierarchicalRiskParity:
         :param covariances: (np.array) the covariance matrix
         '''
 
-        self.weights = pd.Series(1, index = self.ordered_indices)
+        self.weights = pd.Series(1, index=self.ordered_indices)
         clustered_alphas = [self.ordered_indices]
 
         while len(clustered_alphas) > 0:
@@ -95,7 +96,7 @@ class HierarchicalRiskParity:
                 self.weights[left_cluster] *= alloc_factor
                 self.weights[right_cluster] *= 1 - alloc_factor
 
-    def plot_clusters(self, height = 10, width = 10):
+    def plot_clusters(self, height=10, width=10):
         '''
         Plot a dendrogram of the hierarchical clusters
 
@@ -103,7 +104,7 @@ class HierarchicalRiskParity:
         :param width: (int) width of the plot
         '''
 
-        plt.figure(figsize = (width, height))
+        plt.figure(figsize=(width, height))
         dendrogram(self.clusters)
         plt.show()
 
@@ -121,11 +122,11 @@ class HierarchicalRiskParity:
         cov, corr = asset_prices.cov(), asset_prices.corr()
 
         # Step-1: Tree Clustering
-        self.distances, self.clusters = self._tree_clustering(correlation = corr)
+        self.distances, self.clusters = self._tree_clustering(correlation=corr)
 
         # Step-2: Quasi Diagnalization
-        self.ordered_indices = self._quasi_diagnalization(N, 2*N - 2)
-        self.seriated_distances = self._get_seriated_matrix(N = N)
+        self.ordered_indices = self._quasi_diagnalization(N, 2 * N - 2)
+        self.seriated_distances = self._get_seriated_matrix(N=N)
 
         # Step-3: Recursive Bisection
-        self._recursive_bisection(covariances = cov)
+        self._recursive_bisection(covariances=cov)

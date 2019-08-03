@@ -13,8 +13,9 @@ from math import log, ceil
 def _infnone(x):
     return float("-inf") if x is None else x
 
+
 class CLA:
-    def __init__(self, weight_bounds = (0, 1), calculate_returns = "mean"):
+    def __init__(self, weight_bounds=(0, 1), calculate_returns="mean"):
         '''
         Initialise the storage arrays and some preprocessing.
 
@@ -26,7 +27,7 @@ class CLA:
         self.weight_bounds = weight_bounds
         self.calculate_returns = calculate_returns
 
-    def _calculate_mean_historical_returns(self, X, frequency = 252):
+    def _calculate_mean_historical_returns(self, X, frequency=252):
         '''
         Calculate the annualised mean historical returns from asset price data
 
@@ -34,11 +35,11 @@ class CLA:
         :return: (np.array) returns per asset
         '''
 
-        returns = X.pct_change().dropna(how = "all")
+        returns = X.pct_change().dropna(how="all")
         returns = returns.mean() * frequency
         return returns
 
-    def _calculate_exponential_historical_returns(self, X, frequency = 252, span = 500):
+    def _calculate_exponential_historical_returns(self, X, frequency=252, span=500):
         '''
         Calculate the exponentially-weighted mean of (daily) historical returns, giving
         higher weight to more recent data.
@@ -47,8 +48,8 @@ class CLA:
         :return: (np.array) returns per asset
         '''
 
-        returns = X.pct_change().dropna(how = "all")
-        returns = returns.ewm(span = span).mean().iloc[-1] * frequency
+        returns = X.pct_change().dropna(how="all")
+        returns = returns.ewm(span=span).mean().iloc[-1] * frequency
         return returns
 
     def _init_algo(self):
@@ -66,7 +67,7 @@ class CLA:
         a[:] = list(zip(list(range(self.expected_returns.shape[0])), b))
 
         # Sort structured array
-        b = np.sort(a, order = "mu")
+        b = np.sort(a, order="mu")
 
         # First free weight
         i, w = b.shape[0], np.copy(self.lower_bounds)
@@ -220,8 +221,8 @@ class CLA:
             else:
                 for j in range(self.weights[i].shape[0]):
                     if (
-                        self.weights[i][j] - self.lower_bounds[j] < -tol
-                        or self.weights[i][j] - self.upper_bounds[j] > tol
+                            self.weights[i][j] - self.lower_bounds[j] < -tol
+                            or self.weights[i][j] - self.upper_bounds[j] > tol
                     ):
                         flag = True
                         break
@@ -364,9 +365,9 @@ class CLA:
 
         # Calculate the expected returns
         if self.calculate_returns == "mean":
-            self.expected_returns = self._calculate_mean_historical_returns(X = asset_prices)
+            self.expected_returns = self._calculate_mean_historical_returns(X=asset_prices)
         else:
-            self.expected_returns = self._calculate_exponential_historical_returns(X = asset_prices)
+            self.expected_returns = self._calculate_exponential_historical_returns(X=asset_prices)
         self.expected_returns = np.array(self.expected_returns).reshape((len(self.expected_returns), 1))
         if (self.expected_returns == np.ones(self.expected_returns.shape) * self.expected_returns.mean()).all():
             self.expected_returns[-1, 0] += 1e-5
@@ -447,7 +448,7 @@ class CLA:
                 sigma.append(np.dot(np.dot(w.T, self.cov_matrix), w)[0, 0] ** 0.5)
         return mu, sigma, weights
 
-    def allocate(self, asset_prices, solution = "cla_turning_points"):
+    def allocate(self, asset_prices, solution="cla_turning_points"):
         '''
         Calculate the solution of turning points satisfying the weight bounds
 
@@ -457,7 +458,7 @@ class CLA:
         '''
 
         # Some initial steps before the algorithm runs
-        self._initialise(asset_prices = asset_prices)
+        self._initialise(asset_prices=asset_prices)
 
         # Compute the turning points,free sets and weights
         free_weights, w = self._init_algo()
