@@ -1,3 +1,5 @@
 .idea/*
 *.pyc
 mlfinlab/tests/.DS_Store
+*.txt
+mlfinlab.egg-info/PKG-INFO
