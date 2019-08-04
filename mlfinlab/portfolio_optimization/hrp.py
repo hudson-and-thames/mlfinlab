@@ -50,7 +50,7 @@ class HierarchicalRiskParity:
 
         return (self._quasi_diagnalization(N, left) + self._quasi_diagnalization(N, right))
 
-    def _get_seriated_matrix(self, N):
+    def _get_seriated_matrix(self, N, distances, correlations):
         '''
         Based on the quasi-diagnalization, reorder the original distance matrix, so that assets within
         the same cluster are grouped together.
@@ -60,11 +60,20 @@ class HierarchicalRiskParity:
         '''
 
         seriated_dist = np.zeros((N, N))
+        seriated_corr = np.ones((N, N))
         a, b = np.triu_indices(N, k=1)
-        distances_np = self.distances.values
+        distances_np = distances.values
+        correlations_np = correlations.values
+
+        # Get clustered distance matrix
         seriated_dist[a, b] = distances_np[[self.ordered_indices[i] for i in a], [self.ordered_indices[j] for j in b]]
         seriated_dist[b, a] = seriated_dist[a, b]
-        return seriated_dist
+
+        # Get clustered correlation matrix
+        seriated_corr[a, b] = correlations_np[[self.ordered_indices[i] for i in a], [self.ordered_indices[j] for j in b]]
+        seriated_corr[b, a] = seriated_corr[a, b]
+
+        return seriated_dist, seriated_corr
 
     def _recursive_bisection(self, covariances):
         '''
@@ -129,11 +138,13 @@ class HierarchicalRiskParity:
         cov, corr = asset_prices.cov(), asset_prices.corr()
 
         # Step-1: Tree Clustering
-        self.distances, self.clusters = self._tree_clustering(correlation=corr)
+        distances, self.clusters = self._tree_clustering(correlation=corr)
 
         # Step-2: Quasi Diagnalization
         self.ordered_indices = self._quasi_diagnalization(N, 2 * N - 2)
-        self.seriated_distances = self._get_seriated_matrix(N=N)
+        self.seriated_distances, self.seriated_correlations = self._get_seriated_matrix(N=N,
+                                                                                        distances=distances,
+                                                                                        correlations=corr)
 
         # Step-3: Recursive Bisection
         self._recursive_bisection(covariances=cov)
