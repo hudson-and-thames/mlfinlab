@@ -10,9 +10,8 @@ class MeanVarianceOptimisation:
     def allocate(self, asset_prices, solution='inverse_variance'):
         '''
 
-        :param asset_prices:
-        :param solution:
-        :return:
+        :param asset_prices: (pd.Dataframe/np.array) the matrix of historical asset prices (daily close)
+        :param solution: (str) the type of solution/algorithm to use to calculate the weights
         '''
 
         if not isinstance(asset_prices, pd.DataFrame):
@@ -25,8 +24,8 @@ class MeanVarianceOptimisation:
     def _inverse_variance(self, asset_prices):
         '''
 
-        :param asset_prices:
-        :return:
+        :param asset_prices: (pd.Dataframe/np.array) the matrix of historical asset prices (daily close)
+        :return: (np.array) array of portfolio weights
         '''
 
         cov = asset_prices.cov()
