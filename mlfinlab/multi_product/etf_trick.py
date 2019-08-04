@@ -123,8 +123,9 @@ class ETFTrick:
             self.data_dict[df_name] = temp_df
 
         # To recalculate latest row we need close price differences
-        self.data_dict['close'].loc[second_max_prev_index, :] = cache['close'].loc[second_max_prev_index, :]
         # That is why close_df needs 2 previous chunk rows to omit first row nans
+        self.data_dict['close'].loc[second_max_prev_index, :] = cache['close'].loc[second_max_prev_index, :]
+
 
         for df_name in self.data_dict:
             self.data_dict[df_name].sort_index(inplace=True)  # Sort data frames after all appends
@@ -300,7 +301,7 @@ class ETFTrick:
         """
         Csv based ETF trick series generation
 
-        :param: batch_size: Size of the batch that you would like to make use of
+        :param: batch_size: (int): Size of the batch that you would like to make use of
         :return: (pd.Series): pandas Series with ETF trick values starting from 1.0
         """
         etf_series = pd.Series()
