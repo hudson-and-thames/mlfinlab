@@ -60,109 +60,112 @@ class CLA:
         '''
 
         # Form structured array
-        a = np.zeros((self.expected_returns.shape[0]), dtype=[("id", int), ("mu", float)])
-        b = [self.expected_returns[i][0] for i in range(self.expected_returns.shape[0])]  # dump array into list
+        structured_array = np.zeros((self.expected_returns.shape[0]), dtype=[("id", int), ("mu", float)])
+        expected_returns = [self.expected_returns[i][0] for i in range(self.expected_returns.shape[0])]  # dump array into list
 
         # Fill structured array
-        a[:] = list(zip(list(range(self.expected_returns.shape[0])), b))
+        structured_array[:] = list(zip(list(range(self.expected_returns.shape[0])), expected_returns))
 
-        # Sort structured array
-        b = np.sort(a, order="mu")
+        # Sort structured array based on increasing return value
+        expected_returns = np.sort(structured_array, order="mu")
 
         # First free weight
-        i, w = b.shape[0], np.copy(self.lower_bounds)
+        i, w = expected_returns.shape[0], np.copy(self.lower_bounds)
         while np.sum(w) < 1:
             i -= 1
 
             # Set weights one by one to the upper bounds
-            w[b[i][0]] = self.upper_bounds[b[i][0]]
-        w[b[i][0]] += 1 - np.sum(w)
-        return [b[i][0]], w
+            w[expected_returns[i][0]] = self.upper_bounds[expected_returns[i][0]]
+        w[expected_returns[i][0]] += 1 - np.sum(w)
+        return [expected_returns[i][0]], w
 
-    def _compute_bi(self, c, bi):
+    def _compute_bi(self, c, asset_bounds_i):
         '''
-        Calculates which bound value to assign to a bounded weight - lower bound or upper bound.
+        Calculates which bound value to assign to a bounded asset - lower bound or upper bound.
 
         :param c: (float) a value calculated using the covariance matrices of free weights.
                           Refer to https://pdfs.semanticscholar.org/4fb1/2c1129ba5389bafe47b03e595d098d0252b9.pdf for
                           more information.
-        :param bi: (list) a list containing the lower and upper bound values for the ith weight
+        :param asset_bounds_i: (list) a list containing the lower and upper bound values for the ith weight
         :return: bounded weight value
         '''
 
+        bounded_asset_i = 0
         if c > 0:
-            bi = bi[1][0]
+            bounded_asset_i = asset_bounds_i[1][0]
         if c < 0:
-            bi = bi[0][0]
-        return bi
+            bounded_asset_i = asset_bounds_i[0][0]
+        return bounded_asset_i
 
-    def _compute_w(self, covarF_inv, covarFB, meanF, wB):
+    def _compute_w(self, covarF_inv, covar_FB, mean_F, w_B):
         '''
         Compute the turning point associated with the current set of free weights F
 
         :param covarF_inv: (np.array) inverse of covariance matrix of free assets
-        :param covarFB: (np.array) covariance matrix between free assets and bounded assets
-        :param meanF: (np.array) expected returns of free assets
-        :param wB: (np.array) bounded asset weight values
+        :param covar_FB: (np.array) covariance matrix between free assets and bounded assets
+        :param mean_F: (np.array) expected returns of free assets
+        :param w_B: (np.array) bounded asset weight values
 
         :return: (array, array) list of turning point weights and gamma value from the langrange equation
         '''
 
-        # 1) compute gamma
-        onesF = np.ones(meanF.shape)
-        g1 = np.dot(np.dot(onesF.T, covarF_inv), meanF)
-        g2 = np.dot(np.dot(onesF.T, covarF_inv), onesF)
-        if wB is None:
-            g, w1 = float(-self.lambdas[-1] * g1 / g2 + 1 / g2), 0
+        # Compute gamma
+        ones_F = np.ones(mean_F.shape)
+        g_1 = np.dot(np.dot(ones_F.T, covarF_inv), mean_F)
+        g_2 = np.dot(np.dot(ones_F.T, covarF_inv), ones_F)
+        if w_B is None:
+            g, w_1 = float(-self.lambdas[-1] * g_1 / g_2 + 1 / g_2), 0
         else:
-            onesB = np.ones(wB.shape)
-            g3 = np.dot(onesB.T, wB)
-            g4 = np.dot(covarF_inv, covarFB)
-            w1 = np.dot(g4, wB)
-            g4 = np.dot(onesF.T, w1)
-            g = float(-self.lambdas[-1] * g1 / g2 + (1 - g3 + g4) / g2)
-        # 2) compute weights
-        w2 = np.dot(covarF_inv, onesF)
-        w3 = np.dot(covarF_inv, meanF)
-        return -w1 + g * w2 + self.lambdas[-1] * w3, g
+            onesB = np.ones(w_B.shape)
+            g_3 = np.dot(onesB.T, w_B)
+            g_4 = np.dot(covarF_inv, covar_FB)
+            w_1 = np.dot(g_4, w_B)
+            g_4 = np.dot(ones_F.T, w_1)
+            g = float(-self.lambdas[-1] * g_1 / g_2 + (1 - g_3 + g_4) / g_2)
 
-    def _compute_lambda(self, covarF_inv, covarFB, meanF, wB, i, bi):
+        # Compute weights
+        w_2 = np.dot(covarF_inv, ones_F)
+        w_3 = np.dot(covarF_inv, mean_F)
+        return -w_1 + g * w_2 + self.lambdas[-1] * w_3, g
+
+    def _compute_lambda(self, covarF_inv, covar_FB, mean_F, w_B, i, bi):
         '''
         Calculate the lambda value in the langrange optimsation equation
 
         :param covarF_inv: (np.array) inverse of covariance matrix of free assets
-        :param covarFB: (np.array) covariance matrix between free assets and bounded assets
-        :param meanF: (np.array) expected returns of free assets
-        :param wB: (np.array) bounded asset weight values
+        :param covar_FB: (np.array) covariance matrix between free assets and bounded assets
+        :param mean_F: (np.array) expected returns of free assets
+        :param w_B: (np.array) bounded asset weight values
         :param i: (int) asset index
         :param bi: (list) list of upper and lower bounded weight values
         :return: (float) lambda value
         '''
 
-        # 1) C
-        onesF = np.ones(meanF.shape)
-        c1 = np.dot(np.dot(onesF.T, covarF_inv), onesF)
-        c2 = np.dot(covarF_inv, meanF)
-        c3 = np.dot(np.dot(onesF.T, covarF_inv), meanF)
-        c4 = np.dot(covarF_inv, onesF)
+        # Compute C
+        ones_F = np.ones(mean_F.shape)
+        c1 = np.dot(np.dot(ones_F.T, covarF_inv), ones_F)
+        c2 = np.dot(covarF_inv, mean_F)
+        c3 = np.dot(np.dot(ones_F.T, covarF_inv), mean_F)
+        c4 = np.dot(covarF_inv, ones_F)
         c = -c1 * c2[i] + c3 * c4[i]
         if c == 0:
             return None, None
 
-        # 2) bi
+        # Compute bi
         if type(bi) == list:
             bi = self._compute_bi(c, bi)
 
-        # 3) Lambda
-        if wB is None:
+        # Compute Lambda
+        if w_B is None:
+
             # All free assets
             return float((c4[i] - c1 * bi) / c), bi
         else:
-            onesB = np.ones(wB.shape)
-            l1 = np.dot(onesB.T, wB)
-            l2 = np.dot(covarF_inv, covarFB)
-            l3 = np.dot(l2, wB)
-            l2 = np.dot(onesF.T, l3)
+            onesB = np.ones(w_B.shape)
+            l1 = np.dot(onesB.T, w_B)
+            l2 = np.dot(covarF_inv, covar_FB)
+            l3 = np.dot(l2, w_B)
+            l2 = np.dot(ones_F.T, l3)
             return float(((1 - l1 + l2) * c4[i] - c1 * (bi + l3[i])) / c), bi
 
     def _get_matrices(self, f):
@@ -174,11 +177,11 @@ class CLA:
         '''
 
         covarF = self._reduce_matrix(self.cov_matrix, f, f)
-        meanF = self._reduce_matrix(self.expected_returns, f, [0])
+        mean_F = self._reduce_matrix(self.expected_returns, f, [0])
         b = self._get_b(f)
-        covarFB = self._reduce_matrix(self.cov_matrix, f, b)
-        wB = self._reduce_matrix(self.weights[-1], b, [0])
-        return covarF, covarFB, meanF, wB
+        covar_FB = self._reduce_matrix(self.cov_matrix, f, b)
+        w_B = self._reduce_matrix(self.weights[-1], b, [0])
+        return covarF, covar_FB, mean_F, w_B
 
     def _get_b(self, f):
         '''
@@ -321,12 +324,12 @@ class CLA:
         i_in = None
         bi_in = None
         if len(free_weights) > 1:
-            covarF, covarFB, meanF, wB = self._get_matrices(free_weights)
+            covarF, covar_FB, mean_F, w_B = self._get_matrices(free_weights)
             covarF_inv = np.linalg.inv(covarF)
             j = 0
             for i in free_weights:
                 l, bi = self._compute_lambda(
-                    covarF_inv, covarFB, meanF, wB, j, [self.lower_bounds[i], self.upper_bounds[i]]
+                    covarF_inv, covar_FB, mean_F, w_B, j, [self.lower_bounds[i], self.upper_bounds[i]]
                 )
                 if _infnone(l) > _infnone(lambda_in):
                     lambda_in, i_in, bi_in = l, i, bi
@@ -343,14 +346,14 @@ class CLA:
         if len(free_weights) < self.expected_returns.shape[0]:
             b = self._get_b(free_weights)
             for i in b:
-                covarF, covarFB, meanF, wB = self._get_matrices(free_weights + [i])
+                covarF, covar_FB, mean_F, w_B = self._get_matrices(free_weights + [i])
                 covarF_inv = np.linalg.inv(covarF)
                 l, bi = self._compute_lambda(
                     covarF_inv,
-                    covarFB,
-                    meanF,
-                    wB,
-                    meanF.shape[0] - 1,
+                    covar_FB,
+                    mean_F,
+                    w_B,
+                    mean_F.shape[0] - 1,
                     self.weights[-1][i],
                 )
                 if (self.lambdas[-1] is None or l < self.lambdas[-1]) and l > _infnone(lambda_out):
@@ -477,9 +480,9 @@ class CLA:
             if (lambda_in is None or lambda_in < 0) and (lambda_out is None or lambda_out < 0):
                 # 3) Compute minimum variance solution
                 self.lambdas.append(0)
-                covarF, covarFB, meanF, wB = self._get_matrices(free_weights)
+                covarF, covar_FB, mean_F, w_B = self._get_matrices(free_weights)
                 covarF_inv = np.linalg.inv(covarF)
-                meanF = np.zeros(meanF.shape)
+                mean_F = np.zeros(mean_F.shape)
             else:
                 # 4) Decide whether to free a bounded weight or bound a free weight
                 if _infnone(lambda_in) > _infnone(lambda_out):
@@ -489,11 +492,11 @@ class CLA:
                 else:
                     self.lambdas.append(lambda_out)
                     free_weights.append(i_out)
-                covarF, covarFB, meanF, wB = self._get_matrices(free_weights)
+                covarF, covar_FB, mean_F, w_B = self._get_matrices(free_weights)
                 covarF_inv = np.linalg.inv(covarF)
 
             # 5) Compute solution vector
-            wF, g = self._compute_w(covarF_inv, covarFB, meanF, wB)
+            wF, g = self._compute_w(covarF_inv, covar_FB, mean_F, w_B)
             for i in range(len(free_weights)):
                 w[free_weights[i]] = wF[i]
             self.weights.append(np.copy(w))  # store solution
