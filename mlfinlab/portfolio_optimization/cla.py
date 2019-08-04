@@ -1,7 +1,7 @@
 '''
 CLA class implements the famous Critical Line Algorithm for mean-variance portfolio
-optimisation. It is taken from the following open-source implementation provided by
-Marcos López de Prado and David Bailey.
+optimisation. It is reproduced with modification from the following paper:
+D.H. Bailey and M.L. Prado “An Open-Source Implementation of the Critical- Line Algorithm for Portfolio Optimization”,Algorithms, 6 (2013), 169-196. http://dx.doi.org/10.3390/a6010169
 '''
 
 import numbers

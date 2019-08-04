@@ -1,3 +1,8 @@
+'''
+This module implements the classic mean-variance optimisation techniques for calculating the efficient frontier.
+It uses typical quadratic optimisers to generate optimal portfolios for different objective functions.
+'''
+
 import numpy as np
 import pandas as pd
 

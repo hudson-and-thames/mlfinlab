@@ -1,3 +1,10 @@
+'''
+This module implements the HRP algorithm mentioned in the following paper:
+López de Prado, Marcos, Building Diversified Portfolios that Outperform Out-of-Sample (May 23, 2016).
+Journal of Portfolio Management, 2016;
+The code is reproduced with modification from his book: Advances in Financial Machine Learning
+'''
+
 import matplotlib
 import numpy as np
 import pandas as pd
