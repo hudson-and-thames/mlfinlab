@@ -57,8 +57,9 @@ def avg_active_signals(signals, num_threads=1):
     Function averages the bet sizes of all concurrently active bets. This function makes use of multiprocessing.
 
     :param signals: (pandas.DataFrame) Contains at least the following columns:
-        'signal' - the bet size
-        't1' - the closing time of the bet
+     'signal' - the bet size
+     't1' - the closing time of the bet
+     And the index must be datetime format.
     :param num_threads: (int) Number of threads to use in multiprocessing, default value is 1.
     :return: (pandas.Series) The averaged bet sizes.
     """
