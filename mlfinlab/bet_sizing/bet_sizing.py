@@ -36,8 +36,8 @@ def bet_size_probability(events, prob, num_classes, pred=None, step_size=0.0, av
     else:
         signal_1 = events_0.signal
 
-    if step_size > 0:
-        signal_1 = discrete_signal(signal0=signal_1, step_size=step_size)
+    if abs(step_size) > 0:
+        signal_1 = discrete_signal(signal0=signal_1, step_size=abs(step_size))
 
     return signal_1
 
@@ -136,10 +136,9 @@ def bet_size_reserve(events_t1, sides, fit_runs=100, epsilon=1e-5, factor=5, var
     df_fit_results = m2n.mp_fit(epsilon=epsilon, factor=factor, n_runs=fit_runs,
                                 variant=variant, max_iter=max_iter, num_workers=num_workers)
     fit_params = most_likely_parameters(df_fit_results)
-    print(fit_params)
     params_list = [fit_params[key] for key in ['mu_1', 'mu_2', 'sigma_1', 'sigma_2', 'p_1']]
     # Calculate the bet size.
-    events_active['bet_size'] = events_active['c_t'].apply(lambda c: bet_size_mixed(c, params_list))
+    events_active['bet_size'] = events_active['c_t'].apply(lambda c: single_bet_size_mixed(c, params_list))
 
     if return_parameters:
         return events_active, fit_params
@@ -224,7 +223,7 @@ def cdf_mixture(x_val, parameters):
     mu_1, mu_2, sigma_1, sigma_2, p_1 = parameters  # Parameters reassigned for clarity.
     return p_1*norm.cdf(x_val, mu_1, sigma_1) + (1-p_1)*norm.cdf(x_val, mu_2, sigma_2)
 
-def bet_size_mixed(c_t, parameters):
+def single_bet_size_mixed(c_t, parameters):
     """
     Returns the single bet size based on the description provided in question 10.4(c), provided the difference in
     concurrent long and short positions, c_t, and the fitted parameters of the mixture of two Gaussain distributions.
