@@ -12,6 +12,7 @@ def get_ind_matrix(triple_barrier_events, price_bars):
     Get indicator matrix. The book implementation uses bar_index as input, however there is no explanation
     how to form it. We decided that using triple_barrier_events and price bars by analogy with concurrency
     is the best option.
+
     :param triple_barrier_events: (pd.DataFrame): triple barrier events from labeling.get_events
     :param price_bars: (pd.DataFrame): price bars which were used to form triple barrier events
     :return: (np.array) indicator binary matrix indicating what (price) bars influence the label for each observation
@@ -50,6 +51,7 @@ def get_ind_mat_average_uniqueness(ind_mat):
     """
     Snippet 4.4. page 65, Compute Average Uniqueness
     Average uniqueness from indicator matrix
+
     :param ind_mat: (np.matrix) indicator binary matrix
     :return: (float) average uniqueness
     """
