@@ -1,0 +1,677 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Data Structures &mdash; mlfinlab 0.3.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Multi-Product Series" href="multi_product.html" />
+    <link rel="prev" title="Requirements" href="../getting_started/requirements.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> mlfinlab
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/barriers_to_entry.html">Barriers to Entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/requirements.html">Requirements</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Implementations</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Structures</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-preparation">Data Preparation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#data-formatting">Data Formatting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#standard-bars">Standard Bars</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#tick-bars">Tick Bars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#volume-bars">Volume Bars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dollar-bars">Dollar Bars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#statistical-properties">Statistical Properties</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#information-driven-bars">Information-Driven Bars</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#imbalance-bars">Imbalance Bars</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imbalance-bars-generation-algorithm">Imbalance Bars Generation Algorithm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#algorithm-logic">Algorithm Logic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#run-bars">Run Bars</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#research-notebooks">Research Notebooks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Standard Bars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Imbalance Bars</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="multi_product.html">Multi-Product Series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="filters.html">Filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="labeling.html">Labeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sampling.html">Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frac_diff.html">Fractionally Differentiated Features</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../additional_information/contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_information/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_information/license.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">mlfinlab</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Data Structures</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/implementations/data_structures.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="data-structures">
+<span id="implementations-data-structures"></span><h1>Data Structures<a class="headerlink" href="#data-structures" title="Permalink to this headline">¶</a></h1>
+<p>When analyzing financial data, unstructured datasets are commonly transformed into a structured format referred to as bars, where a bar represents a row in a table.
+mlfinlab implements tick, volume, and dollar bars using traditional standard bar methods as well as the less common information driven bars.</p>
+<div class="section" id="data-preparation">
+<h2>Data Preparation<a class="headerlink" href="#data-preparation" title="Permalink to this headline">¶</a></h2>
+<p>Read in our data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Required Imports</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="data-formatting">
+<h3>Data Formatting<a class="headerlink" href="#data-formatting" title="Permalink to this headline">¶</a></h3>
+<p>In order to utilize the bar sampling methods presented below, our data must first be formatted properly.
+Many data vendors will let you choose the format of your raw tick data files. We want to only focus on the following 3 columns: date_time, price, volume. The reason for this is to minimise the size of the csv files and the amount of time when reading in the files.</p>
+<p>Our data is sourced from TickData LLC which provide TickWrite 7, to aid in the formatting of saved files. This allows us to save csv files in the format date_time, price, volume.</p>
+<p>For this tutorial we will assume that you need to first do some preprocessing and then save your data to a csv file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Format the Data</span>
+
+<span class="c1"># Don&#39;t convert to datetime here, it will take forever to convert</span>
+<span class="n">date_time</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span>
+<span class="n">new_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">date_time</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Volume&#39;</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">new_data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;price&#39;</span><span class="p">,</span> <span class="s1">&#39;volume&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Initially, your instinct may be to pass mlfinlab package an in-memory DataFrame object but the truth is when you’re running the function in production, your raw tick data csv files will be way too large to hold in memory. We used the subset 2011 to 2019 and it was more than 25 gigs. It is for this reason that the mlfinlab package requires a file path to read the raw data files from disk:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Save to csv</span>
+<span class="n">new_data</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="standard-bars">
+<h2>Standard Bars<a class="headerlink" href="#standard-bars" title="Permalink to this headline">¶</a></h2>
+<p>The three standard bar methods implemented share a similiar underlying idea in that we want to sample a bar after a certain threshold is reached.</p>
+<p>For tick bars, we sample a bar after a certain number of ticks.</p>
+<p>For volume bars, we sample a bar after a certain volume amount is traded.</p>
+<p>For dollar bars, we sample a bar after a certain dollar amount is traded.</p>
+<p>These bars are used throughout the text book (Advances in Financial Machine Learning, By Marcos Lopez de Prado, 2018,
+pg 25) to build the more interesting features for predicting financial time series data.</p>
+<div class="section" id="tick-bars">
+<h3>Tick Bars<a class="headerlink" href="#tick-bars" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="get_tick_bars">
+<code class="sig-name descname">get_tick_bars</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">threshold=2800</em>, <em class="sig-param">batch_size=20000000</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">to_csv=False</em>, <em class="sig-param">output_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#get_tick_bars" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> – File path pointing to csv data.</p></li>
+<li><p><strong>threshold</strong> – A cumulative value above this threshold triggers a sample to be taken.</p></li>
+<li><p><strong>batch_size</strong> – The number of rows per batch. Less RAM = smaller batch size.</p></li>
+<li><p><strong>verbose</strong> – Print out batch numbers (True or False)</p></li>
+<li><p><strong>to_csv</strong> – Save bars to csv after every batch run (True or False)</p></li>
+<li><p><strong>output_path</strong> – Path to csv file, if to_csv is True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataframe of tick bars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Creates the tick bars: date_time, open, high, low, close.</p>
+<p>The get_tick_bars function can be implemented as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlfinlab.data_structures</span> <span class="k">import</span> <span class="n">standard_data_structures</span>
+
+
+<span class="c1"># Tick Bars</span>
+<span class="n">tick</span> <span class="o">=</span> <span class="n">standard_data_structures</span><span class="o">.</span><span class="n">get_tick_bars</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">5500</span><span class="p">,</span>
+<span class="n">batch_size</span><span class="o">=</span><span class="mi">1000000</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="volume-bars">
+<h3>Volume Bars<a class="headerlink" href="#volume-bars" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="get_volume_bars">
+<code class="sig-name descname">get_volume_bars</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">threshold=28224</em>, <em class="sig-param">batch_size=20000000</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">to_csv=False</em>, <em class="sig-param">output_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#get_volume_bars" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> – File path pointing to csv data.</p></li>
+<li><p><strong>threshold</strong> – A cumulative value above this threshold triggers a sample to be taken.</p></li>
+<li><p><strong>batch_size</strong> – The number of rows per batch. Less RAM = smaller batch size.</p></li>
+<li><p><strong>verbose</strong> – Print out batch numbers (True or False)</p></li>
+<li><p><strong>to_csv</strong> – Save bars to csv after every batch run (True or False)</p></li>
+<li><p><strong>output_path</strong> – Path to csv file, if to_csv is True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataframe of volume bars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Creates the volume bars: date_time, open, high, low, close.</p>
+<p>The get_volume_bars function can be implemented as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlfinlab.data_structures</span> <span class="k">import</span> <span class="n">standard_data_structures</span>
+
+
+<span class="c1"># Volume Bars</span>
+<span class="n">volume</span> <span class="o">=</span> <span class="n">standard_data_structures</span><span class="o">.</span><span class="n">get_volume_bars</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">28000</span><span class="p">,</span>
+<span class="n">batch_size</span><span class="o">=</span><span class="mi">1000000</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="dollar-bars">
+<h3>Dollar Bars<a class="headerlink" href="#dollar-bars" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="get_dollar_bars">
+<code class="sig-name descname">get_dollar_bars</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">threshold=70000000</em>, <em class="sig-param">batch_size=20000000</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">to_csv=False</em>, <em class="sig-param">output_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#get_dollar_bars" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> – File path pointing to csv data.</p></li>
+<li><p><strong>threshold</strong> – A cumulative value above this threshold triggers a sample to be taken.</p></li>
+<li><p><strong>batch_size</strong> – The number of rows per batch. Less RAM = smaller batch size.</p></li>
+<li><p><strong>verbose</strong> – Print out batch numbers (True or False)</p></li>
+<li><p><strong>to_csv</strong> – Save bars to csv after every batch run (True or False)</p></li>
+<li><p><strong>output_path</strong> – Path to csv file, if to_csv is True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataframe of dollar bars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Creates the dollar bars: date_time, open, high, low, close.</p>
+<p>The get_dollar_bars function can be implemented as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlfinlab.data_structures</span> <span class="k">import</span> <span class="n">standard_data_structures</span>
+
+
+<span class="c1"># Dollar Bars</span>
+<span class="n">dollar</span> <span class="o">=</span> <span class="n">standard_data_structures</span><span class="o">.</span><span class="n">get_dollar_bars</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">70000000</span><span class="p">,</span>
+<span class="n">batch_size</span><span class="o">=</span><span class="mi">1000000</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="statistical-properties">
+<h3>Statistical Properties<a class="headerlink" href="#statistical-properties" title="Permalink to this headline">¶</a></h3>
+<p>It can be seen below that tick, volume, and dollar bars all exhibit a distribution significantly closer to normal versus standard time bars:</p>
+<a class="reference internal image-reference" href="../_images/normality_graph.png"><img alt="../_images/normality_graph.png" class="align-center" src="../_images/normality_graph.png" style="width: 653.0999999999999px; height: 508.2px;" /></a>
+</div>
+</div>
+<div class="section" id="information-driven-bars">
+<h2>Information-Driven Bars<a class="headerlink" href="#information-driven-bars" title="Permalink to this headline">¶</a></h2>
+<p>Information-driven bars are based on the notion of sampling a bar when new information arrives to the market. The two types of information-driven bars implemented are imbalance bars and run bars. For each type, tick, volume, and dollar bars are included.</p>
+<div class="section" id="imbalance-bars">
+<h3>Imbalance Bars<a class="headerlink" href="#imbalance-bars" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="imbalance-bars-generation-algorithm">
+<h4>Imbalance Bars Generation Algorithm<a class="headerlink" href="#imbalance-bars-generation-algorithm" title="Permalink to this headline">¶</a></h4>
+<p>Let’s discuss imbalance bars generation on example of volume imbalance bars. As it is described in Advances in Financial Machine Learning book:</p>
+<p>First let’s define what is the tick rule:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(b_t = \begin{cases} b_{t-1},\;\;\;\;\;\;\;\;\;\; \Delta p_t \mbox{=0} \\ |\Delta p_t| / \Delta p_{t},\;\;\;      \Delta p_t \neq\mbox{0} \end{cases}\)</span></p>
+</div></blockquote>
+<p>For any given <span class="math notranslate nohighlight">\(t\)</span>, where <span class="math notranslate nohighlight">\(p_t\)</span> is the price associated with <span class="math notranslate nohighlight">\(t\)</span> and <span class="math notranslate nohighlight">\(v_t\)</span> is volume, the tick rule <span class="math notranslate nohighlight">\(b_t\)</span> is defined as:</p>
+<p>Tick rule is used as a proxy of trade direction, however, some data providers already provide customers with tick direction, in this case we don’t need to calculate tick rule, just use the provided tick direction instead.</p>
+<p>Cumulative volume imbalance from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(T\)</span> is defined as:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(\theta_t = \sum_{t=1}^T b_t*v_t\)</span></p>
+</div></blockquote>
+<p><span class="math notranslate nohighlight">\(T\)</span> is the time when the bar is sampled.</p>
+<p>Next we need to define <span class="math notranslate nohighlight">\(E_0[T]\)</span> as expected number of ticks, the book suggests to use EWMA of expected number of ticks from previously generated bars. Let’s introduce the first hyperparameter for imbalance bars generation: <strong>num_prev_bars</strong> which corresponds to window used for EWMA calculation.</p>
+<p>Here we face the problem of first bar generation, because we don’t know expected number of ticks with no bars generated. To solve this we introduce the second hyperparameter: expected_num_ticks_init which corresponds to initial guess for <strong>expected number of ticks</strong> before the first imbalance bar is generated.</p>
+<p>Bar is sampled when:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(|\theta_t| \geq E_0[T]*[2v^+ - E_0[v_t]]\)</span></p>
+</div></blockquote>
+<p>To estimate  (expected imbalance) we simply calculate EWMA of volume imbalance from previous bars, that is why we need to store volume imbalances in imbalance array, the window for estimation is either <strong>expected_num_ticks_init</strong> before the first bar is sampled, or expected number of ticks(<span class="math notranslate nohighlight">\(E_0[T]\)</span>) * <strong>num_prev_bars</strong> when the first bar is generated.</p>
+<p>Note that when we have at least one imbalance bar generated we update <span class="math notranslate nohighlight">\(2v^+ - E_0[v_t]\)</span> only when the next bar is sampled not on every trade observed</p>
+</div>
+<div class="section" id="algorithm-logic">
+<h4>Algorithm Logic<a class="headerlink" href="#algorithm-logic" title="Permalink to this headline">¶</a></h4>
+<p>Now we have understood the logic of imbalance bar generation, let’s understand how the process looks in details:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">num_prev_bars</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">expected_num_ticks_init</span> <span class="o">=</span> <span class="mi">100000</span>
+<span class="n">expected_num_ticks</span> <span class="o">=</span> <span class="n">expected_num_ticks_init</span>
+<span class="n">cum_theta</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">num_ticks</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">imbalance_array</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">imbalance_bars</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">bar_length_array</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">rows</span><span class="p">:</span>
+    <span class="c1">#track high,low,close, volume info</span>
+    <span class="n">num_ticks</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">tick_rule</span> <span class="o">=</span> <span class="n">get_tick_rule</span><span class="p">(</span><span class="n">price</span><span class="p">,</span> <span class="n">prev_price</span><span class="p">)</span>
+    <span class="n">volume_imbalance</span> <span class="o">=</span> <span class="n">tick_rule</span> <span class="o">*</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;volume&#39;</span><span class="p">]</span>
+    <span class="n">imbalance_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">volume_imbalance</span><span class="p">)</span>
+    <span class="n">cum_theta</span> <span class="o">+=</span> <span class="n">volume_imbalance</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">imbalance_bars</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">imbalance_array</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">expected_num_ticks_init</span><span class="p">:</span>
+        <span class="n">expected_imbalance</span> <span class="o">=</span> <span class="n">ewma</span><span class="p">(</span><span class="n">imbalance_array</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">expected_num_ticks_init</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">cum_theta</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">expected_num_ticks</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">expected_imbalance</span><span class="p">):</span>
+        <span class="n">bar</span> <span class="o">=</span> <span class="n">form_bar</span><span class="p">(</span><span class="nb">open</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">close</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span>
+        <span class="n">imbalance_bars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>
+        <span class="n">bar_length_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">num_ticks</span><span class="p">)</span>
+        <span class="n">cum_theta</span><span class="p">,</span> <span class="n">num_ticks</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="n">expected_num_ticks</span> <span class="o">=</span> <span class="n">ewma</span><span class="p">(</span><span class="n">bar_lenght_array</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">num_prev_bars</span><span class="p">)</span>
+        <span class="n">expected_imbalance</span> <span class="o">=</span> <span class="n">ewma</span><span class="p">(</span><span class="n">imbalance_array</span><span class="p">,</span> <span class="n">window</span> <span class="o">=</span> <span class="n">num_prev_bars</span> <span class="o">*</span> <span class="n">expected_num_ticks</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that in algorithm pseudo-code we reset <span class="math notranslate nohighlight">\(\theta_t\)</span> when bar is formed, in our case the formula for <span class="math notranslate nohighlight">\(\theta_t\)</span> is:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(\theta_t = \sum_{t=t^*}^T b_t*v_t\)</span></p>
+</div></blockquote>
+<p>Let’s look at dynamics of <span class="math notranslate nohighlight">\(|\theta_t|\)</span> and <span class="math notranslate nohighlight">\(E_0[T] * |2v^+ - E_0[v_t]|\)</span> to understand why we decided to reset <span class="math notranslate nohighlight">\(\theta_t\)</span> when bar is formed. The dynamics when theta value is reset:</p>
+<a class="reference internal image-reference" href="../_images/theta_reset.png"><img alt="../_images/theta_reset.png" class="align-center" src="../_images/theta_reset.png" style="width: 448.0px; height: 336.0px;" /></a>
+<p>Note that on the first ticks, threshold condition is not stable. Remember, before the first bar is generated, expected imbalance is calculated on every tick with window = expected_num_ticks_init, that is why it changes with every tick. After the first bar was generated both expected number of ticks (<span class="math notranslate nohighlight">\(E_0[T]\)</span>) and exptected volume imbalance
+(<span class="math notranslate nohighlight">\(2v^+ - E_0[v_t]\)</span>) are updated only when the next bar is generated</p>
+<p>When theta is not reset:</p>
+<a class="reference internal image-reference" href="../_images/theta_not_reset.png"><img alt="../_images/theta_not_reset.png" class="align-center" src="../_images/theta_not_reset.png" style="width: 448.0px; height: 336.0px;" /></a>
+<p>The reason for that is due to the fact that theta is accumulated when several bars are generated theta value is not reset <span class="math notranslate nohighlight">\(\Rightarrow\)</span> condition is met on small number of ticks <span class="math notranslate nohighlight">\(\Rightarrow\)</span> length of the next bar converges to 1 <span class="math notranslate nohighlight">\(\Rightarrow\)</span> bar is sampled on the next consecutive tick.</p>
+<p>The logic described above is implemented in <strong>mlfinlab</strong> package in ImbalanceBars</p>
+</div>
+<div class="section" id="examples">
+<h4>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h4>
+<p>Examples of implementations of imbalance bars can be seen below:</p>
+<dl class="function">
+<dt id="get_tick_imbalance_bars">
+<code class="sig-name descname">get_tick_imbalance_bars</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">num_prev_bars</em>, <em class="sig-param">exp_num_ticks_init=100000</em>, <em class="sig-param">batch_size=2e7</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">to_csv=False</em>, <em class="sig-param">output_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#get_tick_imbalance_bars" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> – File path pointing to csv data.</p></li>
+<li><p><strong>num_prev_bars</strong> – Number of previous bars used for EWMA window expected # of ticks</p></li>
+<li><p><strong>exp_num_ticks_init</strong> – initial expected number of ticks per bar</p></li>
+<li><p><strong>batch_size</strong> – The number of rows per batch. Less RAM = smaller batch size.</p></li>
+<li><p><strong>verbose</strong> – Print out batch numbers (True or False)</p></li>
+<li><p><strong>to_csv</strong> – Save bars to csv after every batch run (True or False)</p></li>
+<li><p><strong>output_path</strong> – Path to csv file, if to_csv is True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DataFrame of tick bars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Creates the tick imbalance bars: date_time, open, high, low, close.</p>
+<p>The get_tick_imbalance_bars function can be implemented as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlfinlab.data_structures</span> <span class="k">import</span> <span class="n">imbalance_data_structures</span>
+
+
+<span class="c1"># Tick Imbalance Bars</span>
+<span class="n">tick_imbalance</span> <span class="o">=</span> <span class="n">imbalance_data_structures</span><span class="o">.</span><span class="n">get_tick_imbalance_bars</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span>
+<span class="n">num_prev_bars</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">exp_num_ticks_init</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="get_volume_imbalance_bars">
+<code class="sig-name descname">get_volume_imbalance_bars</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">num_prev_bars</em>, <em class="sig-param">exp_num_ticks_init=100000</em>, <em class="sig-param">batch_size=2e7</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">to_csv=False</em>, <em class="sig-param">output_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#get_volume_imbalance_bars" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> – File path pointing to csv data.</p></li>
+<li><p><strong>num_prev_bars</strong> – Number of previous bars used for EWMA window expected # of ticks</p></li>
+<li><p><strong>exp_num_ticks_init</strong> – initial expected number of ticks per bar</p></li>
+<li><p><strong>batch_size</strong> – The number of rows per batch. Less RAM = smaller batch size.</p></li>
+<li><p><strong>verbose</strong> – Print out batch numbers (True or False)</p></li>
+<li><p><strong>to_csv</strong> – Save bars to csv after every batch run (True or False)</p></li>
+<li><p><strong>output_path</strong> – Path to csv file, if to_csv is True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DataFrame of volume bars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Creates the volume imbalance bars: date_time, open, high, low, close.</p>
+<p>The get_volume_imbalance_bars function can be implemented as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlfinlab.data_structures</span> <span class="k">import</span> <span class="n">imbalance_data_structures</span>
+
+
+<span class="c1"># Volume Imbalance Bars</span>
+<span class="n">volume_imbalance</span> <span class="o">=</span> <span class="n">imbalance_data_structures</span><span class="o">.</span><span class="n">get_volume_imbalance_bars</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span>
+<span class="n">num_prev_bars</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">exp_num_ticks_init</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="get_dollar_imbalance_bars">
+<code class="sig-name descname">get_dollar_imbalance_bars</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">num_prev_bars</em>, <em class="sig-param">exp_num_ticks_init=100000</em>, <em class="sig-param">batch_size=2e7</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">to_csv=False</em>, <em class="sig-param">output_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#get_dollar_imbalance_bars" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> – File path pointing to csv data.</p></li>
+<li><p><strong>num_prev_bars</strong> – Number of previous bars used for EWMA window expected # of ticks</p></li>
+<li><p><strong>exp_num_ticks_init</strong> – initial expected number of ticks per bar</p></li>
+<li><p><strong>batch_size</strong> – The number of rows per batch. Less RAM = smaller batch size.</p></li>
+<li><p><strong>verbose</strong> – Print out batch numbers (True or False)</p></li>
+<li><p><strong>to_csv</strong> – Save bars to csv after every batch run (True or False)</p></li>
+<li><p><strong>output_path</strong> – Path to csv file, if to_csv is True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DataFrame of dollar bars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Creates the dollar imbalance bars: date_time, open, high, low, close.</p>
+<p>The get_dollar_imbalance_bars function can be implemented as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlfinlab.data_structures</span> <span class="k">import</span> <span class="n">imbalance_data_structures</span>
+
+
+<span class="c1"># Dollar Imbalance Bars</span>
+<span class="n">dollar</span> <span class="o">=</span> <span class="n">imbalance_data_structures</span><span class="o">.</span><span class="n">get_dollar_bars</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span>
+<span class="n">num_prev_bars</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">exp_num_ticks_init</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="run-bars">
+<h3>Run Bars<a class="headerlink" href="#run-bars" title="Permalink to this headline">¶</a></h3>
+<p>Run bars share the same mathematical structure as imblance bars, however, instead of looking at each individual trade, we are looking at sequences of trades in the same direction. The idea is that we are trying to detect order flow imbalance caused by actions such as large traders sweeping the order book or iceberg orders.</p>
+<p>Examples of implementations of run bars can be seen below:</p>
+<dl class="function">
+<dt id="get_tick_run_bars">
+<code class="sig-name descname">get_tick_run_bars</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">num_prev_bars</em>, <em class="sig-param">exp_num_ticks_init=100000</em>, <em class="sig-param">batch_size=2e7</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">to_csv=False</em>, <em class="sig-param">output_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#get_tick_run_bars" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> – File path pointing to csv data.</p></li>
+<li><p><strong>num_prev_bars</strong> – Number of previous bars used for EWMA window expected # of ticks</p></li>
+<li><p><strong>exp_num_ticks_init</strong> – initial expected number of ticks per bar</p></li>
+<li><p><strong>batch_size</strong> – The number of rows per batch. Less RAM = smaller batch size.</p></li>
+<li><p><strong>verbose</strong> – Print out batch numbers (True or False)</p></li>
+<li><p><strong>to_csv</strong> – Save bars to csv after every batch run (True or False)</p></li>
+<li><p><strong>output_path</strong> – Path to csv file, if to_csv is True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DataFrame of tick bars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Creates the tick run bars: date_time, open, high, low, close.</p>
+<p>The get_tick_run_bars function can be implemented as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlfinlab.data_structures</span> <span class="k">import</span> <span class="n">run_data_structures</span>
+
+
+<span class="c1"># Tick Run Bars</span>
+<span class="n">tick_run</span> <span class="o">=</span> <span class="n">run_data_structures</span><span class="o">.</span><span class="n">get_tick_run_bars</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span>
+<span class="n">num_prev_bars</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">exp_num_ticks_init</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="get_volume_run_bars">
+<code class="sig-name descname">get_volume_run_bars</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">num_prev_bars</em>, <em class="sig-param">exp_num_ticks_init=100000</em>, <em class="sig-param">batch_size=2e7</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">to_csv=False</em>, <em class="sig-param">output_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#get_volume_run_bars" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> – File path pointing to csv data.</p></li>
+<li><p><strong>num_prev_bars</strong> – Number of previous bars used for EWMA window expected # of ticks</p></li>
+<li><p><strong>exp_num_ticks_init</strong> – initial expected number of ticks per bar</p></li>
+<li><p><strong>batch_size</strong> – The number of rows per batch. Less RAM = smaller batch size.</p></li>
+<li><p><strong>verbose</strong> – Print out batch numbers (True or False)</p></li>
+<li><p><strong>to_csv</strong> – Save bars to csv after every batch run (True or False)</p></li>
+<li><p><strong>output_path</strong> – Path to csv file, if to_csv is True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DataFrame of volume bars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Creates the volume run bars: date_time, open, high, low, close.</p>
+<p>The get_volume_run_bars function can be implemented as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlfinlab.data_structures</span> <span class="k">import</span> <span class="n">run_data_structures</span>
+
+
+<span class="c1"># Volume Run Bars</span>
+<span class="n">volume_run</span> <span class="o">=</span> <span class="n">run_data_structures</span><span class="o">.</span><span class="n">get_volume_run_bars</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span>
+<span class="n">num_prev_bars</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">exp_num_ticks_init</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="get_dollar_run_bars">
+<code class="sig-name descname">get_dollar_run_bars</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">num_prev_bars</em>, <em class="sig-param">exp_num_ticks_init=100000</em>, <em class="sig-param">batch_size=2e7</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">to_csv=False</em>, <em class="sig-param">output_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#get_dollar_run_bars" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> – File path pointing to csv data.</p></li>
+<li><p><strong>num_prev_bars</strong> – Number of previous bars used for EWMA window expected # of ticks</p></li>
+<li><p><strong>exp_num_ticks_init</strong> – initial expected number of ticks per bar</p></li>
+<li><p><strong>batch_size</strong> – The number of rows per batch. Less RAM = smaller batch size.</p></li>
+<li><p><strong>verbose</strong> – Print out batch numbers (True or False)</p></li>
+<li><p><strong>to_csv</strong> – Save bars to csv after every batch run (True or False)</p></li>
+<li><p><strong>output_path</strong> – Path to csv file, if to_csv is True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DataFrame of dollar bars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Creates the dollar run bars: date_time, open, high, low, close.</p>
+<p>The get_dollar_run_bars function can be implemented as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mlfinlab.data_structures</span> <span class="k">import</span> <span class="n">run_data_structures</span>
+
+
+<span class="c1"># Dollar Run Bars</span>
+<span class="n">dollar_run</span> <span class="o">=</span> <span class="n">run_data_structures</span><span class="o">.</span><span class="n">get_dollar_run_bars</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span>
+<span class="n">num_prev_bars</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">exp_num_ticks_init</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="research-notebooks">
+<h2>Research Notebooks<a class="headerlink" href="#research-notebooks" title="Permalink to this headline">¶</a></h2>
+<p>The following research notebooks can be used to better understand the previously discussed data structures</p>
+<div class="section" id="id1">
+<h3>Standard Bars<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://github.com/hudson-and-thames/research/blob/master/Chapter2/Getting%20Started.ipynb">Getting Started</a></p>
+<p><a class="reference external" href="https://github.com/hudson-and-thames/research/blob/master/Chapter2/2019-03-03_JJ_Sample-Techniques.ipynb">Sample Techniques</a></p>
+</div>
+<div class="section" id="id2">
+<h3>Imbalance Bars<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://github.com/hudson-and-thames/research/blob/master/Chapter2/2019-04-11_OP_Dollar-Imbalance-Bars.ipynb">Imbalance Bars</a></p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="multi_product.html" class="btn btn-neutral float-right" title="Multi-Product Series" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../getting_started/requirements.html" class="btn btn-neutral float-left" title="Requirements" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Hudson &amp; Thames
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

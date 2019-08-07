@@ -1,0 +1,12 @@
+###############
+Getting Started
+###############
+
+
+. toctree::
+   :caption: Getting Started
+   :hidden:
+
+   getting_started/requirements
+   getting_started/installation
+   getting_started/barriers_to_entry
