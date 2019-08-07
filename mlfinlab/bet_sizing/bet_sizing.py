@@ -180,7 +180,7 @@ def confirm_and_cast_to_df(d_vars):
                 d_vars[k] = pd.Series(data=np.array([d_vars[k] for i in range(ser_len)]), index=idx)
 
     # Combine Series to form a DataFrame.
-    events = pd.concat([d_vars.values()], axis=1)
+    events = pd.concat(list(d_vars.values()), axis=1)
     d_col_names = {i: k_i for i, k_i in enumerate(d_vars.keys())}
     events = events.rename(columns=d_col_names)
 
