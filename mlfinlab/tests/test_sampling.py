@@ -12,7 +12,7 @@ from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier
 from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix, get_ind_mat_average_uniqueness, \
     _bootstrap_loop_run, get_ind_mat_label_uniqueness  # pylint: disable=protected-access
-from mlfinlab.sampling.concurrent import get_av_uniqueness_from_tripple_barrier, num_concurrent_events
+from mlfinlab.sampling.concurrent import get_av_uniqueness_from_triple_barrier, num_concurrent_events
 from mlfinlab.util.utils import get_daily_vol
 
 
@@ -72,7 +72,7 @@ class TestSampling(unittest.TestCase):
         Assert that average event uniqueness is available for all labels and equals to particular values
         """
 
-        av_un = get_av_uniqueness_from_tripple_barrier(self.meta_labeled_events, self.data['close'], num_threads=4)
+        av_un = get_av_uniqueness_from_triple_barrier(self.meta_labeled_events, self.data['close'], num_threads=4)
         # Assert for each label we have uniqueness value
         self.assertTrue(av_un.shape[0] == self.meta_labeled_events.shape[0])
         self.assertTrue(av_un['tW'].iloc[0] == 1)
