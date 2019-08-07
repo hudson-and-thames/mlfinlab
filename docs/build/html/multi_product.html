@@ -1,0 +1,424 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Multi-Product Series &mdash; mlfinlab 0.3.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> mlfinlab
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started/barriers_to_entry.html">Barriers to Entry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started/requirements.html">Requirements</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Implementations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="implementations/data_structures.html">Data Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementations/multi_product.html">Multi-Product Series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementations/filters.html">Filters</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">mlfinlab</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Multi-Product Series</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/multi_product.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="multi-product-series">
+<span id="implementations-multi-product"></span><h1>Multi-Product Series<a class="headerlink" href="#multi-product-series" title="Permalink to this headline">¶</a></h1>
+<p>When modeling multi-product series we are faced with many unique challenges which alter the nature of the underlying time series. For example, when working with a series of instruments, weights often need to be adjusted dynamically over time. Additionally, the constituents of a multi-product series may pay out irregular coupons or dividends. mlfinlab provides a solution known as the “ETF trick”  which helps us avoid the pitfalls of many of these scenarios.</p>
+<div class="section" id="etf-trick">
+<h2>ETF Trick<a class="headerlink" href="#etf-trick" title="Permalink to this headline">¶</a></h2>
+<p>The ETF trick solves many of the issues that arise when dealing with multi-product series by transforming a multi-product dataset into a single dataset resembling a return ETF. This allows for the series to be traded as if it were a cashlike product regardless of the underlying complexity. An implementation of the ETF trick using mlfinlab can be seen below.</p>
+<p>The following contains logic of vectorised ETF trick implementation. It can be used for both memory data frames (pd.DataFrame) and csv files.
+All data frames, files should be processed in a specific format, described in the examples.</p>
+<dl class="class">
+<dt id="ETFTrick">
+<em class="property">class </em><code class="sig-name descname">ETFTrick</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">open_df</em>, <em class="sig-param">close_df</em>, <em class="sig-param">alloc_df</em>, <em class="sig-param">costs_df</em>, <em class="sig-param">rates_df=None</em>, <em class="sig-param">index_col=0</em><span class="sig-paren">)</span><a class="headerlink" href="#ETFTrick" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">parameter open_df</dt>
+<dd class="field-odd"><p>(pd.DataFrame or string): open prices data frame or path to csv file, corresponds to o(t) from the book</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>close_df</strong> – (pd.DataFrame or string): close prices data frame or path to csv file, corresponds to p(t)</p></li>
+<li><p><strong>alloc_df</strong> – (pd.DataFrame or string): asset allocations data frame or path to csv file (in # of contracts), corresponds to w(t)</p></li>
+<li><p><strong>costs_df</strong> – (pd.DataFrame or string): rebalance, carry and dividend costs of holding/rebalancing the position, corresponds to d(t)</p></li>
+<li><p><strong>rates_df</strong> – (pd.DataFrame or string): dollar value of one point move of contract includes exchange rate,
+futures contracts multiplies). Corresponds to phi(t)
+For example, 1$ in VIX index, equals 1000$ in VIX futures contract value.
+If None then trivial (all values equal 1.0) is generated</p></li>
+<li><p><strong>index_col</strong> – (int): positional index of index column. Used for to determine index column in csv files</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>The ETFTrick object supports the following method to generate the ETF trick series</p>
+<dl class="method">
+<dt id="get_etf_series">
+<code class="sig-name descname">get_etf_series</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">batch_size=1e5</em><span class="sig-paren">)</span><a class="headerlink" href="#get_etf_series" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>batch_size</strong> – Size of the batch that you would like to make use of</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>pandas Series with ETF trick values starting from 1.0</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>An end-to-end example showing how the ETF trick can be implemented can be seen below:</p>
+<div class="section" id="spx-eurostoxx-hedging-implementation">
+<h3>SPX/EuroStoxx Hedging Implementation<a class="headerlink" href="#spx-eurostoxx-hedging-implementation" title="Permalink to this headline">¶</a></h3>
+<p>Let’s see how mlfinlab’s ETF trick is used to solve the exercise 2.3 from Chapter 2. For this exercise we use daily SPY and EUROSTOXX futures data and EUR/USD exchange rates from <a class="reference external" href="https://www.investing.com">link</a>. Hedging weights are recalculated on a daily basis.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#imports</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<span class="kn">from</span> <span class="nn">mlfinlab.multi_product.etf_trick</span> <span class="k">import</span> <span class="n">ETFTrick</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">generate_cov_mat</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Forms covariance matrix from current data frame row using &#39;rolling_cov&#39;,</span>
+<span class="sd">    &#39;rolling_spx_var&#39; and &#39;rolling_eur_var&#39; column values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cov</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;rolling_cov&#39;</span><span class="p">]</span>
+    <span class="n">spx_var</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;rolling_spx_var&#39;</span><span class="p">]</span>
+    <span class="n">euro_var</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;rolling_euro_var&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">([[</span><span class="n">spx_var</span><span class="p">,</span> <span class="n">cov</span><span class="p">],</span> <span class="p">[</span><span class="n">cov</span><span class="p">,</span> <span class="n">euro_var</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Snippet 2.1 from a book</span>
+<span class="k">def</span> <span class="nf">pca_weights</span><span class="p">(</span><span class="n">cov</span><span class="p">,</span> <span class="n">riskDist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">risk_target</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates hedging weights using covariance matrix(cov), risk distribution(riskDist) and risk_target</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">eVal</span><span class="p">,</span> <span class="n">eVec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">eVal</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">eVal</span><span class="p">,</span> <span class="n">eVec</span> <span class="o">=</span> <span class="n">eVal</span><span class="p">[</span><span class="n">indices</span><span class="p">],</span> <span class="n">eVec</span><span class="p">[:,</span> <span class="n">indices</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">riskDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">riskDist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">cov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">riskDist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">loads</span> <span class="o">=</span> <span class="n">risk_target</span> <span class="o">*</span> <span class="p">(</span><span class="n">riskDist</span><span class="o">/</span><span class="n">eVal</span><span class="p">)</span><span class="o">**.</span><span class="mi">5</span>
+    <span class="n">wghts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">eVec</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">loads</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">wghts</span>
+</pre></div>
+</div>
+<div class="section" id="data-preprocessing">
+<h4>Data Preprocessing<a class="headerlink" href="#data-preprocessing" title="Permalink to this headline">¶</a></h4>
+<p>Read in Data</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="s1">&#39;Open&#39;</span><span class="p">])</span>
+<span class="n">euro</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="s1">&#39;Open&#39;</span><span class="p">])</span>
+<span class="n">eur_usd</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span> <span class="n">usecols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="s1">&#39;Price&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Rename columns to universal format</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spx</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Date&#39;</span><span class="p">:</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;Price&#39;</span><span class="p">:</span> <span class="s1">&#39;close&#39;</span><span class="p">,</span> <span class="s1">&#39;Open&#39;</span><span class="p">:</span> <span class="s1">&#39;open&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">euro</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Date&#39;</span><span class="p">:</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;Price&#39;</span><span class="p">:</span> <span class="s1">&#39;close&#39;</span><span class="p">,</span> <span class="s1">&#39;Open&#39;</span><span class="p">:</span> <span class="s1">&#39;open&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">eur_usd</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Date&#39;</span><span class="p">:</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;Price&#39;</span><span class="p">:</span> <span class="s1">&#39;close&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Convert date column to datetime format</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spx</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">spx</span><span class="o">.</span><span class="n">date</span><span class="p">)</span>
+<span class="n">euro</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">euro</span><span class="o">.</span><span class="n">date</span><span class="p">)</span>
+<span class="n">eur_usd</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">eur_usd</span><span class="o">.</span><span class="n">date</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Convert price data from strings to float (investing.com uses specific decimal sep format)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spx</span><span class="o">.</span><span class="n">close</span> <span class="o">=</span> <span class="n">spx</span><span class="o">.</span><span class="n">close</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">euro</span><span class="o">.</span><span class="n">close</span> <span class="o">=</span> <span class="n">euro</span><span class="o">.</span><span class="n">close</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">spx</span><span class="o">.</span><span class="n">open</span> <span class="o">=</span> <span class="n">spx</span><span class="o">.</span><span class="n">open</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">euro</span><span class="o">.</span><span class="n">open</span> <span class="o">=</span> <span class="n">euro</span><span class="o">.</span><span class="n">open</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Set and sort index</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spx</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">euro</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">eur_usd</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">spx</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">euro</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">eur_usd</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Exchange rate is needed only for dates when futures are traded</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eur_usd</span> <span class="o">=</span> <span class="n">eur_usd</span><span class="p">[</span><span class="n">eur_usd</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">spx</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="generate-covariances-and-hedging-weights">
+<h4>Generate Covariances and Hedging Weights<a class="headerlink" href="#generate-covariances-and-hedging-weights" title="Permalink to this headline">¶</a></h4>
+<p>Init data frame with covariance and price data</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cov_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">spx</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cov_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">spx</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;spx_close&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spx</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;close&#39;</span><span class="p">]</span>
+<span class="n">cov_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">euro</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;euro_close&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">euro</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;close&#39;</span><span class="p">]</span>
+<span class="n">cov_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">spx</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;spx_open&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spx</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;open&#39;</span><span class="p">]</span>
+<span class="n">cov_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">euro</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;euro_open&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">euro</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;open&#39;</span><span class="p">]</span>
+<span class="n">cov_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">eur_usd</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;eur_usd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eur_usd</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;close&#39;</span><span class="p">]</span>
+<span class="c1"># we need to calculate EUROSTOXX returns adjusted for FX rate</span>
+<span class="n">cov_df</span><span class="p">[</span><span class="s1">&#39;euro_fx_adj&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_df</span><span class="o">.</span><span class="n">euro_close</span> <span class="o">/</span> <span class="n">cov_df</span><span class="o">.</span><span class="n">eur_usd</span>
+<span class="n">cov_df</span><span class="p">[</span><span class="s1">&#39;spx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_df</span><span class="o">.</span><span class="n">spx_close</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">cov_df</span><span class="p">[</span><span class="s1">&#39;euro&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_df</span><span class="o">.</span><span class="n">euro_fx_adj</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Fill missing values with previous ones and sort index</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cov_df</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">cov_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;spx&#39;</span><span class="p">,</span> <span class="s1">&#39;euro&#39;</span><span class="p">,</span> <span class="s1">&#39;spx_close&#39;</span><span class="p">,</span> <span class="s1">&#39;spx_open&#39;</span><span class="p">,</span> <span class="s1">&#39;euro_close&#39;</span><span class="p">,</span> <span class="s1">&#39;euro_open&#39;</span><span class="p">,</span> <span class="s1">&#39;eur_usd&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;pad&#39;</span><span class="p">))</span>
+<span class="n">cov_df</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Get 252 rolling covariance between SPY and EUROSTOXX, rolling variances</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cov_df</span><span class="p">[</span><span class="s1">&#39;rolling_cov&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_df</span><span class="p">[</span><span class="s1">&#39;spx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">cov_df</span><span class="p">[</span><span class="s1">&#39;euro&#39;</span><span class="p">])</span>
+<span class="n">cov_df</span><span class="p">[</span><span class="s1">&#39;rolling_spx_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_df</span><span class="p">[</span><span class="s1">&#39;spx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+<span class="n">cov_df</span><span class="p">[</span><span class="s1">&#39;rolling_euro_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_df</span><span class="p">[</span><span class="s1">&#39;euro&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Iterate over cov_df and on each step define hedging weights using pca_weights function</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cov_df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cov_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">mat</span> <span class="o">=</span> <span class="n">generate_cov_mat</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">pca_weights</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+    <span class="n">cov_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;spx_w&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">cov_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;euro_w&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="prepare-data-set-for-etf-trick">
+<h4>Prepare Data Set for ETF Trick<a class="headerlink" href="#prepare-data-set-for-etf-trick" title="Permalink to this headline">¶</a></h4>
+<p>ETFTrick class requires open_df, close_df, alloc_df, costs_df, rates_df. Each of these data frames should be in a specific format:</p>
+<ol class="arabic simple">
+<li><p>DateTime index</p></li>
+<li><p>Each column name corresponds to a ticker, number of columns in all data frames should be equal.</p></li>
+</ol>
+<p>In our case all data frames contain columns: ‘spx’ and ‘euro’.</p>
+<p>For example, we implement etf trick with 5 securities: A, B, C, D, E.</p>
+<p>If for the first two years only A, B and C close data is available while for the last two years only D and E data is available, close data frame format will be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">index</span>        <span class="n">A</span>    <span class="n">B</span>     <span class="n">C</span>     <span class="n">D</span>     <span class="n">E</span>
+<span class="n">Year</span> <span class="mi">1</span>      <span class="mf">22.0</span> <span class="mf">7.52</span>  <span class="mf">7.5</span>   <span class="n">NaN</span>   <span class="n">NaN</span>
+<span class="n">Year</span> <span class="mi">1</span>      <span class="mf">20.7</span> <span class="mf">7.96</span>  <span class="mf">8.2</span>   <span class="n">NaN</span>   <span class="n">NaN</span>
+<span class="o">.....</span>
+<span class="n">Year</span> <span class="n">N</span>      <span class="n">NaN</span>  <span class="n">NaN</span>   <span class="n">NaN</span>   <span class="mf">0.3</span>   <span class="mf">100.5</span>
+</pre></div>
+</div>
+<p><strong>open_df</strong>: open prices (in contract currency)</p>
+<p><strong>close_df</strong>: close prices</p>
+<p><strong>alloc_df</strong>: securities allocation vector</p>
+<p><strong>costs_df</strong>: costs of holding/rebalancing the position</p>
+<p><strong>rates_df</strong>: $ value of 1 point move of contract price. This includes exchange rates, futures multipliers</p>
+<p>Create open_df and close_df</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">open_df</span> <span class="o">=</span> <span class="n">cov_df</span><span class="p">[[</span><span class="s1">&#39;spx_open&#39;</span><span class="p">,</span> <span class="s1">&#39;euro_open&#39;</span><span class="p">]]</span>
+<span class="n">open_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;spx_open&#39;</span><span class="p">:</span> <span class="s1">&#39;spx&#39;</span><span class="p">,</span> <span class="s1">&#39;euro_open&#39;</span><span class="p">:</span> <span class="s1">&#39;euro&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">close_df</span> <span class="o">=</span> <span class="n">cov_df</span><span class="p">[[</span><span class="s1">&#39;spx_close&#39;</span><span class="p">,</span> <span class="s1">&#39;euro_close&#39;</span><span class="p">]]</span>
+<span class="n">close_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;spx_close&#39;</span><span class="p">:</span> <span class="s1">&#39;spx&#39;</span><span class="p">,</span> <span class="s1">&#39;euro_close&#39;</span><span class="p">:</span> <span class="s1">&#39;euro&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We need USD_EUR = 1/EUR_USD rate for EUROSTOXX price movements</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rates_df</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">cov_df</span><span class="p">[[</span><span class="s1">&#39;eur_usd&#39;</span><span class="p">]]</span>
+<span class="n">rates_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;eur_usd&#39;</span><span class="p">:</span> <span class="s1">&#39;euro&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">rates_df</span><span class="p">[</span><span class="s1">&#39;spx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+</pre></div>
+</div>
+<p>Allocations data frame with weights generated using pca_weights()</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">alloc_df</span> <span class="o">=</span> <span class="n">cov_df</span><span class="p">[[</span><span class="s1">&#39;spx_w&#39;</span><span class="p">,</span> <span class="s1">&#39;euro_w&#39;</span><span class="p">]]</span>
+<span class="n">alloc_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;spx_w&#39;</span><span class="p">:</span> <span class="s1">&#39;spx&#39;</span><span class="p">,</span> <span class="s1">&#39;euro_w&#39;</span><span class="p">:</span> <span class="s1">&#39;euro&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s assume zero rebalancing costs</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">costs_df</span> <span class="o">=</span> <span class="n">alloc_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">costs_df</span><span class="p">[</span><span class="s1">&#39;spx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">costs_df</span><span class="p">[</span><span class="s1">&#39;euro&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># In_memory means that all data frames are stored in memory</span>
+<span class="c1"># If False open_df should be a path to open data frame</span>
+<span class="n">trick</span> <span class="o">=</span> <span class="n">ETFTrick</span><span class="p">(</span><span class="n">open_df</span><span class="p">,</span> <span class="n">close_df</span><span class="p">,</span> <span class="n">alloc_df</span><span class="p">,</span>
+                <span class="n">costs_df</span><span class="p">,</span> <span class="n">rates_df</span><span class="p">,</span> <span class="n">in_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">trick_series</span> <span class="o">=</span> <span class="n">trick</span><span class="o">.</span><span class="n">get_etf_series</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Ashutosh Singh, Jacques Joubert, Oleksandr Proskurin
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
