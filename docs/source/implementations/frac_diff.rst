@@ -15,23 +15,22 @@ The following graph shows a fractionally differenced series plotted over the ori
 Implementation
 ==============
 
-The following function implemented in mlfinlab can be used to derive fractionally differentiated features
+The following function implemented in mlfinlab can be used to derive fractionally differentiated features.
 
-Source: Chapter 5, AFML (section 5.5, page 83);
-
-The steps are as follows:
-
-- Compute weights (this is a one-time exercise)
-
-- Iteratively apply the weights to the price series and generate output points
-
-This is the expanding window variant of the fracDiff algorithm
-
-Note 1: For thresh-1, nothing is skipped
-
-Note 2: diff_amt can be any positive fractional, not necessarility bounded [0, 1]
 
 .. function::  frac_diff_ffd(series, diff_amt, thresh=1e-5))
+
+    Source: Chapter 5, AFML (section 5.5, page 83);
+
+    The steps are as follows:
+
+    - Compute weights (this is a one-time exercise)
+    - Iteratively apply the weights to the price series and generate output points
+
+    This is the expanding window variant of the fracDiff algorithm
+
+    1. Note: For thresh-1, nothing is skipped
+    2. Note: diff_amt can be any positive fractional, not necessarility bounded [0, 1]
 
     :param series: (pd.Series) a time series that needs to be differenced
     :param diff_amt: (float) Differencing amount
@@ -45,9 +44,7 @@ Given that we know the amount we want to difference our price series, fractional
 	import pandas as pd
 	from mlfinlab.features.fracdiff import frac_diff_ffd
 
-
 	data = pd.read_csv('FILE_PATH')
-
 	frac_diff_series = frac_diff_ffd(data['close'], 0.5)
 
 Research Notebook
@@ -58,7 +55,7 @@ The following research notebook can be used to better understand fractionally di
 Fractionally Differentiated Features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`Fractionally Differentiated Features`_
+* `Fractionally Differentiated Features`_
 
 .. _Fractionally Differentiated Features: https://github.com/hudson-and-thames/research/blob/master/Chapter5/Chapter5_Exercises.ipynb
 
