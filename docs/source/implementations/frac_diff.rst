@@ -50,7 +50,7 @@ Given that we know the amount we want to difference our price series, fractional
 Research Notebook
 =================
 
-The following research notebook can be used to better understand fractionally differentiated features
+The following research notebook can be used to better understand fractionally differentiated features.
 
 Fractionally Differentiated Features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
