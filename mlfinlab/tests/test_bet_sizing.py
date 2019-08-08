@@ -260,6 +260,20 @@ class TestConfirmAndCastToDf(unittest.TestCase):
         df_results = confirm_and_cast_to_df(d_events)
         self.assertTrue(np.allclose(events_test.to_numpy(), df_results.to_numpy(), 1e-9))
 
+    def test_cast_to_df_no_series(self):
+        """
+        Tests for successful execution of 'confirm_and_cast_to_df' when none of the dictionary values are
+        a pandas.Series.
+        """
+        # Setup the test DataFrame.
+        pos, max_pos, market_price, forecast_price = 35, 55, 75.00, 80.00
+        events_test = pd.DataFrame(data=[[pos, max_pos, market_price, forecast_price]],
+                                   columns=['pos', 'max_pos', 'm_p', 'f'])
+        d_events = {'pos': pos, 'max_pos': max_pos, 'm_p': market_price, 'f': forecast_price}
+        # Evaluate.
+        df_results = confirm_and_cast_to_df(d_events)
+        self.assertTrue(np.allclose(events_test.to_numpy(), df_results.to_numpy(), 1e-9))
+
 class TestGetConcurrentSides(unittest.TestCase):
     """
     Tests the function 'get_concurrent_sides' for successful operation.
