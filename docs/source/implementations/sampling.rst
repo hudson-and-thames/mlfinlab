@@ -4,7 +4,7 @@
 Sampling
 ========
 
-In financial machine learning, samples are not independent. The most part of traditional machine learning algorithms assume that samples are i.i.d, in case of financial machine learning samples are neither identically distributed not indepedent. In this section we will tackle the problem of samples dependency. As you remember, we mostly label our datasets using triple-barrier method. Each label in triple-barrier event has label index and label endtime (t1) which corresponds to time when one of barriers was touched.
+In financial machine learning, samples are not independent. The most part of traditional machine learning algorithms assume that samples are IID, in case of financial machine learning samples are neither identically distributed not independent. In this section we will tackle the problem of samples dependency. As you remember, we mostly label our data sets using the triple-barrier method. Each label in triple-barrier event has label index and label end time (t1) which corresponds to time when one of barriers was touched.
 
 Sample Uniqueness
 =================
@@ -13,17 +13,15 @@ Let's look at example of 3 samples: A, B, C.
 
 Imagine that:
 
-A was generated at :math:`t_1` and triggered on :math:`t_8`
-
-B was generated at :math:`t_3` and triggered on :math:`t_6`
-
-C was generated on :math:`t_7` and triggered on :math:`t_9`
+* A was generated at :math:`t_1` and triggered on :math:`t_8`
+* B was generated at :math:`t_3` and triggered on :math:`t_6`
+* C was generated on :math:`t_7` and triggered on :math:`t_9`
 
 In this case we see that A used information about returns on :math:`[t_1,t_8]` to generate label-endtime which overlaps with :math:`[t_3, t_6]` which was used by B, however C didn't use any returns information which was used by to label other samples. Here we would like to introduce the concept of concurrency.
 
 We say that labels :math:`y_i` and :math:`y_j` are concurrent at :math:`t` if they are a function of at least one common return at :math:`r_{t-1,t}`
 
-In terms of concurrency label C is the most 'pure' as it doesn't use any piece of information from other labels, while A is the 'dirtiest' as it uses information from both B and C. By understanding average label uniqueness you can measure how 'pure' your dataset is based on concurrency of labels. We can measure average label uniqueness using get_av_uniqueness_from_triple_barrier function from mlfinlab package.
+In terms of concurrency label C is the most 'pure' as it doesn't use any piece of information from other labels, while A is the 'dirtiest' as it uses information from both B and C. By understanding average label uniqueness you can measure how 'pure' your dataset is based on concurrency of labels. We can measure average label uniqueness using get_av_uniqueness_from_triple_barrier function from the mlfinlab package.
 
 This function is the orchestrator to derive average sample uniqueness from a dateset labeled by the triple barrier method.
 
@@ -67,41 +65,42 @@ Implementation
 
 The core functions behind Sequential Bootstrapping are implemented in mlfinlab and can be seen below:
 
-Snippet 4.3, page 65, Build an Indicator Matrix
-
-Get indicator matrix. The book implementation uses bar_index as input, however there is no explanation how to form it.
-
-We decided that using triple_barrier_events and price bars by analogy with concurrency is the best option.
-
 .. function:: get_ind_matrix(triple_barrier_events, price_bars)
+
+    Snippet 4.3, page 65, Build an Indicator Matrix
+
+    Get indicator matrix. The book implementation uses bar_index as input, however there is no explanation how to form it.
+    We decided that using triple_barrier_events and price bars by analogy with concurrency is the best option.
 
     :param triple_barrier_events: (pd.DataFrame): triple barrier events from labeling.get_events
     :param price_bars: (pd.DataFrame): price bars which were used to form triple barrier events
     :return: (np.array) indicator binary matrix indicating what (price) bars influence the label for each observation
 
-Snippet 4.4. page 65, Compute Average Uniqueness
-
-Average uniqueness from indicator matrix
 
 .. function:: get_ind_mat_average_uniqueness(ind_mat)
+
+    Snippet 4.4. page 65, Compute Average Uniqueness
+    Average uniqueness from indicator matrix
+
 
     :param ind_mat: (np.matrix) indicator binary matrix
     :return: (float) average uniqueness
 
-An adaption of Snippet 4.4. page 65, which returns the indicator matrix element uniqueness.
 
 .. function:: get_ind_mat_label_uniqueness(ind_mat)
+
+    An adaption of Snippet 4.4. page 65, which returns the indicator matrix element uniqueness.
 
     :param ind_mat: (np.matrix) indicator binary matrix
     :return: (np.matrix) element uniqueness
 
-Snippet 4.5, Snippet 4.6, page 65, Return Sample from Sequential Bootstrap
-
-Generate a sample via sequential bootstrap.
-
-Note: Moved from pd.DataFrame to np.matrix for performance increase
 
 .. function:: seq_bootstrap(ind_mat, sample_length=None, warmup_samples=None, compare=False, verbose=False, random_state=np.random.RandomState())
+
+    Snippet 4.5, Snippet 4.6, page 65, Return Sample from Sequential Bootstrap
+    Generate a sample via sequential bootstrap.
+
+    Note: Moved from pd.DataFrame to np.matrix for performance increase
 
     :param ind_mat: (data frame) indicator matrix from triple barrier events
     :param sample_length: (int) Length of bootstrapped sample
@@ -118,11 +117,9 @@ An example of Sequential Bootstrap using a a toy example from the book can be se
 
 Consider a set of labels :math:`\left\{y_i\right\}_{i=0,1,2}` where:
 
-label :math:`y_0` is a function of return :math:`r_{0,2}`
-
-label :math:`y_1` is a function of return :math:`r_{2,3}`
-
-label :math:`y_2` is a function of return :math:`r_{4,5}`
+* label :math:`y_0` is a function of return :math:`r_{0,2}`
+* label :math:`y_1` is a function of return :math:`r_{2,3}`
+* label :math:`y_2` is a function of return :math:`r_{4,5}`
 
 The first thing we need to do is to build and indicator matrix. Columns of this matrix correspond to samples and rows correspond to price returns timestamps which were used during samples labelling. In our case indicator matrix is::
 
@@ -178,11 +175,11 @@ Let's move back to our example. In Sequential Bootstrapping algorithm we start w
 	    phi.append(chosen_sample)
 
 
-For peformance increase we optimized and parallesied for-loop using numba, which corresponds to bootstrap_loop_run function.
+For performance increase we optimized and parallesied for-loop using numba, which corresponds to bootstrap_loop_run function.
 
 Not let's finish the example:
 
-To be as close to mlfinlab implementation let's convert ind_mat to numpy matrix
+To be as close to the mlfinlab implementation let's convert ind_mat to numpy matrix
 
 ::
 
@@ -250,12 +247,11 @@ Sequential Bootstrapping tries to minimise the probability of repeated samples s
 
 The most probable sample would be 2 in this case
 
-After 4 steps of sequential bootstrapping our drawn samples are [1,2,0,2]
+After 4 steps of sequential bootstrapping our drawn samples are [1, 2, 0, 2]
 
-Let's see how this example is solved by mlfinlab implementation. To reproduce that:
+Let's see how this example is solved by the mlfinlab implementation. To reproduce that:
 
 1) we need to set warmup to [1], which corresponds to phi = [1] on the first step
-
 2) verbose = True to print updated probabilities
 
 ::
@@ -389,14 +385,14 @@ The following research notebooks can be used to better understand the previously
 Sample Uniqueness and Weights
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`Sample Uniqueness and Weights`_
+* `Sample Uniqueness and Weights`_
 
 .. _Sample Uniqueness and Weights: https://github.com/hudson-and-thames/research/blob/master/Chapter4/Chapter4_Exercises.ipynb
 
 Sequential Bootstrapping
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-`Sequential Bootstrapping`_
+* `Sequential Bootstrapping`_
 
 .. _Sequential Bootstrapping: https://github.com/hudson-and-thames/research/blob/master/Chapter4/Sequential_Bootstrapping.ipynb
 
