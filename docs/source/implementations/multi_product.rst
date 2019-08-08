@@ -201,15 +201,11 @@ If for the first two years only A, B and C close data is available while for the
 	Year N      NaN  NaN   NaN   0.3   100.5
 
 
-**open_df**: open prices (in contract currency)
-
-**close_df**: close prices
-
-**alloc_df**: securities allocation vector
-
-**costs_df**: costs of holding/rebalancing the position
-
-**rates_df**: $ value of 1 point move of contract price. This includes exchange rates, futures multipliers
+* **open_df**: open prices (in contract currency)
+* **close_df**: close prices
+* **alloc_df**: securities allocation vector
+* **costs_df**: costs of holding/rebalancing the position
+* **rates_df**: $ value of 1 point move of contract price. This includes exchange rates, futures multipliers
 
 Create open_df and close_df
 
@@ -261,7 +257,7 @@ The following research notebook can be used to better understand the ETF trick
 ETF Trick
 ~~~~~~~~~
 
-`ETF Trick Hedge`_
+* `ETF Trick Hedge`_
 
 .. _ETF Trick Hedge: https://github.com/hudson-and-thames/research/blob/master/Chapter2/2019_04_10_ETF_trick_hedge.ipynb
 
