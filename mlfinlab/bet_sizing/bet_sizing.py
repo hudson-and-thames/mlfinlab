@@ -176,7 +176,6 @@ def confirm_and_cast_to_df(d_vars):
     if any_series and not all_series:
         for k in d_vars:
             if not isinstance(d_vars[k], pd.Series):
-                print(f"{k} becomes a pd.Series from a {type(d_vars[k])}")
                 d_vars[k] = pd.Series(data=np.array([d_vars[k] for i in range(ser_len)]), index=idx)
 
     # Combine Series to form a DataFrame.
@@ -221,7 +220,7 @@ def cdf_mixture(x_val, parameters):
     :return: (float) CDF of the mixture.
     """
     mu_1, mu_2, sigma_1, sigma_2, p_1 = parameters  # Parameters reassigned for clarity.
-    return p_1*norm.cdf(x_val, mu_1, sigma_1) + (1-p_1)*norm.cdf(x_val, mu_2, sigma_2)
+    return p_1 * norm.cdf(x_val, mu_1, sigma_1) + (1-p_1) * norm.cdf(x_val, mu_2, sigma_2)
 
 def single_bet_size_mixed(c_t, parameters):
     """
