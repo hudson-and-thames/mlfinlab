@@ -15,7 +15,7 @@ The idea behind the triple-barrier method is that we have three barriers: an upp
    :scale: 100 %
    :align: center
 
-One of the major faults with the fixed-time horizon method is that observations are given a label with respect to a certrain threshold after a fixed interval regardless of their respective volatilities. In other words, the expected returns of every observation are treated equally regardless of the associated risk. The triple-barrier method tackles this issue by dynamically setting the upper and lower barriers for each observation based on their given volatilities. 
+One of the major faults with the fixed-time horizon method is that observations are given a label with respect to a certain threshold after a fixed interval regardless of their respective volatilities. In other words, the expected returns of every observation are treated equally regardless of the associated risk. The triple-barrier method tackles this issue by dynamically setting the upper and lower barriers for each observation based on their given volatilities.
 
 .. _reference: https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086
 Meta-Labeling
@@ -35,7 +35,7 @@ How to use Meta-Labeling
 Binary classification problems present a trade-off between type-I errors (false positives) and type-II errors (false negatives). In general, increasing the true positive rate of a binary classifier will tend to increase its false positive rate. The receiver operating characteristic (ROC) curve of a binary classifier measures the cost of increasing the true positive rate, in terms of accepting higher false positive rates.
 
 .. image:: labeling_images/confusion_matrix.png
-   :scale: 70 %
+   :scale: 40 %
    :align: center
 
 
@@ -62,38 +62,30 @@ Implementation
 
 The following functions are used for the triple-barrier method which works in tandem with meta-labeling.
 
-Snippet 3.1, page 44, Daily Volatility Estimates
-
-Computes the daily volatility at intraday estimation points.
-
-In practice we want to set profit taking and stop-loss limits that are a function of the risks involved
-in a bet. Otherwise, sometimes we will be aiming too high (tao ≫ sigma_t_i,0), and sometimes too low
-(tao ≪ sigma_t_i,0 ), considering the prevailing volatility. 
-
-Snippet 3.1 computes the daily volatility
-at intraday estimation points, applying a span of lookback days to an exponentially weighted moving
-standard deviation.
-
-See the pandas documentation for details on the pandas.Series.ewm function.
-
-Note: This function is used to compute dynamic thresholds for profit taking and stop loss limits.
 
 .. function:: get_daily_vol(close, lookback=100)
+
+    Snippet 3.1 computes the daily volatility
+    at intraday estimation points, applying a span of lookback days to an exponentially weighted moving
+    standard deviation.
+
+    See the pandas documentation for details on the pandas.Series.ewm function.
+
+    Note: This function is used to compute dynamic thresholds for profit taking and stop loss limits.
 
     :param close: Closing prices
     :param lookback: lookback period to compute volatility
     :return: series of daily volatility value
 
 
-
-Snippet 3.4 page 49, Adding a Vertical Barrier
-
-For each index in t_events, it finds the timestamp of the next price bar at or immediately after
-a number of days num_days. This vertical barrier can be passed as an optional argument t1 in get_events.
-
-This function creates a series that has all the timestamps of when the vertical barrier would be reached.
-
 .. function:: add_vertical_barrier(t_events, close, num_days=0, num_hours=0, num_minutes=0, num_seconds=0)
+
+    Snippet 3.4 page 49, Adding a Vertical Barrier
+
+    For each index in t_events, it finds the timestamp of the next price bar at or immediately after
+    a number of days num_days. This vertical barrier can be passed as an optional argument t1 in get_events.
+
+    This function creates a series that has all the timestamps of when the vertical barrier would be reached.
 
     :param t_events: (series) series of events (symmetric CUSUM filter)
     :param close: (series) close prices
@@ -104,11 +96,11 @@ This function creates a series that has all the timestamps of when the vertical 
     :return: (series) timestamps of vertical barriers
 
 
-Snippet 3.6 page 50, Getting the Time of the First Touch, with Meta Labels
-
-This function is orchestrator to meta-label the data, in conjunction with the Triple Barrier Method.
-
 .. function:: get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_barrier_times=False, side_prediction=None)
+
+    Snippet 3.6 page 50, Getting the Time of the First Touch, with Meta Labels
+
+    This function is orchestrator to meta-label the data, in conjunction with the Triple Barrier Method.
 
     :param close: (series) Close prices
 
@@ -138,21 +130,22 @@ This function is orchestrator to meta-label the data, in conjunction with the Tr
 
             events['side'] (optional) implies the algo's position side
 
-Snippet 3.7, page 51, Labeling for Side & Size with Meta Labels
-
-Compute event's outcome (including side information, if provided).
-events is a DataFrame where:
-
-Now the possible values for labels in out['bin'] are {0,1}, as opposed to whether to take the bet or pass,
-a purely binary prediction. When the predicted label the previous feasible values {−1,0,1}.
-The ML algorithm will be trained to decide is 1, we can use the probability of this secondary prediction
-to derive the size of the bet, where the side (sign) of the position has been set by the primary model.
 
 .. function:: get_bins(triple_barrier_events, close)
 
+    Snippet 3.7, page 51, Labeling for Side & Size with Meta Labels
+
+    Compute event's outcome (including side information, if provided).
+    events is a DataFrame where:
+
+    Now the possible values for labels in out['bin'] are {0,1}, as opposed to whether to take the bet or pass,
+    a purely binary prediction. When the predicted label the previous feasible values {−1,0,1}.
+    The ML algorithm will be trained to decide is 1, we can use the probability of this secondary prediction
+    to derive the size of the bet, where the side (sign) of the position has been set by the primary model.
+
     :param triple_barrier_events: (data frame)
 
-    	events.index is event's starttime
+        events.index is event's starttime
 
 	events['t1'] is event's endtime
 
@@ -167,11 +160,10 @@ to derive the size of the bet, where the side (sign) of the position has been se
     :param close: (series) close prices
     :return: (data frame) of meta-labeled events
 
-Snippet 3.8 page 54
-
-This function recursively eliminates rare observations.
-
 .. function:: drop_labels(events, min_pct=.05)
+
+    Snippet 3.8 page 54
+    This function recursively eliminates rare observations.
 
     :param events: (data frame) events
     :param min_pct: (float) a fraction used to decide if the observation occurs less than that fraction
@@ -204,11 +196,11 @@ Assuming we have a pandas series with the timestamps of our observations and the
 	# Apply Symmetric CUSUM Filter and get timestamps for events
 	# Note: Only the CUSUM filter needs a point estimate for volatility
 	cusum_events = ml.filters.cusum_filter(data['close'],
-	 threshold=daily_vol['2011-09-01':'2018-01-01'].mean()*0.5)
+        threshold=daily_vol['2011-09-01':'2018-01-01'].mean()*0.5)
 
 	# Compute vertical barrier
 	vertical_barriers = ml.labeling.add_vertical_barrier(t_events=cusum_events,
-	 close=data['close'], num_days=1)
+        close=data['close'], num_days=1)
 
 Once we have computed our daily volatility along with our vertical time barriers and have downsampled our series using the CUSUM filter, we can use the triple-barrier method to compute our meta-labels by passing in the side predicted by the primary model.
 
@@ -233,6 +225,7 @@ Meta-labels can then be computed using the time that each observation touched it
 
 	meta_labels = ml.labeling.get_bins(triple_barrier_events, data['close'])
 
+This example ends with creating the meta-labels. To see a further explanation of using these labels in a secondary model to help filter out false positives, see the research notebooks below.
 
 Research Notebooks
 ==================
@@ -242,9 +235,8 @@ The following research notebooks can be used to better understand the triple-bar
 Triple-Barrier Method
 ~~~~~~~~~~~~~~~~~~~~~
 
-`Trend Follow Question`_
-
-`Bollinger band Question`_
+* `Trend Follow Question`_
+* `Bollinger band Question`_
 
 .. _Trend Follow Question: https://github.com/hudson-and-thames/research/blob/master/Chapter3/2019-03-06_JJ_Trend-Follow-Question.ipynb
 .. _Bollinger Band Question: https://github.com/hudson-and-thames/research/blob/master/Chapter3/2019-03-09_AS_BBand-Question.ipynb
@@ -252,7 +244,7 @@ Triple-Barrier Method
 Meta-Labeling
 ~~~~~~~~~~~~~~
 
-`Meta Labeling MNIST`_
+* `Meta Labeling MNIST`_
 
 .. _Meta Labeling MNIST: https://github.com/hudson-and-thames/research/blob/master/Chapter3/2019-03-06_JJ_Meta-Labels-MNIST.ipynb
 
