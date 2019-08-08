@@ -51,11 +51,9 @@ Standard Bars
 
 The three standard bar methods implemented share a similiar underlying idea in that we want to sample a bar after a certain threshold is reached.
 
-For tick bars, we sample a bar after a certain number of ticks.
-
-For volume bars, we sample a bar after a certain volume amount is traded.
-
-For dollar bars, we sample a bar after a certain dollar amount is traded.
+1. For tick bars, we sample a bar after a certain number of ticks.
+2. For volume bars, we sample a bar after a certain volume amount is traded.
+3. For dollar bars, we sample a bar after a certain dollar amount is traded.
 
 These bars are used throughout the text book (Advances in Financial Machine Learning, By Marcos Lopez de Prado, 2018,
 pg 25) to build the more interesting features for predicting financial time series data.
@@ -65,17 +63,17 @@ Tick Bars
 
 .. function:: get_tick_bars(file_path, threshold=2800, batch_size=20000000, verbose=True, to_csv=False, output_path=None)
 
-	:param file_path: File path pointing to csv data.
-	:param threshold: A cumulative value above this threshold triggers a sample to be taken.
-	:param batch_size: The number of rows per batch. Less RAM = smaller batch size.
-	:param verbose: Print out batch numbers (True or False)
-	:param to_csv: Save bars to csv after every batch run (True or False)
-	:param output_path: Path to csv file, if to_csv is True
-	:return: Dataframe of tick bars
+    Creates the tick bars: date_time, open, high, low, close.
 
-Creates the tick bars: date_time, open, high, low, close.
+    :param file_path: File path pointing to csv data.
+    :param threshold: A cumulative number of ticks above this threshold triggers a sample to be taken.
+    :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
+    :param verbose: Print out batch numbers (True or False)
+    :param to_csv: Save bars to csv after every batch run (True or False)
+    :param output_path: Path to csv file, if to_csv is True
+    :return: Dataframe of tick bars
 
-The get_tick_bars function can be implemented as follows::
+::
 	
 	from mlfinlab.data_structures import standard_data_structures
 
@@ -90,18 +88,19 @@ Volume Bars
 
 .. function:: get_volume_bars(file_path, threshold=28224, batch_size=20000000, verbose=True, to_csv=False, output_path=None)
 
-	:param file_path: File path pointing to csv data.
-	:param threshold: A cumulative value above this threshold triggers a sample to be taken.
-	:param batch_size: The number of rows per batch. Less RAM = smaller batch size.
-	:param verbose: Print out batch numbers (True or False)
-	:param to_csv: Save bars to csv after every batch run (True or False)
-	:param output_path: Path to csv file, if to_csv is True
-	:return: Dataframe of volume bars
+    Creates the volume bars: date_time, open, high, low, close.
 
-Creates the volume bars: date_time, open, high, low, close.
+    :param file_path: File path pointing to csv data.
+    :param threshold: A cumulative number of contracts traded above this threshold triggers a sample to be taken.
+    :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
+    :param verbose: Print out batch numbers (True or False)
+    :param to_csv: Save bars to csv after every batch run (True or False)
+    :param output_path: Path to csv file, if to_csv is True
+    :return: Dataframe of volume bars
 
-The get_volume_bars function can be implemented as follows::
-	
+
+::
+
 	from mlfinlab.data_structures import standard_data_structures
 
 	
@@ -114,17 +113,18 @@ Dollar Bars
 
 .. function:: get_dollar_bars(file_path, threshold=70000000, batch_size=20000000, verbose=True, to_csv=False, output_path=None)
 
-	:param file_path: File path pointing to csv data.
-	:param threshold: A cumulative value above this threshold triggers a sample to be taken.
-	:param batch_size: The number of rows per batch. Less RAM = smaller batch size.
-	:param verbose: Print out batch numbers (True or False)
-	:param to_csv: Save bars to csv after every batch run (True or False)
-	:param output_path: Path to csv file, if to_csv is True
-	:return: Dataframe of dollar bars
+    Creates the dollar bars: date_time, open, high, low, close.
 
-Creates the dollar bars: date_time, open, high, low, close.
+    :param file_path: File path pointing to csv data.
+    :param threshold: A cumulative dollar value above this threshold triggers a sample to be taken.
+    :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
+    :param verbose: Print out batch numbers (True or False)
+    :param to_csv: Save bars to csv after every batch run (True or False)
+    :param output_path: Path to csv file, if to_csv is True
+    :return: Dataframe of dollar bars
 
-The get_dollar_bars function can be implemented as follows::
+
+::
 	
 	from mlfinlab.data_structures import standard_data_structures
 
@@ -240,15 +240,15 @@ When theta is not reset:
 
 The reason for that is due to the fact that theta is accumulated when several bars are generated theta value is not reset :math:`\Rightarrow` condition is met on small number of ticks :math:`\Rightarrow` length of the next bar converges to 1 :math:`\Rightarrow` bar is sampled on the next consecutive tick.
 
-The logic described above is implemented in **mlfinlab** package in ImbalanceBars
+The logic described above is implemented in the **mlfinlab** package under ImbalanceBars
 
 Examples
 ********
 
-Examples of implementations of imbalance bars can be seen below:
-
 
 .. function:: get_tick_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=100000, batch_size=2e7, verbose=True, to_csv=False, output_path=None)
+
+    Creates the tick imbalance bars: date_time, open, high, low, close.
 
     :param file_path: File path pointing to csv data.
     :param num_prev_bars: Number of previous bars used for EWMA window expected # of ticks
@@ -259,9 +259,8 @@ Examples of implementations of imbalance bars can be seen below:
     :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of tick bars
 
-Creates the tick imbalance bars: date_time, open, high, low, close.
 
-The get_tick_imbalance_bars function can be implemented as follows::
+::
 	
 	from mlfinlab.data_structures import imbalance_data_structures
 
@@ -271,9 +270,9 @@ The get_tick_imbalance_bars function can be implemented as follows::
 	num_prev_bars=3, exp_num_ticks_init=100000)
 
 
-
-
 .. function:: get_volume_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=100000, batch_size=2e7, verbose=True, to_csv=False, output_path=None)
+
+    Creates the volume imbalance bars: date_time, open, high, low, close.
 
     :param file_path: File path pointing to csv data.
     :param num_prev_bars: Number of previous bars used for EWMA window expected # of ticks
@@ -284,9 +283,8 @@ The get_tick_imbalance_bars function can be implemented as follows::
     :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of volume bars
 
-Creates the volume imbalance bars: date_time, open, high, low, close.
 
-The get_volume_imbalance_bars function can be implemented as follows::
+::
 	
 	from mlfinlab.data_structures import imbalance_data_structures
 
@@ -298,6 +296,8 @@ The get_volume_imbalance_bars function can be implemented as follows::
 
 .. function:: get_dollar_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=100000, batch_size=2e7, verbose=True, to_csv=False, output_path=None)
 
+    Creates the dollar imbalance bars: date_time, open, high, low, close.
+
     :param file_path: File path pointing to csv data.
     :param num_prev_bars: Number of previous bars used for EWMA window expected # of ticks
     :param exp_num_ticks_init: initial expected number of ticks per bar
@@ -307,9 +307,7 @@ The get_volume_imbalance_bars function can be implemented as follows::
     :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of dollar bars
 
-Creates the dollar imbalance bars: date_time, open, high, low, close.
-
-The get_dollar_imbalance_bars function can be implemented as follows::
+::
 	
 	from mlfinlab.data_structures import imbalance_data_structures
 
@@ -327,6 +325,8 @@ Examples of implementations of run bars can be seen below:
 
 .. function:: get_tick_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000, batch_size=2e7, verbose=True, to_csv=False, output_path=None)
 
+    Creates the tick run bars: date_time, open, high, low, close.
+
     :param file_path: File path pointing to csv data.
     :param num_prev_bars: Number of previous bars used for EWMA window expected # of ticks
     :param exp_num_ticks_init: initial expected number of ticks per bar
@@ -336,9 +336,7 @@ Examples of implementations of run bars can be seen below:
     :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of tick bars
 
-Creates the tick run bars: date_time, open, high, low, close.
-
-The get_tick_run_bars function can be implemented as follows::
+::
 	
 	from mlfinlab.data_structures import run_data_structures
 
@@ -350,6 +348,8 @@ The get_tick_run_bars function can be implemented as follows::
 
 .. function:: get_volume_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000, batch_size=2e7, verbose=True, to_csv=False, output_path=None)
 
+    Creates the volume run bars: date_time, open, high, low, close.
+
     :param file_path: File path pointing to csv data.
     :param num_prev_bars: Number of previous bars used for EWMA window expected # of ticks
     :param exp_num_ticks_init: initial expected number of ticks per bar
@@ -359,9 +359,8 @@ The get_tick_run_bars function can be implemented as follows::
     :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of volume bars
 
-Creates the volume run bars: date_time, open, high, low, close.
 
-The get_volume_run_bars function can be implemented as follows::
+::
 	
 	from mlfinlab.data_structures import run_data_structures
 
@@ -371,8 +370,9 @@ The get_volume_run_bars function can be implemented as follows::
 	num_prev_bars=3, exp_num_ticks_init=100000)
 
 
-
 .. function:: get_dollar_run_bars(file_path, num_prev_bars, exp_num_ticks_init=100000, batch_size=2e7, verbose=True, to_csv=False, output_path=None)
+
+    Creates the dollar run bars: date_time, open, high, low, close.
 
     :param file_path: File path pointing to csv data.
     :param num_prev_bars: Number of previous bars used for EWMA window expected # of ticks
@@ -383,9 +383,8 @@ The get_volume_run_bars function can be implemented as follows::
     :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of dollar bars
 
-Creates the dollar run bars: date_time, open, high, low, close.
 
-The get_dollar_run_bars function can be implemented as follows::
+::
 	
 	from mlfinlab.data_structures import run_data_structures
 
@@ -403,9 +402,8 @@ The following research notebooks can be used to better understand the previously
 Standard Bars
 ~~~~~~~~~~~~~
 
-`Getting Started`_
-
-`Sample Techniques`_
+* `Getting Started`_
+* `Sample Techniques`_
 
 .. _Getting Started: https://github.com/hudson-and-thames/research/blob/master/Chapter2/Getting%20Started.ipynb
 .. _Sample Techniques: https://github.com/hudson-and-thames/research/blob/master/Chapter2/2019-03-03_JJ_Sample-Techniques.ipynb
@@ -413,9 +411,6 @@ Standard Bars
 Imbalance Bars
 ~~~~~~~~~~~~~~
 
-`Imbalance Bars`_
+* `Imbalance Bars`_
 
 .. _Imbalance Bars: https://github.com/hudson-and-thames/research/blob/master/Chapter2/2019-04-11_OP_Dollar-Imbalance-Bars.ipynb
-
-
-
