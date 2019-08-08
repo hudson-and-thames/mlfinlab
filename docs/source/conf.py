@@ -18,11 +18,11 @@
 # -- Project information -----------------------------------------------------
 
 project = 'mlfinlab'
-copyright = '2019, Hudson & Thames'
+copyright = '2019, Hudson & Thames,'
 author = 'Hudson & Thames'
 
 # The full version, including alpha/beta/rc tags
-release = '0.3.2'
+release = '0.3.4'
 
 
 # -- General configuration ---------------------------------------------------
