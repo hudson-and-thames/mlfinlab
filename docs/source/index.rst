@@ -101,14 +101,12 @@ Implementations
    :hidden:
 
    implementations/data_structures
-   implementations/multi_product
    implementations/filters
    implementations/labeling
    implementations/sampling
    implementations/frac_diff
 
 * :doc:`implementations/data_structures`
-* :doc:`implementations/multi_product`
 * :doc:`implementations/filters`
 * :doc:`implementations/labeling`
 * :doc:`implementations/sampling`
