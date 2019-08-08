@@ -48,23 +48,23 @@ mlfinlab is a living, breathing project, and new functionalities are consistentl
 The implementations that will be added in the future as well as the implementations that are currently supported can be seen below:
 
 * Part 3: Backtesting
-* Working on Chapter 16 (Aditya)
-* Working on Chapter 10 (Lee)
+* Working on Chapter 16: ML Asset Allocation (Aditya)
+* Working on Chapter 10: Bet Sizing (Lee)
 .. |vspace| raw:: latex
 
    \vspace{5mm}
 * Part 2: Modelling
-* Working on Chapter 7 (Mihai)
-* Done Chapter 6 (Jacques: No code, questions answered in Research Repo)
+* Working on Chapter 7: Cross-Validation (Mihai)
+* Done Chapter 6: Ensemble Methods
 * Adding Sequential Bootstrap Ensemble method (Alex)
 .. |vspace| raw:: latex
 
    \vspace{5mm}
 * Part 1: Data Analysis
-* Done Chapter 5
-* Done Chapter 4
-* Done Chapter 3
-* Done Chapter 2
+* Done Chapter 5: Fractionally Differentiated Features
+* Done Chapter 4: Sample Weights
+* Done Chapter 3: Labeling
+* Done Chapter 2: Data Structures
 * Purchased high quality raw tick data.
 * Email us if you would like a sample of the standard bars.
 
