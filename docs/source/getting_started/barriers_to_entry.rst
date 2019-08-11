@@ -22,3 +22,17 @@ You should be able to work on a few implementations of the code with this set.
 
 .. _link: https://s3-us-west-2.amazonaws.com/tick-data-s3/downloads/ES_Sample.zip
 .. _research repo: https://github.com/hudson-and-thames/research/tree/master/Sample-Data
+
+
+Additional Sources
+==================
+
+Searching for free tick data can be a challenging task. The following three sources may help:
+
+1. `Dukascopy`_. Offers free historical tick data for some futures, though you do have to register.
+2. Most crypto exchanges offer tick data but not historical (see `Binance API`_). So you'd have to run a script for a few days.
+3. `Blog Post`_: How and why I got 75Gb of free foreign exchange “Tick” data.
+
+.. _Dukascopy: https://www.dukascopy.com/swiss/english/marketwatch/historical/
+.. _Binance API: https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md
+.. _Blog Post: https://towardsdatascience.com/how-and-why-i-got-75gb-of-free-foreign-exchange-tick-data-9ca78f5fa26c
