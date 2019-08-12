@@ -377,7 +377,7 @@ class CLA:
             self.expected_returns[-1, 0] += 1e-5
 
         # Calculate the covariance matrix
-        self.cov_matrix = np.asarray(asset_prices.corr())
+        self.cov_matrix = np.asarray(asset_prices.cov())
 
         if isinstance(self.weight_bounds[0], numbers.Real):
             self.lower_bounds = np.ones(self.expected_returns.shape) * self.weight_bounds[0]
@@ -511,14 +511,26 @@ class CLA:
         self._purge_excess()
 
         # Compute the specified corresponding solution
+        assets = asset_prices.columns
         if solution == "max_sharpe":
             self.max_sharpe, self.weights = self._max_sharpe()
+            self.weights = pd.DataFrame(self.weights)
+            self.weights.index = assets
+            self.weights = self.weights.T
         elif solution == "min_volatility":
             self.min_var, self.weights = self._min_volatility()
+            self.weights = pd.DataFrame(self.weights)
+            self.weights.index = assets
+            self.weights = self.weights.T
         elif solution == "efficient_frontier":
             self.mu, self.sigma, self.weights = self._efficient_frontier()
+            weights_copy = self.weights.copy()
+            for i, turning_point in enumerate(weights_copy):
+                self.weights[i] = turning_point.reshape(1, -1)[0]
+            self.weights = pd.DataFrame(self.weights, columns=assets)
         else:
             # Reshape the weight matrix
             weights_copy = self.weights.copy()
             for i, turning_point in enumerate(weights_copy):
                 self.weights[i] = turning_point.reshape(1, -1)[0]
+            self.weights = pd.DataFrame(self.weights, columns=assets)

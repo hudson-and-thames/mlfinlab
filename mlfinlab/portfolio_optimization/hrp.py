@@ -5,13 +5,10 @@ Journal of Portfolio Management, 2016;
 The code is reproduced with modification from his book: Advances in Financial Machine Learning
 '''
 
-import matplotlib
 import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
-
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 
@@ -50,36 +47,28 @@ class HierarchicalRiskParity:
 
         return (self._quasi_diagnalization(N, left) + self._quasi_diagnalization(N, right))
 
-    def _get_seriated_matrix(self, N, distances, correlations):
+    def _get_seriated_matrix(self, assets, distances, correlations):
         '''
         Based on the quasi-diagnalization, reorder the original distance matrix, so that assets within
         the same cluster are grouped together.
 
-        :param N: (int) total number of assets
+        :param assets:
+        :param distances:
+        :param correlations:
         :return: (np.array) re-arranged distance matrix based on tree clusters
         '''
 
-        seriated_dist = np.zeros((N, N))
-        seriated_corr = np.ones((N, N))
-        a, b = np.triu_indices(N, k=1)
-        distances_np = distances.values
-        correlations_np = correlations.values
+        ordering = assets[self.ordered_indices]
+        seriated_distances = distances.loc[ordering, ordering]
+        seriated_correlations = correlations.loc[ordering, ordering]
+        return seriated_distances, seriated_correlations
 
-        # Get clustered distance matrix
-        seriated_dist[a, b] = distances_np[[self.ordered_indices[i] for i in a], [self.ordered_indices[j] for j in b]]
-        seriated_dist[b, a] = seriated_dist[a, b]
-
-        # Get clustered correlation matrix
-        seriated_corr[a, b] = correlations_np[[self.ordered_indices[i] for i in a], [self.ordered_indices[j] for j in b]]
-        seriated_corr[b, a] = seriated_corr[a, b]
-
-        return seriated_dist, seriated_corr
-
-    def _recursive_bisection(self, covariances):
+    def _recursive_bisection(self, covariances, assets):
         '''
         Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets
 
         :param covariances: (np.array) the covariance matrix
+        :param assets:
         '''
 
         self.weights = pd.Series(1, index=self.ordered_indices)
@@ -112,6 +101,11 @@ class HierarchicalRiskParity:
                 self.weights[left_cluster] *= alloc_factor
                 self.weights[right_cluster] *= 1 - alloc_factor
 
+        # Assign actual asset values to weight index
+        self.weights.index = assets[self.ordered_indices]
+        self.weights = pd.DataFrame(self.weights)
+        self.weights = self.weights.T
+
     def plot_clusters(self, height=10, width=10):
         '''
         Plot a dendrogram of the hierarchical clusters
@@ -135,6 +129,7 @@ class HierarchicalRiskParity:
             asset_prices = pd.DataFrame(asset_prices)
 
         N = asset_prices.shape[1]
+        assets = asset_prices.columns
         cov, corr = asset_prices.cov(), asset_prices.corr()
 
         # Step-1: Tree Clustering
@@ -142,9 +137,9 @@ class HierarchicalRiskParity:
 
         # Step-2: Quasi Diagnalization
         self.ordered_indices = self._quasi_diagnalization(N, 2 * N - 2)
-        self.seriated_distances, self.seriated_correlations = self._get_seriated_matrix(N=N,
+        self.seriated_distances, self.seriated_correlations = self._get_seriated_matrix(assets=assets,
                                                                                         distances=distances,
                                                                                         correlations=corr)
 
         # Step-3: Recursive Bisection
-        self._recursive_bisection(covariances=cov)
+        self._recursive_bisection(covariances=cov, assets=assets)

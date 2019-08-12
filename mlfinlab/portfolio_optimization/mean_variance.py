@@ -23,8 +23,12 @@ class MeanVarianceOptimisation:
             asset_prices = pd.DataFrame(asset_prices)
 
         self.weights = []
+        assets = asset_prices.columns
         if solution == 'inverse_variance':
             self.weights = self._inverse_variance(asset_prices=asset_prices)
+        self.weights = pd.DataFrame(self.weights)
+        self.weights.index = assets
+        self.weights = self.weights.T
 
     def _inverse_variance(self, asset_prices):
         '''
