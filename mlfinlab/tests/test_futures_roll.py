@@ -48,17 +48,30 @@ class TestETFTrick(unittest.TestCase):
                                                   np.where(combined_df.index <= roll_dates['futures_2'], 'futures_2',
                                                            'futures_3'))
 
-        res = get_futures_roll_series(combined_df, 'open', 'close', 'current_futures', 'current_futures')
-        combined_df.loc[res.index, 'roll_gap'] = res.values
-        combined_df['open_diff_close'] = combined_df.open - combined_df.close
+        gaps_diff_no_backward = get_futures_roll_series(combined_df, 'open', 'close', 'current_futures',
+                                                        'current_futures', method='absolute', roll_backward=False)
+        gaps_rel_no_backward = get_futures_roll_series(combined_df, 'open', 'close', 'current_futures',
+                                                       'current_futures', method='relative', roll_backward=False)
+        gaps_diff_with_backward = get_futures_roll_series(combined_df, 'open', 'close', 'current_futures',
+                                                          'current_futures', method='absolute', roll_backward=True)
+        gaps_rel_with_backward = get_futures_roll_series(combined_df, 'open', 'close', 'current_futures',
+                                                         'current_futures', method='relative', roll_backward=True)
+        with self.assertRaises(ValueError):
+            get_futures_roll_series(combined_df, 'open', 'close', 'current_futures',
+                                    'current_futures', method='unknown', roll_backward=True)
 
         # Test number of gaps (should be 2 => number of unique gaps should be 3 (0 added)
-        self.assertTrue(len(combined_df['roll_gap'].unique()) == len(roll_dates) + 1)  # zero value + rolling gaps
+        self.assertTrue(len(gaps_diff_no_backward.unique()) == len(roll_dates) + 1)
+        self.assertTrue(len(gaps_rel_no_backward.unique()) == len(roll_dates) + 1)
 
-        res_backward = get_futures_roll_series(combined_df, 'open', 'close', 'current_futures', 'current_futures',
-                                               roll_backward=True)
+        # Assert values of difference method Futures Roll Trick
+        self.assertTrue(gaps_diff_no_backward.iloc[0] == 0)
+        self.assertTrue(gaps_diff_no_backward.iloc[-1] == -1.75)
+        self.assertTrue(gaps_diff_with_backward.iloc[0] == 1.75)
+        self.assertTrue(gaps_diff_with_backward.iloc[-1] == 0)
 
-        # Test difference between backward and forward roll equal latest cumulative gap
-        self.assertTrue(np.all(res.iloc[-1] == 33.75))
-        self.assertTrue(np.all(res_backward.iloc[0] == -33.75))
-        self.assertTrue(np.all(res.unique() == [0, 26.75, 33.75]))
+        # Assert values of relative method Futures Roll Trick
+        self.assertTrue(gaps_rel_no_backward.iloc[0] == 1)
+        self.assertTrue(abs(gaps_rel_no_backward.iloc[-1] - 0.999294) < 1e-6)
+        self.assertTrue(abs(gaps_rel_with_backward.iloc[0] - 1 / 0.999294) < 1e-6)
+        self.assertTrue(gaps_rel_with_backward.iloc[-1] == 1)
