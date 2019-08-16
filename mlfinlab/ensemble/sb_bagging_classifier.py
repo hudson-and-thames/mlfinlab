@@ -2,7 +2,7 @@ import numbers
 import itertools
 from warnings import warn
 from abc import ABCMeta, abstractmethod
-
+import pandas as pd
 import numpy as np
 
 from sklearn.tree import DecisionTreeClassifier
@@ -40,12 +40,12 @@ def _generate_bagging_indices(random_state, bootstrap_features, n_features, max_
     # Draw indices
     feature_indices = _generate_indices_standard(random_state, bootstrap_features,
                                                  n_features, max_features)
-    sample_indices = seq_bootstrap(ind_mat, n_samples=max_samples)  # TODO: add random state to sequential bootstrapping
+    sample_indices = seq_bootstrap(ind_mat, sample_length=max_samples, random_state=random_state)
 
     return feature_indices, sample_indices
 
 
-def _parallel_build_estimators(n_estimators, ensemble, X, y, triple_barrier_events, price_bars, sample_weight,
+def _parallel_build_estimators(n_estimators, ensemble, X, y, ind_mat, sample_weight,
                                seeds, total_n_estimators, verbose):
     """Private function used to build a batch of estimators within a job."""
     # Retrieve settings
@@ -56,16 +56,6 @@ def _parallel_build_estimators(n_estimators, ensemble, X, y, triple_barrier_even
     bootstrap_features = ensemble.bootstrap_features
     support_sample_weight = has_fit_parameter(ensemble.base_estimator_,
                                               "sample_weight")
-
-    # Generate indicator matrix for Sequential Bootstrapping
-    min_timestamp = X.index.min()
-    max_timestamp = X.inde.max()
-    # Take only events which are in X
-    subsamled_barrie_events = triple_barrier_events.loc[min_timestamp:max_timestamp, :]
-    subsampled_price_bars = price_bars.loc[min_timestamp:max_timestamp, :]
-
-    # Get indicator matrix
-    ind_mat = get_ind_matrix(subsamled_barrie_events, subsampled_price_bars)
 
     if not support_sample_weight and sample_weight is not None:
         raise ValueError("The base estimator doesn't support sample weight")
@@ -147,6 +137,9 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
 
         self.triple_barrier_events = triple_barrier_events
         self.price_bars = price_bars
+        self.ind_mat = get_ind_matrix(triple_barrier_events, price_bars)
+        # Used for create get ind_matrix subsample during cross-validation
+        self.timestamp_int_index_mapping = pd.Series(index=triple_barrier_events.index, data=range(self.ind_mat.shape[1]))
 
     def fit(self, X, y, sample_weight=None):
         """Build a Bagging ensemble of estimators from the training
@@ -195,6 +188,9 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         """
         random_state = check_random_state(self.random_state)
 
+        # Generate subsample ind_matrix (we need this during subsampling cross_validation)
+        subsampled_ind_mat = self.ind_mat[:, self.timestamp_int_index_mapping.loc[X.index]]
+
         # Convert data (X is required to be 2d and indexable)
         X, y = check_X_y(
             X, y, ['csr', 'csc'], dtype=None, force_all_finite=False,
@@ -210,7 +206,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         y = self._validate_y(y)
 
         # Check parameters
-        self._validate_estimator()
+        super()._validate_estimator()
 
         if max_depth is not None:
             self.base_estimator_.max_depth = max_depth
@@ -292,8 +288,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
                 self,
                 X,
                 y,
-                self.triple_barrier_events,
-                self.price_bars,
+                subsampled_ind_mat,
                 sample_weight,
                 seeds[starts[i]:starts[i + 1]],
                 total_n_estimators,
@@ -313,15 +308,8 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
 
     def _get_estimators_indices(self, X, y):
 
-        # Generate indicator matrix for Sequential Bootstrapping
-        min_timestamp = X.index.min()
-        max_timestamp = X.inde.max()
-        # Take only events which are in X
-        subsamled_barrie_events = self.triple_barrier_events.loc[min_timestamp:max_timestamp, :]
-        subsampled_price_bars = self.price_bars.loc[min_timestamp:max_timestamp, :]
-
         # Get indicator matrix
-        ind_mat = get_ind_matrix(subsamled_barrie_events, subsampled_price_bars)
+        subsampled_ind_mat = self.ind_mat[:, self.timestamp_int_index_mapping.loc[X.index]]
 
         # Get drawn indices along both sample and feature axes
         for seed in self._seeds:
@@ -330,7 +318,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
             random_state = np.random.RandomState(seed)
             feature_indices, sample_indices = _generate_bagging_indices(
                 random_state, self.bootstrap_features,
-                self.n_features_, self._max_features, self._max_samples, ind_mat)
+                self.n_features_, self._max_features, self._max_samples, subsampled_ind_mat)
 
             yield feature_indices, sample_indices
 
@@ -462,7 +450,6 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
             price_bars=price_bars,
             base_estimator=base_estimator,
             n_estimators=n_estimators,
-            bootstrap=True,
             max_samples=max_samples,
             max_features=max_features,
             bootstrap_features=bootstrap_features,
