@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 from scipy.special import comb
 
-
 from mlfinlab.bet_sizing.ef3m import M2N, centered_moment, raw_moment, most_likely_parameters
 
 
@@ -222,9 +221,14 @@ class TestM2NFit(unittest.TestCase):
         Tests the 'fit' method of the M2N class, using variant 1.
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
-        mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e-5, 1, 10_000
-        m2n_test = M2N(moments_test)
-        m2n_test.fit(mu_2_test, epsilon_test, variant_test, max_iter_test)
+        mu_2_test = 1
+        epsilon_test = 1e-5
+        factor_test = 5
+        n_runs_test = 5
+        variant_test = 1
+        max_iter_test = 10_000
+        m2n_test = M2N(moments_test, epsilon_test, factor_test, n_runs_test, variant_test, max_iter_test)
+        m2n_test.fit(mu_2_test)
         self.assertTrue(len(m2n_test.parameters) == 5)
 
     def test_fit_variant_2(self):
@@ -232,9 +236,14 @@ class TestM2NFit(unittest.TestCase):
         Tests the 'fit' method of the M2N class, using variant 2.
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
-        mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e-5, 2, 10_000
-        m2n_test = M2N(moments_test)
-        m2n_test.fit(mu_2_test, epsilon_test, variant_test, max_iter_test)
+        mu_2_test = 1
+        epsilon_test = 1e-5
+        factor_test = 5
+        n_runs_test = 5
+        variant_test = 2
+        max_iter_test = 10_000
+        m2n_test = M2N(moments_test, epsilon_test, factor_test, n_runs_test, variant_test, max_iter_test)
+        m2n_test.fit(mu_2_test)
         self.assertTrue(len(m2n_test.parameters) == 5)
 
     def test_fit_variant_value_error(self):
@@ -242,19 +251,30 @@ class TestM2NFit(unittest.TestCase):
         Tests that the 'fit' method throws a ValueError if an invalid value is passed to argument 'variant'.
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
-        mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e-5, 3, 10_000
-        m2n_test = M2N(moments_test)
-        self.assertRaises(ValueError, m2n_test.fit, mu_2_test, epsilon_test, variant_test, max_iter_test)
+        mu_2_test = 1
+        epsilon_test = 1e-5
+        factor_test = 5
+        n_runs_test = 5
+        variant_test = 3
+        max_iter_test = 10_000
+        m2n_test = M2N(moments_test, epsilon_test, factor_test, n_runs_test, variant_test, max_iter_test)
+        self.assertRaises(ValueError, m2n_test.fit, mu_2_test)
 
     def test_fit_success_via_error(self):
         """
         Tests that the 'fit' method successfully exits due to a low error being reached.
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
+        mu_2_test = 1
+        epsilon_test = 1e-5
+        factor_test = 5
+        n_runs_test = 5
+        variant_test = 1
+        max_iter_test = 10_000
         mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e-5, 1, 10_000
-        m2n_test = M2N(moments_test)
+        m2n_test = M2N(moments_test, epsilon_test, factor_test, n_runs_test, variant_test, max_iter_test)
         m2n_test.error = 1e6
-        m2n_test.fit(mu_2_test, epsilon_test, variant_test, max_iter_test)
+        m2n_test.fit(mu_2_test)
         self.assertTrue(len(m2n_test.parameters) == 5)
 
     def test_fit_success_via_epsilon(self):
@@ -262,10 +282,16 @@ class TestM2NFit(unittest.TestCase):
         Tests that the 'fit' method successfully exits due to p_1 converging.
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
+        mu_2_test = 1
+        epsilon_test = 1e12
+        factor_test = 5
+        n_runs_test = 5
+        variant_test = 1
+        max_iter_test = 10_000
         mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e12, 1, 10_000
         np.random.seed(12)
-        m2n_test = M2N(moments_test)
-        m2n_test.fit(mu_2_test, epsilon_test, variant_test, max_iter_test)
+        m2n_test = M2N(moments_test, epsilon_test, factor_test, n_runs_test, variant_test, max_iter_test)
+        m2n_test.fit(mu_2_test)
         self.assertTrue(len(m2n_test.parameters) == 5)
 
     def test_fit_success_via_max_iter(self):
@@ -274,9 +300,15 @@ class TestM2NFit(unittest.TestCase):
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
         np.random.seed(12)
+        mu_2_test = 1
+        epsilon_test = 1e-12
+        factor_test = 5
+        n_runs_test = 5
+        variant_test = 1
+        max_iter_test = 1
         mu_2_test, epsilon_test, variant_test, max_iter_test = 1, 1e-12, 1, 1
-        m2n_test = M2N(moments_test)
-        m2n_test.fit(mu_2=mu_2_test, epsilon=epsilon_test, variant=variant_test, max_iter=max_iter_test)
+        m2n_test = M2N(moments_test, epsilon_test, factor_test, n_runs_test, variant_test, max_iter_test)
+        m2n_test.fit(mu_2=mu_2_test)
         self.assertTrue(len(m2n_test.parameters) == 5)
 
 class TestM2NSingleFitLoop(unittest.TestCase):
@@ -288,10 +320,15 @@ class TestM2NSingleFitLoop(unittest.TestCase):
         Tests that the 'single_fit_loop' method executes successfully.
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
+        epsilon_test = 1e-5
+        factor_test = 5
+        n_runs_test = 10
+        variant_test = 2
+        max_iter_test = 10_000
         epsilon_test, factor_test, variant_test, max_iter_test = 1e-5, 5, 2, 10_000
         np.random.seed(12)
-        m2n_test = M2N(moments_test)
-        df_results = m2n_test.single_fit_loop(epsilon_test, factor_test, variant_test, max_iter_test)
+        m2n_test = M2N(moments_test, epsilon_test, factor_test, n_runs_test, variant_test, max_iter_test)
+        df_results = m2n_test.single_fit_loop()
         self.assertTrue(isinstance(df_results, pd.DataFrame))
 
 
@@ -304,9 +341,15 @@ class TestM2NMpFit(unittest.TestCase):
         Tests that the 'mp_fit' method executes successfully.
         """
         moments_test = [0.7, 2.6, 0.4, 25, -59.8]
-        epsilon_test, factor_test, runs_test, variant_test, max_iter_test, num_workers_test = 1e-5, 5, 10, 2, 10_000, 1
-        m2n_test = M2N(moments_test)
-        df_results = m2n_test.mp_fit(epsilon_test, factor_test, runs_test, variant_test, max_iter_test, num_workers_test)
+        epsilon_test = 1e-5
+        factor_test = 5
+        n_runs_test = 10
+        variant_test = 2
+        max_iter_test = 10_000
+        num_workers_test = 1
+        epsilon_test, factor_test, n_runs_test, variant_test, max_iter_test, num_workers_test = 1e-5, 5, 10, 2, 10_000, 1
+        m2n_test = M2N(moments_test, epsilon_test, factor_test, n_runs_test, variant_test, max_iter_test, num_workers_test)
+        df_results = m2n_test.mp_fit()
         self.assertTrue(isinstance(df_results, pd.DataFrame))
 
 

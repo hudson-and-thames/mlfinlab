@@ -4,11 +4,10 @@ of 2 Gaussian distributions. Based on the work by Lopez de Prado and Foreman (20
 approach to mathematical portfolio oversight: The EF3M algorithm." Quantitative Finance, Vol. 14, No. 5, pp. 913-930.
 """
 
-from multiprocessing import cpu_count
+import sys
+from multiprocessing import cpu_count, Pool
 import numpy as np
 import pandas as pd
-import dask.dataframe as dd
-from dask import delayed
 from scipy.special import comb
 from scipy.stats import gaussian_kde
 
@@ -19,37 +18,50 @@ class M2N:
     This class is used to contain parameters and equations for the EF3M algorithm, when fitting parameters to a mixture
     of 2 Gaussians.
     """
-    def __init__(self, moments):
+    def __init__(self, moments, epsilon=10**-5, factor=5, n_runs=1, variant=1, max_iter=100_000, num_workers=-1):
         """
         Constructor
 
         :param moments: (list) The first five (1... 5) raw moments of the mixture distribution.
+        :param epsilon: (float) Fitting tolerance
+        :param factor: (float) Lambda factor from equations
+        :param n_runs: (int) Number of times to execute 'singleLoop'
+        :param variant: (int) The EF3M variant to execute, options are 1: EF3M using first 4 moments, 2: EF3M using
+         first 5 moments
+        :param max_iter: (int) Maximum number of iterations to perform in the 'fit' method
+        :param num_workers: (int) Number of CPU cores to use for multiprocessing execution. Default is -1 which sets
+         num_workers to all cores.
 
         The parameters of the mixture are defined by a list, where:
             parameters = [mu_1, mu_2, sigma_1, sigma_2, p_1]
         """
+        # Set fitting parameters in constructor.
+        self.epsilon = epsilon
+        self. factor = factor
+        self.n_runs = n_runs
+        self.variant = variant
+        self.max_iter = max_iter
+        self.num_workers = num_workers
+        # Set moments to fit and initialize lists and errors.
         self.moments = moments
         self.new_moments = [0 for _ in range(5)]  # Initialize the new moment list to zeroes.
         self.parameters = [0 for _ in range(5)]  # Initialize the parameter list to zeroes.
         self.error = sum([moments[i]**2 for i in range(len(moments))])
 
-    def fit(self, mu_2, epsilon, variant=1, max_iter=100_000):
+    def fit(self, mu_2):
         """
         Fits and the parameters that describe the mixture of the 2 Normal distributions for a given set of initial
         parameter guesses.
 
         :param mu_2: (float) An initial estimate for the mean of the second distribution.
-        :param epsilon: (float) Error tolerance.
-        :param variant: (int) Which algorithm variant to use, 1 or 2.
-        :param max_iter: (int) Maximum number of iterations after which to terminate loop.
         """
         p_1 = np.random.uniform(0, 1)
         num_iter = 0
         while True:
             num_iter += 1
-            if variant == 1:
+            if self.variant == 1:
                 parameters_new = self.iter_4(mu_2, p_1)  # First variant, using the first 4 moments.
-            elif variant == 2:
+            elif self.variant == 2:
                 parameters_new = self.iter_5(mu_2, p_1)  # Second variant, using all 5 moments.
             else:
                 raise ValueError("Value of argument 'variant' must be either 1 or 2.")
@@ -66,11 +78,11 @@ class M2N:
                 self.parameters = parameters
                 self.error = error
 
-            if abs(p_1 - parameters[4]) < epsilon:
+            if abs(p_1 - parameters[4]) < self.epsilon:
                 # Stopping condition.
                 break
 
-            if num_iter > max_iter:
+            if num_iter > self.max_iter:
                 # Stops calculation if algorithm reaches the set maximum number of iterations.
                 return None
 
@@ -147,13 +159,6 @@ class M2N:
                 break
             sigma_1 = sigma_1_squared**0.5
 
-            #if np.iscomplex(sigma_1) or np.iscomplex(sigma_2) or np.isnan(sigma_1) or np.isnan(sigma_2):
-                # Validity check 4: Break loop if sigma_1 or sigma_2 are invalid.
-                # This check is removed since it appears to be unreachable, however it is not
-                # being removed from the code yet. It's number will remain to avoid renumbering should it
-                # be needed in the future.
-                #break
-
             # Adjust guess for p_1, Equation (25)
             p_1_deno = (3 * (sigma_1**4 - sigma_2**4) + 6 * (sigma_1**2 * mu_1**2 - sigma_2**2 * mu_2**2) + mu_1**4 -
                         mu_2**4)
@@ -214,16 +219,7 @@ class M2N:
             if sigma_1_squared < 0:
                 # Validity check 3: check for upcoming complex numbers.
                 break
-
             sigma_1 = sigma_1_squared**0.5
-
-            # Last check for sigma_1 and sigma_2 validity.
-            #if np.iscomplex(sigma_1) or np.iscomplex(sigma_2) or np.isnan(sigma_1) or np.isnan(sigma_2):
-                # Validity check 4: Break loop if sigma_1 or sigma_2 are invalid.
-                # This check is removed since it appears to be unreachable, however it is not
-                # being removed from the code yet. It's number will remain to avoid renumbering should it
-                # be needed in the future.
-                #break
 
             # Adjust the guess for mu_2, Equation (27).
             if (1 - p_1) < 1e-4:
@@ -267,28 +263,25 @@ class M2N:
 
         return param_list
 
-    def single_fit_loop(self, epsilon=10**-5, factor=5, variant=1, max_iter=100_000):
+    def single_fit_loop(self, epsilon=0):
         """
         A single scan through the list of mu_2 values, cataloging the successful fittings in a DataFrame.
 
-        :param epsilon: (float) Fitting tolerance
-        :param factor: (float) Lambda factor from equations
-        :param variant: (int) The EF3M variant to execute, options are 1: EF3M using first 4 moments, 2: EF3M using
-        first 5 moments
-        :param max_iter: (int) Maximum number of iterations to perform in the 'fit' method
+        :param epsilon: (float) Fitting tolerance.
         :return: (pd.DataFrame) Fitted parameters and error
         """
         # Reset parameters and error for each single_fit_loop.
+        self.epsilon = epsilon if epsilon != 0 else self.epsilon
         self.parameters = [0 for _ in range(5)]  # Initialize the parameter list.
         self.error = sum([self.moments[i]**2 for i in range(len(self.moments))])
 
         std_dev = centered_moment(self.moments, 2)**0.5
-        mu_2 = [float(i) * epsilon * factor * std_dev + self.moments[0] for i in range(1, int(1/epsilon))]
+        mu_2 = [float(i) * self.epsilon * self.factor * std_dev + self.moments[0] for i in range(1, int(1/self.epsilon))]
         err_min = self.error
 
         d_results = {}
         for mu_2_i in mu_2:
-            self.fit(mu_2=mu_2_i, epsilon=epsilon, variant=variant, max_iter=max_iter)
+            self.fit(mu_2=mu_2_i)
 
             if self.error < err_min:
                 err_min = self.error
@@ -298,33 +291,31 @@ class M2N:
 
         return pd.DataFrame.from_dict(d_results)
 
-    def mp_fit(self, epsilon=10**-5, factor=5, n_runs=1, variant=1, max_iter=100_000, num_workers=-1):
+    def mp_fit(self):
         """
         Parallelized implementation of the 'single_fit_loop' method. Makes use of dask.delayed to execute multiple
         calls of 'single_fit_loop' in parallel.
 
-        :param epsilon: (float) Fitting tolerance
-        :param factor: (float) Lambda factor from equations
-        :param n_runs: (int) Number of times to execute 'singleLoop'
-        :param variant: (int) The EF3M variant to execute, options are 1: EF3M using first 4 moments, 2: EF3M using
-         first 5 moments
-        :param max_iter: (int) Maximum number of iterations to perform in the 'fit' method
-        :param num_workers: (int) Number of CPU cores to use for multiprocessing execution. Default is -1 which sets
-         num_workers to all cores.
         :return: (pd.DataFrame) Fitted parameters and error
         """
-        # Create a list of delayed objects that return a pd.DataFrame from 'single_fit_loop'.
-        dfs = [delayed(self.single_fit_loop)(epsilon=epsilon, factor=factor, variant=variant, max_iter=max_iter)
-               for _ in range(n_runs)]
+        num_workers = self.num_workers if self.num_workers > 0 else cpu_count()
+        pool = Pool(num_workers)
 
-        # Build a dask.DataFrame from a list of delayed objects.
-        ddf = dd.from_delayed(dfs)
+        output_list = pool.imap_unordered(self.single_fit_loop, [self.epsilon for i in range(self.n_runs)])
+        df_list = []
 
-        # Compute all runs, using dask multiprocessing.
-        num_workers = num_workers if num_workers > 0 else cpu_count()
-        df_out = ddf.compute(scheduler='processes', num_workers=num_workers).reset_index(drop=True)
-        df_out = df_out.sort_values('error')
-
+        # Process asynchronous output, report progress and progress bar.
+        max_prog_bar_len = 25
+        for i, out_i in enumerate(output_list, 1):
+            df_list.append(out_i)
+            num_fill = int((i/self.n_runs) * max_prog_bar_len)
+            prog_bar_string = '|' + num_fill*'#' + (max_prog_bar_len-num_fill)*' ' + '|'
+            sys.stderr.write(f'\r{prog_bar_string} Completed {i} of {self.n_runs} fitting rounds.')
+        # Close and clean up pool.
+        pool.close()
+        pool.join()
+        # Concatenate and return results of fitting.
+        df_out = pd.concat(df_list)
         return df_out
 
 
