@@ -132,9 +132,9 @@ def bet_size_reserve(events_t1, sides, fit_runs=100, epsilon=1e-5, factor=5, var
     central_mmnts = [moment(events_active['c_t'].to_numpy(), moment=i) for i in range(1, 6)]
     raw_mmnts = raw_moment(central_moments=central_mmnts, dist_mean=events_active['c_t'].mean())
     # Fit the mixture of distributions.
-    m2n = M2N(raw_mmnts)
-    df_fit_results = m2n.mp_fit(epsilon=epsilon, factor=factor, n_runs=fit_runs,
-                                variant=variant, max_iter=max_iter, num_workers=num_workers)
+    m2n = M2N(raw_mmnts, epsilon=epsilon, factor=factor, n_runs=fit_runs,
+              variant=variant, max_iter=max_iter, num_workers=num_workers)
+    df_fit_results = m2n.mp_fit()
     fit_params = most_likely_parameters(df_fit_results)
     params_list = [fit_params[key] for key in ['mu_1', 'mu_2', 'sigma_1', 'sigma_2', 'p_1']]
     # Calculate the bet size.
