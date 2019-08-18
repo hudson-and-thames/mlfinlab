@@ -140,6 +140,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         self.ind_mat = get_ind_matrix(triple_barrier_events, price_bars)
         # Used for create get ind_matrix subsample during cross-validation
         self.timestamp_int_index_mapping = pd.Series(index=triple_barrier_events.index, data=range(self.ind_mat.shape[1]))
+        self.X_time_index = None  # Timestamp index of X_train
 
     def fit(self, X, y, sample_weight=None):
         """Build a Bagging ensemble of estimators from the training
@@ -187,9 +188,10 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         self : object
         """
         random_state = check_random_state(self.random_state)
+        self.X_time_index = X.index  # Remember X index for future sampling
 
         # Generate subsample ind_matrix (we need this during subsampling cross_validation)
-        subsampled_ind_mat = self.ind_mat[:, self.timestamp_int_index_mapping.loc[X.index]]
+        subsampled_ind_mat = self.ind_mat[:, self.timestamp_int_index_mapping.loc[self.X_time_index]]
 
         # Convert data (X is required to be 2d and indexable)
         X, y = check_X_y(
@@ -282,7 +284,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         self._seeds = seeds
 
         all_results = Parallel(n_jobs=n_jobs, verbose=self.verbose,
-                               **self._parallel_args())(
+                               )(
             delayed(_parallel_build_estimators)(
                 n_estimators[i],
                 self,
@@ -309,7 +311,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
     def _get_estimators_indices(self, X, y):
 
         # Get indicator matrix
-        subsampled_ind_mat = self.ind_mat[:, self.timestamp_int_index_mapping.loc[X.index]]
+        subsampled_ind_mat = self.ind_mat[:, self.timestamp_int_index_mapping.loc[self.X_time_index]]
 
         # Get drawn indices along both sample and feature axes
         for seed in self._seeds:
@@ -322,7 +324,6 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
 
             yield feature_indices, sample_indices
 
-    @property
     def estimators_samples_(self, X, y):
         """The subset of drawn samples for each base estimator.
         Returns a dynamically generated list of indices identifying
