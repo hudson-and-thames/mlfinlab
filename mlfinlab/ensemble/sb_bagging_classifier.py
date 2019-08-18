@@ -5,7 +5,7 @@ from abc import ABCMeta, abstractmethod
 import pandas as pd
 import numpy as np
 
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.metrics import accuracy_score, r2_score
 from sklearn.ensemble.bagging import BaseBagging, BaggingClassifier
 from sklearn.base import ClassifierMixin, RegressorMixin
@@ -208,7 +208,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         y = self._validate_y(y)
 
         # Check parameters
-        super()._validate_estimator()
+        self._validate_estimator()
 
         if max_depth is not None:
             self.base_estimator_.max_depth = max_depth
@@ -462,7 +462,7 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
 
     def _validate_estimator(self):
         """Check the estimator and set the base_estimator_ attribute."""
-        super()._validate_estimator(
+        super(BaggingClassifier, self)._validate_estimator(
             default=DecisionTreeClassifier())
 
     def _set_oob_score(self, X, y):
@@ -608,7 +608,6 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
             price_bars=price_bars,
             base_estimator=base_estimator,
             n_estimators=n_estimators,
-            bootstrap=True,
             max_samples=max_samples,
             max_features=max_features,
             bootstrap_features=bootstrap_features,
@@ -617,6 +616,11 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
             n_jobs=n_jobs,
             random_state=random_state,
             verbose=verbose)
+
+    def _validate_estimator(self):
+        """Check the estimator and set the base_estimator_ attribute."""
+        super(BaggingClassifier, self)._validate_estimator(
+            default=DecisionTreeRegressor())
 
     def _set_oob_score(self, X, y):
         n_samples = y.shape[0]
