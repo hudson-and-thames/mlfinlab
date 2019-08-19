@@ -1,3 +1,6 @@
+"""
+Implementation of Sequentially Bootstrapped Bagging Classifier using sklearn's library as base class
+"""
 import numbers
 import itertools
 from warnings import warn
@@ -19,6 +22,20 @@ from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix
 
 MAX_INT = np.iinfo(np.int32).max
 
+
+# pylint: disable=R0902
+# pylint: disable=R0912
+# pylint: disable=R0913
+# pylint: disable=R0914
+# pylint: disable=R0915
+# pylint: disable=R1720
+# pylint: disable=invalid-name
+# pylint: disable=W0201
+# pylint: disable=W0212
+# pylint: disable=C1801
+# pylint: disable=E1003
+# pylint: disable=E1121
+# pylint: disable=W0221
 
 def _generate_indices_standard(random_state, bootstrap, n_population, n_samples):
     """Draw randomly sampled indices."""
@@ -107,6 +124,10 @@ def _parallel_build_estimators(n_estimators, ensemble, X, y, ind_mat, sample_wei
 
 
 class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
+    """
+    Base class for Sequentially Bootstrapped Classifier and Regressor, extension of sklearn's BaseBagging
+    """
+
     @abstractmethod
     def __init__(self,
                  triple_barrier_events,
@@ -135,11 +156,14 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
             random_state=random_state,
             verbose=verbose)
 
+        # pylint: disable=invalid-name
         self.triple_barrier_events = triple_barrier_events
         self.price_bars = price_bars
         self.ind_mat = get_ind_matrix(triple_barrier_events, price_bars)
         # Used for create get ind_matrix subsample during cross-validation
-        self.timestamp_int_index_mapping = pd.Series(index=triple_barrier_events.index, data=range(self.ind_mat.shape[1]))
+        self.timestamp_int_index_mapping = pd.Series(index=triple_barrier_events.index,
+                                                     data=range(self.ind_mat.shape[1]))
+
         self.X_time_index = None  # Timestamp index of X_train
 
     def fit(self, X, y, sample_weight=None):
@@ -283,6 +307,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         seeds = random_state.randint(MAX_INT, size=n_more_estimators)
         self._seeds = seeds
 
+        # pylint: disable=C0330
         all_results = Parallel(n_jobs=n_jobs, verbose=self.verbose,
                                )(
             delayed(_parallel_build_estimators)(
@@ -308,7 +333,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
 
         return self
 
-    def _get_estimators_indices(self, X, y):
+    def _get_estimators_indices(self):
 
         # Get indicator matrix
         subsampled_ind_mat = self.ind_mat[:, self.timestamp_int_index_mapping.loc[self.X_time_index]]
@@ -324,7 +349,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
 
             yield feature_indices, sample_indices
 
-    def estimators_samples_(self, X, y):
+    def estimators_samples_(self):
         """The subset of drawn samples for each base estimator.
         Returns a dynamically generated list of indices identifying
         the samples used for fitting each member of the ensemble, i.e.,
@@ -334,7 +359,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         data. Thus fetching the property may be slower than expected.
         """
         return [sample_indices
-                for _, sample_indices in self._get_estimators_indices(X, y)]
+                for _, sample_indices in self._get_estimators_indices()]
 
 
 class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagging, BaggingClassifier,
@@ -472,7 +497,7 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
         predictions = np.zeros((n_samples, n_classes_))
 
         for estimator, samples, features in zip(self.estimators_,
-                                                self.estimators_samples_(X, y),
+                                                self.estimators_samples_(),
                                                 self.estimators_features_):
             # Create mask for OOB samples
             mask = ~indices_to_mask(samples, n_samples)
