@@ -10,11 +10,12 @@ import pandas as pd
 
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier, get_bins
+from mlfinlab.sampling.bootstrapping import seq_bootstrap
 from mlfinlab.ensemble.sb_bagging_classifier import SequentiallyBootstrappedBaggingClassifier, \
     SequentiallyBootstrappedBaggingRegressor
 from sklearn.metrics import precision_score, recall_score, roc_auc_score, accuracy_score, mean_absolute_error, \
-    mean_squared_error
-from sklearn.ensemble import BaggingClassifier, BaggingRegressor
+    mean_squared_error, f1_score
+from sklearn.ensemble import BaggingClassifier, BaggingRegressor, RandomForestClassifier, RandomForestRegressor
 from mlfinlab.util.utils import get_daily_vol
 
 
@@ -87,13 +88,73 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         labels = labels.loc[X.index, :]  # Sync X and y
         self.meta_labeled_events = self.meta_labeled_events.loc[X.index, :]  # Sync X and meta_labeled_events
 
-        self.X_train, self.y_train_clf, self.y_train_reg = X.iloc[:200][features], labels.iloc[:200].bin, labels.iloc[
-                                                                                                          :200].ret
-        self.X_test, self.y_test_clf, self.y_test_reg = X.iloc[200:][features], labels.iloc[200:].bin, labels.iloc[
-                                                                                                       200:].ret
+        self.X_train, self.y_train_clf, self.y_train_reg = X.iloc[:300][features], labels.iloc[:300].bin, labels.iloc[
+                                                                                                          :300].ret
+        self.X_test, self.y_test_clf, self.y_test_reg = X.iloc[300:][features], labels.iloc[300:].bin, labels.iloc[
+                                                                                                       300:].ret
+
+        # Init classifiers
+        clf = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
+                                     class_weight='balanced_subsample')
+        reg = RandomForestRegressor(n_estimators=1, bootstrap=False)
+        self.sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=100,
+                                                                triple_barrier_events=self.meta_labeled_events,
+                                                                price_bars=self.data, oob_score=True)
+        self.sb_reg = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=100,
+                                                               triple_barrier_events=self.meta_labeled_events,
+                                                               price_bars=self.data, oob_score=True)
+
+        self.sklearn_clf = BaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=50, oob_score=True)
+        self.sklearn_reg = BaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=50, oob_score=True)
 
     def test_sb_classifier(self):
-        pass
+        self.sb_clf.fit(self.X_train, self.y_train_clf)
+        self.sklearn_clf.fit(self.X_train, self.y_train_clf)
+
+        oos_sb_predictions = self.sb_clf.predict(self.X_test)
+        oos_sklearn_predictions = self.sklearn_clf.predict(self.X_test)
+
+        sb_precision = precision_score(self.y_test_clf, oos_sb_predictions)
+        sb_recall = recall_score(self.y_test_clf, oos_sb_predictions)
+        sb_f1 = f1_score(self.y_test_clf, oos_sb_predictions)
+        sb_roc_auc = roc_auc_score(self.y_test_clf, oos_sb_predictions)
+
+        sklearn_precision = precision_score(self.y_test_clf, oos_sklearn_predictions)
+        sklearn_recall = recall_score(self.y_test_clf, oos_sklearn_predictions)
+        sklearn_f1 = f1_score(self.y_test_clf, oos_sklearn_predictions)
+        sklearn_roc_auc = roc_auc_score(self.y_test_clf, oos_sklearn_predictions)
+
+        # Test OOB scores (sequentially bootstrapped, algorithm specific, standard (random sampling)
+
+        # Algorithm specific
+        self.assertGreater(self.sb_clf.oob_score_, self.sklearn_clf.oob_score_)  # oob_score for SB should be greater
+        self.assertAlmostEqual(self.sb_clf.oob_score_, 0.99, delta=0.01)
+
+        # Sequentially Bootstrapped oob_score
+        # Trim index map so that only train indices are present
+        subsampled_ind_mat = self.sb_clf.ind_mat[:,
+                             self.sb_clf.timestamp_int_index_mapping.loc[self.sb_clf.X_time_index]]
+        sb_sample = seq_bootstrap(subsampled_ind_mat, sample_length=self.X_train.shape[0], compare=True)
+        sb_clf_accuracy = accuracy_score(self.y_train_clf.iloc[sb_sample],
+                                         self.sb_clf.predict(self.X_train.iloc[sb_sample]))
+        sklearn_clf_accuracy = accuracy_score(self.y_train_clf.iloc[sb_sample],
+                                              self.sklearn_clf.predict(self.X_train.iloc[sb_sample]))
+        self.assertGreaterEqual(sb_clf_accuracy, sklearn_clf_accuracy)
+
+        # Random sampling oob_score
+        random_sample = np.random.choice(subsampled_ind_mat.shape[1], size=self.X_train.shape[0])
+        sb_clf_accuracy = accuracy_score(self.y_train_clf.iloc[random_sample],
+                                         self.sb_clf.predict(self.X_train.iloc[sb_sample]))
+        sklearn_clf_accuracy = accuracy_score(self.y_train_clf.iloc[random_sample],
+                                              self.sklearn_clf.predict(self.X_train.iloc[sb_sample]))
+
+        self.assertTrue(sb_clf_accuracy >= sklearn_clf_accuracy)
+
+        # Test that OOB metrics for SB are greater than sklearn's
+        self.assertGreaterEqual(sb_precision, sklearn_precision)
+        self.assertGreaterEqual(sb_recall, sklearn_recall)
+        self.assertGreaterEqual(sb_f1, sklearn_f1)
+        self.assertGreaterEqual(sb_roc_auc, sklearn_roc_auc)
 
     def test_sb_regressor(self):
         pass
