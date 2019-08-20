@@ -10,7 +10,7 @@ import numpy as np
 
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.metrics import accuracy_score, r2_score
-from sklearn.ensemble.bagging import BaseBagging, BaggingClassifier
+from sklearn.ensemble.bagging import BaseBagging, BaggingClassifier, BaggingRegressor
 from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.ensemble.base import _partition_estimators
 from sklearn.utils.random import sample_without_replacement
@@ -22,7 +22,7 @@ from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix
 
 MAX_INT = np.iinfo(np.int32).max
 
-
+# pylint: disable=R0901
 # pylint: disable=R0902
 # pylint: disable=R0912
 # pylint: disable=R0913
@@ -167,7 +167,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         self.X_time_index = None  # Timestamp index of X_train
 
     def fit(self, X, y, sample_weight=None):
-        """Build a Bagging ensemble of estimators from the training
+        """Build a Sequentially Bootstrapped Bagging ensemble of estimators from the training
            set (X, y).
         Parameters
         ----------
@@ -188,7 +188,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         return self._fit(X, y, self.max_samples, sample_weight=sample_weight)
 
     def _fit(self, X, y, max_samples=None, max_depth=None, sample_weight=None):
-        """Build a Bagging ensemble of estimators from the training
+        """Build a Sequentially Bootstrapped Bagging ensemble of estimators from the training
            set (X, y).
         Parameters
         ----------
@@ -364,11 +364,11 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
 
 class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagging, BaggingClassifier,
                                                 ClassifierMixin):
-    """A Bagging classifier.
-    A Bagging classifier is an ensemble meta-estimator that fits base
-    classifiers each on random subsets of the original dataset and then
-    aggregate their individual predictions (either by voting or by averaging)
-    to form a final prediction. Such a meta-estimator can typically be used as
+    """A Sequentially Bootstrapped Bagging classifier.
+    A Sequentially Bootstrapped Bagging classifier is an ensemble meta-estimator that fits base
+    classifiers each on random subsets of the original dataset generated using
+    Sequential Bootstrapping sampling procedure and then aggregate their individual predictions (
+    either by voting or by averaging) to form a final prediction. Such a meta-estimator can typically be used as
     a way to reduce the variance of a black-box estimator (e.g., a decision
     tree), by introducing randomization into its construction procedure and
     then making an ensemble out of it.
@@ -383,6 +383,10 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
     Read more in the :ref:`User Guide <bagging>`.
     Parameters
     ----------
+    triple_barrier_events: pd.DataFrame
+        Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation
+    price_bars: pd.DataFrame
+        Price bars used in triple_barrier_events generation
     base_estimator : object or None, optional (default=None)
         The base estimator to fit on random subsets of the dataset.
         If None, then the base estimator is a decision tree.
@@ -396,9 +400,6 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
         The number of features to draw from X to train each base estimator.
         - If int, then draw `max_features` features.
         - If float, then draw `max_features * X.shape[1]` features.
-    bootstrap : boolean, optional (default=True)
-        Whether samples are drawn with replacement. If False, sampling
-        without replacement is performed.
     bootstrap_features : boolean, optional (default=False)
         Whether features are drawn with replacement.
     oob_score : bool, optional (default=False)
@@ -528,10 +529,10 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
         self.oob_score_ = oob_score
 
 
-class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBagging, RegressorMixin):
+class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBagging, BaggingRegressor, RegressorMixin):
     """A Bagging regressor.
-    A Bagging regressor is an ensemble meta-estimator that fits base
-    regressors each on random subsets of the original dataset and then
+    A Sequentially Bootstrapped Bagging regressor is an ensemble meta-estimator that fits base
+    regressors each on random subsets of the original dataset using Sequential Bootstrapping and then
     aggregate their individual predictions (either by voting or by averaging)
     to form a final prediction. Such a meta-estimator can typically be used as
     a way to reduce the variance of a black-box estimator (e.g., a decision
@@ -548,6 +549,10 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
     Read more in the :ref:`User Guide <bagging>`.
     Parameters
     ----------
+    triple_barrier_events: pd.DataFrame
+        Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation
+    price_bars: pd.DataFrame
+        Price bars used in triple_barrier_events generation
     base_estimator : object or None, optional (default=None)
         The base estimator to fit on random subsets of the dataset.
         If None, then the base estimator is a decision tree.
@@ -561,9 +566,6 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
         The number of features to draw from X to train each base estimator.
         - If int, then draw `max_features` features.
         - If float, then draw `max_features * X.shape[1]` features.
-    bootstrap : boolean, optional (default=True)
-        Whether samples are drawn with replacement. If False, sampling
-        without replacement is performed.
     bootstrap_features : boolean, optional (default=False)
         Whether features are drawn with replacement.
     oob_score : bool
@@ -644,7 +646,7 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
 
     def _validate_estimator(self):
         """Check the estimator and set the base_estimator_ attribute."""
-        super(BaggingClassifier, self)._validate_estimator(
+        super(BaggingRegressor, self)._validate_estimator(
             default=DecisionTreeRegressor())
 
     def _set_oob_score(self, X, y):
@@ -654,7 +656,7 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
         n_predictions = np.zeros((n_samples,))
 
         for estimator, samples, features in zip(self.estimators_,
-                                                self.estimators_samples_(X, y),
+                                                self.estimators_samples_(),
                                                 self.estimators_features_):
             # Create mask for OOB samples
             mask = ~indices_to_mask(samples, n_samples)
