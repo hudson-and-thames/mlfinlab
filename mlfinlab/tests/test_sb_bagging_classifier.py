@@ -97,6 +97,30 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         self.X_test, self.y_test_clf, self.y_test_reg = X.iloc[300:][features], labels.iloc[300:].bin, \
                                                         labels.iloc[300:].ret
 
+    def test_other_sb_features(self):
+        """
+        Test sample_weight, bootstrap feature
+        """
+        clf = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=True,
+                                     class_weight='balanced_subsample', max_depth=12)
+        sb_clf_bootstrap_features = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=0.2,
+                                                                              n_estimators=100,
+                                                                              triple_barrier_events=self.meta_labeled_events,
+                                                                              price_bars=self.data, oob_score=True,
+                                                                              random_state=1, bootstrap_features=True,
+                                                                              max_samples=30, verbose=True)
+        sb_clf_bootstrap_features.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)),)
+
+    # def test_value_error_raise(self):
+    #     """
+    #     Test various values error raise
+    #     """
+    #
+    #     with self.assertRaises(ValueError):
+    #         pass
+
+
+
     def test_sb_classifier(self):
         """
         Test Sequentially Bootstrapped Bagging Classifier
