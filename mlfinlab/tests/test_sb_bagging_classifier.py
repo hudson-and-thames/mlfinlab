@@ -12,6 +12,7 @@ from sklearn.metrics import precision_score, recall_score, roc_auc_score, accura
     mean_squared_error
 from sklearn.ensemble import BaggingClassifier, BaggingRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import LinearSVC
 
 from mlfinlab.util.utils import get_daily_vol
 from mlfinlab.filters.filters import cusum_filter
@@ -100,34 +101,51 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
 
     def test_other_sb_features(self):
         """
-        Test sample_weight, bootstrap feature
+        This function simply creates various estimators in order to get all lines of code covered, we don't check
+        anything here
         """
         clf_1 = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=True,
-                                     class_weight='balanced_subsample', max_depth=12)
+                                       class_weight='balanced_subsample', max_depth=12)
         clf_2 = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
-                                      class_weight='balanced_subsample', max_depth=12)
+                                       class_weight='balanced_subsample', max_depth=12)
         clf_3 = KNeighborsClassifier()
+        clf_4 = LinearSVC()
 
         sb_clf_1 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_1, max_features=0.2,
-                                                                              n_estimators=100,
-                                                                              triple_barrier_events=self.meta_labeled_events,
-                                                                              price_bars=self.data, oob_score=True,
-                                                                              random_state=1, bootstrap_features=True,
-                                                                              max_samples=30, verbose=2)
-
-        sb_clf_2 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_2, max_features=7,
                                                              n_estimators=100,
                                                              triple_barrier_events=self.meta_labeled_events,
                                                              price_bars=self.data, oob_score=True,
                                                              random_state=1, bootstrap_features=True,
-                                                             max_samples=0.3)
+                                                             max_samples=30, verbose=2)
+
+        sb_clf_2 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_2, max_features=7,
+                                                             n_estimators=100,
+                                                             triple_barrier_events=self.meta_labeled_events,
+                                                             price_bars=self.data, oob_score=False,
+                                                             random_state=1, bootstrap_features=True,
+                                                             max_samples=0.3, warm_start=True)
 
         sb_clf_3 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_3,
                                                              triple_barrier_events=self.meta_labeled_events,
                                                              price_bars=self.data)
-        sb_clf_1.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)),)
+
+        sb_clf_4 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_4, max_features=0.2,
+                                                             n_estimators=100,
+                                                             triple_barrier_events=self.meta_labeled_events,
+                                                             price_bars=self.data, oob_score=True,
+                                                             random_state=1, bootstrap_features=True,
+                                                             max_samples=30, verbose=2)
+
+        sb_clf_1.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
+
         sb_clf_2.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
+        sb_clf_2.n_estimators += 0
+        sb_clf_2.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
+        sb_clf_2.n_estimators += 2
+        sb_clf_2.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
+
         sb_clf_3.fit(self.X_train, self.y_train_clf)
+        sb_clf_4.fit(self.X_train, self.y_train_clf)
 
     def test_value_error_raise(self):
         """
@@ -149,7 +167,12 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         bagging_clf_5 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
                                                                   triple_barrier_events=self.meta_labeled_events,
                                                                   price_bars=self.data, oob_score=True, warm_start=True)
-
+        bagging_clf_6 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
+                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  price_bars=self.data, warm_start=True)
+        bagging_clf_7 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
+                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  price_bars=self.data, warm_start=True)
         with self.assertRaises(ValueError):
             bagging_clf_1.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
         with self.assertRaises(ValueError):
@@ -164,6 +187,15 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         with self.assertRaises(ValueError):
             bagging_clf_5.fit(self.X_train, self.y_train_clf,
                               sample_weight=np.ones((self.X_train.shape[0],)), )
+        with self.assertRaises(ValueError):
+            bagging_clf_6.fit(self.X_train, self.y_train_clf)
+            bagging_clf_6.n_estimators -= 2
+            bagging_clf_6.fit(self.X_train, self.y_train_clf)
+
+        with self.assertRaises(ValueError):
+            bagging_clf_7.fit(self.X_train, self.y_train_clf)
+            bagging_clf_7.n_estimators -= 1000
+            bagging_clf_7.fit(self.X_train, self.y_train_clf)
 
     def test_sb_classifier(self):
         """
@@ -241,12 +273,18 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         sb_reg = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=100,
                                                           triple_barrier_events=self.meta_labeled_events,
                                                           price_bars=self.data, oob_score=True, random_state=1)
+        sb_reg_1_estimator = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0,
+                                                                      n_estimators=1,
+                                                                      triple_barrier_events=self.meta_labeled_events,
+                                                                      price_bars=self.data, oob_score=True,
+                                                                      random_state=1)
         sklearn_reg = BaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=50, oob_score=True,
                                        random_state=1)
 
         # X_train index should be in index mapping
 
         sb_reg.fit(self.X_train, self.y_train_reg)
+        sb_reg_1_estimator.fit(self.X_train, self.y_train_reg)
         sklearn_reg.fit(self.X_train, self.y_train_reg)
 
         self.assertTrue(self.X_train.index.isin(sb_reg.timestamp_int_index_mapping.index).all())

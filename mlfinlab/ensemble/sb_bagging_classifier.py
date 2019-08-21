@@ -22,6 +22,7 @@ from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix
 
 MAX_INT = np.iinfo(np.int32).max
 
+
 # pylint: disable=R0901
 # pylint: disable=R0902
 # pylint: disable=R0912
@@ -69,7 +70,6 @@ def _parallel_build_estimators(n_estimators, ensemble, X, y, ind_mat, sample_wei
     n_samples, n_features = X.shape
     max_features = ensemble._max_features
     max_samples = ensemble._max_samples
-    bootstrap = ensemble.bootstrap
     bootstrap_features = ensemble.bootstrap_features
     support_sample_weight = has_fit_parameter(ensemble.base_estimator_,
                                               "sample_weight")
@@ -107,7 +107,6 @@ def _parallel_build_estimators(n_estimators, ensemble, X, y, ind_mat, sample_wei
 
             sample_counts = np.bincount(indices, minlength=n_samples)
             curr_sample_weight *= sample_counts
-
 
             estimator.fit(X[:, features], y, sample_weight=curr_sample_weight)
 
@@ -260,9 +259,6 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         if self.warm_start and self.oob_score:
             raise ValueError("Out of bag estimate only available"
                              " if warm_start=False")
-
-        if hasattr(self, "oob_score_") and self.warm_start:
-            del self.oob_score_
 
         if not self.warm_start or not hasattr(self, 'estimators_'):
             # Free allocated memory, if any
