@@ -231,13 +231,8 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         # Check parameters
         self._validate_estimator()
 
-        if max_depth is not None:
-            self.base_estimator_.max_depth = max_depth
-
         # Validate max_samples
-        if max_samples is None:
-            max_samples = self.max_samples
-        elif not isinstance(max_samples, (numbers.Integral, np.integer)):
+        if not isinstance(max_samples, (numbers.Integral, np.integer)):
             max_samples = int(max_samples * X.shape[0])
 
         if not (0 < max_samples <= X.shape[0]):

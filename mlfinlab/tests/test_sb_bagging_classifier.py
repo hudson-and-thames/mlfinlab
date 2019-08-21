@@ -120,7 +120,7 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
                                                              triple_barrier_events=self.meta_labeled_events,
                                                              price_bars=self.data, oob_score=True,
                                                              random_state=1, bootstrap_features=True,
-                                                             max_samples=30)
+                                                             max_samples=0.3)
 
         sb_clf_3 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_3,
                                                              triple_barrier_events=self.meta_labeled_events,
