@@ -11,6 +11,7 @@ import pandas as pd
 from sklearn.metrics import precision_score, recall_score, roc_auc_score, accuracy_score, mean_absolute_error, \
     mean_squared_error
 from sklearn.ensemble import BaggingClassifier, BaggingRegressor, RandomForestClassifier, RandomForestRegressor
+from sklearn.neighbors import KNeighborsClassifier
 
 from mlfinlab.util.utils import get_daily_vol
 from mlfinlab.filters.filters import cusum_filter
@@ -101,25 +102,45 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         """
         Test sample_weight, bootstrap feature
         """
-        clf = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=True,
+        clf_1 = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=True,
                                      class_weight='balanced_subsample', max_depth=12)
-        sb_clf_bootstrap_features = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=0.2,
+        clf_2 = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
+                                      class_weight='balanced_subsample', max_depth=12)
+        clf_3 = KNeighborsClassifier()
+
+        sb_clf_1 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_1, max_features=0.2,
                                                                               n_estimators=100,
                                                                               triple_barrier_events=self.meta_labeled_events,
                                                                               price_bars=self.data, oob_score=True,
                                                                               random_state=1, bootstrap_features=True,
-                                                                              max_samples=30, verbose=True)
-        sb_clf_bootstrap_features.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)),)
+                                                                              max_samples=30, verbose=2)
 
-    # def test_value_error_raise(self):
-    #     """
-    #     Test various values error raise
-    #     """
-    #
-    #     with self.assertRaises(ValueError):
-    #         pass
+        sb_clf_2 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_2, max_features=0.2,
+                                                             n_estimators=100,
+                                                             triple_barrier_events=self.meta_labeled_events,
+                                                             price_bars=self.data, oob_score=True,
+                                                             random_state=1, bootstrap_features=True,
+                                                             max_samples=30)
 
+        sb_clf_3 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_3,
+                                                             triple_barrier_events=self.meta_labeled_events,
+                                                             price_bars=self.data)
+        sb_clf_1.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)),)
+        sb_clf_2.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
+        sb_clf_3.fit(self.X_train, self.y_train_clf)
 
+    def test_value_error_raise(self):
+        """
+        Test various values error raise
+        """
+
+        with self.assertRaises(ValueError):
+            clf = KNeighborsClassifier()
+            bagging_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
+                                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                                  price_bars=self.data)
+            bagging_clf.fit(self.X_train, self.y_train_clf,
+                                          sample_weight=np.ones((self.X_train.shape[0],)), )
 
     def test_sb_classifier(self):
         """

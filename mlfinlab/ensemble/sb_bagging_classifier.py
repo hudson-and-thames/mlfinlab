@@ -105,12 +105,9 @@ def _parallel_build_estimators(n_estimators, ensemble, X, y, ind_mat, sample_wei
             else:
                 curr_sample_weight = sample_weight.copy()
 
-            if bootstrap:
-                sample_counts = np.bincount(indices, minlength=n_samples)
-                curr_sample_weight *= sample_counts
-            else:
-                not_indices_mask = ~indices_to_mask(indices, n_samples)
-                curr_sample_weight[not_indices_mask] = 0
+            sample_counts = np.bincount(indices, minlength=n_samples)
+            curr_sample_weight *= sample_counts
+
 
             estimator.fit(X[:, features], y, sample_weight=curr_sample_weight)
 
