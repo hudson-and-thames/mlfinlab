@@ -115,7 +115,7 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
                                                                               random_state=1, bootstrap_features=True,
                                                                               max_samples=30, verbose=2)
 
-        sb_clf_2 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_2, max_features=0.2,
+        sb_clf_2 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_2, max_features=7,
                                                              n_estimators=100,
                                                              triple_barrier_events=self.meta_labeled_events,
                                                              price_bars=self.data, oob_score=True,
@@ -133,14 +133,37 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         """
         Test various values error raise
         """
+        clf = KNeighborsClassifier()
+        bagging_clf_1 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
+                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  price_bars=self.data)
+        bagging_clf_2 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
+                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  price_bars=self.data, max_samples=2000000)
+        bagging_clf_3 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
+                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  price_bars=self.data, max_features='20')
+        bagging_clf_4 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
+                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  price_bars=self.data, max_features=2000000)
+        bagging_clf_5 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
+                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  price_bars=self.data, oob_score=True, warm_start=True)
 
         with self.assertRaises(ValueError):
-            clf = KNeighborsClassifier()
-            bagging_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                                  triple_barrier_events=self.meta_labeled_events,
-                                                                                  price_bars=self.data)
-            bagging_clf.fit(self.X_train, self.y_train_clf,
-                                          sample_weight=np.ones((self.X_train.shape[0],)), )
+            bagging_clf_1.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
+        with self.assertRaises(ValueError):
+            bagging_clf_2.fit(self.X_train, self.y_train_clf,
+                              sample_weight=np.ones((self.X_train.shape[0],)), )
+        with self.assertRaises(ValueError):
+            bagging_clf_3.fit(self.X_train, self.y_train_clf,
+                              sample_weight=np.ones((self.X_train.shape[0],)), )
+        with self.assertRaises(ValueError):
+            bagging_clf_4.fit(self.X_train, self.y_train_clf,
+                              sample_weight=np.ones((self.X_train.shape[0],)), )
+        with self.assertRaises(ValueError):
+            bagging_clf_5.fit(self.X_train, self.y_train_clf,
+                              sample_weight=np.ones((self.X_train.shape[0],)), )
 
     def test_sb_classifier(self):
         """

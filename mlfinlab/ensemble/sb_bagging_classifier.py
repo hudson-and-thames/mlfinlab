@@ -257,11 +257,6 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         # Store validated integer feature sampling value
         self._max_features = max_features
 
-        # Other checks
-        if not self.bootstrap and self.oob_score:
-            raise ValueError("Out of bag estimation only available"
-                             " if bootstrap=True")
-
         if self.warm_start and self.oob_score:
             raise ValueError("Out of bag estimate only available"
                              " if warm_start=False")
