@@ -34,7 +34,7 @@ def feature_importance_mean_imp_reduction(clf, feature_names):
 
 def feature_importance_mean_decrease_accuracy(clf, X, y, triple_barrier_events, n_splits=3, sample_weight=None,
                                               pct_embargo=0.,
-                                              scoring='neg_log_loss'):
+                                              scoring='accuracy'):
     """
     Snippet 8.3, page 116-117. MDA Feature Importance
 
@@ -92,7 +92,7 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, triple_barrier_events, 
     return imp
 
 
-def feature_importance_sfi(clf, X, y, sample_weight=None, scoring='neg_log_loss', cv_gen=None):
+def feature_importance_sfi(clf, X, y, sample_weight=None, scoring='accuracy', cv_gen=None):
     feature_names = X.columns
     if sample_weight is None:
         sample_weight = np.ones((X.shape[0],))

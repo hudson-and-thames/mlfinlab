@@ -116,5 +116,5 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         triple_barrier_events = self.meta_labeled_events.loc[self.X_train.index, :]
         #imp, mean = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf, triple_barrier_events, n_splits=3)
         cv_gen = PurgedKFold(n_splits=4, info_sets=triple_barrier_events.t1)
-        imp = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf, cv_gen=cv_gen)
+        imp = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf, cv_gen=cv_gen, scoring='accuracy')
         print(imp)
