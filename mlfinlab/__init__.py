@@ -3,6 +3,7 @@ Package based on the text book: Advances in Financial Machine Learning, by Marco
 """
 
 import mlfinlab.data_structures as data_structures
+import mlfinlab.multi_product as multi_product
 import mlfinlab.filters.filters as filters
 import mlfinlab.labeling.labeling as labeling
 import mlfinlab.features.fracdiff as fracdiff

@@ -2,3 +2,4 @@
 __pycache__
 test_reports
 .coverage
+.DS_Store

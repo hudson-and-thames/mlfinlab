@@ -5,7 +5,7 @@ Logic regarding return and time decay attribution for sample weights from chapte
 import numpy as np
 import pandas as pd
 
-from mlfinlab.sampling.concurrent import num_concurrent_events, get_av_uniqueness_from_tripple_barrier
+from mlfinlab.sampling.concurrent import num_concurrent_events, get_av_uniqueness_from_triple_barrier
 from mlfinlab.util.multiprocess import mp_pandas_obj
 
 
@@ -76,7 +76,7 @@ def get_weights_by_time_decay(triple_barrier_events, close_series, num_threads=5
 
     # Apply piecewise-linear decay to observed uniqueness
     # Newest observation gets weight=1, oldest observation gets weight=decay
-    av_uniqueness = get_av_uniqueness_from_tripple_barrier(triple_barrier_events, close_series, num_threads)
+    av_uniqueness = get_av_uniqueness_from_triple_barrier(triple_barrier_events, close_series, num_threads)
     decay_w = av_uniqueness['tW'].sort_index().cumsum()
     if decay >= 0:
         slope = (1 - decay) / decay_w.iloc[-1]

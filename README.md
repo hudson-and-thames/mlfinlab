@@ -9,12 +9,15 @@
 ![pylint Score](https://mperlet.github.io/pybadge/badges/10.svg)
 [![License: BSD3](https://img.shields.io/github/license/hudson-and-thames/mlfinlab.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
+[![Documentation Status](https://readthedocs.org/projects/mlfinlab/badge/?version=latest)](https://mlfinlab.readthedocs.io/en/latest/?badge=latest)
 [![PyPi](https://img.shields.io/pypi/v/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
 [![Downloads](https://img.shields.io/pypi/dm/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
 [![Python](https://img.shields.io/pypi/pyversions/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
 
 MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
-Advances in Financial Machine Learning. This implementation started out as a spring board for a research project in the [Masters in Financial Engineering programme at WorldQuant University](https://wqu.org/) and has grown into a mini research group called Hudson and Thames (not affiliated with the university).
+Advances in Financial Machine Learning. This implementation started out as a spring board for a research project in the [Masters in Financial Engineering programme at WorldQuant University](https://wqu.org/) and has grown into a mini research group called [Hudson and Thames Quantitative Research](https://hudsonthames.org/) (not affiliated with the university).
+
+The following is the online documentation for the package: [read-the-docs](https://mlfinlab.readthedocs.io/en/latest/#).
 
 ## Barriers to Entry
 As most of you know, getting through the first 3 chapters of the book is challenging as it relies on HFT data to 
@@ -39,16 +42,19 @@ You should be able to work on a few implementations of the code with this set.
 ## Notes
 
 Part 3: Backtesting
-* Working on Chapter 10 (Lee)
+* Working on Chapter 16: Asset Allocation (Aditya)
+* Working on Chapter 10: Bet Sizing (Lee)
 
 Part 2: Modelling
-* Working on Chapter 7 (Mihai)
+* Working on Chapter 7: Cross-Validation (Mihai)
+* Done Chapter 6: Ensemble Methods
+* Adding Sequential Bootstrap Ensemble method (Alex)
 
 Part 1: Data Analysis
-* Done Chapter 5
-* Done Chapter 4
-* Done Chapter 3
-* Done Chapter 2
+* Done Chapter 5: Fractional Differentiation
+* Done Chapter 4: Sample Weights
+* Done Chapter 3: Labeling
+* Done Chapter 2: Data Structures
 * Purchased high quality raw tick data.
 * Email us if you would like a sample of the standard bars.
 
@@ -107,9 +113,9 @@ BlackArbsCEO has a great repo based on de Prado's research. It covers many of th
 * [Adv Fin ML Exercises](https://github.com/BlackArbsCEO/Adv_Fin_ML_Exercises)
 
 ## Contact us
-At the moment the project is still rather small and thus I would recommend getting in touch with us over email so that we can further discuss the areas of contribution that interest you the most.
+At the moment the project is still rather small and thus I would recommend getting in touch with us over email so that we can further discuss the areas of contribution that interest you the most. We have a slack channel where we all communicate.
 
-For now you can get hold us at: hudsonthames19@gmail.com
+For now you can get hold us at: reseach@hudsonthames.org
 
 Looking forward to hearing from you!
 
