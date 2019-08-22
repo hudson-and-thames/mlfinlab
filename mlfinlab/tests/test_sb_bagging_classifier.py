@@ -275,8 +275,8 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
                                                           price_bars=self.data, oob_score=True, random_state=1)
 
         sb_reg_70 = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=70,
-                                                          triple_barrier_events=self.meta_labeled_events,
-                                                          price_bars=self.data, oob_score=True, random_state=1)
+                                                             triple_barrier_events=self.meta_labeled_events,
+                                                             price_bars=self.data, oob_score=True, random_state=1)
         sb_reg_1_estimator = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0,
                                                                       n_estimators=1,
                                                                       triple_barrier_events=self.meta_labeled_events,
