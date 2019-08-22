@@ -106,7 +106,7 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
 
         sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=100,
                                                            triple_barrier_events=self.meta_labeled_events,
-                                                           price_bars=self.data, oob_score=True, random_state=1)
+                                                           price_bars=self.data, oob_score=False, random_state=1)
 
         sb_clf.fit(self.X_train, self.y_train_clf)
 
@@ -116,5 +116,5 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         triple_barrier_events = self.meta_labeled_events.loc[self.X_train.index, :]
         #imp, mean = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf, triple_barrier_events, n_splits=3)
         cv_gen = PurgedKFold(n_splits=4, info_sets=triple_barrier_events.t1)
-        imp = feature_importance_sfi(sb_clf, self.X_train, self.y_train_clf, cv_gen=cv_gen, num_threads=8)
+        imp = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf, cv_gen=cv_gen)
         print(imp)
