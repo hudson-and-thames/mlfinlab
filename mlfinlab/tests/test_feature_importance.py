@@ -15,7 +15,7 @@ from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier, get_bins
 from mlfinlab.ensemble.sb_bagging_classifier import SequentiallyBootstrappedBaggingClassifier
 from mlfinlab.feature_importance.importance import feature_importance_mean_imp_reduction
-from mlfinlab.feature_importance.orthogonal import get_pca_analysis, get_orthogonal_features
+from mlfinlab.feature_importance.orthogonal import feature_pca_analysis, get_orthogonal_features
 
 
 # pylint: disable=invalid-name
@@ -109,6 +109,5 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         sb_clf.fit(self.X_train, self.y_train_clf)
 
         mdi_feat_imp = feature_importance_mean_imp_reduction(sb_clf, self.X_train.columns)
-        get_pca_analysis(self.X_train, mdi_feat_imp)
-        get_orthogonal_features(self.X_train)
+        feature_pca_analysis(self.X_train, mdi_feat_imp)
         pass
