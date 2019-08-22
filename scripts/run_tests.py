@@ -1,3 +1,7 @@
+"""
+Helper module used to tun tests
+"""
+
 import unittest
 import xmlrunner
 
