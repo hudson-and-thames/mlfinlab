@@ -1,10 +1,25 @@
+"""
+Module which implements feature importance algorithms described in Chapter 8
+"""
+
+
 import pandas as pd
 import numpy as np
-from sklearn.metrics import log_loss, accuracy_score, f1_score, precision_score, roc_auc_score, recall_score
+from sklearn.metrics import log_loss, accuracy_score
 import matplotlib as mpl
+from mlfinlab.util import mp_pandas_obj
 
 
 def feature_importance_mean_imp_reduction(clf, feature_names):
+    """
+    Snippet 8.2, page 115. MDI Feature importance
+
+    This function generates feature importance from classifiers estimators importance
+    using Mean Impurity Reduction (MDI) algorithm
+    :param clf: (BaggingClassifier, RandomForest or any ensemble sklearn object): trained classifier
+    :param feature_names: (list): array of feature names
+    :return: (pd.DataFrame): individual MDI feature importance
+    """
     # Feature importance based on IS mean impurity reduction
     feature_imp_df = {i: tree.feature_importances_ for i, tree in enumerate(clf.estimators_)}
     feature_imp_df = pd.DataFrame.from_dict(feature_imp_df, orient='index')
@@ -56,10 +71,9 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, cv, sample_weight, t1, 
     return imp, scr0.mean()
 
 
-def feature_importance_sfi(featNames, clf, trnsX, cont, scoring, cvGen):
-    # TODO: parallel
+def _loop_run_feature_importance_sfi(clf, feature_names, trnsX, cont, scoring, cvGen):
     imp = pd.DataFrame(columns=['mean', 'std'])
-    for featName in featNames:
+    for featName in feature_names:
         df0 = cvScore(clf, X=trnsX[[featName]], y=cont['bin'], sample_weight=cont['w'],
                       scoring=scoring, cvGen=cvGen)
     imp.loc[featName, 'mean'] = df0.mean()
@@ -67,7 +81,12 @@ def feature_importance_sfi(featNames, clf, trnsX, cont, scoring, cvGen):
     return imp
 
 
-def plotFeatImportance(pathOut, imp, oob, oos, method, tag=0, simNum=0, **kargs):
+def feature_importance_sfi(clf, feature_names, trnsX, cont, scoring, cvGen, num_threads):
+    return mp_pandas_obj(_loop_run_feature_importance_sfi, ('feature_names', feature_names), num_threads,
+                         clf=clf, trnsX=trnsX, cont=cont, scoring=scoring, cvGen=cvGen)
+
+
+def plot_feature_importance(imp, oob, oos, method, tag=0, simNum=0, savefig=False, output_path=None):
     # plot mean imp bars with std
     mpl.figure(figsize=(10, imp.shape[0] / 5.))
     imp = imp.sort_values('mean', ascending=True)
@@ -82,7 +101,10 @@ def plotFeatImportance(pathOut, imp, oob, oos, method, tag=0, simNum=0, **kargs)
                                                     color='black')
     mpl.title('tag = ' + tag + ' | simNum = ' + str(simNum) + ' | oob = ' + str(round(oob, 4)) +
               ' | oos = ' + str(round(oos, 4)))
-    mpl.savefig(pathOut + 'featImportance_' + str(simNum) + '.png', dpi=100)
-    mpl.clf()
-    mpl.close()
+    if savefig is True:
+        mpl.savefig(output_path + 'featImportance_' + str(simNum) + '.png', dpi=100)
+        mpl.clf()
+        mpl.close()
+    else:
+        mpl.show()
     return
