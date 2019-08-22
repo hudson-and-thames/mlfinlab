@@ -92,19 +92,24 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, triple_barrier_events, 
     return imp
 
 
-def _loop_run_feature_importance_sfi(clf, feature_names, trnsX, cont, scoring, cv_gen):
+def _loop_run_feature_importance_sfi(clf, feature_names, X, y, sample_weight, scoring, cv_gen):
     imp = pd.DataFrame(columns=['mean', 'std'])
     for featName in feature_names:
-        df0 = ml_cross_val_score(clf, X=trnsX[[featName]], y=cont['bin'], sample_weight=cont['w'],
-                                 scoring=scoring, cv_gen=cv_gen, train_sets=None)
-    imp.loc[featName, 'mean'] = df0.mean()
-    imp.loc[featName, 'std'] = df0.std() * df0.shape[0] ** -.5
+        feat_cross_val_scores = ml_cross_val_score(clf, X=X[[featName]], y=y, sample_weight=sample_weight,
+                                                   scoring=scoring, cv_gen=cv_gen)
+    imp.loc[featName, 'mean'] = feat_cross_val_scores.mean()
+    imp.loc[featName, 'std'] = feat_cross_val_scores.std() * feat_cross_val_scores.shape[0] ** -.5
     return imp
 
 
-def feature_importance_sfi(clf, feature_names, trnsX, cont, scoring, cvGen, num_threads):
+def feature_importance_sfi(clf, X, y, sample_weight=None,
+                           scoring='neg_log_loss', cv_gen=None, num_threads=1):
+    feature_names = X.columns
+    if sample_weight is None:
+        sample_weight = np.ones((X.shape[0],))
+
     return mp_pandas_obj(_loop_run_feature_importance_sfi, ('feature_names', feature_names), num_threads,
-                         clf=clf, trnsX=trnsX, cont=cont, scoring=scoring, cvGen=cvGen)
+                         clf=clf, X=X, y=y, scoring=scoring, cv_gen=cv_gen, sample_weight=sample_weight)
 
 
 def plot_feature_importance(imp, oob, oos, method, tag=0, simNum=0, savefig=False, output_path=None):

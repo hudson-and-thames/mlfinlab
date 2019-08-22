@@ -79,7 +79,7 @@ class PurgedKFold(KFold):
 
 
 # noinspection PyPep8Naming
-def ml_cross_val_score(classifier, X, y, sample_weight, scoring='neg_log_loss', info_sets=None, n_splits=None, cv_gen=None, pct_embargo=None):
+def ml_cross_val_score(classifier, X, y, sample_weight, scoring='neg_log_loss', cv_gen=None):
     # pylint: disable=invalid-name
     """
     Function to run a cross-validation evaluation of the using sample weights and a custom CV generator
@@ -88,26 +88,19 @@ def ml_cross_val_score(classifier, X, y, sample_weight, scoring='neg_log_loss', 
     :param y: The labels corresponding to the X dataset
     :param sample_weight: A numpy array of weights for each record in the dataset
     :param scoring: A metric name to use for scoring; currently supports `neg_log_loss` and `accuracy`
-    :param info_sets:
-        —info_sets.index: Time when the information extraction started.
-        —info_sets.value: Time when the information extraction ended.
-    :param n_splits: Number of splits
     :param cv_gen: Cross Validation generator object instance; if None then PurgedKFold will be used
-    :param pct_embargo: Embargo percentage [0, 1]
     :return: The computed score
     """
     if scoring not in ['neg_log_loss', 'accuracy']:
         raise ValueError('wrong scoring method.')
-    if cv_gen is None:
-        cv_gen = PurgedKFold(n_splits=n_splits, info_sets=info_sets, pct_embargo=pct_embargo)
     ret_scores = []
     for train, test in cv_gen.split(X=X):
-        fit = classifier.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight.iloc[train].values)
+        fit = classifier.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight[train])
         if scoring == 'neg_log_loss':
             prob = fit.predict_proba(X.iloc[test, :])
-            score = -1*log_loss(y.iloc[test], prob, sample_weight=sample_weight.iloc[test].values, labels=classifier.classes_)
+            score = -1*log_loss(y.iloc[test], prob, sample_weight=sample_weight[test], labels=classifier.classes_)
         else:
             pred = fit.predict(X.iloc[test, :])
-            score = accuracy_score(y.iloc[test], pred, sample_weight=sample_weight.iloc[test].values)
+            score = accuracy_score(y.iloc[test], pred, sample_weight=sample_weight[test])
         ret_scores.append(score)
     return np.array(ret_scores)
