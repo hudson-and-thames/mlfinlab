@@ -2,12 +2,12 @@
 Module which implements feature importance algorithms described in Chapter 8
 """
 
-
 import pandas as pd
 import numpy as np
 from sklearn.metrics import log_loss, accuracy_score
 import matplotlib as mpl
 from mlfinlab.util import mp_pandas_obj
+from mlfinlab.cross_validation.cross_validation import PurgedKFold, ml_cross_val_score
 
 
 def feature_importance_mean_imp_reduction(clf, feature_names):
@@ -16,6 +16,7 @@ def feature_importance_mean_imp_reduction(clf, feature_names):
 
     This function generates feature importance from classifiers estimators importance
     using Mean Impurity Reduction (MDI) algorithm
+
     :param clf: (BaggingClassifier, RandomForest or any ensemble sklearn object): trained classifier
     :param feature_names: (list): array of feature names
     :return: (pd.DataFrame): individual MDI feature importance
@@ -31,51 +32,71 @@ def feature_importance_mean_imp_reduction(clf, feature_names):
     return imp
 
 
-def feature_importance_mean_decrease_accuracy(clf, X, y, cv, sample_weight, t1, pctEmbargo, scoring='neg_log_loss'):
+def feature_importance_mean_decrease_accuracy(clf, X, y, triple_barrier_events, n_splits=3, sample_weight=None,
+                                              pct_embargo=0.,
+                                              scoring='neg_log_loss'):
+    """
+    Snippet 8.3, page 116-117. MDA Feature Importance
+
+    :param clf: (BaggingClassifier, RandomForest or any ensemble sklearn object): trained classifier
+    :param X: (pd.DataFrame): train set features
+    :param y: (pd.DataFrame, np.array): train set labels
+    :param triple_barrier_events: (pd.Series): Triple-Barrier-Events used to sample training set (t1 and index is needed)
+    :param n_splits: (int): the number of splits, default to 3
+    :param sample_weight: (np.array): sample weights, if None equal to ones
+    :param pct_embargo: (float): percent that determines the embargo size
+    :param scoring: (str): scoring function used to determine importance, either 'neg_log_loss' or 'accuracy'
+    :return: (pd.DataFrame): mean and std feature importance
+    """
     # Feature importance based on OOS score reduction
     if scoring not in ['neg_log_loss', 'accuracy']:
-        raise Exception('wrong scoring method.')
+        raise ValueError('wrong scoring method.')
 
-    cross_validator = PurgedKFold(n_splits=cv, t1=t1, pctEmbargo=pctEmbargo)  # Purged cv
-    scr0, scr1 = pd.Series(), pd.DataFrame(columns=X.columns)
+    if sample_weight is None:
+        sample_weight = np.ones((X.shape[0],))
 
-    for i, (train, test) in enumerate(cross_validator.split(X=X)):
-        X0, y0, w0 = X.iloc[train, :], y.iloc[train], sample_weight.iloc[train]
-        X1, y1, w1 = X.iloc[test, :], y.iloc[test], sample_weight.iloc[test]
-        fit = clf.fit(X=X0, y=y0, sample_weight=w0.values)
+    cv_gen = PurgedKFold(n_splits=n_splits, info_sets=triple_barrier_events.t1, pct_embargo=pct_embargo)  # Purged cv
+    fold_metrics_values, features_metrics_values = pd.Series(), pd.DataFrame(columns=X.columns)
+
+    for i, (train, test) in enumerate(cv_gen.split(X=X)):
+        X0, y0, w0 = X.iloc[train, :], y.iloc[train], sample_weight[train]
+        X1, y1, w1 = X.iloc[test, :], y.iloc[test], sample_weight[test]
+        fit = clf.fit(X=X0, y=y0, sample_weight=w0)
         pred = fit.predict(X1)
+
+        # Get overall metrics value on out-of-sample fold
         if scoring == 'neg_log_loss':
             prob = fit.predict_proba(X1)
-            scr0.loc[i] = -log_loss(y1, prob, sample_weight=w1.values,
-                                    labels=clf.classes_)
+            fold_metrics_values.loc[i] = -log_loss(y1, prob, sample_weight=w1,
+                                                   labels=clf.classes_)
         elif scoring == 'accuracy_score':
-            scr0.loc[i] = accuracy_score(y1, pred, sample_weight=w1.values)
+            fold_metrics_values.loc[i] = accuracy_score(y1, pred, sample_weight=w1)
 
+        # Get feature specific metric on out-of-sample fold
         for j in X.columns:
             X1_ = X1.copy(deep=True)
-            np.random.shuffle(X1_[j].values)  # permutation of a single column
+            np.random.shuffle(X1_[j].values)  # Permutation of a single column
             if scoring == 'neg_log_loss':
                 prob = fit.predict_proba(X1_)
-                scr1.loc[i, j] = -log_loss(y1, prob, sample_weight=w1.values,
-                                           labels=clf.classes_)
+                features_metrics_values.loc[i, j] = -log_loss(y1, prob, sample_weight=w1, labels=clf.classes_)
             else:
                 pred = fit.predict(X1_)
-                scr1.loc[i, j] = accuracy_score(y1, pred, sample_weight=w1.values)
+                features_metrics_values.loc[i, j] = accuracy_score(y1, pred, sample_weight=w1)
 
-    imp = (-scr1).add(scr0, axis=0)
+    imp = (-features_metrics_values).add(fold_metrics_values, axis=0)
     if scoring == 'neg_log_loss':
-        imp = imp / -scr1
+        imp = imp / -features_metrics_values
     else:
-        imp = imp / (1. - scr1)
+        imp = imp / (1. - features_metrics_values)
     imp = pd.concat({'mean': imp.mean(), 'std': imp.std() * imp.shape[0] ** -.5}, axis=1)
-    return imp, scr0.mean()
+    return imp
 
 
-def _loop_run_feature_importance_sfi(clf, feature_names, trnsX, cont, scoring, cvGen):
+def _loop_run_feature_importance_sfi(clf, feature_names, trnsX, cont, scoring, cv_gen):
     imp = pd.DataFrame(columns=['mean', 'std'])
     for featName in feature_names:
-        df0 = cvScore(clf, X=trnsX[[featName]], y=cont['bin'], sample_weight=cont['w'],
-                      scoring=scoring, cvGen=cvGen)
+        df0 = ml_cross_val_score(clf, X=trnsX[[featName]], y=cont['bin'], sample_weight=cont['w'],
+                                 scoring=scoring, cv_gen=cv_gen, train_sets=None)
     imp.loc[featName, 'mean'] = df0.mean()
     imp.loc[featName, 'std'] = df0.std() * df0.shape[0] ** -.5
     return imp
@@ -87,7 +108,7 @@ def feature_importance_sfi(clf, feature_names, trnsX, cont, scoring, cvGen, num_
 
 
 def plot_feature_importance(imp, oob, oos, method, tag=0, simNum=0, savefig=False, output_path=None):
-    # plot mean imp bars with std
+    # Plot mean imp bars with std
     mpl.figure(figsize=(10, imp.shape[0] / 5.))
     imp = imp.sort_values('mean', ascending=True)
     ax = imp['mean'].plot(kind='barh', color='b', alpha=.25, xerr=imp['std'],

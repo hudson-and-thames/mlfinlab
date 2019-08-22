@@ -14,7 +14,8 @@ from mlfinlab.util.utils import get_daily_vol
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier, get_bins
 from mlfinlab.ensemble.sb_bagging_classifier import SequentiallyBootstrappedBaggingClassifier
-from mlfinlab.feature_importance.importance import feature_importance_mean_imp_reduction
+from mlfinlab.feature_importance.importance import feature_importance_mean_imp_reduction, \
+    feature_importance_mean_decrease_accuracy
 from mlfinlab.feature_importance.orthogonal import feature_pca_analysis, get_orthogonal_features
 
 
@@ -110,4 +111,7 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
 
         mdi_feat_imp = feature_importance_mean_imp_reduction(sb_clf, self.X_train.columns)
         feature_pca_analysis(self.X_train, mdi_feat_imp)
-        pass
+
+        triple_barrier_events = self.meta_labeled_events.loc[self.X_train.index, :]
+        imp, mean = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf, triple_barrier_events, n_splits=3)
+        print()
