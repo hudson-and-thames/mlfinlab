@@ -61,13 +61,16 @@ class TestCUSUMFilter(unittest.TestCase):
         self.assertTrue(cusum_events.shape[0] == 9)
 
     def test_z_score_filter(self):
+        """
+        Test Z-score filter
+        """
         z_score_events = z_score_filter(self.data['close'], 100, 100, 2, time_stamps=True)
         z_score_events_timestamp_false = z_score_filter(self.data['close'], 100, 100, 2, time_stamps=False)
 
         self.assertTrue(z_score_events.shape[0] == 68)
         self.assertTrue(z_score_events.shape[0] == z_score_events_timestamp_false.shape[0])
-        self.assertEquals(self.data.loc[z_score_events[0], 'close'], 2037.25)
-        self.assertEquals(self.data.loc[z_score_events[25], 'close'], 2009.5)
+        self.assertEqual(self.data.loc[z_score_events[0], 'close'], 2037.25)
+        self.assertEqual(self.data.loc[z_score_events[25], 'close'], 2009.5)
 
 
 
