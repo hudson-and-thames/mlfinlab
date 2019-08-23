@@ -41,7 +41,7 @@ def cusum_filter(raw_time_series, threshold, time_stamps=True):
     raw_time_series = pd.DataFrame(raw_time_series)  # Convert to DataFrame
     raw_time_series.columns = ['price']
     raw_time_series['log_ret'] = raw_time_series.price.apply(np.log).diff()
-    if isinstance(threshold, float) or isinstance(threshold, int):
+    if isinstance(threshold, (float, int)):
         raw_time_series['threshold'] = threshold
     elif isinstance(threshold, pd.Series):
         raw_time_series.loc[threshold.index, 'threshold'] = threshold
