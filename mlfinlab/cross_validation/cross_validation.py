@@ -39,17 +39,18 @@ class PurgedKFold(KFold):
     Test set is assumed contiguous (shuffle=False), w/o training samples in between
     """
 
-    def __init__(self, n_splits=3, info_sets=None, pct_embargo=0.):
+    def __init__(self, n_splits=3, info_sets=None, pct_embargo=0., random_state=None):
         """
         :param n_splits: The number of splits. Default to 3
         :param info_sets:
             —info_sets.index: Time when the information extraction started.
             —info_sets.value: Time when the information extraction ended.
         :param pct_embargo: Percent that determines the embargo size.
+        :param random_state: (int or RandomState): random state
         """
         if not isinstance(info_sets, pd.Series):
             raise ValueError('The info_sets param must be a pd.Series')
-        super(PurgedKFold, self).__init__(n_splits, shuffle=False, random_state=None)
+        super(PurgedKFold, self).__init__(n_splits, shuffle=False, random_state=random_state)
 
         self.info_sets = info_sets
         self.pct_embargo = pct_embargo

@@ -130,7 +130,7 @@ def plot_feature_importance(imp, oob_score, oos_score, savefig=False, output_pat
     plt.figure(figsize=(20, 10))
     imp.sort_values('mean', ascending=True, inplace=True)
     imp['mean'].plot(kind='barh', color='b', alpha=0.25, xerr=imp['std'], error_kw={'ecolor': 'r'})
-    plt.title('Feature importance. OOB Score:{}; OOS score:{}'.format(round(oob_score,4), round(oos_score,4)))
+    plt.title('Feature importance. OOB Score:{}; OOS score:{}'.format(round(oob_score, 4), round(oos_score, 4)))
     if savefig is True:
         plt.savefig(output_path)
     else:
