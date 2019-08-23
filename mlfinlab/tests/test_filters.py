@@ -71,6 +71,3 @@ class TestCUSUMFilter(unittest.TestCase):
         self.assertTrue(z_score_events.shape[0] == z_score_events_timestamp_false.shape[0])
         self.assertEqual(self.data.loc[z_score_events[0], 'close'], 2037.25)
         self.assertEqual(self.data.loc[z_score_events[25], 'close'], 2009.5)
-
-
-
