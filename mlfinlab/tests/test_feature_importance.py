@@ -1,5 +1,5 @@
 """
-Test various functions regarding chapter 4: Sampling (Bootstrapping, Concurrency).
+Test various functions regarding chapter 8: MDI, MDA, SFI importance.
 """
 
 import os
@@ -135,28 +135,21 @@ class TestFeatureImportance(unittest.TestCase):
         """
         Test features importance: MDI, MDA, SFI and plot function
         """
-        clf = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
-                                     class_weight='balanced_subsample')
-
-        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=100,
-                                                           triple_barrier_events=self.meta_labeled_events,
-                                                           price_bars=self.data, oob_score=False, random_state=1)
-        sb_clf.fit(self.X_train, self.y_train_clf)
-
-        triple_barrier_events = self.meta_labeled_events.loc[self.X_train.index, :]
-        cv_gen = PurgedKFold(n_splits=4, info_sets=triple_barrier_events.t1, random_state=1)
+        sb_clf, cv_gen = self._prepare_clf_data_set(oob_score=False)
 
         # MDI feature importance
         mdi_feat_imp = feature_importance_mean_imp_reduction(sb_clf, self.X_train.columns)
 
         # MDA feature importance
         mda_feat_imp_log_loss = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
-                                                                          cv_gen)
+                                                                          cv_gen,
+                                                                          sample_weight=np.ones(
+                                                                              (self.X_train.shape[0],)))
         mda_feat_imp_accuracy = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
                                                                           cv_gen, scoring='accuracy')
         # SFI feature importance
         sfi_feat_imp_log_loss = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
-                                                       cv_gen=cv_gen)
+                                                       cv_gen=cv_gen, sample_weight=np.ones((self.X_train.shape[0],)))
         sfi_feat_imp_accuracy = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
                                                        cv_gen=cv_gen, scoring='accuracy')
 
@@ -192,16 +185,7 @@ class TestFeatureImportance(unittest.TestCase):
         Test plot_feature_importance function
         """
 
-        clf = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
-                                     class_weight='balanced_subsample')
-
-        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=100,
-                                                           triple_barrier_events=self.meta_labeled_events,
-                                                           price_bars=self.data, oob_score=True, random_state=1)
-        sb_clf.fit(self.X_train, self.y_train_clf)
-
-        triple_barrier_events = self.meta_labeled_events.loc[self.X_train.index, :]
-        cv_gen = PurgedKFold(n_splits=4, info_sets=triple_barrier_events.t1)
+        sb_clf, cv_gen = self._prepare_clf_data_set(oob_score=True)
         oos_score = ml_cross_val_score(sb_clf, self.X_train, self.y_train_clf, cv_gen=cv_gen, sample_weight=None,
                                        scoring='accuracy').mean()
 
@@ -211,3 +195,35 @@ class TestFeatureImportance(unittest.TestCase):
                                 savefig=True, output_path='test.png')
 
         os.remove('test.png')
+
+    def _prepare_clf_data_set(self, oob_score):
+        """
+        Helper function for preparing data sets for feature importance
+
+        :param oob_score: (bool): bool flag for oob_score in classifier
+        """
+        clf = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
+                                     class_weight='balanced_subsample')
+
+        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=100,
+                                                           triple_barrier_events=self.meta_labeled_events,
+                                                           price_bars=self.data, oob_score=oob_score, random_state=1)
+        sb_clf.fit(self.X_train, self.y_train_clf)
+
+        triple_barrier_events = self.meta_labeled_events.loc[self.X_train.index, :]
+        cv_gen = PurgedKFold(n_splits=4, info_sets=triple_barrier_events.t1, random_state=1)
+        return sb_clf, cv_gen
+
+    def test_raise_value_error(self):
+        """
+        Test ValueError raise in MDA, SFI
+        """
+        sb_clf, cv_gen = self._prepare_clf_data_set(oob_score=False)
+
+        with self.assertRaises(ValueError):
+            feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
+                                                      cv_gen, sample_weight=np.ones((self.X_train.shape[0],)),
+                                                      scoring='roc')
+        with self.assertRaises(ValueError):
+            feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
+                                   cv_gen=cv_gen, sample_weight=np.ones((self.X_train.shape[0],)), scoring='roc')

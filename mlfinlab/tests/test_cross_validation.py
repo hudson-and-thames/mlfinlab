@@ -373,8 +373,7 @@ class TestCrossValidation(unittest.TestCase):
         Test the ml_cross_val_score function with an artificial dataset
         :return:
         """
-        infosets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
-        cv_gen = PurgedKFold(info_sets=infosets, n_splits=3, pct_embargo=0.01)
+        _, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
         scores = ml_cross_val_score(
             classifier=decision_tree,
             X=records,

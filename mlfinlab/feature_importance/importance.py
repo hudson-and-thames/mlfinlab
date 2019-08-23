@@ -64,7 +64,7 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, cv_gen, sample_weight=N
             prob = fit.predict_proba(X.iloc[test, :])
             fold_metrics_values.loc[i] = -log_loss(y.iloc[test], prob, sample_weight=sample_weight[test],
                                                    labels=clf.classes_)
-        elif scoring == 'accuracy':
+        else:
             fold_metrics_values.loc[i] = accuracy_score(y.iloc[test], pred, sample_weight=sample_weight[test])
 
         # Get feature specific metric on out-of-sample fold
