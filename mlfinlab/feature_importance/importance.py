@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import log_loss, accuracy_score
 import matplotlib.pyplot as plt
-from mlfinlab.cross_validation.cross_validation import PurgedKFold, ml_cross_val_score
+from mlfinlab.cross_validation.cross_validation import ml_cross_val_score
 
 
 # pylint: disable=invalid-name
@@ -34,19 +34,15 @@ def feature_importance_mean_imp_reduction(clf, feature_names):
     return imp
 
 
-def feature_importance_mean_decrease_accuracy(clf, X, y, triple_barrier_events, n_splits=3, sample_weight=None,
-                                              pct_embargo=0.,
-                                              scoring='neg_log_loss'):
+def feature_importance_mean_decrease_accuracy(clf, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss'):
     """
     Snippet 8.3, page 116-117. MDA Feature Importance
 
     :param clf: (BaggingClassifier, RandomForest or any ensemble sklearn object): trained classifier
     :param X: (pd.DataFrame): train set features
     :param y: (pd.DataFrame, np.array): train set labels
-    :param triple_barrier_events: (pd.Series): Triple-Barrier-Events used to sample training set (t1 and index is needed)
-    :param n_splits: (int): the number of splits, default to 3
+    :param cv_gen: (PurgedKFold): cross-validation object
     :param sample_weight: (np.array): sample weights, if None equal to ones
-    :param pct_embargo: (float): percent that determines the embargo size
     :param scoring: (str): scoring function used to determine importance, either 'neg_log_loss' or 'accuracy'
     :return: (pd.DataFrame): mean and std feature importance
     """
@@ -57,7 +53,6 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, triple_barrier_events, 
     if sample_weight is None:
         sample_weight = np.ones((X.shape[0],))
 
-    cv_gen = PurgedKFold(n_splits=n_splits, info_sets=triple_barrier_events.t1, pct_embargo=pct_embargo)  # Purged cv
     fold_metrics_values, features_metrics_values = pd.Series(), pd.DataFrame(columns=X.columns)
 
     for i, (train, test) in enumerate(cv_gen.split(X=X)):
@@ -69,7 +64,7 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, triple_barrier_events, 
             prob = fit.predict_proba(X.iloc[test, :])
             fold_metrics_values.loc[i] = -log_loss(y.iloc[test], prob, sample_weight=sample_weight[test],
                                                    labels=clf.classes_)
-        elif scoring == 'accuracy_score':
+        elif scoring == 'accuracy':
             fold_metrics_values.loc[i] = accuracy_score(y.iloc[test], pred, sample_weight=sample_weight[test])
 
         # Get feature specific metric on out-of-sample fold
@@ -94,7 +89,7 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, triple_barrier_events, 
     return imp
 
 
-def feature_importance_sfi(clf, X, y, sample_weight=None, scoring='neg_log_loss', cv_gen=None):
+def feature_importance_sfi(clf, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss'):
     """
     Snippet 8.4, page 118. Implementation of SFI
 
@@ -102,9 +97,9 @@ def feature_importance_sfi(clf, X, y, sample_weight=None, scoring='neg_log_loss'
     :param clf: (sklearn.ClassifierMixin): any sklearn classifier
     :param X: (pd.DataFrame): train set features
     :param y: (pd.DataFrame, np.array): train set labels
+    :param cv_gen: (PurgedKFold): cross-validation object
     :param sample_weight: (np.array): sample weights, if None equal to ones
     :param scoring: (str): scoring function used to determine importance, either 'neg_log_loss' or 'accuracy'
-    :param cv_gen: (PurgedKFold): cross-validation object
     :return: (pd.DataFrame): mean and std feature importance
     """
     feature_names = X.columns
@@ -133,8 +128,9 @@ def plot_feature_importance(imp, oob_score, oos_score, savefig=False, output_pat
     """
     # Plot mean imp bars with std
     plt.figure(figsize=(20, 10))
+    imp.sort_values('mean', ascending=True, inplace=True)
     imp['mean'].plot(kind='barh', color='b', alpha=0.25, xerr=imp['std'], error_kw={'ecolor': 'r'})
-    plt.title('Feature importance. OOB Score:{}; OOS score:{}'.format(oob_score, oos_score))
+    plt.title('Feature importance. OOB Score:{}; OOS score:{}'.format(round(oob_score,4), round(oos_score,4)))
     if savefig is True:
         plt.savefig(output_path)
     else:

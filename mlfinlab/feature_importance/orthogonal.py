@@ -104,6 +104,6 @@ def feature_pca_analysis(feature_df, feature_importance, variance_thresh=0.95):
     # Get Rank based weighted Tau correlation
     feature_pca_rank = (eigen_val * eigen_vec).abs().sum(axis=1).rank(
         ascending=False)  # Sum of absolute values across all eigen vectors
-    corr_dict['Weighed_Kendall'] = get_pca_rank_weighted_kendall_tau(feature_importance['mean'].values,
-                                                                     feature_pca_rank.values)
+    corr_dict['Weighted_Kendall_Rank'] = get_pca_rank_weighted_kendall_tau(feature_importance['mean'].values,
+                                                                           feature_pca_rank.values)
     return corr_dict

@@ -79,20 +79,23 @@ class PurgedKFold(KFold):
 
 
 # noinspection PyPep8Naming
-def ml_cross_val_score(classifier, X, y, sample_weight, scoring='neg_log_loss', cv_gen=None):
+def ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss', ):
     # pylint: disable=invalid-name
     """
     Function to run a cross-validation evaluation of the using sample weights and a custom CV generator
     :param classifier: A sk-learn Classifier object instance
     :param X: The dataset of records to evaluate
     :param y: The labels corresponding to the X dataset
+    :param cv_gen: Cross Validation generator object instance; if None then PurgedKFold will be used
     :param sample_weight: A numpy array of weights for each record in the dataset
     :param scoring: A metric name to use for scoring; currently supports `neg_log_loss` and `accuracy`
-    :param cv_gen: Cross Validation generator object instance; if None then PurgedKFold will be used
     :return: The computed score
     """
     if scoring not in ['neg_log_loss', 'accuracy']:
         raise ValueError('wrong scoring method.')
+
+    if sample_weight is None:
+        sample_weight = np.ones((X.shape[0],))
     ret_scores = []
     for train, test in cv_gen.split(X=X):
         fit = classifier.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight[train])

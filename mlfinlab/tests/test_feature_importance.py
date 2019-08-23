@@ -14,10 +14,11 @@ from mlfinlab.util.utils import get_daily_vol
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier, get_bins
 from mlfinlab.ensemble.sb_bagging_classifier import SequentiallyBootstrappedBaggingClassifier
-from mlfinlab.feature_importance.importance import feature_importance_mean_imp_reduction, \
-    feature_importance_mean_decrease_accuracy, feature_importance_sfi
+from mlfinlab.feature_importance.importance import (feature_importance_mean_imp_reduction,
+                                                    feature_importance_mean_decrease_accuracy, feature_importance_sfi,
+                                                    plot_feature_importance)
 from mlfinlab.feature_importance.orthogonal import feature_pca_analysis, get_orthogonal_features
-from mlfinlab.cross_validation.cross_validation import PurgedKFold
+from mlfinlab.cross_validation.cross_validation import PurgedKFold, ml_cross_val_score
 
 
 # pylint: disable=invalid-name
@@ -95,9 +96,9 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         self.X_train, self.y_train_clf, = X.iloc[:300][features], labels.iloc[:300].bin
         self.X_test, self.y_test_clf = X.iloc[300:][features], labels.iloc[300:].bin
 
-    def test_sb_classifier(self):
+    def test_orthogonal_features(self):
         """
-        Test Sequentially Bootstrapped Bagging Classifier
+        Test orthogonal features: PCA features, importance vs PCA importance analysis
         """
 
         # Init classifiers
@@ -108,13 +109,106 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
                                                            triple_barrier_events=self.meta_labeled_events,
                                                            price_bars=self.data, oob_score=False, random_state=1)
 
+        pca_features = get_orthogonal_features(self.X_train)
+
+        # PCA features should have mean of 0
+        self.assertAlmostEqual(np.mean(pca_features[:, 2]), 0, delta=1e-7)
+        self.assertAlmostEqual(np.mean(pca_features[:, 5]), 0, delta=1e-7)
+        self.assertAlmostEqual(np.mean(pca_features[:, 6]), 0, delta=1e-7)
+
+        # Check particular PCA values std
+        self.assertAlmostEqual(np.std(pca_features[:, 1]), 1.862, delta=1e-3)
+        self.assertAlmostEqual(np.std(pca_features[:, 3]), 0.987, delta=1e-3)
+        self.assertAlmostEqual(np.std(pca_features[:, 4]), 0.954, delta=1e-3)
+
+        sb_clf.fit(self.X_train, self.y_train_clf)
+        mdi_feat_imp = feature_importance_mean_imp_reduction(sb_clf, self.X_train.columns)
+        pca_corr_res = feature_pca_analysis(self.X_train, mdi_feat_imp)
+
+        # Check correlation metrics results
+        self.assertAlmostEqual(pca_corr_res['Pearson'][0], -0.194, delta=1e-3)
+        self.assertAlmostEqual(pca_corr_res['Spearman'][0], -0.178, delta=1e-3)
+        self.assertAlmostEqual(pca_corr_res['Kendall'][0], -0.115, delta=1e-3)
+        self.assertAlmostEqual(pca_corr_res['Weighted_Kendall_Rank'][0], -0.078, delta=1e-3)
+
+    def test_feature_importance(self):
+        """
+        Test features importance: MDI, MDA, SFI and plot function
+        """
+        clf = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
+                                     class_weight='balanced_subsample')
+
+        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=100,
+                                                           triple_barrier_events=self.meta_labeled_events,
+                                                           price_bars=self.data, oob_score=False, random_state=1)
         sb_clf.fit(self.X_train, self.y_train_clf)
 
+        triple_barrier_events = self.meta_labeled_events.loc[self.X_train.index, :]
+        cv_gen = PurgedKFold(n_splits=4, info_sets=triple_barrier_events.t1)
+
+        # MDI feature importance
         mdi_feat_imp = feature_importance_mean_imp_reduction(sb_clf, self.X_train.columns)
-        feature_pca_analysis(self.X_train, mdi_feat_imp)
+
+        # MDA feature importance
+        mda_feat_imp_log_loss = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
+                                                                          cv_gen)
+        mda_feat_imp_accuracy = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
+                                                                          cv_gen, scoring='accuracy')
+        # SFI feature importance
+        sfi_feat_imp_log_loss = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
+                                                       cv_gen=cv_gen)
+        sfi_feat_imp_accuracy = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
+                                                       cv_gen=cv_gen, scoring='accuracy')
+
+        # MDI assertions
+        self.assertEquals(mdi_feat_imp['mean'].sum(), 1)
+        self.assertAlmostEqual(mdi_feat_imp.loc['momentum_2', 'mean'], 0.0434, delta=1e-3)
+        self.assertAlmostEqual(mdi_feat_imp.loc['momentum_2', 'std'], 0.002779, delta=1e-3)
+        self.assertAlmostEqual(mdi_feat_imp.loc['pct_change_5', 'mean'], 0.043, delta=1e-3)
+        self.assertAlmostEqual(mdi_feat_imp.loc['pct_change_5', 'std'], 0.00292, delta=1e-3)
+        self.assertAlmostEqual(mdi_feat_imp.loc['std_20', 'mean'], 0.08421, delta=1e-3)
+
+        # MDA(log_loss) assertions
+        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['std_25', 'mean'], 0.01629, delta=1e-3)
+        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['std_25', 'std'], 0.01542, delta=1e-3)
+        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['diff_20', 'mean'], -0.0341, delta=1e-3)
+        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['diff_20', 'std'], 0.02301, delta=1e-3)
+
+        # MDA(accuracy) assertions
+        self.assertAlmostEqual(mda_feat_imp_accuracy.loc['std_25', 'mean'], -0.02, delta=1e-3)
+        self.assertAlmostEqual(mda_feat_imp_accuracy.loc['std_25', 'std'], 0.03864, delta=1e-3)
+        self.assertAlmostEqual(mda_feat_imp_accuracy.loc['diff_20', 'mean'], 0.00184, delta=1e-3)
+        self.assertAlmostEqual(mda_feat_imp_accuracy.loc['diff_20', 'std'], 0.0351, delta=1e-3)
+
+        # SFI(log_loss) assertions
+        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['momentum_2', 'mean'], -2.879, delta=1e-3)
+        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['momentum_2', 'std'], 0.66422, delta=1e-3)
+        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['diff_2', 'mean'], -2.0558, delta=1e-3)
+        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['diff_2', 'std'], 0.434, delta=1e-3)
+
+        # SFI(accuracy) assertions
+        self.assertAlmostEqual(sfi_feat_imp_accuracy.loc['momentum_2', 'mean'], 0.51, delta=1e-3)
+        self.assertAlmostEqual(sfi_feat_imp_accuracy.loc['momentum_2', 'std'], 0.05361, delta=1e-3)
+        self.assertAlmostEqual(sfi_feat_imp_accuracy.loc['diff_2', 'mean'], 0.533, delta=1e-3)
+        self.assertAlmostEqual(sfi_feat_imp_accuracy.loc['diff_2', 'std'], 0.04027, delta=1e-3)
+
+    def test_plot_feature_importance(self):
+        """
+        Test plot_feature_importance function
+        """
+
+        clf = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
+                                     class_weight='balanced_subsample')
+
+        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=100,
+                                                           triple_barrier_events=self.meta_labeled_events,
+                                                           price_bars=self.data, oob_score=True, random_state=1)
+        sb_clf.fit(self.X_train, self.y_train_clf)
 
         triple_barrier_events = self.meta_labeled_events.loc[self.X_train.index, :]
-        imp = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf, triple_barrier_events, n_splits=3)
         cv_gen = PurgedKFold(n_splits=4, info_sets=triple_barrier_events.t1)
-        imp = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf, cv_gen=cv_gen)
-        print(imp)
+        oos_score = ml_cross_val_score(sb_clf, self.X_train, self.y_train_clf, cv_gen=cv_gen, sample_weight=None,
+                                       scoring='accuracy').mean()
+
+        mdi_feat_imp = feature_importance_mean_imp_reduction(sb_clf, self.X_train.columns)
+        plot_feature_importance(mdi_feat_imp, oob_score=sb_clf.oob_score_, oos_score=oos_score)
