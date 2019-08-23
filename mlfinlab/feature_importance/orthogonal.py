@@ -1,3 +1,7 @@
+"""
+Module which implements feature PCA compression and PCA analysis of feature importance
+"""
+
 import pandas as pd
 import numpy as np
 from scipy.stats import weightedtau, kendalltau, spearmanr, pearsonr
@@ -29,14 +33,14 @@ def _get_eigen_vector(dot_matrix, variance_thresh):
     return eigen_val, eigen_vec
 
 
-def _standardize_df(df):
+def _standardize_df(data_frame):
     """
     Helper function which divides df by std and extracts mean.
 
-    :param df: (pd.DataFrame): to standardize
+    :param data_frame: (pd.DataFrame): to standardize
     :return: (pd.DataFrame): standardized data frame
     """
-    return df.sub(df.mean(), axis=1).div(df.std(), axis=1)
+    return data_frame.sub(data_frame.mean(), axis=1).div(data_frame.std(), axis=1)
 
 
 def get_orthogonal_features(feature_df, variance_thresh=.95):
@@ -48,11 +52,11 @@ def get_orthogonal_features(feature_df, variance_thresh=.95):
     :param variance_thresh: (float): % of overall variance which compressed vectors should explain
     :return: (pd.DataFrame): compressed PCA features which explain %variance_thresh of variance
     """
-    # Given a dataframe  of features, compute orthofeatures 
+    # Given a dataframe of features, compute orthofeatures
     feature_df_standard = _standardize_df(feature_df)  # Standardize
     dot_matrix = pd.DataFrame(np.dot(feature_df_standard.T, feature_df_standard), index=feature_df.columns,
                               columns=feature_df.columns)
-    eigen_val, eigen_vec = _get_eigen_vector(dot_matrix, variance_thresh)
+    _, eigen_vec = _get_eigen_vector(dot_matrix, variance_thresh)
     pca_features = np.dot(feature_df_standard, eigen_vec)
     return pca_features
 
@@ -100,5 +104,6 @@ def feature_pca_analysis(feature_df, feature_importance, variance_thresh=0.95):
     # Get Rank based weighted Tau correlation
     feature_pca_rank = (eigen_val * eigen_vec).abs().sum(axis=1).rank(
         ascending=False)  # Sum of absolute values across all eigen vectors
-    corr_dict['Weighed_Kendall'] = get_pca_rank_weighted_kendall_tau(feature_importance['mean'].values, feature_pca_rank.values)
+    corr_dict['Weighed_Kendall'] = get_pca_rank_weighted_kendall_tau(feature_importance['mean'].values,
+                                                                     feature_pca_rank.values)
     return corr_dict

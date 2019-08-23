@@ -5,10 +5,12 @@ Module which implements feature importance algorithms described in Chapter 8
 import pandas as pd
 import numpy as np
 from sklearn.metrics import log_loss, accuracy_score
-import matplotlib as mpl
-from mlfinlab.util import mp_pandas_obj
+import matplotlib.pyplot as plt
 from mlfinlab.cross_validation.cross_validation import PurgedKFold, ml_cross_val_score
 
+
+# pylint: disable=invalid-name
+# pylint: disable=E1130
 
 def feature_importance_mean_imp_reduction(clf, feature_names):
     """
@@ -34,7 +36,7 @@ def feature_importance_mean_imp_reduction(clf, feature_names):
 
 def feature_importance_mean_decrease_accuracy(clf, X, y, triple_barrier_events, n_splits=3, sample_weight=None,
                                               pct_embargo=0.,
-                                              scoring='accuracy'):
+                                              scoring='neg_log_loss'):
     """
     Snippet 8.3, page 116-117. MDA Feature Importance
 
@@ -59,29 +61,29 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, triple_barrier_events, 
     fold_metrics_values, features_metrics_values = pd.Series(), pd.DataFrame(columns=X.columns)
 
     for i, (train, test) in enumerate(cv_gen.split(X=X)):
-        X0, y0, w0 = X.iloc[train, :], y.iloc[train], sample_weight[train]
-        X1, y1, w1 = X.iloc[test, :], y.iloc[test], sample_weight[test]
-        fit = clf.fit(X=X0, y=y0, sample_weight=w0)
-        pred = fit.predict(X1)
+        fit = clf.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight[train])
+        pred = fit.predict(X.iloc[test, :])
 
         # Get overall metrics value on out-of-sample fold
         if scoring == 'neg_log_loss':
-            prob = fit.predict_proba(X1)
-            fold_metrics_values.loc[i] = -log_loss(y1, prob, sample_weight=w1,
+            prob = fit.predict_proba(X.iloc[test, :])
+            fold_metrics_values.loc[i] = -log_loss(y.iloc[test], prob, sample_weight=sample_weight[test],
                                                    labels=clf.classes_)
         elif scoring == 'accuracy_score':
-            fold_metrics_values.loc[i] = accuracy_score(y1, pred, sample_weight=w1)
+            fold_metrics_values.loc[i] = accuracy_score(y.iloc[test], pred, sample_weight=sample_weight[test])
 
         # Get feature specific metric on out-of-sample fold
         for j in X.columns:
-            X1_ = X1.copy(deep=True)
+            X1_ = X.iloc[test, :].copy(deep=True)
             np.random.shuffle(X1_[j].values)  # Permutation of a single column
             if scoring == 'neg_log_loss':
                 prob = fit.predict_proba(X1_)
-                features_metrics_values.loc[i, j] = -log_loss(y1, prob, sample_weight=w1, labels=clf.classes_)
+                features_metrics_values.loc[i, j] = -log_loss(y.iloc[test], prob, sample_weight=sample_weight[test],
+                                                              labels=clf.classes_)
             else:
                 pred = fit.predict(X1_)
-                features_metrics_values.loc[i, j] = accuracy_score(y1, pred, sample_weight=w1)
+                features_metrics_values.loc[i, j] = accuracy_score(y.iloc[test], pred,
+                                                                   sample_weight=sample_weight[test])
 
     imp = (-features_metrics_values).add(fold_metrics_values, axis=0)
     if scoring == 'neg_log_loss':
@@ -92,7 +94,19 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, triple_barrier_events, 
     return imp
 
 
-def feature_importance_sfi(clf, X, y, sample_weight=None, scoring='accuracy', cv_gen=None):
+def feature_importance_sfi(clf, X, y, sample_weight=None, scoring='neg_log_loss', cv_gen=None):
+    """
+    Snippet 8.4, page 118. Implementation of SFI
+
+    This function generates Single Feature Importance based on OOS score (using cross-validation object)
+    :param clf: (sklearn.ClassifierMixin): any sklearn classifier
+    :param X: (pd.DataFrame): train set features
+    :param y: (pd.DataFrame, np.array): train set labels
+    :param sample_weight: (np.array): sample weights, if None equal to ones
+    :param scoring: (str): scoring function used to determine importance, either 'neg_log_loss' or 'accuracy'
+    :param cv_gen: (PurgedKFold): cross-validation object
+    :return: (pd.DataFrame): mean and std feature importance
+    """
     feature_names = X.columns
     if sample_weight is None:
         sample_weight = np.ones((X.shape[0],))
@@ -106,25 +120,22 @@ def feature_importance_sfi(clf, X, y, sample_weight=None, scoring='accuracy', cv
     return imp
 
 
-def plot_feature_importance(imp, oob, oos, method, tag=0, simNum=0, savefig=False, output_path=None):
+def plot_feature_importance(imp, oob_score, oos_score, savefig=False, output_path=None):
+    """
+    Snippet 8.10, page 124. Feature importance plotting function
+    Plot feature importance function
+    :param imp: (pd.DataFrame): mean and std feature importance
+    :param oob_score: (float): out-of-bag score
+    :param oos_score: (float): out-of-sample (or cross-validation) score
+    :param savefig: (bool): boolean flag to save figure to a file
+    :param output_path: (str): if savefig is True, path where figure should be saved
+    :return: None
+    """
     # Plot mean imp bars with std
-    mpl.figure(figsize=(10, imp.shape[0] / 5.))
-    imp = imp.sort_values('mean', ascending=True)
-    ax = imp['mean'].plot(kind='barh', color='b', alpha=.25, xerr=imp['std'],
-                          error_kw={'ecolor': 'r'})
-    if method == 'MDI':
-        mpl.xlim([0, imp.sum(axis=1).max()])
-        mpl.axvline(1. / imp.shape[0], linewidth=1, color='r', linestyle='dotted')
-    ax.get_yaxis().set_visible(False)
-    for i, j in zip(ax.patches, imp.index): ax.text(i.get_width() / 2, i.get_y() + i.get_height() / 2, j, ha='center',
-                                                    va='center',
-                                                    color='black')
-    mpl.title('tag = ' + tag + ' | simNum = ' + str(simNum) + ' | oob = ' + str(round(oob, 4)) +
-              ' | oos = ' + str(round(oos, 4)))
+    plt.figure(figsize=(20, 10))
+    imp['mean'].plot(kind='barh', color='b', alpha=0.25, xerr=imp['std'], error_kw={'ecolor': 'r'})
+    plt.title('Feature importance. OOB Score:{}; OOS score:{}'.format(oob_score, oos_score))
     if savefig is True:
-        mpl.savefig(output_path + 'featImportance_' + str(simNum) + '.png', dpi=100)
-        mpl.clf()
-        mpl.close()
+        plt.savefig(output_path)
     else:
-        mpl.show()
-    return
+        plt.show()
