@@ -80,7 +80,7 @@ class PurgedKFold(KFold):
 
 
 # noinspection PyPep8Naming
-def ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss', ):
+def ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss'):
     # pylint: disable=invalid-name
     """
     Function to run a cross-validation evaluation of the using sample weights and a custom CV generator
