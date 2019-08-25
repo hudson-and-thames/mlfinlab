@@ -127,3 +127,23 @@ Sequentially Bootstrapped Bagging Regressor
       .. [4] G. Louppe and P. Geurts, "Ensembles on Random Patches", Machine
              Learning and Knowledge Discovery in Databases, 346-361, 2012.
       """
+
+An example of using SequentiallyBootstrappedBaggingRegressor:
+::
+  import pandas as pd
+  from sklearn.ensemble import RandomForestClassifier
+  from mlfinlab.ensemble import SequentiallyBootstrappedBaggingClassifier
+  
+  X = pd.read_csv('X_FILE_PATH', index_col=0, parse_dates = [0])
+  y = pd.read_csv('y_FILE_PATH', index_col=0, parse_dates = [0])
+  triple_barrier_events = pd.read_csv('BARRIER_FILE_PATH', index_col=0, parse_dates = [0, 2])
+  price_bars = pd.read_csv('PRICE_BARS_FILE_PATH', index_col=0, parse_dates = [0, 2])
+
+  triple_barrier_events = triple_barrier_events.loc[X.index, :] # take only train part
+  price_events = price_events[(price_events.index >= X.index.min()) & (price_events.index <= X.index.max())]
+
+  base_est = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
+                                   class_weight='balanced_subsample')
+  clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=base_est, triple_barrier_events=triple_barrier_events,
+                                                  price_bars=price_bars, oob_score=True)
+  clf.fit(X, y)
