@@ -45,6 +45,7 @@ Z-score Filter
 ============
 
 Z-score filter is used to define explosive/peak points in time series. https://stackoverflow.com/questions/22583391/peak-signal-detection-in-realtime-timeseries-data
+
 It uses rolling simple moving average, rolling simple moving standard deviation and z_score(threshold). When current time series value exceeds rolling average + z_score * rolling std event is sampled
 
 .. function:: z_score_filter(raw_time_series, mean_window, std_window, z_score=3, time_stamps=True)
@@ -56,7 +57,7 @@ It uses rolling simple moving average, rolling simple moving standard deviation 
     :param time_stamps: (bool) default is to return a DateTimeIndex, change to false to have it return a list.
     :return: (datetime index vector) vector of datetimes when the events occurred. This is used later to sample.
 
-An example of how the Z-score filter can be used to downsample a time series:
+An example of how the Z-score filter can be used to downsample a time series::
 
   from mlfinlb.filters import z_score_filter
 
