@@ -6,13 +6,15 @@ Feature importance
 
 One of the key research principles of Advances in Financial Machine learning is:
 
-`Backtesting is not a research tool. Feature importance is.`
+
+                              **Backtesting is not a research tool. Feature importance is.**
+
 
 There are three ways to get feature importance scores:
 
 1) Mean Decrease Impurity (MDI). This score can be obtained from tree-based classifiers and corresponds to sklearn's feature_importances_ attribute. MDI uses in-sample (IS) performance to estimate feature importance.
 2) Mean Decrease Accuracy (MDA). This method can be applied to any tree-based classifier, not only tree based. MDA uses out-of-sample (OOS) performance in order to estimate feature importance.
-3) Single Feature Importance (SFI). MDA and MDI feature suffer from substitution effects: if two feature are highly correlated, one of them will be considered as important while the other one will be redundant. SFI is OOS feature importance estimator which doesn't suffer from substitution effect because it estimates each feature importance separately.
+3) Single Feature Importance (SFI). MDA and MDI feature suffer from substitution effects: if two features are highly correlated, one of them will be considered as important while the other one will be redundant. SFI is OOS feature importance estimator which doesn't suffer from substitution effect because it estimates each feature importance separately.
 
 MDI, MDA, SFI feature importance
 ================================
