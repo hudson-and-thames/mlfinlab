@@ -12,8 +12,7 @@ There are three ways to get feature importance scores:
 
 1) Mean Decrease Impurity (MDI). This score can be obtained from tree-based classifiers and corresponds to sklearn's feature_importances_ attribute. MDI uses in-sample (IS) performance to estimate feature importance.
 2) Mean Decrease Accuracy (MDA). This method can be applied to any tree-based classifier, not only tree based. MDA uses out-of-sample (OOS) performance in order to estimate feature importance.
-3) Single Feature Importance (SFI). MDA and MDI feature suffer from substitution effects: if two feature are highly correlated, one of them will be considered as important while the other one will be redundant.
-                                    SFI is OOS feature importance estimator which doesn't suffer from substitution effect because it estimates each feature importance separately.
+3) Single Feature Importance (SFI). MDA and MDI feature suffer from substitution effects: if two feature are highly correlated, one of them will be considered as important while the other one will be redundant. SFI is OOS feature importance estimator which doesn't suffer from substitution effect because it estimates each feature importance separately.
 
 MDI, MDA, SFI feature importance
 ================================
@@ -72,8 +71,7 @@ An example showing how to use various feature importance functions::
   import pandas as pd
   from sklearn.ensemble import RandomForestClassifier
   from mlfinlab.ensemble import SequentiallyBootstrappedBaggingClassifier
-	from mlfinlab.feature_importance import feature_importance_mean_imp_reduction, feature_importance_mean_decrease_accuracy,
-                                          feature_importance_sfi, plot_feature_importance
+	from mlfinlab.feature_importance import feature_importance_mean_imp_reduction, feature_importance_mean_decrease_accuracy, feature_importance_sfi, plot_feature_importance
   from mlfinlab.cross_validation import PurgedKFold, ml_cross_val_score
   from mlfinlab.ensemble import SequentiallyBootstrappedBaggingClassifier
 
@@ -108,7 +106,7 @@ An example showing how to use various feature importance functions::
   plot_feature_importance(sfi_feat_imp, oob_score=clf.oob_score_, oos_score=oos_score,
                                 savefig=True, output_path='mdi_feat_imp.png')
 
-Resulting images:
+Resulting images for MDI, MDA, SFI feature importances respectively:
 
 .. image:: feature_imp_images/mdi_feat_imp.png
    :scale: 100 %
