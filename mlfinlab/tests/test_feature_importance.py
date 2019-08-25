@@ -162,8 +162,8 @@ class TestFeatureImportance(unittest.TestCase):
         self.assertAlmostEqual(mdi_feat_imp.loc['std_20', 'mean'], 0.08421, delta=0.5)
 
         # MDA(log_loss) assertions
-        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['diff_20', 'mean'], -0.026309, delta=1e-2)
-        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['diff_20', 'std'], 0.01824, delta=1e-2)
+        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['diff_20', 'mean'], -0.026309, delta=0.3)
+        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['diff_20', 'std'], 0.01824, delta=0.3)
 
         # MDA(accuracy) assertions
         self.assertAlmostEqual(mda_feat_imp_accuracy.loc['diff_20', 'std'], 0.0485, delta=0.7)
