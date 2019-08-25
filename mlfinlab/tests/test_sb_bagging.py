@@ -18,7 +18,7 @@ from mlfinlab.util.utils import get_daily_vol
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier, get_bins
 from mlfinlab.sampling.bootstrapping import seq_bootstrap
-from mlfinlab.ensemble.sb_bagging_classifier import SequentiallyBootstrappedBaggingClassifier, \
+from mlfinlab.ensemble.sb_bagging import SequentiallyBootstrappedBaggingClassifier, \
     SequentiallyBootstrappedBaggingRegressor
 
 
