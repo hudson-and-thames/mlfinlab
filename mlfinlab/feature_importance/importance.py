@@ -38,7 +38,7 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, cv_gen, sample_weight=N
     """
     Snippet 8.3, page 116-117. MDA Feature Importance
 
-    :param clf: (BaggingClassifier, RandomForest or any ensemble sklearn object): trained classifier
+    :param clf: (sklearn.ClassifierMixin): any sklearn classifier
     :param X: (pd.DataFrame): train set features
     :param y: (pd.DataFrame, np.array): train set labels
     :param cv_gen: (PurgedKFold): cross-validation object
@@ -118,6 +118,7 @@ def feature_importance_sfi(clf, X, y, cv_gen, sample_weight=None, scoring='neg_l
 def plot_feature_importance(imp, oob_score, oos_score, savefig=False, output_path=None):
     """
     Snippet 8.10, page 124. Feature importance plotting function
+
     Plot feature importance function
     :param imp: (pd.DataFrame): mean and std feature importance
     :param oob_score: (float): out-of-bag score

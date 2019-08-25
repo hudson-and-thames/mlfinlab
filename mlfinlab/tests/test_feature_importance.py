@@ -26,7 +26,7 @@ from mlfinlab.cross_validation.cross_validation import PurgedKFold, ml_cross_val
 
 class TestFeatureImportance(unittest.TestCase):
     """
-    Test SequentiallyBootstrapped Bagging classifiers
+    Test Feature importance
     """
 
     def setUp(self):
