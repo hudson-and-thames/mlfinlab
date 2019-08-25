@@ -13,7 +13,7 @@ from sklearn.ensemble import RandomForestClassifier
 from mlfinlab.util.utils import get_daily_vol
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier, get_bins
-from mlfinlab.ensemble.sb_bagging_classifier import SequentiallyBootstrappedBaggingClassifier
+from mlfinlab.ensemble.sb_bagging import SequentiallyBootstrappedBaggingClassifier
 from mlfinlab.feature_importance.importance import (feature_importance_mean_imp_reduction,
                                                     feature_importance_mean_decrease_accuracy, feature_importance_sfi,
                                                     plot_feature_importance)
