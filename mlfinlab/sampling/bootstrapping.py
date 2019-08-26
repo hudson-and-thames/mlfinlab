@@ -13,7 +13,7 @@ def get_ind_matrix(triple_barrier_events, price_bars):
     how to form it. We decided that using triple_barrier_events and price bars by analogy with concurrency
     is the best option.
 
-    :param triple_barrier_events: (pd.DataFrame): triple barrier events from labeling.get_events
+    :param triple_barrier_events: (pd.Series): triple barrier events(t1) from labeling.get_events
     :param price_bars: (pd.DataFrame): price bars which were used to form triple barrier events
     :return: (np.array) indicator binary matrix indicating what (price) bars influence the label for each observation
     """
@@ -23,11 +23,11 @@ def get_ind_matrix(triple_barrier_events, price_bars):
 
     # Take only period covered in triple_barrier_events
     trimmed_price_bars_index = price_bars[(price_bars.index >= triple_barrier_events.index.min()) &
-                                          (price_bars.index <= triple_barrier_events.t1.max())].index
+                                          (price_bars.index <= triple_barrier_events.values.max())].index
 
-    label_endtime = triple_barrier_events.t1
+    label_endtime = triple_barrier_events.values
     bar_index = list(triple_barrier_events.index)  # Generate index for indicator matrix from t1 and index
-    bar_index.extend(triple_barrier_events.t1)
+    bar_index.extend(triple_barrier_events.values)
     bar_index.extend(trimmed_price_bars_index)  # Add price bars index
     bar_index = sorted(list(set(bar_index)))  # Drop duplicates and sort
 
