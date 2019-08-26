@@ -121,3 +121,51 @@ Resulting images for MDI, MDA, SFI feature importances respectively:
 .. image:: feature_imp_images/sfi_feat_imp.png
    :scale: 100 %
    :align: center
+
+
+PCA features and analysis
+================================
+
+Partial solution to solve substitution effects is to orthogonalize features - apply PCA to them. However, PCA can be used not only
+to reduce the dimension of your data set, but also to understand whether the pattern detected by feature importance are valid.
+Suppose, that you derive orthogonal features using PCA. Your PCA analysis has determined that some features are more 'principal' than others,
+without any knowledge of the labels (unsupervised learning). That is, PCA has ranked features without any possible overfitting in a classification sense.
+When your MDI, MDA, SFI analysis selects as most important (using label information) the same features that PCA chose as principal (ignoring label information),
+this constitutes confirmatory evidence that the pattern identified by the ML algorithm is not entirely overfit. Here is the example plot of MDI feature imp vs PCA eigen values:
+
+.. image:: feature_imp_images/pca_correlation_analysis.png
+   :scale: 100 %
+   :align: center
+
+
+.. py:function:: get_orthogonal_features(feature_df, variance_thresh=.95)
+
+    Snippet 8.5, page 119. Computation of Orthogonal Features.
+
+    Get PCA orthogonal features
+    :param feature_df: (pd.DataFrame): with features
+    :param variance_thresh: (float): % of overall variance which compressed vectors should explain
+    :return: (pd.DataFrame): compressed PCA features which explain %variance_thresh of variance
+
+.. py:function:: feature_pca_analysis(feature_df, feature_importance, variance_thresh=0.95)
+
+    Perform correlation analysis between feature importance (MDI for example, supervised)
+    and PCA eigen values (unsupervised). High correlation means that probably the pattern identified
+    by the ML algorithm is not entirely overfit.
+
+    :param feature_df: (pd.DataFrame): with features
+    :param feature_importance: (pd.DataFrame): individual MDI feature importance
+    :param variance_thresh: (float): % of overall variance which compressed vectors should explain in PCA compression
+    :return: (dict): with kendall, spearman, pearson and weighted_kendall correlations and p_values
+
+Let's see how PCA feature extraction is analysis are done using mlfinlab functions::
+
+
+    import pandas as pd
+    from mlfinlab.feature_importance.orthogonal import get_orthogonal_features, feature_pca_analysis
+
+    X_train = pd.read_csv('X_FILE_PATH', index_col=0, parse_dates = [0])
+    feat_imp = pd.read_csv('FEATURE_IMP_PATH')
+
+    pca_features = get_orthogonal_features(X_train)
+    correlation_dict = feature_pca_analysis(X_train, feat_imp)
