@@ -174,32 +174,39 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
                                                                   triple_barrier_events=self.meta_labeled_events,
                                                                   price_bars=self.data, warm_start=True)
         with self.assertRaises(ValueError):
+            # ValueError to use sample weight with classifier which doesn't support sample weights
             bagging_clf_1.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
         with self.assertRaises(ValueError):
+            # ValueError for max_samples > X_train.shape[0]
             bagging_clf_2.fit(self.X_train, self.y_train_clf,
                               sample_weight=np.ones((self.X_train.shape[0],)), )
         with self.assertRaises(ValueError):
+            # ValueError for non-int/float max_features param
             bagging_clf_3.fit(self.X_train, self.y_train_clf,
                               sample_weight=np.ones((self.X_train.shape[0],)), )
         with self.assertRaises(ValueError):
+            # ValueError for max_features > X_train.shape[1]
             bagging_clf_4.fit(self.X_train, self.y_train_clf,
                               sample_weight=np.ones((self.X_train.shape[0],)), )
         with self.assertRaises(ValueError):
+            # ValueError for warm_start and oob_score being True
             bagging_clf_5.fit(self.X_train, self.y_train_clf,
                               sample_weight=np.ones((self.X_train.shape[0],)), )
         with self.assertRaises(ValueError):
+            # ValueError for decreasing the number of estimators when warm start is True
             bagging_clf_6.fit(self.X_train, self.y_train_clf)
             bagging_clf_6.n_estimators -= 2
             bagging_clf_6.fit(self.X_train, self.y_train_clf)
-
         with self.assertRaises(ValueError):
+            # ValueError for setting n_estimators to negative value
             bagging_clf_7.fit(self.X_train, self.y_train_clf)
             bagging_clf_7.n_estimators -= 1000
             bagging_clf_7.fit(self.X_train, self.y_train_clf)
 
     def test_sb_classifier(self):
         """
-        Test Sequentially Bootstrapped Bagging Classifier
+        Test Sequentially Bootstrapped Bagging Classifier. Here we compare oos/oob scores to sklearn's bagging oos scores,
+        test oos predictions values
         """
 
         # Init classifiers
