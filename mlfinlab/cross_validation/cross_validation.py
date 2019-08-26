@@ -5,7 +5,7 @@ Implements the book chapter 7 on Cross Validation for financial data
 import pandas as pd
 import numpy as np
 
-from sklearn.metrics import log_loss, accuracy_score
+from sklearn.metrics import log_loss, accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
 from sklearn.model_selection import KFold
 
 
@@ -70,7 +70,7 @@ class PurgedKFold(KFold):
             if end_ix < X.shape[0]:
                 end_ix += embargo
 
-            test_times = pd.Series(index=[self.info_sets[start_ix]], data=[self.info_sets[end_ix-1]])
+            test_times = pd.Series(index=[self.info_sets[start_ix]], data=[self.info_sets[end_ix - 1]])
             train_times = ml_get_train_times(self.info_sets, test_times)
 
             train_indices = []
@@ -89,11 +89,18 @@ def ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='ne
     :param y: The labels corresponding to the X dataset
     :param cv_gen: Cross Validation generator object instance; if None then PurgedKFold will be used
     :param sample_weight: A numpy array of weights for each record in the dataset
-    :param scoring: A metric name to use for scoring; currently supports `neg_log_loss` and `accuracy`
+    :param scoring: A metric name to use for scoring; currently supports `neg_log_loss` and `accuracy`, `f1`, '
+                    `precision`, `recall`, `roc_auc`
     :return: The computed score
     """
-    if scoring not in ['neg_log_loss', 'accuracy']:
+    scoring_func_dict = {'neg_log_loss': log_loss, 'accuracy': accuracy_score, 'f1': f1_score,
+                         'precision': precision_score, 'recall': recall_score, 'roc_auc': roc_auc_score}
+    try:
+        scoring_func_dict[scoring]
+    except KeyError:
         raise ValueError('wrong scoring method.')
+
+    scoring_func = scoring_func_dict[scoring]
 
     if sample_weight is None:
         sample_weight = np.ones((X.shape[0],))
@@ -102,9 +109,9 @@ def ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='ne
         fit = classifier.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight[train])
         if scoring == 'neg_log_loss':
             prob = fit.predict_proba(X.iloc[test, :])
-            score = -1*log_loss(y.iloc[test], prob, sample_weight=sample_weight[test], labels=classifier.classes_)
+            score = -1 * scoring_func(y.iloc[test], prob, sample_weight=sample_weight[test], labels=classifier.classes_)
         else:
             pred = fit.predict(X.iloc[test, :])
-            score = accuracy_score(y.iloc[test], pred, sample_weight=sample_weight[test])
+            score = scoring_func(y.iloc[test], pred, sample_weight=sample_weight[test])
         ret_scores.append(score)
     return np.array(ret_scores)
