@@ -113,25 +113,25 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
 
         sb_clf_1 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_1, max_features=0.2,
                                                              n_estimators=100,
-                                                             triple_barrier_events=self.meta_labeled_events,
+                                                             triple_barrier_events=self.meta_labeled_events.t1,
                                                              price_bars=self.data, oob_score=True,
                                                              random_state=1, bootstrap_features=True,
                                                              max_samples=30, verbose=2)
 
         sb_clf_2 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_2, max_features=7,
                                                              n_estimators=100,
-                                                             triple_barrier_events=self.meta_labeled_events,
+                                                             triple_barrier_events=self.meta_labeled_events.t1,
                                                              price_bars=self.data, oob_score=False,
                                                              random_state=1, bootstrap_features=True,
                                                              max_samples=0.3, warm_start=True)
 
         sb_clf_3 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_3,
-                                                             triple_barrier_events=self.meta_labeled_events,
+                                                             triple_barrier_events=self.meta_labeled_events.t1,
                                                              price_bars=self.data)
 
         sb_clf_4 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_4, max_features=0.2,
                                                              n_estimators=100,
-                                                             triple_barrier_events=self.meta_labeled_events,
+                                                             triple_barrier_events=self.meta_labeled_events.t1,
                                                              price_bars=self.data, oob_score=True,
                                                              random_state=1, bootstrap_features=True,
                                                              max_samples=30, verbose=2)
@@ -153,25 +153,25 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         """
         clf = KNeighborsClassifier()
         bagging_clf_1 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  triple_barrier_events=self.meta_labeled_events.t1,
                                                                   price_bars=self.data)
         bagging_clf_2 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  triple_barrier_events=self.meta_labeled_events.t1,
                                                                   price_bars=self.data, max_samples=2000000)
         bagging_clf_3 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  triple_barrier_events=self.meta_labeled_events.t1,
                                                                   price_bars=self.data, max_features='20')
         bagging_clf_4 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  triple_barrier_events=self.meta_labeled_events.t1,
                                                                   price_bars=self.data, max_features=2000000)
         bagging_clf_5 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  triple_barrier_events=self.meta_labeled_events.t1,
                                                                   price_bars=self.data, oob_score=True, warm_start=True)
         bagging_clf_6 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  triple_barrier_events=self.meta_labeled_events.t1,
                                                                   price_bars=self.data, warm_start=True)
         bagging_clf_7 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  triple_barrier_events=self.meta_labeled_events,
+                                                                  triple_barrier_events=self.meta_labeled_events.t1,
                                                                   price_bars=self.data, warm_start=True)
         with self.assertRaises(ValueError):
             # ValueError to use sample weight with classifier which doesn't support sample weights
@@ -214,7 +214,7 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
                                      class_weight='balanced_subsample')
 
         sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=100,
-                                                           triple_barrier_events=self.meta_labeled_events,
+                                                           triple_barrier_events=self.meta_labeled_events.t1,
                                                            price_bars=self.data, oob_score=True, random_state=1)
         sklearn_clf = BaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=50, oob_score=True,
                                         random_state=1)
@@ -278,15 +278,15 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         # Init regressors
         reg = RandomForestRegressor(n_estimators=1, bootstrap=False)
         sb_reg = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=100,
-                                                          triple_barrier_events=self.meta_labeled_events,
+                                                          triple_barrier_events=self.meta_labeled_events.t1,
                                                           price_bars=self.data, oob_score=True, random_state=1)
 
         sb_reg_70 = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=70,
-                                                             triple_barrier_events=self.meta_labeled_events,
+                                                             triple_barrier_events=self.meta_labeled_events.t1,
                                                              price_bars=self.data, oob_score=True, random_state=1)
         sb_reg_1_estimator = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0,
                                                                       n_estimators=1,
-                                                                      triple_barrier_events=self.meta_labeled_events,
+                                                                      triple_barrier_events=self.meta_labeled_events.t1,
                                                                       price_bars=self.data, oob_score=True,
                                                                       random_state=1)
         sklearn_reg = BaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=50, oob_score=True,
