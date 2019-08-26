@@ -127,11 +127,11 @@ PCA features and analysis
 ================================
 
 Partial solution to solve substitution effects is to orthogonalize features - apply PCA to them. However, PCA can be used not only
-to reduce the dimension of your data set, but also to understand whether the pattern detected by feature importance are valid.
+to reduce the dimension of your data set, but also to understand whether the patterns detected by feature importance are valid.
 Suppose, that you derive orthogonal features using PCA. Your PCA analysis has determined that some features are more 'principal' than others,
 without any knowledge of the labels (unsupervised learning). That is, PCA has ranked features without any possible overfitting in a classification sense.
 When your MDI, MDA, SFI analysis selects as most important (using label information) the same features that PCA chose as principal (ignoring label information),
-this constitutes confirmatory evidence that the pattern identified by the ML algorithm is not entirely overfit. Here is the example plot of MDI feature imp vs PCA eigen values:
+this constitutes confirmatory evidence that the pattern identified by the ML algorithm is not entirely overfit. Here is the example plot of MDI feature importance vs PCA eigen values:
 
 .. image:: feature_imp_images/pca_correlation_analysis.png
    :scale: 100 %
