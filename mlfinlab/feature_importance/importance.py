@@ -54,7 +54,8 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, cv_gen, sample_weight=N
     try:
         scoring_func_dict[scoring]
     except KeyError:
-        raise ValueError('Invalid choice of scoring method. Possible scoring methods:{}.'.format(list(scoring_func.keys())))
+        raise ValueError(
+            'Invalid choice of scoring method. Possible scoring methods:{}.'.format(list(scoring_func_dict.keys())))
 
     scoring_func = scoring_func_dict[scoring]
 
@@ -86,7 +87,7 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, cv_gen, sample_weight=N
             else:
                 pred = fit.predict(X1_)
                 features_metrics_values.loc[i, j] = scoring_func(y.iloc[test], pred,
-                                                                   sample_weight=sample_weight[test])
+                                                                 sample_weight=sample_weight[test])
 
     imp = (-features_metrics_values).add(fold_metrics_values, axis=0)
     if scoring == 'neg_log_loss':
@@ -137,7 +138,7 @@ def plot_feature_importance(imp, oob_score, oos_score, savefig=False, output_pat
     :return: None
     """
     # Plot mean imp bars with std
-    plt.figure(figsize=(10, imp.shape[0]/5))
+    plt.figure(figsize=(10, imp.shape[0] / 5))
     imp.sort_values('mean', ascending=True, inplace=True)
     imp['mean'].plot(kind='barh', color='b', alpha=0.25, xerr=imp['std'], error_kw={'ecolor': 'r'})
     plt.title('Feature importance. OOB Score:{}; OOS score:{}'.format(round(oob_score, 4), round(oos_score, 4)))
