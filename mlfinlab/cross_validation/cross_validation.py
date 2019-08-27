@@ -88,14 +88,23 @@ def ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='ne
     Snippet 7.4, page 110, Using the PurgedKFold Class.
     Function to run a cross-validation evaluation of the using sample weights and a custom CV generator.
 
-    :param classifier: A sk-learn Classifier object instance
-    :param X: The dataset of records to evaluate
-    :param y: The labels corresponding to the X dataset
-    :param cv_gen: Cross Validation generator object instance; if None then PurgedKFold will be used
-    :param sample_weight: A numpy array of weights for each record in the dataset
-    :param scoring: A metric name to use for scoring; currently supports `neg_log_loss` and `accuracy`, `f1`, '
-                    `precision`, `recall`, `roc_auc`
-    :return: The computed score
+    Note: This function is different to the book in that it requires the user to pass through a CV object. The book
+    will accept a None value as a default and then resort to using PurgedCV, this also meant that extra arguments had to
+    be passed to the function. To correct this we have removed the default and require the user to pass a CV object to
+    the function.
+
+    Example:
+    cv_gen = PurgedKFold(n_splits=n_splits, info_sets=info_sets, pct_embargo=pct_embargo)
+    scores_array = ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss')
+
+    :param classifier: A sk-learn Classifier object instance.
+    :param X: The dataset of records to evaluate.
+    :param y: The labels corresponding to the X dataset.
+    :param cv_gen: Cross Validation generator object instance.
+    :param sample_weight: A numpy array of weights for each record in the dataset.
+    :param scoring: A metric name to use for scoring; currently supports `neg_log_loss`, `accuracy`, `f1`, `precision`,
+        `recall`, and `roc_auc`.
+    :return: The computed score as a numpy array.
     """
     # Define scoring metrics
     scoring_func_dict = {'neg_log_loss': log_loss, 'accuracy': accuracy_score, 'f1': f1_score,
