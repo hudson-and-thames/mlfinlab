@@ -102,6 +102,7 @@ def feature_importance_sfi(clf, X, y, cv_gen, sample_weight=None, scoring='neg_l
     Snippet 8.4, page 118. Implementation of SFI
 
     This function generates Single Feature Importance based on OOS score (using cross-validation object)
+
     :param clf: (sklearn.ClassifierMixin): any sklearn classifier
     :param X: (pd.DataFrame): train set features
     :param y: (pd.DataFrame, np.array): train set labels

@@ -14,7 +14,7 @@ from mlfinlab.util.utils import get_daily_vol
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier, get_bins
 from mlfinlab.ensemble.sb_bagging import SequentiallyBootstrappedBaggingClassifier
-from mlfinlab.feature_importance.importance import (feature_importance_mean_imp_reduction,
+from mlfinlab.feature_importance.importance import (feature_importance_mean_decrease_impurity,
                                                     feature_importance_mean_decrease_accuracy, feature_importance_sfi,
                                                     plot_feature_importance)
 from mlfinlab.feature_importance.orthogonal import feature_pca_analysis, get_orthogonal_features
@@ -122,7 +122,7 @@ class TestFeatureImportance(unittest.TestCase):
         self.assertAlmostEqual(np.std(pca_features[:, 4]), 0.954, delta=1e-3)
 
         sb_clf.fit(self.X_train, self.y_train_clf)
-        mdi_feat_imp = feature_importance_mean_imp_reduction(sb_clf, self.X_train.columns)
+        mdi_feat_imp = feature_importance_mean_decrease_impurity(sb_clf, self.X_train.columns)
         pca_corr_res = feature_pca_analysis(self.X_train, mdi_feat_imp)
 
         # Check correlation metrics results
@@ -138,7 +138,7 @@ class TestFeatureImportance(unittest.TestCase):
         sb_clf, cv_gen = self._prepare_clf_data_set(oob_score=False)
 
         # MDI feature importance
-        mdi_feat_imp = feature_importance_mean_imp_reduction(sb_clf, self.X_train.columns)
+        mdi_feat_imp = feature_importance_mean_decrease_impurity(sb_clf, self.X_train.columns)
 
         # MDA feature importance
         mda_feat_imp_log_loss = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
@@ -189,7 +189,7 @@ class TestFeatureImportance(unittest.TestCase):
         oos_score = ml_cross_val_score(sb_clf, self.X_train, self.y_train_clf, cv_gen=cv_gen, sample_weight=None,
                                        scoring='accuracy').mean()
 
-        mdi_feat_imp = feature_importance_mean_imp_reduction(sb_clf, self.X_train.columns)
+        mdi_feat_imp = feature_importance_mean_decrease_impurity(sb_clf, self.X_train.columns)
         plot_feature_importance(mdi_feat_imp, oob_score=sb_clf.oob_score_, oos_score=oos_score)
         plot_feature_importance(mdi_feat_imp, oob_score=sb_clf.oob_score_, oos_score=oos_score,
                                 savefig=True, output_path='test.png')
