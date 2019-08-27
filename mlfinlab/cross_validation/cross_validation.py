@@ -1,5 +1,5 @@
 """
-Implements the book chapter 7 on Cross Validation for financial data
+Implements the book chapter 7 on Cross Validation for financial data.
 """
 
 import pandas as pd
@@ -34,9 +34,11 @@ def ml_get_train_times(info_sets: pd.Series, test_times: pd.Series) -> pd.Series
 
 class PurgedKFold(KFold):
     """
-    Extend KFold class to work with labels that span intervals
-    The train is purged of observations overlapping test-label intervals
-    Test set is assumed contiguous (shuffle=False), w/o training samples in between
+    Snippet 7.3, page 109, Cross-Validation Class when Observations Overlap.
+
+    Extend KFold class to work with labels that span intervals.
+    The train is purged of observations overlapping test-label intervals.
+    Test set is assumed contiguous (shuffle=False), w/o training samples in between.
     """
 
     def __init__(self, n_splits=3, info_sets=None, pct_embargo=0., random_state=None):
@@ -83,7 +85,9 @@ class PurgedKFold(KFold):
 def ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss'):
     # pylint: disable=invalid-name
     """
-    Function to run a cross-validation evaluation of the using sample weights and a custom CV generator
+    Snippet 7.4, page 110, Using the PurgedKFold Class.
+    Function to run a cross-validation evaluation of the using sample weights and a custom CV generator.
+
     :param classifier: A sk-learn Classifier object instance
     :param X: The dataset of records to evaluate
     :param y: The labels corresponding to the X dataset
@@ -93,17 +97,19 @@ def ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='ne
                     `precision`, `recall`, `roc_auc`
     :return: The computed score
     """
+    # Define scoring metrics
     scoring_func_dict = {'neg_log_loss': log_loss, 'accuracy': accuracy_score, 'f1': f1_score,
                          'precision': precision_score, 'recall': recall_score, 'roc_auc': roc_auc_score}
     try:
-        scoring_func_dict[scoring]
+        scoring_func = scoring_func_dict[scoring]
     except KeyError:
-        raise ValueError('wrong scoring method.')
+        raise ValueError('Wrong scoring method. Select from: neg_log_loss, accuracy, f1, precision, recall, roc_auc')
 
-    scoring_func = scoring_func_dict[scoring]
-
+    # If no sample_weight then broadcast a value of 1 to all samples (full weight).
     if sample_weight is None:
         sample_weight = np.ones((X.shape[0],))
+
+    # Score model on KFolds
     ret_scores = []
     for train, test in cv_gen.split(X=X):
         fit = classifier.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight[train])
