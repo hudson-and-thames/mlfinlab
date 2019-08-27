@@ -13,6 +13,7 @@ from sklearn.metrics import precision_score, recall_score, roc_auc_score, accura
 from sklearn.ensemble import BaggingClassifier, BaggingRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC
+from sklearn.utils import indices_to_mask
 
 from mlfinlab.util.utils import get_daily_vol
 from mlfinlab.filters.filters import cusum_filter
@@ -249,10 +250,11 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         subsamples = sb_clf.timestamp_int_index_mapping.loc[sb_clf.X_time_index]
         subsampled_ind_mat = sb_clf.ind_mat[:, subsamples]
         sb_sample = seq_bootstrap(subsampled_ind_mat, sample_length=self.X_train.shape[0], compare=True)
-        sb_clf_accuracy = accuracy_score(self.y_train_clf.iloc[sb_sample],
-                                         sb_clf.predict(self.X_train.iloc[sb_sample]))
-        sklearn_clf_accuracy = accuracy_score(self.y_train_clf.iloc[sb_sample],
-                                              sklearn_clf.predict(self.X_train.iloc[sb_sample]))
+        masked_sample = ~indices_to_mask(sb_sample)  # Take OOB samples
+        sb_clf_accuracy = accuracy_score(self.y_train_clf.iloc[~masked_sample],
+                                         sb_clf.predict(self.X_train.iloc[~masked_sample]))
+        sklearn_clf_accuracy = accuracy_score(self.y_train_clf.iloc[~masked_sample],
+                                              sklearn_clf.predict(self.X_train.iloc[~masked_sample]))
         self.assertGreaterEqual(sb_clf_accuracy, sklearn_clf_accuracy)
 
         # Random sampling oob_score
