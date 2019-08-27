@@ -41,12 +41,14 @@ class PurgedKFold(KFold):
     Test set is assumed contiguous (shuffle=False), w/o training samples in between.
     """
 
-    def __init__(self, n_splits=3, info_sets=None, pct_embargo=0., random_state=None):
+    def __init__(self, info_sets, n_splits=3, pct_embargo=0., random_state=None):
         """
-        :param n_splits: The number of splits. Default to 3
-        :param info_sets:
+        Constructor
+
+        :param info_sets (pd.Series):
             —info_sets.index: Time when the information extraction started.
             —info_sets.value: Time when the information extraction ended.
+        :param n_splits: The number of splits. Default to 3
         :param pct_embargo: Percent that determines the embargo size.
         :param random_state: (int or RandomState): random state
         """
@@ -54,6 +56,7 @@ class PurgedKFold(KFold):
             raise ValueError('The info_sets param must be a pd.Series')
         super(PurgedKFold, self).__init__(n_splits, shuffle=False, random_state=random_state)
 
+        # Attributes
         self.info_sets = info_sets
         self.pct_embargo = pct_embargo
 
@@ -120,7 +123,7 @@ def ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='ne
 
     # Score model on KFolds
     ret_scores = []
-    for train, test in cv_gen.split(X=X):
+    for train, test in cv_gen.split(X=X, y=y):
         fit = classifier.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight[train])
         if scoring == 'neg_log_loss':
             prob = fit.predict_proba(X.iloc[test, :])

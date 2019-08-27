@@ -1,5 +1,5 @@
 """
-Tests the cross validation technique described in Ch.7 of the book
+Tests the cross validation technique described in Ch.7 of the book.
 """
 import unittest
 import os
@@ -32,7 +32,6 @@ class TestCrossValidation(unittest.TestCase):
             print(msg)
 
     def setUp(self):
-
         """
         This is how the observations dataset looks like
         2019-01-01 00:00:00   2019-01-01 00:02:00
@@ -57,7 +56,7 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_get_train_times_1(self):
         """
-        Tests the get_train_times method for the case where the train STARTS within test
+        Tests the get_train_times method for the case where the train STARTS within test.
         """
         test_times = pd.Series(
             index=pd.date_range(start='2019-01-01 00:01:00', periods=1, freq='T'),
@@ -77,7 +76,7 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_get_train_times_2(self):
         """
-        Tests the get_train_times method for the case where the train ENDS within test
+        Tests the get_train_times method for the case where the train ENDS within test.
         """
         test_times = pd.Series(
             index=pd.date_range(start='2019-01-01 00:08:00', periods=1, freq='T'),
@@ -97,7 +96,7 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_get_train_times_3(self):
         """
-        Tests the get_train_times method for the case where the train ENVELOPES test
+        Tests the get_train_times method for the case where the train ENVELOPES test.
         """
         test_times = pd.Series(
             index=pd.date_range(start='2019-01-01 00:06:00', periods=1, freq='T'),
@@ -122,23 +121,22 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_purgedkfold_01_exception(self):
         """
-        Test throw exception when info_sets is not a pd.Series
-        :return:
+        Test throw exception when info_sets is not a pd.Series.
         """
-        infosets = pd.DataFrame(
+        info_sets = pd.DataFrame(
             index=pd.date_range(start='2019-01-01 00:00:00', periods=20, freq='T'),
             data=pd.date_range(start='2019-01-01 00:02:00', periods=20, freq='T'),
         )
-        self.log(f"infosets=\n{infosets}")
+        self.log(f"infosets=\n{info_sets}")
 
         dataset = pd.DataFrame(
-            index=infosets.index,
+            index=info_sets.index,
             data={'feat': np.arange(0, 20)},
         )
         self.log(f"dataset=\n{dataset}")
 
         try:
-            PurgedKFold(n_splits=3, info_sets=infosets, pct_embargo=0.)
+            PurgedKFold(n_splits=3, info_sets=info_sets, pct_embargo=0.)
         except ValueError:
             pass
         else:
@@ -146,9 +144,8 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_purgedkfold_02_exception(self):
         """
-        Test exception is raised when passing in a dataset with a different length
-        than the infosets used in the constructor
-        :return:
+        Test exception is raised when passing in a dataset with a different length than the info_sets used in the
+        constructor.
         """
         infosets = pd.Series(
             index=pd.date_range(start='2019-01-01 00:00:00', periods=10, freq='T'),
@@ -158,7 +155,7 @@ class TestCrossValidation(unittest.TestCase):
 
         dataset = pd.DataFrame(
             index=pd.date_range(start='2019-01-01 00:00:00', periods=11, freq='T'),
-            data={'feat': np.arange(0, 11)},  # one entry more than infosets
+            data={'feat': np.arange(0, 11)},  # One entry more than infosets
         )
         self.log(f"dataset=\n{dataset}")
 
@@ -173,10 +170,10 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_purgedkfold_03_simple(self):
         """
-        Test PurgedKFold class using the ml_get_train_times method. Get the test range from PurgedKFold
-        and then make sure the train range is exactly the same using the two methods.
+        Test PurgedKFold class using the ml_get_train_times method. Get the test range from PurgedKFold and then make
+        sure the train range is exactly the same using the two methods.
+
         This is the test with no embargo.
-        :return:
         """
 
         infosets = pd.Series(
@@ -213,8 +210,7 @@ class TestCrossValidation(unittest.TestCase):
     def test_purgedkfold_04_embargo(self):
         """
         Test PurgedKFold class using the 'embargo' parameter set to pct_points_test which means pct_points_test percent
-        which also means pct_points_test entries from a total of 100 in total in the dataset
-        :return:
+        which also means pct_points_test entries from a total of 100 in total in the dataset.
         """
 
         infosets = pd.Series(
@@ -264,8 +260,7 @@ class TestCrossValidation(unittest.TestCase):
 
     def _test_ml_cross_val_score__data(self):
         """
-        Get data structures for next few tests
-        :return:
+        Get data structures for next few tests.
         """
         sample_size = 1000
 
@@ -300,9 +295,8 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_ml_cross_val_score_00_exception(self):
         """
-        Test the ml_cross_val_score function with an artificial dataset
-        the case where we give it the wrong scoring method - jaccard_score
-        :return:
+        Test the ml_cross_val_score function with an artificial dataset. In this case we give it the wrong scoring
+        method - jaccard_score.
         """
         infosets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
         cv_gen = PurgedKFold(info_sets=infosets, n_splits=3, pct_embargo=0.01)
@@ -322,8 +316,7 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_ml_cross_val_score_01_accuracy(self):
         """
-        Test the ml_cross_val_score function with an artificial dataset
-        :return:
+        Test the ml_cross_val_score function with an artificial dataset.
         """
         infosets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
         cv_gen = PurgedKFold(info_sets=infosets, n_splits=3, pct_embargo=0.01)
@@ -346,8 +339,7 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_ml_cross_val_score_02_neg_log_loss(self):
         """
-        Test the ml_cross_val_score function with an artificial dataset
-        :return:
+        Test the ml_cross_val_score function with an artificial dataset.
         """
         infosets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
         cv_gen = PurgedKFold(info_sets=infosets, n_splits=3, pct_embargo=0.01)
@@ -370,8 +362,7 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_ml_cross_val_score_03_other_cv_gen(self):
         """
-        Test the ml_cross_val_score function with an artificial dataset
-        :return:
+        Test the ml_cross_val_score function with an artificial dataset.
         """
         _, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
         scores = ml_cross_val_score(
