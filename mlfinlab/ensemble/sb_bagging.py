@@ -367,7 +367,8 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
     ----------
     triple_barrier_events: pd.Series
         Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation.
-        Expected columns are t1 (label endtime), index when label was started
+        -triple_barrier_events.index: Time when the information extraction started.
+        -triple_barrier_events.value: Time when the information extraction ended
     price_bars: pd.DataFrame
         Price bars used in triple_barrier_events generation
     base_estimator : object or None, optional (default=None)
@@ -533,8 +534,9 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
     Parameters
     ----------
     triple_barrier_events: pd.Series
-        Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation
-        Expected columns are t1 (label endtime), index when label was started
+        Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation.
+         -triple_barrier_events.index: Time when the information extraction started.
+         -triple_barrier_events.value: Time when the information extraction ended
     price_bars: pd.DataFrame
         Price bars used in triple_barrier_events generation
     base_estimator : object or None, optional (default=None)
