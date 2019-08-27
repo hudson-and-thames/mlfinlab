@@ -250,7 +250,7 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         subsamples = sb_clf.timestamp_int_index_mapping.loc[sb_clf.X_time_index]
         subsampled_ind_mat = sb_clf.ind_mat[:, subsamples]
         sb_sample = seq_bootstrap(subsampled_ind_mat, sample_length=self.X_train.shape[0], compare=True)
-        masked_sample = ~indices_to_mask(sb_sample)  # Take OOB samples
+        masked_sample = ~indices_to_mask(sb_sample, self.X_train.shape[0])  # Take OOB samples
         sb_clf_accuracy = accuracy_score(self.y_train_clf.iloc[~masked_sample],
                                          sb_clf.predict(self.X_train.iloc[~masked_sample]))
         sklearn_clf_accuracy = accuracy_score(self.y_train_clf.iloc[~masked_sample],
