@@ -10,9 +10,9 @@ from mlfinlab.cross_validation.cross_validation import ml_cross_val_score
 
 
 # pylint: disable=invalid-name
-# pylint: disable=E1130
+# pylint: disable=invalid-unary-operand-type
 
-def feature_importance_mean_imp_reduction(clf, feature_names):
+def feature_importance_mean_decrease_impurity(clf, feature_names):
     """
     Snippet 8.2, page 115. MDI Feature importance
 
@@ -38,10 +38,12 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, cv_gen, sample_weight=N
     """
     Snippet 8.3, page 116-117. MDA Feature Importance
 
+    This function uses OOS performance to generate Mean Decrease Accuracy importance
+
     :param clf: (sklearn.ClassifierMixin): any sklearn classifier
     :param X: (pd.DataFrame): train set features
     :param y: (pd.DataFrame, np.array): train set labels
-    :param cv_gen: (PurgedKFold): cross-validation object
+    :param cv_gen: (cross_validation.PurgedKFold): cross-validation object
     :param sample_weight: (np.array): sample weights, if None equal to ones
     :param scoring: (str): scoring function used to determine importance, either 'neg_log_loss' or 'accuracy'
     :return: (pd.DataFrame): mean and std feature importance
@@ -52,7 +54,7 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, cv_gen, sample_weight=N
     try:
         scoring_func_dict[scoring]
     except KeyError:
-        raise ValueError('wrong scoring method.')
+        raise ValueError('Invalid choice of scoring method. Possible scoring methods:{}.'.format(list(scoring_func.keys())))
 
     scoring_func = scoring_func_dict[scoring]
 
@@ -69,7 +71,7 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, cv_gen, sample_weight=N
         if scoring == 'neg_log_loss':
             prob = fit.predict_proba(X.iloc[test, :])
             fold_metrics_values.loc[i] = -scoring_func(y.iloc[test], prob, sample_weight=sample_weight[test],
-                                                   labels=clf.classes_)
+                                                       labels=clf.classes_)
         else:
             fold_metrics_values.loc[i] = scoring_func(y.iloc[test], pred, sample_weight=sample_weight[test])
 
@@ -80,7 +82,7 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, cv_gen, sample_weight=N
             if scoring == 'neg_log_loss':
                 prob = fit.predict_proba(X1_)
                 features_metrics_values.loc[i, j] = -scoring_func(y.iloc[test], prob, sample_weight=sample_weight[test],
-                                                              labels=clf.classes_)
+                                                                  labels=clf.classes_)
             else:
                 pred = fit.predict(X1_)
                 features_metrics_values.loc[i, j] = scoring_func(y.iloc[test], pred,
@@ -103,7 +105,7 @@ def feature_importance_sfi(clf, X, y, cv_gen, sample_weight=None, scoring='neg_l
     :param clf: (sklearn.ClassifierMixin): any sklearn classifier
     :param X: (pd.DataFrame): train set features
     :param y: (pd.DataFrame, np.array): train set labels
-    :param cv_gen: (PurgedKFold): cross-validation object
+    :param cv_gen: (cross_validation.PurgedKFold): cross-validation object
     :param sample_weight: (np.array): sample weights, if None equal to ones
     :param scoring: (str): scoring function used to determine importance
     :return: (pd.DataFrame): mean and std feature importance
@@ -134,7 +136,7 @@ def plot_feature_importance(imp, oob_score, oos_score, savefig=False, output_pat
     :return: None
     """
     # Plot mean imp bars with std
-    plt.figure(figsize=(20, 10))
+    plt.figure(figsize=(10, imp.shape[0]/5))
     imp.sort_values('mean', ascending=True, inplace=True)
     imp['mean'].plot(kind='barh', color='b', alpha=0.25, xerr=imp['std'], error_kw={'ecolor': 'r'})
     plt.title('Feature importance. OOB Score:{}; OOS score:{}'.format(round(oob_score, 4), round(oos_score, 4)))

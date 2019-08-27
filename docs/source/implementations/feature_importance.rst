@@ -20,7 +20,7 @@ MDI, MDA, SFI feature importance
 ================================
 
 
-.. py:function:: feature_importance_mean_imp_reduction(clf, feature_names)
+.. py:function:: feature_importance_mean_decrease_impurity(clf, feature_names)
 
     Snippet 8.2, page 115. MDI Feature importance
 
