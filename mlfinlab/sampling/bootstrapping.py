@@ -2,6 +2,7 @@
 Logic regarding sequential bootstrapping from chapter 4.
 """
 
+import pandas as pd
 import numpy as np
 from numba import jit, prange
 
@@ -21,13 +22,15 @@ def get_ind_matrix(triple_barrier_events, price_bars):
             triple_barrier_events.index.isnull().any()) is True:
         raise ValueError('NaN values in triple_barrier_events, delete nans')
 
+    triple_barrier_events = pd.DataFrame(triple_barrier_events) # Convert Series to DataFrame
+
     # Take only period covered in triple_barrier_events
     trimmed_price_bars_index = price_bars[(price_bars.index >= triple_barrier_events.index.min()) &
-                                          (price_bars.index <= triple_barrier_events.values.max())].index
+                                          (price_bars.index <= triple_barrier_events.t1.max())].index
 
-    label_endtime = triple_barrier_events.values
+    label_endtime = triple_barrier_events.t1
     bar_index = list(triple_barrier_events.index)  # Generate index for indicator matrix from t1 and index
-    bar_index.extend(triple_barrier_events.values)
+    bar_index.extend(triple_barrier_events.t1)
     bar_index.extend(trimmed_price_bars_index)  # Add price bars index
     bar_index = sorted(list(set(bar_index)))  # Drop duplicates and sort
 
