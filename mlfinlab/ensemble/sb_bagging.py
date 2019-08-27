@@ -23,20 +23,19 @@ from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix
 MAX_INT = np.iinfo(np.int32).max
 
 
-# pylint: disable=R0901
-# pylint: disable=R0902
-# pylint: disable=R0912
-# pylint: disable=R0913
-# pylint: disable=R0914
-# pylint: disable=R0915
-# pylint: disable=R1720
+# pylint: disable=too-many-ancestors
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-statements
 # pylint: disable=invalid-name
-# pylint: disable=W0201
-# pylint: disable=W0212
-# pylint: disable=C1801
-# pylint: disable=E1003
-# pylint: disable=E1121
-# pylint: disable=W0221
+# pylint: disable=protected-access
+# pylint: disable=len-as-condition
+# pylint: disable=attribute-defined-outside-init
+# pylint: disable=bad-super-call
+# pylint: disable=no-else-raise
+
 
 def _generate_indices_standard(random_state, bootstrap, n_population, n_samples):
     """Draw randomly sampled indices."""
@@ -366,8 +365,9 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
     Read more in the :ref:`User Guide <bagging>`.
     Parameters
     ----------
-    triple_barrier_events: pd.DataFrame
-        Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation
+    triple_barrier_events: pd.Series
+        Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation.
+        Expected columns are t1 (label endtime), index when label was started
     price_bars: pd.DataFrame
         Price bars used in triple_barrier_events generation
     base_estimator : object or None, optional (default=None)
@@ -532,8 +532,9 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
     Read more in the :ref:`User Guide <bagging>`.
     Parameters
     ----------
-    triple_barrier_events: pd.DataFrame
+    triple_barrier_events: pd.Series
         Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation
+        Expected columns are t1 (label endtime), index when label was started
     price_bars: pd.DataFrame
         Price bars used in triple_barrier_events generation
     base_estimator : object or None, optional (default=None)
