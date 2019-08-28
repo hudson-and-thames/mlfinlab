@@ -316,7 +316,6 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
         return self
 
     def _get_estimators_indices(self):
-
         # Get indicator matrix
         subsampled_ind_mat = self.ind_mat[:, self.timestamp_int_index_mapping.loc[self.X_time_index]]
 
@@ -331,7 +330,8 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
 
             yield feature_indices, sample_indices
 
-    def get_estimators_samples_(self):
+    @property
+    def estimators_samples_(self):
         """The subset of drawn samples for each base estimator.
         Returns a dynamically generated list of indices identifying
         the samples used for fitting each member of the ensemble, i.e.,
@@ -475,43 +475,6 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
         super(BaggingClassifier, self)._validate_estimator(
             default=DecisionTreeClassifier())
 
-    def _set_oob_score(self, X, y):
-        n_samples = y.shape[0]
-        n_classes_ = self.n_classes_
-
-        predictions = np.zeros((n_samples, n_classes_))
-
-        for estimator, samples, features in zip(self.estimators_,
-                                                self.get_estimators_samples_(),
-                                                self.estimators_features_):
-            # Create mask for OOB samples
-            mask = ~indices_to_mask(samples, n_samples)
-
-            if hasattr(estimator, "predict_proba"):
-                predictions[mask, :] += estimator.predict_proba(
-                    (X[mask, :])[:, features])
-
-            else:
-                p = estimator.predict((X[mask, :])[:, features])
-                j = 0
-
-                for i in range(n_samples):
-                    if mask[i]:
-                        predictions[i, p[j]] += 1
-                        j += 1
-
-        if (predictions.sum(axis=1) == 0).any():
-            warn("Some inputs do not have OOB scores. "
-                 "This probably means too few estimators were used "
-                 "to compute any reliable oob estimates.")
-
-        oob_decision_function = (predictions /
-                                 predictions.sum(axis=1)[:, np.newaxis])
-        oob_score = accuracy_score(y, np.argmax(predictions, axis=1))
-
-        self.oob_decision_function_ = oob_decision_function
-        self.oob_score_ = oob_score
-
 
 class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBagging, BaggingRegressor, RegressorMixin):
     """A Bagging regressor.
@@ -634,29 +597,3 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
         """Check the estimator and set the base_estimator_ attribute."""
         super(BaggingRegressor, self)._validate_estimator(
             default=DecisionTreeRegressor())
-
-    def _set_oob_score(self, X, y):
-        n_samples = y.shape[0]
-
-        predictions = np.zeros((n_samples,))
-        n_predictions = np.zeros((n_samples,))
-
-        for estimator, samples, features in zip(self.estimators_,
-                                                self.get_estimators_samples_(),
-                                                self.estimators_features_):
-            # Create mask for OOB samples
-            mask = ~indices_to_mask(samples, n_samples)
-
-            predictions[mask] += estimator.predict((X[mask, :])[:, features])
-            n_predictions[mask] += 1
-
-        if (n_predictions == 0).any():
-            warn("Some inputs do not have OOB scores. "
-                 "This probably means too few estimators were used "
-                 "to compute any reliable oob estimates.")
-            n_predictions[n_predictions == 0] = 1
-
-        predictions /= n_predictions
-
-        self.oob_prediction_ = predictions
-        self.oob_score_ = r2_score(y, predictions)
