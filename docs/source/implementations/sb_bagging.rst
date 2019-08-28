@@ -15,11 +15,11 @@ Sequentially Bootstrapped Bagging Classifier
 
 .. py:class:: SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagging, BaggingClassifier,
                                                 ClassifierMixin)
-    triple_barrier_events: pd.Series
+    events_end_times: pd.Series
           Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation
           Expected columns are t1 (label endtime), index when label was started
       price_bars: pd.DataFrame
-          Price bars used in triple_barrier_events generation
+          Price bars used in events_end_times generation
       base_estimator : object or None, optional (default=None)
           The base estimator to fit on random subsets of the dataset.
           If None, then the base estimator is a decision tree.
@@ -62,11 +62,11 @@ Sequentially Bootstrapped Bagging Regressor
 ============================================
 
 .. py:class:: SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBagging, BaggingRegressor, RegressorMixin)
-    triple_barrier_events: pd.Series
+    events_end_times: pd.Series
           Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation
           Expected columns are t1 (label endtime), index when label was started
       price_bars: pd.DataFrame
-          Price bars used in triple_barrier_events generation
+          Price bars used in events_end_times generation
       base_estimator : object or None, optional (default=None)
           The base estimator to fit on random subsets of the dataset.
           If None, then the base estimator is a decision tree.
@@ -135,7 +135,7 @@ An example of using SequentiallyBootstrappedBaggingRegressor:
   import pandas as pd
   from sklearn.ensemble import RandomForestClassifier
   from mlfinlab.ensemble import SequentiallyBootstrappedBaggingClassifier
-  
+
   X = pd.read_csv('X_FILE_PATH', index_col=0, parse_dates = [0])
   y = pd.read_csv('y_FILE_PATH', index_col=0, parse_dates = [0])
   triple_barrier_events = pd.read_csv('BARRIER_FILE_PATH', index_col=0, parse_dates = [0, 2])
@@ -146,6 +146,6 @@ An example of using SequentiallyBootstrappedBaggingRegressor:
 
   base_est = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
                                    class_weight='balanced_subsample')
-  clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=base_est, triple_barrier_events=triple_barrier_events,
+  clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=base_est, events_end_times=triple_barrier_events.t1,
                                                   price_bars=price_bars, oob_score=True)
   clf.fit(X, y)
