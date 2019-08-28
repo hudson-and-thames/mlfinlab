@@ -22,7 +22,7 @@ def get_ind_matrix(triple_barrier_events, price_bars):
             triple_barrier_events.index.isnull().any()) is True:
         raise ValueError('NaN values in triple_barrier_events, delete nans')
 
-    triple_barrier_events = pd.DataFrame(triple_barrier_events) # Convert Series to DataFrame
+    triple_barrier_events = pd.DataFrame(triple_barrier_events)  # Convert Series to DataFrame
 
     # Take only period covered in triple_barrier_events
     trimmed_price_bars_index = price_bars[(price_bars.index >= triple_barrier_events.index.min()) &

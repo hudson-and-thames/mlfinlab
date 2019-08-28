@@ -331,7 +331,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
 
             yield feature_indices, sample_indices
 
-    def estimators_samples_(self):
+    def get_estimators_samples_(self):
         """The subset of drawn samples for each base estimator.
         Returns a dynamically generated list of indices identifying
         the samples used for fitting each member of the ensemble, i.e.,
@@ -482,7 +482,7 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
         predictions = np.zeros((n_samples, n_classes_))
 
         for estimator, samples, features in zip(self.estimators_,
-                                                self.estimators_samples_(),
+                                                self.get_estimators_samples_(),
                                                 self.estimators_features_):
             # Create mask for OOB samples
             mask = ~indices_to_mask(samples, n_samples)
@@ -642,7 +642,7 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
         n_predictions = np.zeros((n_samples,))
 
         for estimator, samples, features in zip(self.estimators_,
-                                                self.estimators_samples_(),
+                                                self.get_estimators_samples_(),
                                                 self.estimators_features_):
             # Create mask for OOB samples
             mask = ~indices_to_mask(samples, n_samples)
