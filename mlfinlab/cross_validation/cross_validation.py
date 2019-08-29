@@ -7,6 +7,8 @@ import numpy as np
 
 from sklearn.metrics import log_loss, accuracy_score
 from sklearn.model_selection import KFold
+from sklearn.base import ClassifierMixin
+from sklearn.model_selection import BaseCrossValidator
 
 
 def ml_get_train_times(samples_info_sets: pd.Series, test_times: pd.Series) -> pd.Series:
@@ -16,11 +18,11 @@ def ml_get_train_times(samples_info_sets: pd.Series, test_times: pd.Series) -> p
 
     This function find the training set indexes given the information on which each record is based
     and the range for the test set.
-
     Given test_times, find the times of the training observations.
-    :param samples_info_sets: The information on which each record is constructed from
-        -samples_info_sets.index: Time when the information extraction started.
-        -samples_info_sets.value: Time when the information extraction ended.
+
+    :param samples_info_sets: The information range on which each record is constructed from
+        *samples_info_sets.index*: Time when the information extraction started.
+        *samples_info_sets.value*: Time when the information extraction ended.
     :param test_times: Times for the test dataset.
     """
     train = samples_info_sets.copy(deep=True)
@@ -37,16 +39,19 @@ class PurgedKFold(KFold):
     Extend KFold class to work with labels that span intervals
     The train is purged of observations overlapping test-label intervals
     Test set is assumed contiguous (shuffle=False), w/o training samples in between
+
+    :param n_splits: The number of splits. Default to 3
+    :param samples_info_sets: The information range on which each record is constructed from
+        *samples_info_sets.index*: Time when the information extraction started.
+        *samples_info_sets.value*: Time when the information extraction ended.
+    :param pct_embargo: Percent that determines the embargo size.
     """
 
-    def __init__(self, n_splits=3, samples_info_sets=None, pct_embargo=0.):
-        """
-        :param n_splits: The number of splits. Default to 3
-        :param samples_info_sets:
-            —samples_info_sets.index: Time when the information extraction started.
-            —samples_info_sets.value: Time when the information extraction ended.
-        :param pct_embargo: Percent that determines the embargo size.
-        """
+    def __init__(self,
+                 n_splits: int = 3,
+                 samples_info_sets: pd.Series = None,
+                 pct_embargo: float = 0.):
+
         if not isinstance(samples_info_sets, pd.Series):
             raise ValueError('The samples_info_sets param must be a pd.Series')
         super(PurgedKFold, self).__init__(n_splits, shuffle=False, random_state=None)
@@ -55,7 +60,20 @@ class PurgedKFold(KFold):
         self.pct_embargo = pct_embargo
 
     # noinspection PyPep8Naming
-    def split(self, X, y=None, groups=None):
+    def split(self,
+              X: pd.DataFrame,
+              y: pd.Series = None,
+              groups=None):
+        """
+        The main method to call for the PurgedKFold class
+
+        :param X: The pd.DataFrame samples dataset that is to be split
+        :param y: The pd.Series sample labels series
+        :param groups: array-like, with shape (n_samples,), optional
+            Group labels for the samples used while splitting the dataset into
+            train/test set.
+        :return: This method yields uples of (train, test) where train and test are lists of sample indices
+        """
         if X.shape[0] != self.samples_info_sets.shape[0]:
             raise ValueError("X and the 'samples_info_sets' series param must be the same length")
 
@@ -79,18 +97,28 @@ class PurgedKFold(KFold):
 
 
 # noinspection PyPep8Naming
-def ml_cross_val_score(classifier, X, y, sample_weight, scoring='neg_log_loss', samples_info_sets=None, n_splits=None, cv_gen=None, pct_embargo=None):
+def ml_cross_val_score(
+        classifier: ClassifierMixin,
+        X: pd.DataFrame,
+        y: pd.Series,
+        sample_weight: np.ndarray,
+        scoring: str = 'neg_log_loss',
+        samples_info_sets: pd.Series = None,
+        n_splits: int = None,
+        cv_gen: BaseCrossValidator = None,
+        pct_embargo: int = None):
     # pylint: disable=invalid-name
     """
     Function to run a cross-validation evaluation of the using sample weights and a custom CV generator
+
     :param classifier: A sk-learn Classifier object instance
     :param X: The dataset of records to evaluate
     :param y: The labels corresponding to the X dataset
     :param sample_weight: A numpy array of weights for each record in the dataset
     :param scoring: A metric name to use for scoring; currently supports `neg_log_loss` and `accuracy`
-    :param samples_info_sets:
-        —samples_info_sets.index: Time when the information extraction started.
-        —samples_info_sets.value: Time when the information extraction ended.
+    :param samples_info_sets: The information range on which each record is constructed from
+        *samples_info_sets.index*: Time when the information extraction started.
+        *samples_info_sets.value*: Time when the information extraction ended.
     :param n_splits: Number of splits
     :param cv_gen: Cross Validation generator object instance; if None then PurgedKFold will be used
     :param pct_embargo: Embargo percentage [0, 1]
