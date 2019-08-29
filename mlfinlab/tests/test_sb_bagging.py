@@ -130,53 +130,70 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         self.price_bars_trim = self.data[
             (self.data.index >= self.X_train.index.min()) & (self.data.index <= self.X_train.index.max())].close
 
-    def test_other_sb_features(self):
+    def test_sb_bagging_not_tree_base_estimator(self):
         """
-        This function simply creates various estimators in order to get all lines of code covered, we don't check
-        anything here
+        Test SB Bagging with non-tree base estimator (KNN)
         """
-        clf_1 = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=True,
-                                       class_weight='balanced_subsample', max_depth=12)
-        clf_2 = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
-                                       class_weight='balanced_subsample', max_depth=12)
-        clf_3 = KNeighborsClassifier()
-        clf_4 = LinearSVC()
+        clf = KNeighborsClassifier()
+        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
+                                                           samples_info_sets=self.samples_info_sets,
+                                                           price_bars=self.price_bars_trim)
+        sb_clf.fit(self.X_train, self.y_train_clf)
+        self.assertTrue((sb_clf.predict(self.X_train)[:10] == np.array([0, 0, 0, 0, 0, 0, 1, 1, 1, 0])).all)
 
-        sb_clf_1 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_1, max_features=0.2,
-                                                             n_estimators=100,
-                                                             samples_info_sets=self.price_bars_trim,
-                                                             price_bars=self.data, oob_score=True,
-                                                             random_state=1, bootstrap_features=True,
-                                                             max_samples=30, verbose=2)
+    def test_sb_bagging_non_sample_weights_with_verbose(self):
+        """
+        Test SB Bagging with classifier which doesn't support sample_weights with verbose > 1
+        """
 
-        sb_clf_2 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_2, max_features=7,
-                                                             n_estimators=100,
-                                                             samples_info_sets=self.price_bars_trim,
-                                                             price_bars=self.data, oob_score=False,
-                                                             random_state=1, bootstrap_features=True,
-                                                             max_samples=0.3, warm_start=True)
+        clf = LinearSVC()
 
-        sb_clf_3 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_3,
-                                                             samples_info_sets=self.price_bars_trim,
-                                                             price_bars=self.data)
+        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=0.2,
+                                                           n_estimators=2,
+                                                           samples_info_sets=self.samples_info_sets,
+                                                           price_bars=self.price_bars_trim, oob_score=True,
+                                                           random_state=1, bootstrap_features=True,
+                                                           max_samples=30, verbose=2)
 
-        sb_clf_4 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_4, max_features=0.2,
-                                                             n_estimators=100,
-                                                             samples_info_sets=self.price_bars_trim,
-                                                             price_bars=self.data, oob_score=True,
-                                                             random_state=1, bootstrap_features=True,
-                                                             max_samples=30, verbose=2)
+        sb_clf.fit(self.X_train, self.y_train_clf)
+        self.assertTrue((sb_clf.predict(self.X_train)[:10] == np.array([0, 0, 0, 0, 0, 0, 1, 1, 1, 0])).all)
 
-        sb_clf_1.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
+    def test_sb_bagging_with_max_features(self):
+        """
+        Test SB Bagging with base_estimator bootstrap = True, float max_features, max_features bootstrap = True
+        :return:
+        """
+        clf = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=True,
+                                     class_weight='balanced_subsample', max_depth=12)
 
-        sb_clf_2.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
-        sb_clf_2.n_estimators += 0
-        sb_clf_2.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
-        sb_clf_2.n_estimators += 2
-        sb_clf_2.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
+        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=0.2,
+                                                           n_estimators=2,
+                                                           samples_info_sets=self.samples_info_sets,
+                                                           price_bars=self.price_bars_trim, oob_score=True,
+                                                           random_state=1, bootstrap_features=True,
+                                                           max_samples=30, verbose=2)
 
-        sb_clf_3.fit(self.X_train, self.y_train_clf)
-        sb_clf_4.fit(self.X_train, self.y_train_clf)
+        sb_clf.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)))
+        self.assertTrue((sb_clf.predict(self.X_train)[:10] == np.array([0, 0, 0, 0, 0, 0, 1, 1, 1, 0])).all)
+
+    def test_sb_bagging_float_max_samples_warm_start_true(self):
+        clf = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
+                                     class_weight='balanced_subsample', max_depth=12)
+
+        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=7,
+                                                           n_estimators=2,
+                                                           samples_info_sets=self.samples_info_sets,
+                                                           price_bars=self.price_bars_trim, oob_score=False,
+                                                           random_state=1, bootstrap_features=True,
+                                                           max_samples=0.3, warm_start=True)
+
+        sb_clf.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
+        sb_clf.n_estimators += 0
+        sb_clf.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
+        sb_clf.n_estimators += 2
+        sb_clf.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
+
+        self.assertTrue((sb_clf.predict(self.X_train)[:10] == np.array([0, 0, 0, 0, 0, 0, 1, 1, 1, 0])).all)
 
     def test_value_error_raise(self):
         """
