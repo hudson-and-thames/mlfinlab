@@ -9,7 +9,7 @@ from sklearn.metrics import log_loss, accuracy_score
 from sklearn.model_selection import KFold
 
 
-def ml_get_train_times(info_sets: pd.Series, test_times: pd.Series) -> pd.Series:
+def ml_get_train_times(samples_info_sets: pd.Series, test_times: pd.Series) -> pd.Series:
     # pylint: disable=invalid-name
     """
     Snippet 7.1, page 106,  Purging observations in the training set
@@ -18,12 +18,12 @@ def ml_get_train_times(info_sets: pd.Series, test_times: pd.Series) -> pd.Series
     and the range for the test set.
 
     Given test_times, find the times of the training observations.
-    :param info_sets: The information on which each record is constructed from
-        -info_sets.index: Time when the information extraction started.
-        -info_sets.value: Time when the information extraction ended.
+    :param samples_info_sets: The information on which each record is constructed from
+        -samples_info_sets.index: Time when the information extraction started.
+        -samples_info_sets.value: Time when the information extraction ended.
     :param test_times: Times for the test dataset.
     """
-    train = info_sets.copy(deep=True)
+    train = samples_info_sets.copy(deep=True)
     for start_ix, end_ix in test_times.iteritems():
         df0 = train[(start_ix <= train.index) & (train.index <= end_ix)].index  # Train starts within test
         df1 = train[(start_ix <= train) & (train <= end_ix)].index  # Train ends within test
@@ -39,25 +39,25 @@ class PurgedKFold(KFold):
     Test set is assumed contiguous (shuffle=False), w/o training samples in between
     """
 
-    def __init__(self, n_splits=3, info_sets=None, pct_embargo=0.):
+    def __init__(self, n_splits=3, samples_info_sets=None, pct_embargo=0.):
         """
         :param n_splits: The number of splits. Default to 3
-        :param info_sets:
-            —info_sets.index: Time when the information extraction started.
-            —info_sets.value: Time when the information extraction ended.
+        :param samples_info_sets:
+            —samples_info_sets.index: Time when the information extraction started.
+            —samples_info_sets.value: Time when the information extraction ended.
         :param pct_embargo: Percent that determines the embargo size.
         """
-        if not isinstance(info_sets, pd.Series):
-            raise ValueError('The info_sets param must be a pd.Series')
+        if not isinstance(samples_info_sets, pd.Series):
+            raise ValueError('The samples_info_sets param must be a pd.Series')
         super(PurgedKFold, self).__init__(n_splits, shuffle=False, random_state=None)
 
-        self.info_sets = info_sets
+        self.samples_info_sets = samples_info_sets
         self.pct_embargo = pct_embargo
 
     # noinspection PyPep8Naming
     def split(self, X, y=None, groups=None):
-        if X.shape[0] != self.info_sets.shape[0]:
-            raise ValueError("X and the 'info_sets' series param must be the same length")
+        if X.shape[0] != self.samples_info_sets.shape[0]:
+            raise ValueError("X and the 'samples_info_sets' series param must be the same length")
 
         indices: np.ndarray = np.arange(X.shape[0])
         embargo: int = int(X.shape[0] * self.pct_embargo)
@@ -69,17 +69,17 @@ class PurgedKFold(KFold):
             if end_ix < X.shape[0]:
                 end_ix += embargo
 
-            test_times = pd.Series(index=[self.info_sets[start_ix]], data=[self.info_sets[end_ix-1]])
-            train_times = ml_get_train_times(self.info_sets, test_times)
+            test_times = pd.Series(index=[self.samples_info_sets[start_ix]], data=[self.samples_info_sets[end_ix-1]])
+            train_times = ml_get_train_times(self.samples_info_sets, test_times)
 
             train_indices = []
             for train_ix in train_times.index:
-                train_indices.append(self.info_sets.index.get_loc(train_ix))
+                train_indices.append(self.samples_info_sets.index.get_loc(train_ix))
             yield np.array(train_indices), test_indices
 
 
 # noinspection PyPep8Naming
-def ml_cross_val_score(classifier, X, y, sample_weight, scoring='neg_log_loss', info_sets=None, n_splits=None, cv_gen=None, pct_embargo=None):
+def ml_cross_val_score(classifier, X, y, sample_weight, scoring='neg_log_loss', samples_info_sets=None, n_splits=None, cv_gen=None, pct_embargo=None):
     # pylint: disable=invalid-name
     """
     Function to run a cross-validation evaluation of the using sample weights and a custom CV generator
@@ -88,9 +88,9 @@ def ml_cross_val_score(classifier, X, y, sample_weight, scoring='neg_log_loss', 
     :param y: The labels corresponding to the X dataset
     :param sample_weight: A numpy array of weights for each record in the dataset
     :param scoring: A metric name to use for scoring; currently supports `neg_log_loss` and `accuracy`
-    :param info_sets:
-        —info_sets.index: Time when the information extraction started.
-        —info_sets.value: Time when the information extraction ended.
+    :param samples_info_sets:
+        —samples_info_sets.index: Time when the information extraction started.
+        —samples_info_sets.value: Time when the information extraction ended.
     :param n_splits: Number of splits
     :param cv_gen: Cross Validation generator object instance; if None then PurgedKFold will be used
     :param pct_embargo: Embargo percentage [0, 1]
@@ -99,7 +99,7 @@ def ml_cross_val_score(classifier, X, y, sample_weight, scoring='neg_log_loss', 
     if scoring not in ['neg_log_loss', 'accuracy']:
         raise ValueError('wrong scoring method.')
     if cv_gen is None:
-        cv_gen = PurgedKFold(n_splits=n_splits, info_sets=info_sets, pct_embargo=pct_embargo)
+        cv_gen = PurgedKFold(n_splits=n_splits, samples_info_sets=samples_info_sets, pct_embargo=pct_embargo)
     ret_scores = []
     for train, test in cv_gen.split(X=X):
         fit = classifier.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight.iloc[train].values)

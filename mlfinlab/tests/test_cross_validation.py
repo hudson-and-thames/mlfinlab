@@ -122,7 +122,7 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_purgedkfold_01_exception(self):
         """
-        Test throw exception when info_sets is not a pd.Series
+        Test throw exception when samples_info_sets is not a pd.Series
         :return:
         """
         infosets = pd.DataFrame(
@@ -138,7 +138,7 @@ class TestCrossValidation(unittest.TestCase):
         self.log(f"dataset=\n{dataset}")
 
         try:
-            PurgedKFold(n_splits=3, info_sets=infosets, pct_embargo=0.)
+            PurgedKFold(n_splits=3, samples_info_sets=infosets, pct_embargo=0.)
         except ValueError:
             pass
         else:
@@ -162,7 +162,7 @@ class TestCrossValidation(unittest.TestCase):
         )
         self.log(f"dataset=\n{dataset}")
 
-        pkf = PurgedKFold(n_splits=3, info_sets=infosets, pct_embargo=0.)
+        pkf = PurgedKFold(n_splits=3, samples_info_sets=infosets, pct_embargo=0.)
         try:
             for _, _ in pkf.split(dataset):
                 pass
@@ -191,7 +191,7 @@ class TestCrossValidation(unittest.TestCase):
         )
         self.log(f"dataset=\n{dataset}")
 
-        pkf = PurgedKFold(n_splits=3, info_sets=infosets, pct_embargo=0.)
+        pkf = PurgedKFold(n_splits=3, samples_info_sets=infosets, pct_embargo=0.)
         for train_indices, test_indices in pkf.split(dataset):
             self.log(f"test_times_ret=\n{infosets[test_indices]}")
 
@@ -229,7 +229,7 @@ class TestCrossValidation(unittest.TestCase):
         pct_points_test: int = 2
         self.log(f"pct_points_test= {pct_points_test}")
 
-        pkf = PurgedKFold(n_splits=3, info_sets=infosets, pct_embargo=0.01*pct_points_test)
+        pkf = PurgedKFold(n_splits=3, samples_info_sets=infosets, pct_embargo=0.01*pct_points_test)
 
         # Also test that X can be an np.ndarray by passing in the .values of the pd.DataFrame
         for train_indices, test_indices in pkf.split(dataset.values):
@@ -312,7 +312,7 @@ class TestCrossValidation(unittest.TestCase):
                 y=labels,
                 sample_weight=sample_weights,
                 scoring='jaccard_score',
-                info_sets=infosets,
+                samples_info_sets=infosets,
                 n_splits=3,
                 cv_gen=None,
                 pct_embargo=0.01
@@ -334,7 +334,7 @@ class TestCrossValidation(unittest.TestCase):
             y=labels,
             sample_weight=sample_weights,
             scoring='accuracy',
-            info_sets=infosets,
+            samples_info_sets=infosets,
             n_splits=3,
             cv_gen=None,
             pct_embargo=0.01
@@ -360,7 +360,7 @@ class TestCrossValidation(unittest.TestCase):
             y=labels,
             sample_weight=sample_weights,
             scoring='neg_log_loss',
-            info_sets=infosets,
+            samples_info_sets=infosets,
             n_splits=3,
             cv_gen=None,
             pct_embargo=0.01
@@ -386,7 +386,7 @@ class TestCrossValidation(unittest.TestCase):
             y=labels,
             sample_weight=sample_weights,
             scoring='neg_log_loss',
-            info_sets=infosets,
+            samples_info_sets=infosets,
             n_splits=3,
             cv_gen=TimeSeriesSplit(max_train_size=None, n_splits=3),
             pct_embargo=0.01
