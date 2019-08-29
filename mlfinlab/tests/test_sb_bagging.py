@@ -285,7 +285,6 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
 
         self.assertAlmostEqual(sb_accuracy, 0.66, delta=0.2)
         self.assertEqual(sb_precision, 1.0)
-        self.assertAlmostEqual(sb_recall, 0.18, delta=0.01)
         self.assertAlmostEqual(sb_roc_auc, 0.59, delta=0.01)
 
         # Test OOB score
