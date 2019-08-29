@@ -9,13 +9,12 @@ import pandas as pd
 import numpy as np
 
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.metrics import accuracy_score, r2_score
 from sklearn.ensemble.bagging import BaseBagging, BaggingClassifier, BaggingRegressor
 from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.ensemble.base import _partition_estimators
 from sklearn.utils.random import sample_without_replacement
 from sklearn.utils.validation import has_fit_parameter
-from sklearn.utils import check_random_state, indices_to_mask, check_array, check_consistent_length, check_X_y
+from sklearn.utils import check_random_state, check_array, check_consistent_length, check_X_y
 from sklearn.utils._joblib import Parallel, delayed
 
 from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix
@@ -37,7 +36,7 @@ MAX_INT = np.iinfo(np.int32).max
 # pylint: disable=no-else-raise
 
 
-def _generate_indices_standard(random_state, bootstrap, n_population, n_samples):
+def _generate_random_features(random_state, bootstrap, n_population, n_samples):
     """Draw randomly sampled indices."""
     # Draw sample indices
     if bootstrap:
@@ -55,8 +54,8 @@ def _generate_bagging_indices(random_state, bootstrap_features, n_features, max_
     random_state = check_random_state(random_state)
 
     # Draw indices
-    feature_indices = _generate_indices_standard(random_state, bootstrap_features,
-                                                 n_features, max_features)
+    feature_indices = _generate_random_features(random_state, bootstrap_features,
+                                                n_features, max_features)
     sample_indices = seq_bootstrap(ind_mat, sample_length=max_samples, random_state=random_state)
 
     return feature_indices, sample_indices
