@@ -63,17 +63,17 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         self.data['side'] = self.data['side'].shift(1)
 
         daily_vol = get_daily_vol(close=self.data['close'], lookback=50) * 0.5
-        cusum_events = cusum_filter(self.data['close'], threshold=0.001)
+        cusum_events = cusum_filter(self.data['close'], threshold=0.005)
         vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'],
-                                                 num_days=2)
+                                                 num_hours=2)
         meta_labeled_events = get_events(close=self.data['close'],
-                                              t_events=cusum_events,
-                                              pt_sl=[1, 4],
-                                              target=daily_vol,
-                                              min_ret=5e-5,
-                                              num_threads=3,
-                                              vertical_barrier_times=vertical_barriers,
-                                              side_prediction=self.data['side'])
+                                         t_events=cusum_events,
+                                         pt_sl=[1, 4],
+                                         target=daily_vol,
+                                         min_ret=5e-5,
+                                         num_threads=3,
+                                         vertical_barrier_times=vertical_barriers,
+                                         side_prediction=self.data['side'])
         meta_labeled_events.dropna(inplace=True)
         labels = get_bins(meta_labeled_events, self.data['close'])
 
@@ -81,9 +81,8 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         ind_mat = get_ind_matrix(meta_labeled_events.t1, self.data.close)
 
         # Get mix of samples where some of them are extremely non-overlapping, the other one are highly overlapping
-        good_uniqueness_thresh = 0.4
-        bad_uniqueness_thresh = 0.12
-
+        good_uniqueness_thresh = 0.5
+        bad_uniqueness_thresh = 0.1
         i = 0
         unique_samples = []
         for label in get_ind_mat_label_uniqueness(ind_mat):
@@ -112,17 +111,20 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         X.dropna(inplace=True)
         y = X.pop('y')
 
-        self.X_train, self.X_test, self.y_train_clf, self.y_test_clf = train_test_split(X, y, test_size=0.4, random_state=1, shuffle=False)
+        self.X_train, self.X_test, self.y_train_clf, self.y_test_clf = train_test_split(X[features], y, test_size=0.4,
+                                                                                        random_state=1, shuffle=False)
+        self.y_train_reg = (1 + self.y_train_clf) * np.random.random_sample()
+        self.y_test_reg = (1 + self.y_test_clf) * np.random.random_sample()
 
         self.samples_info_sets = meta_labeled_events.loc[self.X_train.index, 't1']
-        self.price_bars_trim = self.data[(self.data.index >= self.X_train.index.min()) & (self.data.index <= self.X_train.index.max())].close
+        self.price_bars_trim = self.data[
+            (self.data.index >= self.X_train.index.min()) & (self.data.index <= self.X_train.index.max())].close
 
-
-    def _generate_label_with_prob(self, x, prob):
+    def _generate_label_with_prob(self, x, prob, random_state=np.random.RandomState(1)):
         """
         Generates true label value with some probability(prob)
         """
-        choice = np.random.choice([0, 1], p=[1 - prob, prob])
+        choice = random_state.choice([0, 1], p=[1 - prob, prob])
         if choice == 1:
             return x
         else:
@@ -239,67 +241,37 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         """
 
         # Init classifiers
-        clf = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
-                                     class_weight='balanced_subsample')
+        clf_base = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
+                                          class_weight='balanced_subsample')
 
-        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=100,
-                                                           samples_info_sets=self.meta_labeled_events.t1,
-                                                           price_bars=self.data, oob_score=True, random_state=1)
-        sklearn_clf = BaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=50, oob_score=True,
-                                        random_state=1)
+        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_base, max_features=1.0, n_estimators=100,
+                                                           samples_info_sets=self.samples_info_sets,
+                                                           price_bars=self.price_bars_trim, oob_score=True,
+                                                           random_state=1)
 
         # X_train index should be in index mapping
         self.assertTrue(self.X_train.index.isin(sb_clf.timestamp_int_index_mapping.index).all())
 
         sb_clf.fit(self.X_train, self.y_train_clf)
-        sklearn_clf.fit(self.X_train, self.y_train_clf)
 
         self.assertTrue((sb_clf.X_time_index == self.X_train.index).all())  # X_train index == clf X_train index
 
         oos_sb_predictions = sb_clf.predict(self.X_test)
-        oos_sklearn_predictions = sklearn_clf.predict(self.X_test)
 
         sb_precision = precision_score(self.y_test_clf, oos_sb_predictions)
         sb_recall = recall_score(self.y_test_clf, oos_sb_predictions)
         sb_roc_auc = roc_auc_score(self.y_test_clf, oos_sb_predictions)
+        sb_accuracy = accuracy_score(self.y_test_clf, oos_sb_predictions)
 
-        sklearn_precision = precision_score(self.y_test_clf, oos_sklearn_predictions)
-        sklearn_recall = recall_score(self.y_test_clf, oos_sklearn_predictions)
-        sklearn_roc_auc = roc_auc_score(self.y_test_clf, oos_sklearn_predictions)
+        self.assertAlmostEqual(sb_accuracy, 0.66, delta=0.01)
+        self.assertEqual(sb_precision, 1.0)
+        self.assertAlmostEqual(sb_recall, 0.18, delta=0.01)
+        self.assertAlmostEqual(sb_roc_auc, 0.59, delta=0.01)
 
-        # Test OOB scores (sequentially bootstrapped, algorithm specific, standard (random sampling)
-
-        # Algorithm specific
-        self.assertGreater(sb_clf.oob_score_, sklearn_clf.oob_score_)  # oob_score for SB should be greater
-        self.assertAlmostEqual(sb_clf.oob_score_, 0.99, delta=0.01)
-
-        # Sequentially Bootstrapped oob_score
-        # Trim index mapping so that only train indices are present
-        subsamples = sb_clf.timestamp_int_index_mapping.loc[sb_clf.X_time_index]
-        subsampled_ind_mat = sb_clf.ind_mat[:, subsamples]
-        sb_sample = seq_bootstrap(subsampled_ind_mat, sample_length=self.X_train.shape[0], compare=True)
-        masked_sample = ~indices_to_mask(sb_sample, self.X_train.shape[0])  # Take OOB samples
-        sb_clf_accuracy = accuracy_score(self.y_train_clf.iloc[~masked_sample],
-                                         sb_clf.predict(self.X_train.iloc[~masked_sample]))
-        sklearn_clf_accuracy = accuracy_score(self.y_train_clf.iloc[~masked_sample],
-                                              sklearn_clf.predict(self.X_train.iloc[~masked_sample]))
-        self.assertGreaterEqual(sb_clf_accuracy, sklearn_clf_accuracy)
-
-        # Random sampling oob_score
-        random_sample = np.random.choice(subsampled_ind_mat.shape[1], size=self.X_train.shape[0])
-        sb_clf_accuracy = accuracy_score(self.y_train_clf.iloc[random_sample],
-                                         sb_clf.predict(self.X_train.iloc[sb_sample]))
-        sklearn_clf_accuracy = accuracy_score(self.y_train_clf.iloc[random_sample],
-                                              sklearn_clf.predict(self.X_train.iloc[sb_sample]))
-
-        self.assertTrue(sb_clf_accuracy >= sklearn_clf_accuracy)
-
-        # Test that OOS metrics for SB are greater than sklearn's
-        self.assertGreaterEqual(sb_precision, sklearn_precision)
-        self.assertGreaterEqual(sb_recall, sklearn_recall)
-        self.assertGreaterEqual(sb_roc_auc, sklearn_roc_auc)
-
-        self.assertTrue((oos_sb_predictions == np.array([0, 1, 0, 0, 0, 0, 1, 1, 0, 0])).all())  # check oos predictions
+        # Test OOB score
+        self.assertTrue((oos_sb_predictions == np.array(
+            [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+             0])).all())  # check oos predictions
 
     def test_sb_regressor(self):
         """
@@ -308,40 +280,20 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         # Init regressors
         reg = RandomForestRegressor(n_estimators=1, bootstrap=False)
         sb_reg = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=100,
-                                                          samples_info_sets=self.meta_labeled_events.t1,
-                                                          price_bars=self.data, oob_score=True, random_state=1)
-
-        sb_reg_70 = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=70,
-                                                             samples_info_sets=self.meta_labeled_events.t1,
-                                                             price_bars=self.data, oob_score=True, random_state=1)
-        sb_reg_1_estimator = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0,
-                                                                      n_estimators=1,
-                                                                      samples_info_sets=self.meta_labeled_events.t1,
-                                                                      price_bars=self.data, oob_score=True,
-                                                                      random_state=1)
-        sklearn_reg = BaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=50, oob_score=True,
-                                       random_state=1)
+                                                          samples_info_sets=self.samples_info_sets,
+                                                          price_bars=self.price_bars_trim, oob_score=True,
+                                                          random_state=1)
 
         # X_train index should be in index mapping
 
         sb_reg.fit(self.X_train, self.y_train_reg)
-        sb_reg_1_estimator.fit(self.X_train, self.y_train_reg)
-        sb_reg_70.fit(self.X_train.iloc[20:40], self.y_train_reg.iloc[20:40])  # Cover not raised oob warning
-        sklearn_reg.fit(self.X_train, self.y_train_reg)
 
         self.assertTrue(self.X_train.index.isin(sb_reg.timestamp_int_index_mapping.index).all())
         self.assertTrue((sb_reg.X_time_index == self.X_train.index).all())  # X_train index == reg X_train index
 
         oos_sb_predictions = sb_reg.predict(self.X_test)
-        oos_sklearn_predictions = sklearn_reg.predict(self.X_test)
-
-        self.assertGreaterEqual(sb_reg.oob_score_, sklearn_reg.oob_score_)
-
         mse_sb_reg = mean_squared_error(self.y_test_reg, oos_sb_predictions)
         mae_sb_reg = mean_absolute_error(self.y_test_reg, oos_sb_predictions)
 
-        mse_sklearn_reg = mean_squared_error(self.y_test_reg, oos_sklearn_predictions)
-        mae_sklearn_reg = mean_absolute_error(self.y_test_reg, oos_sklearn_predictions)
-
-        self.assertLessEqual(mae_sb_reg, mae_sklearn_reg)
-        self.assertGreaterEqual(mse_sb_reg, mse_sklearn_reg)
+        self.assertAlmostEqual(mse_sb_reg, 0.7, delta=0.01)
+        self.assertAlmostEqual(mae_sb_reg, 0.767, delta=0.01)
