@@ -10,6 +10,7 @@ import pandas as pd
 
 from sklearn.metrics import precision_score, recall_score, roc_auc_score, accuracy_score, mean_absolute_error, \
     mean_squared_error
+from sklearn.model_selection import train_test_split
 from sklearn.ensemble import BaggingClassifier, BaggingRegressor, RandomForestClassifier, RandomForestRegressor
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC
@@ -18,7 +19,8 @@ from sklearn.utils import indices_to_mask
 from mlfinlab.util.utils import get_daily_vol
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier, get_bins
-from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix, get_ind_mat_average_uniqueness
+from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix, get_ind_mat_average_uniqueness, \
+    get_ind_mat_label_uniqueness
 from mlfinlab.ensemble.sb_bagging import SequentiallyBootstrappedBaggingClassifier, \
     SequentiallyBootstrappedBaggingRegressor
 
@@ -60,45 +62,71 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         # Remove Look ahead bias by lagging the signal
         self.data['side'] = self.data['side'].shift(1)
 
-        daily_vol = get_daily_vol(close=self.data['close'], lookback=50)
+        daily_vol = get_daily_vol(close=self.data['close'], lookback=50) * 0.5
         cusum_events = cusum_filter(self.data['close'], threshold=0.001)
         vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'],
                                                  num_days=2)
-        self.meta_labeled_events = get_events(close=self.data['close'],
+        meta_labeled_events = get_events(close=self.data['close'],
                                               t_events=cusum_events,
-                                              pt_sl=[4, 4],
+                                              pt_sl=[1, 4],
                                               target=daily_vol,
-                                              min_ret=0.005,
+                                              min_ret=5e-5,
                                               num_threads=3,
                                               vertical_barrier_times=vertical_barriers,
                                               side_prediction=self.data['side'])
+        meta_labeled_events.dropna(inplace=True)
+        labels = get_bins(meta_labeled_events, self.data['close'])
 
-        self.meta_labeled_events.dropna(inplace=True)
-        labels = get_bins(self.meta_labeled_events, self.data['close'])
+        # Generate data set which shows the power of SB Bagging vs Standard Bagging
+        ind_mat = get_ind_matrix(meta_labeled_events.t1, self.data.close)
 
-        # Feature generation
-        features = []
-        X = self.data.copy()
-        X['log_ret'] = X.close.apply(np.log).diff()
-        for win in [2, 5, 10, 20, 25]:
-            X['momentum_{}'.format(win)] = X.close / X.close.rolling(window=win).mean() - 1
-            X['std_{}'.format(win)] = X.log_ret.rolling(window=win).std()
-            X['pct_change_{}'.format(win)] = X.close.pct_change(win)
-            X['diff_{}'.format(win)] = X.close.diff(win)
+        # Get mix of samples where some of them are extremely non-overlapping, the other one are highly overlapping
+        good_uniqueness_thresh = 0.4
+        bad_uniqueness_thresh = 0.12
 
-            for f in ['momentum', 'std', 'pct_change', 'diff']:
-                features.append('{}_{}'.format(f, win))
+        i = 0
+        unique_samples = []
+        for label in get_ind_mat_label_uniqueness(ind_mat):
+            if np.mean(label[label > 0]) > good_uniqueness_thresh or np.mean(label[label > 0]) < bad_uniqueness_thresh:
+                unique_samples.append(i)
+            i += 1
 
-        # Train/test generation
+        X = self.data.loc[labels.index,].iloc[unique_samples].dropna()  # get synthetic data set with drawn samples
+        labels = labels.loc[X.index, :]
+        X.loc[labels.index, 'y'] = labels.bin
+
+        # Generate features (some of them are informative, others are just noise)
+        for index, value in X.y.iteritems():
+            X.loc[index, 'label_prob_0.6'] = self._generate_label_with_prob(value, 0.6)
+            X.loc[index, 'label_prob_0.5'] = self._generate_label_with_prob(value, 0.5)
+            X.loc[index, 'label_prob_0.3'] = self._generate_label_with_prob(value, 0.3)
+            X.loc[index, 'label_prob_0.2'] = self._generate_label_with_prob(value, 0.2)
+            X.loc[index, 'label_prob_0.1'] = self._generate_label_with_prob(value, 0.1)
+
+        features = ['label_prob_0.6', 'label_prob_0.2']  # Two super-informative features
+        for prob in [0.5, 0.3, 0.2, 0.1]:
+            for window in [2, 5, 10]:
+                X['label_prob_{}_sma_{}'.format(prob, window)] = X['label_prob_{}'.format(prob)].rolling(
+                    window=window).mean()
+                features.append('label_prob_{}_sma_{}'.format(prob, window))
         X.dropna(inplace=True)
-        X = X.loc[self.meta_labeled_events.index, :]  # Take only filtered events
-        labels = labels.loc[X.index, :]  # Sync X and y
-        self.meta_labeled_events = self.meta_labeled_events.loc[X.index, :]  # Sync X and meta_labeled_events
+        y = X.pop('y')
 
-        self.X_train, self.y_train_clf, self.y_train_reg = X.iloc[:300][features], labels.iloc[:300].bin, \
-                                                           labels.iloc[:300].ret
-        self.X_test, self.y_test_clf, self.y_test_reg = X.iloc[300:][features], labels.iloc[300:].bin, \
-                                                        labels.iloc[300:].ret
+        self.X_train, self.X_test, self.y_train_clf, self.y_test_clf = train_test_split(X, y, test_size=0.4, random_state=1, shuffle=False)
+
+        self.samples_info_sets = meta_labeled_events.loc[self.X_train.index, 't1']
+        self.price_bars_trim = self.data[(self.data.index >= self.X_train.index.min()) & (self.data.index <= self.X_train.index.max())].close
+
+
+    def _generate_label_with_prob(self, x, prob):
+        """
+        Generates true label value with some probability(prob)
+        """
+        choice = np.random.choice([0, 1], p=[1 - prob, prob])
+        if choice == 1:
+            return x
+        else:
+            return int(not x)
 
     def test_other_sb_features(self):
         """
@@ -114,25 +142,25 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
 
         sb_clf_1 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_1, max_features=0.2,
                                                              n_estimators=100,
-                                                             events_end_times=self.meta_labeled_events.t1,
+                                                             samples_info_sets=self.meta_labeled_events.t1,
                                                              price_bars=self.data, oob_score=True,
                                                              random_state=1, bootstrap_features=True,
                                                              max_samples=30, verbose=2)
 
         sb_clf_2 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_2, max_features=7,
                                                              n_estimators=100,
-                                                             events_end_times=self.meta_labeled_events.t1,
+                                                             samples_info_sets=self.meta_labeled_events.t1,
                                                              price_bars=self.data, oob_score=False,
                                                              random_state=1, bootstrap_features=True,
                                                              max_samples=0.3, warm_start=True)
 
         sb_clf_3 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_3,
-                                                             events_end_times=self.meta_labeled_events.t1,
+                                                             samples_info_sets=self.meta_labeled_events.t1,
                                                              price_bars=self.data)
 
         sb_clf_4 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_4, max_features=0.2,
                                                              n_estimators=100,
-                                                             events_end_times=self.meta_labeled_events.t1,
+                                                             samples_info_sets=self.meta_labeled_events.t1,
                                                              price_bars=self.data, oob_score=True,
                                                              random_state=1, bootstrap_features=True,
                                                              max_samples=30, verbose=2)
@@ -154,25 +182,25 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         """
         clf = KNeighborsClassifier()
         bagging_clf_1 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  events_end_times=self.meta_labeled_events.t1,
+                                                                  samples_info_sets=self.meta_labeled_events.t1,
                                                                   price_bars=self.data)
         bagging_clf_2 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  events_end_times=self.meta_labeled_events.t1,
+                                                                  samples_info_sets=self.meta_labeled_events.t1,
                                                                   price_bars=self.data, max_samples=2000000)
         bagging_clf_3 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  events_end_times=self.meta_labeled_events.t1,
+                                                                  samples_info_sets=self.meta_labeled_events.t1,
                                                                   price_bars=self.data, max_features='20')
         bagging_clf_4 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  events_end_times=self.meta_labeled_events.t1,
+                                                                  samples_info_sets=self.meta_labeled_events.t1,
                                                                   price_bars=self.data, max_features=2000000)
         bagging_clf_5 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  events_end_times=self.meta_labeled_events.t1,
+                                                                  samples_info_sets=self.meta_labeled_events.t1,
                                                                   price_bars=self.data, oob_score=True, warm_start=True)
         bagging_clf_6 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  events_end_times=self.meta_labeled_events.t1,
+                                                                  samples_info_sets=self.meta_labeled_events.t1,
                                                                   price_bars=self.data, warm_start=True)
         bagging_clf_7 = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf,
-                                                                  events_end_times=self.meta_labeled_events.t1,
+                                                                  samples_info_sets=self.meta_labeled_events.t1,
                                                                   price_bars=self.data, warm_start=True)
         with self.assertRaises(ValueError):
             # ValueError to use sample weight with classifier which doesn't support sample weights
@@ -215,7 +243,7 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
                                      class_weight='balanced_subsample')
 
         sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=100,
-                                                           events_end_times=self.meta_labeled_events.t1,
+                                                           samples_info_sets=self.meta_labeled_events.t1,
                                                            price_bars=self.data, oob_score=True, random_state=1)
         sklearn_clf = BaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=50, oob_score=True,
                                         random_state=1)
@@ -280,15 +308,15 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         # Init regressors
         reg = RandomForestRegressor(n_estimators=1, bootstrap=False)
         sb_reg = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=100,
-                                                          events_end_times=self.meta_labeled_events.t1,
+                                                          samples_info_sets=self.meta_labeled_events.t1,
                                                           price_bars=self.data, oob_score=True, random_state=1)
 
         sb_reg_70 = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=70,
-                                                             events_end_times=self.meta_labeled_events.t1,
+                                                             samples_info_sets=self.meta_labeled_events.t1,
                                                              price_bars=self.data, oob_score=True, random_state=1)
         sb_reg_1_estimator = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0,
                                                                       n_estimators=1,
-                                                                      events_end_times=self.meta_labeled_events.t1,
+                                                                      samples_info_sets=self.meta_labeled_events.t1,
                                                                       price_bars=self.data, oob_score=True,
                                                                       random_state=1)
         sklearn_reg = BaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=50, oob_score=True,

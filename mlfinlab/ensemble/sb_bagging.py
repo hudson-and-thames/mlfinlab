@@ -125,7 +125,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
 
     @abstractmethod
     def __init__(self,
-                 events_end_times,
+                 samples_info_sets,
                  price_bars,
                  base_estimator=None,
                  n_estimators=10,
@@ -152,11 +152,11 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
             verbose=verbose)
 
         # pylint: disable=invalid-name
-        self.events_end_times = events_end_times
+        self.samples_info_sets = samples_info_sets
         self.price_bars = price_bars
-        self.ind_mat = get_ind_matrix(events_end_times, price_bars)
+        self.ind_mat = get_ind_matrix(samples_info_sets, price_bars)
         # Used for create get ind_matrix subsample during cross-validation
-        self.timestamp_int_index_mapping = pd.Series(index=events_end_times.index,
+        self.timestamp_int_index_mapping = pd.Series(index=samples_info_sets.index,
                                                      data=range(self.ind_mat.shape[1]))
 
         self.X_time_index = None  # Timestamp index of X_train
@@ -365,12 +365,12 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
     Read more in the :ref:`User Guide <bagging>`.
     Parameters
     ----------
-    events_end_times: pd.Series
+    samples_info_sets: pd.Series
         Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation.
-        -events_end_times.index: Time when the information extraction started.
-        -events_end_times.value: Time when the information extraction ended
+        -samples_info_sets.index: Time when the information extraction started.
+        -samples_info_sets.values: Time when the information extraction ended
     price_bars: pd.DataFrame
-        Price bars used in events_end_times generation
+        Price bars used in samples_info_sets generation
     base_estimator : object or None, optional (default=None)
         The base estimator to fit on random subsets of the dataset.
         If None, then the base estimator is a decision tree.
@@ -443,7 +443,7 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
     """
 
     def __init__(self,
-                 events_end_times,
+                 samples_info_sets,
                  price_bars,
                  base_estimator=None,
                  n_estimators=10,
@@ -457,7 +457,7 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
                  verbose=0,
                  ):
         super().__init__(
-            events_end_times=events_end_times,
+            samples_info_sets=samples_info_sets,
             price_bars=price_bars,
             base_estimator=base_estimator,
             n_estimators=n_estimators,
@@ -496,12 +496,12 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
     Read more in the :ref:`User Guide <bagging>`.
     Parameters
     ----------
-    events_end_times: pd.Series
+    samples_info_sets: pd.Series
         Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation.
-         -events_end_times.index: Time when the information extraction started.
-         -events_end_times.value: Time when the information extraction ended
+         -samples_info_sets.index: Time when the information extraction started.
+         -samples_info_sets.value: Time when the information extraction ended
     price_bars: pd.DataFrame
-        Price bars used in events_end_times generation
+        Price bars used in samples_info_sets generation
     base_estimator : object or None, optional (default=None)
         The base estimator to fit on random subsets of the dataset.
         If None, then the base estimator is a decision tree.
@@ -566,7 +566,7 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
     """
 
     def __init__(self,
-                 events_end_times,
+                 samples_info_sets,
                  price_bars,
                  base_estimator=None,
                  n_estimators=10,
@@ -580,7 +580,7 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
                  verbose=0,
                  ):
         super().__init__(
-            events_end_times=events_end_times,
+            samples_info_sets=samples_info_sets,
             price_bars=price_bars,
             base_estimator=base_estimator,
             n_estimators=n_estimators,
