@@ -31,3 +31,7 @@ More details on this in section 7.4.2, page 107.
    Image showing the process of **embargo**. Figure taken from page 108 of the book.
 
 
+.. py:currentmodule:: mlfinlab.cross_validation.cross_validation
+.. automodule:: mlfinlab.cross_validation.cross_validation
+   :members:
+

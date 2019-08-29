@@ -53,7 +53,6 @@ The implementations that will be added in the future as well as the implementati
 
 .. |vspace| raw:: latex
 
-
    \vspace{5mm}
 
 * Part 2: Modelling
