@@ -222,6 +222,8 @@ class TestFeatureImportance(unittest.TestCase):
         oos_score = ml_cross_val_score(sb_clf, self.X_train, self.y_train_clf, cv_gen=cv_gen, sample_weight=None,
                                        scoring='accuracy').mean()
 
+        sb_clf.fit(self.X_train, self.y_train_clf)
+
         mdi_feat_imp = feature_importance_mean_decrease_impurity(sb_clf, self.X_train.columns)
         plot_feature_importance(mdi_feat_imp, oob_score=sb_clf.oob_score_, oos_score=oos_score)
         plot_feature_importance(mdi_feat_imp, oob_score=sb_clf.oob_score_, oos_score=oos_score,
