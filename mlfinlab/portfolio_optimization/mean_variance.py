@@ -9,7 +9,7 @@ class MeanVarianceOptimisation:
     '''
 
     def __init__(self):
-        return
+        self.weights = list()
 
     def allocate(self, asset_prices, solution='inverse_variance', resample_returns_by='B'):
         '''
@@ -30,7 +30,6 @@ class MeanVarianceOptimisation:
         asset_returns = self._calculate_returns(asset_prices, resample_returns_by=resample_returns_by)
         assets = asset_prices.columns
 
-        self.weights = []
         if solution == 'inverse_variance':
             self.weights = self._inverse_variance(asset_returns=asset_returns)
         self.weights = pd.DataFrame(self.weights)

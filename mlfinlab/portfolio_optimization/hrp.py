@@ -1,9 +1,9 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 from sklearn.covariance import OAS
+import matplotlib.pyplot as plt
 
 
 class HierarchicalRiskParity:
@@ -15,7 +15,10 @@ class HierarchicalRiskParity:
     '''
 
     def __init__(self):
-        return
+        self.weights = list()
+        self.seriated_correlations = None
+        self.seriated_distances = None
+        self.ordered_indices = None
 
     @staticmethod
     def _tree_clustering(correlation, method='single'):
@@ -75,7 +78,7 @@ class HierarchicalRiskParity:
         self.weights = pd.Series(1, index=self.ordered_indices)
         clustered_alphas = [self.ordered_indices]
 
-        while len(clustered_alphas) > 0:
+        while clustered_alphas:
             clustered_alphas = [cluster[start:end]
                                 for cluster in clustered_alphas
                                 for start, end in ((0, len(cluster) // 2), (len(cluster) // 2, len(cluster)))

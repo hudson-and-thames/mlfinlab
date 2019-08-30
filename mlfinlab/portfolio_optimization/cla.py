@@ -34,6 +34,18 @@ class CLA:
 
         self.weight_bounds = weight_bounds
         self.calculate_returns = calculate_returns
+        self.expected_returns = None
+        self.cov_matrix = None
+        self.lower_bounds = None
+        self.upper_bounds = None
+        self.weights = None
+        self.lambdas = None
+        self.gammas = None
+        self.free_weights = None
+        self.max_sharpe = None
+        self.min_var = None
+        self.means = None
+        self.sigma = None
 
     @staticmethod
     def _calculate_mean_historical_returns(asset_prices, frequency=252):
@@ -280,7 +292,7 @@ class CLA:
                     index_2 += 1
 
     @staticmethod
-    def _golden_section(obj, left, right, **kargs):
+    def _golden_section(obj, left, right, **kwargs):
         '''
         Golden section method. Maximum if kargs['minimum']==False is passed
 
@@ -290,10 +302,10 @@ class CLA:
         '''
 
         tol, sign, args = 1.0e-9, 1, None
-        if "minimum" in kargs and kargs["minimum"] is False:
+        if "minimum" in kwargs and kwargs["minimum"] is False:
             sign = -1
-        if "args" in kargs:
-            args = kargs["args"]
+        if "args" in kwargs:
+            args = kwargs["args"]
         num_iterations = int(ceil(-2.078087 * log(tol / abs(right - left))))
         gs_ratio = 0.618033989
         complementary_gs_ratio = 1.0 - gs_ratio
@@ -346,11 +358,11 @@ class CLA:
             covar_f_inv = np.linalg.inv(covar_f)
             j = 0
             for i in free_weights:
-                l, b_i = self._compute_lambda(
+                lambda_i, b_i = self._compute_lambda(
                     covar_f_inv, covar_fb, mean_f, w_b, j, [self.lower_bounds[i], self.upper_bounds[i]]
                 )
-                if _infnone(l) > _infnone(lambda_in):
-                    lambda_in, i_in, bi_in = l, i, b_i
+                if _infnone(lambda_i) > _infnone(lambda_in):
+                    lambda_in, i_in, bi_in = lambda_i, i, b_i
                 j += 1
         return lambda_in, i_in, bi_in
 
@@ -362,8 +374,8 @@ class CLA:
         lambda_out = None
         i_out = None
         if len(free_weights) < self.expected_returns.shape[0]:
-            b = self._get_bounded_weights(free_weights)
-            for i in b:
+            bounded_weight_indices = self._get_bounded_weights(free_weights)
+            for i in bounded_weight_indices:
                 covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights + [i])
                 covar_f_inv = np.linalg.inv(covar_f)
                 lambda_i, _ = self._compute_lambda(
@@ -448,13 +460,14 @@ class CLA:
         '''
 
         var = []
-        for w in self.weights:
-            volatility = np.dot(np.dot(w.T, self.cov_matrix), w)
+        for weights in self.weights:
+            volatility = np.dot(np.dot(weights.T, self.cov_matrix), weights)
             var.append(volatility)
         min_var = min(var)
         return min_var ** .5, self.weights[var.index(min_var)]
 
     def _efficient_frontier(self, points=100):
+        # pylint: disable=invalid-name
         '''
         Compute the entire efficient frontier solution
 
@@ -462,24 +475,27 @@ class CLA:
         :return: tuple of mean, variance amd weights of the frontier solutions
         '''
 
-        mean, sigma, weights = [], [], []
+        means, sigma, weights = [], [], []
 
         # remove the 1, to avoid duplications
-        a = np.linspace(0, 1, points // len(self.weights))[:-1]
+        partitions = np.linspace(0, 1, points // len(self.weights))[:-1]
         b = list(range(len(self.weights) - 1))
         for i in b:
             w_0, w_1 = self.weights[i], self.weights[i + 1]
+
             if i == b[-1]:
                 # include the 1 in the last iteration
-                a = np.linspace(0, 1, points // len(self.weights))
-            for j in a:
+                partitions = np.linspace(0, 1, points // len(self.weights))
+
+            for j in partitions:
                 w = w_1 * j + (1 - j) * w_0
                 weights.append(np.copy(w))
-                mean.append(np.dot(w.T, self.expected_returns)[0, 0])
+                means.append(np.dot(w.T, self.expected_returns)[0, 0])
                 sigma.append(np.dot(np.dot(w.T, self.cov_matrix), w)[0, 0] ** 0.5)
-        return mean, sigma, weights
+        return means, sigma, weights
 
     def allocate(self, asset_prices, solution="cla_turning_points"):
+        # pylint: disable=consider-using-enumerate
         '''
         Calculate the portfolio asset allocations using the method specified.
 
@@ -524,11 +540,11 @@ class CLA:
                 covar_f_inv = np.linalg.inv(covar_f)
 
             # 5) Compute solution vector
-            w_f, g = self._compute_w(covar_f_inv, covar_fb, mean_f, w_b)
+            w_f, gamma = self._compute_w(covar_f_inv, covar_fb, mean_f, w_b)
             for i in range(len(free_weights)):
                 weights[free_weights[i]] = w_f[i]
             self.weights.append(np.copy(weights))  # store solution
-            self.gammas.append(g)
+            self.gammas.append(gamma)
             self.free_weights.append(free_weights[:])
             if self.lambdas[-1] == 0:
                 break
