@@ -7,23 +7,25 @@ import numpy as np
 
 from sklearn.metrics import log_loss, accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
 from sklearn.model_selection import KFold
+from sklearn.base import ClassifierMixin
+from sklearn.model_selection import BaseCrossValidator
 
 
-def ml_get_train_times(info_sets: pd.Series, test_times: pd.Series) -> pd.Series:
+def ml_get_train_times(samples_info_sets: pd.Series, test_times: pd.Series) -> pd.Series:
     # pylint: disable=invalid-name
     """
     Snippet 7.1, page 106,  Purging observations in the training set
 
     This function find the training set indexes given the information on which each record is based
     and the range for the test set.
-
     Given test_times, find the times of the training observations.
-    :param info_sets: The information on which each record is constructed from
-        -info_sets.index: Time when the information extraction started.
-        -info_sets.value: Time when the information extraction ended.
+
+    :param samples_info_sets: The information range on which each record is constructed from
+        *samples_info_sets.index*: Time when the information extraction started.
+        *samples_info_sets.value*: Time when the information extraction ended.
     :param test_times: Times for the test dataset.
     """
-    train = info_sets.copy(deep=True)
+    train = samples_info_sets.copy(deep=True)
     for start_ix, end_ix in test_times.iteritems():
         df0 = train[(start_ix <= train.index) & (train.index <= end_ix)].index  # Train starts within test
         df1 = train[(start_ix <= train) & (train <= end_ix)].index  # Train ends within test
@@ -34,36 +36,46 @@ def ml_get_train_times(info_sets: pd.Series, test_times: pd.Series) -> pd.Series
 
 class PurgedKFold(KFold):
     """
-    Snippet 7.3, page 109, Cross-Validation Class when Observations Overlap.
+    Extend KFold class to work with labels that span intervals
+    The train is purged of observations overlapping test-label intervals
+    Test set is assumed contiguous (shuffle=False), w/o training samples in between
 
-    Extend KFold class to work with labels that span intervals.
-    The train is purged of observations overlapping test-label intervals.
-    Test set is assumed contiguous (shuffle=False), w/o training samples in between.
+    :param n_splits: The number of splits. Default to 3
+    :param samples_info_sets: The information range on which each record is constructed from
+        *samples_info_sets.index*: Time when the information extraction started.
+        *samples_info_sets.value*: Time when the information extraction ended.
+    :param pct_embargo: Percent that determines the embargo size.
     """
 
-    def __init__(self, info_sets, n_splits=3, pct_embargo=0.):
-        """
-        Constructor
+    def __init__(self,
+                 n_splits: int = 3,
+                 samples_info_sets: pd.Series = None,
+                 pct_embargo: float = 0.):
 
-        :param info_sets (pd.Series):
-            —info_sets.index: Time when the information extraction started.
-            —info_sets.value: Time when the information extraction ended.
-        :param n_splits: The number of splits. Default to 3
-        :param pct_embargo: Percent that determines the embargo size.
-        :param random_state: (int or RandomState): random state
-        """
-        if not isinstance(info_sets, pd.Series):
-            raise ValueError('The info_sets param must be a pd.Series')
-        super(PurgedKFold, self).__init__(n_splits, shuffle=False)
+        if not isinstance(samples_info_sets, pd.Series):
+            raise ValueError('The samples_info_sets param must be a pd.Series')
+        super(PurgedKFold, self).__init__(n_splits, shuffle=False, random_state=None)
 
-        # Attributes
-        self.info_sets = info_sets
+        self.samples_info_sets = samples_info_sets
         self.pct_embargo = pct_embargo
 
     # noinspection PyPep8Naming
-    def split(self, X, y=None, groups=None):
-        if X.shape[0] != self.info_sets.shape[0]:
-            raise ValueError("X and the 'info_sets' series param must be the same length")
+    def split(self,
+              X: pd.DataFrame,
+              y: pd.Series = None,
+              groups=None):
+        """
+        The main method to call for the PurgedKFold class
+
+        :param X: The pd.DataFrame samples dataset that is to be split
+        :param y: The pd.Series sample labels series
+        :param groups: array-like, with shape (n_samples,), optional
+            Group labels for the samples used while splitting the dataset into
+            train/test set.
+        :return: This method yields uples of (train, test) where train and test are lists of sample indices
+        """
+        if X.shape[0] != self.samples_info_sets.shape[0]:
+            raise ValueError("X and the 'samples_info_sets' series param must be the same length")
 
         indices: np.ndarray = np.arange(X.shape[0])
         embargo: int = int(X.shape[0] * self.pct_embargo)
@@ -75,17 +87,23 @@ class PurgedKFold(KFold):
             if end_ix < X.shape[0]:
                 end_ix += embargo
 
-            test_times = pd.Series(index=[self.info_sets[start_ix]], data=[self.info_sets[end_ix - 1]])
-            train_times = ml_get_train_times(self.info_sets, test_times)
+            test_times = pd.Series(index=[self.samples_info_sets[start_ix]], data=[self.samples_info_sets[end_ix-1]])
+            train_times = ml_get_train_times(self.samples_info_sets, test_times)
 
             train_indices = []
             for train_ix in train_times.index:
-                train_indices.append(self.info_sets.index.get_loc(train_ix))
+                train_indices.append(self.samples_info_sets.index.get_loc(train_ix))
             yield np.array(train_indices), test_indices
 
 
 # noinspection PyPep8Naming
-def ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss'):
+def ml_cross_val_score(
+        classifier: ClassifierMixin,
+        X: pd.DataFrame,
+        y: pd.Series,
+        cv_gen: BaseCrossValidator,
+        sample_weight: np.ndarray = None,
+        scoring: str = 'neg_log_loss'):
     # pylint: disable=invalid-name
     """
     Snippet 7.4, page 110, Using the PurgedKFold Class.
@@ -97,7 +115,7 @@ def ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='ne
     the function.
 
     Example:
-    cv_gen = PurgedKFold(n_splits=n_splits, info_sets=info_sets, pct_embargo=pct_embargo)
+    cv_gen = PurgedKFold(n_splits=n_splits, samples_info_sets=samples_info_sets, pct_embargo=pct_embargo)
     scores_array = ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss')
 
     :param classifier: A sk-learn Classifier object instance.

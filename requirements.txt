@@ -7,4 +7,7 @@ xmlrunner==1.7.7
 numba==0.43.0
 scikit-learn==0.21
 scipy==1.2.1
-matplotlib==3.0.3
+toolz==0.10.0  # =needed for dask
+cloudpickle==1.2.1  # needed for dask
+sphinx==2.2.0 # needed for docs
+sphinx-rtd-theme==0.4.3 # needed for docs

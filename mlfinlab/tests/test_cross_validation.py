@@ -49,7 +49,7 @@ class TestCrossValidation(unittest.TestCase):
         pwd_path = os.path.dirname(__file__)
         self.log(f"pwd_path= {pwd_path}")
 
-        self.infosets = pd.Series(
+        self.info_sets = pd.Series(
             index=pd.date_range(start='2019-01-01 00:00:00', periods=10, freq='T'),
             data=pd.date_range(start='2019-01-01 00:02:00', periods=10, freq='T'),
         )
@@ -63,7 +63,7 @@ class TestCrossValidation(unittest.TestCase):
             data=pd.date_range(start='2019-01-01 00:02:00', periods=1, freq='T'),
         )
         self.log(f"test_times=\n{test_times}")
-        train_times_ret = ml_get_train_times(self.infosets, test_times)
+        train_times_ret = ml_get_train_times(self.info_sets, test_times)
         self.log(f"train_times_ret=\n{train_times_ret}")
 
         train_times_ok = pd.Series(
@@ -83,7 +83,7 @@ class TestCrossValidation(unittest.TestCase):
             data=pd.date_range(start='2019-01-01 00:11:00', periods=1, freq='T'),
         )
         self.log(f"test_times=\n{test_times}")
-        train_times_ret = ml_get_train_times(self.infosets, test_times)
+        train_times_ret = ml_get_train_times(self.info_sets, test_times)
         self.log(f"train_times_ret=\n{train_times_ret}")
 
         train_times_ok = pd.Series(
@@ -103,7 +103,7 @@ class TestCrossValidation(unittest.TestCase):
             data=pd.date_range(start='2019-01-01 00:08:00', periods=1, freq='T'),
         )
         self.log(f"test_times=\n{test_times}")
-        train_times_ret = ml_get_train_times(self.infosets, test_times)
+        train_times_ret = ml_get_train_times(self.info_sets, test_times)
         self.log(f"train_times_ret=\n{train_times_ret}")
 
         train_times_ok1 = pd.Series(
@@ -121,22 +121,22 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_purgedkfold_01_exception(self):
         """
-        Test throw exception when info_sets is not a pd.Series.
+        Test throw exception when samples_info_sets is not a pd.Series.
         """
-        info_sets = pd.DataFrame(
+        samples_info_sets = pd.DataFrame(
             index=pd.date_range(start='2019-01-01 00:00:00', periods=20, freq='T'),
             data=pd.date_range(start='2019-01-01 00:02:00', periods=20, freq='T'),
         )
-        self.log(f"infosets=\n{info_sets}")
+        self.log(f"info_sets=\n{samples_info_sets}")
 
         dataset = pd.DataFrame(
-            index=info_sets.index,
+            index=samples_info_sets.index,
             data={'feat': np.arange(0, 20)},
         )
         self.log(f"dataset=\n{dataset}")
 
         try:
-            PurgedKFold(n_splits=3, info_sets=info_sets, pct_embargo=0.)
+            PurgedKFold(n_splits=3, samples_info_sets=samples_info_sets, pct_embargo=0.)
         except ValueError:
             pass
         else:
@@ -144,22 +144,22 @@ class TestCrossValidation(unittest.TestCase):
 
     def test_purgedkfold_02_exception(self):
         """
-        Test exception is raised when passing in a dataset with a different length than the info_sets used in the
+        Test exception is raised when passing in a dataset with a different length than the samples_info_sets used in the
         constructor.
         """
-        infosets = pd.Series(
+        info_sets = pd.Series(
             index=pd.date_range(start='2019-01-01 00:00:00', periods=10, freq='T'),
             data=pd.date_range(start='2019-01-01 00:02:00', periods=10, freq='T'),
         )
-        self.log(f"infosets=\n{infosets}")
+        self.log(f"info_sets=\n{info_sets}")
 
         dataset = pd.DataFrame(
             index=pd.date_range(start='2019-01-01 00:00:00', periods=11, freq='T'),
-            data={'feat': np.arange(0, 11)},  # One entry more than infosets
+            data={'feat': np.arange(0, 11)},  # One entry more than info_sets
         )
         self.log(f"dataset=\n{dataset}")
 
-        pkf = PurgedKFold(n_splits=3, info_sets=infosets, pct_embargo=0.)
+        pkf = PurgedKFold(n_splits=3, samples_info_sets=info_sets, pct_embargo=0.)
         try:
             for _, _ in pkf.split(dataset):
                 pass
@@ -176,32 +176,32 @@ class TestCrossValidation(unittest.TestCase):
         This is the test with no embargo.
         """
 
-        infosets = pd.Series(
+        info_sets = pd.Series(
             index=pd.date_range(start='2019-01-01 00:00:00', periods=20, freq='T'),
             data=pd.date_range(start='2019-01-01 00:02:00', periods=20, freq='T'),
         )
-        self.log(f"infosets=\n{infosets}")
+        self.log(f"info_sets=\n{info_sets}")
 
         dataset = pd.DataFrame(
-            index=infosets.index,
+            index=info_sets.index,
             data={'feat': np.arange(0, 20)},
         )
         self.log(f"dataset=\n{dataset}")
 
-        pkf = PurgedKFold(n_splits=3, info_sets=infosets, pct_embargo=0.)
+        pkf = PurgedKFold(n_splits=3, samples_info_sets=info_sets, pct_embargo=0.)
         for train_indices, test_indices in pkf.split(dataset):
-            self.log(f"test_times_ret=\n{infosets[test_indices]}")
+            self.log(f"test_times_ret=\n{info_sets[test_indices]}")
 
-            train_times_ret = infosets.iloc[train_indices]
+            train_times_ret = info_sets.iloc[train_indices]
             self.log(f"train_times_ret=\n{train_times_ret}")
 
             test_times_gtt = pd.Series(
-                index=[infosets[test_indices[0]]],
-                data=[infosets[test_indices[-1]]],
+                index=[info_sets[test_indices[0]]],
+                data=[info_sets[test_indices[-1]]],
             )
 
             self.log(f"test_times_gtt=\n{test_times_gtt}")
-            train_times_gtt = ml_get_train_times(infosets, test_times_gtt)
+            train_times_gtt = ml_get_train_times(info_sets, test_times_gtt)
             self.log(f"train_times_gtt=\n{train_times_gtt}")
             self.log("-" * 100)
 
@@ -213,36 +213,36 @@ class TestCrossValidation(unittest.TestCase):
         which also means pct_points_test entries from a total of 100 in total in the dataset.
         """
 
-        infosets = pd.Series(
+        info_sets = pd.Series(
             index=pd.date_range(start='2019-01-01 00:00:00', periods=100, freq='T'),
             data=pd.date_range(start='2019-01-01 00:02:00', periods=100, freq='T'),
         )
 
         dataset = pd.DataFrame(
-            index=infosets.index,
+            index=info_sets.index,
             data={'feat': np.arange(0, 100)},
         )
         pct_points_test: int = 2
         self.log(f"pct_points_test= {pct_points_test}")
 
-        pkf = PurgedKFold(n_splits=3, info_sets=infosets, pct_embargo=0.01*pct_points_test)
+        pkf = PurgedKFold(n_splits=3, samples_info_sets=info_sets, pct_embargo=0.01*pct_points_test)
 
         # Also test that X can be an np.ndarray by passing in the .values of the pd.DataFrame
-        for train_indices, test_indices in pkf.split(dataset.values):
+        for train_indices, test_indices in pkf.split(dataset):
 
-            train_times_ret = infosets.iloc[train_indices]
+            train_times_ret = info_sets.iloc[train_indices]
             self.log(f"train_times_ret=\n{train_times_ret}")
 
-            test_times_ret = infosets.iloc[test_indices]
+            test_times_ret = info_sets.iloc[test_indices]
             self.log(f"test_times_ret=\n{test_times_ret}")
 
             test_times_gtt = pd.Series(
-                index=[infosets[test_indices[0]]],
-                data=[infosets[test_indices[-1]]],
+                index=[info_sets[test_indices[0]]],
+                data=[info_sets[test_indices[-1]]],
             )
             self.log(f"test_times_gtt=\n{test_times_gtt}")
 
-            train_times_gtt = ml_get_train_times(infosets, test_times_gtt)
+            train_times_gtt = ml_get_train_times(info_sets, test_times_gtt)
 
             # if test set is at the beginning, drop pct_points_test records from beginning of train dataset
             if test_times_ret.index[0] == dataset.index[0]:
@@ -264,20 +264,20 @@ class TestCrossValidation(unittest.TestCase):
         """
         sample_size = 1000
 
-        infosets = pd.Series(
+        info_sets = pd.Series(
             index=pd.date_range(start='2019-01-01 00:00:00', periods=sample_size, freq='T'),
             data=pd.date_range(start='2019-01-01 00:02:00', periods=sample_size, freq='T'),
         )
 
         records = pd.DataFrame(
-            index=infosets.index,
+            index=info_sets.index,
             data={
                 'even': np.arange(0, sample_size),
                 'odd': np.arange(1, sample_size+1)
             },
         )
         labels = pd.Series(
-            index=infosets.index,
+            index=info_sets.index,
             data=np.arange(0, sample_size)
         )
         labels[records['even'] % 2 == 0] = 1
@@ -286,26 +286,26 @@ class TestCrossValidation(unittest.TestCase):
 
         random_state = np.random.RandomState(seed=12345)
         sample_weights = pd.Series(
-            index=infosets.index,
+            index=info_sets.index,
             data=random_state.random_sample(sample_size)
         )
 
         decision_tree = DecisionTreeClassifier(random_state=0)
-        return infosets, records, labels, sample_weights, decision_tree
+        return info_sets, records, labels, sample_weights, decision_tree
 
     def test_ml_cross_val_score_00_exception(self):
         """
         Test the ml_cross_val_score function with an artificial dataset. In this case we give it the wrong scoring
         method - jaccard_score.
         """
-        infosets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
-        cv_gen = PurgedKFold(info_sets=infosets, n_splits=3, pct_embargo=0.01)
+        info_sets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
+        cv_gen = PurgedKFold(samples_info_sets=info_sets, n_splits=3, pct_embargo=0.01)
         try:
             ml_cross_val_score(
                 classifier=decision_tree,
                 X=records,
                 y=labels,
-                sample_weight=sample_weights,
+                sample_weight=sample_weights.values,
                 scoring='jaccard_score',
                 cv_gen=cv_gen,
             )
@@ -318,8 +318,8 @@ class TestCrossValidation(unittest.TestCase):
         """
         Test the ml_cross_val_score function with an artificial dataset.
         """
-        infosets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
-        cv_gen = PurgedKFold(info_sets=infosets, n_splits=3, pct_embargo=0.01)
+        info_sets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
+        cv_gen = PurgedKFold(samples_info_sets=info_sets, n_splits=3, pct_embargo=0.01)
         scores = ml_cross_val_score(
             classifier=decision_tree,
             X=records,
@@ -333,7 +333,6 @@ class TestCrossValidation(unittest.TestCase):
         should_be = np.array([0.5186980141893885, 0.4876916232189882, 0.4966185791847402])
         self.assertTrue(
             np.array_equal(scores, should_be),
-            # self.assertListEqual(scores.tolist(), should_be.tolist()),
             "score lists don't match"
         )
 
@@ -341,8 +340,8 @@ class TestCrossValidation(unittest.TestCase):
         """
         Test the ml_cross_val_score function with an artificial dataset.
         """
-        infosets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
-        cv_gen = PurgedKFold(info_sets=infosets, n_splits=3, pct_embargo=0.01)
+        info_sets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
+        cv_gen = PurgedKFold(samples_info_sets=info_sets, n_splits=3, pct_embargo=0.01)
         scores = ml_cross_val_score(
             classifier=decision_tree,
             X=records,
@@ -356,7 +355,6 @@ class TestCrossValidation(unittest.TestCase):
         should_be = np.array([-16.623581666339184, -17.694504470879014, -17.386178334890698])
         self.assertTrue(
             np.array_equal(scores, should_be),
-            # self.assertListEqual(scores.tolist(), should_be.tolist()),
             "score lists don't match"
         )
 
@@ -379,5 +377,27 @@ class TestCrossValidation(unittest.TestCase):
         self.assertTrue(
             np.array_equal(scores, should_be),
             # self.assertListEqual(scores.tolist(), should_be.tolist()),
+            "score lists don't match"
+        )
+
+    def test_ml_cross_val_score_04_sw(self):
+        """
+        Test the ml_cross_val_score function with an artificial dataset.
+        """
+        info_sets, records, labels, _, decision_tree = self._test_ml_cross_val_score__data()
+        cv_gen = PurgedKFold(samples_info_sets=info_sets, n_splits=3, pct_embargo=0.01)
+        scores = ml_cross_val_score(
+            classifier=decision_tree,
+            X=records,
+            y=labels,
+            sample_weight=None,
+            scoring='accuracy',
+            cv_gen=cv_gen,
+        )
+        self.log(f"score1= {scores}")
+
+        should_be = np.array([0.5, 0.4984984984984985, 0.4984984984984985])
+        self.assertTrue(
+            np.array_equal(scores, should_be),
             "score lists don't match"
         )
