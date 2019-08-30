@@ -115,8 +115,11 @@ def ml_cross_val_score(
     the function.
 
     Example:
-    cv_gen = PurgedKFold(n_splits=n_splits, samples_info_sets=samples_info_sets, pct_embargo=pct_embargo)
-    scores_array = ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss')
+
+    .. code-block:: python
+
+        cv_gen = PurgedKFold(n_splits=n_splits, samples_info_sets=samples_info_sets, pct_embargo=pct_embargo)
+        scores_array = ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss')
 
     :param classifier: A sk-learn Classifier object instance.
     :param X: The dataset of records to evaluate.

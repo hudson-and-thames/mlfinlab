@@ -51,18 +51,18 @@ The implementations that will be added in the future as well as the implementati
 * Working on Chapter 16: ML Asset Allocation (Aditya)
 * Working on Chapter 10: Bet Sizing (Lee)
 
-.. |vspace| raw:: latex
+.. raw:: latex
 
-   \vspace{5mm}
+    \vspace{5mm}
 
 * Part 2: Modelling
 * Done Chapter 7: Cross-Validation (Mihai)
 * Done Chapter 6: Ensemble Methods
 * Adding Sequential Bootstrap Ensemble method (Alex)
 
-.. |vspace| raw:: latex
+.. raw:: latex
 
-   \vspace{5mm}
+    \vspace{5mm}
 
 * Part 1: Data Analysis
 * Done Chapter 5: Fractionally Differentiated Features
@@ -111,6 +111,8 @@ Implementations
    implementations/sampling
    implementations/frac_diff
    implementations/cross_validation
+   implementations/sb_bagging
+
 
 * :doc:`implementations/data_structures`
 * :doc:`implementations/filters`
@@ -118,6 +120,7 @@ Implementations
 * :doc:`implementations/sampling`
 * :doc:`implementations/frac_diff`
 * :doc:`implementations/cross_validation`
+* :doc:`implementations/sb_bagging`
 
 Additional Information
 ======================
