@@ -41,7 +41,7 @@ class PurgedKFold(KFold):
     Test set is assumed contiguous (shuffle=False), w/o training samples in between.
     """
 
-    def __init__(self, info_sets, n_splits=3, pct_embargo=0., random_state=None):
+    def __init__(self, info_sets, n_splits=3, pct_embargo=0.):
         """
         Constructor
 
@@ -54,7 +54,7 @@ class PurgedKFold(KFold):
         """
         if not isinstance(info_sets, pd.Series):
             raise ValueError('The info_sets param must be a pd.Series')
-        super(PurgedKFold, self).__init__(n_splits, shuffle=False, random_state=random_state)
+        super(PurgedKFold, self).__init__(n_splits, shuffle=False)
 
         # Attributes
         self.info_sets = info_sets

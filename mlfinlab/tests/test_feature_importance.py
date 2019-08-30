@@ -244,7 +244,7 @@ class TestFeatureImportance(unittest.TestCase):
                                                            random_state=1)
         sb_clf.fit(self.X_train, self.y_train_clf)
 
-        cv_gen = PurgedKFold(n_splits=4, info_sets=self.samples_info_sets, random_state=1)
+        cv_gen = PurgedKFold(n_splits=4, info_sets=self.samples_info_sets)
         return sb_clf, cv_gen
 
     def test_raise_value_error(self):
