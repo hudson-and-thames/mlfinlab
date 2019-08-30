@@ -55,7 +55,7 @@ class MeanVarianceOptimisation:
     def _inverse_variance(self, asset_returns):
         '''
         Calculate weights using inverse-variance allocation
-        
+
         :param asset_prices: (pd.Dataframe/np.array) the matrix of historical asset prices (daily close)
         :return: (np.array) array of portfolio weights
         '''
