@@ -137,7 +137,8 @@ class CLA:
         # Compute weights
         w_2 = np.dot(covar_f_inv, ones_f)
         w_3 = np.dot(covar_f_inv, mean_f)
-        return -w_1 + g_final * w_2 + self.lambdas[-1] * w_3, g_final
+        free_asset_weights = -1*w_1 + g_final * w_2 + self.lambdas[-1] * w_3
+        return free_asset_weights, g_final
 
     def _compute_lambda(self, covar_f_inv, covar_fb, mean_f, w_b, asset_index, b_i):
         '''
@@ -158,7 +159,7 @@ class CLA:
         c_2 = np.dot(covar_f_inv, mean_f)
         c_3 = np.dot(np.dot(ones_f.T, covar_f_inv), mean_f)
         c_4 = np.dot(covar_f_inv, ones_f)
-        c_final = -c_1 * c_2[asset_index] + c_3 * c_4[asset_index]
+        c_final = -1*c_1 * c_2[asset_index] + c_3 * c_4[asset_index]
         if c_final == 0:
             return None, None
 
@@ -177,7 +178,8 @@ class CLA:
         l_2 = np.dot(covar_f_inv, covar_fb)
         l_3 = np.dot(l_2, w_b)
         l_2 = np.dot(ones_f.T, l_3)
-        return float(((1 - l_1 + l_2) * c_4[asset_index] - c_1 * (b_i + l_3[asset_index])) / c_final), b_i
+        lambda_value = float(((1 - l_1 + l_2) * c_4[asset_index] - c_1 * (b_i + l_3[asset_index])) / c_final)
+        return lambda_value, b_i
 
     def _get_matrices(self, free_weights):
         '''

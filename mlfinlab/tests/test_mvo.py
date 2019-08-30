@@ -9,7 +9,7 @@ class TestMVO(unittest.TestCase):
     """
     Tests for the Mean Variance Optimisation module
     """
-    
+
     def setUp(self):
         """
         Set the file path for the tick data csv
