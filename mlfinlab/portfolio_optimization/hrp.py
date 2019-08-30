@@ -1,10 +1,3 @@
-'''
-This module implements the HRP algorithm mentioned in the following paper:
-López de Prado, Marcos, Building Diversified Portfolios that Outperform Out-of-Sample (May 23, 2016).
-Journal of Portfolio Management, 2016;
-The code is reproduced with modification from his book: Advances in Financial Machine Learning
-'''
-
 import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
@@ -14,10 +7,17 @@ from sklearn.covariance import OAS
 
 
 class HierarchicalRiskParity:
+    '''
+    This module implements the HRP algorithm mentioned in the following paper:
+    López de Prado, Marcos, Building Diversified Portfolios that Outperform Out-of-Sample (May 23, 2016).
+    Journal of Portfolio Management, 2016;
+    The code is reproduced with modification from his book: Advances in Financial Machine Learning
+    '''
 
     def __init__(self):
         return
 
+    @staticmethod
     def _tree_clustering(self, correlation, method='single'):
         '''
         Perform the traditional heirarchical tree clustering
@@ -31,6 +31,7 @@ class HierarchicalRiskParity:
         clusters = linkage(squareform(distances.values), method=method)
         return distances, clusters
 
+    @staticmethod
     def _quasi_diagnalization(self, N, curr_index):
         '''
         Rearrange the assets to reorder them according to hierarchical tree clustering order.
@@ -48,6 +49,7 @@ class HierarchicalRiskParity:
 
         return (self._quasi_diagnalization(N, left) + self._quasi_diagnalization(N, right))
 
+    @staticmethod
     def _get_seriated_matrix(self, assets, distances, correlations):
         '''
         Based on the quasi-diagnalization, reorder the original distance matrix, so that assets within
@@ -64,6 +66,7 @@ class HierarchicalRiskParity:
         seriated_correlations = correlations.loc[ordering, ordering]
         return seriated_distances, seriated_correlations
 
+    @staticmethod
     def _recursive_bisection(self, covariances, assets):
         '''
         Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets
@@ -118,8 +121,10 @@ class HierarchicalRiskParity:
         dendrogram(self.clusters)
         plt.show()
 
+    @staticmethod
     def _calculate_returns(self, asset_prices, resample_returns_by):
-        '''
+        '''Calculate the annualised mean historical returns from asset price data
+
 
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
         :param resample_returns_by: (str) specifies how to resample the returns - weekly, daily, monthly etc.. Defaults to
@@ -132,8 +137,10 @@ class HierarchicalRiskParity:
         asset_returns = asset_returns.resample(resample_returns_by).mean()
         return asset_returns
 
+    @staticmethod
     def _shrink_covariance(self, covariance):
         '''
+        Regularise/Shrink the asset covariances
 
         :param covariance: (pd.Dataframe) asset returns covariances
         :return: (pd.Dataframe) shrinked asset returns covariances
@@ -144,8 +151,10 @@ class HierarchicalRiskParity:
         shrinked_covariance = oas.covariance_
         return pd.DataFrame(shrinked_covariance, index=covariance.columns, columns=covariance.columns)
 
+    @staticmethod
     def _cov2corr(self, covariance):
         '''
+        Calculate the correlations from asset returns covariance matrix
 
         :param covariance: (pd.Dataframe) asset returns covariances
         :return: (pd.Dataframe) correlations between asset returns
@@ -159,6 +168,7 @@ class HierarchicalRiskParity:
         corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
         return corr
 
+    @staticmethod
     def allocate(self, asset_prices, resample_returns_by='B', use_shrinkage=False):
         '''
         Calculate asset allocations using HRP algorithm
