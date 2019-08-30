@@ -15,14 +15,16 @@ class MeanVarianceOptimisation:
     def allocate(self, asset_prices, solution='inverse_variance', resample_returns_by='B'):
         '''
 
-        :param asset_prices: (pd.Dataframe/np.array) the matrix of historical asset prices (daily close)
+        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
         :param solution: (str) the type of solution/algorithm to use to calculate the weights
         :param resample_returns_by: (str) specifies how to resample the returns - weekly, daily, monthly etc.. Defaults to
                                   'B' meaning daily business days which is equivalent to no resampling
         '''
 
-        if not isinstance(asset_prices, pd.DataFrame):
-            asset_prices = pd.DataFrame(asset_prices)
+        if type(asset_prices) != pd.DataFrame:
+            raise ValueError("Asset prices matrix must be a dataframe")
+        if not isinstance(asset_prices.index, pd.DatetimeIndex):
+            raise ValueError("Asset prices dataframe must be indexed by date.")
 
         # Calculate returns
         asset_returns = self._calculate_returns(asset_prices, resample_returns_by=resample_returns_by)

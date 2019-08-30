@@ -363,9 +363,11 @@ class CLA:
 
     def _initialise(self, asset_prices):
 
-        # Handle non-dataframes
-        if not isinstance(asset_prices, pd.DataFrame):
-            asset_prices = pd.DataFrame(asset_prices)
+        # Initial checks
+        if type(asset_prices) != pd.DataFrame:
+            raise ValueError("Asset prices matrix must be a dataframe")
+        if not isinstance(asset_prices.index, pd.DatetimeIndex):
+            raise ValueError("Asset prices dataframe must be indexed by date.")
 
         # Calculate the expected returns
         if self.calculate_returns == "mean":
