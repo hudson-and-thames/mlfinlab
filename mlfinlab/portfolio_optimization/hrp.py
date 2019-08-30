@@ -118,19 +118,38 @@ class HierarchicalRiskParity:
         dendrogram(self.clusters)
         plt.show()
 
-    def allocate(self, asset_prices):
+    def _calculate_returns(self, asset_prices, resample_returns_by):
+        '''
+
+        :param asset_prices: (pd.Dataframe/np.array) the matrix of historical asset prices (daily close)
+        :param resample_returns_by: (str) specifies how to resample the returns - weekly, daily, monthly etc.. Defaults to
+                                  'B' meaning daily business days which is equivalent to no resampling
+        :return: (pd.Dataframe) stock returns
+        '''
+        asset_returns = asset_prices.pct_change()
+        asset_returns = asset_returns.dropna(how='all')
+        asset_returns = asset_returns.resample(resample_returns_by).mean()
+        return asset_returns
+
+    def allocate(self, asset_prices, resample_returns_by='B'):
         '''
         Calculate asset allocations using HRP algorithm
 
         :param asset_prices: (pd.Dataframe/np.array) the matrix of historical asset prices (daily close)
+                                                     indexed by date
+        :param resample_returns_by: (str) specifies how to resample the returns - weekly, daily, monthly etc.. Defaults to
+                                          'B' meaning daily business days which is equivalent to no resampling
         '''
 
         if type(asset_prices) != pd.DataFrame:
             asset_prices = pd.DataFrame(asset_prices)
 
-        N = asset_prices.shape[1]
-        assets = asset_prices.columns
-        cov, corr = asset_prices.cov(), asset_prices.corr()
+        # Calculate the returns
+        asset_returns = self._calculate_returns(asset_prices, resample_returns_by=resample_returns_by)
+
+        N = asset_returns.shape[1]
+        assets = asset_returns.columns
+        cov, corr = asset_returns.cov(), asset_returns.corr()
 
         # Step-1: Tree Clustering
         distances, self.clusters = self._tree_clustering(correlation=corr)
