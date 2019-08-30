@@ -13,6 +13,8 @@ from sklearn.ensemble.bagging import BaseBagging, BaggingClassifier, BaggingRegr
 from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.ensemble.base import _partition_estimators
 from sklearn.utils.random import sample_without_replacement
+from sklearn.utils import indices_to_mask
+from sklearn.metrics import accuracy_score, r2_score
 from sklearn.utils.validation import has_fit_parameter
 from sklearn.utils import check_random_state, check_array, check_consistent_length, check_X_y
 from sklearn.utils._joblib import Parallel, delayed
@@ -78,6 +80,7 @@ def _parallel_build_estimators(n_estimators, ensemble, X, y, ind_mat, sample_wei
     # Build estimators
     estimators = []
     estimators_features = []
+    estimators_indices = []
 
     for i in range(n_estimators):
         if verbose > 1:
@@ -113,8 +116,9 @@ def _parallel_build_estimators(n_estimators, ensemble, X, y, ind_mat, sample_wei
 
         estimators.append(estimator)
         estimators_features.append(features)
+        estimators_indices.append(indices)
 
-    return estimators, estimators_features
+    return estimators, estimators_features, estimators_indices
 
 
 class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
@@ -262,6 +266,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
             # Free allocated memory, if any
             self.estimators_ = []
             self.estimators_features_ = []
+            self.sequentially_bootstrapped_samples_ = []
 
         n_more_estimators = self.n_estimators - len(self.estimators_)
 
@@ -308,6 +313,8 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
             t[0] for t in all_results))
         self.estimators_features_ += list(itertools.chain.from_iterable(
             t[1] for t in all_results))
+        self.sequentially_bootstrapped_samples_ += list(itertools.chain.from_iterable(
+            t[2] for t in all_results))
 
         if self.oob_score:
             self._set_oob_score(X, y)
@@ -328,19 +335,6 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
                 self.n_features_, self._max_features, self._max_samples, subsampled_ind_mat)
 
             yield feature_indices, sample_indices
-
-    @property
-    def estimators_samples_(self):
-        """The subset of drawn samples for each base estimator.
-        Returns a dynamically generated list of indices identifying
-        the samples used for fitting each member of the ensemble, i.e.,
-        the in-bag samples.
-        Note: the list is re-created at each call to the property in order
-        to reduce the object memory footprint by not storing the sampling
-        data. Thus fetching the property may be slower than expected.
-        """
-        return [sample_indices
-                for _, sample_indices in self._get_estimators_indices()]
 
 
 class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagging, BaggingClassifier,
@@ -474,6 +468,43 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
         super(BaggingClassifier, self)._validate_estimator(
             default=DecisionTreeClassifier())
 
+    def _set_oob_score(self, X, y):
+        n_samples = y.shape[0]
+        n_classes_ = self.n_classes_
+
+        predictions = np.zeros((n_samples, n_classes_))
+
+        for estimator, samples, features in zip(self.estimators_,
+                                                self.sequentially_bootstrapped_samples_,
+                                                self.estimators_features_):
+            # Create mask for OOB samples
+            mask = ~indices_to_mask(samples, n_samples)
+
+            if hasattr(estimator, "predict_proba"):
+                predictions[mask, :] += estimator.predict_proba(
+                    (X[mask, :])[:, features])
+
+            else:
+                p = estimator.predict((X[mask, :])[:, features])
+                j = 0
+
+                for i in range(n_samples):
+                    if mask[i]:
+                        predictions[i, p[j]] += 1
+                        j += 1
+
+        if (predictions.sum(axis=1) == 0).any():
+            warn("Some inputs do not have OOB scores. "
+                 "This probably means too few estimators were used "
+                 "to compute any reliable oob estimates.")
+
+        oob_decision_function = (predictions /
+                                 predictions.sum(axis=1)[:, np.newaxis])
+        oob_score = accuracy_score(y, np.argmax(predictions, axis=1))
+
+        self.oob_decision_function_ = oob_decision_function
+        self.oob_score_ = oob_score
+
 
 class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBagging, BaggingRegressor, RegressorMixin):
     """A Bagging regressor.
@@ -596,3 +627,29 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
         """Check the estimator and set the base_estimator_ attribute."""
         super(BaggingRegressor, self)._validate_estimator(
             default=DecisionTreeRegressor())
+
+    def _set_oob_score(self, X, y):
+        n_samples = y.shape[0]
+
+        predictions = np.zeros((n_samples,))
+        n_predictions = np.zeros((n_samples,))
+
+        for estimator, samples, features in zip(self.estimators_,
+                                                self.sequentially_bootstrapped_samples_,
+                                                self.estimators_features_):
+            # Create mask for OOB samples
+            mask = ~indices_to_mask(samples, n_samples)
+
+            predictions[mask] += estimator.predict((X[mask, :])[:, features])
+            n_predictions[mask] += 1
+
+        if (n_predictions == 0).any():
+            warn("Some inputs do not have OOB scores. "
+                 "This probably means too few estimators were used "
+                 "to compute any reliable oob estimates.")
+            n_predictions[n_predictions == 0] = 1
+
+        predictions /= n_predictions
+
+        self.oob_prediction_ = predictions
+        self.oob_score_ = r2_score(y, predictions)
