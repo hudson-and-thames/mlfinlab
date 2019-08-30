@@ -324,7 +324,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
 
 class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagging, BaggingClassifier,
                                                 ClassifierMixin):
-    """A Sequentially Bootstrapped Bagging classifier.
+    """
     A Sequentially Bootstrapped Bagging classifier is an ensemble meta-estimator that fits base
     classifiers each on random subsets of the original dataset generated using
     Sequential Bootstrapping sampling procedure and then aggregate their individual predictions (
@@ -332,23 +332,16 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
     a way to reduce the variance of a black-box estimator (e.g., a decision
     tree), by introducing randomization into its construction procedure and
     then making an ensemble out of it.
-    This algorithm encompasses several works from the literature. When random
-    subsets of the dataset are drawn as random subsets of the samples, then
-    this algorithm is known as Pasting [1]_. If samples are drawn with
-    replacement, then the method is known as Bagging [2]_. When random subsets
-    of the dataset are drawn as random subsets of the features, then the method
-    is known as Random Subspaces [3]_. Finally, when base estimators are built
-    on subsets of both samples and features, then the method is known as
-    Random Patches [4]_.
-    Read more in the :ref:`User Guide <bagging>`.
-    Parameters
-    ----------
+
     samples_info_sets: pd.Series
         Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation.
+
         -samples_info_sets.index: Time when the information extraction started.
-        -samples_info_sets.values: Time when the information extraction ended
+
+        -samples_info_sets.value: Time when the information extraction ended
     price_bars: pd.DataFrame
         Price bars used in samples_info_sets generation
+
     base_estimator : object or None, optional (default=None)
         The base estimator to fit on random subsets of the dataset.
         If None, then the base estimator is a decision tree.
@@ -407,17 +400,6 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
         set. If n_estimators is small it might be possible that a data point
         was never left out during the bootstrap. In this case,
         `oob_decision_function_` might contain NaN.
-    References
-    ----------
-    .. [1] L. Breiman, "Pasting small votes for classification in large
-           databases and on-line", Machine Learning, 36(1), 85-103, 1999.
-    .. [2] L. Breiman, "Bagging predictors", Machine Learning, 24(2), 123-140,
-           1996.
-    .. [3] T. Ho, "The random subspace method for constructing decision
-           forests", Pattern Analysis and Machine Intelligence, 20(8), 832-844,
-           1998.
-    .. [4] G. Louppe and P. Geurts, "Ensembles on Random Patches", Machine
-           Learning and Knowledge Discovery in Databases, 346-361, 2012.
     """
 
     def __init__(self,
@@ -492,7 +474,7 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
 
 
 class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBagging, BaggingRegressor, RegressorMixin):
-    """A Bagging regressor.
+    """
     A Sequentially Bootstrapped Bagging regressor is an ensemble meta-estimator that fits base
     regressors each on random subsets of the original dataset using Sequential Bootstrapping and then
     aggregate their individual predictions (either by voting or by averaging)
@@ -500,21 +482,13 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
     a way to reduce the variance of a black-box estimator (e.g., a decision
     tree), by introducing randomization into its construction procedure and
     then making an ensemble out of it.
-    This algorithm encompasses several works from the literature. When random
-    subsets of the dataset are drawn as random subsets of the samples, then
-    this algorithm is known as Pasting [1]_. If samples are drawn with
-    replacement, then the method is known as Bagging [2]_. When random subsets
-    of the dataset are drawn as random subsets of the features, then the method
-    is known as Random Subspaces [3]_. Finally, when base estimators are built
-    on subsets of both samples and features, then the method is known as
-    Random Patches [4]_.
-    Read more in the :ref:`User Guide <bagging>`.
-    Parameters
-    ----------
+
     samples_info_sets: pd.Series
         Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation.
-         -samples_info_sets.index: Time when the information extraction started.
-         -samples_info_sets.value: Time when the information extraction ended
+
+        -samples_info_sets.index: Time when the information extraction started.
+
+        -samples_info_sets.value: Time when the information extraction ended
     price_bars: pd.DataFrame
         Price bars used in samples_info_sets generation
     base_estimator : object or None, optional (default=None)
@@ -567,17 +541,6 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
         set. If n_estimators is small it might be possible that a data point
         was never left out during the bootstrap. In this case,
         `oob_prediction_` might contain NaN.
-    References
-    ----------
-    .. [1] L. Breiman, "Pasting small votes for classification in large
-           databases and on-line", Machine Learning, 36(1), 85-103, 1999.
-    .. [2] L. Breiman, "Bagging predictors", Machine Learning, 24(2), 123-140,
-           1996.
-    .. [3] T. Ho, "The random subspace method for constructing decision
-           forests", Pattern Analysis and Machine Intelligence, 20(8), 832-844,
-           1998.
-    .. [4] G. Louppe and P. Geurts, "Ensembles on Random Patches", Machine
-           Learning and Knowledge Discovery in Databases, 346-361, 2012.
     """
 
     def __init__(self,

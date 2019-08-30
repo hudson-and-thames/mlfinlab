@@ -111,6 +111,8 @@ Implementations
    implementations/sampling
    implementations/frac_diff
    implementations/cross_validation
+   implementations/sb_bagging
+
 
 * :doc:`implementations/data_structures`
 * :doc:`implementations/filters`

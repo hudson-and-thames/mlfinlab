@@ -7,12 +7,12 @@ Sequentially Bootstrapped Bagging Classifier/Regressor
 In sampling section we have shown that sampling should be done by Sequential Bootstrapping.
 SequentiallyBootstrappedBaggingClassifier and SequentiallyBootstrappedBaggingRegressor extend sklearn's BaggingClassifier/Regressor by using Sequential Bootstrapping instead of random sampling.
 
-In order to build indicator matrix, Triple Barrier Events (samples_info_sets) and price bars used to label training data set should be passed as parameters.
+In order to build indicator matrix we need Triple Barrier Events (samples_info_sets) and price bars used to label training data set. That is why samples_info_sets and price bars are input parameters for classifier/regressor.
 
 
 .. py:currentmodule:: mlfinlab.ensemble.sb_bagging
 .. automodule:: mlfinlab.ensemble.sb_bagging
-   :members:
+   :members: SequentiallyBootstrappedBaggingClassifier, SequentiallyBootstrappedBaggingRegressor
 
 
 
@@ -32,6 +32,6 @@ An example of using SequentiallyBootstrappedBaggingClassifier:
 
   base_est = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
                                    class_weight='balanced_subsample')
-  clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=base_est, events_end_times=triple_barrier_events.t1,
+  clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=base_est, samples_info_sets=triple_barrier_events.t1,
                                                   price_bars=price_bars, oob_score=True)
   clf.fit(X, y)
