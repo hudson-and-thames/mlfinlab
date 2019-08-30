@@ -42,7 +42,7 @@ An example showing how the CUSUM filter can be used to downsample a time series 
 	cusum_events = cusum_filter(data['close'], threshold=0.05)
 
 Z-score Filter
-============
+==============
 
 Z-score filter is used to define explosive/peak points in time series. https://stackoverflow.com/questions/22583391/peak-signal-detection-in-realtime-timeseries-data
 
