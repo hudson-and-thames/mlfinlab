@@ -153,11 +153,11 @@ class HierarchicalRiskParity:
         :return: (pd.Dataframe) correlations between asset returns
         '''
 
-        D = np.zeros_like(covariance)
-        d = np.sqrt(np.diag(covariance))
-        np.fill_diagonal(D, d)
-        DInv = np.linalg.inv(D)
-        corr = np.dot(np.dot(DInv, covariance), DInv)
+        d_matrix = np.zeros_like(covariance)
+        diagnoal_sqrt = np.sqrt(np.diag(covariance))
+        np.fill_diagonal(d_matrix, diagnoal_sqrt)
+        d_inv = np.linalg.inv(d_matrix)
+        corr = np.dot(np.dot(d_inv, covariance), d_inv)
         corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
         return corr
 
