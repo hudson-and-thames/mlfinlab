@@ -139,8 +139,7 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
                  warm_start=False,
                  n_jobs=None,
                  random_state=None,
-                 verbose=0,
-                 ):
+                 verbose=0):
         super().__init__(
             base_estimator=base_estimator,
             n_estimators=n_estimators,
@@ -333,29 +332,22 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
     tree), by introducing randomization into its construction procedure and
     then making an ensemble out of it.
 
-    :param samples_info_sets: pd.Series
-        Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation.
-        -*samples_info_sets.index*: Time when the information extraction started.
-        -*samples_info_sets.value*: Time when the information extraction ended
-
+    :param samples_info_sets: pd.Series, The information range on which each record is constructed from
+        *samples_info_sets.index*: Time when the information extraction started.
+        *samples_info_sets.value*: Time when the information extraction ended.
     :param price_bars: pd.DataFrame
         Price bars used in samples_info_sets generation
-
     :param base_estimator: object or None, optional (default=None)
         The base estimator to fit on random subsets of the dataset.
         If None, then the base estimator is a decision tree.
     :param n_estimators: int, optional (default=10)
         The number of base estimators in the ensemble.
-    :max_samples: int or float, optional (default=1.0)
+    :param max_samples: int or float, optional (default=1.0)
         The number of samples to draw from X to train each base estimator.
-        - If int, then draw `max_samples` samples.
-        - If float, then draw `max_samples * X.shape[0]` samples.
-
-    :param max_features : int or float, optional (default=1.0)
+        If int, then draw `max_samples` samples. If float, then draw `max_samples * X.shape[0]` samples.
+    :param max_features: int or float, optional (default=1.0)
         The number of features to draw from X to train each base estimator.
-        - If int, then draw `max_features` features.
-        - If float, then draw `max_features * X.shape[1]` features.
-
+        If int, then draw `max_features` features. If float, then draw `max_features * X.shape[1]` features.
     :param bootstrap_features: boolean, optional (default=False)
         Whether features are drawn with replacement.
     :param oob_score: bool, optional (default=False)
@@ -369,7 +361,6 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
         The number of jobs to run in parallel for both `fit` and `predict`.
         ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
         ``-1`` means using all processors.
-
     :param random_state: int, RandomState instance or None, optional (default=None)
         If int, random_state is the seed used by the random number generator;
         If RandomState instance, random_state is the random number generator;
@@ -412,8 +403,7 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
                  warm_start=False,
                  n_jobs=None,
                  random_state=None,
-                 verbose=0,
-                 ):
+                 verbose=0):
         super().__init__(
             samples_info_sets=samples_info_sets,
             price_bars=price_bars,
@@ -481,29 +471,22 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
     tree), by introducing randomization into its construction procedure and
     then making an ensemble out of it.
 
-    samples_info_sets: pd.Series
-        Triple-Barrier events used to label X_train, y_train. We need them for indicator matrix generation.
+    :param samples_info_sets: pd.Series, The information range on which each record is constructed from
+        *samples_info_sets.index*: Time when the information extraction started.
+        *samples_info_sets.value*: Time when the information extraction ended.
 
-        - *samples_info_sets.index*: Time when the information extraction started.
-        - *samples_info_sets.value*: Time when the information extraction ended
-    price_bars: pd.DataFrame
+    :param price_bars: pd.DataFrame
         Price bars used in samples_info_sets generation
-
     :param base_estimator: object or None, optional (default=None)
-        The base estimator to fit on random subsets of the dataset.
-        If None, then the base estimator is a decision tree.
+        The base estimator to fit on random subsets of the dataset. If None, then the base estimator is a decision tree.
     :param n_estimators: int, optional (default=10)
         The number of base estimators in the ensemble.
     :param max_samples: int or float, optional (default=1.0)
         The number of samples to draw from X to train each base estimator.
-        - If int, then draw `max_samples` samples.
-        - If float, then draw `max_samples * X.shape[0]` samples.
-
+        If int, then draw `max_samples` samples. If float, then draw `max_samples * X.shape[0]` samples.
     :param max_features: int or float, optional (default=1.0)
         The number of features to draw from X to train each base estimator.
-        - If int, then draw `max_features` features.
-        - If float, then draw `max_features * X.shape[1]` features.
-
+        If int, then draw `max_features` features. If float, then draw `max_features * X.shape[1]` features.
     :param bootstrap_features: boolean, optional (default=False)
         Whether features are drawn with replacement.
     :param oob_score: bool
@@ -513,18 +496,16 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
         When set to True, reuse the solution of the previous call to fit
         and add more estimators to the ensemble, otherwise, just fit
         a whole new ensemble.
-
-    :param n_jobs : int or None, optional (default=None)
+    :param n_jobs: int or None, optional (default=None)
         The number of jobs to run in parallel for both `fit` and `predict`.
         ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
         ``-1`` means using all processors.
-
-    :param random_state : int, RandomState instance or None, optional (default=None)
+    :param random_state: int, RandomState instance or None, optional (default=None)
         If int, random_state is the seed used by the random number generator;
         If RandomState instance, random_state is the random number generator;
         If None, the random number generator is the RandomState instance used
         by `np.random`.
-    :param verbose : int, optional (default=0)
+    :param verbose: int, optional (default=0)
         Controls the verbosity when fitting and predicting.
 
     :ivar estimators_: list of estimators
@@ -555,8 +536,7 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
                  warm_start=False,
                  n_jobs=None,
                  random_state=None,
-                 verbose=0,
-                 ):
+                 verbose=0):
         super().__init__(
             samples_info_sets=samples_info_sets,
             price_bars=price_bars,
