@@ -297,11 +297,15 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
                                                           samples_info_sets=self.samples_info_sets,
                                                           price_bars=self.price_bars_trim, oob_score=True,
                                                           random_state=1)
-
-        # X_train index should be in index mapping
+        sb_reg_1 = SequentiallyBootstrappedBaggingRegressor(base_estimator=reg, max_features=1.0, n_estimators=1,
+                                                          samples_info_sets=self.samples_info_sets,
+                                                          price_bars=self.price_bars_trim, oob_score=True,
+                                                          random_state=1)
 
         sb_reg.fit(self.X_train, self.y_train_reg)
+        sb_reg_1.fit(self.X_train, self.y_test_reg)  # To raise warning and get code coverage
 
+        # X_train index should be in index mapping
         self.assertTrue(self.X_train.index.isin(sb_reg.timestamp_int_index_mapping.index).all())
         self.assertTrue((sb_reg.X_time_index == self.X_train.index).all())  # X_train index == reg X_train index
 

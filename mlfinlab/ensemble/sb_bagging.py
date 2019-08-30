@@ -321,21 +321,6 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
 
         return self
 
-    def _get_estimators_indices(self):
-        # Get indicator matrix
-        subsampled_ind_mat = self.ind_mat[:, self.timestamp_int_index_mapping.loc[self.X_time_index]]
-
-        # Get drawn indices along both sample and feature axes
-        for seed in self._seeds:
-            # Operations accessing random_state must be performed identically
-            # to those in `_parallel_build_estimators()`
-            random_state = np.random.RandomState(seed)
-            feature_indices, sample_indices = _generate_bagging_indices(
-                random_state, self.bootstrap_features,
-                self.n_features_, self._max_features, self._max_samples, subsampled_ind_mat)
-
-            yield feature_indices, sample_indices
-
 
 class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagging, BaggingClassifier,
                                                 ClassifierMixin):
