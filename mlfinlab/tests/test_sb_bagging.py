@@ -276,8 +276,6 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
 
         self.assertTrue((sb_clf.X_time_index == self.X_train.index).all())  # X_train index == clf X_train index
 
-        oos_sb_predictions = sb_clf.predict(self.X_test)
-
         sb_precision = precision_score(self.y_test_clf, oos_sb_predictions)
         sb_roc_auc = roc_auc_score(self.y_test_clf, oos_sb_predictions)
         sb_accuracy = accuracy_score(self.y_test_clf, oos_sb_predictions)
