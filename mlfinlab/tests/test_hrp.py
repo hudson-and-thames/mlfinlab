@@ -1,7 +1,3 @@
-"""
-Tests for the HRP module
-"""
-
 import unittest
 import os
 import numpy as np
@@ -10,6 +6,9 @@ from mlfinlab.portfolio_optimization.hrp import HierarchicalRiskParity
 
 
 class TestCLA(unittest.TestCase):
+    """
+    Tests for the HRP module
+    """
 
     def setUp(self):
         """

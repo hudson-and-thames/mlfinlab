@@ -1,7 +1,3 @@
-"""
-Tests for the Mean Variance Optimisation module
-"""
-
 import unittest
 import os
 import numpy as np
@@ -10,7 +6,10 @@ from mlfinlab.portfolio_optimization.mean_variance import MeanVarianceOptimisati
 
 
 class TestMVO(unittest.TestCase):
-
+    """
+    Tests for the Mean Variance Optimisation module
+    """
+    
     def setUp(self):
         """
         Set the file path for the tick data csv

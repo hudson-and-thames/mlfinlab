@@ -1,7 +1,3 @@
-"""
-Tests for the CLA module
-"""
-
 import unittest
 import os
 import numpy as np
@@ -10,6 +6,9 @@ from mlfinlab.portfolio_optimization.cla import CLA
 
 
 class TestCLA(unittest.TestCase):
+    """
+    Tests for the CLA module
+    """
 
     def setUp(self):
         """
