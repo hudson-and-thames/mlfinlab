@@ -1,21 +1,27 @@
-'''
-CLA class implements the famous Critical Line Algorithm for mean-variance portfolio
-optimisation. It is reproduced with modification from the following paper:
-D.H. Bailey and M.L. Prado “An Open-Source Implementation of the Critical- Line Algorithm for
-Portfolio Optimization”,Algorithms, 6 (2013), 169-196. http://dx.doi.org/10.3390/a6010169
-'''
-
 import numbers
 import numpy as np
 import pandas as pd
 from math import log, ceil
 
 
-def _infnone(x):
-    return float("-inf") if x is None else x
+def _infnone(number):
+    '''
+    Converts a Nonetype object to inf
+
+    :param number: (int/float/None) a number
+    :return: (float) -inf or number
+    '''
+    return float("-inf") if number is None else number
 
 
 class CLA:
+    '''
+    CLA class implements the famous Critical Line Algorithm for mean-variance portfolio
+    optimisation. It is reproduced with modification from the following paper:
+    D.H. Bailey and M.L. Prado “An Open-Source Implementation of the Critical- Line Algorithm for
+    Portfolio Optimization”,Algorithms, 6 (2013), 169-196. http://dx.doi.org/10.3390/a6010169
+    '''
+
     def __init__(self, weight_bounds=(0, 1), calculate_returns="mean"):
         '''
         Initialise the storage arrays and some preprocessing.
@@ -28,28 +34,28 @@ class CLA:
         self.weight_bounds = weight_bounds
         self.calculate_returns = calculate_returns
 
-    def _calculate_mean_historical_returns(self, X, frequency=252):
+    def _calculate_mean_historical_returns(self, asset_prices, frequency=252):
         '''
         Calculate the annualised mean historical returns from asset price data
 
-        :param X: (pd.DataFrame) asset price data
+        :param asset_prices: (pd.DataFrame) asset price data
         :return: (np.array) returns per asset
         '''
 
-        returns = X.pct_change().dropna(how="all")
+        returns = asset_prices.pct_change().dropna(how="all")
         returns = returns.mean() * frequency
         return returns
 
-    def _calculate_exponential_historical_returns(self, X, frequency=252, span=500):
+    def _calculate_exponential_historical_returns(self, asset_prices, frequency=252, span=500):
         '''
         Calculate the exponentially-weighted mean of (daily) historical returns, giving
         higher weight to more recent data.
 
-        :param X: (pd.DataFrame) asset price data
+        :param asset_prices: (pd.DataFrame) asset price data
         :return: (np.array) returns per asset
         '''
 
-        returns = X.pct_change().dropna(how="all")
+        returns = asset_prices.pct_change().dropna(how="all")
         returns = returns.ewm(span=span).mean().iloc[-1] * frequency
         return returns
 
@@ -71,20 +77,20 @@ class CLA:
         expected_returns = np.sort(structured_array, order="mu")
 
         # First free weight
-        i, w = expected_returns.shape[0], np.copy(self.lower_bounds)
-        while np.sum(w) < 1:
-            i -= 1
+        index, weights = expected_returns.shape[0], np.copy(self.lower_bounds)
+        while np.sum(weights) < 1:
+            index -= 1
 
             # Set weights one by one to the upper bounds
-            w[expected_returns[i][0]] = self.upper_bounds[expected_returns[i][0]]
-        w[expected_returns[i][0]] += 1 - np.sum(w)
-        return [expected_returns[i][0]], w
+            weights[expected_returns[index][0]] = self.upper_bounds[expected_returns[index][0]]
+        weights[expected_returns[index][0]] += 1 - np.sum(weights)
+        return [expected_returns[index][0]], weights
 
-    def _compute_bi(self, c, asset_bounds_i):
+    def _compute_bi(self, c_final, asset_bounds_i):
         '''
         Calculates which bound value to assign to a bounded asset - lower bound or upper bound.
 
-        :param c: (float) a value calculated using the covariance matrices of free weights.
+        :param c_final: (float) a value calculated using the covariance matrices of free weights.
                           Refer to https://pdfs.semanticscholar.org/4fb1/2c1129ba5389bafe47b03e595d098d0252b9.pdf for
                           more information.
         :param asset_bounds_i: (list) a list containing the lower and upper bound values for the ith weight
@@ -92,82 +98,82 @@ class CLA:
         '''
 
         bounded_asset_i = 0
-        if c > 0:
+        if c_final > 0:
             bounded_asset_i = asset_bounds_i[1][0]
-        if c < 0:
+        if c_final < 0:
             bounded_asset_i = asset_bounds_i[0][0]
         return bounded_asset_i
 
-    def _compute_w(self, covarF_inv, covar_FB, mean_F, w_B):
+    def _compute_w(self, covar_f_inv, covar_fb, mean_f, w_b):
         '''
         Compute the turning point associated with the current set of free weights F
 
-        :param covarF_inv: (np.array) inverse of covariance matrix of free assets
-        :param covar_FB: (np.array) covariance matrix between free assets and bounded assets
-        :param mean_F: (np.array) expected returns of free assets
-        :param w_B: (np.array) bounded asset weight values
+        :param covar_f_inv: (np.array) inverse of covariance matrix of free assets
+        :param covar_fb: (np.array) covariance matrix between free assets and bounded assets
+        :param mean_f: (np.array) expected returns of free assets
+        :param w_b: (np.array) bounded asset weight values
 
         :return: (array, array) list of turning point weights and gamma value from the langrange equation
         '''
 
         # Compute gamma
-        ones_F = np.ones(mean_F.shape)
-        g_1 = np.dot(np.dot(ones_F.T, covarF_inv), mean_F)
-        g_2 = np.dot(np.dot(ones_F.T, covarF_inv), ones_F)
-        if w_B is None:
-            g, w_1 = float(-self.lambdas[-1] * g_1 / g_2 + 1 / g_2), 0
+        ones_f = np.ones(mean_f.shape)
+        g_1 = np.dot(np.dot(ones_f.T, covar_f_inv), mean_f)
+        g_2 = np.dot(np.dot(ones_f.T, covar_f_inv), ones_f)
+        if w_b is None:
+            g_final, w_1 = float(-self.lambdas[-1] * g_1 / g_2 + 1 / g_2), 0
         else:
-            onesB = np.ones(w_B.shape)
-            g_3 = np.dot(onesB.T, w_B)
-            g_4 = np.dot(covarF_inv, covar_FB)
-            w_1 = np.dot(g_4, w_B)
-            g_4 = np.dot(ones_F.T, w_1)
-            g = float(-self.lambdas[-1] * g_1 / g_2 + (1 - g_3 + g_4) / g_2)
+            ones_b = np.ones(w_b.shape)
+            g_3 = np.dot(ones_b.T, w_b)
+            g_4 = np.dot(covar_f_inv, covar_fb)
+            w_1 = np.dot(g_4, w_b)
+            g_4 = np.dot(ones_f.T, w_1)
+            g_final = float(-self.lambdas[-1] * g_1 / g_2 + (1 - g_3 + g_4) / g_2)
 
         # Compute weights
-        w_2 = np.dot(covarF_inv, ones_F)
-        w_3 = np.dot(covarF_inv, mean_F)
-        return -w_1 + g * w_2 + self.lambdas[-1] * w_3, g
+        w_2 = np.dot(covar_f_inv, ones_f)
+        w_3 = np.dot(covar_f_inv, mean_f)
+        return -w_1 + g_final * w_2 + self.lambdas[-1] * w_3, g_final
 
-    def _compute_lambda(self, covarF_inv, covar_FB, mean_F, w_B, i, bi):
+    def _compute_lambda(self, covar_f_inv, covar_fb, mean_f, w_b, i, bi):
         '''
         Calculate the lambda value in the langrange optimsation equation
 
-        :param covarF_inv: (np.array) inverse of covariance matrix of free assets
-        :param covar_FB: (np.array) covariance matrix between free assets and bounded assets
-        :param mean_F: (np.array) expected returns of free assets
-        :param w_B: (np.array) bounded asset weight values
+        :param covar_f_inv: (np.array) inverse of covariance matrix of free assets
+        :param covar_fb: (np.array) covariance matrix between free assets and bounded assets
+        :param mean_f: (np.array) expected returns of free assets
+        :param w_b: (np.array) bounded asset weight values
         :param i: (int) asset index
         :param bi: (list) list of upper and lower bounded weight values
         :return: (float) lambda value
         '''
 
         # Compute C
-        ones_F = np.ones(mean_F.shape)
-        c1 = np.dot(np.dot(ones_F.T, covarF_inv), ones_F)
-        c2 = np.dot(covarF_inv, mean_F)
-        c3 = np.dot(np.dot(ones_F.T, covarF_inv), mean_F)
-        c4 = np.dot(covarF_inv, ones_F)
-        c = -c1 * c2[i] + c3 * c4[i]
-        if c == 0:
+        ones_f = np.ones(mean_f.shape)
+        c_1 = np.dot(np.dot(ones_f.T, covar_f_inv), ones_f)
+        c_2 = np.dot(covar_f_inv, mean_f)
+        c_3 = np.dot(np.dot(ones_f.T, covar_f_inv), mean_f)
+        c_4 = np.dot(covar_f_inv, ones_f)
+        c_final = -c_1 * c_2[i] + c_3 * c_4[i]
+        if c_final == 0:
             return None, None
 
         # Compute bi
         if type(bi) == list:
-            bi = self._compute_bi(c, bi)
+            bi = self._compute_bi(c_final, bi)
 
         # Compute Lambda
-        if w_B is None:
+        if w_b is None:
 
             # All free assets
-            return float((c4[i] - c1 * bi) / c), bi
+            return float((c_4[i] - c_1 * bi) / c_final), bi
         else:
-            onesB = np.ones(w_B.shape)
-            l1 = np.dot(onesB.T, w_B)
-            l2 = np.dot(covarF_inv, covar_FB)
-            l3 = np.dot(l2, w_B)
-            l2 = np.dot(ones_F.T, l3)
-            return float(((1 - l1 + l2) * c4[i] - c1 * (bi + l3[i])) / c), bi
+            ones_b = np.ones(w_b.shape)
+            l1 = np.dot(ones_b.T, w_b)
+            l2 = np.dot(covar_f_inv, covar_fb)
+            l3 = np.dot(l2, w_b)
+            l2 = np.dot(ones_f.T, l3)
+            return float(((1 - l1 + l2) * c_4[i] - c_1 * (bi + l3[i])) / c_final), bi
 
     def _get_matrices(self, f):
         '''
@@ -177,12 +183,12 @@ class CLA:
         :return: (tuple of np.array matrices) the corresponding matrices
         '''
 
-        covarF = self._reduce_matrix(self.cov_matrix, f, f)
-        mean_F = self._reduce_matrix(self.expected_returns, f, [0])
+        covar_f = self._reduce_matrix(self.cov_matrix, f, f)
+        mean_f = self._reduce_matrix(self.expected_returns, f, [0])
         b = self._get_b(f)
-        covar_FB = self._reduce_matrix(self.cov_matrix, f, b)
-        w_B = self._reduce_matrix(self.weights[-1], b, [0])
-        return covarF, covar_FB, mean_F, w_B
+        covar_fb = self._reduce_matrix(self.cov_matrix, f, b)
+        w_b = self._reduce_matrix(self.weights[-1], b, [0])
+        return covar_f, covar_fb, mean_f, w_b
 
     def _get_b(self, f):
         '''
@@ -325,12 +331,12 @@ class CLA:
         i_in = None
         bi_in = None
         if len(free_weights) > 1:
-            covarF, covar_FB, mean_F, w_B = self._get_matrices(free_weights)
-            covarF_inv = np.linalg.inv(covarF)
+            covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights)
+            covar_f_inv = np.linalg.inv(covar_f)
             j = 0
             for i in free_weights:
                 l, bi = self._compute_lambda(
-                    covarF_inv, covar_FB, mean_F, w_B, j, [self.lower_bounds[i], self.upper_bounds[i]]
+                    covar_f_inv, covar_fb, mean_f, w_b, j, [self.lower_bounds[i], self.upper_bounds[i]]
                 )
                 if _infnone(l) > _infnone(lambda_in):
                     lambda_in, i_in, bi_in = l, i, bi
@@ -347,14 +353,14 @@ class CLA:
         if len(free_weights) < self.expected_returns.shape[0]:
             b = self._get_b(free_weights)
             for i in b:
-                covarF, covar_FB, mean_F, w_B = self._get_matrices(free_weights + [i])
-                covarF_inv = np.linalg.inv(covarF)
+                covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights + [i])
+                covar_f_inv = np.linalg.inv(covar_f)
                 l, bi = self._compute_lambda(
-                    covarF_inv,
-                    covar_FB,
-                    mean_F,
-                    w_B,
-                    mean_F.shape[0] - 1,
+                    covar_f_inv,
+                    covar_fb,
+                    mean_f,
+                    w_b,
+                    mean_f.shape[0] - 1,
                     self.weights[-1][i],
                 )
                 if (self.lambdas[-1] is None or l < self.lambdas[-1]) and l > _infnone(lambda_out):
@@ -371,9 +377,9 @@ class CLA:
 
         # Calculate the expected returns
         if self.calculate_returns == "mean":
-            self.expected_returns = self._calculate_mean_historical_returns(X=asset_prices)
+            self.expected_returns = self._calculate_mean_historical_returns(asset_prices=asset_prices)
         else:
-            self.expected_returns = self._calculate_exponential_historical_returns(X=asset_prices)
+            self.expected_returns = self._calculate_exponential_historical_returns(asset_prices=asset_prices)
         self.expected_returns = np.array(self.expected_returns).reshape((len(self.expected_returns), 1))
         if (self.expected_returns == np.ones(self.expected_returns.shape) * self.expected_returns.mean()).all():
             self.expected_returns[-1, 0] += 1e-5
@@ -466,9 +472,9 @@ class CLA:
         # Some initial steps before the algorithm runs
         self._initialise(asset_prices=asset_prices)
 
-        # Compute the turning points,free sets and weights
-        free_weights, w = self._init_algo()
-        self.weights.append(np.copy(w))  # store solution
+        # Compute the turning points, free sets and weights
+        free_weights, weights = self._init_algo()
+        self.weights.append(np.copy(weights))  # store solution
         self.lambdas.append(None)
         self.gammas.append(None)
         self.free_weights.append(free_weights[:])
@@ -483,26 +489,26 @@ class CLA:
             if (lambda_in is None or lambda_in < 0) and (lambda_out is None or lambda_out < 0):
                 # 3) Compute minimum variance solution
                 self.lambdas.append(0)
-                covarF, covar_FB, mean_F, w_B = self._get_matrices(free_weights)
-                covarF_inv = np.linalg.inv(covarF)
-                mean_F = np.zeros(mean_F.shape)
+                covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights)
+                covar_f_inv = np.linalg.inv(covar_f)
+                mean_f = np.zeros(mean_f.shape)
             else:
                 # 4) Decide whether to free a bounded weight or bound a free weight
                 if _infnone(lambda_in) > _infnone(lambda_out):
                     self.lambdas.append(lambda_in)
                     free_weights.remove(i_in)
-                    w[i_in] = bi_in  # set value at the correct boundary
+                    weights[i_in] = bi_in  # set value at the correct boundary
                 else:
                     self.lambdas.append(lambda_out)
                     free_weights.append(i_out)
-                covarF, covar_FB, mean_F, w_B = self._get_matrices(free_weights)
-                covarF_inv = np.linalg.inv(covarF)
+                covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights)
+                covar_f_inv = np.linalg.inv(covar_f)
 
             # 5) Compute solution vector
-            wF, g = self._compute_w(covarF_inv, covar_FB, mean_F, w_B)
+            wF, g = self._compute_w(covar_f_inv, covar_fb, mean_f, w_b)
             for i in range(len(free_weights)):
-                w[free_weights[i]] = wF[i]
-            self.weights.append(np.copy(w))  # store solution
+                weights[free_weights[i]] = wF[i]
+            self.weights.append(np.copy(weights))  # store solution
             self.gammas.append(g)
             self.free_weights.append(free_weights[:])
             if self.lambdas[-1] == 0:
@@ -525,7 +531,7 @@ class CLA:
             self.weights.index = assets
             self.weights = self.weights.T
         elif solution == "efficient_frontier":
-            self.mu, self.sigma, self.weights = self._efficient_frontier()
+            self.means, self.sigma, self.weights = self._efficient_frontier()
             weights_copy = self.weights.copy()
             for i, turning_point in enumerate(weights_copy):
                 self.weights[i] = turning_point.reshape(1, -1)[0]
