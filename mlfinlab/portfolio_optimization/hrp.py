@@ -10,6 +10,7 @@ import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 import matplotlib.pyplot as plt
+from sklearn.covariance import OAS
 
 
 class HierarchicalRiskParity:
@@ -26,7 +27,7 @@ class HierarchicalRiskParity:
         :return: distance matrix and clusters
         '''
 
-        distances = np.sqrt((1 - correlation) / 2)
+        distances = np.sqrt((1 - correlation).round(5) / 2)
         clusters = linkage(squareform(distances.values), method=method)
         return distances, clusters
 
@@ -113,7 +114,6 @@ class HierarchicalRiskParity:
         :param height: (int) height of the plot
         :param width: (int) width of the plot
         '''
-
         plt.figure(figsize=(width, height))
         dendrogram(self.clusters)
         plt.show()
@@ -126,12 +126,40 @@ class HierarchicalRiskParity:
                                   'B' meaning daily business days which is equivalent to no resampling
         :return: (pd.Dataframe) stock returns
         '''
+
         asset_returns = asset_prices.pct_change()
         asset_returns = asset_returns.dropna(how='all')
         asset_returns = asset_returns.resample(resample_returns_by).mean()
         return asset_returns
 
-    def allocate(self, asset_prices, resample_returns_by='B'):
+    def _shrink_covariance(self, covariance):
+        '''
+
+        :param covariance: (pd.Dataframe) asset returns covariances
+        :return: (pd.Dataframe) shrinked asset returns covariances
+        '''
+
+        oas = OAS()
+        oas.fit(covariance)
+        shrinked_covariance = oas.covariance_
+        return pd.DataFrame(shrinked_covariance, index=covariance.columns, columns=covariance.columns)
+
+    def _cov2corr(self, covariance):
+        '''
+
+        :param covariance: (pd.Dataframe) asset returns covariances
+        :return: (pd.Dataframe) correlations between asset returns
+        '''
+
+        D = np.zeros_like(covariance)
+        d = np.sqrt(np.diag(covariance))
+        np.fill_diagonal(D, d)
+        DInv = np.linalg.inv(D)
+        corr = np.dot(np.dot(DInv, covariance), DInv)
+        corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
+        return corr
+
+    def allocate(self, asset_prices, resample_returns_by='B', use_shrinkage=False):
         '''
         Calculate asset allocations using HRP algorithm
 
@@ -139,6 +167,7 @@ class HierarchicalRiskParity:
                                             indexed by date
         :param resample_returns_by: (str) specifies how to resample the returns - weekly, daily, monthly etc.. Defaults to
                                           'B' meaning daily business days which is equivalent to no resampling
+        :param use_shrinkage: (Boolean) specifies whether to shrink the covariances
         '''
 
         if type(asset_prices) != pd.DataFrame:
@@ -151,7 +180,12 @@ class HierarchicalRiskParity:
 
         N = asset_returns.shape[1]
         assets = asset_returns.columns
-        cov, corr = asset_returns.cov(), asset_returns.corr()
+
+        # Covariance and correlation
+        cov = asset_returns.cov()
+        if use_shrinkage:
+            cov = self._shrink_covariance(covariance=cov)
+        corr = self._cov2corr(covariance=cov)
 
         # Step-1: Tree Clustering
         distances, self.clusters = self._tree_clustering(correlation=corr)
