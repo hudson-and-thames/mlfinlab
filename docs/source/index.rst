@@ -118,6 +118,7 @@ Implementations
 * :doc:`implementations/sampling`
 * :doc:`implementations/frac_diff`
 * :doc:`implementations/cross_validation`
+* :doc:`implementations/sb_bagging`
 
 Additional Information
 ======================
