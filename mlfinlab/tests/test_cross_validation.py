@@ -22,7 +22,7 @@ class TestCrossValidation(unittest.TestCase):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.verbose = True
+        self.verbose = False
 
     def log(self, msg):
         """
