@@ -1,11 +1,11 @@
 """
-Implements the book chapter 7 on Cross Validation for financial data
+Implements the book chapter 7 on Cross Validation for financial data.
 """
 
 import pandas as pd
 import numpy as np
 
-from sklearn.metrics import log_loss, accuracy_score
+from sklearn.metrics import log_loss, accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
 from sklearn.model_selection import KFold
 from sklearn.base import ClassifierMixin
 from sklearn.model_selection import BaseCrossValidator
@@ -101,41 +101,53 @@ def ml_cross_val_score(
         classifier: ClassifierMixin,
         X: pd.DataFrame,
         y: pd.Series,
-        sample_weight: np.ndarray,
-        scoring: str = 'neg_log_loss',
-        samples_info_sets: pd.Series = None,
-        n_splits: int = None,
-        cv_gen: BaseCrossValidator = None,
-        pct_embargo: int = None):
+        cv_gen: BaseCrossValidator,
+        sample_weight: np.ndarray = None,
+        scoring: str = 'neg_log_loss'):
     # pylint: disable=invalid-name
     """
-    Function to run a cross-validation evaluation of the using sample weights and a custom CV generator
+    Snippet 7.4, page 110, Using the PurgedKFold Class.
+    Function to run a cross-validation evaluation of the using sample weights and a custom CV generator.
 
-    :param classifier: A sk-learn Classifier object instance
-    :param X: The dataset of records to evaluate
-    :param y: The labels corresponding to the X dataset
-    :param sample_weight: A numpy array of weights for each record in the dataset
-    :param scoring: A metric name to use for scoring; currently supports `neg_log_loss` and `accuracy`
-    :param samples_info_sets: The information range on which each record is constructed from
-        *samples_info_sets.index*: Time when the information extraction started.
-        *samples_info_sets.value*: Time when the information extraction ended.
-    :param n_splits: Number of splits
-    :param cv_gen: Cross Validation generator object instance; if None then PurgedKFold will be used
-    :param pct_embargo: Embargo percentage [0, 1]
-    :return: The computed score
+    Note: This function is different to the book in that it requires the user to pass through a CV object. The book
+    will accept a None value as a default and then resort to using PurgedCV, this also meant that extra arguments had to
+    be passed to the function. To correct this we have removed the default and require the user to pass a CV object to
+    the function.
+
+    Example:
+    cv_gen = PurgedKFold(n_splits=n_splits, samples_info_sets=samples_info_sets, pct_embargo=pct_embargo)
+    scores_array = ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss')
+
+    :param classifier: A sk-learn Classifier object instance.
+    :param X: The dataset of records to evaluate.
+    :param y: The labels corresponding to the X dataset.
+    :param cv_gen: Cross Validation generator object instance.
+    :param sample_weight: A numpy array of weights for each record in the dataset.
+    :param scoring: A metric name to use for scoring; currently supports `neg_log_loss`, `accuracy`, `f1`, `precision`,
+        `recall`, and `roc_auc`.
+    :return: The computed score as a numpy array.
     """
-    if scoring not in ['neg_log_loss', 'accuracy']:
-        raise ValueError('wrong scoring method.')
-    if cv_gen is None:
-        cv_gen = PurgedKFold(n_splits=n_splits, samples_info_sets=samples_info_sets, pct_embargo=pct_embargo)
+    # Define scoring metrics
+    scoring_func_dict = {'neg_log_loss': log_loss, 'accuracy': accuracy_score, 'f1': f1_score,
+                         'precision': precision_score, 'recall': recall_score, 'roc_auc': roc_auc_score}
+    try:
+        scoring_func = scoring_func_dict[scoring]
+    except KeyError:
+        raise ValueError('Wrong scoring method. Select from: neg_log_loss, accuracy, f1, precision, recall, roc_auc')
+
+    # If no sample_weight then broadcast a value of 1 to all samples (full weight).
+    if sample_weight is None:
+        sample_weight = np.ones((X.shape[0],))
+
+    # Score model on KFolds
     ret_scores = []
-    for train, test in cv_gen.split(X=X):
-        fit = classifier.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight.iloc[train].values)
+    for train, test in cv_gen.split(X=X, y=y):
+        fit = classifier.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight[train])
         if scoring == 'neg_log_loss':
             prob = fit.predict_proba(X.iloc[test, :])
-            score = -1*log_loss(y.iloc[test], prob, sample_weight=sample_weight.iloc[test].values, labels=classifier.classes_)
+            score = -1 * scoring_func(y.iloc[test], prob, sample_weight=sample_weight[test], labels=classifier.classes_)
         else:
             pred = fit.predict(X.iloc[test, :])
-            score = accuracy_score(y.iloc[test], pred, sample_weight=sample_weight.iloc[test].values)
+            score = scoring_func(y.iloc[test], pred, sample_weight=sample_weight[test])
         ret_scores.append(score)
     return np.array(ret_scores)
