@@ -50,16 +50,20 @@ The implementations that will be added in the future as well as the implementati
 * Part 3: Backtesting
 * Working on Chapter 16: ML Asset Allocation (Aditya)
 * Working on Chapter 10: Bet Sizing (Lee)
+
 .. |vspace| raw:: latex
 
    \vspace{5mm}
+
 * Part 2: Modelling
-* Working on Chapter 7: Cross-Validation (Mihai)
+* Done Chapter 7: Cross-Validation (Mihai)
 * Done Chapter 6: Ensemble Methods
 * Adding Sequential Bootstrap Ensemble method (Alex)
+
 .. |vspace| raw:: latex
 
    \vspace{5mm}
+
 * Part 1: Data Analysis
 * Done Chapter 5: Fractionally Differentiated Features
 * Done Chapter 4: Sample Weights
@@ -73,6 +77,7 @@ Built With
 
 * `Github`_ - Development platform and repo
 * `Travis CI`_ - Continuous integration, test and deploy
+
 .. _Github: https://github.com/hudson-and-thames/mlfinlab
 .. _Travis CI: https://www.travis-ci.com
 
@@ -105,12 +110,14 @@ Implementations
    implementations/labeling
    implementations/sampling
    implementations/frac_diff
+   implementations/cross_validation
 
 * :doc:`implementations/data_structures`
 * :doc:`implementations/filters`
 * :doc:`implementations/labeling`
 * :doc:`implementations/sampling`
 * :doc:`implementations/frac_diff`
+* :doc:`implementations/cross_validation`
 
 Additional Information
 ======================
