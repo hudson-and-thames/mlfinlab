@@ -95,6 +95,7 @@ def feature_importance_mean_decrease_accuracy(clf, X, y, cv_gen, sample_weight=N
     else:
         imp = imp / (1. - features_metrics_values)
     imp = pd.concat({'mean': imp.mean(), 'std': imp.std() * imp.shape[0] ** -.5}, axis=1)
+    imp.replace([-np.inf, np.nan], 0, inplace=True)  # Replace infinite values
     return imp
 
 

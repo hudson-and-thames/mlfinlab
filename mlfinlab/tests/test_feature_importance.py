@@ -9,10 +9,12 @@ import numpy as np
 import pandas as pd
 
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
 
 from mlfinlab.util.utils import get_daily_vol
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier, get_bins
+from mlfinlab.sampling.bootstrapping import get_ind_mat_label_uniqueness, get_ind_matrix
 from mlfinlab.ensemble.sb_bagging import SequentiallyBootstrappedBaggingClassifier
 from mlfinlab.feature_importance.importance import (feature_importance_mean_decrease_impurity,
                                                     feature_importance_mean_decrease_accuracy, feature_importance_sfi,
@@ -22,6 +24,30 @@ from mlfinlab.cross_validation.cross_validation import PurgedKFold, ml_cross_val
 
 
 # pylint: disable=invalid-name
+
+
+def _generate_label_with_prob(x, prob, random_state=np.random.RandomState(1)):
+    """
+    Generates true label value with some probability(prob)
+    """
+    choice = random_state.choice([0, 1], p=[1 - prob, prob])
+    if choice == 1:
+        return x
+    return int(not x)
+
+
+def _get_synthetic_samples(ind_mat, good_samples_thresh, bad_samples_thresh):
+    """
+    Get samples with uniqueness either > good_samples_thresh or uniqueness < bad_samples_thresh
+    """
+    # Get mix of samples where some of them are extremely non-overlapping, the other one are highly overlapping
+    i = 0
+    unique_samples = []
+    for label in get_ind_mat_label_uniqueness(ind_mat):
+        if np.mean(label[label > 0]) > good_samples_thresh or np.mean(label[label > 0]) < bad_samples_thresh:
+            unique_samples.append(i)
+        i += 1
+    return unique_samples
 
 
 class TestFeatureImportance(unittest.TestCase):
@@ -39,12 +65,9 @@ class TestFeatureImportance(unittest.TestCase):
         self.data.index = pd.to_datetime(self.data.index)
 
         # Compute moving averages
-        fast_window = 20
-        slow_window = 50
-
-        self.data['fast_mavg'] = self.data['close'].rolling(window=fast_window, min_periods=fast_window,
+        self.data['fast_mavg'] = self.data['close'].rolling(window=20, min_periods=20,
                                                             center=False).mean()
-        self.data['slow_mavg'] = self.data['close'].rolling(window=slow_window, min_periods=slow_window,
+        self.data['slow_mavg'] = self.data['close'].rolling(window=50, min_periods=50,
                                                             center=False).mean()
 
         # Compute sides
@@ -58,43 +81,55 @@ class TestFeatureImportance(unittest.TestCase):
         # Remove Look ahead bias by lagging the signal
         self.data['side'] = self.data['side'].shift(1)
 
-        daily_vol = get_daily_vol(close=self.data['close'], lookback=50)
-        cusum_events = cusum_filter(self.data['close'], threshold=0.001)
+        daily_vol = get_daily_vol(close=self.data['close'], lookback=50) * 0.5
+        cusum_events = cusum_filter(self.data['close'], threshold=0.005)
         vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'],
-                                                 num_days=2)
-        self.meta_labeled_events = get_events(close=self.data['close'],
-                                              t_events=cusum_events,
-                                              pt_sl=[4, 4],
-                                              target=daily_vol,
-                                              min_ret=0.005,
-                                              num_threads=3,
-                                              vertical_barrier_times=vertical_barriers,
-                                              side_prediction=self.data['side'])
+                                                 num_hours=2)
+        meta_labeled_events = get_events(close=self.data['close'],
+                                         t_events=cusum_events,
+                                         pt_sl=[1, 4],
+                                         target=daily_vol,
+                                         min_ret=5e-5,
+                                         num_threads=3,
+                                         vertical_barrier_times=vertical_barriers,
+                                         side_prediction=self.data['side'])
+        meta_labeled_events.dropna(inplace=True)
+        labels = get_bins(meta_labeled_events, self.data['close'])
 
-        self.meta_labeled_events.dropna(inplace=True)
-        labels = get_bins(self.meta_labeled_events, self.data['close'])
+        # Generate data set which shows the power of SB Bagging vs Standard Bagging
+        ind_mat = get_ind_matrix(meta_labeled_events.t1, self.data.close)
 
-        # Feature generation
-        features = []
-        X = self.data.copy()
-        X['log_ret'] = X.close.apply(np.log).diff()
-        for win in [2, 5, 10, 20, 25]:
-            X['momentum_{}'.format(win)] = X.close / X.close.rolling(window=win).mean() - 1
-            X['std_{}'.format(win)] = X.log_ret.rolling(window=win).std()
-            X['pct_change_{}'.format(win)] = X.close.pct_change(win)
-            X['diff_{}'.format(win)] = X.close.diff(win)
+        unique_samples = _get_synthetic_samples(ind_mat, 0.5, 0.1)
 
-            for f in ['momentum', 'std', 'pct_change', 'diff']:
-                features.append('{}_{}'.format(f, win))
+        X = self.data.loc[labels.index,].iloc[unique_samples].dropna()  # get synthetic data set with drawn samples
+        labels = labels.loc[X.index, :]
+        X.loc[labels.index, 'y'] = labels.bin
 
-        # Train/test generation
+        # Generate features (some of them are informative, others are just noise)
+        for index, value in X.y.iteritems():
+            X.loc[index, 'label_prob_0.6'] = _generate_label_with_prob(value, 0.6)
+            X.loc[index, 'label_prob_0.5'] = _generate_label_with_prob(value, 0.5)
+            X.loc[index, 'label_prob_0.3'] = _generate_label_with_prob(value, 0.3)
+            X.loc[index, 'label_prob_0.2'] = _generate_label_with_prob(value, 0.2)
+            X.loc[index, 'label_prob_0.1'] = _generate_label_with_prob(value, 0.1)
+
+        features = ['label_prob_0.6', 'label_prob_0.2', 'label_prob_0.1']  # Two super-informative features
+        for prob in [0.5, 0.3, 0.2, 0.1]:
+            for window in [2, 5]:
+                X['label_prob_{}_sma_{}'.format(prob, window)] = X['label_prob_{}'.format(prob)].rolling(
+                    window=window).mean()
+                features.append('label_prob_{}_sma_{}'.format(prob, window))
         X.dropna(inplace=True)
-        X = X.loc[self.meta_labeled_events.index, :]  # Take only filtered events
-        labels = labels.loc[X.index, :]  # Sync X and y
-        self.meta_labeled_events = self.meta_labeled_events.loc[X.index, :]  # Sync X and meta_labeled_events
+        y = X.pop('y')
 
-        self.X_train, self.y_train_clf, = X.iloc[:300][features], labels.iloc[:300].bin
-        self.X_test, self.y_test_clf = X.iloc[300:][features], labels.iloc[300:].bin
+        self.X_train, self.X_test, self.y_train_clf, self.y_test_clf = train_test_split(X[features], y, test_size=0.4,
+                                                                                        random_state=1, shuffle=False)
+        self.y_train_reg = (1 + self.y_train_clf)
+        self.y_test_reg = (1 + self.y_test_clf)
+
+        self.samples_info_sets = meta_labeled_events.loc[self.X_train.index, 't1']
+        self.price_bars_trim = self.data[
+            (self.data.index >= self.X_train.index.min()) & (self.data.index <= self.X_train.index.max())].close
 
     def test_orthogonal_features(self):
         """
@@ -102,12 +137,13 @@ class TestFeatureImportance(unittest.TestCase):
         """
 
         # Init classifiers
-        clf = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
-                                     class_weight='balanced_subsample')
+        clf_base = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
+                                          class_weight='balanced_subsample')
 
-        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=100,
-                                                           triple_barrier_events=self.meta_labeled_events,
-                                                           price_bars=self.data, oob_score=False, random_state=1)
+        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_base, max_features=1.0, n_estimators=100,
+                                                           samples_info_sets=self.samples_info_sets,
+                                                           price_bars=self.price_bars_trim, oob_score=True,
+                                                           random_state=1)
 
         pca_features = get_orthogonal_features(self.X_train)
 
@@ -117,19 +153,16 @@ class TestFeatureImportance(unittest.TestCase):
         self.assertAlmostEqual(np.mean(pca_features[:, 6]), 0, delta=1e-7)
 
         # Check particular PCA values std
-        self.assertAlmostEqual(np.std(pca_features[:, 1]), 1.862, delta=1e-3)
-        self.assertAlmostEqual(np.std(pca_features[:, 3]), 0.987, delta=1e-3)
-        self.assertAlmostEqual(np.std(pca_features[:, 4]), 0.954, delta=1e-3)
+        self.assertAlmostEqual(np.std(pca_features[:, 1]), 1.499, delta=0.2)
+        self.assertAlmostEqual(np.std(pca_features[:, 3]), 1.047, delta=0.2)
+        self.assertAlmostEqual(np.std(pca_features[:, 4]), 0.948, delta=0.2)
 
         sb_clf.fit(self.X_train, self.y_train_clf)
         mdi_feat_imp = feature_importance_mean_decrease_impurity(sb_clf, self.X_train.columns)
         pca_corr_res = feature_pca_analysis(self.X_train, mdi_feat_imp)
 
         # Check correlation metrics results
-        self.assertAlmostEqual(pca_corr_res['Pearson'][0], -0.194, delta=1e-3)
-        self.assertAlmostEqual(pca_corr_res['Spearman'][0], -0.178, delta=1e-3)
-        self.assertAlmostEqual(pca_corr_res['Kendall'][0], -0.115, delta=1e-3)
-        self.assertAlmostEqual(pca_corr_res['Weighted_Kendall_Rank'][0], -0.078, delta=1e-3)
+        self.assertAlmostEqual(pca_corr_res['Weighted_Kendall_Rank'][0], 0.26, delta=1e-1)
 
     def test_feature_importance(self):
         """
@@ -145,40 +178,40 @@ class TestFeatureImportance(unittest.TestCase):
                                                                           cv_gen,
                                                                           sample_weight=np.ones(
                                                                               (self.X_train.shape[0],)))
-        mda_feat_imp_accuracy = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
-                                                                          cv_gen, scoring='accuracy')
+        mda_feat_imp_f1 = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
+                                                                    cv_gen, scoring='f1')
         # SFI feature importance
         sfi_feat_imp_log_loss = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
                                                        cv_gen=cv_gen, sample_weight=np.ones((self.X_train.shape[0],)))
-        sfi_feat_imp_accuracy = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
-                                                       cv_gen=cv_gen, scoring='accuracy')
+        sfi_feat_imp_f1 = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
+                                                 cv_gen=cv_gen,
+                                                 scoring='f1')  # Take only 5 features for faster test run
 
         # MDI assertions
         self.assertTrue(mdi_feat_imp['mean'].sum() == 1)
-        self.assertAlmostEqual(mdi_feat_imp.loc['momentum_2', 'mean'], 0.0434, delta=0.5)
-        self.assertAlmostEqual(mdi_feat_imp.loc['momentum_2', 'std'], 0.002779, delta=0.5)
-        self.assertAlmostEqual(mdi_feat_imp.loc['pct_change_5', 'mean'], 0.0434, delta=0.5)
-        self.assertAlmostEqual(mdi_feat_imp.loc['pct_change_5', 'std'], 0.00292, delta=0.5)
-        self.assertAlmostEqual(mdi_feat_imp.loc['std_20', 'mean'], 0.08421, delta=0.5)
+        # The most informative features
+        self.assertAlmostEqual(mdi_feat_imp.loc['label_prob_0.1', 'mean'], 0.209, delta=0.01)
+        self.assertAlmostEqual(mdi_feat_imp.loc['label_prob_0.2', 'mean'], 0.164, delta=0.01)
+        # Noisy feature
+        self.assertAlmostEqual(mdi_feat_imp.loc['label_prob_0.1_sma_5', 'mean'], 0.06253, delta=0.5)
 
         # MDA(log_loss) assertions
-        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['diff_20', 'mean'], -0.026309, delta=0.3)
-        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['diff_20', 'std'], 0.01824, delta=0.3)
+        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['label_prob_0.1', 'mean'], 0.234, delta=0.3)
+        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['label_prob_0.2', 'mean'], 0.3222, delta=0.3)
 
-        # MDA(accuracy) assertions
-        self.assertAlmostEqual(mda_feat_imp_accuracy.loc['diff_20', 'std'], 0.0485, delta=0.7)
+        # MDA(f1) assertions
+        self.assertAlmostEqual(mda_feat_imp_f1.loc['label_prob_0.1', 'mean'], 0.25, delta=0.3)
+        self.assertAlmostEqual(mda_feat_imp_f1.loc['label_prob_0.2', 'mean'], 0.3, delta=0.3)
+        self.assertLessEqual(mda_feat_imp_f1.loc['label_prob_0.1_sma_5', 'mean'], 0)
 
         # SFI(log_loss) assertions
-        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['momentum_2', 'mean'], -2.879, delta=1e-2)
-        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['momentum_2', 'std'], 0.66422, delta=1e-2)
-        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['diff_2', 'mean'], -2.0558, delta=1e-2)
-        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['diff_2', 'std'], 0.434, delta=1e-2)
+        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['label_prob_0.1', 'mean'], -2.14, delta=1)
+        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['label_prob_0.2', 'mean'], -2.15, delta=1)
 
         # SFI(accuracy) assertions
-        self.assertAlmostEqual(sfi_feat_imp_accuracy.loc['momentum_2', 'mean'], 0.51, delta=1e-2)
-        self.assertAlmostEqual(sfi_feat_imp_accuracy.loc['momentum_2', 'std'], 0.05361, delta=1e-2)
-        self.assertAlmostEqual(sfi_feat_imp_accuracy.loc['diff_2', 'mean'], 0.533, delta=1e-2)
-        self.assertAlmostEqual(sfi_feat_imp_accuracy.loc['diff_2', 'std'], 0.04027, delta=1e-2)
+        self.assertAlmostEqual(sfi_feat_imp_f1.loc['label_prob_0.1', 'mean'], 0.81, delta=1e-2)
+        self.assertAlmostEqual(sfi_feat_imp_f1.loc['label_prob_0.2', 'mean'], 0.74, delta=1e-2)
+        self.assertAlmostEqual(sfi_feat_imp_f1.loc['label_prob_0.5_sma_2', 'mean'], 0.224, delta=1e-2)
 
     def test_plot_feature_importance(self):
         """
@@ -202,16 +235,16 @@ class TestFeatureImportance(unittest.TestCase):
 
         :param oob_score: (bool): bool flag for oob_score in classifier
         """
-        clf = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
-                                     class_weight='balanced_subsample')
+        clf_base = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
+                                          class_weight='balanced_subsample')
 
-        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf, max_features=1.0, n_estimators=100,
-                                                           triple_barrier_events=self.meta_labeled_events,
-                                                           price_bars=self.data, oob_score=oob_score, random_state=1)
+        sb_clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=clf_base, max_features=1.0, n_estimators=100,
+                                                           samples_info_sets=self.samples_info_sets,
+                                                           price_bars=self.price_bars_trim, oob_score=oob_score,
+                                                           random_state=1)
         sb_clf.fit(self.X_train, self.y_train_clf)
 
-        triple_barrier_events = self.meta_labeled_events.loc[self.X_train.index, :]
-        cv_gen = PurgedKFold(n_splits=4, info_sets=triple_barrier_events.t1, random_state=1)
+        cv_gen = PurgedKFold(n_splits=4, info_sets=self.samples_info_sets, random_state=1)
         return sb_clf, cv_gen
 
     def test_raise_value_error(self):
