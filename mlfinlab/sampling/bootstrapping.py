@@ -2,24 +2,27 @@
 Logic regarding sequential bootstrapping from chapter 4.
 """
 
+import pandas as pd
 import numpy as np
 from numba import jit, prange
 
 
-def get_ind_matrix(triple_barrier_events, price_bars):
+def get_ind_matrix(samples_info_sets, price_bars):
     """
     Snippet 4.3, page 65, Build an Indicator Matrix
     Get indicator matrix. The book implementation uses bar_index as input, however there is no explanation
     how to form it. We decided that using triple_barrier_events and price bars by analogy with concurrency
     is the best option.
 
-    :param triple_barrier_events: (pd.DataFrame): triple barrier events from labeling.get_events
+    :param samples_info_sets: (pd.Series): triple barrier events(t1) from labeling.get_events
     :param price_bars: (pd.DataFrame): price bars which were used to form triple barrier events
     :return: (np.array) indicator binary matrix indicating what (price) bars influence the label for each observation
     """
-    if bool(triple_barrier_events.isnull().values.any()) is True or bool(
-            triple_barrier_events.index.isnull().any()) is True:
+    if bool(samples_info_sets.isnull().values.any()) is True or bool(
+            samples_info_sets.index.isnull().any()) is True:
         raise ValueError('NaN values in triple_barrier_events, delete nans')
+
+    triple_barrier_events = pd.DataFrame(samples_info_sets)  # Convert Series to DataFrame
 
     # Take only period covered in triple_barrier_events
     trimmed_price_bars_index = price_bars[(price_bars.index >= triple_barrier_events.index.min()) &
