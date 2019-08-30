@@ -1,4 +1,7 @@
 .idea/*
+*.pyc
+*.txt
+mlfinlab.egg-info/PKG-INFO
 __pycache__
 test_reports
 .coverage
