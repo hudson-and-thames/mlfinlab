@@ -19,7 +19,11 @@ class TestCLA(unittest.TestCase):
         data_path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="date")
 
-    def test_cla(self):
+    def test_cla_turning_points(self):
+        """
+        Test the calculation of CLA turning points
+        """
+
         cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
         cla.allocate(asset_prices=self.data)
         for turning_point in cla.weights:
@@ -28,6 +32,10 @@ class TestCLA(unittest.TestCase):
             np.testing.assert_almost_equal(np.sum(turning_point), 1)
 
     def test_cla_max_sharpe(self):
+        """
+        Test the calculation of maximum sharpe ratio weights
+        """
+
         cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
         cla.allocate(asset_prices=self.data, solution='max_sharpe')
         assert len(cla.weights) > 0
@@ -35,6 +43,10 @@ class TestCLA(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(cla.weights), 1)
 
     def test_cla_min_volatility(self):
+        """
+        Test the calculation for minimum volatility weights
+        """
+
         cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
         cla.allocate(asset_prices=self.data, solution='min_volatility')
         assert len(cla.weights) > 0
@@ -42,6 +54,10 @@ class TestCLA(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(cla.weights), 1)
 
     def test_cla_efficient_frontier(self):
+        """
+        Test the calculation of the efficient frontier solution
+        """
+
         cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
         cla.allocate(asset_prices=self.data, solution='efficient_frontier')
         assert len(cla.mu) == len(cla.sigma) and len(cla.sigma) == len(cla.weights)

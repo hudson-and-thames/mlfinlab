@@ -20,6 +20,9 @@ class TestCLA(unittest.TestCase):
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="date")
 
     def test_hrp(self):
+        """
+        Test the HRP algorithm
+        """
         hrp = HierarchicalRiskParity()
         hrp.allocate(asset_prices=self.data)
         assert len(hrp.weights) > 0
@@ -27,6 +30,10 @@ class TestCLA(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(hrp.weights), 1)
 
     def test_quasi_diagnalization(self):
+        """
+        Test the quasi-diagnalisation step of HRP algorithm
+        """
+
         hrp = HierarchicalRiskParity()
         hrp.allocate(asset_prices=self.data)
         assert hrp.ordered_indices == [12, 6, 14, 11, 5, 13, 3, 15, 7, 10, 17,

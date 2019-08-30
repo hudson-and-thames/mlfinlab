@@ -20,6 +20,10 @@ class TestMVO(unittest.TestCase):
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="date")
 
     def test_inverse_variance(self):
+        """
+        Test the calculation of inverse-variance portfolio weights
+        """
+
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data)
         assert len(mvo.weights) > 0

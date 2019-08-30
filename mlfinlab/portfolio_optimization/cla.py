@@ -35,7 +35,8 @@ class CLA:
         self.weight_bounds = weight_bounds
         self.calculate_returns = calculate_returns
 
-    def _calculate_mean_historical_returns(self, asset_prices, frequency=252):
+    @staticmethod
+    def _calculate_mean_historical_returns(asset_prices, frequency=252):
         '''
         Calculate the annualised mean historical returns from asset price data
 
@@ -47,7 +48,8 @@ class CLA:
         returns = returns.mean() * frequency
         return returns
 
-    def _calculate_exponential_historical_returns(self, asset_prices, frequency=252, span=500):
+    @staticmethod
+    def _calculate_exponential_historical_returns(asset_prices, frequency=252, span=500):
         '''
         Calculate the exponentially-weighted mean of (daily) historical returns, giving
         higher weight to more recent data.
@@ -87,7 +89,8 @@ class CLA:
         weights[expected_returns[index][0]] += 1 - np.sum(weights)
         return [expected_returns[index][0]], weights
 
-    def _compute_bi(self, c_final, asset_bounds_i):
+    @staticmethod
+    def _compute_bi(c_final, asset_bounds_i):
         '''
         Calculates which bound value to assign to a bounded asset - lower bound or upper bound.
 
@@ -201,14 +204,16 @@ class CLA:
 
         return self._diff_lists(list(range(self.expected_returns.shape[0])), free_weights)
 
-    def _diff_lists(self, list_1, list_2):
+    @staticmethod
+    def _diff_lists(list_1, list_2):
         '''
         Calculate the set difference between two lists
         '''
 
         return list(set(list_1) - set(list_2))
 
-    def _reduce_matrix(self, matrix, list_x, list_y):
+    @staticmethod
+    def _reduce_matrix(matrix, list_x, list_y):
         '''
         Reduce a matrix to the provided set of rows and columns
         '''
@@ -272,7 +277,8 @@ class CLA:
                 else:
                     index_2 += 1
 
-    def _golden_section(self, obj, left, right, **kargs):
+    @staticmethod
+    def _golden_section(obj, left, right, **kargs):
         '''
         Golden section method. Maximum if kargs['minimum']==False is passed
 

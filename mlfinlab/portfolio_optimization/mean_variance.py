@@ -37,7 +37,8 @@ class MeanVarianceOptimisation:
         self.weights.index = assets
         self.weights = self.weights.T
 
-    def _calculate_returns(self, asset_prices, resample_returns_by):
+    @staticmethod
+    def _calculate_returns(asset_prices, resample_returns_by):
         '''
         Calculate the annualised mean historical returns from asset price data
 
@@ -52,7 +53,8 @@ class MeanVarianceOptimisation:
         asset_returns = asset_returns.resample(resample_returns_by).mean()
         return asset_returns
 
-    def _inverse_variance(self, asset_returns):
+    @staticmethod
+    def _inverse_variance(asset_returns):
         '''
         Calculate weights using inverse-variance allocation
 

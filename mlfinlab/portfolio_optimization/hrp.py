@@ -17,7 +17,8 @@ class HierarchicalRiskParity:
     def __init__(self):
         return
 
-    def _tree_clustering(self, correlation, method='single'):
+    @staticmethod
+    def _tree_clustering(correlation, method='single'):
         '''
         Perform the traditional heirarchical tree clustering
 
@@ -117,7 +118,8 @@ class HierarchicalRiskParity:
         dendrogram(self.clusters)
         plt.show()
 
-    def _calculate_returns(self, asset_prices, resample_returns_by):
+    @staticmethod
+    def _calculate_returns(asset_prices, resample_returns_by):
         '''Calculate the annualised mean historical returns from asset price data
 
 
@@ -132,7 +134,8 @@ class HierarchicalRiskParity:
         asset_returns = asset_returns.resample(resample_returns_by).mean()
         return asset_returns
 
-    def _shrink_covariance(self, covariance):
+    @staticmethod
+    def _shrink_covariance(covariance):
         '''
         Regularise/Shrink the asset covariances
 
@@ -145,7 +148,8 @@ class HierarchicalRiskParity:
         shrinked_covariance = oas.covariance_
         return pd.DataFrame(shrinked_covariance, index=covariance.columns, columns=covariance.columns)
 
-    def _cov2corr(self, covariance):
+    @staticmethod
+    def _cov2corr(covariance):
         '''
         Calculate the correlations from asset returns covariance matrix
 
