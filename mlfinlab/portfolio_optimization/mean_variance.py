@@ -21,7 +21,7 @@ class MeanVarianceOptimisation:
                                   'B' meaning daily business days which is equivalent to no resampling
         '''
 
-        if type(asset_prices) != pd.DataFrame:
+        if not isinstance(asset_prices, pd.DataFrame):
             raise ValueError("Asset prices matrix must be a dataframe")
         if not isinstance(asset_prices.index, pd.DatetimeIndex):
             raise ValueError("Asset prices dataframe must be indexed by date.")

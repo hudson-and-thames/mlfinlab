@@ -1,7 +1,8 @@
 import numbers
+from math import log, ceil
+
 import numpy as np
 import pandas as pd
-from math import log, ceil
 
 
 def _infnone(number):
@@ -377,7 +378,7 @@ class CLA:
         '''
 
         # Initial checks
-        if type(asset_prices) != pd.DataFrame:
+        if not isinstance(asset_prices, pd.DataFrame):
             raise ValueError("Asset prices matrix must be a dataframe")
         if not isinstance(asset_prices.index, pd.DatetimeIndex):
             raise ValueError("Asset prices dataframe must be indexed by date.")
