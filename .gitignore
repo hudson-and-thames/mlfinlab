@@ -3,3 +3,4 @@
 mlfinlab/tests/.DS_Store
 *.txt
 mlfinlab.egg-info/PKG-INFO
+.DS_Store
