@@ -6,3 +6,4 @@ test_reports
 docs/build/
 .local/
 cover/
+.coverage.*
