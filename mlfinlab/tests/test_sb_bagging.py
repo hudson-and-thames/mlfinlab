@@ -287,6 +287,7 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
         self.assertAlmostEqual(sb_roc_auc, 0.59, delta=0.2)
 
         # Test OOB score
+        print(oos_sb_predictions)
         self.assertTrue((oos_sb_predictions == np.array(
             [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
              0])).all())  # check oos predictions
