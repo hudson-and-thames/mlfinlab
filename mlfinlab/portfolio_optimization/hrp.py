@@ -17,7 +17,6 @@ class HierarchicalRiskParity:
     def __init__(self):
         return
 
-    @staticmethod
     def _tree_clustering(self, correlation, method='single'):
         '''
         Perform the traditional heirarchical tree clustering
@@ -31,25 +30,23 @@ class HierarchicalRiskParity:
         clusters = linkage(squareform(distances.values), method=method)
         return distances, clusters
 
-    @staticmethod
-    def _quasi_diagnalization(self, N, curr_index):
+    def _quasi_diagnalization(self, num_assets, curr_index):
         '''
         Rearrange the assets to reorder them according to hierarchical tree clustering order.
 
-        :param N: (int) index of element in the cluster list
+        :param num_assets: (int) the total number of assets
         :param curr_index: (int) current index
         :return: (list) the assets rearranged according to hierarchical clustering
         '''
 
-        if curr_index < N:
+        if curr_index < num_assets:
             return [curr_index]
 
-        left = int(self.clusters[curr_index - N, 0])
-        right = int(self.clusters[curr_index - N, 1])
+        left = int(self.clusters[curr_index - num_assets, 0])
+        right = int(self.clusters[curr_index - num_assets, 1])
 
-        return (self._quasi_diagnalization(N, left) + self._quasi_diagnalization(N, right))
+        return (self._quasi_diagnalization(num_assets, left) + self._quasi_diagnalization(num_assets, right))
 
-    @staticmethod
     def _get_seriated_matrix(self, assets, distances, correlations):
         '''
         Based on the quasi-diagnalization, reorder the original distance matrix, so that assets within
@@ -66,7 +63,6 @@ class HierarchicalRiskParity:
         seriated_correlations = correlations.loc[ordering, ordering]
         return seriated_distances, seriated_correlations
 
-    @staticmethod
     def _recursive_bisection(self, covariances, assets):
         '''
         Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets
@@ -121,7 +117,6 @@ class HierarchicalRiskParity:
         dendrogram(self.clusters)
         plt.show()
 
-    @staticmethod
     def _calculate_returns(self, asset_prices, resample_returns_by):
         '''Calculate the annualised mean historical returns from asset price data
 
@@ -137,7 +132,6 @@ class HierarchicalRiskParity:
         asset_returns = asset_returns.resample(resample_returns_by).mean()
         return asset_returns
 
-    @staticmethod
     def _shrink_covariance(self, covariance):
         '''
         Regularise/Shrink the asset covariances
@@ -151,7 +145,6 @@ class HierarchicalRiskParity:
         shrinked_covariance = oas.covariance_
         return pd.DataFrame(shrinked_covariance, index=covariance.columns, columns=covariance.columns)
 
-    @staticmethod
     def _cov2corr(self, covariance):
         '''
         Calculate the correlations from asset returns covariance matrix
@@ -168,7 +161,6 @@ class HierarchicalRiskParity:
         corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
         return corr
 
-    @staticmethod
     def allocate(self, asset_prices, resample_returns_by='B', use_shrinkage=False):
         '''
         Calculate asset allocations using HRP algorithm
@@ -188,7 +180,7 @@ class HierarchicalRiskParity:
         # Calculate the returns
         asset_returns = self._calculate_returns(asset_prices, resample_returns_by=resample_returns_by)
 
-        N = asset_returns.shape[1]
+        num_assets = asset_returns.shape[1]
         assets = asset_returns.columns
 
         # Covariance and correlation
@@ -201,7 +193,7 @@ class HierarchicalRiskParity:
         distances, self.clusters = self._tree_clustering(correlation=corr)
 
         # Step-2: Quasi Diagnalization
-        self.ordered_indices = self._quasi_diagnalization(N, 2 * N - 2)
+        self.ordered_indices = self._quasi_diagnalization(num_assets, 2 * num_assets - 2)
         self.seriated_distances, self.seriated_correlations = self._get_seriated_matrix(assets=assets,
                                                                                         distances=distances,
                                                                                         correlations=corr)

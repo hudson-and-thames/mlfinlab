@@ -34,7 +34,6 @@ class CLA:
         self.weight_bounds = weight_bounds
         self.calculate_returns = calculate_returns
 
-    @staticmethod
     def _calculate_mean_historical_returns(self, asset_prices, frequency=252):
         '''
         Calculate the annualised mean historical returns from asset price data
@@ -47,7 +46,6 @@ class CLA:
         returns = returns.mean() * frequency
         return returns
 
-    @staticmethod
     def _calculate_exponential_historical_returns(self, asset_prices, frequency=252, span=500):
         '''
         Calculate the exponentially-weighted mean of (daily) historical returns, giving
@@ -61,7 +59,6 @@ class CLA:
         returns = returns.ewm(span=span).mean().iloc[-1] * frequency
         return returns
 
-    @staticmethod
     def _init_algo(self):
         '''
         Initial setting up of the algorithm. Calculates the first free weight of the first turning point.
@@ -89,7 +86,6 @@ class CLA:
         weights[expected_returns[index][0]] += 1 - np.sum(weights)
         return [expected_returns[index][0]], weights
 
-    @staticmethod
     def _compute_bi(self, c_final, asset_bounds_i):
         '''
         Calculates which bound value to assign to a bounded asset - lower bound or upper bound.
@@ -108,7 +104,6 @@ class CLA:
             bounded_asset_i = asset_bounds_i[0][0]
         return bounded_asset_i
 
-    @staticmethod
     def _compute_w(self, covar_f_inv, covar_fb, mean_f, w_b):
         '''
         Compute the turning point associated with the current set of free weights F
@@ -140,8 +135,7 @@ class CLA:
         w_3 = np.dot(covar_f_inv, mean_f)
         return -w_1 + g_final * w_2 + self.lambdas[-1] * w_3, g_final
 
-    @staticmethod
-    def _compute_lambda(self, covar_f_inv, covar_fb, mean_f, w_b, i, b_i):
+    def _compute_lambda(self, covar_f_inv, covar_fb, mean_f, w_b, asset_index, b_i):
         '''
         Calculate the lambda value in the langrange optimsation equation
 
@@ -149,7 +143,7 @@ class CLA:
         :param covar_fb: (np.array) covariance matrix between free assets and bounded assets
         :param mean_f: (np.array) expected returns of free assets
         :param w_b: (np.array) bounded asset weight values
-        :param i: (int) asset index
+        :param asset_index: (int) index of the asset in the portfolio
         :param b_i: (list) list of upper and lower bounded weight values
         :return: (float) lambda value
         '''
@@ -160,28 +154,27 @@ class CLA:
         c_2 = np.dot(covar_f_inv, mean_f)
         c_3 = np.dot(np.dot(ones_f.T, covar_f_inv), mean_f)
         c_4 = np.dot(covar_f_inv, ones_f)
-        c_final = -c_1 * c_2[i] + c_3 * c_4[i]
+        c_final = -c_1 * c_2[asset_index] + c_3 * c_4[asset_index]
         if c_final == 0:
             return None, None
 
         # Compute bi
-        if type(b_i) == list:
+        if isinstance(b_i, list):
             b_i = self._compute_bi(c_final, b_i)
 
         # Compute Lambda
         if w_b is None:
 
             # All free assets
-            return float((c_4[i] - c_1 * b_i) / c_final), b_i
-        else:
-            ones_b = np.ones(w_b.shape)
-            l_1 = np.dot(ones_b.T, w_b)
-            l_2 = np.dot(covar_f_inv, covar_fb)
-            l_3 = np.dot(l_2, w_b)
-            l_2 = np.dot(ones_f.T, l_3)
-            return float(((1 - l_1 + l_2) * c_4[i] - c_1 * (b_i + l_3[i])) / c_final), b_i
+            return float((c_4[asset_index] - c_1 * b_i) / c_final), b_i
 
-    @staticmethod
+        ones_b = np.ones(w_b.shape)
+        l_1 = np.dot(ones_b.T, w_b)
+        l_2 = np.dot(covar_f_inv, covar_fb)
+        l_3 = np.dot(l_2, w_b)
+        l_2 = np.dot(ones_f.T, l_3)
+        return float(((1 - l_1 + l_2) * c_4[asset_index] - c_1 * (b_i + l_3[asset_index])) / c_final), b_i
+
     def _get_matrices(self, free_weights):
         '''
         Calculate the required matrices between free and bounded assets
@@ -197,7 +190,6 @@ class CLA:
         w_b = self._reduce_matrix(self.weights[-1], bounded_weights, [0])
         return covar_f, covar_fb, mean_f, w_b
 
-    @staticmethod
     def _get_bounded_weights(self, free_weights):
         '''
         Compute the list of bounded assets
@@ -208,23 +200,20 @@ class CLA:
 
         return self._diff_lists(list(range(self.expected_returns.shape[0])), free_weights)
 
-    @staticmethod
-    def _diff_lists(list_1, list_2):
+    def _diff_lists(self, list_1, list_2):
         '''
         Calculate the set difference between two lists
         '''
 
         return list(set(list_1) - set(list_2))
 
-    @staticmethod
-    def _reduce_matrix(matrix, list_x, list_y):
+    def _reduce_matrix(self, matrix, list_x, list_y):
         '''
         Reduce a matrix to the provided set of rows and columns
         '''
 
         return matrix[np.ix_(list_x, list_y)]
 
-    @staticmethod
     def _purge_num_err(self, tol):
         '''
         Purge violations of inequality constraints (associated with ill-conditioned cov matrix)
@@ -253,7 +242,6 @@ class CLA:
             else:
                 index_1 += 1
 
-    @staticmethod
     def _purge_excess(self):
         '''
         Remove violations of the convex hull
@@ -283,7 +271,6 @@ class CLA:
                 else:
                     index_2 += 1
 
-    @staticmethod
     def _golden_section(self, obj, left, right, **kargs):
         '''
         Golden section method. Maximum if kargs['minimum']==False is passed
@@ -299,12 +286,12 @@ class CLA:
         if "args" in kargs:
             args = kargs["args"]
         num_iterations = int(ceil(-2.078087 * log(tol / abs(right - left))))
-        r = 0.618033989
-        c = 1.0 - r
+        gs_ratio = 0.618033989
+        complementary_gs_ratio = 1.0 - gs_ratio
 
         # Initialize
-        x_1 = r * left + c * right
-        x_2 = c * left + r * right
+        x_1 = gs_ratio * left + complementary_gs_ratio * right
+        x_2 = complementary_gs_ratio * left + gs_ratio * right
         f_1 = sign * obj(x_1, *args)
         f_2 = sign * obj(x_2, *args)
 
@@ -314,31 +301,29 @@ class CLA:
                 left = x_1
                 x_1 = x_2
                 f_1 = f_2
-                x_2 = c * left + r * right
+                x_2 = complementary_gs_ratio * left + gs_ratio * right
                 f_2 = sign * obj(x_2, *args)
             else:
                 right = x_2
                 x_2 = x_1
                 f_2 = f_1
-                x_1 = r * left + c * right
+                x_1 = gs_ratio * left + complementary_gs_ratio * right
                 f_1 = sign * obj(x_1, *args)
 
         if f_1 < f_2:
             return x_1, sign * f_1
         return x_2, sign * f_2
 
-    @staticmethod
-    def _eval_sr(self, a, w_0, w_1):
+    def _eval_sr(self, alpha, w_0, w_1):
         '''
-        Evaluate SR of the portfolio within the convex combination
+        Evaluate the sharpe ratio of the portfolio within the convex combination
         '''
 
-        w = a * w_0 + (1 - a) * w_1
-        b = np.dot(w.T, self.expected_returns)[0, 0]
-        c = np.dot(np.dot(w.T, self.cov_matrix), w)[0, 0] ** 0.5
-        return b / c
+        weights = alpha * w_0 + (1 - alpha) * w_1
+        returns = np.dot(weights.T, self.expected_returns)[0, 0]
+        volatility = np.dot(np.dot(weights.T, self.cov_matrix), weights)[0, 0] ** 0.5
+        return returns / volatility
 
-    @staticmethod
     def _bound_free_weight(self, free_weights):
         '''
         Add a free weight to list of bounded weights
@@ -352,15 +337,14 @@ class CLA:
             covar_f_inv = np.linalg.inv(covar_f)
             j = 0
             for i in free_weights:
-                l, bi = self._compute_lambda(
+                l, b_i = self._compute_lambda(
                     covar_f_inv, covar_fb, mean_f, w_b, j, [self.lower_bounds[i], self.upper_bounds[i]]
                 )
                 if _infnone(l) > _infnone(lambda_in):
-                    lambda_in, i_in, bi_in = l, i, bi
+                    lambda_in, i_in, bi_in = l, i, b_i
                 j += 1
         return lambda_in, i_in, bi_in
 
-    @staticmethod
     def _free_bound_weight(self, free_weights):
         '''
         Add a bounded weight to list of free weights
@@ -373,7 +357,7 @@ class CLA:
             for i in b:
                 covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights + [i])
                 covar_f_inv = np.linalg.inv(covar_f)
-                l, bi = self._compute_lambda(
+                lambda_i, _ = self._compute_lambda(
                     covar_f_inv,
                     covar_fb,
                     mean_f,
@@ -381,11 +365,10 @@ class CLA:
                     mean_f.shape[0] - 1,
                     self.weights[-1][i],
                 )
-                if (self.lambdas[-1] is None or l < self.lambdas[-1]) and l > _infnone(lambda_out):
-                    lambda_out, i_out = l, i
+                if (self.lambdas[-1] is None or lambda_i < self.lambdas[-1]) and lambda_i > _infnone(lambda_out):
+                    lambda_out, i_out = lambda_i, i
         return lambda_out, i_out
 
-    @staticmethod
     def _initialise(self, asset_prices):
         '''
         Initialise covariances, upper-counds, lower-bounds and storage buffers
@@ -427,7 +410,6 @@ class CLA:
         self.gammas = []
         self.free_weights = []
 
-    @staticmethod
     def _max_sharpe(self):
         '''
         Compute the maximum sharpe portfolio allocation
@@ -436,17 +418,19 @@ class CLA:
         '''
 
         # 1) Compute the local max SR portfolio between any two neighbor turning points
-        w_sr, sr = [], []
+        w_sr, sharpe_ratios = [], []
         for i in range(len(self.weights) - 1):
-            w0 = np.copy(self.weights[i])
-            w1 = np.copy(self.weights[i + 1])
-            kargs = {"minimum": False, "args": (w0, w1)}
-            a, b = self._golden_section(self._eval_sr, 0, 1, **kargs)
-            w_sr.append(a * w0 + (1 - a) * w1)
-            sr.append(b)
-        return max(sr), w_sr[sr.index(max(sr))]
+            w_0 = np.copy(self.weights[i])
+            w_1 = np.copy(self.weights[i + 1])
+            kwargs = {"minimum": False, "args": (w_0, w_1)}
+            alpha, sharpe_ratio = self._golden_section(self._eval_sr, 0, 1, **kwargs)
+            w_sr.append(alpha * w_0 + (1 - alpha) * w_1)
+            sharpe_ratios.append(sharpe_ratio)
 
-    @staticmethod
+        maximum_sharp_ratio = max(sharpe_ratios)
+        weights_with_max_sharpe_ratio = w_sr[sharpe_ratios.index(maximum_sharp_ratio)]
+        return maximum_sharp_ratio, weights_with_max_sharpe_ratio
+
     def _min_volatility(self):
         '''
         Compute minimum volatility portfolio allocation
@@ -456,12 +440,11 @@ class CLA:
 
         var = []
         for w in self.weights:
-            a = np.dot(np.dot(w.T, self.cov_matrix), w)
-            var.append(a)
+            volatility = np.dot(np.dot(w.T, self.cov_matrix), w)
+            var.append(volatility)
         min_var = min(var)
         return min_var ** .5, self.weights[var.index(min_var)]
 
-    @staticmethod
     def _efficient_frontier(self, points=100):
         '''
         Compute the entire efficient frontier solution
@@ -470,22 +453,22 @@ class CLA:
         :return: tuple of mean, variance amd weights of the frontier solutions
         '''
 
-        mu, sigma, weights = [], [], []
+        mean, sigma, weights = [], [], []
 
         # remove the 1, to avoid duplications
         a = np.linspace(0, 1, points // len(self.weights))[:-1]
         b = list(range(len(self.weights) - 1))
         for i in b:
-            w0, w1 = self.weights[i], self.weights[i + 1]
+            w_0, w_1 = self.weights[i], self.weights[i + 1]
             if i == b[-1]:
                 # include the 1 in the last iteration
                 a = np.linspace(0, 1, points // len(self.weights))
             for j in a:
-                w = w1 * j + (1 - j) * w0
+                w = w_1 * j + (1 - j) * w_0
                 weights.append(np.copy(w))
-                mu.append(np.dot(w.T, self.expected_returns)[0, 0])
+                mean.append(np.dot(w.T, self.expected_returns)[0, 0])
                 sigma.append(np.dot(np.dot(w.T, self.cov_matrix), w)[0, 0] ** 0.5)
-        return mu, sigma, weights
+        return mean, sigma, weights
 
     def allocate(self, asset_prices, solution="cla_turning_points"):
         '''
@@ -532,9 +515,9 @@ class CLA:
                 covar_f_inv = np.linalg.inv(covar_f)
 
             # 5) Compute solution vector
-            wF, g = self._compute_w(covar_f_inv, covar_fb, mean_f, w_b)
+            w_f, g = self._compute_w(covar_f_inv, covar_fb, mean_f, w_b)
             for i in range(len(free_weights)):
-                weights[free_weights[i]] = wF[i]
+                weights[free_weights[i]] = w_f[i]
             self.weights.append(np.copy(weights))  # store solution
             self.gammas.append(g)
             self.free_weights.append(free_weights[:])
