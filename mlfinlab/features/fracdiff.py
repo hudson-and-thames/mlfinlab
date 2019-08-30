@@ -102,6 +102,7 @@ class FractionalDifferentiation:
     def get_weights_ffd(diff_amt, thresh, lim):
         """
         Source: Chapter 5, AFML (section 5.4.2, page 83)
+
         The helper function generates weights that are used to compute fractionally
         differentiate dseries. It computes the weights that get used in the computation
         of fractionally differentiated series. The series is of fixed width and same
@@ -147,6 +148,7 @@ class FractionalDifferentiation:
     def frac_diff_ffd(series, diff_amt, thresh=1e-5):
         """
         Source: Chapter 5, AFML (section 5.5, page 83);
+
         References:
         https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086
         https://wwwf.imperial.ac.uk/~ejm/M3S8/Problems/hosking81.pdf
