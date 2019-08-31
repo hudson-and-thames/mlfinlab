@@ -120,6 +120,7 @@ Implementations
    implementations/frac_diff
    implementations/cross_validation
    implementations/sb_bagging
+   implementations/feature_importance
 
 
 * :doc:`implementations/data_structures`
@@ -129,6 +130,7 @@ Implementations
 * :doc:`implementations/frac_diff`
 * :doc:`implementations/cross_validation`
 * :doc:`implementations/sb_bagging`
+* :doc:`implementations/feature_importance`
 
 Additional Information
 ======================

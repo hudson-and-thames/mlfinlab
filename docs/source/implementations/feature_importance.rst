@@ -1,7 +1,7 @@
 .. _implementations-feature_importance:
 
 ==================
-Feature importance
+Feature Importance
 ==================
 
 One of the key research principles of Advances in Financial Machine learning is:
@@ -12,60 +12,16 @@ One of the key research principles of Advances in Financial Machine learning is:
 
 There are three ways to get feature importance scores:
 
-1) Mean Decrease Impurity (MDI). This score can be obtained from tree-based classifiers and corresponds to sklearn's feature_importances_ attribute. MDI uses in-sample (IS) performance to estimate feature importance.
+1) Mean Decrease Impurity (MDI). This score can be obtained from tree-based classifiers and corresponds to sklearn's feature_importances attribute. MDI uses in-sample (IS) performance to estimate feature importance.
 2) Mean Decrease Accuracy (MDA). This method can be applied to any tree-based classifier, not only tree based. MDA uses out-of-sample (OOS) performance in order to estimate feature importance.
 3) Single Feature Importance (SFI). MDA and MDI feature suffer from substitution effects: if two features are highly correlated, one of them will be considered as important while the other one will be redundant. SFI is OOS feature importance estimator which doesn't suffer from substitution effect because it estimates each feature importance separately.
 
 MDI, MDA, SFI feature importance
 ================================
 
-
-.. py:function:: feature_importance_mean_decrease_impurity(clf, feature_names)
-
-    Snippet 8.2, page 115. MDI Feature importance
-
-    This function generates feature importance from classifiers estimators importance
-    using Mean Impurity Reduction (MDI) algorithm
-
-    :param clf: (BaggingClassifier, RandomForest or any ensemble sklearn object): trained classifier
-    :param feature_names: (list): array of feature names
-    :return: (pd.DataFrame): individual MDI feature importance
-
-.. py:function:: feature_importance_mean_decrease_accuracy(clf, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss')
-
-    Snippet 8.3, page 116-117. MDA Feature Importance
-
-    :param clf: (sklearn.ClassifierMixin): any sklearn classifier
-    :param X: (pd.DataFrame): train set features
-    :param y: (pd.DataFrame, np.array): train set labels
-    :param cv_gen: (PurgedKFold): cross-validation object
-    :param sample_weight: (np.array): sample weights, if None equal to ones
-    :param scoring: (str): scoring function used to determine importance, either 'neg_log_loss' or 'accuracy'
-    :return: (pd.DataFrame): mean and std feature importance
-
-.. py:function:: feature_importance_sfi(clf, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss')
-
-    Snippet 8.4, page 118. Implementation of SFI
-
-    :param clf: (sklearn.ClassifierMixin): any sklearn classifier
-    :param X: (pd.DataFrame): train set features
-    :param y: (pd.DataFrame, np.array): train set labels
-    :param cv_gen: (PurgedKFold): cross-validation object
-    :param sample_weight: (np.array): sample weights, if None equal to ones
-    :param scoring: (str): scoring function used to determine importance, either 'neg_log_loss' or 'accuracy'
-    :return: (pd.DataFrame): mean and std feature importance
-
-.. py:function:: plot_feature_importance(imp, oob_score, oos_score, savefig=False, output_path=None)
-
-    Snippet 8.10, page 124. Feature importance plotting function
-
-    Plot feature importance function
-    :param imp: (pd.DataFrame): mean and std feature importance
-    :param oob_score: (float): out-of-bag score
-    :param oos_score: (float): out-of-sample (or cross-validation) score
-    :param savefig: (bool): boolean flag to save figure to a file
-    :param output_path: (str): if savefig is True, path where figure should be saved
-    :return: None
+.. py:currentmodule:: mlfinlab.feature_importance.importance
+.. automodule:: mlfinlab.feature_importance.importance
+   :members:
 
 
 An example showing how to use various feature importance functions::
@@ -86,11 +42,11 @@ An example showing how to use various feature importance functions::
   triple_barrier_events = triple_barrier_events.loc[X.index, :] # take only train part
   price_events = price_events[(price_events.index >= X.index.min()) & (price_events.index <= X.index.max())]
 
-  cv_gen = PurgedKFold(n_splits=4, info_sets=triple_barrier_events.t1)
+  cv_gen = PurgedKFold(n_splits=4, samples_info_sets=triple_barrier_events.t1)
 
   base_est = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
                                    class_weight='balanced_subsample')
-  clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=base_est, triple_barrier_events=triple_barrier_events,
+  clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=base_est, samples_info_sets=triple_barrier_events.t1,
                                                   price_bars=price_bars, oob_score=True)
   clf.fit(X_train, y_train)
 
@@ -138,25 +94,9 @@ this constitutes confirmatory evidence that the pattern identified by the ML alg
    :align: center
 
 
-.. py:function:: get_orthogonal_features(feature_df, variance_thresh=.95)
-
-    Snippet 8.5, page 119. Computation of Orthogonal Features.
-
-    Get PCA orthogonal features
-    :param feature_df: (pd.DataFrame): with features
-    :param variance_thresh: (float): % of overall variance which compressed vectors should explain
-    :return: (pd.DataFrame): compressed PCA features which explain %variance_thresh of variance
-
-.. py:function:: feature_pca_analysis(feature_df, feature_importance, variance_thresh=0.95)
-
-    Perform correlation analysis between feature importance (MDI for example, supervised)
-    and PCA eigen values (unsupervised). High correlation means that probably the pattern identified
-    by the ML algorithm is not entirely overfit.
-
-    :param feature_df: (pd.DataFrame): with features
-    :param feature_importance: (pd.DataFrame): individual MDI feature importance
-    :param variance_thresh: (float): % of overall variance which compressed vectors should explain in PCA compression
-    :return: (dict): with kendall, spearman, pearson and weighted_kendall correlations and p_values
+.. py:currentmodule:: mlfinlab.feature_importance.orthogonal
+.. automodule:: mlfinlab.feature_importance.orthogonal
+   :members: get_orthogonal_features, get_pca_rank_weighted_kendall_tau, feature_pca_analysis
 
 Let's see how PCA feature extraction is analysis are done using mlfinlab functions::
 

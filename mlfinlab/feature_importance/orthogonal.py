@@ -48,6 +48,7 @@ def get_orthogonal_features(feature_df, variance_thresh=.95):
     Snippet 8.5, page 119. Computation of Orthogonal Features.
 
     Get PCA orthogonal features
+
     :param feature_df: (pd.DataFrame): with features
     :param variance_thresh: (float): % of overall variance which compressed vectors should explain
     :return: (pd.DataFrame): compressed PCA features which explain %variance_thresh of variance
