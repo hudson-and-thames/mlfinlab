@@ -16,22 +16,22 @@ The code in this directory falls under 3 submodules:
 2. EF3M: An implementation of the EF3M algorithm.
 3. Chapter10_Snippets: Documented and adjusted snippets from the book for users to experiment with.
 
-Bet Sizing Methods
-==================
-Functions for bet sizing methods are implemented in ``mlfinlab.bet_sizing.bet_sizing``.
-
-
 .. image:: bet_sizing_images/bet_sizing.png
    :scale: 50 %
    :align: center
 
+Bet Sizing Methods
+==================
+Functions for bet sizing are implemented based on the strategies described in chapter 10.
 
-Bet Size Probability
-~~~~~~~~~~~~~~~~~~~~
+Bet Sizing From Predicted Probability
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Assuming a machine learning algorithm has predicted a series of investment positions, one can use the probabilities of each of these predictions to derive the size of that specific bet.
 .. autofunction:: bet_size_probability
 
-Bet Size Dynamic
-~~~~~~~~~~~~~~~~
+Dynamic Bet Sizes
+~~~~~~~~~~~~~~~~~
+
 .. autofunction:: bet_size_dynamic
 
 Bet Size Budget
@@ -42,9 +42,15 @@ Bet Size Reserve
 ~~~~~~~~~~~~~~~~
 .. autofunction:: bet_size_reserve
 
+Additional Utility Functions For Bet Sizing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: confirm_and_cast_to_df
+.. autofunction:: get_concurrent_sides
+.. autofunction:: cdf_mixture
+.. autofunction:: single_bet_size_mixed
+
 
 .. py:currentmodule:: mlfinlab.bet_sizing.ef3m
-
 
 EF3M - Exact Fit using the first 3 Moments
 ==========================================
@@ -75,16 +81,46 @@ A more thorough investigation into the algorithm can be found within our `Resear
 
 M2N
 ~~~
+A class for determining the means, standard deviations, and mixture proportion of a given distribution from it's first four or five statistical moments.
+
 .. autoclass:: M2N
     :members:
+
+
+Utility Functions For Fitting Of Distribution Mixtures
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: centered_moment
+.. autofunction:: raw_moment
+.. autofunction:: most_likely_parameters
 
 
 .. py:currentmodule:: mlfinlab.bet_sizing.ch10_snippets
 
 Chapter 10 Code Snippets
 ========================
+Chapter 10 of "Advances in Financial Machine Learning" contains a number of Python code snippets, many of which are used to create the top level bet sizing functions.
 
-**get_signal**
---------------
-
+Snippets For Bet Sizing From Probabilities
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: get_signal
+.. autofunction:: avg_active_signals
+.. autofunction:: mp_avg_active_signals
+.. autofunction:: discrete_signal
+
+Snippets for Dynamic Bet Sizing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: bet_size_sigmoid
+.. autofunction:: get_target_pos_sigmoid
+.. autofunction:: inv_price_sigmoid
+.. autofunction:: limit_price_sigmoid
+.. autofunction:: get_w_sigmoid
+.. autofunction:: bet_size_power
+.. autofunction:: get_target_pos_power
+.. autofunction:: inv_price_power
+.. autofunction:: limit_price_power
+.. autofunction:: get_w_power
+.. autofunction:: bet_size
+.. autofunction:: get_target_pos
+.. autofunction:: inv_price
+.. autofunction:: limit_price
+.. autofunction:: get_w
