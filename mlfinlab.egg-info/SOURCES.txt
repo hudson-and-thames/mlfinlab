@@ -85,7 +85,6 @@ mlfinlab/sampling/concurrent.py
 mlfinlab/tests/__init__.py
 mlfinlab/tests/test_bet_sizing.py
 mlfinlab/tests/test_ch10_snippets.py
-mlfinlab/tests/test_cla.py
 mlfinlab/tests/test_cross_validation.py
 mlfinlab/tests/test_ef3m.py
 mlfinlab/tests/test_etf_trick.py
@@ -93,10 +92,9 @@ mlfinlab/tests/test_fast_ewma.py
 mlfinlab/tests/test_filters.py
 mlfinlab/tests/test_fracdiff.py
 mlfinlab/tests/test_futures_roll.py
-mlfinlab/tests/test_hrp.py
 mlfinlab/tests/test_imbalance_data_structures.py
 mlfinlab/tests/test_labels.py
-mlfinlab/tests/test_mvo.py
+mlfinlab/tests/test_portfolio_optimisation.py
 mlfinlab/tests/test_run_data_structures.py
 mlfinlab/tests/test_sample_weights.py
 mlfinlab/tests/test_sampling.py

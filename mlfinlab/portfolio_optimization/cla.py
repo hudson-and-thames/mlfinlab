@@ -1,6 +1,5 @@
 import numbers
 from math import log, ceil
-
 import numpy as np
 import pandas as pd
 
@@ -47,33 +46,6 @@ class CLA:
         self.means = None
         self.sigma = None
 
-    @staticmethod
-    def _calculate_mean_historical_returns(asset_prices, frequency=252):
-        '''
-        Calculate the annualised mean historical returns from asset price data
-
-        :param asset_prices: (pd.DataFrame) asset price data
-        :return: (np.array) returns per asset
-        '''
-
-        returns = asset_prices.pct_change().dropna(how="all")
-        returns = returns.mean() * frequency
-        return returns
-
-    @staticmethod
-    def _calculate_exponential_historical_returns(asset_prices, frequency=252, span=500):
-        '''
-        Calculate the exponentially-weighted mean of (daily) historical returns, giving
-        higher weight to more recent data.
-
-        :param asset_prices: (pd.DataFrame) asset price data
-        :return: (np.array) returns per asset
-        '''
-
-        returns = asset_prices.pct_change().dropna(how="all")
-        returns = returns.ewm(span=span).mean().iloc[-1] * frequency
-        return returns
-
     def _init_algo(self):
         '''
         Initial setting up of the algorithm. Calculates the first free weight of the first turning point.
@@ -113,12 +85,9 @@ class CLA:
         :return: bounded weight value
         '''
 
-        bounded_asset_i = 0
         if c_final > 0:
-            bounded_asset_i = asset_bounds_i[1][0]
-        if c_final < 0:
-            bounded_asset_i = asset_bounds_i[0][0]
-        return bounded_asset_i
+            return asset_bounds_i[1][0]
+        return asset_bounds_i[0][0]
 
     def _compute_w(self, covar_f_inv, covar_fb, mean_f, w_b):
         '''
@@ -390,11 +359,13 @@ class CLA:
                     lambda_out, i_out = lambda_i, i
         return lambda_out, i_out
 
-    def _initialise(self, asset_prices):
+    def _initialise(self, asset_prices, resample_by):
         '''
         Initialise covariances, upper-counds, lower-bounds and storage buffers
 
         :param asset_prices: (pd.Dataframe) dataframe of asset prices
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+                                  'B' meaning daily business days which is equivalent to no resampling
         '''
 
         # Initial checks
@@ -402,6 +373,9 @@ class CLA:
             raise ValueError("Asset prices matrix must be a dataframe")
         if not isinstance(asset_prices.index, pd.DatetimeIndex):
             raise ValueError("Asset prices dataframe must be indexed by date.")
+
+        # Resample the asset prices
+        asset_prices = asset_prices.resample(resample_by).mean()
 
         # Calculate the expected returns
         if self.calculate_returns == "mean":
@@ -415,11 +389,13 @@ class CLA:
         # Calculate the covariance matrix
         self.cov_matrix = np.asarray(asset_prices.cov())
 
+        # Intialise lower bounds
         if isinstance(self.weight_bounds[0], numbers.Real):
             self.lower_bounds = np.ones(self.expected_returns.shape) * self.weight_bounds[0]
         else:
             self.lower_bounds = np.array(self.weight_bounds[0]).reshape(self.expected_returns.shape)
 
+        # Intialise upper bounds
         if isinstance(self.weight_bounds[0], numbers.Real):
             self.upper_bounds = np.ones(self.expected_returns.shape) * self.weight_bounds[1]
         else:
@@ -430,6 +406,131 @@ class CLA:
         self.lambdas = []
         self.gammas = []
         self.free_weights = []
+
+    @staticmethod
+    def _calculate_mean_historical_returns(asset_prices, frequency=252):
+        '''
+        Calculate the annualised mean historical returns from asset price data
+
+        :param asset_prices: (pd.DataFrame) asset price data
+        :return: (np.array) returns per asset
+        '''
+
+        returns = asset_prices.pct_change().dropna(how="all")
+        returns = returns.mean() * frequency
+        return returns
+
+    @staticmethod
+    def _calculate_exponential_historical_returns(asset_prices, frequency=252, span=500):
+        '''
+        Calculate the exponentially-weighted mean of (daily) historical returns, giving
+        higher weight to more recent data.
+
+        :param asset_prices: (pd.DataFrame) asset price data
+        :return: (np.array) returns per asset
+        '''
+
+        returns = asset_prices.pct_change().dropna(how="all")
+        returns = returns.ewm(span=span).mean().iloc[-1] * frequency
+        return returns
+
+    def allocate(self, asset_prices, solution="cla_turning_points", resample_by="B"):
+        # pylint: disable=consider-using-enumerate,too-many-locals,too-many-branches,too-many-statements
+        '''
+        Calculate the portfolio asset allocations using the method specified.
+
+        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (adj closed)
+        :param solution: (str) specify the type of solution to compute. Options are: cla_turning_points, max_sharpe,
+                               min_volatility, efficient_frontier
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+                                  'B' meaning daily business days which is equivalent to no resampling
+        '''
+
+        # Some initial steps before the algorithm runs
+        self._initialise(asset_prices=asset_prices, resample_by=resample_by)
+        assets = asset_prices.columns
+
+        # Compute the turning points, free sets and weights
+        free_weights, weights = self._init_algo()
+        self.weights.append(np.copy(weights))  # store solution
+        self.lambdas.append(None)
+        self.gammas.append(None)
+        self.free_weights.append(free_weights[:])
+        while True:
+
+            # 1) Bound one free weight
+            lambda_in, i_in, bi_in = self._bound_free_weight(free_weights)
+
+            # 2) Free one bounded weight
+            lambda_out, i_out = self._free_bound_weight(free_weights)
+
+            # 3) Compute minimum variance solution
+            if (lambda_in is None or lambda_in < 0) and (lambda_out is None or lambda_out < 0):
+                self.lambdas.append(0)
+                covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights)
+                covar_f_inv = np.linalg.inv(covar_f)
+                mean_f = np.zeros(mean_f.shape)
+
+            # 4) Decide whether to free a bounded weight or bound a free weight
+            else:
+                if _infnone(lambda_in) > _infnone(lambda_out):
+                    self.lambdas.append(lambda_in)
+                    free_weights.remove(i_in)
+                    weights[i_in] = bi_in  # set value at the correct boundary
+                else:
+                    self.lambdas.append(lambda_out)
+                    free_weights.append(i_out)
+                covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights)
+                covar_f_inv = np.linalg.inv(covar_f)
+
+            # 5) Compute solution vector
+            w_f, gamma = self._compute_w(covar_f_inv, covar_fb, mean_f, w_b)
+            for i in range(len(free_weights)):
+                weights[free_weights[i]] = w_f[i]
+            self.weights.append(np.copy(weights))  # store solution
+            self.gammas.append(gamma)
+            self.free_weights.append(free_weights[:])
+            if self.lambdas[-1] == 0:
+                break
+
+        # 6) Purge turning points
+        self._purge_num_err(10e-10)
+        self._purge_excess()
+
+        # Compute the specified solution
+        self._compute_solution(assets=assets, solution=solution)
+
+    def _compute_solution(self, assets, solution):
+        '''
+        Compute the desired solution to the portfolio optimisation problem
+
+        :param assets: (list) a list of asset names
+        :param solution: (str) specify the type of solution to compute. Options are: cla_turning_points, max_sharpe,
+                               min_volatility, efficient_frontier
+        '''
+
+        if solution == "max_sharpe":
+            self.max_sharpe, self.weights = self._max_sharpe()
+            self.weights = pd.DataFrame(self.weights)
+            self.weights.index = assets
+            self.weights = self.weights.T
+        elif solution == "min_volatility":
+            self.min_var, self.weights = self._min_volatility()
+            self.weights = pd.DataFrame(self.weights)
+            self.weights.index = assets
+            self.weights = self.weights.T
+        elif solution == "efficient_frontier":
+            self.means, self.sigma, self.weights = self._efficient_frontier()
+            weights_copy = self.weights.copy()
+            for i, turning_point in enumerate(weights_copy):
+                self.weights[i] = turning_point.reshape(1, -1)[0]
+            self.weights = pd.DataFrame(self.weights, columns=assets)
+        else:
+            # Reshape the weight matrix
+            weights_copy = self.weights.copy()
+            for i, turning_point in enumerate(weights_copy):
+                self.weights[i] = turning_point.reshape(1, -1)[0]
+            self.weights = pd.DataFrame(self.weights, columns=assets)
 
     def _max_sharpe(self):
         '''
@@ -493,87 +594,3 @@ class CLA:
                 means.append(np.dot(w.T, self.expected_returns)[0, 0])
                 sigma.append(np.dot(np.dot(w.T, self.cov_matrix), w)[0, 0] ** 0.5)
         return means, sigma, weights
-
-    def allocate(self, asset_prices, solution="cla_turning_points"):
-        # pylint: disable=consider-using-enumerate
-        '''
-        Calculate the portfolio asset allocations using the method specified.
-
-        :param asset_prices: (pd.Dataframe/np.array) a dataframe of historical asset prices (adj closed)
-        :param solution: (str) specify the type of solution to compute. Options are: cla_turning_points, max_sharpe,
-                               min_volatility, efficient_frontier
-        '''
-
-        # Some initial steps before the algorithm runs
-        self._initialise(asset_prices=asset_prices)
-
-        # Compute the turning points, free sets and weights
-        free_weights, weights = self._init_algo()
-        self.weights.append(np.copy(weights))  # store solution
-        self.lambdas.append(None)
-        self.gammas.append(None)
-        self.free_weights.append(free_weights[:])
-        while True:
-
-            # 1) Bound one free weight
-            lambda_in, i_in, bi_in = self._bound_free_weight(free_weights)
-
-            # 2) Free one bounded weight
-            lambda_out, i_out = self._free_bound_weight(free_weights)
-
-            if (lambda_in is None or lambda_in < 0) and (lambda_out is None or lambda_out < 0):
-                # 3) Compute minimum variance solution
-                self.lambdas.append(0)
-                covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights)
-                covar_f_inv = np.linalg.inv(covar_f)
-                mean_f = np.zeros(mean_f.shape)
-            else:
-                # 4) Decide whether to free a bounded weight or bound a free weight
-                if _infnone(lambda_in) > _infnone(lambda_out):
-                    self.lambdas.append(lambda_in)
-                    free_weights.remove(i_in)
-                    weights[i_in] = bi_in  # set value at the correct boundary
-                else:
-                    self.lambdas.append(lambda_out)
-                    free_weights.append(i_out)
-                covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights)
-                covar_f_inv = np.linalg.inv(covar_f)
-
-            # 5) Compute solution vector
-            w_f, gamma = self._compute_w(covar_f_inv, covar_fb, mean_f, w_b)
-            for i in range(len(free_weights)):
-                weights[free_weights[i]] = w_f[i]
-            self.weights.append(np.copy(weights))  # store solution
-            self.gammas.append(gamma)
-            self.free_weights.append(free_weights[:])
-            if self.lambdas[-1] == 0:
-                break
-
-        # 6) Purge turning points
-        self._purge_num_err(10e-10)
-        self._purge_excess()
-
-        # Compute the specified corresponding solution
-        assets = asset_prices.columns
-        if solution == "max_sharpe":
-            self.max_sharpe, self.weights = self._max_sharpe()
-            self.weights = pd.DataFrame(self.weights)
-            self.weights.index = assets
-            self.weights = self.weights.T
-        elif solution == "min_volatility":
-            self.min_var, self.weights = self._min_volatility()
-            self.weights = pd.DataFrame(self.weights)
-            self.weights.index = assets
-            self.weights = self.weights.T
-        elif solution == "efficient_frontier":
-            self.means, self.sigma, self.weights = self._efficient_frontier()
-            weights_copy = self.weights.copy()
-            for i, turning_point in enumerate(weights_copy):
-                self.weights[i] = turning_point.reshape(1, -1)[0]
-            self.weights = pd.DataFrame(self.weights, columns=assets)
-        else:
-            # Reshape the weight matrix
-            weights_copy = self.weights.copy()
-            for i, turning_point in enumerate(weights_copy):
-                self.weights[i] = turning_point.reshape(1, -1)[0]
-            self.weights = pd.DataFrame(self.weights, columns=assets)

@@ -19,6 +19,7 @@ class HierarchicalRiskParity:
         self.seriated_correlations = None
         self.seriated_distances = None
         self.ordered_indices = None
+        self.clusters = None
 
     @staticmethod
     def _tree_clustering(correlation, method='single'):
@@ -122,19 +123,19 @@ class HierarchicalRiskParity:
         plt.show()
 
     @staticmethod
-    def _calculate_returns(asset_prices, resample_returns_by):
-        '''Calculate the annualised mean historical returns from asset price data
-
+    def _calculate_returns(asset_prices, resample_by):
+        '''
+        Calculate the annualised mean historical returns from asset price data
 
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
-        :param resample_returns_by: (str) specifies how to resample the returns - weekly, daily, monthly etc.. Defaults to
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   'B' meaning daily business days which is equivalent to no resampling
         :return: (pd.Dataframe) stock returns
         '''
 
+        asset_prices = asset_prices.resample_by(resample_by).mean()
         asset_returns = asset_prices.pct_change()
         asset_returns = asset_returns.dropna(how='all')
-        asset_returns = asset_returns.resample(resample_returns_by).mean()
         return asset_returns
 
     @staticmethod
@@ -168,13 +169,13 @@ class HierarchicalRiskParity:
         corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
         return corr
 
-    def allocate(self, asset_prices, resample_returns_by='B', use_shrinkage=False):
+    def allocate(self, asset_prices, resample_by='B', use_shrinkage=False):
         '''
         Calculate asset allocations using HRP algorithm
 
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
                                             indexed by date
-        :param resample_returns_by: (str) specifies how to resample the returns - weekly, daily, monthly etc.. Defaults to
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                           'B' meaning daily business days which is equivalent to no resampling
         :param use_shrinkage: (Boolean) specifies whether to shrink the covariances
         '''
@@ -185,7 +186,7 @@ class HierarchicalRiskParity:
             raise ValueError("Asset prices dataframe must be indexed by date.")
 
         # Calculate the returns
-        asset_returns = self._calculate_returns(asset_prices, resample_returns_by=resample_returns_by)
+        asset_returns = self._calculate_returns(asset_prices, resample_by=resample_by)
 
         num_assets = asset_returns.shape[1]
         assets = asset_returns.columns
