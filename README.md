@@ -39,7 +39,7 @@ You should be able to work on a few implementations of the code with this set.
 
 ---
 
-## Notes
+## Progress
 
 **Part 4: Useful Financial Features**
 * Working on Chapter 19: Microstructural Features (Maksim
@@ -51,8 +51,7 @@ You should be able to work on a few implementations of the code with this set.
 **Part 2: Modelling**
 * Working on Chapter 8: Feature Importance (Alex)
 * Done on Chapter 7: Cross-Validation
-* Done Chapter 6: Ensemble Methods
-* Done Sequential Bootstrap Ensemble
+* Done Chapter 6: Ensemble Methods (Sequential Bootstrap Ensemble)
 
 **Part 1: Data Analysis**
 * Done Chapter 5: Fractional Differentiation
