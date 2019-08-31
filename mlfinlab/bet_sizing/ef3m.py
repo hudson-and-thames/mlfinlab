@@ -1,5 +1,5 @@
 """
-An implementation of the Exact Fit of the first 3 Moments (#F3M) of finding the parameters that make up the mixture
+An implementation of the Exact Fit of the first 3 Moments (EF3M) of finding the parameters that make up the mixture
 of 2 Gaussian distributions. Based on the work by Lopez de Prado and Foreman (2014) "A mixture of two Gaussians
 approach to mathematical portfolio oversight: The EF3M algorithm." Quantitative Finance, Vol. 14, No. 5, pp. 913-930.
 """
