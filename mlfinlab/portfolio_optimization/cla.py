@@ -532,12 +532,15 @@ class CLA:
             for i, turning_point in enumerate(weights_copy):
                 self.weights[i] = turning_point.reshape(1, -1)[0]
             self.weights = pd.DataFrame(self.weights, columns=assets)
-        else:
+        elif solution == "cla_turning_points":
             # Reshape the weight matrix
             weights_copy = self.weights.copy()
             for i, turning_point in enumerate(weights_copy):
                 self.weights[i] = turning_point.reshape(1, -1)[0]
             self.weights = pd.DataFrame(self.weights, columns=assets)
+        else:
+            raise ValueError("Unknown solution string specified. Supported solutions - cla_turning_points, "
+                             "efficient_frontier, min_volatility, max_sharpe")
 
     def _max_sharpe(self):
         '''

@@ -74,6 +74,34 @@ class TestCLA(unittest.TestCase):
         assert cla.efficient_frontier_sigma[-1] <= cla.efficient_frontier_sigma[0] and \
                cla.efficient_frontier_means[-1] <= cla.efficient_frontier_means[0]  # higher risk = higher return
 
+    def test_value_error_for_unknown_solution(self):
+        """
+        Test ValueError on passing unknown solution string
+        """
+
+        with self.assertRaises(ValueError):
+            cla = CLA()
+            cla.allocate(asset_prices=self.data, solution='unknown_string')
+
+    def test_value_error_for_non_dataframe_input(self):
+        """
+        Test ValueError on passing non-dataframe input
+        """
+
+        with self.assertRaises(ValueError):
+            cla = CLA()
+            cla.allocate(asset_prices=self.data.values, solution='cla_turning_points')
+
+    def test_value_error_for_non_date_index(self):
+        """
+        Test ValueError on passing dataframe not indexed by date
+        """
+
+        with self.assertRaises(ValueError):
+            cla = CLA()
+            data = self.data.reset_index()
+            cla.allocate(asset_prices=data, solution='cla_turning_points')
+
 class TestHRP(unittest.TestCase):
     """
     Tests different functions of the HRP algorithm class.
@@ -108,6 +136,25 @@ class TestHRP(unittest.TestCase):
         assert hrp.ordered_indices == [13, 9, 10, 8, 14, 7, 1, 6, 4, 16, 3, 17,
                                        12, 18, 22, 0, 15, 21, 11, 2, 20, 5, 19]
 
+    def test_value_error_for_non_dataframe_input(self):
+        """
+        Test ValueError on passing non-dataframe input
+        """
+
+        with self.assertRaises(ValueError):
+            hrp = HierarchicalRiskParity()
+            hrp.allocate(asset_prices=self.data.values)
+
+    def test_value_error_for_non_date_index(self):
+        """
+        Test ValueError on passing dataframe not indexed by date
+        """
+
+        with self.assertRaises(ValueError):
+            hrp = HierarchicalRiskParity()
+            data = self.data.reset_index()
+            hrp.allocate(asset_prices=data)
+
 class TestMVO(unittest.TestCase):
     """
     Tests the different functions of the Mean Variance Optimisation class
@@ -127,8 +174,38 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        mvo.allocate(asset_prices=self.data)
+        mvo.allocate(asset_prices=self.data, solution='inverse_variance')
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_value_error_for_unknown_solution(self):
+        """
+        Test ValueError on passing unknown solution string
+        """
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation()
+            mvo.allocate(asset_prices=self.data, solution='ivp')
+
+    def test_value_error_for_non_dataframe_input(self):
+        """
+        Test ValueError on passing non-dataframe input
+        """
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation()
+            mvo.allocate(asset_prices=self.data.values, solution='inverse_variance')
+
+    def test_value_error_for_non_date_index(self):
+        """
+        Test ValueError on passing dataframe not indexed by date
+        """
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation()
+            data = self.data.reset_index()
+            mvo.allocate(asset_prices=data, solution='inverse_variance')
+
+unittest.main()

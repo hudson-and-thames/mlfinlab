@@ -38,6 +38,8 @@ class MeanVarianceOptimisation:
         if solution == 'inverse_variance':
             cov = asset_returns.cov()
             self.weights = self._inverse_variance(covariance=cov)
+        else:
+            raise ValueError("Unknown solution string specified. Supported solutions - inverse_variance.")
         self.weights = pd.DataFrame(self.weights)
         self.weights.index = assets
         self.weights = self.weights.T
