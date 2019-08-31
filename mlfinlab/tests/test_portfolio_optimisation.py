@@ -24,12 +24,26 @@ class TestCLA(unittest.TestCase):
         data_path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
-    def test_cla_turning_points(self):
+    def test_cla_turning_points_with_mean_returns(self):
         """
-        Test the calculation of CLA turning points
+        Test the calculation of CLA turning points using mean returns
         """
 
         cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
+        cla.allocate(asset_prices=self.data)
+        weights = cla.weights.values
+        weights[weights <= 1e-15] = 0 # Convert very very small numbers to 0
+        for turning_point in weights:
+            assert (turning_point >= 0).all()
+            assert len(turning_point) == self.data.shape[1]
+            np.testing.assert_almost_equal(np.sum(turning_point), 1)
+
+    def test_cla_turning_points_with_exponential_returns(self):
+        """
+        Test the calculation of CLA turning points using exponential returns
+        """
+
+        cla = CLA(weight_bounds=(0, 1), calculate_returns="exponential")
         cla.allocate(asset_prices=self.data)
         weights = cla.weights.values
         weights[weights <= 1e-15] = 0 # Convert very very small numbers to 0
@@ -102,6 +116,15 @@ class TestCLA(unittest.TestCase):
             data = self.data.reset_index()
             cla.allocate(asset_prices=data, solution='cla_turning_points')
 
+    def test_value_error_for_unknown_returns(self):
+        """
+        Test ValueError on passing dataframe not indexed by date
+        """
+
+        with self.assertRaises(ValueError):
+            cla = CLA(calculate_returns="unknown_returns")
+            cla.allocate(asset_prices=self.data, solution='cla_turning_points')
+
 class TestHRP(unittest.TestCase):
     """
     Tests different functions of the HRP algorithm class.
@@ -119,12 +142,39 @@ class TestHRP(unittest.TestCase):
         """
         Test the HRP algorithm
         """
+
         hrp = HierarchicalRiskParity()
         hrp.allocate(asset_prices=self.data)
         weights = hrp.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_hrp_with_shrinkage(self):
+        """
+        Test the HRP algorithm with covariance shrinkage
+        """
+
+        hrp = HierarchicalRiskParity()
+        hrp.allocate(asset_prices=self.data, use_shrinkage=True)
+        weights = hrp.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_dendrogram_plot(self):
+        """
+        Test if dendrogram plot object is correctly rendered
+        """
+
+        hrp = HierarchicalRiskParity()
+        hrp.allocate(asset_prices=self.data, use_shrinkage=True)
+        dendrogram = hrp.plot_clusters(assets=self.data.columns)
+        assert dendrogram.get('icoord')
+        assert dendrogram.get('dcoord')
+        assert dendrogram.get('ivl')
+        assert dendrogram.get('leaves')
+        assert dendrogram.get('color_list')
 
     def test_quasi_diagnalization(self):
         """

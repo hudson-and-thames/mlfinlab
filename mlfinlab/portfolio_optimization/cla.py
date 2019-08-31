@@ -204,12 +204,12 @@ class CLA:
         return list(set(list_1) - set(list_2))
 
     @staticmethod
-    def _reduce_matrix(matrix, list_x, list_y):
+    def _reduce_matrix(matrix, row_indices, col_indices):
         '''
         Reduce a matrix to the provided set of rows and columns
         '''
 
-        return matrix[np.ix_(list_x, list_y)]
+        return matrix[np.ix_(row_indices, col_indices)]
 
     def _purge_num_err(self, tol):
         '''
@@ -387,8 +387,10 @@ class CLA:
         # Calculate the expected returns
         if self.calculate_returns == "mean":
             self.expected_returns = self._calculate_mean_historical_returns(asset_prices=asset_prices)
-        else:
+        elif self.calculate_returns == "exponential":
             self.expected_returns = self._calculate_exponential_historical_returns(asset_prices=asset_prices)
+        else:
+            raise ValueError("Unknown returns specified. Supported returns - mean, exponential")
         self.expected_returns = np.array(self.expected_returns).reshape((len(self.expected_returns), 1))
         if (self.expected_returns == np.ones(self.expected_returns.shape) * self.expected_returns.mean()).all():
             self.expected_returns[-1, 0] += 1e-5

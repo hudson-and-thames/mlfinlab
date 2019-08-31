@@ -10,7 +10,6 @@ import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 from sklearn.covariance import OAS
-import matplotlib.pyplot as plt
 
 
 class HierarchicalRiskParity:
@@ -63,9 +62,9 @@ class HierarchicalRiskParity:
         Based on the quasi-diagnalization, reorder the original distance matrix, so that assets within
         the same cluster are grouped together.
 
-        :param assets:
-        :param distances:
-        :param correlations:
+        :param assets: (list) list of asset names in the portfolio
+        :param distances: (pd.Dataframe) distance values between asset returns
+        :param correlations: (pd.Dataframe) correlations between asset returns
         :return: (np.array) re-arranged distance matrix based on tree clusters
         '''
 
@@ -79,7 +78,7 @@ class HierarchicalRiskParity:
         Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets
 
         :param covariances: (np.array) the covariance matrix
-        :param assets:
+        :param assets: (list) list of asset names in the portfolio
         '''
 
         self.weights = pd.Series(1, index=self.ordered_indices)
@@ -117,16 +116,15 @@ class HierarchicalRiskParity:
         self.weights = pd.DataFrame(self.weights)
         self.weights = self.weights.T
 
-    def plot_clusters(self, height=10, width=10):
+    def plot_clusters(self, assets):
         '''
         Plot a dendrogram of the hierarchical clusters
 
-        :param height: (int) height of the plot
-        :param width: (int) width of the plot
+        :param assets: (list) list of asset names in the portfolio
         '''
-        plt.figure(figsize=(width, height))
-        dendrogram(self.clusters)
-        plt.show()
+
+        dendrogram_plot = dendrogram(self.clusters, labels=assets)
+        return dendrogram_plot
 
     @staticmethod
     def _calculate_returns(asset_prices, resample_by):
