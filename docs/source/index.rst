@@ -120,6 +120,7 @@ Implementations
    implementations/frac_diff
    implementations/cross_validation
    implementations/sb_bagging
+   implementations/bet_sizing
 
 
 * :doc:`implementations/data_structures`
@@ -129,6 +130,7 @@ Implementations
 * :doc:`implementations/frac_diff`
 * :doc:`implementations/cross_validation`
 * :doc:`implementations/sb_bagging`
+* :doc:`implementations/bet_sizing`
 
 Additional Information
 ======================
@@ -145,3 +147,4 @@ Additional Information
 * :doc:`additional_information/contributing`
 * :doc:`additional_information/license`
 
+:module: mlfinlab
