@@ -42,7 +42,7 @@ You should be able to work on a few implementations of the code with this set.
 ## Progress
 
 **Part 4: Useful Financial Features**
-* Working on Chapter 19: Microstructural Features (Maksim
+* Working on Chapter 19: Microstructural Features (Maksim)
 
 **Part 3: Backtesting**
 * Working on Chapter 16: Asset Allocation (Aditya)
