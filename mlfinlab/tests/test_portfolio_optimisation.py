@@ -207,5 +207,3 @@ class TestMVO(unittest.TestCase):
             mvo = MeanVarianceOptimisation()
             data = self.data.reset_index()
             mvo.allocate(asset_prices=data, solution='inverse_variance')
-
-unittest.main()

@@ -10,8 +10,6 @@ import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 from sklearn.covariance import OAS
-import matplotlib
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 
