@@ -132,5 +132,3 @@ class TestMVO(unittest.TestCase):
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
-
-unittest.main()
