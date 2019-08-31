@@ -38,6 +38,21 @@ class TestCLA(unittest.TestCase):
             assert len(turning_point) == self.data.shape[1]
             np.testing.assert_almost_equal(np.sum(turning_point), 1)
 
+    def test_cla_with_weight_bounds_as_lists(self):
+        """
+        Test the calculation of CLA turning points when we pass the weight bounds as a list
+        instead of just lower and upper bound value
+        """
+
+        cla = CLA(weight_bounds=([0]*self.data.shape[1], [1]*self.data.shape[1]), calculate_returns="mean")
+        cla.allocate(asset_prices=self.data)
+        weights = cla.weights.values
+        weights[weights <= 1e-15] = 0 # Convert very very small numbers to 0
+        for turning_point in weights:
+            assert (turning_point >= 0).all()
+            assert len(turning_point) == self.data.shape[1]
+            np.testing.assert_almost_equal(np.sum(turning_point), 1)
+
     def test_cla_with_exponential_returns(self):
         """
         Test the calculation of CLA turning points using exponential returns
