@@ -24,7 +24,7 @@ class TestCLA(unittest.TestCase):
         data_path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
-    def test_cla_turning_points_with_mean_returns(self):
+    def test_cla_with_mean_returns(self):
         """
         Test the calculation of CLA turning points using mean returns
         """
@@ -38,7 +38,7 @@ class TestCLA(unittest.TestCase):
             assert len(turning_point) == self.data.shape[1]
             np.testing.assert_almost_equal(np.sum(turning_point), 1)
 
-    def test_cla_turning_points_with_exponential_returns(self):
+    def test_cla_with_exponential_returns(self):
         """
         Test the calculation of CLA turning points using exponential returns
         """
