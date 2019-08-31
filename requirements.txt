@@ -11,3 +11,4 @@ toolz==0.10.0  # =needed for dask
 cloudpickle==1.2.1  # needed for dask
 sphinx==2.2.0 # needed for docs
 sphinx-rtd-theme==0.4.3 # needed for docs
+matplotlib==2.2.2

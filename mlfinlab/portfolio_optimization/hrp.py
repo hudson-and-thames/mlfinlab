@@ -1,3 +1,10 @@
+'''
+This module implements the HRP algorithm mentioned in the following paper:
+López de Prado, Marcos, Building Diversified Portfolios that Outperform Out-of-Sample (May 23, 2016).
+Journal of Portfolio Management, 2016;
+The code is reproduced with modification from his book: Advances in Financial Machine Learning, Chp-16
+'''
+
 import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
@@ -8,10 +15,9 @@ import matplotlib.pyplot as plt
 
 class HierarchicalRiskParity:
     '''
-    This module implements the HRP algorithm mentioned in the following paper:
-    López de Prado, Marcos, Building Diversified Portfolios that Outperform Out-of-Sample (May 23, 2016).
-    Journal of Portfolio Management, 2016;
-    The code is reproduced with modification from his book: Advances in Financial Machine Learning
+    The HRP algorithm is a robust algorithm which tries to overcome the limitations of the CLA algorithm. It has three
+    important steps - hierarchical tree clustering, quasi diagnalisation and recursive bisection. Non-inversion of
+    covariance matrix makes HRP a very stable algorithm and insensitive to small changes in covariances.
     '''
 
     def __init__(self):

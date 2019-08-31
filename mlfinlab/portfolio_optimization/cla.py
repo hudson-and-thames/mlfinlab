@@ -1,3 +1,10 @@
+'''
+This module implements the famous Critical Line Algorithm for mean-variance portfolio
+optimisation. It is reproduced with modification from the following paper:
+D.H. Bailey and M.L. Prado “An Open-Source Implementation of the Critical- Line Algorithm for
+Portfolio Optimization”,Algorithms, 6 (2013), 169-196. http://dx.doi.org/10.3390/a6010169
+'''
+
 import numbers
 from math import log, ceil
 import numpy as np
@@ -16,13 +23,14 @@ def _infnone(number):
 
 class CLA:
     '''
-    CLA class implements the famous Critical Line Algorithm for mean-variance portfolio
-    optimisation. It is reproduced with modification from the following paper:
-    D.H. Bailey and M.L. Prado “An Open-Source Implementation of the Critical- Line Algorithm for
-    Portfolio Optimization”,Algorithms, 6 (2013), 169-196. http://dx.doi.org/10.3390/a6010169
+    CLA is a famous portfolio optimisation algorithm used for calculating the optimal allocation weights for a given
+    portfolio. It solves the optimisation problem with constraints on each weight - lower and upper bounds on the weight
+    value. This class can compute multiple types of solutions - the normal cla solution, minimum variance solution,
+    maximum sharpe solution and finally the solution to the efficient frontier.
     '''
 
     def __init__(self, weight_bounds=(0, 1), calculate_returns="mean"):
+        # pylint: disable:too-many-instance-attributes
         '''
         Initialise the storage arrays and some preprocessing.
 
@@ -33,14 +41,14 @@ class CLA:
 
         self.weight_bounds = weight_bounds
         self.calculate_returns = calculate_returns
+        self.weights = list()
+        self.lambdas = list()
+        self.gammas = list()
+        self.free_weights = list()
         self.expected_returns = None
         self.cov_matrix = None
         self.lower_bounds = None
         self.upper_bounds = None
-        self.weights = None
-        self.lambdas = None
-        self.gammas = None
-        self.free_weights = None
         self.max_sharpe = None
         self.min_var = None
         self.means = None
@@ -273,8 +281,7 @@ class CLA:
         tol, sign, args = 1.0e-9, 1, None
         if "minimum" in kwargs and kwargs["minimum"] is False:
             sign = -1
-        if "args" in kwargs:
-            args = kwargs["args"]
+        args = kwargs.get("args", None)
         num_iterations = int(ceil(-2.078087 * log(tol / abs(right - left))))
         gs_ratio = 0.618033989
         complementary_gs_ratio = 1.0 - gs_ratio

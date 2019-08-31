@@ -1,11 +1,16 @@
+'''
+This module implements the classic mean-variance optimisation techniques for calculating the efficient frontier.
+It uses typical quadratic optimisers to generate optimal portfolios for different objective functions.
+'''
+
 import numpy as np
 import pandas as pd
 
 
 class MeanVarianceOptimisation:
     '''
-    This module implements the classic mean-variance optimisation techniques for calculating the efficient frontier.
-    It uses typical quadratic optimisers to generate optimal portfolios for different objective functions.
+    This class contains a variety of methods dealing with different solutions to the mean variance optimisation
+    problem.
     '''
 
     def __init__(self):
