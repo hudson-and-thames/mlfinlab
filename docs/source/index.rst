@@ -12,15 +12,15 @@ Machine Learning Financial Laboratory (mlfinlab)
 
 	|Build Status| |codecov| |pylint Score| |License: BSD3|																			
 
-	.. |Build Status| image:: https://travis-ci.com/hudson-and-thames/mlfinlab.svg				
+	.. |Build Status| image:: https://travis-ci.com/hudson-and-thames/mlfinlab.svg?branch=master			
 		:target: https://travis-ci.com/hudson-and-thames/mlfinlab
 
-	.. |codecov| image:: https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg				
+	.. |codecov| image:: https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg		
 		:target: https://codecov.io/gh/hudson-and-thames/mlfinlab
 
 	.. |pylint Score| image:: https://mperlet.github.io/pybadge/badges/10.svg			
 
-	.. |License: BSD3| image:: https://img.shields.io/github/license/hudson-and-thames/mlfinlab.svg				
+	.. |License: BSD3| image:: https://img.shields.io/github/license/hudson-and-thames/mlfinlab.svg			
 		:target: https://opensource.org/licenses/BSD-3-Clause
 
 	|PyPi| |Downloads| |Python|																			
