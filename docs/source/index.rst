@@ -121,6 +121,7 @@ Implementations
    implementations/cross_validation
    implementations/sb_bagging
    implementations/bet_sizing
+   implementations/ef3m
 
 
 * :doc:`implementations/data_structures`
