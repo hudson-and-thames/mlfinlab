@@ -22,7 +22,7 @@ class TestCLA(unittest.TestCase):
         """
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/stock_prices.csv'
-        self.data = pd.read_csv(data_path, parse_dates=True, index_col="date")
+        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
     def test_cla_turning_points(self):
         """
@@ -31,8 +31,10 @@ class TestCLA(unittest.TestCase):
 
         cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
         cla.allocate(asset_prices=self.data)
-        for turning_point in cla.weights:
-            assert turning_point
+        weights = cla.weights.values
+        weights[weights <= 1e-15] = 0 # Convert very very small numbers to 0
+        for turning_point in weights:
+            assert (turning_point >= 0).all()
             assert len(turning_point) == self.data.shape[1]
             np.testing.assert_almost_equal(np.sum(turning_point), 1)
 
@@ -43,9 +45,10 @@ class TestCLA(unittest.TestCase):
 
         cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
         cla.allocate(asset_prices=self.data, solution='max_sharpe')
-        assert cla.weights
-        assert len(cla.weights) == self.data.shape[1]
-        np.testing.assert_almost_equal(np.sum(cla.weights), 1)
+        weights = cla.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_cla_min_volatility(self):
         """
@@ -54,9 +57,10 @@ class TestCLA(unittest.TestCase):
 
         cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
         cla.allocate(asset_prices=self.data, solution='min_volatility')
-        assert cla.weights
-        assert len(cla.weights) == self.data.shape[1]
-        np.testing.assert_almost_equal(np.sum(cla.weights), 1)
+        weights = cla.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_cla_efficient_frontier(self):
         """
@@ -65,8 +69,10 @@ class TestCLA(unittest.TestCase):
 
         cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
         cla.allocate(asset_prices=self.data, solution='efficient_frontier')
-        assert len(cla.means) == len(cla.sigma) and len(cla.sigma) == len(cla.weights)
-        assert cla.sigma[-1] < cla.sigma[0] and cla.means[-1] < cla.means[0]  # higher risk = higher return
+        assert len(cla.efficient_frontier_means) == len(cla.efficient_frontier_sigma) and \
+               len(cla.efficient_frontier_sigma) == len(cla.weights.values)
+        assert cla.efficient_frontier_sigma[-1] <= cla.efficient_frontier_sigma[0] and \
+               cla.efficient_frontier_means[-1] <= cla.efficient_frontier_means[0]  # higher risk = higher return
 
 class TestHRP(unittest.TestCase):
     """
@@ -79,7 +85,7 @@ class TestHRP(unittest.TestCase):
         """
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/stock_prices.csv'
-        self.data = pd.read_csv(data_path, parse_dates=True, index_col="date")
+        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
     def test_hrp(self):
         """
@@ -87,9 +93,10 @@ class TestHRP(unittest.TestCase):
         """
         hrp = HierarchicalRiskParity()
         hrp.allocate(asset_prices=self.data)
-        assert hrp.weights
-        assert len(hrp.weights) == self.data.shape[1]
-        np.testing.assert_almost_equal(np.sum(hrp.weights), 1)
+        weights = hrp.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_quasi_diagnalization(self):
         """
@@ -98,8 +105,8 @@ class TestHRP(unittest.TestCase):
 
         hrp = HierarchicalRiskParity()
         hrp.allocate(asset_prices=self.data)
-        assert hrp.ordered_indices == [12, 6, 14, 11, 5, 13, 3, 15, 7, 10, 17,
-                                       18, 19, 4, 2, 0, 1, 16, 8, 9]
+        assert hrp.ordered_indices == [13, 9, 10, 8, 14, 7, 1, 6, 4, 16, 3, 17,
+                                       12, 18, 22, 0, 15, 21, 11, 2, 20, 5, 19]
 
 class TestMVO(unittest.TestCase):
     """
@@ -112,7 +119,7 @@ class TestMVO(unittest.TestCase):
         """
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/stock_prices.csv'
-        self.data = pd.read_csv(data_path, parse_dates=True, index_col="date")
+        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
     def test_inverse_variance(self):
         """
@@ -121,6 +128,9 @@ class TestMVO(unittest.TestCase):
 
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data)
-        assert mvo.weights
-        assert len(mvo.weights) == self.data.shape[1]
-        np.testing.assert_almost_equal(np.sum(mvo.weights), 1)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+unittest.main()
