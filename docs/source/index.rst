@@ -12,15 +12,15 @@ Machine Learning Financial Laboratory (mlfinlab)
 
 	|Build Status| |codecov| |pylint Score| |License: BSD3|																			
 
-	.. |Build Status| image:: https://travis-ci.com/hudson-and-thames/mlfinlab.svg				
+	.. |Build Status| image:: https://travis-ci.com/hudson-and-thames/mlfinlab.svg?branch=master			
 		:target: https://travis-ci.com/hudson-and-thames/mlfinlab
 
-	.. |codecov| image:: https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg				
+	.. |codecov| image:: https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg		
 		:target: https://codecov.io/gh/hudson-and-thames/mlfinlab
 
 	.. |pylint Score| image:: https://mperlet.github.io/pybadge/badges/10.svg			
 
-	.. |License: BSD3| image:: https://img.shields.io/github/license/hudson-and-thames/mlfinlab.svg				
+	.. |License: BSD3| image:: https://img.shields.io/github/license/hudson-and-thames/mlfinlab.svg			
 		:target: https://opensource.org/licenses/BSD-3-Clause
 
 	|PyPi| |Downloads| |Python|																			
@@ -47,7 +47,14 @@ mlfinlab is a living, breathing project, and new functionalities are consistentl
 
 The implementations that will be added in the future as well as the implementations that are currently supported can be seen below:
 
-* Part 3: Backtesting
+* **Part 4: Useful Financial Features**
+* Working on Chapter 19: Microstructural Features (Maksim)
+
+.. raw:: latex
+
+    \vspace{5mm}
+
+* **Part 3: Backtesting**
 * Working on Chapter 16: ML Asset Allocation (Aditya)
 * Working on Chapter 10: Bet Sizing (Lee)
 
@@ -55,16 +62,17 @@ The implementations that will be added in the future as well as the implementati
 
     \vspace{5mm}
 
-* Part 2: Modelling
-* Done Chapter 7: Cross-Validation (Mihai)
+* **Part 2: Modelling**
+* Working on Chapter 8: Feature Importance (Alex)
+* Done Chapter 7: Cross-Validation
 * Done Chapter 6: Ensemble Methods
-* Adding Sequential Bootstrap Ensemble method (Alex)
+* Done Sequential Bootstrap Ensemble
 
 .. raw:: latex
 
     \vspace{5mm}
 
-* Part 1: Data Analysis
+* **Part 1: Data Analysis**
 * Done Chapter 5: Fractionally Differentiated Features
 * Done Chapter 4: Sample Weights
 * Done Chapter 3: Labeling
