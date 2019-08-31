@@ -41,16 +41,20 @@ You should be able to work on a few implementations of the code with this set.
 
 ## Notes
 
-Part 3: Backtesting
+**Part 4: Useful Financial Features**
+* Working on Chapter 19: Microstructural Features (Maksim
+
+**Part 3: Backtesting**
 * Working on Chapter 16: Asset Allocation (Aditya)
 * Working on Chapter 10: Bet Sizing (Lee)
 
-Part 2: Modelling
-* Working on Chapter 7: Cross-Validation (Mihai)
+**Part 2: Modelling**
+* Working on Chapter 8: Feature Importance (Alex)
+* Done on Chapter 7: Cross-Validation
 * Done Chapter 6: Ensemble Methods
-* Adding Sequential Bootstrap Ensemble method (Alex)
+* Done Sequential Bootstrap Ensemble
 
-Part 1: Data Analysis
+**Part 1: Data Analysis**
 * Done Chapter 5: Fractional Differentiation
 * Done Chapter 4: Sample Weights
 * Done Chapter 3: Labeling
