@@ -133,7 +133,7 @@ class TestCLA(unittest.TestCase):
 
     def test_value_error_for_unknown_returns(self):
         """
-        Test ValueError on passing dataframe not indexed by date
+        Test ValueError on passing unknown returns string
         """
 
         with self.assertRaises(ValueError):
@@ -155,7 +155,8 @@ class TestHRP(unittest.TestCase):
 
     def test_hrp(self):
         """
-        Test the HRP algorithm
+        Test the weights calculated by the HRP algorithm - if all the weights are positive and
+        their sum is equal to 1.
         """
 
         hrp = HierarchicalRiskParity()
@@ -167,7 +168,7 @@ class TestHRP(unittest.TestCase):
 
     def test_hrp_with_shrinkage(self):
         """
-        Test the HRP algorithm with covariance shrinkage
+        Test the weights calculated by HRP algorithm with covariance shrinkage
         """
 
         hrp = HierarchicalRiskParity()

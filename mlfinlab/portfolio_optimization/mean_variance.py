@@ -46,8 +46,8 @@ class MeanVarianceOptimisation:
 
     @staticmethod
     def _calculate_returns(asset_prices, resample_by):
-        '''Calculate the annualised mean historical returns from asset price data
-
+        '''
+        Calculate the annualised mean historical returns from asset price data
 
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to

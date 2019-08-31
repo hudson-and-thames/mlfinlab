@@ -11,16 +11,6 @@ import numpy as np
 import pandas as pd
 
 
-def _infnone(number):
-    '''
-    Converts a Nonetype object to inf
-
-    :param number: (int/float/None) a number
-    :return: (float) -inf or number
-    '''
-    return float("-inf") if number is None else number
-
-
 class CLA:
     # pylint: disable=too-many-instance-attributes
     '''
@@ -54,6 +44,16 @@ class CLA:
         self.efficient_frontier_means = None
         self.efficient_frontier_sigma = None
 
+    @staticmethod
+    def _infnone(number):
+        '''
+        Converts a Nonetype object to inf
+
+        :param number: (int/float/None) a number
+        :return: (float) -inf or number
+        '''
+        return float("-inf") if number is None else number
+    
     def _init_algo(self):
         '''
         Initial setting up of the algorithm. Calculates the first free weight of the first turning point.
@@ -199,6 +199,10 @@ class CLA:
     def _diff_lists(list_1, list_2):
         '''
         Calculate the set difference between two lists
+
+        :param list_1: (list) a list of asset indices
+        :param list_2: (list) another list of asset indices
+        :return: (list) set difference between the two input lists
         '''
 
         return list(set(list_1) - set(list_2))
@@ -207,6 +211,11 @@ class CLA:
     def _reduce_matrix(matrix, row_indices, col_indices):
         '''
         Reduce a matrix to the provided set of rows and columns
+
+        :param matrix: (np.array) a matrix whose subset of rows and columns we need
+        :param row_indices: (list) list of row indices for the matrix
+        :param col_indices: (list) list of column indices for the matrix
+        :return: (np.array) subset of input matrix
         '''
 
         return matrix[np.ix_(row_indices, col_indices)]
@@ -214,6 +223,8 @@ class CLA:
     def _purge_num_err(self, tol):
         '''
         Purge violations of inequality constraints (associated with ill-conditioned cov matrix)
+
+        :param tol: (float) tolerance level for purging
         '''
 
         index_1 = 0
@@ -314,6 +325,11 @@ class CLA:
     def _eval_sr(self, alpha, w_0, w_1):
         '''
         Evaluate the sharpe ratio of the portfolio within the convex combination
+
+        :param alpha: (float) convex combination value
+        :param w_0: (list) first endpoint of convex combination of weights
+        :param w_1: (list) second endpoint of convex combination of weights
+        :return:
         '''
 
         weights = alpha * w_0 + (1 - alpha) * w_1
@@ -324,6 +340,9 @@ class CLA:
     def _bound_free_weight(self, free_weights):
         '''
         Add a free weight to list of bounded weights
+
+        :param free_weights: (list) list of free-weight indices
+        :return: (float, int, int) lambda value, index of free weight to be bounded, bound weight value
         '''
 
         lambda_in = None
@@ -337,7 +356,7 @@ class CLA:
                 lambda_i, b_i = self._compute_lambda(
                     covar_f_inv, covar_fb, mean_f, w_b, j, [self.lower_bounds[i], self.upper_bounds[i]]
                 )
-                if _infnone(lambda_i) > _infnone(lambda_in):
+                if self._infnone(lambda_i) > self._infnone(lambda_in):
                     lambda_in, i_in, bi_in = lambda_i, i, b_i
                 j += 1
         return lambda_in, i_in, bi_in
@@ -345,6 +364,9 @@ class CLA:
     def _free_bound_weight(self, free_weights):
         '''
         Add a bounded weight to list of free weights
+
+        :param free_weights: (list) list of free-weight indices
+        :return: (float, int) lambda value, index of the bounded weight to be made free
         '''
 
         lambda_out = None
@@ -362,7 +384,7 @@ class CLA:
                     mean_f.shape[0] - 1,
                     self.weights[-1][i],
                 )
-                if (self.lambdas[-1] is None or lambda_i < self.lambdas[-1]) and lambda_i > _infnone(lambda_out):
+                if (self.lambdas[-1] is None or lambda_i < self.lambdas[-1]) and lambda_i > self._infnone(lambda_out):
                     lambda_out, i_out = lambda_i, i
         return lambda_out, i_out
 
@@ -482,7 +504,7 @@ class CLA:
 
             # 4) Decide whether to free a bounded weight or bound a free weight
             else:
-                if _infnone(lambda_in) > _infnone(lambda_out):
+                if self._infnone(lambda_in) > self._infnone(lambda_out):
                     self.lambdas.append(lambda_in)
                     free_weights.remove(i_in)
                     weights[i_in] = bi_in  # set value at the correct boundary
