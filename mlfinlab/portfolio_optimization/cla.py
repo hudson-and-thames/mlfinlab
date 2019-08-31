@@ -22,6 +22,7 @@ def _infnone(number):
 
 
 class CLA:
+    # pylint: disable=too-many-instance-attributes
     '''
     CLA is a famous portfolio optimisation algorithm used for calculating the optimal allocation weights for a given
     portfolio. It solves the optimisation problem with constraints on each weight - lower and upper bounds on the weight
@@ -30,7 +31,6 @@ class CLA:
     '''
 
     def __init__(self, weight_bounds=(0, 1), calculate_returns="mean"):
-        # pylint: disable:too-many-instance-attributes
         '''
         Initialise the storage arrays and some preprocessing.
 
@@ -51,8 +51,8 @@ class CLA:
         self.upper_bounds = None
         self.max_sharpe = None
         self.min_var = None
-        self.means = None
-        self.sigma = None
+        self.efficient_frontier_means = None
+        self.efficient_frontier_sigma = None
 
     def _init_algo(self):
         '''
@@ -527,7 +527,7 @@ class CLA:
             self.weights.index = assets
             self.weights = self.weights.T
         elif solution == "efficient_frontier":
-            self.means, self.sigma, self.weights = self._efficient_frontier()
+            self.efficient_frontier_means, self.efficient_frontier_sigma, self.weights = self._efficient_frontier()
             weights_copy = self.weights.copy()
             for i, turning_point in enumerate(weights_copy):
                 self.weights[i] = turning_point.reshape(1, -1)[0]
