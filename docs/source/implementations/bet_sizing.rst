@@ -22,24 +22,25 @@ The code in this directory falls under 3 submodules:
 
 Bet Sizing Methods
 ==================
-Functions for bet sizing are implemented based on the strategies described in chapter 10.
+Functions for bet sizing are implemented based on the approaches described in chapter 10.
 
 Bet Sizing From Predicted Probability
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Assuming a machine learning algorithm has predicted a series of investment positions, one can use the probabilities of each of these predictions to derive the size of that specific bet.
+
 .. autofunction:: bet_size_probability
 
 Dynamic Bet Sizes
 ~~~~~~~~~~~~~~~~~
+Assuming one has a series of forecasted prices for a given investment product, that forecast and the current market price and position can be used to dynamically calculate the bet size.
 
 .. autofunction:: bet_size_dynamic
 
-Bet Size Budget
-~~~~~~~~~~~~~~~
-.. autofunction:: bet_size_budget
+Strategy-Independent Bet Sizing Approaches
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+These approaches consider the number of concurrent active bets and their sides, and sets the bet size is such a way that reserves some cash for the possibility that the trading signal strengthens before it weakens.
 
-Bet Size Reserve
-~~~~~~~~~~~~~~~~
+.. autofunction:: bet_size_budget
 .. autofunction:: bet_size_reserve
 
 Additional Utility Functions For Bet Sizing
@@ -98,7 +99,7 @@ Utility Functions For Fitting Of Distribution Mixtures
 
 Chapter 10 Code Snippets
 ========================
-Chapter 10 of "Advances in Financial Machine Learning" contains a number of Python code snippets, many of which are used to create the top level bet sizing functions.
+Chapter 10 of "Advances in Financial Machine Learning" contains a number of Python code snippets, many of which are used to create the top level bet sizing functions. These functions can be found in ``mlfinlab.bet_sizing.ch10_snippets.py``.
 
 Snippets For Bet Sizing From Probabilities
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

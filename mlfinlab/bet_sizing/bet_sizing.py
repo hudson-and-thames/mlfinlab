@@ -56,7 +56,7 @@ def bet_size_dynamic(current_pos, max_pos, market_price, forecast_price, cal_div
     :param forecast_price: (pandas.Series, float) Forecast price.
     :param cal_divergence: (float) The divergence to use in calibration.
     :param cal_bet_size: (float) The bet size to use in calibration.
-    :param func: (string) Function to use for dynamic calculation. Valid options are: 'sigmoid'.
+    :param func: (string) Function to use for dynamic calculation. Valid options are: 'sigmoid', 'power'.
     :return: (pandas.DataFrame) Bet size (bet_size), target position (t_pos), and limit price (l_p).
     """
     # Create a dictionary of bet size variables for easier handling.
