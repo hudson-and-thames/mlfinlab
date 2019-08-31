@@ -1,4 +1,4 @@
-.. py:currentmodule:: mlfinlab.bet_sizing.bet_sizing
+.. py:currentmodule:: mlfinlab.bet_sizing.bet_sizing, mlfinlab.bet_sizing.ef3m
 
 ==========
 Bet Sizing
@@ -28,4 +28,8 @@ Bet Size Reserve
 
 See also
 ========
+
 :doc:`ef3m`
+~~~~~~~~~~~
+The bet sizing function `bet_size_reserve` makes use of the EF3M algorithm for fitting a mixture of two Gaussian distributions to the distribution of concurrent bet sides. This functionality is encapsulated in a separate module.
+
