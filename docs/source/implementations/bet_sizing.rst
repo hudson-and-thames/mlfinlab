@@ -1,4 +1,4 @@
-.. py:currentmodule:: mlfinlab.bet_sizing.bet_sizing, mlfinlab.bet_sizing.ef3m
+.. py:currentmodule:: mlfinlab.bet_sizing.bet_sizing
 
 ==========
 Bet Sizing
@@ -8,6 +8,7 @@ Introduction and motivation for the bet sizing module.
 
 Bet Sizing Methods
 ==================
+Functions for bet sizing methods are implemented in ``mlfinlab.bet_sizing.bet_sizing``.
 
 Bet Size Probability
 ~~~~~~~~~~~~~~~~~~~~
@@ -26,10 +27,26 @@ Bet Size Reserve
 .. autofunction:: bet_size_reserve
 
 
-See also
-========
+.. py:currentmodule:: mlfinlab.bet_sizing.ef3m
 
-:doc:`ef3m`
-~~~~~~~~~~~
-The bet sizing function `bet_size_reserve` makes use of the EF3M algorithm for fitting a mixture of two Gaussian distributions to the distribution of concurrent bet sides. This functionality is encapsulated in a separate module.
 
+EF3M - Exact Fit using the first 3 Moments
+==========================================
+Reference to de Prado paper, brief description of what the algorithm is supposed to accomplish, and how it is used in `mlfinlab`.
+
+
+M2N
+~~~
+.. autoclass:: M2N
+    :members:
+
+
+.. py:currentmodule:: mlfinlab.bet_sizing.ch10_snippets
+
+Chapter 10 Code Snippets
+========================
+
+**get_signal**
+--------------
+
+.. autofunction:: get_signal

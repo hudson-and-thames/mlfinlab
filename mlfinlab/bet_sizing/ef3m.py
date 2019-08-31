@@ -191,7 +191,7 @@ class M2N:
         :param mu_2: (float) Initial parameter value for mu_2
         :param p_1: (float) Probability defining the mixture; p_1, 1-p_1
         :return: (list) List of estimated parameter if no invalid values are encountered (e.g. complex values,
-        divide-by-zero), otherwise an empty list is returned.
+         divide-by-zero), otherwise an empty list is returned.
         """
         m_1, m_2, m_3, m_4, m_5 = self.moments  # Expand list of moments to individual variables for clarity.
 
