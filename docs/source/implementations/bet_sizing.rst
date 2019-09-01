@@ -136,5 +136,7 @@ Exercises From Chapter 10
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * `Chapter 10 Exercise Notebook`_
+* `EF3M Algorithm Test Cases`_
 
 .. _Chapter 10 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Chapter10/Chapter10_Exercises.ipynb
+.. _EF3M Algorithm Test Cases: https://github.com/hudson-and-thames/research/blob/master/Chapter10/ef3m_testing.ipynb
