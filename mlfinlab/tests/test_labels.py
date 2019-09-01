@@ -101,7 +101,7 @@ class TestChapter3(unittest.TestCase):
                                            side_prediction=None)
 
         # Test that the events are the same as expected (naive test)
-        self.assertTrue(triple_barrier_events.shape == (8, 2))  # Assert shape
+        self.assertTrue(triple_barrier_events.shape == (8, 4))  # Assert shape
 
         # Assert that targets match expectations
         self.assertTrue(triple_barrier_events.iloc[0, 1] == 0.010166261175903357)
@@ -127,7 +127,7 @@ class TestChapter3(unittest.TestCase):
         self.assertTrue(np.all(meta_labeled_events['trgt'] == triple_barrier_events['trgt']))
 
         # Assert shape
-        self.assertTrue(meta_labeled_events.shape == (8, 3))
+        self.assertTrue(meta_labeled_events.shape == (8, 5))
 
         # ----------------------
         # No vertical barriers
@@ -142,7 +142,7 @@ class TestChapter3(unittest.TestCase):
 
         # Assert targets match other events trgts
         self.assertTrue(np.all(triple_barrier_events['trgt'] == no_vertical_events['trgt']))
-        self.assertTrue(no_vertical_events.shape == (8, 2))
+        self.assertTrue(no_vertical_events.shape == (8, 4))
 
         # Previously the vertical barrier was touched twice, assert that those events aren't included here
         self.assertTrue((no_vertical_events['t1'] != triple_barrier_events['t1']).sum() == 2)
@@ -169,6 +169,34 @@ class TestChapter3(unittest.TestCase):
 
         triple_labels = get_bins(triple_barrier_events, self.data['close'])
         self.assertTrue(np.all(triple_labels[np.abs(triple_labels['ret']) < triple_labels['trgt']]['bin'] == 0))
+
+        # Assert all labels == 0 (because of very large pt sl levels)
+        triple_barrier_events_ptsl = get_events(close=self.data['close'],
+                                                t_events=cusum_events,
+                                                pt_sl=[1000, 1000],
+                                                target=daily_vol,
+                                                min_ret=0.005,
+                                                num_threads=3,
+                                                vertical_barrier_times=vertical_barriers,
+                                                side_prediction=None)
+
+        triple_labels_ptsl = get_bins(triple_barrier_events_ptsl, self.data['close'])
+        label_count = triple_labels_ptsl['bin'].sum()
+        self.assertTrue(label_count == 0)
+
+        # Assert no vertical barriers if ptsl levels are very small
+        triple_barrier_events_ptsl = get_events(close=self.data['close'],
+                                                t_events=cusum_events,
+                                                pt_sl=[0.00000001, 0.00000001],
+                                                target=daily_vol,
+                                                min_ret=0.005,
+                                                num_threads=3,
+                                                vertical_barrier_times=vertical_barriers,
+                                                side_prediction=None)
+
+        triple_labels_ptsl = get_bins(triple_barrier_events_ptsl, self.data['close'])
+        label_count = (triple_labels_ptsl['bin'] == 0).sum()
+        self.assertTrue(label_count == 0)
 
         # ----------------------
         # Assert meta labeling works
