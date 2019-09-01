@@ -170,34 +170,6 @@ class TestChapter3(unittest.TestCase):
         triple_labels = get_bins(triple_barrier_events, self.data['close'])
         self.assertTrue(np.all(triple_labels[np.abs(triple_labels['ret']) < triple_labels['trgt']]['bin'] == 0))
 
-        # Assert all labels == 0 (because of very large pt sl levels)
-        triple_barrier_events_ptsl = get_events(close=self.data['close'],
-                                                t_events=cusum_events,
-                                                pt_sl=[1000, 1000],
-                                                target=daily_vol,
-                                                min_ret=0.005,
-                                                num_threads=3,
-                                                vertical_barrier_times=vertical_barriers,
-                                                side_prediction=None)
-
-        triple_labels_ptsl = get_bins(triple_barrier_events_ptsl, self.data['close'])
-        label_count = triple_labels_ptsl['bin'].sum()
-        self.assertTrue(label_count == 0)
-
-        # Assert no vertical barriers if ptsl levels are very small
-        triple_barrier_events_ptsl = get_events(close=self.data['close'],
-                                                t_events=cusum_events,
-                                                pt_sl=[0.00000001, 0.00000001],
-                                                target=daily_vol,
-                                                min_ret=0.005,
-                                                num_threads=3,
-                                                vertical_barrier_times=vertical_barriers,
-                                                side_prediction=None)
-
-        triple_labels_ptsl = get_bins(triple_barrier_events_ptsl, self.data['close'])
-        label_count = (triple_labels_ptsl['bin'] == 0).sum()
-        self.assertTrue(label_count == 0)
-
         # ----------------------
         # Assert meta labeling works
         self.data['side'] = 1
@@ -219,6 +191,60 @@ class TestChapter3(unittest.TestCase):
 
         # Assert shape
         self.assertTrue(triple_labels.shape == (8, 4))
+
+    def test_pt_sl_levels_triple_barrier_events(self):
+        """
+        Previously a bug was introduced by not multiplying the target by the profit taking / stop loss multiple. This
+        meant that the get_bins function would not return the correct label. Example: if take profit was set to 1000,
+        it would ignore this multiple and use only the target value. This meant that if we set a very large pt value
+        (so high that it would never be hit before the vertical barrier is reached), it would ignore the multiple and
+        only use the target value (it would signal that price reached the pt barrier). This meant that vertical barriers
+        were incorrectly labeled.
+
+        This also meant that irrespective of the pt_sl levels set, the labels would always be the same.
+        """
+
+        target = get_daily_vol(close=self.data['close'], lookback=100)
+        cusum_events = cusum_filter(self.data['close'], threshold=0.02)
+        vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], num_days=1)
+
+        # --------------------------------------------------------------------------------------------------------
+        # Assert that the vertical barrier would be reached for all positions due to the high pt level.
+        # All labels should be 0. Check the 'bin' column
+        pt_sl = [1000, 1000]
+        triple_barrier_events_ptsl = get_events(close=self.data['close'],
+                                                t_events=cusum_events,
+                                                pt_sl=pt_sl,
+                                                target=target,
+                                                min_ret=0.005,
+                                                num_threads=3,
+                                                vertical_barrier_times=vertical_barriers,
+                                                side_prediction=None)
+
+        triple_labels_ptsl_large = get_bins(triple_barrier_events_ptsl, self.data['close'])
+        labels_large = triple_labels_ptsl_large['bin']
+        label_count = triple_labels_ptsl_large['bin'].sum()
+        self.assertTrue(label_count == 0)
+
+        # --------------------------------------------------------------------------------------------------------
+        # Assert that the vertical barriers are never reached for very small multiples
+        triple_barrier_events_ptsl = get_events(close=self.data['close'],
+                                                t_events=cusum_events,
+                                                pt_sl=[0.00000001, 0.00000001],
+                                                target=target,
+                                                min_ret=0.005,
+                                                num_threads=3,
+                                                vertical_barrier_times=vertical_barriers,
+                                                side_prediction=None)
+
+        triple_labels_ptsl_small = get_bins(triple_barrier_events_ptsl, self.data['close'])
+        labels_small = triple_labels_ptsl_small['bin']
+        label_count = (triple_labels_ptsl_small['bin'] == 0).sum()
+        self.assertTrue(label_count == 0)
+
+        # --------------------------------------------------------------------------------------------------------
+        # Test that the bins are in-fact different. (Previously they would be the same)
+        self.assertTrue(np.all(labels_small[0:5] != labels_large[0:5]))
 
     def test_drop_labels(self):
         """
