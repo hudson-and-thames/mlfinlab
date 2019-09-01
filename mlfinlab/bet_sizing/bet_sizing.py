@@ -56,7 +56,7 @@ def bet_size_dynamic(current_pos, max_pos, market_price, forecast_price, cal_div
     :param forecast_price: (pandas.Series, float) Forecast price.
     :param cal_divergence: (float) The divergence to use in calibration.
     :param cal_bet_size: (float) The bet size to use in calibration.
-    :param func: (string) Function to use for dynamic calculation. Valid options are: 'sigmoid'.
+    :param func: (string) Function to use for dynamic calculation. Valid options are: 'sigmoid', 'power'.
     :return: (pandas.DataFrame) Bet size (bet_size), target position (t_pos), and limit price (l_p).
     """
     # Create a dictionary of bet size variables for easier handling.
@@ -73,6 +73,7 @@ def bet_size_dynamic(current_pos, max_pos, market_price, forecast_price, cal_div
     events_0['bet_size'] = events_0.apply(lambda x: bet_size(w_param, x.f-x.m_p, func), axis=1)
 
     return events_0[['bet_size', 't_pos', 'l_p']]
+
 
 def bet_size_budget(events_t1, sides):
     """
@@ -95,6 +96,7 @@ def bet_size_budget(events_t1, sides):
     events_1['bet_size'] = avg_active_long - avg_active_short
 
     return events_1
+
 
 def bet_size_reserve(events_t1, sides, fit_runs=100, epsilon=1e-5, factor=5, variant=2, max_iter=10_000,
                      num_workers=1, return_parameters=False):
@@ -144,6 +146,7 @@ def bet_size_reserve(events_t1, sides, fit_runs=100, epsilon=1e-5, factor=5, var
         return events_active, fit_params
     return events_active
 
+
 def confirm_and_cast_to_df(d_vars):
     """
     Accepts either pandas.Series (with a common index) or integer/float values, casts all non-pandas.Series values
@@ -185,6 +188,7 @@ def confirm_and_cast_to_df(d_vars):
 
     return events
 
+
 def get_concurrent_sides(events_t1, sides):
     """
     Given the side of the position along with its start and end timestamps, this function returns two pandas.Series
@@ -211,6 +215,7 @@ def get_concurrent_sides(events_t1, sides):
 
     return events_0
 
+
 def cdf_mixture(x_val, parameters):
     """
     The cumulative distribution function of a mixture of 2 normal distributions, evaluated at x_val.
@@ -221,6 +226,7 @@ def cdf_mixture(x_val, parameters):
     """
     mu_1, mu_2, sigma_1, sigma_2, p_1 = parameters  # Parameters reassigned for clarity.
     return p_1 * norm.cdf(x_val, mu_1, sigma_1) + (1-p_1) * norm.cdf(x_val, mu_2, sigma_2)
+
 
 def single_bet_size_mixed(c_t, parameters):
     """
