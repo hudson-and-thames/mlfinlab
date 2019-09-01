@@ -194,12 +194,12 @@ class TestCLA(unittest.TestCase):
         Test purge number excess for very very small tolerance
         """
 
-        cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
-        cla.allocate(asset_prices=self.data, solution='cla_turning_points')
-        cla.weights = list(cla.weights.values)
-        cla._purge_num_err(tol=-100)
-        assert not cla.weights
-
+        with self.assertRaises(IndexError):
+            cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
+            cla.allocate(asset_prices=self.data, solution='cla_turning_points')
+            cla.weights = list(cla.weights.values)
+            cla.weights = cla.weights*100
+            cla._purge_num_err(tol=1e-18)
 
     def test_value_error_for_unknown_solution(self):
         """
