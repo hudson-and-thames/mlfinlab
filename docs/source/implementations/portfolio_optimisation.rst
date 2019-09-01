@@ -33,10 +33,28 @@ in the covariances of the asset returns.
 The Critical Line Algorithm (CLA)
 =================================
 
-This is a robust alternative to the quadratic solver used to find mean-variance optimal portfolios,
-that is especially advantageous when we apply linear inequalities. Unlike generic quadratic optimisers,
-the CLA is specially designed for portfolio optimisation. It is guaranteed to converge after a certain
-number of iterations, and can efficiently derive the entire efficient frontier.
+This is a robust alternative to the quadratic optimisation used to find mean-variance optimal portfolios. The major difference
+between classic Mean-Variance and CLA is the type of optimisation problem solved. A typical mean-variance optimisation problem
+looks something like this:
+
+.. math::
+    min w^{T}\sigmaw
+
+    where,
+        1. \sigma_{i}w_{i} = 1
+        2. 0 <= w <= 1
+        3. \sigma is the covariance matrix and w is the vector of portfolio weights
+
+CLA also solves the same problem but with some added constraints - each weight of an asset in the portfolio can have different
+lower and upper bounds. The optimisation objective still remains the same but it looks something like this:
+
+.. math::
+    min w^{T}\sigmaw
+
+    where,
+        1. \sigmaw = 1
+        2. l_{i} <= w_{i} <= u_{i}
+        3. \sigma is the covariance matrix and w is the vector of portfolio weights
 
 
 I am most grateful to Marcos López de Prado and David Bailey for providing the open-source implementation.
