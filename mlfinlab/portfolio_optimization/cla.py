@@ -289,9 +289,7 @@ class CLA:
         :param right: (float) The rightmost extreme of search
         '''
 
-        tol, sign, args = 1.0e-9, 1, None
-        if "minimum" in kwargs and kwargs["minimum"] is False:
-            sign = -1
+        tol, sign, args = 1.0e-9, -1, None
         args = kwargs.get("args", None)
         num_iterations = int(ceil(-2.078087 * log(tol / abs(right - left))))
         gs_ratio = 0.618033989
