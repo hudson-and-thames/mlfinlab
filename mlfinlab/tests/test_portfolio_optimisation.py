@@ -29,6 +29,9 @@ class TestCLA(unittest.TestCase):
         Test the calculation of CLA turning points using mean returns
         """
 
+        self.data.iloc[1:10, :] = 40
+        self.data.iloc[11:20, :] = 50
+        self.data.iloc[21, :] = 100
         cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
         cla.allocate(asset_prices=self.data)
         weights = cla.weights.values
