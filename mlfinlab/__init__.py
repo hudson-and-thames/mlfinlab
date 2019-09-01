@@ -9,4 +9,5 @@ import mlfinlab.labeling.labeling as labeling
 import mlfinlab.features.fracdiff as fracdiff
 import mlfinlab.sample_weights as sample_weights
 import mlfinlab.sampling as sampling
+import mlfinlab.bet_sizing as bet_sizing
 import mlfinlab.util as util

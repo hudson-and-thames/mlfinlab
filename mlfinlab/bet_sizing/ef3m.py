@@ -1,5 +1,5 @@
 """
-An implementation of the Exact Fit of the first 3 Moments (#F3M) of finding the parameters that make up the mixture
+An implementation of the Exact Fit of the first 3 Moments (EF3M) of finding the parameters that make up the mixture
 of 2 Gaussian distributions. Based on the work by Lopez de Prado and Foreman (2014) "A mixture of two Gaussians
 approach to mathematical portfolio oversight: The EF3M algorithm." Quantitative Finance, Vol. 14, No. 5, pp. 913-930.
 """
@@ -14,9 +14,20 @@ from scipy.stats import gaussian_kde
 
 class M2N:
     """
-    m2n - A Mixture of 2 Normal distributions
+    M2N - A Mixture of 2 Normal distributions
     This class is used to contain parameters and equations for the EF3M algorithm, when fitting parameters to a mixture
-    of 2 Gaussians.
+    of 2 Gaussian distributions.
+
+    :param moments: (list) The first five (1... 5) raw moments of the mixture distribution.
+    :param epsilon: (float) Fitting tolerance
+    :param factor: (float) Lambda factor from equations
+    :param n_runs: (int) Number of times to execute 'singleLoop'
+    :param variant: (int) The EF3M variant to execute, options are 1: EF3M using first 4 moments, 2: EF3M using
+     first 5 moments
+    :param max_iter: (int) Maximum number of iterations to perform in the 'fit' method
+    :param num_workers: (int) Number of CPU cores to use for multiprocessing execution. Default is -1 which sets
+     num_workers to all cores.
+
     """
     def __init__(self, moments, epsilon=10**-5, factor=5, n_runs=1, variant=1, max_iter=100_000, num_workers=-1):
         """
@@ -191,7 +202,7 @@ class M2N:
         :param mu_2: (float) Initial parameter value for mu_2
         :param p_1: (float) Probability defining the mixture; p_1, 1-p_1
         :return: (list) List of estimated parameter if no invalid values are encountered (e.g. complex values,
-        divide-by-zero), otherwise an empty list is returned.
+         divide-by-zero), otherwise an empty list is returned.
         """
         m_1, m_2, m_3, m_4, m_5 = self.moments  # Expand list of moments to individual variables for clarity.
 
@@ -362,7 +373,8 @@ def raw_moment(central_moments, dist_mean):
 
 def most_likely_parameters(data, ignore_columns='error', res=10_000):
     """
-    Determines the most likely parameter estimate using a KDE
+    Determines the most likely parameter estimate using a KDE from the DataFrame of the results of the fit from the
+    M2N object.
 
     :param data: (pandas.DataFrame) Contains parameter estimates from all runs.
     :param ignore_columns: (string, list) Column or columns to exclude from analysis.
