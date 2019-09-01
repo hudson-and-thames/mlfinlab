@@ -106,6 +106,40 @@ class TestCLA(unittest.TestCase):
         assert cla.efficient_frontier_sigma[-1] <= cla.efficient_frontier_sigma[0] and \
                cla.efficient_frontier_means[-1] <= cla.efficient_frontier_means[0]  # higher risk = higher return
 
+    def test_lambda_for_no_bounded_weights(self):
+        """
+        Test the computation of lambda when there are no bounded weights
+        """
+
+        cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
+        cla.allocate(asset_prices=self.data, solution='min_volatility')
+        data = self.data.cov()
+        data = data.values
+        x, y = cla._compute_lambda(covar_f_inv=data,
+                                   covar_fb=data,
+                                   mean_f=cla.expected_returns,
+                                   w_b=None,
+                                   asset_index=1,
+                                   b_i=[[0], [1]])
+        assert isinstance(x, float)
+        assert isinstance(y, int)
+
+    def test_w_for_no_bounded_weights(self):
+        """
+        Test the computation of weights (w) when there are no bounded weights
+        """
+
+        cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
+        cla.allocate(asset_prices=self.data, solution='min_volatility')
+        data = self.data.cov()
+        data = data.values
+        x, y = cla._compute_w(covar_f_inv=data,
+                               covar_fb=data,
+                               mean_f=cla.expected_returns,
+                               w_b=None)
+        assert isinstance(x, np.ndarray)
+        assert isinstance(y, float)
+
     def test_value_error_for_unknown_solution(self):
         """
         Test ValueError on passing unknown solution string

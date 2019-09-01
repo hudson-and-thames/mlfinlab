@@ -106,7 +106,7 @@ class CLA:
         :param mean_f: (np.array) expected returns of free assets
         :param w_b: (np.array) bounded asset weight values
 
-        :return: (array, array) list of turning point weights and gamma value from the langrange equation
+        :return: (array, float) list of turning point weights and gamma value from the langrange equation
         '''
 
         # Compute gamma
