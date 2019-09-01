@@ -175,6 +175,19 @@ class TestCLA(unittest.TestCase):
         assert isinstance(x, np.ndarray)
         assert isinstance(y, float)
 
+    def test_purge_num_excess(self):
+        # pylint: disable=protected-access,invalid-name
+        """
+        Test purge number excess for very very small tolerance
+        """
+
+        cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
+        cla.allocate(asset_prices=self.data, solution='cla_turning_points')
+        cla.weights = list(cla.weights.values)
+        cla._purge_num_err(tol=-100)
+        assert not cla.weights
+
+
     def test_value_error_for_unknown_solution(self):
         """
         Test ValueError on passing unknown solution string
