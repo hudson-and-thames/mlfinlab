@@ -53,7 +53,7 @@ class CLA:
         :return: (float) -inf or number
         '''
         return float("-inf") if number is None else number
-    
+
     def _init_algo(self):
         '''
         Initial setting up of the algorithm. Calculates the first free weight of the first turning point.
