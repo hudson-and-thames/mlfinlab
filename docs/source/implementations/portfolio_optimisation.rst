@@ -4,34 +4,53 @@
 Portfolio Optimisation
 ========
 
-The primary labeling method used in financial academia is the fixed-time horizon method. While ubiquitous, this method has many faults which are remedied by the triple-barrier method discussed below. The triple-barrier method can be extended to incorporate meta-labeling which will also be demonstrated and discussed below.
+The portfolio optimisation module contains some classic algorithms that are used for asset allocation and optimising strategies. We will discuss these algorithms in detail below.
 
 Hierarchical Risk Parity (HRP)
-=====================
+==============================
 
-The idea behind the triple-barrier method is that we have three barriers: an upper barrier, a lower barrier, and a vertical barrier. The upper barrier represents the threshold an observation's return needs to reach in order to be considered a buying opportunty (a label of 1), the lower barrier represents the threshold an observation's return needs to reach in order to be considered a selling opportunity (a label of -1), and the vertical barrier represents the amount of time an observation has to reach its given return in either direction before it is given a label of 0. This concept can be better understood visually and is shown in the figure below taken from Advances in Financial Machine Learning (`reference`_):
+Hierarchical Risk Parity is a novel portfolio optimisation method developed by
+Marcos Lopez de Prado. The working of the algorithm can be broken down into 3 steps:
 
-.. image:: labeling_images/triple_barrier.png
-   :scale: 100 %
-   :align: center
+1. Based on the expected returns of the assets, they are segregated into clusters via hierarchical
+   tree clustering.
+2. Based on these clusters, the covariance matrix of the returns is diagnalised in a quasi manner such that assets
+   within the same cluster are regrouped together.
+3. Finally, using an iterative approach, weights are assigned to each cluster recursively. At each node, the weight breaks
+   down into the subcluster until all the individual assets are assigned a unique weight.
 
-One of the major faults with the fixed-time horizon method is that observations are given a label with respect to a certain threshold after a fixed interval regardless of their respective volatilities. In other words, the expected returns of every observation are treated equally regardless of the associated risk. The triple-barrier method tackles this issue by dynamically setting the upper and lower barriers for each observation based on their given volatilities.
+Although, it is a simple algorithm, HRP has been found to be a very stable algorithm as compared to its older counterparts.
+This is because, HRP does not involve taking inverse of the covariance matrix matrix which makes it robust to small changes
+in the covariances of the asset returns.
 
-.. _reference: https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086
+.. automodule:: mlfinlab.portfolio_optimization.hrp
+
+    .. autoclass:: HierarchicalRiskParity
+        :members:
+
+        .. automethod:: __init__
 
 The Critical Line Algorithm (CLA)
-=============
+=================================
 
-Advances in Financial Machine Learning, Chapter 3, page 50. Reads:
+This is a robust alternative to the quadratic solver used to find mean-variance optimal portfolios,
+that is especially advantageous when we apply linear inequalities. Unlike generic quadratic optimisers,
+the CLA is specially designed for portfolio optimisation. It is guaranteed to converge after a certain
+number of iterations, and can efficiently derive the entire efficient frontier.
 
-"Suppose that you have a model for setting the side of the bet (long or short). You just need to learn the size of that bet, which includes the possibility of no bet at all (zero size). This is a situation that practitioners face regularly. We often know whether we want to buy or sell a product, and the only remaining question is how much money we should risk in such a bet. We do not want the ML algorithm to learn the side, just to tell us what is the appropriate size. At this point, it probably does not surprise you to hear that no book or paper has so far discussed this common problem. Thankfully, that misery ends here.""
 
-I call this problem meta-labeling because we want to build a secondary ML model that learns how to use a primary exogenous model.
+I am most grateful to Marcos López de Prado and David Bailey for providing the open-source implementation.
 
-The ML algorithm will be trained to decide whether to take the bet or pass, a purely binary prediction. When the predicted label is 1, we can use the probability of this secondary prediction to derive the size of the bet, where the side (sign) of the position has been set by the primary model.
+
+.. automodule:: mlfinlab.portfolio_optimization.cla
+
+    .. autoclass:: CLA
+        :members:
+
+        .. automethod:: __init__
 
 Mean-Variance Optimisation
-~~~~~~~~~~~~~~~~~~~~~~~~
+==========================
 
 Binary classification problems present a trade-off between type-I errors (false positives) and type-II errors (false negatives). In general, increasing the true positive rate of a binary classifier will tend to increase its false positive rate. The receiver operating characteristic (ROC) curve of a binary classifier measures the cost of increasing the true positive rate, in terms of accepting higher false positive rates.
 
@@ -49,7 +68,7 @@ Meta-labeling will increase your F1-score by filtering out the false positives, 
 Meta-labeling is a very powerful tool to have in your arsenal, for four additional reasons. **First**, ML algorithms are often criticized as black boxes. Meta-labeling allows you to build an ML system on top of a white box (like a fundamental model founded on economic theory). This ability to transform a fundamental model into an ML model should make meta-labeling particularly useful to “quantamental” firms. **Second**, the effects of overfitting are limited when you apply metalabeling, because ML will not decide the side of your bet, only the size. **Third**, by decoupling the side prediction from the size prediction, meta-labeling enables sophisticated strategy structures. For instance, consider that the features driving a rally may differ from the features driving a sell-off. In that case, you may want to develop an ML strategy exclusively for long positions, based on the buy recommendations of a primary model, and an ML strategy exclusively for short positions, based on the sell recommendations of an entirely different primary model. **Fourth**, achieving high accuracy on small bets and low accuracy on large bets will ruin you. As important as identifying good opportunities is to size them properly, so it makes sense to develop an ML algorithm solely focused on getting that critical decision (sizing) right. We will retake this fourth point in Chapter 10. In my experience, meta-labeling ML models can deliver more robust and reliable outcomes than standard labeling models.
 
 
-Example
+Examples
 =======
 
 Suppose we use a mean reverting strategy as our primary model, giving each observation a label of 1 or -1.
