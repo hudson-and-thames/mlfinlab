@@ -1,4 +1,4 @@
--[run]
+[run]
 omit=*__init__*
      mlfinlab/tests/*
      mlfinlab/util/multiprocess.py
