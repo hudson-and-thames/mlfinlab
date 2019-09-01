@@ -137,6 +137,19 @@ class TestCLA(unittest.TestCase):
         assert not x
         assert not y
 
+    def test_expected_returns_equals_means(self):
+        # pylint: disable=protected-access,invalid-name
+        """
+        Test for condition when expected returns equal the mean value
+        """
+
+        cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
+        cla.allocate(asset_prices=self.data, solution='min_volatility')
+        data = self.data.copy()
+        data.iloc[:, :] = 0.02320653
+        cla._initialise(asset_prices=data, resample_by='B')
+        assert cla.expected_returns[-1, 0] == 1e-5
+
     def test_lambda_for_zero_matrices(self):
         # pylint: disable=protected-access,invalid-name
         """
