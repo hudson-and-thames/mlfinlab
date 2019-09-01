@@ -404,7 +404,7 @@ class CLA:
             raise ValueError("Asset prices dataframe must be indexed by date.")
 
         # Resample the asset prices
-        asset_prices = asset_prices.resample(resample_by).mean()
+        asset_prices = asset_prices.resample(resample_by).last()
 
         # Calculate the expected returns
         if self.calculate_returns == "mean":

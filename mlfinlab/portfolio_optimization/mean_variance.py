@@ -55,7 +55,7 @@ class MeanVarianceOptimisation:
         :return: (pd.Dataframe) stock returns
         '''
 
-        asset_prices = asset_prices.resample(resample_by).mean()
+        asset_prices = asset_prices.resample(resample_by).last()
         asset_returns = asset_prices.pct_change()
         asset_returns = asset_returns.dropna(how='all')
         return asset_returns
