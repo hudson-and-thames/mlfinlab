@@ -125,3 +125,16 @@ Snippets for Dynamic Bet Sizing
 .. autofunction:: inv_price
 .. autofunction:: limit_price
 .. autofunction:: get_w
+
+
+Research Notebooks
+==================
+
+The following research notebooks can be used to better understand bet sizing.
+
+Exercises From Chapter 10
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `Chapter 10 Exercise Notebook`_
+
+.. _Chapter 10 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Chapter10/Chapter10_Exercises.ipynb
