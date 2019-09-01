@@ -107,6 +107,7 @@ class TestCLA(unittest.TestCase):
                cla.efficient_frontier_means[-1] <= cla.efficient_frontier_means[0]  # higher risk = higher return
 
     def test_lambda_for_no_bounded_weights(self):
+        # pylint: disable=protected-access,invalid-name
         """
         Test the computation of lambda when there are no bounded weights
         """
@@ -124,7 +125,41 @@ class TestCLA(unittest.TestCase):
         assert isinstance(x, float)
         assert isinstance(y, int)
 
+    def test_free_bound_weights(self):
+        # pylint: disable=protected-access,invalid-name
+        """
+        Test the method of freeing bounded weights when free-weights is None
+        """
+
+        cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
+        cla.allocate(asset_prices=self.data, solution='min_volatility')
+        x, y = cla._free_bound_weight(free_weights=[1]*(cla.expected_returns.shape[0]+1))
+        assert not x
+        assert not y
+
+    def test_lambda_for_zero_matrices(self):
+        # pylint: disable=protected-access,invalid-name
+        """
+        Test the computation of lambda when there are no bounded weights. The method
+        should return None, None
+        """
+
+        cla = CLA(weight_bounds=(0, 1), calculate_returns="mean")
+        cla.allocate(asset_prices=self.data, solution='min_volatility')
+        data = self.data.cov()
+        data = data.values
+        data[:, :] = 0
+        x, y = cla._compute_lambda(covar_f_inv=data,
+                                   covar_fb=data,
+                                   mean_f=cla.expected_returns,
+                                   w_b=None,
+                                   asset_index=1,
+                                   b_i=[[0], [1]])
+        assert not x
+        assert not y
+
     def test_w_for_no_bounded_weights(self):
+        # pylint: disable=protected-access,invalid-name
         """
         Test the computation of weights (w) when there are no bounded weights
         """
@@ -134,9 +169,9 @@ class TestCLA(unittest.TestCase):
         data = self.data.cov()
         data = data.values
         x, y = cla._compute_w(covar_f_inv=data,
-                               covar_fb=data,
-                               mean_f=cla.expected_returns,
-                               w_b=None)
+                              covar_fb=data,
+                              mean_f=cla.expected_returns,
+                              w_b=None)
         assert isinstance(x, np.ndarray)
         assert isinstance(y, float)
 
@@ -310,3 +345,4 @@ class TestMVO(unittest.TestCase):
             mvo = MeanVarianceOptimisation()
             data = self.data.reset_index()
             mvo.allocate(asset_prices=data, solution='inverse_variance')
+unittest.main()
