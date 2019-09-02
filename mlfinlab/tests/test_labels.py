@@ -243,6 +243,20 @@ class TestChapter3(unittest.TestCase):
         self.assertTrue(label_count == 0)
 
         # --------------------------------------------------------------------------------------------------------
+        # TP too large and tight stop loss: expected all values less than 1
+        triple_barrier_events_ptsl = get_events(close=self.data['close'],
+                                                t_events=cusum_events,
+                                                pt_sl=[10000, 0.00000001],
+                                                target=target,
+                                                min_ret=0.005,
+                                                num_threads=3,
+                                                vertical_barrier_times=vertical_barriers,
+                                                side_prediction=None)
+
+        labels_no_ones = get_bins(triple_barrier_events_ptsl, self.data['close'])['bin']
+        self.assertTrue(labels_no_ones.sum() <= 0)
+
+        # --------------------------------------------------------------------------------------------------------
         # Test that the bins are in-fact different. (Previously they would be the same)
         self.assertTrue(np.all(labels_small[0:5] != labels_large[0:5]))
 
