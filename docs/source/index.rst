@@ -121,6 +121,7 @@ Implementations
    implementations/cross_validation
    implementations/sb_bagging
    implementations/bet_sizing
+   implementations/portfolio_optimisation
 
 
 * :doc:`implementations/data_structures`
@@ -131,6 +132,7 @@ Implementations
 * :doc:`implementations/cross_validation`
 * :doc:`implementations/sb_bagging`
 * :doc:`implementations/bet_sizing`
+* :doc:`implementations/portfolio_optimisation`
 
 Additional Information
 ======================
