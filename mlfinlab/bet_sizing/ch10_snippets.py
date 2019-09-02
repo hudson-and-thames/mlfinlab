@@ -78,14 +78,10 @@ def mp_avg_active_signals(signals, molecule):
     A function to be passed to the 'mp_pandas_obj' function to allow the bet sizes to be averaged using multiprocessing.
 
     At time loc, average signal among those still active.
-    Signal is active if:
-        a) it is issued before or at loc, and
-        b) loc is before the signal's end time, or end time is still
-            unknown (NaT).
+    Signal is active if (a) it is issued before or at loc, and (b) loc is before the signal's end time,
+    or end time is still unknown (NaT).
 
-    :param signals: (pandas.DataFrame) Contains at least the following columns:
-        'signal' - the bet size
-        't1' - the closing time of the bet
+    :param signals: (pandas.DataFrame) Contains at least the following columns: 'signal' (the bet size) and 't1' (the closing time of the bet).
     :param molecule: (list) Indivisible tasks to be passed to 'mp_pandas_obj', in this case a list of datetimes.
     :return: (pandas.Series) The averaged bet size sub-series.
     """
