@@ -14,10 +14,10 @@ Marcos Lopez de Prado. The working of the algorithm can be broken down into 3 st
 
 1. Based on the expected returns of the assets, they are segregated into clusters via hierarchical
    tree clustering.
-2. Based on these clusters, the covariance matrix of the returns is diagnalised in a quasi manner such that assets
+2. Based on these clusters, the covariance matrix of the returns is diagonalised in a quasi manner such that assets
    within the same cluster are regrouped together.
 3. Finally, using an iterative approach, weights are assigned to each cluster recursively. At each node, the weight breaks
-   down into the subcluster until all the individual assets are assigned a unique weight.
+   down into the sub-cluster until all the individual assets are assigned a unique weight.
 
 Although, it is a simple algorithm, HRP has been found to be a very stable algorithm as compared to its older counterparts.
 This is because, HRP does not involve taking inverse of the covariance matrix matrix which makes it robust to small changes
@@ -42,22 +42,9 @@ looks something like this:
 
         :math:`\underset{w}{\text{minimise}} ~ \left\{w^T \Sigma w \right\}`
 
-where,
-    1. :math:`\sum_{i}w_{i} = 1`
-    2. :math:`0 <= w <= 1`
-    3. :math:`\sum` is the covariance matrix and w is the vector of portfolio weights
+where, :math:`\sum_{i}w_{i} = 1` and :math:`0 <= w <= 1`. CLA also solves the same problem but with some added constraints - each weight of an asset in the portfolio can have different lower and upper bounds. The optimisation objective still remains the same but the second constraint changes to - :math:`l_{i} <= w_{i} <= u_{i}`. Each weight in the allocation has an upper and a lower bound, which increases the number of constraints to be solved.
 
-CLA also solves the same problem but with some added constraints - each weight of an asset in the portfolio can have different
-lower and upper bounds. The optimisation objective still remains the same but it looks something like this:
-
-        :math:`\underset{w}{\text{minimise}} ~ \left\{w^T \Sigma w \right\}`
-
-where,
-    1. :math:`\sum_{i}w = 1`
-    2. :math:`l_{i} <= w_{i} <= u_{i}`
-    3. :math:`\sum` is the covariance matrix and w is the vector of portfolio weights
-
-The second condition now has a lower and upper bound for each weight in the portfolio. The current CLA implementation in the package supports the following solutions:
+The current CLA implementation in the package supports the following solutions:
 
 1. CLA Turning Points
 2. Maximum Sharpe Portfolio
