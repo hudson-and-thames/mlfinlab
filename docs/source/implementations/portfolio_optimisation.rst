@@ -148,14 +148,6 @@ For HRP and IVP, you can access the computed weights as shown above. They are in
     means, sigma = cla.efficient_frontier_means, cla.efficient_frontier_sigma
 
 
-Research Notebooks
-==================
-
-The following research notebooks can be used to better understand the triple-barrier method and meta-labeling
-
-Triple-Barrier Method
-~~~~~~~~~~~~~~~~~~~~~
-
 
 
 
