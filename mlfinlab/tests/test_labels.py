@@ -254,7 +254,7 @@ class TestChapter3(unittest.TestCase):
                                                 side_prediction=None)
 
         labels_no_ones = get_bins(triple_barrier_events_ptsl, self.data['close'])['bin']
-        self.assertTrue(labels_no_ones.sum() <= 0)
+        self.assertTrue(np.all(labels_no_ones < 1))
 
         # --------------------------------------------------------------------------------------------------------
         # Test that the bins are in-fact different. (Previously they would be the same)
