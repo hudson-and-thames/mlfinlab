@@ -67,15 +67,15 @@ An example showing how to use various feature importance functions::
 Resulting images for MDI, MDA, SFI feature importances respectively:
 
 .. image:: feature_imp_images/mdi_feat_imp.png
-   :scale: 50 %
+   :scale: 40 %
    :align: center
 
 .. image:: feature_imp_images/mda_feat_imp.png
-  :scale: 50 %
+  :scale: 40 %
   :align: center
 
 .. image:: feature_imp_images/sfi_feat_imp.png
-   :scale: 50 %
+   :scale: 40 %
    :align: center
 
 
