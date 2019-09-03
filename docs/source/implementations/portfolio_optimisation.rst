@@ -134,7 +134,14 @@ For HRP and IVP, you can access the computed weights as shown above. They are in
     cla_weights = cla.weights
     means, sigma = cla.efficient_frontier_means, cla.efficient_frontier_sigma
 
+Research Notebooks
+==================
 
+The following research notebooks can be used to better understand how the algorithms within this module can be used on real stock data.
+
+* `Chapter 16 Exercise Notebook`_
+
+.. _Chapter 16 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Chapter16/Chapter16.ipynb
 
 
 
