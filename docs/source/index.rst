@@ -10,28 +10,28 @@ Machine Learning Financial Laboratory (mlfinlab)
 ================================================
 
 
-	|Build Status| |codecov| |pylint Score| |License: BSD3|																			
+	|Build Status| |codecov| |pylint Score| |License: BSD3|
 
-	.. |Build Status| image:: https://travis-ci.com/hudson-and-thames/mlfinlab.svg?branch=master			
+	.. |Build Status| image:: https://travis-ci.com/hudson-and-thames/mlfinlab.svg?branch=master
 		:target: https://travis-ci.com/hudson-and-thames/mlfinlab
 
-	.. |codecov| image:: https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg		
+	.. |codecov| image:: https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg
 		:target: https://codecov.io/gh/hudson-and-thames/mlfinlab
 
-	.. |pylint Score| image:: https://mperlet.github.io/pybadge/badges/10.svg			
+	.. |pylint Score| image:: https://mperlet.github.io/pybadge/badges/10.svg
 
-	.. |License: BSD3| image:: https://img.shields.io/github/license/hudson-and-thames/mlfinlab.svg			
+	.. |License: BSD3| image:: https://img.shields.io/github/license/hudson-and-thames/mlfinlab.svg
 		:target: https://opensource.org/licenses/BSD-3-Clause
 
-	|PyPi| |Downloads| |Python|																			
+	|PyPi| |Downloads| |Python|
 
-	.. |PyPi| image:: https://img.shields.io/pypi/v/mlfinlab.svg				
+	.. |PyPi| image:: https://img.shields.io/pypi/v/mlfinlab.svg
 		:target: https://pypi.org/project/mlfinlab/
 
-	.. |Downloads| image:: https://img.shields.io/pypi/dm/mlfinlab.svg			
+	.. |Downloads| image:: https://img.shields.io/pypi/dm/mlfinlab.svg
 		:target: https://pypi.org/project/mlfinlab/
 
-	.. |Python| image:: https://img.shields.io/pypi/pyversions/mlfinlab.svg		
+	.. |Python| image:: https://img.shields.io/pypi/pyversions/mlfinlab.svg
 		:target: https://pypi.org/project/mlfinlab/
 
 mlfinlab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
@@ -43,7 +43,7 @@ Advances in Financial Machine Learning. This implementation started out as a spr
 Notes
 =====
 
-mlfinlab is a living, breathing project, and new functionalities are consistently being added. 
+mlfinlab is a living, breathing project, and new functionalities are consistently being added.
 
 The implementations that will be added in the future as well as the implementations that are currently supported can be seen below:
 
@@ -120,6 +120,7 @@ Implementations
    implementations/frac_diff
    implementations/cross_validation
    implementations/sb_bagging
+   implementations/feature_importance
    implementations/bet_sizing
    implementations/portfolio_optimisation
 
@@ -131,6 +132,7 @@ Implementations
 * :doc:`implementations/frac_diff`
 * :doc:`implementations/cross_validation`
 * :doc:`implementations/sb_bagging`
+* :doc:`implementations/feature_importance`
 * :doc:`implementations/bet_sizing`
 * :doc:`implementations/portfolio_optimisation`
 
