@@ -193,6 +193,7 @@ setup(
     # maintainers, and where to support the project financially. The key is
     # what's used to render the link text on PyPI.
     project_urls={  # Optional
+        'Documentation': 'https://mlfinlab.readthedocs.io/en/latest/',
         'Bug Reports': 'https://github.com/hudson-and-thames/mlfinlab/issues',
         'Project Boards': 'https://github.com/orgs/hudson-and-thames/projects',
         'Source': 'https://github.com/hudson-and-thames/mlfinlab',
