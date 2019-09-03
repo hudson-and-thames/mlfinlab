@@ -18,6 +18,7 @@ The idea behind the triple-barrier method is that we have three barriers: an upp
 One of the major faults with the fixed-time horizon method is that observations are given a label with respect to a certain threshold after a fixed interval regardless of their respective volatilities. In other words, the expected returns of every observation are treated equally regardless of the associated risk. The triple-barrier method tackles this issue by dynamically setting the upper and lower barriers for each observation based on their given volatilities.
 
 .. _reference: https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086
+
 Meta-Labeling
 =============
 

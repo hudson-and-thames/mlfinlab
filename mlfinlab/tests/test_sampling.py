@@ -86,7 +86,7 @@ class TestSampling(unittest.TestCase):
         """
 
         non_nan_meta_labels = self.meta_labeled_events.dropna()
-        ind_mat = get_ind_matrix(non_nan_meta_labels, self.data)
+        ind_mat = get_ind_matrix(non_nan_meta_labels.t1, self.data)
 
         label_endtime = non_nan_meta_labels.t1
         trimmed_price_bars_index = self.data[(self.data.index >= non_nan_meta_labels.index.min()) &
@@ -201,4 +201,4 @@ class TestSampling(unittest.TestCase):
         """
 
         with self.assertRaises(ValueError):
-            get_ind_matrix(self.meta_labeled_events, self.data)
+            get_ind_matrix(self.meta_labeled_events.t1, self.data)
