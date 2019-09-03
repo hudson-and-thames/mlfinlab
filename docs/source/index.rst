@@ -122,6 +122,7 @@ Implementations
    implementations/sb_bagging
    implementations/feature_importance
    implementations/bet_sizing
+   implementations/portfolio_optimisation
 
 
 * :doc:`implementations/data_structures`
@@ -133,6 +134,7 @@ Implementations
 * :doc:`implementations/sb_bagging`
 * :doc:`implementations/feature_importance`
 * :doc:`implementations/bet_sizing`
+* :doc:`implementations/portfolio_optimisation`
 
 Additional Information
 ======================

@@ -1,4 +1,5 @@
 .idea/*
+*.pyc
 __pycache__
 test_reports
 .coverage
@@ -6,4 +7,3 @@ test_reports
 docs/build/
 .local/
 cover/
-.coverage.*
