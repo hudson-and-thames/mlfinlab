@@ -1,5 +1,6 @@
 '''
-This module implements the HRP algorithm mentioned in the following paper: `López de Prado, Marcos, Building Diversified Portfolios that Outperform Out-of-Sample (May 23, 2016).
+This module implements the HRP algorithm mentioned in the following paper:
+`López de Prado, Marcos, Building Diversified Portfolios that Outperform Out-of-Sample (May 23, 2016).
 Journal of Portfolio Management, 2016 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_;
 The code is reproduced with modification from his book: Advances in Financial Machine Learning, Chp-16
 '''
@@ -10,6 +11,7 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 from sklearn.covariance import OAS
 import matplotlib
+
 matplotlib.use('Agg')
 
 
