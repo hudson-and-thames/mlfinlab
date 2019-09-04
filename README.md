@@ -45,12 +45,12 @@ You should be able to work on a few implementations of the code with this set.
 * Working on Chapter 19: Microstructural Features (Maksim)
 
 **Part 3: Backtesting**
-* Working on Chapter 16: Asset Allocation
-* Working on Chapter 10: Bet Sizing
+* Done Chapter 16: Asset Allocation
+* Done Chapter 10: Bet Sizing
 
 **Part 2: Modelling**
-* Working on Chapter 8: Feature Importance
-* Done on Chapter 7: Cross-Validation
+* Done Chapter 8: Feature Importance
+* Done Chapter 7: Cross-Validation
 * Done Chapter 6: Ensemble Methods (Sequential Bootstrap Ensemble)
 
 **Part 1: Data Analysis**
