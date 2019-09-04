@@ -55,15 +55,15 @@ The implementations that will be added in the future as well as the implementati
     \vspace{5mm}
 
 * **Part 3: Backtesting**
-* Working on Chapter 16: ML Asset Allocation
-* Working on Chapter 10: Bet Sizing
+* Done Chapter 16: ML Asset Allocation
+* Done Chapter 10: Bet Sizing
 
 .. raw:: latex
 
     \vspace{5mm}
 
 * **Part 2: Modelling**
-* Working on Chapter 8: Feature Importance
+* Done Chapter 8: Feature Importance
 * Done Chapter 7: Cross-Validation
 * Done Chapter 6: Ensemble Methods
 * Done Sequential Bootstrap Ensemble
