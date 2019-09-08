@@ -47,10 +47,10 @@ def apply_pt_sl_on_t1(close, events, pt_sl, molecule):  # pragma: no cover
 
     # Get events
     for loc, vertical_barrier in events_['t1'].fillna(close.index[-1]).iteritems():
-        df0 = close[loc: vertical_barrier]  # path prices
-        df0 = (df0 / close[loc] - 1) * events_.at[loc, 'side']  # path returns
-        out.loc[loc, 'sl'] = df0[df0 < stop_loss[loc]].index.min()  # earliest stop loss
-        out.loc[loc, 'pt'] = df0[df0 > profit_taking[loc]].index.min()  # earliest profit taking
+        closing_prices = close[loc: vertical_barrier]  # Path prices for a given trade
+        cum_returns = (closing_prices / close[loc] - 1) * events_.at[loc, 'side']  # Path returns
+        out.loc[loc, 'sl'] = cum_returns[cum_returns < stop_loss[loc]].index.min()  # Earliest stop loss date
+        out.loc[loc, 'pt'] = cum_returns[cum_returns > profit_taking[loc]].index.min()  # Earliest profit taking date
 
     return out
 
@@ -116,6 +116,8 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
             -events['t1'] is event's endtime
             -events['trgt'] is event's target
             -events['side'] (optional) implies the algo's position side
+            -events['pt'] Profit taking multiple
+            -events['sl'] Stop loss multiple
     """
 
     # 1) Get target
@@ -128,10 +130,10 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
 
     # 3) Form events object, apply stop loss on vertical barrier
     if side_prediction is None:
-        side_ = pd.Series(1., index=target.index)
+        side_ = pd.Series(1.0, index=target.index)
         pt_sl_ = [pt_sl[0], pt_sl[0]]
     else:
-        side_ = side_prediction.loc[target.index]
+        side_ = side_prediction.loc[target.index]  # Subset side_prediction on target index.
         pt_sl_ = pt_sl[:2]
 
     # Create a new df with [v_barrier, target, side] and drop rows that are NA in target
@@ -139,23 +141,27 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
     events = events.dropna(subset=['trgt'])
 
     # Apply Triple Barrier
-    df0 = mp_pandas_obj(func=apply_pt_sl_on_t1,
-                        pd_obj=('molecule', events.index),
-                        num_threads=num_threads,
-                        close=close,
-                        events=events,
-                        pt_sl=pt_sl_)
+    first_touch_dates = mp_pandas_obj(func=apply_pt_sl_on_t1,
+                                      pd_obj=('molecule', events.index),
+                                      num_threads=num_threads,
+                                      close=close,
+                                      events=events,
+                                      pt_sl=pt_sl_)
 
-    events['t1'] = df0.dropna(how='all').min(axis=1)  # pd.min ignores nan
+    events['t1'] = first_touch_dates.dropna(how='all').min(axis=1)  # pd.min ignores nan
 
     if side_prediction is None:
         events = events.drop('side', axis=1)
+
+    # Add profit taking and stop loss multiples for vertical barrier calculations
+    events['pt'] = pt_sl[0]
+    events['sl'] = pt_sl[1]
 
     return events
 
 
 # Snippet 3.9, pg 55, Question 3.3
-def barrier_touched(out_df):
+def barrier_touched(out_df, events):
     """
     Snippet 3.9, pg 55, Question 3.3
     Adjust the getBins function (Snippet 3.7) to return a 0 whenever the vertical barrier is the one touched first.
@@ -165,26 +171,29 @@ def barrier_touched(out_df):
     Vertical barrier: 0
 
     :param out_df: (DataFrame) containing the returns and target
+    :param events: (DataFrame) The original events data frame. Contains the pt sl multiples needed here.
     :return: (DataFrame) containing returns, target, and labels
     """
     store = []
-    for i in np.arange(len(out_df)):
-        date_time = out_df.index[i]
-        ret = out_df.loc[date_time, 'ret']
-        target = out_df.loc[date_time, 'trgt']
+    for date_time, values in out_df.iterrows():
+        ret = values['ret']
+        target = values['trgt']
 
-        if ret > 0.0 and ret > target:
+        pt_level_reached = ret > target * events.loc[date_time, 'pt']
+        sl_level_reached = ret < -target * events.loc[date_time, 'sl']
+
+        if ret > 0.0 and pt_level_reached:
             # Top barrier reached
             store.append(1)
-        elif ret < 0.0 and ret < -target:
+        elif ret < 0.0 and sl_level_reached:
             # Bottom barrier reached
             store.append(-1)
         else:
             # Vertical barrier reached
             store.append(0)
 
+    # Save to 'bin' column and return
     out_df['bin'] = store
-
     return out_df
 
 
@@ -214,9 +223,8 @@ def get_bins(triple_barrier_events, close):
 
     # 1) Align prices with their respective events
     events_ = triple_barrier_events.dropna(subset=['t1'])
-    prices = events_.index.union(events_['t1'].values)
-    prices = prices.drop_duplicates()
-    prices = close.reindex(prices, method='bfill')
+    all_dates = events_.index.union(other=events_['t1'].values).drop_duplicates()
+    prices = close.reindex(all_dates, method='bfill')
 
     # 2) Create out DataFrame
     out_df = pd.DataFrame(index=events_.index)
@@ -229,7 +237,7 @@ def get_bins(triple_barrier_events, close):
         out_df['ret'] = out_df['ret'] * events_['side']  # meta-labeling
 
     # Added code: label 0 when vertical barrier reached
-    out_df = barrier_touched(out_df)
+    out_df = barrier_touched(out_df, triple_barrier_events)
 
     # Meta labeling: label incorrect events with a 0
     if 'side' in events_:

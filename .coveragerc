@@ -1,6 +1,6 @@
 [run]
 omit=*__init__*
-     tests/*
+     mlfinlab/tests/*
      mlfinlab/util/multiprocess.py
      scripts/*
      /opt/conda/*
@@ -24,4 +24,3 @@ exclude_lines =
 directory=cover
 
 [xml]
-

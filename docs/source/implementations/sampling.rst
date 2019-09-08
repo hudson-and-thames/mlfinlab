@@ -72,7 +72,7 @@ The core functions behind Sequential Bootstrapping are implemented in mlfinlab a
     Get indicator matrix. The book implementation uses bar_index as input, however there is no explanation how to form it.
     We decided that using triple_barrier_events and price bars by analogy with concurrency is the best option.
 
-    :param triple_barrier_events: (pd.DataFrame): triple barrier events from labeling.get_events
+    :param samples_info_sets: (pd.Series): triple barrier events.t1 from labeling.get_events
     :param price_bars: (pd.DataFrame): price bars which were used to form triple barrier events
     :return: (np.array) indicator binary matrix indicating what (price) bars influence the label for each observation
 
