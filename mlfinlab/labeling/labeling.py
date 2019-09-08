@@ -236,7 +236,7 @@ def get_bins(triple_barrier_events, close):
         out_df.loc[out_df['ret'] <= 0, 'bin'] = 0
 
     # Transform the log returns back to normal returns.
-    out_df['ret'] = np.exp(out_df['ret']) - 1
+    out_df['ret'] = np.exp(out_df['ret'].astype('float64')) - 1
 
     # Add the side to the output. This is useful for when a meta label model must be fit
     tb_cols = triple_barrier_events.columns
