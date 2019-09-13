@@ -140,6 +140,29 @@ class TestBetSizeBudget(unittest.TestCase):
         # Evaluate.
         self.assertTrue(events_result.equals(bet_size_budget(events_test['t1'], events_test['side'])))
 
+    def test_bet_size_budget_div_zero(self):
+        """
+        Tests for successful handling of events DataFrames that result in a maximum number of
+        concurrent bet sides of zero.
+        """
+        # Setup the test DataFrame.
+        dates_test = np.array([dt.datetime(2000, 1, 1) + i * dt.timedelta(days=1) for i in range(5)])
+        shift_dt = np.array([dt.timedelta(days=0.5*i+1) for i in range(5)])
+        dates_shifted_test = dates_test + shift_dt
+        events_test = pd.DataFrame(data=[[0.55, 1], [0.7, 1], [0.95, 1], [0.65, 1], [0.85, 1]],
+                                   columns=['prob', 'side'],
+                                   index=dates_test)
+        events_test['t1'] = dates_shifted_test
+        # Calculate correct results.
+        events_result = get_concurrent_sides(events_test['t1'], events_test['side'])
+        max_active_long, max_active_short = events_result['active_long'].max(), events_result['active_short'].max()
+        avg_long = events_result['active_long'] / max_active_long if max_active_long > 0 else 0
+        avg_short = events_result['active_short'] / max_active_short if max_active_short > 0 else 0
+        events_result['bet_size'] = avg_long - avg_short
+        # Evaluate.
+        self.assertTrue(events_result.equals(bet_size_budget(events_test['t1'], events_test['side'])))
+
+
 class TestBetSizeReserve(unittest.TestCase):
     """
     Tests the 'bet_size_reserve' function.
