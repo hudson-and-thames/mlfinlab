@@ -1,9 +1,32 @@
-.idea/*
+# Compiled files
+__pycache__/
 *.pyc
-__pycache__
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Test / coverage report
 test_reports
 .coverage
-.DS_Store
-docs/build/
-.local/
 cover/
+
+# OSX files
+*.DS_Store
+
+# Project configuration
+.idea/*
+.vscode
+
+# Project extensions
+!.gitignore
+*.bak
+
+# Docs
+docs/build/
+
+# Project specific
+.local/
