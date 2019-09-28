@@ -10,6 +10,7 @@ import pandas as pd
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score, accuracy_score
 
 from mlfinlab.util.utils import get_daily_vol
 from mlfinlab.filters.filters import cusum_filter
@@ -179,13 +180,13 @@ class TestFeatureImportance(unittest.TestCase):
                                                                           sample_weight=np.ones(
                                                                               (self.X_train.shape[0],)))
         mda_feat_imp_f1 = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
-                                                                    cv_gen, scoring='f1')
+                                                                    cv_gen, scoring=f1_score)
         # SFI feature importance
         sfi_feat_imp_log_loss = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
                                                        cv_gen=cv_gen, sample_weight=np.ones((self.X_train.shape[0],)))
         sfi_feat_imp_f1 = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
                                                  cv_gen=cv_gen,
-                                                 scoring='f1')  # Take only 5 features for faster test run
+                                                 scoring=f1_score)  # Take only 5 features for faster test run
 
         # MDI assertions
         self.assertTrue(mdi_feat_imp['mean'].sum() == 1)
@@ -220,7 +221,7 @@ class TestFeatureImportance(unittest.TestCase):
 
         sb_clf, cv_gen = self._prepare_clf_data_set(oob_score=True)
         oos_score = ml_cross_val_score(sb_clf, self.X_train, self.y_train_clf, cv_gen=cv_gen, sample_weight=None,
-                                       scoring='accuracy').mean()
+                                       scoring=accuracy_score).mean()
 
         sb_clf.fit(self.X_train, self.y_train_clf)
 
@@ -248,17 +249,3 @@ class TestFeatureImportance(unittest.TestCase):
 
         cv_gen = PurgedKFold(n_splits=4, samples_info_sets=self.samples_info_sets)
         return sb_clf, cv_gen
-
-    def test_raise_value_error(self):
-        """
-        Test ValueError raise in MDA, SFI
-        """
-        sb_clf, cv_gen = self._prepare_clf_data_set(oob_score=False)
-
-        with self.assertRaises(ValueError):
-            feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
-                                                      cv_gen, sample_weight=np.ones((self.X_train.shape[0],)),
-                                                      scoring='roc')
-        with self.assertRaises(ValueError):
-            feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
-                                   cv_gen=cv_gen, sample_weight=np.ones((self.X_train.shape[0],)), scoring='roc')
