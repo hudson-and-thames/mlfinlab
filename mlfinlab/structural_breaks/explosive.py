@@ -1,49 +1,61 @@
-def get_bsadf(logP, minSL, constant, lags):
-    y, x = getYX(logP, constant=constant, lags=lags)
-    startPoints, bsadf, allADF = range(0, y.shape[0]+lags-minSL+1), None, []
-    for start in startPoints:
+def get_bsadf(log_prices, min_length, constant, lags):
+    """
+    Snippet 17.2, page 258. SADF's Inner Loop
+    """
+    y, x = _get_y_x(log_prices, constant=constant, lags=lags)
+    start_points, bsadf, all_adf = range(0, y.shape[0]+lags-min_length+1), None, []
+    for start in start_points:
         y_, x_ = y[start:], x[start:]
-        bMean_, bStd_ = getBetas(y_, x_)
-        bMean_, bStd_ = bMean_[0, 0], bStd_[0, 0]**0.5
-        allADF.append(bMean_/bStd_)
-        if allADF[-1] > bsadf:
-            bsadf = allADF[-1]
-    out = {'Time': logP.index[-1], 'gsadf': bsadf}
+        b_mean_, b_std_ = _get_betas(y_, x_)
+        b_mean_, b_std_ = b_mean_[0, 0], b_std_[0, 0]**0.5
+        all_adf.append(b_mean_/b_std_)
+        if all_adf[-1] > bsadf:
+            bsadf = all_adf[-1]
+    out = {'Time': log_prices.index[-1], 'gsadf': bsadf}
     return out
 
-def getYX(series, constant, lags):
-    series_ = series.diff().dropna()
-    x = lagDF(series_, lags).dropna()
+def _get_y_x(series, constant, lags):
+    """
+    Snippet 17.2, page 258-259. Preparing The Datasets
+    """
+    series_diff = series.diff().dropna()
+    x = _lag_df(series_diff, lags).dropna()
     x.iloc[:, 0] = series.values[-x.shape[0] - 1:-1, 0] # lagged level
-    y = series_.iloc[-x.shape[0]:].values
+    y = series_diff.iloc[-x.shape[0]:].values
 
-    if constant != 'nc':
+    if constant != 'const':
         x = np.append(x, np.ones((x.shape[0], 1)), axis=1)
-        if constant[:2] == 'ct':
+        if constant[:2] == 'linear':
             trend = np.arange(x.shape[0]).reshape(-1, 1)
             x = np.append(x, trend, axis=1)
-        if constant == 'ctt':
+        if constant == 'quadratic':
             x = np.append(x, trend**2, axis=1)
     return y, x
 
-def lagDF(df0, lags):
-    df1 = pd.DataFrame()
+def _lag_df(df, lags):
+    """
+    Snipet 17.3, page 259. Apply Lags to DataFrame
+    """
+    df_lagged = pd.DataFrame()
     if isinstance(lags, int):
         lags = range(lags+1)
     else:
         lags = [int(lag) for lag in lags]
 
     for lag in lags:
-        df_ = df0.shift(lag).copy(deep=True)
-        df_.columns = [str(i) + '_' + str(lag) for i in df_.columns]
-        df1 = df1.join(df_, how = 'outer')
-    return df1
+        temp_df = df.shift(lag).copy(deep=True)
+        temp_df.columns = [str(i) + '_' + str(lag) for i in temp_df.columns]
+        df_lagged = df_lagged.join(temp_df, how = 'outer')
+    return df_lagged
 
-def getBetas(y, x):
+def _get_betas(y, x):
+    """
+    Snippet 17.4, page 259. Fitting The ADF Specidication
+    """
     xy = np.dot(x.T, y)
     xx = np.dot(x.T, x)
-    xinv = np.linalg.inv(xx)
-    bMean = np.dot(xxinv, xy)
-    err = y - np.dot(x, bMean)
-    bVar = np.dot(err.T, err) / (x.shape[0] - x.shape[1])*xxinv
-    return bMean, bVar
+    xx_inv = np.linalg.inv(xx)
+    b_mean = np.dot(xx_inv, xy)
+    err = y - np.dot(x, b_mean)
+    b_var = np.dot(err.T, err) / (x.shape[0] - x.shape[1])*xx_inv
+    return b_mean, b_var
