@@ -1,9 +1,20 @@
-def get_bsadf(log_prices, min_length, constant, lags):
+"""
+Explosivness tests: SADF
+"""
+
+import numpy as np
+from mlfinlab.util.multiprocess import mp_pandas_obj
+
+
+import numpy as np
+
+def _get_bsadf_at_t(log_prices, min_length, constant, lags):
     """
-    Snippet 17.2, page 258. SADF's Inner Loop
+    Snippet 17.2, page 258. SADF's Inner Loop (get sadf value at t)
     """
-    y, x = _get_y_x(log_prices, constant=constant, lags=lags)
-    start_points, bsadf, all_adf = range(0, y.shape[0]+lags-min_length+1), None, []
+    log_prices_df = pd.DataFrame(log_prices)
+    y, x = _get_y_x(log_prices_df, constant=constant, lags=lags)
+    start_points, bsadf, all_adf = range(0, y.shape[0]+lags-min_length+1), -np.inf, []
     for start in start_points:
         y_, x_ = y[start:], x[start:]
         b_mean_, b_std_ = _get_betas(y_, x_)
@@ -11,7 +22,7 @@ def get_bsadf(log_prices, min_length, constant, lags):
         all_adf.append(b_mean_/b_std_)
         if all_adf[-1] > bsadf:
             bsadf = all_adf[-1]
-    out = {'Time': log_prices.index[-1], 'gsadf': bsadf}
+    out = log_prices.index[-1], bsadf
     return out
 
 def _get_y_x(series, constant, lags):
@@ -59,3 +70,31 @@ def _get_betas(y, x):
     err = y - np.dot(x, b_mean)
     b_var = np.dot(err.T, err) / (x.shape[0] - x.shape[1])*xx_inv
     return b_mean, b_var
+
+def _sadf_outer_loop(df, min_length, constant, lags, molecule):
+    """
+    This function gets SADF for t times from molecule
+    """
+    sadf_series = pd.Series(index=df.index)
+    for index in molecule:
+        index, value = get_sadf_at_t(df.loc[:index], min_length, constant, lags)
+        sadf_series[index] = value
+    return sadf_series
+
+def get_sadf(df, min_length, constant, lags, num_threads=8):
+    """
+    Multithread implementation of SADF
+    """
+    molecule = []
+    for i in range(min_length,df.shape[0]):
+        molecule.append(df.index[i])
+
+    sadf_series = mp_pandas_obj(func=_sadf_outer_loop,
+                                  pd_obj=('molecule', molecule),
+                                  df = df,
+                                  min_length=min_length,
+                                  constant=constant,
+                                  lags=lags,
+                                  num_threads=num_threads,
+                                  )
+    return sadf_series
