@@ -1,5 +1,5 @@
 """
-Implementation of Chow-Type Dickey-Fuller Test
+Explosivness tests: Chow-Type Dickey-Fuller Test
 """
 
 import pandas as pd
