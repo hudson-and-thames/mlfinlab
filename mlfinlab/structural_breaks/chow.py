@@ -23,7 +23,7 @@ def _get_dfc_for_t(df, molecule):
         x = df_shifted_diff.values
         coefs, coef_vars = _get_betas(y, x.reshape(-1, 1))
         b_estimate, b_var = coefs[0], coef_vars[0][0]
-        dfc_series[index] = b_estimate / b_var
+        dfc_series[index] = b_estimate / (b_var ** 0.5)
     return dfc_series
 
 
