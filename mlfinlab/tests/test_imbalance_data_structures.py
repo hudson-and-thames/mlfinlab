@@ -32,11 +32,11 @@ class TestDataStructures(unittest.TestCase):
         exp_num_ticks_init = 1000
         num_prev_bars = 3
 
-        db1 = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+        db1, _ = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                            num_prev_bars=num_prev_bars, batch_size=2e7, verbose=False)
-        db2 = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+        db2, _ = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                            num_prev_bars=num_prev_bars, batch_size=50, verbose=False)
-        db3 = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+        db3, _ = ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                            num_prev_bars=num_prev_bars, batch_size=10, verbose=False)
         ds.get_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                      num_prev_bars=num_prev_bars, batch_size=50, verbose=False,
@@ -70,11 +70,11 @@ class TestDataStructures(unittest.TestCase):
         exp_num_ticks_init = 100
         num_prev_bars = 3
 
-        db1 = ds.get_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+        db1, _ = ds.get_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                            num_prev_bars=num_prev_bars, batch_size=1000, verbose=False)
-        db2 = ds.get_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+        db2, _ = ds.get_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                            num_prev_bars=num_prev_bars, batch_size=50, verbose=False)
-        db3 = ds.get_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+        db3, _ = ds.get_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                            num_prev_bars=num_prev_bars, batch_size=10, verbose=False)
         ds.get_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                      num_prev_bars=num_prev_bars, batch_size=50, verbose=False,

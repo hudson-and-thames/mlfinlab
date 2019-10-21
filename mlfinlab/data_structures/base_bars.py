@@ -31,7 +31,7 @@ class BaseBars(ABC):
         self.prev_tick_rule = 0
 
         # Cache properties
-        self.open_price = None
+        self.open_price, self.prev_price = None, None
         self.high_price, self.low_price = -np.inf, np.inf
         self.cum_ticks, self.cum_dollar_value, self.cum_volume = 0, 0, 0
 
@@ -172,8 +172,8 @@ class BaseBars(ABC):
         :param price: Price at time t
         :return: The signed tick
         """
-        if self.cache:
-            tick_diff = price - self.cache[-1].price
+        if self.prev_price is not None:
+            tick_diff = price - self.prev_price
         else:
             tick_diff = 0
 
