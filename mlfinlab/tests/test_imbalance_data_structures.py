@@ -43,6 +43,8 @@ class TestDataStructures(unittest.TestCase):
                                      to_csv=True, output_path='test.csv')
         db4 = pd.read_csv('test.csv')
 
+        self.assertEqual(db1.shape, (21, 6))
+
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
         self.assertTrue(db1.shape == db3.shape)
@@ -81,6 +83,8 @@ class TestDataStructures(unittest.TestCase):
                                      to_csv=True, output_path='test.csv')
         db4 = pd.read_csv('test.csv')
 
+        self.assertEqual(db1.shape, (102, 6))
+
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
         self.assertTrue(db1.shape == db3.shape)
@@ -108,16 +112,18 @@ class TestDataStructures(unittest.TestCase):
         exp_num_ticks_init = 100
         num_prev_bars = 3
 
-        db1 = ds.get_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+        db1, _ = ds.get_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                          num_prev_bars=num_prev_bars, batch_size=1000, verbose=False)
-        db2 = ds.get_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+        db2, _ = ds.get_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                          num_prev_bars=num_prev_bars, batch_size=50, verbose=False)
-        db3 = ds.get_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+        db3, _ = ds.get_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                          num_prev_bars=num_prev_bars, batch_size=10, verbose=False)
         ds.get_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                    num_prev_bars=num_prev_bars, batch_size=50, verbose=False,
                                    to_csv=True, output_path='test.csv')
         db4 = pd.read_csv('test.csv')
+
+        self.assertEqual(db1.shape, (102, 6))
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)

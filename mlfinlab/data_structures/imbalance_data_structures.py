@@ -132,46 +132,6 @@ class ImbalanceBars(BaseBars):
 
         return list_bars
 
-    def _update_counters(self):
-        """
-        Updates the counters by resetting them or making use of the cache to update them based on a previous batch.
-
-        :return: Updated cum_ticks, cum_volume, cum_theta, high_price, low_price, exp_num_ticks.
-        """
-        # Check flag
-        if self.flag and self.cache:
-            latest_entry = self.cache[-1]
-
-            # Update variables based on cache
-            cum_ticks = int(latest_entry.cum_ticks)
-            cum_volume = int(latest_entry.cum_volume)
-            low_price = np.float(latest_entry.low)
-            high_price = np.float(latest_entry.high)
-            # cumulative imbalance for a particular imbalance calculation (theta_t in Prado book)
-            cum_theta = np.float(latest_entry.cum_theta)
-        else:
-            # Reset counters
-            cum_ticks, cum_theta, cum_volume = 0, 0, 0
-            high_price, low_price = -np.inf, np.inf
-
-        return cum_ticks, cum_volume, cum_theta, high_price, low_price
-
-    def _update_cache(self, date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_theta):
-        """
-        Update the cache which is used to create a continuous flow of bars from one batch to the next.
-
-        :param date_time: Timestamp of the bar
-        :param price: The current price
-        :param low_price: Lowest price in the period
-        :param high_price: Highest price in the period
-        :param cum_ticks: Cumulative number of ticks
-        :param cum_volume: Cumulative volume (# of contracts)
-        :param cum_theta: Cumulative Theta sub t (pg 29)
-        """
-        cache_data = self.cache_tuple(date_time=date_time, price=price, high=high_price, low=low_price,
-                                      cum_ticks=cum_ticks, cum_volume=cum_volume, cum_theta=cum_theta)
-        self.cache.append(cache_data)
-
     def _get_expected_imbalance(self, window):
         """
         Calculate the expected imbalance: 2P[b_t=1]-1, using a EWMA, pg 29
@@ -232,7 +192,6 @@ def get_volume_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=10000
     :param verbose: Print out batch numbers (True or False)
     :param to_csv: Save bars to csv after every batch run (True or False)
     :param analyse_thresholds: (Boolean) Flag to save  and return thresholds used to sample imbalance bars
-    :param analyse_thresholds: (Boolean) Flag to save  and return thresholds used to sample imbalance bars
     :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of volume bars
     """
@@ -265,4 +224,4 @@ def get_tick_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
     tick_imbalance_bars = bars.batch_run(
         verbose=verbose, to_csv=to_csv, output_path=output_path)
 
-    return tick_imbalance_bars
+    return tick_imbalance_bars, bars.bars_thresholds
