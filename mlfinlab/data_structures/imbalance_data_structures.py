@@ -34,8 +34,10 @@ class ImbalanceBars(BaseBars):
     This is because we wanted to simplify the logic as much as possible, for the end user.
     """
 
-    def __init__(self, file_path, metric, num_prev_bars=3, exp_num_ticks_init=100000, batch_size=2e7,
-                 analyse_thresholds=False):
+    def __init__(self, file_path, metric, num_prev_bars, expected_imbalance_window, exp_num_ticks_init,
+                 min_exp_num_ticks,
+                 max_exp_num_ticks, batch_size,
+                 analyse_thresholds):
         """
         Constructor
 
@@ -50,7 +52,10 @@ class ImbalanceBars(BaseBars):
 
         # Information bar properties
         self.num_prev_bars = num_prev_bars
+        self.expected_imbalance_window = expected_imbalance_window
         self.exp_num_ticks_init = exp_num_ticks_init
+        self.min_exp_num_ticks = min_exp_num_ticks
+        self.max_exp_num_ticks = max_exp_num_ticks
         # Expected number of ticks extracted from prev bars
         self.exp_num_ticks = self.exp_num_ticks_init
         self.num_ticks_bar = []  # List of number of ticks from previous bars
@@ -67,7 +72,7 @@ class ImbalanceBars(BaseBars):
         Implementation of abstract method _reset_cache for imbalance bars
         """
         self.open_price = None
-        self.high_price, self.low_price = np.inf, np.inf
+        self.high_price, self.low_price = -np.inf, np.inf
         self.cum_ticks, self.cum_dollar_value, self.cum_volume, self.cum_theta = 0, 0, 0, 0
 
     def _extract_bars(self, data):
@@ -106,7 +111,7 @@ class ImbalanceBars(BaseBars):
             # Get expected imbalance for the first time, when num_ticks_init passed
             if not list_bars and np.isnan(self.expected_imbalance):
                 self.expected_imbalance = self._get_expected_imbalance(
-                    self.exp_num_ticks)
+                    self.expected_imbalance_window)
 
             if self.analyse_thresholds is True:
                 self.bars_thresholds.append(
@@ -122,11 +127,11 @@ class ImbalanceBars(BaseBars):
 
                 self.num_ticks_bar.append(self.cum_ticks)
                 # Expected number of ticks based on formed bars
-                self.exp_num_ticks = ewma(np.array(
+                exp_num_ticks = ewma(np.array(
                     self.num_ticks_bar[-self.num_prev_bars:], dtype=float), self.num_prev_bars)[-1]
-
+                self.exp_num_ticks = min(max(exp_num_ticks, self.min_exp_num_ticks), self.max_exp_num_ticks)
                 self.expected_imbalance = self._get_expected_imbalance(
-                    self.exp_num_ticks * self.num_prev_bars)
+                    self.expected_imbalance_window)
                 # Reset counters
                 self._reset_cache()
 
@@ -156,7 +161,7 @@ class ImbalanceBars(BaseBars):
         return expected_imbalance
 
 
-def get_dollar_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
+def get_dollar_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=20000,
                               batch_size=2e7, analyse_thresholds=False, verbose=True, to_csv=False, output_path=None):
     """
     Creates the dollar imbalance bars: date_time, open, high, low, close, volume.
@@ -180,7 +185,7 @@ def get_dollar_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=10000
     return dollar_imbalance_bars, bars.bars_thresholds
 
 
-def get_volume_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
+def get_volume_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=20000,
                               batch_size=2e7, verbose=True, to_csv=False, analyse_thresholds=False, output_path=None):
     """
     Creates the volume imbalance bars: date_time, open, high, low, close, volume.
@@ -203,7 +208,7 @@ def get_volume_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=10000
     return volume_imbalance_bars, bars.bars_thresholds
 
 
-def get_tick_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=100000,
+def get_tick_imbalance_bars(file_path, num_prev_bars, exp_num_ticks_init=20000,
                             batch_size=2e7, verbose=True, to_csv=False, analyse_thresholds=False, output_path=None):
     """
     Creates the tick imbalance bars: date_time, open, high, low, close, volume.

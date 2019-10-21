@@ -194,11 +194,13 @@ class BaseBars(ABC):
         :param volume: Volume traded at t
         :return: Imbalance at time t
         """
-        if self.metric == 'tick_imbalance' or self.metric == 'tick_run':
+        if self.metric == 'self.tick_imbalance' or self.metric == 'self.tick_run':
             imbalance = signed_tick
-        elif self.metric == 'dollar_imbalance' or self.metric == 'dollar_run':
+        elif self.metric == 'self.dollar_imbalance' or self.metric == 'self.dollar_run':
             imbalance = signed_tick * volume * price
-        else:  # volume imbalance or volume run
+        elif self.metric == 'self.volume_imbalance' or self.metric == 'self.volume_run':  # volume imbalance or volume run
             imbalance = signed_tick * volume
+        else:
+            raise ValueError('Unknown metric')
 
         return imbalance

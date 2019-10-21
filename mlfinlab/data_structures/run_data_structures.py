@@ -75,7 +75,7 @@ class RunBars(BaseBars):
         Implementation of abstract method _reset_cache for imbalance bars
         """
         self.open_price = None
-        self.high_price, self.low_price = np.inf, np.inf
+        self.high_price, self.low_price = -np.inf, np.inf
         self.cum_ticks, self.cum_dollar_value, self.cum_volume, = 0, 0, 0
         self.cum_theta_buy, self.cum_theta_sell, self.buy_ticks = 0, 0, 0
 
