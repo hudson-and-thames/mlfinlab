@@ -37,9 +37,14 @@ class StandardBars(BaseBars):
 
         # Threshold at which to sample
         self.threshold = threshold
-        # Named tuple to help with the cache
-        self.cache_tuple = namedtuple('CacheData',
-                                      ['date_time', 'price', 'high', 'low', 'cum_ticks', 'cum_volume', 'cum_dollar'])
+
+    def _reset_cache(self):
+        """
+        Implementation of abstract method _reset_cache for standard bars
+        """
+        self.open_price = None
+        self.high_price, self.low_price = np.inf, np.inf
+        self.cum_ticks, self.cum_dollar_value, self.cum_volume = 0, 0, 0
 
     def _extract_bars(self, data):
         """
@@ -48,83 +53,37 @@ class StandardBars(BaseBars):
 
         :param data: Contains 3 columns - date_time, price, and volume.
         """
-        cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = self._update_counters()
 
         # Iterate over rows
         list_bars = []
+
         for row in data.values:
             # Set variables
             date_time = row[0]
             price = np.float(row[1])
             volume = row[2]
 
+            if self.open_price is None:
+                self.open_price = price
+
             # Update high low prices
-            high_price, low_price = self._update_high_low(
-                high_price, low_price, price)
+            self.high_price, self.low_price = self._update_high_low(
+                self.high_price, self.low_price, price)
 
             # Calculations
-            cum_ticks += 1
+            self.cum_ticks += 1
             dollar_value = price * volume
-            cum_dollar_value = cum_dollar_value + dollar_value
-            cum_volume += volume
-
-            # Update cache
-            self._update_cache(date_time, price, low_price,
-                               high_price, cum_ticks, cum_volume, cum_dollar_value)
+            self.cum_dollar_value += dollar_value
+            self.cum_volume += volume
 
             # If threshold reached then take a sample
             if eval(self.metric) >= self.threshold:  # pylint: disable=eval-used
                 self._create_bars(date_time, price,
-                                  high_price, low_price, list_bars)
+                                  self.high_price, self.low_price, list_bars)
 
-                # Reset counters
-                cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = 0, 0, 0, -np.inf, np.inf
-                self.cache = []
-
-                # Update cache after bar generation
-                self._update_cache(
-                    date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_dollar_value)
-
+                # Reset cache
+                self._reset_cache()
         return list_bars
-
-    def _update_counters(self):
-        """
-        Updates the counters by resetting them or making use of the cache to update them based on a previous batch.
-
-        :return: Updated counters - cum_ticks, cum_dollar_value, cum_volume, high_price, low_price
-        """
-        # Check flag
-        if self.flag and self.cache:
-            last_entry = self.cache[-1]
-
-            # Update variables based on cache
-            cum_ticks = int(last_entry.cum_ticks)
-            cum_dollar_value = np.float(last_entry.cum_dollar)
-            cum_volume = last_entry.cum_volume
-            low_price = np.float(last_entry.low)
-            high_price = np.float(last_entry.high)
-        else:
-            # Reset counters
-            cum_ticks, cum_dollar_value, cum_volume, high_price, low_price = 0, 0, 0, -np.inf, np.inf
-
-        return cum_ticks, cum_dollar_value, cum_volume, high_price, low_price
-
-    def _update_cache(self, date_time, price, low_price, high_price, cum_ticks, cum_volume, cum_dollar_value):
-        """
-        Update the cache which is used to create a continuous flow of bars from one batch to the next.
-
-        :param date_time: Timestamp of the bar
-        :param price: The current price
-        :param low_price: Lowest price in the period
-        :param high_price: Highest price in the period
-        :param cum_ticks: Cumulative number of ticks
-        :param cum_volume: Cumulative volume
-        :param cum_dollar_value: Cumulative dollar value
-        """
-        cache_data = self.cache_tuple(
-            date_time, price, high_price, low_price, cum_ticks, cum_volume, cum_dollar_value)
-        self.cache.append(cache_data)
-
 
 def get_dollar_bars(file_path, threshold=70000000, batch_size=20000000, verbose=True, to_csv=False, output_path=None):
     """

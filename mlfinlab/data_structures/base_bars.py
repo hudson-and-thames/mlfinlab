@@ -26,13 +26,17 @@ class BaseBars(ABC):
         """
         # Base properties
         self.file_path = file_path
-        self.metric = metric
+        self.metric = 'self.' + metric
         self.batch_size = batch_size
         self.prev_tick_rule = 0
 
+        # Cache properties
+        self.open_price = None
+        self.high_price, self.low_price = -np.inf, np.inf
+        self.cum_ticks, self.cum_dollar_value, self.cum_volume = 0, 0, 0
+
         # Batch_run properties
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
-        self.cache = []
 
     def batch_run(self, verbose=True, to_csv=False, output_path=None):
         """
@@ -96,6 +100,14 @@ class BaseBars(ABC):
         :return: (List) of bars built using the current batch.
         """
 
+    @abstractmethod
+    def _reset_cache(self):
+        """
+        This method is required by all the bar types. It describes how cache should be reset
+        when new bar is sampled
+        """
+
+
     @staticmethod
     def _assert_csv(test_batch):
         """
@@ -144,11 +156,11 @@ class BaseBars(ABC):
         :param list_bars: List to which we append the bars
         """
         # Create bars
-        open_price = self.cache[0].price
+        open_price = self.open_price
         high_price = max(high_price, open_price)
         low_price = min(low_price, open_price)
         close_price = price
-        volume = self.cache[-1].cum_volume
+        volume = self.cum_volume
 
         # Update bars
         list_bars.append([date_time, open_price, high_price, low_price, close_price, volume])
