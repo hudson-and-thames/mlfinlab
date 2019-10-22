@@ -94,7 +94,7 @@ class ConstImbalanceBars(BaseImbalanceBars):
                                    analyse_thresholds)
 
     def _get_exp_num_ticks(self):
-        return self.exp_num_ticks
+        return self.thresholds['exp_num_ticks']
 
 
 def get_ema_dollar_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance_window=10000, exp_num_ticks_init=20000,
