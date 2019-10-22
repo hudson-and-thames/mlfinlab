@@ -53,8 +53,6 @@ class EMAImbalanceBars(BaseImbalanceBars):
 
         # EMA Imbalance specific  hyper parameters
         self.num_prev_bars = num_prev_bars
-        self.expected_imbalance_window = expected_imbalance_window
-        self.exp_num_ticks_init = exp_num_ticks_init
         if exp_num_ticks_constraints is None:
             self.min_exp_num_ticks = 0
             self.max_exp_num_ticks = np.inf
