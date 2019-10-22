@@ -50,8 +50,9 @@ class EMARunBars(BaseRunBars):
         :param analyse_thresholds: (Bool) flag to return thresholds values (theta, exp_num_ticks, exp_imbalance) in a
                                           form of Pandas DataFrame
         """
-        BaseRunBars.__init__(self, file_path, metric, batch_size, num_prev_bars, expected_imbalance_window, exp_num_ticks_init,
-                                   analyse_thresholds)
+        BaseRunBars.__init__(self, file_path, metric, batch_size, num_prev_bars, expected_imbalance_window,
+                             exp_num_ticks_init,
+                             analyse_thresholds)
 
         # EMA Run Bars specific hyper parameters
         if exp_num_ticks_constraints is None:
@@ -77,27 +78,30 @@ class ConstRunBars(BaseRunBars):
     This is because we wanted to simplify the logic as much as possible, for the end user.
     """
 
-    def __init__(self, file_path, metric, expected_imbalance_window, exp_num_ticks_init, batch_size,
+    def __init__(self, file_path, metric, num_prev_bars, expected_imbalance_window, exp_num_ticks_init, batch_size,
                  analyse_thresholds):
         """
         Constructor
 
         :param file_path: (String) Path to the csv file containing raw tick data in the format[date_time, price, volume]
         :param metric: (String) type of run bar to create. Example: "dollar_run"
+        :param num_prev_bars: (Int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
         :param expected_imbalance_window: (Int) EMA window used to estimate expected run
         :param exp_num_ticks_init: (Int) Initial number of expected ticks
         :param batch_size: (Int) Number of rows to read in from the csv, per batch
         :param analyse_thresholds: (Boolean) Flag to save  and return thresholds used to sample run bars
         """
-        BaseRunBars.__init__(self, file_path, metric, batch_size, num_prev_bars, expected_imbalance_window, exp_num_ticks_init,
-                                   analyse_thresholds)
+        BaseRunBars.__init__(self, file_path, metric, batch_size, num_prev_bars, expected_imbalance_window,
+                             exp_num_ticks_init,
+                             analyse_thresholds)
 
     def _get_exp_num_ticks(self):
         return self.thresholds['exp_num_ticks']
 
+
 def get_ema_dollar_run_bars(file_path, num_prev_bars=3, expected_imbalance_window=10000, exp_num_ticks_init=20000,
-                                  exp_num_ticks_constraints=None, batch_size=2e7, analyse_thresholds=False,
-                                  verbose=True, to_csv=False, output_path=None):
+                            exp_num_ticks_constraints=None, batch_size=2e7, analyse_thresholds=False,
+                            verbose=True, to_csv=False, output_path=None):
     """
     Creates the EMA dollar run bars: date_time, open, high, low, close, volume.
 
@@ -114,9 +118,9 @@ def get_ema_dollar_run_bars(file_path, num_prev_bars=3, expected_imbalance_windo
     :return: DataFrame of dollar bars and DataFrame of thresholds
     """
     bars = EMARunBars(file_path=file_path, metric='dollar_run', num_prev_bars=num_prev_bars,
-                            expected_imbalance_window=expected_imbalance_window,
-                            exp_num_ticks_init=exp_num_ticks_init, exp_num_ticks_constraints=exp_num_ticks_constraints,
-                            batch_size=batch_size, analyse_thresholds=analyse_thresholds)
+                      expected_imbalance_window=expected_imbalance_window,
+                      exp_num_ticks_init=exp_num_ticks_init, exp_num_ticks_constraints=exp_num_ticks_constraints,
+                      batch_size=batch_size, analyse_thresholds=analyse_thresholds)
     run_bars = bars.batch_run(
         verbose=verbose, to_csv=to_csv, output_path=output_path)
 
@@ -124,8 +128,8 @@ def get_ema_dollar_run_bars(file_path, num_prev_bars=3, expected_imbalance_windo
 
 
 def get_ema_volume_run_bars(file_path, num_prev_bars=3, expected_imbalance_window=10000, exp_num_ticks_init=20000,
-                                  exp_num_ticks_constraints=None, batch_size=2e7, analyse_thresholds=False,
-                                  verbose=True, to_csv=False, output_path=None):
+                            exp_num_ticks_constraints=None, batch_size=2e7, analyse_thresholds=False,
+                            verbose=True, to_csv=False, output_path=None):
     """
     Creates the EMA volume run bars: date_time, open, high, low, close, volume.
 
@@ -142,9 +146,9 @@ def get_ema_volume_run_bars(file_path, num_prev_bars=3, expected_imbalance_windo
     :return: DataFrame of volume bars and DataFrame of thresholds
     """
     bars = EMARunBars(file_path=file_path, metric='volume_run', num_prev_bars=num_prev_bars,
-                            expected_imbalance_window=expected_imbalance_window,
-                            exp_num_ticks_init=exp_num_ticks_init, exp_num_ticks_constraints=exp_num_ticks_constraints,
-                            batch_size=batch_size, analyse_thresholds=analyse_thresholds)
+                      expected_imbalance_window=expected_imbalance_window,
+                      exp_num_ticks_init=exp_num_ticks_init, exp_num_ticks_constraints=exp_num_ticks_constraints,
+                      batch_size=batch_size, analyse_thresholds=analyse_thresholds)
     run_bars = bars.batch_run(
         verbose=verbose, to_csv=to_csv, output_path=output_path)
 
@@ -152,8 +156,8 @@ def get_ema_volume_run_bars(file_path, num_prev_bars=3, expected_imbalance_windo
 
 
 def get_ema_tick_run_bars(file_path, num_prev_bars=3, expected_imbalance_window=10000, exp_num_ticks_init=20000,
-                                  exp_num_ticks_constraints=None, batch_size=2e7, analyse_thresholds=False,
-                                  verbose=True, to_csv=False, output_path=None):
+                          exp_num_ticks_constraints=None, batch_size=2e7, analyse_thresholds=False,
+                          verbose=True, to_csv=False, output_path=None):
     """
     Creates the EMA tick run bars: date_time, open, high, low, close, volume.
 
@@ -170,9 +174,9 @@ def get_ema_tick_run_bars(file_path, num_prev_bars=3, expected_imbalance_window=
     :return: DataFrame of tick bars and DataFrame of thresholds
     """
     bars = EMARunBars(file_path=file_path, metric='tick_run', num_prev_bars=num_prev_bars,
-                            expected_imbalance_window=expected_imbalance_window,
-                            exp_num_ticks_init=exp_num_ticks_init, exp_num_ticks_constraints=exp_num_ticks_constraints,
-                            batch_size=batch_size, analyse_thresholds=analyse_thresholds)
+                      expected_imbalance_window=expected_imbalance_window,
+                      exp_num_ticks_init=exp_num_ticks_init, exp_num_ticks_constraints=exp_num_ticks_constraints,
+                      batch_size=batch_size, analyse_thresholds=analyse_thresholds)
     run_bars = bars.batch_run(
         verbose=verbose, to_csv=to_csv, output_path=output_path)
 
@@ -180,8 +184,8 @@ def get_ema_tick_run_bars(file_path, num_prev_bars=3, expected_imbalance_window=
 
 
 def get_const_dollar_run_bars(file_path, num_prev_bars, expected_imbalance_window=10000, exp_num_ticks_init=20000,
-                                    batch_size=2e7, analyse_thresholds=False, verbose=True, to_csv=False,
-                                    output_path=None):
+                              batch_size=2e7, analyse_thresholds=False, verbose=True, to_csv=False,
+                              output_path=None):
     """
     Creates the Const dollar run bars: date_time, open, high, low, close, volume.
 
@@ -197,9 +201,9 @@ def get_const_dollar_run_bars(file_path, num_prev_bars, expected_imbalance_windo
     :return: DataFrame of dollar bars and DataFrame of thresholds
     """
     bars = ConstRunBars(file_path=file_path, metric='dollar_run', num_prev_bars=num_prev_bars,
-                              expected_imbalance_window=expected_imbalance_window,
-                              exp_num_ticks_init=exp_num_ticks_init,
-                              batch_size=batch_size, analyse_thresholds=analyse_thresholds)
+                        expected_imbalance_window=expected_imbalance_window,
+                        exp_num_ticks_init=exp_num_ticks_init,
+                        batch_size=batch_size, analyse_thresholds=analyse_thresholds)
     run_bars = bars.batch_run(
         verbose=verbose, to_csv=to_csv, output_path=output_path)
 
@@ -207,8 +211,8 @@ def get_const_dollar_run_bars(file_path, num_prev_bars, expected_imbalance_windo
 
 
 def get_const_volume_run_bars(file_path, num_prev_bars, expected_imbalance_window=10000, exp_num_ticks_init=20000,
-                                    batch_size=2e7, analyse_thresholds=False, verbose=True, to_csv=False,
-                                    output_path=None):
+                              batch_size=2e7, analyse_thresholds=False, verbose=True, to_csv=False,
+                              output_path=None):
     """
     Creates the Const volume run bars: date_time, open, high, low, close, volume.
 
@@ -224,9 +228,9 @@ def get_const_volume_run_bars(file_path, num_prev_bars, expected_imbalance_windo
     :return: DataFrame of volume bars and DataFrame of thresholds
     """
     bars = ConstRunBars(file_path=file_path, metric='volume_run', num_prev_bars=num_prev_bars,
-                              expected_imbalance_window=expected_imbalance_window,
-                              exp_num_ticks_init=exp_num_ticks_init,
-                              batch_size=batch_size, analyse_thresholds=analyse_thresholds)
+                        expected_imbalance_window=expected_imbalance_window,
+                        exp_num_ticks_init=exp_num_ticks_init,
+                        batch_size=batch_size, analyse_thresholds=analyse_thresholds)
     run_bars = bars.batch_run(
         verbose=verbose, to_csv=to_csv, output_path=output_path)
 
@@ -234,8 +238,8 @@ def get_const_volume_run_bars(file_path, num_prev_bars, expected_imbalance_windo
 
 
 def get_const_tick_run_bars(file_path, num_prev_bars, expected_imbalance_window=10000, exp_num_ticks_init=20000,
-                                    batch_size=2e7, analyse_thresholds=False, verbose=True, to_csv=False,
-                                    output_path=None):
+                            batch_size=2e7, analyse_thresholds=False, verbose=True, to_csv=False,
+                            output_path=None):
     """
     Creates the Const tick run bars: date_time, open, high, low, close, volume.
 
@@ -251,9 +255,9 @@ def get_const_tick_run_bars(file_path, num_prev_bars, expected_imbalance_window=
     :return: DataFrame of tick bars and DataFrame of thresholds
     """
     bars = ConstRunBars(file_path=file_path, metric='tick_run', num_prev_bars=num_prev_bars,
-                              expected_imbalance_window=expected_imbalance_window,
-                              exp_num_ticks_init=exp_num_ticks_init,
-                              batch_size=batch_size, analyse_thresholds=analyse_thresholds)
+                        expected_imbalance_window=expected_imbalance_window,
+                        exp_num_ticks_init=exp_num_ticks_init,
+                        batch_size=batch_size, analyse_thresholds=analyse_thresholds)
     run_bars = bars.batch_run(
         verbose=verbose, to_csv=to_csv, output_path=output_path)
 

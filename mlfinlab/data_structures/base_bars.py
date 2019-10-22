@@ -351,6 +351,7 @@ class BaseImbalanceBars(BaseBars):
         Abstract method which updates expected number of ticks when new imbalance bar is formed
         """
 
+
 class BaseRunBars(BaseBars):
     """
     Base class for Run Bars (EMA and Const) which implements run bars calculation logic
@@ -376,11 +377,13 @@ class BaseRunBars(BaseBars):
         self.num_prev_bars = num_prev_bars
         self.expected_imbalance_window = expected_imbalance_window
 
-        self.thresholds = {'cum_theta_buy': 0, 'cum_theta_sell': 0, 'expected_imbalance_buy': np.nan,  'expected_imbalance_sell': np.nan,
-                           'exp_num_ticks': exp_num_ticks_init, 'buy_ticks_num': 0}
+        self.thresholds = {'cum_theta_buy': 0, 'cum_theta_sell': 0, 'exp_imbalance_buy': np.nan,
+                           'exp_imbalance_sell': np.nan, 'exp_num_ticks': exp_num_ticks_init,
+                           'exp_buy_ticks_proportion': np.nan, 'buy_ticks_num': 0}
 
         # Previous bars number of ticks and previous tick imbalances
-        self.imbalance_tick_statistics = {'num_ticks_bar': [], 'imbalance_array_buy': [], 'imbalance_array_sell': [], 'buy_ticks_proportion': []}
+        self.imbalance_tick_statistics = {'num_ticks_bar': [], 'imbalance_array_buy': [], 'imbalance_array_sell': [],
+                                          'buy_ticks_proportion': []}
 
         self.analyse_thresholds = analyse_thresholds
         # Array of dicts: {'timestamp': value, 'cum_theta': value, 'exp_num_ticks': value, 'exp_imbalance': value}
@@ -393,7 +396,7 @@ class BaseRunBars(BaseBars):
         self.open_price = None
         self.high_price, self.low_price = -np.inf, np.inf
         self.cum_statistics = {'cum_ticks': 0, 'cum_dollar_value': 0, 'cum_volume': 0, 'cum_buy_volume': 0}
-        self.thresholds['cum_theta_buy'], self.thresholds['cum_theta_sell'], self.thresholds['buy_ticks_num'] =  0, 0, 0
+        self.thresholds['cum_theta_buy'], self.thresholds['cum_theta_sell'], self.thresholds['buy_ticks_num'] = 0, 0, 0
 
     def _extract_bars(self, data):
         """
@@ -438,20 +441,23 @@ class BaseRunBars(BaseBars):
                 self.imbalance_tick_statistics['imbalance_array_sell'].append(abs(imbalance))
                 self.thresholds['cum_theta_sell'] += abs(imbalance)
 
-            imbalances_are_counted_flag = np.isnan([self.thresholds['exp_imbalance_buy'], self.thresholds['exp_imbalance_sell']]).any()  # Flag indicating that both buy and sell imbalances are counted
+            imbalances_are_counted_flag = np.isnan([self.thresholds['exp_imbalance_buy'], self.thresholds[
+                'exp_imbalance_sell']]).any()  # Flag indicating that both buy and sell imbalances are counted
 
             self.prev_price = price  # Update previous price for tick rule calculations
 
             # Get expected imbalance for the first time, when num_ticks_init passed
             if not list_bars and imbalances_are_counted_flag:
 
-                self.thresholds['expected_imbalance_buy'] = self._get_expected_imbalance(self.expected_imbalance_window,
-                    self.imbalance_tick_statistics['imbalance_array_buy'])
-                self.thresholds['expected_imbalance_sell'] = self._get_expected_imbalance(self.expected_imbalance_window,
-                    self.imbalance_tick_statistics['imbalance_array_sell'])
+                self.thresholds['exp_imbalance_buy'] = self._get_expected_imbalance(
+                    self.imbalance_tick_statistics['imbalance_array_buy'], self.expected_imbalance_window)
+                self.thresholds['exp_imbalance_sell'] = self._get_expected_imbalance(
+                    self.imbalance_tick_statistics['imbalance_array_sell'], self.expected_imbalance_window)
 
-                if bool(np.isnan([self.thresholds['expected_imbalance_buy'], self.thresholds['expected_imbalance_sell']]).any()) is False:
-                    self.thresholds['exp_buy_ticks_proportion'] = self.thresholds['buy_ticks_num'] / self.statistics['cum_ticks']
+                if bool(np.isnan([self.thresholds['exp_imbalance_buy'],
+                                  self.thresholds['exp_imbalance_sell']]).any()) is False:
+                    self.thresholds['exp_buy_ticks_proportion'] = self.thresholds['buy_ticks_num'] / self.cum_statistics[
+                        'cum_ticks']
                     self.warm_up = False
 
             if self.analyse_thresholds is True:
@@ -461,30 +467,34 @@ class BaseRunBars(BaseBars):
             self.prev_price = price  # Update previous price used for tick rule calculations
 
             # Check expression for possible bar generation
-            max_proportion = max(self.thresholds['expected_imbalance_buy'] * self.thresholds['exp_buy_ticks_proportion'],
-                                 self.thresholds['expected_imbalance_sell'] * (1 - self.thresholds['exp_buy_ticks_proportion']))
-
+            max_proportion = max(
+                self.thresholds['exp_imbalance_buy'] * self.thresholds['exp_buy_ticks_proportion'],
+                self.thresholds['exp_imbalance_sell'] * (1 - self.thresholds['exp_buy_ticks_proportion']))
 
             # Check expression for possible bar generation
-            if if max(self.thresholds['cum_theta_buy'],
-                   self.thresholds['cum_theta_sell']) > self.thresholds['exp_num_ticks'] * max_proportion and self.warm_up is False:
+            if max(self.thresholds['cum_theta_buy'],
+                   self.thresholds['cum_theta_sell']) > self.thresholds[
+                'exp_num_ticks'] * max_proportion and self.warm_up is False:
                 self._create_bars(date_time, price,
                                   self.high_price, self.low_price, list_bars)
 
                 self.imbalance_tick_statistics['num_ticks_bar'].append(self.cum_statistics['cum_ticks'])
-                self.imbalance_tick_statistics['buy_ticks_proportion'].append(self.thresholds['buy_ticks_num']/self.statistics['cum_ticks'])
+                self.imbalance_tick_statistics['buy_ticks_proportion'].append(
+                    self.thresholds['buy_ticks_num'] / self.cum_statistics['cum_ticks'])
 
                 # Expected number of ticks based on formed bars
                 self.thresholds['exp_num_ticks'] = self._get_exp_num_ticks()
 
                 # Expected buy ticks proportion based on formed bars
-                exp_buy_ticks_proportion = ewma(np.array(self.imbalance_tick_statistics['buy_ticks_proportion'][-self.num_prev_bars:], dtype=float),
-                     self.num_prev_bars)[-1]
+                exp_buy_ticks_proportion = ewma(
+                    np.array(self.imbalance_tick_statistics['buy_ticks_proportion'][-self.num_prev_bars:], dtype=float),
+                    self.num_prev_bars)[-1]
+                self.thresholds['exp_buy_ticks_proportion'] = exp_buy_ticks_proportion
 
                 # Get expected imbalance
-                self.thresholds['expected_imbalance_buy'] = self._get_expected_imbalance(,
+                self.thresholds['exp_imbalance_buy'] = self._get_expected_imbalance(
                     self.imbalance_tick_statistics['imbalance_array_buy'], self.expected_imbalance_window)
-                self.thresholds['expected_imbalance_sell'] = self._get_expected_imbalance(
+                self.thresholds['exp_imbalance_sell'] = self._get_expected_imbalance(
                     self.imbalance_tick_statistics['imbalance_array_sell'], self.expected_imbalance_window)
 
                 # Reset counters
