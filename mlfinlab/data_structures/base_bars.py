@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 import numpy as np
+from mlfinlab.util.fast_ewma import ewma
 
 
 class BaseBars(ABC):
@@ -107,7 +108,6 @@ class BaseBars(ABC):
         when new bar is sampled
         """
 
-
     @staticmethod
     def _assert_csv(test_batch):
         """
@@ -205,11 +205,14 @@ class BaseBars(ABC):
 
         return imbalance
 
+
 class BaseImbalanceBars(BaseBars):
-    def __init__(self, file_path, metric, batch_size, expected_imbalance_window, expected_num_ticks_init, analyse_thresholds):
+    def __init__(self, file_path, metric, batch_size, expected_imbalance_window, exp_num_ticks_init,
+                 analyse_thresholds):
         BaseBars.__init__(self, file_path, metric, batch_size)
 
         self.expected_imbalance_window = expected_imbalance_window
+        self.exp_num_ticks_init = exp_num_ticks_init
         # Expected number of ticks extracted from prev bars
         self.exp_num_ticks = self.exp_num_ticks_init
         self.num_ticks_bar = []  # List of number of ticks from previous bars
@@ -317,5 +320,3 @@ class BaseImbalanceBars(BaseBars):
     def _get_exp_num_ticks(self):
         """
         """
-
-    def
