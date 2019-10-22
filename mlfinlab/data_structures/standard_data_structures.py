@@ -16,7 +16,6 @@ Many of the projects going forward will require Dollar and Volume bars.
 """
 
 # Imports
-from collections import namedtuple
 import numpy as np
 
 from mlfinlab.data_structures.base_bars import BaseBars
@@ -44,7 +43,7 @@ class StandardBars(BaseBars):
         """
         self.open_price = None
         self.high_price, self.low_price = np.inf, np.inf
-        self.cum_ticks, self.cum_dollar_value, self.cum_volume = 0, 0, 0
+        self.cum_statistics = {'cum_ticks': 0, 'cum_dollar_value': 0, 'cum_volume': 0, 'cum_buy_volume': 0}
 
     def _extract_bars(self, data):
         """
@@ -62,6 +61,8 @@ class StandardBars(BaseBars):
             date_time = row[0]
             price = np.float(row[1])
             volume = row[2]
+            dollar_value = price * volume
+            signed_tick = self._apply_tick_rule(price)
 
             if self.open_price is None:
                 self.open_price = price
@@ -71,10 +72,13 @@ class StandardBars(BaseBars):
                 self.high_price, self.low_price, price)
 
             # Calculations
-            self.cum_ticks += 1
-            dollar_value = price * volume
-            self.cum_dollar_value += dollar_value
-            self.cum_volume += volume
+            self.cum_statistics['cum_ticks'] += 1
+            self.cum_statistics['cum_dollar_value'] += dollar_value
+            self.cum_statistics['cum_volume'] += volume
+            if signed_tick == 1:
+                self.cum_statistics['cum_buy_volume'] += volume
+
+            self.prev_price = price
 
             # If threshold reached then take a sample
             if eval(self.metric) >= self.threshold:  # pylint: disable=eval-used

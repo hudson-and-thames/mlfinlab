@@ -34,7 +34,7 @@ class BaseBars(ABC):
         # Cache properties
         self.open_price, self.prev_price = None, None
         self.high_price, self.low_price = -np.inf, np.inf
-        self.cum_ticks, self.cum_dollar_value, self.cum_volume = 0, 0, 0
+        self.cum_statistics = {'cum_ticks': 0, 'cum_dollar_value': 0, 'cum_volume': 0, 'cum_buy_volume': 0}
 
         # Batch_run properties
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
@@ -64,7 +64,8 @@ class BaseBars(ABC):
         # Read csv in batches
         count = 0
         final_bars = []
-        cols = ['date_time', 'open', 'high', 'low', 'close', 'volume']
+        cols = ['date_time', 'open', 'high', 'low', 'close', 'volume', 'cum_buy_volume', 'cum_ticks',
+                'cum_dollar_value']
         for batch in pd.read_csv(self.file_path, chunksize=self.batch_size):
             if verbose:  # pragma: no cover
                 print('Batch number:', count)
@@ -146,7 +147,8 @@ class BaseBars(ABC):
 
     def _create_bars(self, date_time, price, high_price, low_price, list_bars):
         """
-        Given the inputs, construct a bar which has the following fields: date_time, open, high, low, close.
+        Given the inputs, construct a bar which has the following fields: date_time, open, high, low, close, volume,
+        cum_buy_volume, cum_ticks, cum_dollar_value.
         These bars are appended to list_bars, which is later used to construct the final bars DataFrame.
 
         :param date_time: Timestamp of the bar
@@ -160,10 +162,14 @@ class BaseBars(ABC):
         high_price = max(high_price, open_price)
         low_price = min(low_price, open_price)
         close_price = price
-        volume = self.cum_volume
+        volume = self.cum_statistics['cum_volume']
+        cum_buy_volume = self.cum_statistics['cum_buy_volume']
+        cum_ticks = self.cum_statistics['cum_ticks']
+        cum_dollar_value = self.cum_statistics['cum_dollar_value']
 
         # Update bars
-        list_bars.append([date_time, open_price, high_price, low_price, close_price, volume])
+        list_bars.append([date_time, open_price, high_price, low_price, close_price, volume, cum_buy_volume, cum_ticks,
+                          cum_dollar_value])
 
     def _apply_tick_rule(self, price):
         """
@@ -198,7 +204,7 @@ class BaseBars(ABC):
             imbalance = signed_tick
         elif self.metric == 'self.dollar_imbalance' or self.metric == 'self.dollar_run':
             imbalance = signed_tick * volume * price
-        elif self.metric == 'self.volume_imbalance' or self.metric == 'self.volume_run':  # volume imbalance or volume run
+        elif self.metric == 'self.volume_imbalance' or self.metric == 'self.volume_run':
             imbalance = signed_tick * volume
         else:
             raise ValueError('Unknown metric')
@@ -207,14 +213,31 @@ class BaseBars(ABC):
 
 
 class BaseImbalanceBars(BaseBars):
+    """
+    Base class for Imbalance Bars (EMA and Const) which implements imbalance bars calculation logic
+    """
+
     def __init__(self, file_path, metric, batch_size, expected_imbalance_window, exp_num_ticks_init,
                  analyse_thresholds):
+        """
+        Constructor
+
+
+        :param file_path: (String) Path to the csv file containing raw tick data in the format[date_time, price, volume]
+        :param metric: (String) type of imbalance bar to create. Example: dollar_imbalance.
+        :param batch_size: (Int) Number of rows to read in from the csv, per batch.
+        :param expected_imbalance_window: (Int) Window used to estimate expected imbalance from previous trades
+        :param exp_num_ticks_init: (Int) Initial estimate for expected number of ticks in bar.
+                                         For Const Imbalance Bars expected number of ticks equals expected number of ticks
+        :param analyse_thresholds: (Bool) flag to return thresholds values (theta, exp_num_ticks, exp_imbalance) in a
+                                          form of Pandas DataFrame
+        """
         BaseBars.__init__(self, file_path, metric, batch_size)
 
         self.expected_imbalance_window = expected_imbalance_window
         self.exp_num_ticks_init = exp_num_ticks_init
-        # Expected number of ticks extracted from prev bars
-        self.exp_num_ticks = self.exp_num_ticks_init
+
+        self.exp_num_ticks = self.exp_num_ticks_init  # Expected number of ticks extracted from prev bars or constant
         self.num_ticks_bar = []  # List of number of ticks from previous bars
 
         self.cum_theta = 0
@@ -222,7 +245,8 @@ class BaseImbalanceBars(BaseBars):
         self.imbalance_array = []
 
         self.analyse_thresholds = analyse_thresholds
-        self.bars_thresholds = []  # Array of dicts: {'timestamp': value, 'cum_theta': value, 'exp_num_ticks': value, 'exp_imbalance': value}
+        # Array of dicts: {'timestamp': value, 'cum_theta': value, 'exp_num_ticks': value, 'exp_imbalance': value}
+        self.bars_thresholds = []
 
     def _reset_cache(self):
         """
@@ -230,7 +254,8 @@ class BaseImbalanceBars(BaseBars):
         """
         self.open_price = None
         self.high_price, self.low_price = -np.inf, np.inf
-        self.cum_ticks, self.cum_dollar_value, self.cum_volume, self.cum_theta = 0, 0, 0, 0
+        self.cum_statistics = {'cum_ticks': 0, 'cum_dollar_value': 0, 'cum_volume': 0, 'cum_buy_volume': 0}
+        self.cum_theta = 0
 
     def _extract_bars(self, data):
         """
@@ -247,23 +272,29 @@ class BaseImbalanceBars(BaseBars):
             date_time = row[0]
             price = np.float(row[1])
             volume = row[2]
-
-            self.cum_ticks += 1
+            dollar_value = price * volume
+            signed_tick = self._apply_tick_rule(price)
 
             if self.open_price is None:
                 self.open_price = price
-
-            self.cum_volume += volume
 
             # Update high low prices
             self.high_price, self.low_price = self._update_high_low(
                 self.high_price, self.low_price, price)
 
+            # Bar statistics calculations
+            self.cum_statistics['cum_ticks'] += 1
+            self.cum_statistics['cum_dollar_value'] += dollar_value
+            self.cum_statistics['cum_volume'] += volume
+            if signed_tick == 1:
+                self.cum_statistics['cum_buy_volume'] += volume
+
             # Imbalance calculations
-            signed_tick = self._apply_tick_rule(price)
             imbalance = self._get_imbalance(price, signed_tick, volume)
             self.imbalance_array.append(imbalance)
             self.cum_theta += imbalance
+
+            self.prev_price = price  # Update previous price for tick rule calculations
 
             # Get expected imbalance for the first time, when num_ticks_init passed
             if not list_bars and np.isnan(self.expected_imbalance):
@@ -282,7 +313,7 @@ class BaseImbalanceBars(BaseBars):
                 self._create_bars(date_time, price,
                                   self.high_price, self.low_price, list_bars)
 
-                self.num_ticks_bar.append(self.cum_ticks)
+                self.num_ticks_bar.append(self.cum_statistics['cum_ticks'])
                 # Expected number of ticks based on formed bars
                 self.exp_num_ticks = self._get_exp_num_ticks()
                 # Get expected imbalance
@@ -319,4 +350,5 @@ class BaseImbalanceBars(BaseBars):
     @abstractmethod
     def _get_exp_num_ticks(self):
         """
+        Abstract method which updates expected number of ticks when new imbalance bar is formed
         """
