@@ -55,12 +55,17 @@ class EMAImbalanceBars(BaseImbalanceBars):
         self.num_prev_bars = num_prev_bars
         self.expected_imbalance_window = expected_imbalance_window
         self.exp_num_ticks_init = exp_num_ticks_init
-        self.min_exp_num_ticks = exp_num_ticks_constraints[0]
-        self.max_exp_num_ticks = exp_num_ticks_constraints[1]
+        if exp_num_ticks_constraints is None:
+            self.min_exp_num_ticks = 0
+            self.max_exp_num_ticks = np.inf
+        else:
+            self.min_exp_num_ticks = exp_num_ticks_constraints[0]
+            self.max_exp_num_ticks = exp_num_ticks_constraints[1]
 
     def _get_exp_num_ticks(self):
+        prev_num_of_ticks = self.imbalance_tick_statistics['num_ticks_bar']
         exp_num_ticks = ewma(np.array(
-            self.num_ticks_bar[-self.num_prev_bars:], dtype=float), self.num_prev_bars)[-1]
+            prev_num_of_ticks[-self.num_prev_bars:], dtype=float), self.num_prev_bars)[-1]
         return min(max(exp_num_ticks, self.min_exp_num_ticks), self.max_exp_num_ticks)
 
 
@@ -93,9 +98,8 @@ class ConstImbalanceBars(BaseImbalanceBars):
 
 
 def get_ema_dollar_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance_window=10000, exp_num_ticks_init=20000,
-                                  exp_num_ticks_constraints=[1000, 100000],
-                                  batch_size=2e7, analyse_thresholds=False, verbose=True, to_csv=False,
-                                  output_path=None):
+                                  exp_num_ticks_constraints=None, batch_size=2e7, analyse_thresholds=False,
+                                  verbose=True, to_csv=False, output_path=None):
     """
     Creates the EMA dollar imbalance bars: date_time, open, high, low, close, volume.
 
@@ -122,9 +126,8 @@ def get_ema_dollar_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance
 
 
 def get_ema_volume_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance_window=10000, exp_num_ticks_init=20000,
-                                  exp_num_ticks_constraints=[1000, 100000],
-                                  batch_size=2e7, analyse_thresholds=False, verbose=True, to_csv=False,
-                                  output_path=None):
+                                  exp_num_ticks_constraints=None, batch_size=2e7, analyse_thresholds=False,
+                                  verbose=True, to_csv=False, output_path=None):
     """
     Creates the EMA volume imbalance bars: date_time, open, high, low, close, volume.
 
@@ -151,9 +154,8 @@ def get_ema_volume_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance
 
 
 def get_ema_tick_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance_window=10000, exp_num_ticks_init=20000,
-                                exp_num_ticks_constraints=[1000, 100000],
-                                batch_size=2e7, analyse_thresholds=False, verbose=True, to_csv=False,
-                                output_path=None):
+                                exp_num_ticks_constraints=None, batch_size=2e7, analyse_thresholds=False,
+                                verbose=True, to_csv=False, output_path=None):
     """
     Creates the EMA tick imbalance bars: date_time, open, high, low, close, volume.
 

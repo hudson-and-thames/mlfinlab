@@ -228,21 +228,18 @@ class BaseImbalanceBars(BaseBars):
         :param batch_size: (Int) Number of rows to read in from the csv, per batch.
         :param expected_imbalance_window: (Int) Window used to estimate expected imbalance from previous trades
         :param exp_num_ticks_init: (Int) Initial estimate for expected number of ticks in bar.
-                                         For Const Imbalance Bars expected number of ticks equals expected number of ticks
+                                         For Const Imbalance Bars expected number of ticks equals expected number of ticks init
         :param analyse_thresholds: (Bool) flag to return thresholds values (theta, exp_num_ticks, exp_imbalance) in a
                                           form of Pandas DataFrame
         """
         BaseBars.__init__(self, file_path, metric, batch_size)
 
         self.expected_imbalance_window = expected_imbalance_window
-        self.exp_num_ticks_init = exp_num_ticks_init
 
-        self.exp_num_ticks = self.exp_num_ticks_init  # Expected number of ticks extracted from prev bars or constant
-        self.num_ticks_bar = []  # List of number of ticks from previous bars
+        self.thresholds = {'cum_theta': 0, 'expected_imbalance': np.nan, 'exp_num_ticks': exp_num_ticks_init}
 
-        self.cum_theta = 0
-        self.expected_imbalance = np.nan
-        self.imbalance_array = []
+        # Previous bars number of ticks and previous tick imbalances
+        self.imbalance_tick_statistics = {'num_ticks_bar': [], 'imbalance_array': []}
 
         self.analyse_thresholds = analyse_thresholds
         # Array of dicts: {'timestamp': value, 'cum_theta': value, 'exp_num_ticks': value, 'exp_imbalance': value}
@@ -255,7 +252,7 @@ class BaseImbalanceBars(BaseBars):
         self.open_price = None
         self.high_price, self.low_price = -np.inf, np.inf
         self.cum_statistics = {'cum_ticks': 0, 'cum_dollar_value': 0, 'cum_volume': 0, 'cum_buy_volume': 0}
-        self.cum_theta = 0
+        self.thresholds['cum_theta'] = 0
 
     def _extract_bars(self, data):
         """
@@ -291,33 +288,33 @@ class BaseImbalanceBars(BaseBars):
 
             # Imbalance calculations
             imbalance = self._get_imbalance(price, signed_tick, volume)
-            self.imbalance_array.append(imbalance)
-            self.cum_theta += imbalance
+            self.imbalance_tick_statistics['imbalance_array'].append(imbalance)
+            self.thresholds['cum_theta'] += imbalance
 
             self.prev_price = price  # Update previous price for tick rule calculations
 
             # Get expected imbalance for the first time, when num_ticks_init passed
-            if not list_bars and np.isnan(self.expected_imbalance):
-                self.expected_imbalance = self._get_expected_imbalance(
+            if not list_bars and np.isnan(self.thresholds['expected_imbalance']):
+                self.thresholds['expected_imbalance'] = self._get_expected_imbalance(
                     self.expected_imbalance_window)
 
             if self.analyse_thresholds is True:
-                self.bars_thresholds.append(
-                    {'timestamp': date_time, 'cum_theta': self.cum_theta, 'exp_num_ticks': self.exp_num_ticks,
-                     'exp_imbalance': np.abs(self.expected_imbalance)})
+                self.thresholds['timestamp'] = date_time
+                self.bars_thresholds.append(self.thresholds)
 
             self.prev_price = price  # Update previous price used for tick rule calculations
 
             # Check expression for possible bar generation
-            if np.abs(self.cum_theta) > self.exp_num_ticks * np.abs(self.expected_imbalance):
+            if np.abs(self.thresholds['cum_theta']) > self.thresholds['exp_num_ticks'] * np.abs(
+                    self.thresholds['expected_imbalance']):
                 self._create_bars(date_time, price,
                                   self.high_price, self.low_price, list_bars)
 
-                self.num_ticks_bar.append(self.cum_statistics['cum_ticks'])
+                self.imbalance_tick_statistics['num_ticks_bar'].append(self.cum_statistics['cum_ticks'])
                 # Expected number of ticks based on formed bars
-                self.exp_num_ticks = self._get_exp_num_ticks()
+                self.thresholds['exp_num_ticks'] = self._get_exp_num_ticks()
                 # Get expected imbalance
-                self.expected_imbalance = self._get_expected_imbalance(
+                self.thresholds['expected_imbalance'] = self._get_expected_imbalance(
                     self.expected_imbalance_window)
                 # Reset counters
                 self._reset_cache()
@@ -330,20 +327,21 @@ class BaseImbalanceBars(BaseBars):
         :param window: EWMA window for calculation
         :return: expected_imbalance: 2P[b_t=1]-1, approximated using a EWMA
         """
-        if len(self.imbalance_array) < self.exp_num_ticks_init:
+        if len(self.imbalance_tick_statistics['imbalance_array']) < self.thresholds['exp_num_ticks']:
             # Waiting for array to fill for ewma
             ewma_window = np.nan
         else:
             # ewma window can be either the window specified in a function call
             # or it is len of imbalance_array if window > len(imbalance_array)
-            ewma_window = int(min(len(self.imbalance_array), window))
+            ewma_window = int(min(len(self.imbalance_tick_statistics['imbalance_array']), window))
 
         if np.isnan(ewma_window):
             # return nan, wait until len(self.imbalance_array) >= self.exp_num_ticks_init
             expected_imbalance = np.nan
         else:
             expected_imbalance = ewma(
-                np.array(self.imbalance_array[-ewma_window:], dtype=float), window=ewma_window)[-1]
+                np.array(self.imbalance_tick_statistics['imbalance_array'][-ewma_window:], dtype=float),
+                window=ewma_window)[-1]
 
         return expected_imbalance
 
