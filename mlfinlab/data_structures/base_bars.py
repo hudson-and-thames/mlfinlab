@@ -241,9 +241,11 @@ class BaseImbalanceBars(BaseBars):
         # Previous bars number of ticks and previous tick imbalances
         self.imbalance_tick_statistics = {'num_ticks_bar': [], 'imbalance_array': []}
 
-        self.analyse_thresholds = analyse_thresholds
-        # Array of dicts: {'timestamp': value, 'cum_theta': value, 'exp_num_ticks': value, 'exp_imbalance': value}
-        self.bars_thresholds = []
+        if analyse_thresholds is True:
+            # Array of dicts: {'timestamp': value, 'cum_theta': value, 'exp_num_ticks': value, 'exp_imbalance': value}
+            self.bars_thresholds = []
+        else:
+            self.bars_thresholds = None
 
     def _reset_cache(self):
         """
@@ -298,7 +300,7 @@ class BaseImbalanceBars(BaseBars):
                 self.thresholds['expected_imbalance'] = self._get_expected_imbalance(
                     self.expected_imbalance_window)
 
-            if self.analyse_thresholds is True:
+            if self.bars_thresholds is not None:
                 self.thresholds['timestamp'] = date_time
                 self.bars_thresholds.append(self.thresholds)
 
@@ -385,9 +387,11 @@ class BaseRunBars(BaseBars):
         self.imbalance_tick_statistics = {'num_ticks_bar': [], 'imbalance_array_buy': [], 'imbalance_array_sell': [],
                                           'buy_ticks_proportion': []}
 
-        self.analyse_thresholds = analyse_thresholds
-        # Array of dicts: {'timestamp': value, 'cum_theta': value, 'exp_num_ticks': value, 'exp_imbalance': value}
-        self.bars_thresholds = []
+        if analyse_thresholds:
+            # Array of dicts: {'timestamp': value, 'cum_theta': value, 'exp_num_ticks': value, 'exp_imbalance': value}
+            self.bars_thresholds = []
+        else:
+            self.bars_thresholds = None
 
     def _reset_cache(self):
         """
@@ -400,7 +404,7 @@ class BaseRunBars(BaseBars):
 
     def _extract_bars(self, data):
         """
-        For loop which compiles the various imbalance bars: dollar, volume, or tick.
+        For loop which compiles the various run bars: dollar, volume, or tick.
 
         :param data: (DataFrame) Contains 3 columns - date_time, price, and volume.
         :return: (List) of bars built using the current batch.
@@ -456,11 +460,11 @@ class BaseRunBars(BaseBars):
 
                 if bool(np.isnan([self.thresholds['exp_imbalance_buy'],
                                   self.thresholds['exp_imbalance_sell']]).any()) is False:
-                    self.thresholds['exp_buy_ticks_proportion'] = self.thresholds['buy_ticks_num'] / self.cum_statistics[
-                        'cum_ticks']
-                    self.warm_up = False
+                    self.thresholds['exp_buy_ticks_proportion'] = self.thresholds['buy_ticks_num'] / \
+                                                                  self.cum_statistics[
+                                                                      'cum_ticks']
 
-            if self.analyse_thresholds is True:
+            if self.bars_thresholds is not None:
                 self.thresholds['timestamp'] = date_time
                 self.bars_thresholds.append(self.thresholds)
 
@@ -473,8 +477,7 @@ class BaseRunBars(BaseBars):
 
             # Check expression for possible bar generation
             if max(self.thresholds['cum_theta_buy'],
-                   self.thresholds['cum_theta_sell']) > self.thresholds[
-                'exp_num_ticks'] * max_proportion and self.warm_up is False:
+                   self.thresholds['cum_theta_sell']) > self.thresholds['exp_num_ticks'] * max_proportion:
                 self._create_bars(date_time, price,
                                   self.high_price, self.low_price, list_bars)
 
