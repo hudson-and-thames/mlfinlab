@@ -27,7 +27,7 @@ class BaseBars(ABC):
         """
         # Base properties
         self.file_path = file_path
-        self.metric = 'self.' + metric
+        self.metric = metric
         self.batch_size = batch_size
         self.prev_tick_rule = 0
 
@@ -350,7 +350,7 @@ class BaseImbalanceBars(BaseBars):
     @abstractmethod
     def _get_exp_num_ticks(self):
         """
-        Abstract method which updates expected number of ticks when new imbalance bar is formed
+        Abstract method which updates expected number of ticks when new run bar is formed
         """
 
 

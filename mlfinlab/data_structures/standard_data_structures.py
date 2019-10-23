@@ -81,7 +81,7 @@ class StandardBars(BaseBars):
             self.prev_price = price
 
             # If threshold reached then take a sample
-            if eval(self.metric) >= self.threshold:  # pylint: disable=eval-used
+            if self.cum_statistics(eval(self.metric)) >= self.threshold:  # pylint: disable=eval-used
                 self._create_bars(date_time, price,
                                   self.high_price, self.low_price, list_bars)
 
