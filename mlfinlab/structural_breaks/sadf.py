@@ -35,14 +35,43 @@ def _get_y_x(series, model, lags, add_const):
 
     if add_const is True:
         x['const'] = 1
+
     if model == 'linear':
         x['trend'] = np.arange(x.shape[0])  # Add t to the model (0, 1, 2, 3, 4, 5, .... t)
+        beta_column = 'y_lagged'  # Column which is used to estimate test beta statistics
     elif model == 'quadratic':
         x['trend'] = np.arange(x.shape[0]) ** 2  # Add t^2 to the model (0, 1, 4, 9, ....)
+        beta_column = 'y_lagged'  # Column which is used to estimate test beta statistics
+    elif model == 'sm_poly_1':
+        y = series
+        x = pd.DataFrame(index=y.index)
+        x['const'] = 1
+        x['trend'] = np.arange(x.shape[0])
+        x['quad_trend'] = np.arange(x.shape[0]) ** 2
+        beta_column = 'quad_trend'
+    elif model == 'sm_poly_2':
+        y = np.log(series)
+        x = pd.DataFrame(index=y.index)
+        x['const'] = 1
+        x['trend'] = np.arange(x.shape[0])
+        x['quad_trend'] = np.arange(x.shape[0]) ** 2
+        beta_column = 'quad_trend'
+    elif model == 'sm_exp':
+        y = np.log(series)
+        x = pd.DataFrame(index=y.index)
+        x['const'] = 1
+        x['trend'] = np.arange(x.shape[0])
+        beta_column = 'trend'
+    elif model == 'sm_power':
+        y = np.log(series)
+        x = pd.DataFrame(index=y.index)
+        x['const'] = 1
+        x['log_trend'] = np.log(np.arange(x.shape[0]))
+        beta_column = 'log_trend'
 
     # Move y_lagged column to the front for further extraction
     columns = list(x.columns)
-    columns.insert(0, columns.pop(columns.index('y_lagged')))
+    columns.insert(0, columns.pop(columns.index(beta_column)))
     x = x[columns]
     return x, y
 
@@ -108,8 +137,3 @@ def get_sadf(df, min_length, model, add_const, lags, num_threads=8):
                                 num_threads=num_threads,
                                 )
     return sadf_series
-
-
-df = pd.read_csv('../../../../Downloads/pnl_and_commissions.csv', index_col=0, parse_dates=[0])
-df['equity'] = 1e6 + df.realised_pnl + df.unrealised_pnl
-sadf = get_sadf(np.log(df.equity), min_length=20, model='linear', add_const=True, lags=6)
