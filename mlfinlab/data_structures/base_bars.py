@@ -17,18 +17,29 @@ class BaseBars(ABC):
     they are included here so as to avoid a complicated nested class structure.
     """
 
-    def __init__(self, file_path, metric, batch_size=2e7):
+    def __init__(self, file_path_or_df, metric, batch_size=2e7):
         """
         Constructor
 
-        :param file_path: (String) Path to the csv file containing raw tick data in the format[date_time, price, volume]
+        :param file_path_or_df: (String) Path to the csv file containing raw tick data in the format[date_time, price, volume]
         :param metric: (String) type of imbalance bar to create. Example: dollar_imbalance.
         :param batch_size: (Int) Number of rows to read in from the csv, per batch.
         """
+
+        if isinstance(file_path_or_df, str):
+            self.generator_object = pd.read_csv(file_path_or_df, chunksize=batch_size)
+            # Read in the first row & assert format
+            first_row = pd.read_csv(file_path_or_df, nrows=1)
+            self._assert_csv(first_row)
+        elif isinstance(file_path_or_df, pd.DataFrame):
+            self.generator_object = self._crop_data_frame_in_batches(file_path_or_df, batch_size)
+            first_row = file_path_or_df.iloc[0]
+            self._assert_csv(first_row)
+        else:
+            raise ValueError('file_path_or_df is neither string(path to a csv file) nor pd.DataFrame')
+
         # Base properties
-        self.file_path = file_path
         self.metric = metric
-        self.batch_size = batch_size
         self.prev_tick_rule = 0
 
         # Cache properties
@@ -38,6 +49,18 @@ class BaseBars(ABC):
 
         # Batch_run properties
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
+
+    def _crop_data_frame_in_batches(self, df, chunksize):
+        """
+        Splits df into chunks of chunksize
+        :param df: (pd.DataFrame) to split
+        :param chunksize: (Int) number of rows in chunk
+        :return: (list) of chunks (pd.DataFrames)
+        """
+        generator_object = []
+        for _, chunk in df.groupby(np.arange(len(df)) // chunksize):
+            generator_object.append(chunk)
+        return generator_object
 
     def batch_run(self, verbose=True, to_csv=False, output_path=None):
         """
@@ -49,10 +72,6 @@ class BaseBars(ABC):
 
         :return: (DataFrame or None) Financial data structure
         """
-
-        # Read in the first row & assert format
-        first_row = pd.read_csv(self.file_path, nrows=1)
-        self._assert_csv(first_row)
 
         if to_csv is True:
             header = True  # if to_csv is True, header should written on the first batch only
@@ -66,7 +85,7 @@ class BaseBars(ABC):
         final_bars = []
         cols = ['date_time', 'open', 'high', 'low', 'close', 'volume', 'cum_buy_volume', 'cum_ticks',
                 'cum_dollar_value']
-        for batch in pd.read_csv(self.file_path, chunksize=self.batch_size):
+        for batch in self.generator_object:
             if verbose:  # pragma: no cover
                 print('Batch number:', count)
 
