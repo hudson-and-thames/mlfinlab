@@ -378,17 +378,17 @@ class TestDataStructures(unittest.TestCase):
                          np.int64(5), 'Limit order', 'B23']
 
         # pylint: disable=protected-access
-        self.assertRaises(ValueError, ds.BaseImbalanceBars._assert_csv(
+        self.assertRaises(ValueError, ds.BaseRunBars._assert_csv(
             pd.DataFrame(wrong_date).T))
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds.BaseImbalanceBars._assert_csv,
+                          ds.BaseRunBars._assert_csv,
                           pd.DataFrame(too_many_cols).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds.BaseImbalanceBars._assert_csv,
+                          ds.BaseRunBars._assert_csv,
                           pd.DataFrame(wrong_price).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds.BaseImbalanceBars._assert_csv,
+                          ds.BaseRunBars._assert_csv,
                           pd.DataFrame(wrong_volume).T)

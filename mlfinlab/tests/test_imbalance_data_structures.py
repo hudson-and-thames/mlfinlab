@@ -238,12 +238,12 @@ class TestDataStructures(unittest.TestCase):
         """
         exp_num_ticks_init = 1000
 
-        db1, _ = ds.get_const_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                                    expected_imbalance_window=10000,
-                                                    batch_size=2e7, verbose=False, )
-        db2, _ = ds.get_const_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
-                                                    expected_imbalance_window=10000,
-                                                    batch_size=50, verbose=False)
+        db1, thresh1 = ds.get_const_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+                                                          expected_imbalance_window=10000,
+                                                          batch_size=2e7, verbose=False, analyse_thresholds=True)
+        db2, thresh2 = ds.get_const_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+                                                          expected_imbalance_window=10000,
+                                                          batch_size=50, verbose=False, analyse_thresholds=True)
         db3, _ = ds.get_const_volume_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                                     expected_imbalance_window=10000,
                                                     batch_size=10, verbose=False)
@@ -254,6 +254,8 @@ class TestDataStructures(unittest.TestCase):
         db4 = pd.read_csv('test.csv')
 
         self.assertEqual(db1.shape, (215, 9))
+
+        self.assertTrue(np.all(thresh1.cum_theta == thresh2.cum_theta))
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -292,7 +294,7 @@ class TestDataStructures(unittest.TestCase):
 
         db1, _ = ds.get_const_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                                   expected_imbalance_window=10000,
-                                                  batch_size=2e7, verbose=False, )
+                                                  batch_size=2e7, verbose=False)
         db2, _ = ds.get_const_tick_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
                                                   expected_imbalance_window=10000,
                                                   batch_size=50, verbose=False)

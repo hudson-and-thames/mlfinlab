@@ -206,9 +206,6 @@ class BaseBars(ABC):
             imbalance = signed_tick * volume * price
         elif self.metric == 'volume_imbalance' or self.metric == 'volume_run':
             imbalance = signed_tick * volume
-        else:
-            raise ValueError('Unknown metric')
-
         return imbalance
 
 
@@ -354,6 +351,7 @@ class BaseImbalanceBars(BaseBars):
         """
 
 
+# pylint: disable=too-many-instance-attributes
 class BaseRunBars(BaseBars):
     """
     Base class for Run Bars (EMA and Const) which implements run bars calculation logic
@@ -371,8 +369,7 @@ class BaseRunBars(BaseBars):
         :param expected_imbalance_window: (Int) Window used to estimate expected imbalance from previous trades
         :param exp_num_ticks_init: (Int) Initial estimate for expected number of ticks in bar.
                                          For Const Imbalance Bars expected number of ticks equals expected number of ticks init
-        :param analyse_thresholds: (Bool) flag to return thresholds values (theta, exp_num_ticks, exp_imbalance) in a
-                                          form of Pandas DataFrame
+        :param analyse_thresholds: (Bool) flag to return thresholds values (thetas, exp_num_ticks, exp_imbalances) in Pandas DataFrame
         """
         BaseBars.__init__(self, file_path, metric, batch_size)
 
@@ -479,11 +476,9 @@ class BaseRunBars(BaseBars):
                 self.thresholds['exp_imbalance_sell'] * (1 - self.thresholds['exp_buy_ticks_proportion']))
 
             # Check expression for possible bar generation
-            if max(self.thresholds['cum_theta_buy'],
-                   self.thresholds['cum_theta_sell']) > self.thresholds[
-                'exp_num_ticks'] * max_proportion and not np.isnan(max_proportion):
-                self._create_bars(date_time, price,
-                                  self.high_price, self.low_price, list_bars)
+            max_theta = max(self.thresholds['cum_theta_buy'], self.thresholds['cum_theta_sell'])
+            if max_theta > self.thresholds['exp_num_ticks'] * max_proportion and not np.isnan(max_proportion):
+                self._create_bars(date_time, price, self.high_price, self.low_price, list_bars)
 
                 self.imbalance_tick_statistics['num_ticks_bar'].append(self.cum_statistics['cum_ticks'])
                 self.imbalance_tick_statistics['buy_ticks_proportion'].append(
