@@ -302,7 +302,7 @@ class BaseImbalanceBars(BaseBars):
 
             if self.bars_thresholds is not None:
                 self.thresholds['timestamp'] = date_time
-                self.bars_thresholds.append(self.thresholds)
+                self.bars_thresholds.append(dict(self.thresholds))
 
             self.prev_price = price  # Update previous price used for tick rule calculations
 
@@ -393,6 +393,8 @@ class BaseRunBars(BaseBars):
         else:
             self.bars_thresholds = None
 
+        self.imbalances_are_counted_flag = False
+
     def _reset_cache(self):
         """
         Implementation of abstract method _reset_cache for imbalance bars
@@ -445,18 +447,19 @@ class BaseRunBars(BaseBars):
                 self.imbalance_tick_statistics['imbalance_array_sell'].append(abs(imbalance))
                 self.thresholds['cum_theta_sell'] += abs(imbalance)
 
-            imbalances_are_counted_flag = np.isnan([self.thresholds['exp_imbalance_buy'], self.thresholds[
+            self.imbalances_are_counted_flag = np.isnan([self.thresholds['exp_imbalance_buy'], self.thresholds[
                 'exp_imbalance_sell']]).any()  # Flag indicating that both buy and sell imbalances are counted
 
             self.prev_price = price  # Update previous price for tick rule calculations
 
             # Get expected imbalance for the first time, when num_ticks_init passed
-            if not list_bars and imbalances_are_counted_flag:
+            if not list_bars and self.imbalances_are_counted_flag:
 
                 self.thresholds['exp_imbalance_buy'] = self._get_expected_imbalance(
-                    self.imbalance_tick_statistics['imbalance_array_buy'], self.expected_imbalance_window)
+                    self.imbalance_tick_statistics['imbalance_array_buy'], self.expected_imbalance_window, warm_up=True)
                 self.thresholds['exp_imbalance_sell'] = self._get_expected_imbalance(
-                    self.imbalance_tick_statistics['imbalance_array_sell'], self.expected_imbalance_window)
+                    self.imbalance_tick_statistics['imbalance_array_sell'], self.expected_imbalance_window,
+                    warm_up=True)
 
                 if bool(np.isnan([self.thresholds['exp_imbalance_buy'],
                                   self.thresholds['exp_imbalance_sell']]).any()) is False:
@@ -466,7 +469,7 @@ class BaseRunBars(BaseBars):
 
             if self.bars_thresholds is not None:
                 self.thresholds['timestamp'] = date_time
-                self.bars_thresholds.append(self.thresholds)
+                self.bars_thresholds.append(dict(self.thresholds))
 
             self.prev_price = price  # Update previous price used for tick rule calculations
 
@@ -477,7 +480,8 @@ class BaseRunBars(BaseBars):
 
             # Check expression for possible bar generation
             if max(self.thresholds['cum_theta_buy'],
-                   self.thresholds['cum_theta_sell']) > self.thresholds['exp_num_ticks'] * max_proportion:
+                   self.thresholds['cum_theta_sell']) > self.thresholds[
+                'exp_num_ticks'] * max_proportion and not np.isnan(max_proportion):
                 self._create_bars(date_time, price,
                                   self.high_price, self.low_price, list_bars)
 
@@ -505,13 +509,14 @@ class BaseRunBars(BaseBars):
 
         return list_bars
 
-    def _get_expected_imbalance(self, array, window):
+    def _get_expected_imbalance(self, array, window, warm_up=False):
         """
         Calculate the expected imbalance: 2P[b_t=1]-1, using a EWMA, pg 29
         :param window: EWMA window for calculation
+        :parawm warm_up: boolean flag of whether warm up period passed
         :return: expected_imbalance: 2P[b_t=1]-1, approximated using a EWMA
         """
-        if len(array) < self.thresholds['exp_num_ticks']:
+        if len(array) < self.thresholds['exp_num_ticks'] and warm_up is True:
             # Waiting for array to fill for ewma
             ewma_window = np.nan
         else:
