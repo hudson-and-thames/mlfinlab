@@ -35,7 +35,7 @@ class BaseBars(ABC):
         """
         Constructor
 
-        :param file_path_or_df: (String) Path to the csv file containing raw tick data in the format[date_time, price, volume]
+        :param file_path_or_df: (String) Path to the csv file or Pandas Dat Frame containing raw tick data in the format[date_time, price, volume]
         :param metric: (String) type of imbalance bar to create. Example: dollar_imbalance.
         :param batch_size: (Int) Number of rows to read in from the csv, per batch.
         """
@@ -235,13 +235,13 @@ class BaseImbalanceBars(BaseBars):
     Base class for Imbalance Bars (EMA and Const) which implements imbalance bars calculation logic
     """
 
-    def __init__(self, file_path, metric, batch_size, expected_imbalance_window, exp_num_ticks_init,
+    def __init__(self, file_path_or_df, metric, batch_size, expected_imbalance_window, exp_num_ticks_init,
                  analyse_thresholds):
         """
         Constructor
 
 
-        :param file_path: (String) Path to the csv file containing raw tick data in the format[date_time, price, volume]
+        :param file_path_or_df: (String) Path to the csv file or Pandas Dat Frame containing raw tick data in the format[date_time, price, volume]
         :param metric: (String) type of imbalance bar to create. Example: dollar_imbalance.
         :param batch_size: (Int) Number of rows to read in from the csv, per batch.
         :param expected_imbalance_window: (Int) Window used to estimate expected imbalance from previous trades
@@ -250,7 +250,7 @@ class BaseImbalanceBars(BaseBars):
         :param analyse_thresholds: (Bool) flag to return thresholds values (theta, exp_num_ticks, exp_imbalance) in a
                                           form of Pandas DataFrame
         """
-        BaseBars.__init__(self, file_path, metric, batch_size)
+        BaseBars.__init__(self, file_path_or_df, metric, batch_size)
 
         self.expected_imbalance_window = expected_imbalance_window
 
@@ -378,13 +378,14 @@ class BaseRunBars(BaseBars):
     Base class for Run Bars (EMA and Const) which implements run bars calculation logic
     """
 
-    def __init__(self, file_path, metric, batch_size, num_prev_bars, expected_imbalance_window, exp_num_ticks_init,
+    def __init__(self, file_path_or_df, metric, batch_size, num_prev_bars, expected_imbalance_window,
+                 exp_num_ticks_init,
                  analyse_thresholds):
         """
         Constructor
 
 
-        :param file_path: (String) Path to the csv file containing raw tick data in the format[date_time, price, volume]
+        :param file_path_or_df: (String) Path to the csv file or Pandas Dat Frame containing raw tick data in the format[date_time, price, volume]
         :param metric: (String) type of imbalance bar to create. Example: dollar_imbalance.
         :param batch_size: (Int) Number of rows to read in from the csv, per batch.
         :param expected_imbalance_window: (Int) Window used to estimate expected imbalance from previous trades
@@ -392,7 +393,7 @@ class BaseRunBars(BaseBars):
                                          For Const Imbalance Bars expected number of ticks equals expected number of ticks init
         :param analyse_thresholds: (Bool) flag to return thresholds values (thetas, exp_num_ticks, exp_imbalances) in Pandas DataFrame
         """
-        BaseBars.__init__(self, file_path, metric, batch_size)
+        BaseBars.__init__(self, file_path_or_df, metric, batch_size)
 
         self.num_prev_bars = num_prev_bars
         self.expected_imbalance_window = expected_imbalance_window

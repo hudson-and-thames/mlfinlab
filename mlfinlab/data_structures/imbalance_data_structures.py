@@ -33,12 +33,12 @@ class EMAImbalanceBars(BaseImbalanceBars):
     This is because we wanted to simplify the logic as much as possible, for the end user.
     """
 
-    def __init__(self, file_path, metric, num_prev_bars, expected_imbalance_window, exp_num_ticks_init,
+    def __init__(self, file_path_or_df, metric, num_prev_bars, expected_imbalance_window, exp_num_ticks_init,
                  exp_num_ticks_constraints, batch_size, analyse_thresholds):
         """
         Constructor
 
-        :param file_path: (String) Path to the csv file containing raw tick data in the format[date_time, price, volume]
+        :param file_path_or_df: (String) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
         :param metric: (String) type of imbalance bar to create. Example: "dollar_imbalance"
         :param num_prev_bars: (Int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
         :param expected_imbalance_window: (Int) EMA window used to estimate expected imbalance
@@ -48,7 +48,7 @@ class EMAImbalanceBars(BaseImbalanceBars):
         :param analyse_thresholds: (Bool) flag to return thresholds values (theta, exp_num_ticks, exp_imbalance) in a
                                           form of Pandas DataFrame
         """
-        BaseImbalanceBars.__init__(self, file_path, metric, batch_size, expected_imbalance_window, exp_num_ticks_init,
+        BaseImbalanceBars.__init__(self, file_path_or_df, metric, batch_size, expected_imbalance_window, exp_num_ticks_init,
                                    analyse_thresholds)
 
         # EMA Imbalance specific  hyper parameters
@@ -76,32 +76,32 @@ class ConstImbalanceBars(BaseImbalanceBars):
     This is because we wanted to simplify the logic as much as possible, for the end user.
     """
 
-    def __init__(self, file_path, metric, expected_imbalance_window, exp_num_ticks_init, batch_size,
+    def __init__(self, file_path_or_df, metric, expected_imbalance_window, exp_num_ticks_init, batch_size,
                  analyse_thresholds):
         """
         Constructor
 
-        :param file_path: (String) Path to the csv file containing raw tick data in the format[date_time, price, volume]
+        :param file_path_or_df: (String) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
         :param metric: (String) type of imbalance bar to create. Example: "dollar_imbalance"
         :param expected_imbalance_window: (Int) EMA window used to estimate expected imbalance
         :param exp_num_ticks_init: (Int) Initial number of expected ticks
         :param batch_size: (Int) Number of rows to read in from the csv, per batch
         :param analyse_thresholds: (Boolean) Flag to save  and return thresholds used to sample imbalance bars
         """
-        BaseImbalanceBars.__init__(self, file_path, metric, batch_size, expected_imbalance_window, exp_num_ticks_init,
+        BaseImbalanceBars.__init__(self, file_path_or_df, metric, batch_size, expected_imbalance_window, exp_num_ticks_init,
                                    analyse_thresholds)
 
     def _get_exp_num_ticks(self):
         return self.thresholds['exp_num_ticks']
 
 
-def get_ema_dollar_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance_window=10000, exp_num_ticks_init=20000,
+def get_ema_dollar_imbalance_bars(file_path_or_df, num_prev_bars=3, expected_imbalance_window=10000, exp_num_ticks_init=20000,
                                   exp_num_ticks_constraints=None, batch_size=2e7, analyse_thresholds=False,
                                   verbose=True, to_csv=False, output_path=None):
     """
     Creates the EMA dollar imbalance bars: date_time, open, high, low, close, volume.
 
-    :param file_path: File path pointing to csv data.
+    :param file_path_or_df: (String) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
     :param num_prev_bars: (Int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
     :param expected_imbalance_window: (Int) EMA window used to estimate expected imbalance
     :param exp_num_ticks_init: initial expected number of ticks per bar
@@ -113,7 +113,7 @@ def get_ema_dollar_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance
     :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of dollar bars and DataFrame of thresholds
     """
-    bars = EMAImbalanceBars(file_path=file_path, metric='dollar_imbalance', num_prev_bars=num_prev_bars,
+    bars = EMAImbalanceBars(file_path_or_df=file_path_or_df, metric='dollar_imbalance', num_prev_bars=num_prev_bars,
                             expected_imbalance_window=expected_imbalance_window,
                             exp_num_ticks_init=exp_num_ticks_init, exp_num_ticks_constraints=exp_num_ticks_constraints,
                             batch_size=batch_size, analyse_thresholds=analyse_thresholds)
@@ -123,13 +123,13 @@ def get_ema_dollar_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance
     return imbalance_bars, pd.DataFrame(bars.bars_thresholds)
 
 
-def get_ema_volume_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance_window=10000, exp_num_ticks_init=20000,
+def get_ema_volume_imbalance_bars(file_path_or_df, num_prev_bars=3, expected_imbalance_window=10000, exp_num_ticks_init=20000,
                                   exp_num_ticks_constraints=None, batch_size=2e7, analyse_thresholds=False,
                                   verbose=True, to_csv=False, output_path=None):
     """
     Creates the EMA volume imbalance bars: date_time, open, high, low, close, volume.
 
-    :param file_path: File path pointing to csv data.
+    :param file_path_or_df: (String) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
     :param num_prev_bars: (Int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
     :param expected_imbalance_window: (Int) EMA window used to estimate expected imbalance
     :param exp_num_ticks_init: initial expected number of ticks per bar
@@ -141,7 +141,7 @@ def get_ema_volume_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance
     :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of volume imbalance bars and DataFrame of thresholds
     """
-    bars = EMAImbalanceBars(file_path=file_path, metric='volume_imbalance', num_prev_bars=num_prev_bars,
+    bars = EMAImbalanceBars(file_path_or_df=file_path_or_df, metric='volume_imbalance', num_prev_bars=num_prev_bars,
                             expected_imbalance_window=expected_imbalance_window,
                             exp_num_ticks_init=exp_num_ticks_init, exp_num_ticks_constraints=exp_num_ticks_constraints,
                             batch_size=batch_size, analyse_thresholds=analyse_thresholds)
@@ -151,13 +151,13 @@ def get_ema_volume_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance
     return imbalance_bars, pd.DataFrame(bars.bars_thresholds)
 
 
-def get_ema_tick_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance_window=10000, exp_num_ticks_init=20000,
+def get_ema_tick_imbalance_bars(file_path_or_df, num_prev_bars=3, expected_imbalance_window=10000, exp_num_ticks_init=20000,
                                 exp_num_ticks_constraints=None, batch_size=2e7, analyse_thresholds=False,
                                 verbose=True, to_csv=False, output_path=None):
     """
     Creates the EMA tick imbalance bars: date_time, open, high, low, close, volume.
 
-    :param file_path: File path pointing to csv data.
+    :param file_path_or_df: (String) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
     :param num_prev_bars: (Int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
     :param expected_imbalance_window: (Int) EMA window used to estimate expected imbalance
     :param exp_num_ticks_init: initial expected number of ticks per bar
@@ -169,7 +169,7 @@ def get_ema_tick_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance_w
     :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of tick imbalance bars and DataFrame of thresholds
     """
-    bars = EMAImbalanceBars(file_path=file_path, metric='tick_imbalance', num_prev_bars=num_prev_bars,
+    bars = EMAImbalanceBars(file_path_or_df=file_path_or_df, metric='tick_imbalance', num_prev_bars=num_prev_bars,
                             expected_imbalance_window=expected_imbalance_window,
                             exp_num_ticks_init=exp_num_ticks_init, exp_num_ticks_constraints=exp_num_ticks_constraints,
                             batch_size=batch_size, analyse_thresholds=analyse_thresholds)
@@ -179,13 +179,13 @@ def get_ema_tick_imbalance_bars(file_path, num_prev_bars=3, expected_imbalance_w
     return imbalance_bars, pd.DataFrame(bars.bars_thresholds)
 
 
-def get_const_dollar_imbalance_bars(file_path, expected_imbalance_window=10000, exp_num_ticks_init=20000,
+def get_const_dollar_imbalance_bars(file_path_or_df, expected_imbalance_window=10000, exp_num_ticks_init=20000,
                                     batch_size=2e7, analyse_thresholds=False, verbose=True, to_csv=False,
                                     output_path=None):
     """
     Creates the Const dollar imbalance bars: date_time, open, high, low, close, volume.
 
-    :param file_path: File path pointing to csv data.
+    :param file_path_or_df: (String) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
     :param expected_imbalance_window: (Int) EMA window used to estimate expected imbalance
     :param exp_num_ticks_init: initial expected number of ticks per bar
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
@@ -195,7 +195,7 @@ def get_const_dollar_imbalance_bars(file_path, expected_imbalance_window=10000, 
     :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of dollar bars and DataFrame of thresholds
     """
-    bars = ConstImbalanceBars(file_path=file_path, metric='dollar_imbalance',
+    bars = ConstImbalanceBars(file_path_or_df=file_path_or_df, metric='dollar_imbalance',
                               expected_imbalance_window=expected_imbalance_window,
                               exp_num_ticks_init=exp_num_ticks_init,
                               batch_size=batch_size, analyse_thresholds=analyse_thresholds)
@@ -205,13 +205,13 @@ def get_const_dollar_imbalance_bars(file_path, expected_imbalance_window=10000, 
     return imbalance_bars, pd.DataFrame(bars.bars_thresholds)
 
 
-def get_const_volume_imbalance_bars(file_path, expected_imbalance_window=10000, exp_num_ticks_init=20000,
+def get_const_volume_imbalance_bars(file_path_or_df, expected_imbalance_window=10000, exp_num_ticks_init=20000,
                                     batch_size=2e7, analyse_thresholds=False, verbose=True, to_csv=False,
                                     output_path=None):
     """
     Creates the Const volume imbalance bars: date_time, open, high, low, close, volume.
 
-    :param file_path: File path pointing to csv data.
+    :param file_path_or_df: (String) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
     :param expected_imbalance_window: (Int) EMA window used to estimate expected imbalance
     :param exp_num_ticks_init: initial expected number of ticks per bar
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
@@ -221,7 +221,7 @@ def get_const_volume_imbalance_bars(file_path, expected_imbalance_window=10000, 
     :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of volume imbalance bars and DataFrame of thresholds
     """
-    bars = ConstImbalanceBars(file_path=file_path, metric='volume_imbalance',
+    bars = ConstImbalanceBars(file_path_or_df=file_path_or_df, metric='volume_imbalance',
                               expected_imbalance_window=expected_imbalance_window,
                               exp_num_ticks_init=exp_num_ticks_init,
                               batch_size=batch_size, analyse_thresholds=analyse_thresholds)
@@ -231,13 +231,13 @@ def get_const_volume_imbalance_bars(file_path, expected_imbalance_window=10000, 
     return imbalance_bars, pd.DataFrame(bars.bars_thresholds)
 
 
-def get_const_tick_imbalance_bars(file_path, expected_imbalance_window=10000, exp_num_ticks_init=20000,
+def get_const_tick_imbalance_bars(file_path_or_df, expected_imbalance_window=10000, exp_num_ticks_init=20000,
                                   batch_size=2e7, analyse_thresholds=False, verbose=True, to_csv=False,
                                   output_path=None):
     """
     Creates the Const tick imbalance bars: date_time, open, high, low, close, volume.
 
-    :param file_path: File path pointing to csv data.
+    :param file_path_or_df: (String) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
     :param expected_imbalance_window: (Int) EMA window used to estimate expected imbalance
     :param exp_num_ticks_init: initial expected number of ticks per bar
     :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
@@ -247,7 +247,7 @@ def get_const_tick_imbalance_bars(file_path, expected_imbalance_window=10000, ex
     :param output_path: Path to csv file, if to_csv is True
     :return: DataFrame of tick imbalance bars and DataFrame of thresholds
     """
-    bars = ConstImbalanceBars(file_path=file_path, metric='tick_imbalance',
+    bars = ConstImbalanceBars(file_path_or_df=file_path_or_df, metric='tick_imbalance',
                               expected_imbalance_window=expected_imbalance_window,
                               exp_num_ticks_init=exp_num_ticks_init,
                               batch_size=batch_size, analyse_thresholds=analyse_thresholds)

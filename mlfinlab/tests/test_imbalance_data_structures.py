@@ -180,7 +180,7 @@ class TestDataStructures(unittest.TestCase):
         # Delete generated csv file (if it wasn't generated test would fail)
         os.remove('test.csv')
 
-    def test_ema_imbalance_dollar_bars_with_constraints(self):
+    def test_ema_imb_dollar_bars_with_constraints(self):
         """
         Test the EMA Dollar Imbalance bars with expected number of ticks max and min constraints
         """
