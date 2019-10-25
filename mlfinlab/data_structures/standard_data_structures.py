@@ -42,7 +42,7 @@ class StandardBars(BaseBars):
         Implementation of abstract method _reset_cache for standard bars
         """
         self.open_price = None
-        self.high_price, self.low_price = np.inf, np.inf
+        self.high_price, self.low_price = -np.inf, np.inf
         self.cum_statistics = {'cum_ticks': 0, 'cum_dollar_value': 0, 'cum_volume': 0, 'cum_buy_volume': 0}
 
     def _extract_bars(self, data):
