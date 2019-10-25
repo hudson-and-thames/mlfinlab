@@ -62,7 +62,6 @@ class TestDataStructures(unittest.TestCase):
         Tests the volume bars implementation.
         """
         threshold = 30
-
         db1 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
         db2 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
         db3 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
@@ -145,3 +144,24 @@ class TestDataStructures(unittest.TestCase):
         self.assertRaises(AssertionError,
                           ds.StandardBars._assert_csv,
                           pd.DataFrame(wrong_volume).T)
+
+    def test_df_as_input(self):
+        """
+        Tests that bars generated for csv file and Pandas Data Frame yield the same result
+        """
+        threshold = 100000
+        tick_data = pd.read_csv(self.path)
+
+        db1 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
+        ds.get_dollar_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
+                           to_csv=True, output_path='test.csv')
+        db2 = pd.read_csv('test.csv')
+        db3 = ds.get_dollar_bars(tick_data, threshold=threshold, batch_size=10, verbose=False)
+
+        # Assert diff batch sizes have same number of bars
+        self.assertTrue(db1.shape == db2.shape)
+        self.assertTrue(db1.shape == db3.shape)
+
+        # Assert same values
+        self.assertTrue(np.all(db1.values == db2.values))
+        self.assertTrue(np.all(db1.values == db3.values))

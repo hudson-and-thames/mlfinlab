@@ -10,6 +10,20 @@ import numpy as np
 from mlfinlab.util.fast_ewma import ewma
 
 
+def _crop_data_frame_in_batches(df, chunksize):
+    # pylint: disable=invalid-name
+    """
+    Splits df into chunks of chunksize
+    :param df: (pd.DataFrame) to split
+    :param chunksize: (Int) number of rows in chunk
+    :return: (list) of chunks (pd.DataFrames)
+    """
+    generator_object = []
+    for _, chunk in df.groupby(np.arange(len(df)) // chunksize):
+        generator_object.append(chunk)
+    return generator_object
+
+
 class BaseBars(ABC):
     """
     Abstract base class which contains the structure which is shared between the various standard and information
@@ -32,9 +46,7 @@ class BaseBars(ABC):
             first_row = pd.read_csv(file_path_or_df, nrows=1)
             self._assert_csv(first_row)
         elif isinstance(file_path_or_df, pd.DataFrame):
-            self.generator_object = self._crop_data_frame_in_batches(file_path_or_df, batch_size)
-            first_row = file_path_or_df.iloc[0]
-            self._assert_csv(first_row)
+            self.generator_object = _crop_data_frame_in_batches(file_path_or_df, batch_size)
         else:
             raise ValueError('file_path_or_df is neither string(path to a csv file) nor pd.DataFrame')
 
@@ -49,18 +61,6 @@ class BaseBars(ABC):
 
         # Batch_run properties
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
-
-    def _crop_data_frame_in_batches(self, df, chunksize):
-        """
-        Splits df into chunks of chunksize
-        :param df: (pd.DataFrame) to split
-        :param chunksize: (Int) number of rows in chunk
-        :return: (list) of chunks (pd.DataFrames)
-        """
-        generator_object = []
-        for _, chunk in df.groupby(np.arange(len(df)) // chunksize):
-            generator_object.append(chunk)
-        return generator_object
 
     def batch_run(self, verbose=True, to_csv=False, output_path=None):
         """
@@ -225,6 +225,8 @@ class BaseBars(ABC):
             imbalance = signed_tick * volume * price
         elif self.metric == 'volume_imbalance' or self.metric == 'volume_run':
             imbalance = signed_tick * volume
+        else:
+            raise ValueError('Unknown imbalance metric, possible values are tick/dollar/volume imbalance/run')
         return imbalance
 
 

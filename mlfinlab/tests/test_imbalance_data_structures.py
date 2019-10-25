@@ -180,6 +180,64 @@ class TestDataStructures(unittest.TestCase):
         # Delete generated csv file (if it wasn't generated test would fail)
         os.remove('test.csv')
 
+    def test_ema_imbalance_dollar_bars_with_constraints(self):
+        """
+        Test the EMA Dollar Imbalance bars with expected number of ticks max and min constraints
+        """
+        exp_num_ticks_init = 1000
+        num_prev_bars = 3
+        exp_num_ticks_constraints = [100, 1000]
+
+        db1, _ = ds.get_ema_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+                                                  expected_imbalance_window=10000,
+                                                  exp_num_ticks_constraints=exp_num_ticks_constraints,
+                                                  num_prev_bars=num_prev_bars, batch_size=2e7, verbose=False)
+        db2, _ = ds.get_ema_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+                                                  expected_imbalance_window=10000,
+                                                  exp_num_ticks_constraints=exp_num_ticks_constraints,
+                                                  num_prev_bars=num_prev_bars, batch_size=50, verbose=False)
+        db3, _ = ds.get_ema_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+                                                  expected_imbalance_window=10000,
+                                                  exp_num_ticks_constraints=exp_num_ticks_constraints,
+                                                  num_prev_bars=num_prev_bars, batch_size=10, verbose=False)
+        ds.get_ema_dollar_imbalance_bars(self.path, exp_num_ticks_init=exp_num_ticks_init,
+                                         expected_imbalance_window=10000,
+                                         exp_num_ticks_constraints=exp_num_ticks_constraints,
+                                         num_prev_bars=num_prev_bars, batch_size=50, verbose=False,
+                                         to_csv=True, output_path='test.csv')
+        db4 = pd.read_csv('test.csv')
+
+        self.assertEqual(db1.shape, (1396, 9))
+
+        # Assert diff batch sizes have same number of bars
+        self.assertTrue(db1.shape == db2.shape)
+        self.assertTrue(db1.shape == db3.shape)
+        self.assertTrue(db1.shape == db4.shape)
+
+        # Assert same values
+        self.assertTrue(np.all(db1.values == db2.values))
+        self.assertTrue(np.all(db1.values == db3.values))
+        self.assertTrue(np.all(db1.values == db4.values))
+
+        # Assert OHLC is correct (the first value)
+        self.assertEqual(db1.loc[0, 'open'], 1306.0)
+        self.assertEqual(db1.loc[0, 'high'], 1306.0)
+        self.assertEqual(db1.loc[0, 'low'], 1304.25)
+        self.assertEqual(db1.loc[0, 'close'], 1304.5)
+
+        self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
+
+        # Assert OHLC is correct (some index)
+        self.assertEqual(db1.loc[1387, 'open'], 1303.25)
+        self.assertEqual(db1.loc[1387, 'high'], 1303.25)
+        self.assertEqual(db1.loc[1387, 'low'], 1303.25)
+        self.assertEqual(db1.loc[1387, 'close'], 1303.25)
+
+        self.assertTrue((db1.loc[:, 'volume'] >= db1.loc[:, 'cum_buy_volume']).all())
+
+        # Delete generated csv file (if it wasn't generated test would fail)
+        os.remove('test.csv')
+
     def test_const_imbalance_dollar_bars(self):
         """
         Tests the Const imbalance dollar bars implementation.
@@ -363,3 +421,13 @@ class TestDataStructures(unittest.TestCase):
         self.assertRaises(AssertionError,
                           ds.BaseImbalanceBars._assert_csv,
                           pd.DataFrame(wrong_volume).T)
+
+    def test_wrong_imbalance_passed(self):
+        """
+        Tests ValueError raise when wrong imbalance was passed
+        """
+        bar_gen = ds.ConstImbalanceBars(self.path, metric='cum_buy_volume', expected_imbalance_window=10,
+                                        exp_num_ticks_init=100,
+                                        analyse_thresholds=False, batch_size=10000)
+        with self.assertRaises(ValueError):
+            bar_gen.batch_run(verbose=False)
