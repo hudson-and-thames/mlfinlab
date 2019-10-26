@@ -12,8 +12,6 @@ from scipy.spatial.distance import squareform
 from sklearn.covariance import OAS
 import matplotlib
 
-matplotlib.use('Agg')
-
 
 class HierarchicalRiskParity:
     '''
