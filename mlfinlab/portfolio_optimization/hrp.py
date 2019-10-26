@@ -137,7 +137,8 @@ class HierarchicalRiskParity:
         :return: (pd.Dataframe) stock returns
         '''
 
-        asset_prices = asset_prices.resample(resample_by).last()
+        if resample_by is not None:
+            asset_prices = asset_prices.resample(resample_by).last()
         asset_returns = asset_prices.pct_change()
         asset_returns = asset_returns.dropna(how='all')
         return asset_returns
@@ -173,14 +174,14 @@ class HierarchicalRiskParity:
         corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
         return corr
 
-    def allocate(self, asset_prices, resample_by='B', use_shrinkage=False):
+    def allocate(self, asset_prices, resample_by=None, use_shrinkage=False):
         '''
         Calculate asset allocations using HRP algorithm
 
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
                                             indexed by date
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                          'B' meaning daily business days which is equivalent to no resampling
+                                          None which is equivalent to no resampling
         :param use_shrinkage: (Boolean) specifies whether to shrink the covariances
         '''
 
