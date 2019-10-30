@@ -1,23 +1,36 @@
+import math
+import numpy as np
+
 def get_shannon_entropy(message):
     """
     """
+    log2 = lambda x: math.log(x) / math.log(2)
+    exr = {}
     entropy = 0
-    for character_i in message:
-        prob = message.count(character_i) / len(message)
-        if prob > 0:
-            entropy += - prob * math.log(prob, 2)
+    for each in message:
+        try:
+            exr[each] += 1
+        except:
+            exr[each] = 1
+    textlen = len(message)
+    for k, v in exr.items():
+        freq = 1.0 * v / textlen
+        entropy += freq * log2(freq)
+    entropy *= -1
     return entropy
+
 
 def get_lempel_ziv_entropy(message):
     i, lib = 1, [message[0]]
     while i < len(message):
         for j in range(i, len(message)):
-            message = message[i:j + 1]
-            if message not in lib:
-                lib.append(message)
+            message_ = message[i:j + 1]
+            if message_ not in lib:
+                lib.append(message_)
                 break
         i = j + 1
     return len(lib) / len(message)
+
 
 def get_plug_in_entropy(message, w=None):
     if w is None:

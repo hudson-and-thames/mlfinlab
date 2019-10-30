@@ -1,5 +1,24 @@
-from mlfinlab.mircostructural_features.entropy import encode_array, get_shannon_entropy, get_plug_in_entropy, get_lempel_ziv_entropy
-from mlfinlab.mircostructural_features.second_generation import get_trades_based_kyle_lambda, get_trades_based_amihud_lambda, get_trades_based_hasbrouck_lambda
+from mlfinlab.microstructural_features.entropy import get_shannon_entropy, get_plug_in_entropy, get_lempel_ziv_entropy
+from mlfinlab.microstructural_features.encoding import encode_array
+from mlfinlab.microstructural_features.second_generation import get_trades_based_kyle_lambda, \
+    get_trades_based_amihud_lambda, get_trades_based_hasbrouck_lambda
+from mlfinlab.microstructural_features.misc import get_avg_tick_size, vwap
+import pandas as pd
+import numpy as np
+
+
+def _crop_data_frame_in_batches(df, chunksize):
+    # pylint: disable=invalid-name
+    """
+    Splits df into chunks of chunksize
+    :param df: (pd.DataFrame) to split
+    :param chunksize: (Int) number of rows in chunk
+    :return: (list) of chunks (pd.DataFrames)
+    """
+    generator_object = []
+    for _, chunk in df.groupby(np.arange(len(df)) // chunksize):
+        generator_object.append(chunk)
+    return generator_object
 
 
 class MicrostructuralFeaturesGenerator:
@@ -18,7 +37,7 @@ class MicrostructuralFeaturesGenerator:
         """
 
         if isinstance(trades_input, str):
-            self.generator_object = pd.read_csv(trades_input, chunksize=batch_size)
+            self.generator_object = pd.read_csv(trades_input, chunksize=batch_size, parse_dates=[0])
             # Read in the first row & assert format
             first_row = pd.read_csv(trades_input, nrows=1)
             self._assert_csv(first_row)
@@ -30,7 +49,6 @@ class MicrostructuralFeaturesGenerator:
         # Base properties
         bar_index_iterator = iter(bar_index)
         self.current_date_time = bar_index_iterator.__next__()
-        self.features = features
 
         # Cache properties
         self.price_diff = []
@@ -43,10 +61,10 @@ class MicrostructuralFeaturesGenerator:
         self.volume_encoding = volume_encoding
         self.pct_encoding = pct_encoding
 
-
         # Batch_run properties
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
         self.prev_price = None
+        self.prev_tick_rule = 0
 
     def batch_run(self, verbose=True, to_csv=False, output_path=None):
         """
@@ -68,7 +86,8 @@ class MicrostructuralFeaturesGenerator:
         # Read csv in batches
         count = 0
         final_bars = []
-        cols = ['date_time', 'avg_tick_size', 'tick_rule_sum', 'vwap', 'kyle_lambda', 'amihud_lambda', 'hasbrouck_lambda', ]
+        cols = ['date_time', 'avg_tick_size', 'tick_rule_sum', 'vwap', 'kyle_lambda', 'amihud_lambda',
+                'hasbrouck_lambda', ]
 
         for en in ['shannon', 'plug_in', 'lempel_ziv']:
             cols += ['tick_rule_entropy' + en]
@@ -148,25 +167,27 @@ class MicrostructuralFeaturesGenerator:
 
             # If date_time reached bar index
             if date_time >= self.current_date_time:
-                self._get_bar_features(date_time)
+                self._get_bar_features(date_time, list_bars)
 
+                # Take the next timestamp
+                self.current_date_time.__next__()
                 # Reset cache
                 self._reset_cache()
         return list_bars
 
-
-    def _get_bar_features(self):
-        features = []
+    def _get_bar_features(self, date_time, list_bars):
+        features = [date_time]
 
         # Tick rule sum, avg tick size, VWAP
         features.append(sum(self.tick_rule))
         features.append(get_avg_tick_size(self.trade_size))
-        features.append(vwap(self.dollar_size, self.volume))
+        features.append(vwap(self.dollar_size, self.trade_size))
 
         # Lambdas
-        features.append(get_trades_based_kyle_lambda(self.price_diff, self.trade_size, self.tick_rule)) # Kyle lambda
-        features.append(get_trades_based_amihud_lambda(self.log_ret, self.dollar_size)) # Amihud lambda
-        features.append(get_trades_based_hasbrouck_lambda(self.log_ret, self.dollar_size, self.tick_rule)) # Hasbrouck lambda
+        features.append(get_trades_based_kyle_lambda(self.price_diff, self.trade_size, self.tick_rule))  # Kyle lambda
+        features.append(get_trades_based_amihud_lambda(self.log_ret, self.dollar_size))  # Amihud lambda
+        features.append(
+            get_trades_based_hasbrouck_lambda(self.log_ret, self.dollar_size, self.tick_rule))  # Hasbrouck lambda
 
         # Entropy features
         features.append(get_shannon_entropy(self.tick_rule))
@@ -184,6 +205,8 @@ class MicrostructuralFeaturesGenerator:
             features.append(get_shannon_entropy(message))
             features.append(get_plug_in_entropy(message))
             features.append(get_lempel_ziv_entropy(message))
+
+        list_bars.append(features)
 
     def _apply_tick_rule(self, price):
         """
@@ -210,15 +233,15 @@ class MicrostructuralFeaturesGenerator:
         if self.prev_price is not None:
             return price - self.prev_price
         else:
-            return None
+            return 0  # First diff is assumed 0
 
     def _get_log_ret(self, price):
         """
         """
         if self.prev_price is not None:
-            return np.log(price/self.prev_price)
+            return np.log(price / self.prev_price)
         else:
-            return None
+            return 0  # First return is assumed 0
 
     @staticmethod
     def _assert_csv(test_batch):
