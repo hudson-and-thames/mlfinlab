@@ -59,7 +59,7 @@ class MicrostructuralFeaturesGenerator:
         """
 
         if to_csv is True:
-            header = True  # if to_csv is True, header should written on the first batch only
+            header = True  # if to_csv is True, header should be written on the first batch only
             open(output_path, 'w').close()  # clean output csv file
 
         if verbose:  # pragma: no cover
@@ -72,7 +72,6 @@ class MicrostructuralFeaturesGenerator:
 
         for en in ['shannon', 'plug_in', 'lempel_ziv']:
             cols += ['tick_rule_entropy' + en]
-
 
         if self.volume_encoding is not None:
             for en in ['shannon', 'plug_in', 'lempel_ziv']:

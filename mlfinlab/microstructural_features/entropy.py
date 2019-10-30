@@ -1,24 +1,9 @@
-def _find_nearest(array, value):
-    array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    return array[idx]
-
-def enconde_array(array, inverse_encoding_dict):
-    message = ''
-    for el in array:
-        message += get_letter_from_encoding(array, inverse_encoding_dict)
-    return message
-
-def get_letter_from_encoding(value, inverse_encoding_dict):
-    return inverse_encoding_dict[_find_nearest(list(inverse_encoding_dict.keys()), value)]
-
 def get_shannon_entropy(message):
     """
     """
     entropy = 0
-    # There are 256 possible ASCII characters
-    for character_i in range(256):
-        prob = message.count(chr(character_i)) / len(message)
+    for character_i in message:
+        prob = message.count(character_i) / len(message)
         if prob > 0:
             entropy += - prob * math.log(prob, 2)
     return entropy
