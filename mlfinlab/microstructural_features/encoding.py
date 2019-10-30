@@ -1,6 +1,20 @@
 import numpy as np
 
 
+def encode_tick_rule_array(tick_rule_array):
+    message = ''
+    for el in tick_rule_array:
+        if el == 1:
+            message += 'a'
+        elif el == -1:
+            message += 'b'
+        elif el == 0:
+            message += 'c'
+        else:
+            raise ValueError('Unknown value for tick rule: {}'.format(el))
+    return message
+
+
 def _get_ascii_table():
     # ASCII table consists of 256 characters
     table = []
@@ -24,12 +38,12 @@ def _find_nearest(array, value):
     return array[idx]
 
 
+def _get_letter_from_encoding(value, encoding_dict):
+    return encoding_dict[_find_nearest(list(encoding_dict.keys()), value)]
+
+
 def encode_array(array, encoding_dict):
     message = ''
     for el in array:
-        message += get_letter_from_encoding(el, encoding_dict)
+        message += _get_letter_from_encoding(el, encoding_dict)
     return message
-
-
-def get_letter_from_encoding(value, encoding_dict):
-    return encoding_dict[_find_nearest(list(encoding_dict.keys()), value)]

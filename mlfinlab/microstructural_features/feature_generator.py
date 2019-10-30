@@ -3,6 +3,7 @@ from mlfinlab.microstructural_features.encoding import encode_array
 from mlfinlab.microstructural_features.second_generation import get_trades_based_kyle_lambda, \
     get_trades_based_amihud_lambda, get_trades_based_hasbrouck_lambda
 from mlfinlab.microstructural_features.misc import get_avg_tick_size, vwap
+from mlfinlab.microstructural_features.encoding import encode_tick_rule_array
 import pandas as pd
 import numpy as np
 
@@ -19,6 +20,7 @@ def _crop_data_frame_in_batches(df, chunksize):
     for _, chunk in df.groupby(np.arange(len(df)) // chunksize):
         generator_object.append(chunk)
     return generator_object
+
 
 
 class MicrostructuralFeaturesGenerator:
@@ -47,8 +49,8 @@ class MicrostructuralFeaturesGenerator:
             raise ValueError('trades_input is neither string(path to a csv file) nor pd.DataFrame')
 
         # Base properties
-        bar_index_iterator = iter(bar_index)
-        self.current_date_time = bar_index_iterator.__next__()
+        self.bar_index_iterator = iter(bar_index)
+        self.current_date_time = self.bar_index_iterator.__next__()
 
         # Cache properties
         self.price_diff = []
@@ -90,40 +92,43 @@ class MicrostructuralFeaturesGenerator:
                 'hasbrouck_lambda', ]
 
         for en in ['shannon', 'plug_in', 'lempel_ziv']:
-            cols += ['tick_rule_entropy' + en]
+            cols += ['tick_rule_entropy_' + en]
 
         if self.volume_encoding is not None:
             for en in ['shannon', 'plug_in', 'lempel_ziv']:
-                cols += ['volume_entropy' + en]
+                cols += ['volume_entropy_' + en]
 
         if self.pct_encoding is not None:
             for en in ['shannon', 'plug_in', 'lempel_ziv']:
-                cols += ['price_entropy' + en]
+                cols += ['price_entropy_' + en]
 
-        for batch in self.generator_object:
+            try:
+                for batch in self.generator_object:
+                    if verbose:  # pragma: no cover
+                        print('Batch number:', count)
+
+                    list_bars = self._extract_bars(data=batch)
+
+                    if to_csv is True:
+                        pd.DataFrame(list_bars, columns=cols).to_csv(output_path, header=header, index=False, mode='a')
+                        header = False
+                    else:
+                        # Append to bars list
+                        final_bars += list_bars
+                    count += 1
+
+                    # Set flag to True: notify function to use cache
+                    self.flag = True
+            except StopIteration:
+                pass
+
             if verbose:  # pragma: no cover
-                print('Batch number:', count)
+                print('Returning features \n')
 
-            list_bars = self._extract_bars(data=batch)
-
-            if to_csv is True:
-                pd.DataFrame(list_bars, columns=cols).to_csv(output_path, header=header, index=False, mode='a')
-                header = False
-            else:
-                # Append to bars list
-                final_bars += list_bars
-            count += 1
-
-            # Set flag to True: notify function to use cache
-            self.flag = True
-
-        if verbose:  # pragma: no cover
-            print('Returning features \n')
-
-        # Return a DataFrame
-        if final_bars:
-            bars_df = pd.DataFrame(final_bars, columns=cols)
-            return bars_df
+            # Return a DataFrame
+            if final_bars:
+                bars_df = pd.DataFrame(final_bars, columns=cols)
+                return bars_df
 
         # Processed DataFrame is stored in .csv file, return None
         return None
@@ -170,7 +175,7 @@ class MicrostructuralFeaturesGenerator:
                 self._get_bar_features(date_time, list_bars)
 
                 # Take the next timestamp
-                self.current_date_time.__next__()
+                self.current_date_time = self.bar_index_iterator.__next__()
                 # Reset cache
                 self._reset_cache()
         return list_bars
@@ -190,9 +195,9 @@ class MicrostructuralFeaturesGenerator:
             get_trades_based_hasbrouck_lambda(self.log_ret, self.dollar_size, self.tick_rule))  # Hasbrouck lambda
 
         # Entropy features
-        features.append(get_shannon_entropy(self.tick_rule))
-        features.append(get_plug_in_entropy(self.tick_rule))
-        features.append(get_lempel_ziv_entropy(self.tick_rule))
+        features.append(get_shannon_entropy(encode_tick_rule_array(self.tick_rule)))
+        features.append(get_plug_in_entropy(encode_tick_rule_array(self.tick_rule)))
+        features.append(get_lempel_ziv_entropy(encode_tick_rule_array(self.tick_rule)))
 
         if self.volume_encoding is not None:
             message = encode_array(self.trade_size, self.volume_encoding)
