@@ -3,6 +3,12 @@ def _find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
+def enconde_array(array, inverse_encoding_dict):
+    message = ''
+    for el in array:
+        message += get_letter_from_encoding(array, inverse_encoding_dict)
+    return message
+
 def get_letter_from_encoding(value, inverse_encoding_dict):
     return inverse_encoding_dict[_find_nearest(list(inverse_encoding_dict.keys()), value)]
 
@@ -17,7 +23,7 @@ def get_shannon_entropy(message):
             entropy += - prob * math.log(prob, 2)
     return entropy
 
-def lempel_ziv_entropy(message):
+def get_lempel_ziv_entropy(message):
     i, lib = 1, [message[0]]
     while i < len(message):
         for j in range(i, len(message)):
