@@ -206,7 +206,7 @@ class MicrostructuralFeaturesGenerator:
             features.append(get_lempel_ziv_entropy(message))
 
         if self.pct_encoding is not None:
-            message = encode_array(self.log_ret, self.volume_encoding)
+            message = encode_array(self.log_ret, self.pct_encoding)
             features.append(get_shannon_entropy(message))
             features.append(get_plug_in_entropy(message))
             features.append(get_lempel_ziv_entropy(message))
