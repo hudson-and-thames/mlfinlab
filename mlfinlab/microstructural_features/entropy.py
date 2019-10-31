@@ -1,6 +1,7 @@
 import math
 import numpy as np
 
+
 def get_shannon_entropy(message):
     """
     """

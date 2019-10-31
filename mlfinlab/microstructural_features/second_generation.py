@@ -3,10 +3,10 @@ from sklearn.linear_model import LinearRegression
 
 
 def get_bar_based_kyle_lambda(close, volume, window=20):
-    close_diff = close.diff().dropna(inplace=True)
+    close_diff = close.diff()
     close_diff_sign = np.sign(close_diff)
-    volume_mult_trade_signs = volume * close_diff_sign
-    volume_mult_trade_signs = volume_mult_trade_signs.loc[close_diff.index]  # bt * Vt
+    close_diff_sign.replace(0, method='pad', inplace=True) # Replace 0 values with previous
+    volume_mult_trade_signs = volume * close_diff_sign  # bt * Vt
     return (close_diff / volume_mult_trade_signs).rolling(window=window).mean()
 
 
@@ -17,7 +17,7 @@ def get_bar_based_amihud_lambda(close, dollar_volume, window=20):
 
 def get_bar_based_hasbrouck_lambda(close, dollar_volume, window=20):
     log_ret = np.log(close / close.shift(1))
-    log_ret_sign = np.sign(log_ret)
+    log_ret_sign = np.sign(log_ret).replace(0, method='pad')
 
     signed_dollar_volume_sqrt = log_ret_sign * np.sqrt(dollar_volume)
     return (log_ret / signed_dollar_volume_sqrt).rolling(window=window).mean()
