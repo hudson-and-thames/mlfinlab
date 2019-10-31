@@ -64,7 +64,6 @@ class MicrostructuralFeaturesGenerator:
         self.pct_encoding = pct_encoding
 
         # Batch_run properties
-        self.flag = False  # The first flag is false since the first batch doesn't use the cache
         self.prev_price = None
         self.prev_tick_rule = 0
 
@@ -117,8 +116,6 @@ class MicrostructuralFeaturesGenerator:
                         final_bars += list_bars
                     count += 1
 
-                    # Set flag to True: notify function to use cache
-                    self.flag = True
             except StopIteration:
                 pass
 
