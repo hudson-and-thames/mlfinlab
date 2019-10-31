@@ -1,11 +1,12 @@
 """
-General python utility functions
+Various volatility estimators
 """
 import pandas as pd
 import numpy as np
 
+# pylint: disable=redefined-builtin
 
-def get_daily_vol(close, lookback=100):
+def get_daily_vol(close: pd.Series, lookback: int = 100) -> pd.Series:
     """
     Snippet 3.1, page 44, Daily Volatility Estimates
 
@@ -35,20 +36,51 @@ def get_daily_vol(close, lookback=100):
     return df0
 
 
-def get_parksinson_vol(high, low, window=20):
+def get_parksinson_vol(high: pd.Series, low: pd.Series, window: int = 20) -> pd.Series:
+    """
+    Parkinson volatility estimator
+
+    :param high: (pd.Series): High prices
+    :param low: (pd.Series): Low prices
+    :param window: (int): window used for estimation
+    :return: (pd.Series): Parkinson volatility
+    """
     ret = np.log(high / low)  # High/Low return
     estimator = 1 / (4 * np.log(2)) * (ret ** 2)
     return np.sqrt(estimator.rolling(window=window).mean())
 
 
-def get_garman_class_vol(open, high, low, close, window=20):
+def get_garman_class_vol(open: pd.Series, high: pd.Series, low: pd.Series, close: pd.Series,
+                         window: int = 20) -> pd.Series:
+    """
+    Garman-Class volatility estimator
+
+    :param open: (pd.Series): Open prices
+    :param high: (pd.Series): High prices
+    :param low: (pd.Series): Low prices
+    :param close: (pd.Series): Close prices
+    :param window: (int): window used for estimation
+    :return: (pd.Series): Garman-Class volatility
+    """
     ret = np.log(high / low)  # High/Low return
     close_open_ret = np.log(close / open)  # Close/Open return
     estimator = 0.5 * ret ** 2 - (2 * np.log(2) - 1) * close_open_ret ** 2
     return np.sqrt(estimator.rolling(window=window).mean())
 
 
-def get_yang_zhang_vol(open, high, low, close, window=20):
+def get_yang_zhang_vol(open: pd.Series, high: pd.Series, low: pd.Series, close: pd.Series,
+                       window: int = 20) -> pd.Series:
+    """
+
+    Yang-Zhang volatility estimator
+
+    :param open: (pd.Series): Open prices
+    :param high: (pd.Series): High prices
+    :param low: (pd.Series): Low prices
+    :param close: (pd.Series): Close prices
+    :param window: (int): window used for estimation
+    :return: (pd.Series): Yang-Zhang volatility
+    """
     k = 0.34 / (1.34 + (window + 1) / (window - 1))
 
     open_prev_close_ret = np.log(open / close.shift(1))

@@ -1,14 +1,20 @@
+"""
+Inter-bar feature generator which uses trades data and bars index to calculate inter-bar features
+"""
+
+import pandas as pd
+import numpy as np
 from mlfinlab.microstructural_features.entropy import get_shannon_entropy, get_plug_in_entropy, get_lempel_ziv_entropy
 from mlfinlab.microstructural_features.encoding import encode_array
 from mlfinlab.microstructural_features.second_generation import get_trades_based_kyle_lambda, \
     get_trades_based_amihud_lambda, get_trades_based_hasbrouck_lambda
 from mlfinlab.microstructural_features.misc import get_avg_tick_size, vwap
 from mlfinlab.microstructural_features.encoding import encode_tick_rule_array
-import pandas as pd
-import numpy as np
 
 
-def _crop_data_frame_in_batches(df, chunksize):
+# pylint: disable=too-many-instance-attributes
+
+def _crop_data_frame_in_batches(df: pd.DataFrame, chunksize: int):
     # pylint: disable=invalid-name
     """
     Splits df into chunks of chunksize
@@ -22,20 +28,20 @@ def _crop_data_frame_in_batches(df, chunksize):
     return generator_object
 
 
-
 class MicrostructuralFeaturesGenerator:
     """
-    Abstract base class which contains the structure which is shared between the various standard and information
-    driven bars. There are some methods contained in here that would only be applicable to information bars but
-    they are included here so as to avoid a complicated nested class structure.
+    Class which is used to generate inter-bar features when bars are already compressed
     """
 
-    def __init__(self, trades_input, bar_index, batch_size=2e7, volume_encoding=None, pct_encoding=None):
+    def __init__(self, trades_input: (str, pd.DataFrame), bar_index: pd.DatetimeIndex, batch_size: int = 2e7,
+                 volume_encoding: dict = None, pct_encoding: dict = None):
         """
         Constructor
         :param trades_input: (String) Path to the csv file or Pandas Dat Frame containing raw tick data in the format[date_time, price, volume]
-        :param metric: (String) type of imbalance bar to create. Example: dollar_imbalance.
-        :param batch_size: (Int) Number of rows to read in from the csv, per batch.
+        :param bar_index: (pd.DatetimeIndex) bars index used for feature calculations, should be sorted
+        :param batch_size: (int) Number of rows to read in from the csv, per batch.
+        :param volume_encoding: (dict) Dictionary of encoding trades size anc calculate entropy on encoded messages
+        :param pct_encoding: (dict) Dictionary of encoding log returns anc calculate entropy on encoded messages
         """
 
         if isinstance(trades_input, str):
@@ -79,27 +85,25 @@ class MicrostructuralFeaturesGenerator:
 
         if to_csv is True:
             header = True  # if to_csv is True, header should be written on the first batch only
-            open(output_path, 'w').close()  # clean output csv file
-
-        if verbose:  # pragma: no cover
-            print('Reading data in batches:')
+            open(output_path, 'w').close()  # Clean output csv file
 
         # Read csv in batches
         count = 0
         final_bars = []
         cols = ['date_time', 'avg_tick_size', 'tick_rule_sum', 'vwap', 'kyle_lambda', 'amihud_lambda',
-                'hasbrouck_lambda', ]
+                'hasbrouck_lambda']
 
-        for en in ['shannon', 'plug_in', 'lempel_ziv']:
-            cols += ['tick_rule_entropy_' + en]
+        # Entropy features columns
+        for en_type in ['shannon', 'plug_in', 'lempel_ziv']:
+            cols += ['tick_rule_entropy_' + en_type]
 
         if self.volume_encoding is not None:
-            for en in ['shannon', 'plug_in', 'lempel_ziv']:
-                cols += ['volume_entropy_' + en]
+            for en_type in ['shannon', 'plug_in', 'lempel_ziv']:
+                cols += ['volume_entropy_' + en_type]
 
         if self.pct_encoding is not None:
-            for en in ['shannon', 'plug_in', 'lempel_ziv']:
-                cols += ['price_entropy_' + en]
+            for en_type in ['shannon', 'plug_in', 'lempel_ziv']:
+                cols += ['price_entropy_' + en_type]
 
             try:
                 for batch in self.generator_object:
@@ -119,9 +123,6 @@ class MicrostructuralFeaturesGenerator:
             except StopIteration:
                 pass
 
-            if verbose:  # pragma: no cover
-                print('Returning features \n')
-
             # Return a DataFrame
             if final_bars:
                 bars_df = pd.DataFrame(final_bars, columns=cols)
@@ -131,6 +132,11 @@ class MicrostructuralFeaturesGenerator:
         return None
 
     def _reset_cache(self):
+        """
+        Reset price_diff, trade_size, tick_rule, log_ret arrays to empty when bar is formed and features are
+        calculated
+        :return:
+        """
         self.price_diff = []
         self.trade_size = []
         self.tick_rule = []
@@ -139,8 +145,7 @@ class MicrostructuralFeaturesGenerator:
 
     def _extract_bars(self, data):
         """
-        For loop which compiles the various bars: dollar, volume, or tick.
-        We did investigate the use of trying to solve this in a vectorised manner but found that a For loop worked well.
+        For loop which calculates features for formed bars using trades data
         :param data: Contains 3 columns - date_time, price, and volume.
         """
 
@@ -177,7 +182,13 @@ class MicrostructuralFeaturesGenerator:
                 self._reset_cache()
         return list_bars
 
-    def _get_bar_features(self, date_time, list_bars):
+    def _get_bar_features(self, date_time: pd.Timestamp, list_bars: list) -> list:
+        """
+        Calculate inter-bar features: lambdas, entropies, avg_tick_size, vwap
+        :param date_time: (pd.Timestamp) when bar was formed
+        :param list_bars: (list) of previously formed bars
+        :return: (list) of inter-bar features
+        """
         features = [date_time]
 
         # Tick rule sum, avg tick size, VWAP
@@ -210,7 +221,7 @@ class MicrostructuralFeaturesGenerator:
 
         list_bars.append(features)
 
-    def _apply_tick_rule(self, price):
+    def _apply_tick_rule(self, price: float) -> int:
         """
         Applies the tick rule as defined on page 29.
         :param price: Price at time t
@@ -229,21 +240,31 @@ class MicrostructuralFeaturesGenerator:
 
         return signed_tick
 
-    def _get_price_diff(self, price):
+    def _get_price_diff(self, price: float) -> float:
         """
-        """
-        if self.prev_price is not None:
-            return price - self.prev_price
-        else:
-            return 0  # First diff is assumed 0
+        Get price difference between ticks
 
-    def _get_log_ret(self, price):
-        """
+        :param price: Price at time t
+        return: price difference
         """
         if self.prev_price is not None:
-            return np.log(price / self.prev_price)
+            price_diff = price - self.prev_price
         else:
-            return 0  # First return is assumed 0
+            price_diff = 0  # First diff is assumed 0
+        return price_diff
+
+    def _get_log_ret(self, price: float) -> float:
+        """
+        Get log return between ticks
+
+        :param price: Price at time t
+        return: log return
+        """
+        if self.prev_price is not None:
+            log_ret = np.log(price / self.prev_price)
+        else:
+            log_ret = 0  # First return is assumed 0
+        return log_ret
 
     @staticmethod
     def _assert_csv(test_batch):
