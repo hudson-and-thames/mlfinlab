@@ -2,7 +2,8 @@
 General python utility functions
 """
 import pandas as pd
-from scipy.stats import norm
+import numpy as np
+
 
 def get_daily_vol(close, lookback=100):
     """
@@ -33,40 +34,34 @@ def get_daily_vol(close, lookback=100):
     df0 = df0.ewm(span=lookback).std()
     return df0
 
+
 def get_parksinson_vol(high, low, window=20):
-    ret = np.log(high/low) # High/Low return
+    ret = np.log(high / low)  # High/Low return
     estimator = 1 / (4 * np.log(2)) * (ret ** 2)
     return np.sqrt(estimator.rolling(window=window).mean())
 
-def get_garman_class_vol(open, high, low, close, window=20):
-    ret = np.log(high/low) # High/Low return
-    close_open_ret = np.log(close/open) # Close/Open return
-    estimator = 0.5 * ret ** 2 - (2 * np.log(2) - 1) * close_open_ret ** 2
-    return np.sqrt(estomator.rolling(window=window).mean())
 
-def get_yang_zhang_vol(open, close, window=20):
-    k = 0.34 / (1.34 + (window + 1)/(window - 1))
+def get_garman_class_vol(open, high, low, close, window=20):
+    ret = np.log(high / low)  # High/Low return
+    close_open_ret = np.log(close / open)  # Close/Open return
+    estimator = 0.5 * ret ** 2 - (2 * np.log(2) - 1) * close_open_ret ** 2
+    return np.sqrt(estimator.rolling(window=window).mean())
+
+
+def get_yang_zhang_vol(open, high, low, close, window=20):
+    k = 0.34 / (1.34 + (window + 1) / (window - 1))
 
     open_prev_close_ret = np.log(open / close.shift(1))
     close_prev_open_ret = np.log(close / open.shift(1))
 
-    high_close_ret = np.log(high/close)
-    high_open_ret = np.log(high/open)
-    low_close_ret = np.log(low/close)
-    low_open_ret = np.log(low/open)
+    high_close_ret = np.log(high / close)
+    high_open_ret = np.log(high / open)
+    low_close_ret = np.log(low / close)
+    low_open_ret = np.log(low / open)
 
     sigma_open_sq = 1 / (window - 1) * (open_prev_close_ret ** 2).rolling(window=window).sum()
     sigma_close_sq = 1 / (window - 1) * (close_prev_open_ret ** 2).rolling(window=window).sum()
-    sigma_rs_sq = 1 / (window - 1) * (high_close_ret * high_open_ret + low_close_ret * low_open_ret).rolling(window=window).sum()
+    sigma_rs_sq = 1 / (window - 1) * (high_close_ret * high_open_ret + low_close_ret * low_open_ret).rolling(
+        window=window).sum()
 
     return np.sqrt(sigma_open_sq + k * sigma_close_sq + (1 - k) * sigma_rs_sq)
-
-def get_bvc_buy_volume(close, volume, window=20):
-    return volume * norm.cdf(close.diff() / close.diff().rolling(window=window).std())
-
-def get_tick_rule(price, prev_price):
-    if price > prev_price:
-        return 1
-    elif price < prev_price:
-        return -1
-    return np.nan

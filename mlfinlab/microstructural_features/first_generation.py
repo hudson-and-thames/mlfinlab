@@ -2,13 +2,13 @@ import numpy as np
 import pandas as pd
 
 
-def get_roll_measure(close_prices, window):
+def get_roll_measure(close_prices, window=20):
     price_diff = close_prices.diff()
     price_diff_lag = price_diff.shift(1)
     return 2 * np.sqrt(abs(price_diff.rolling(window=window).cov(price_diff_lag)))
 
 
-def get_roll_impact(close_prices, dollar_volume, window):
+def get_roll_impact(close_prices, dollar_volume, window=20):
     roll_measure = get_roll_measure(close_prices, window)
     return roll_measure / dollar_volume
 
@@ -46,7 +46,7 @@ def get_corwin_schultz_estimator(high, low, sample_length=20):
     start_time = pd.Series(high.index[0:spread.shape[0]], index=spread.index)
     spread = pd.concat([spread, start_time], axis=1)
     spread.columns = ['Spread', 'Start_Time']  # 1st loc used to compute beta
-    return spread
+    return spread.Spread
 
 
 def get_bekker_parkinson_vol(high, low, sample_length=20):
