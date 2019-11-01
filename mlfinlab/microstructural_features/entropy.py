@@ -50,7 +50,7 @@ def get_lempel_ziv_entropy(message: str) -> float:
 def get_plug_in_entropy(message: str, word_length: int = None) -> float:
     """
     Get Plug-in entropy
-    :param message: (str) encoded message
+    :param message: (str or array) encoded message
     :param word_length: (int) approximate word length
     :return: (float): Plug-in entropy
     """

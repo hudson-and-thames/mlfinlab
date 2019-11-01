@@ -103,7 +103,7 @@ class MicrostructuralFeaturesGenerator:
 
         if self.pct_encoding is not None:
             for en_type in ['shannon', 'plug_in', 'lempel_ziv']:
-                cols += ['price_entropy_' + en_type]
+                cols += ['pct_entropy_' + en_type]
 
         for batch in self.generator_object:
             if verbose:  # pragma: no cover
