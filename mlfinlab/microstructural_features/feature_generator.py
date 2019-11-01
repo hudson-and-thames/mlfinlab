@@ -105,28 +105,28 @@ class MicrostructuralFeaturesGenerator:
             for en_type in ['shannon', 'plug_in', 'lempel_ziv']:
                 cols += ['price_entropy_' + en_type]
 
-            try:
-                for batch in self.generator_object:
-                    if verbose:  # pragma: no cover
-                        print('Batch number:', count)
+        for batch in self.generator_object:
+            if verbose:  # pragma: no cover
+                print('Batch number:', count)
 
-                    list_bars = self._extract_bars(data=batch)
+            list_bars, stop_flag = self._extract_bars(data=batch)
 
-                    if to_csv is True:
-                        pd.DataFrame(list_bars, columns=cols).to_csv(output_path, header=header, index=False, mode='a')
-                        header = False
-                    else:
-                        # Append to bars list
-                        final_bars += list_bars
-                    count += 1
+            if to_csv is True:
+                pd.DataFrame(list_bars, columns=cols).to_csv(output_path, header=header, index=False, mode='a')
+                header = False
+            else:
+                # Append to bars list
+                final_bars += list_bars
+            count += 1
 
-            except StopIteration:
-                pass
+            # End of bar index, no need to calculate further
+            if stop_flag is True:
+                break
 
-            # Return a DataFrame
-            if final_bars:
-                bars_df = pd.DataFrame(final_bars, columns=cols)
-                return bars_df
+        # Return a DataFrame
+        if final_bars:
+            bars_df = pd.DataFrame(final_bars, columns=cols)
+            return bars_df
 
         # Processed DataFrame is stored in .csv file, return None
         return None
@@ -177,10 +177,13 @@ class MicrostructuralFeaturesGenerator:
                 self._get_bar_features(date_time, list_bars)
 
                 # Take the next timestamp
-                self.current_date_time = self.bar_index_iterator.__next__()
+                try:
+                    self.current_date_time = self.bar_index_iterator.__next__()
+                except StopIteration:
+                    return list_bars, True  # Looped through all bar index
                 # Reset cache
                 self._reset_cache()
-        return list_bars
+        return list_bars, False
 
     def _get_bar_features(self, date_time: pd.Timestamp, list_bars: list) -> list:
         """
@@ -192,8 +195,8 @@ class MicrostructuralFeaturesGenerator:
         features = [date_time]
 
         # Tick rule sum, avg tick size, VWAP
-        features.append(sum(self.tick_rule))
         features.append(get_avg_tick_size(self.trade_size))
+        features.append(sum(self.tick_rule))
         features.append(vwap(self.dollar_size, self.trade_size))
 
         # Lambdas

@@ -43,7 +43,7 @@ def _get_beta(high: pd.Series, low: pd.Series, window: int) -> pd.Series:
     high_low_ret = ret ** 2
     beta = high_low_ret.rolling(window=2).sum()
     beta = beta.rolling(window=window).mean()
-    return beta.dropna()
+    return beta
 
 
 def _get_gamma(high: pd.Series, low: pd.Series) -> pd.Series:
@@ -56,7 +56,7 @@ def _get_gamma(high: pd.Series, low: pd.Series) -> pd.Series:
     high_max = high.rolling(window=2).max()
     low_min = low.rolling(window=2).min()
     gamma = np.log(high_max / low_min) ** 2
-    return gamma.dropna()
+    return gamma
 
 
 def _get_alpha(beta: pd.Series, gamma: pd.Series) -> pd.Series:
@@ -70,7 +70,7 @@ def _get_alpha(beta: pd.Series, gamma: pd.Series) -> pd.Series:
     alpha = (2 ** .5 - 1) * (beta ** .5) / den
     alpha -= (gamma / den) ** .5
     alpha[alpha < 0] = 0  # Set negative alphas to 0 (see p.727 of paper)
-    return alpha.dropna()
+    return alpha
 
 
 def get_corwin_schultz_estimator(high: pd.Series, low: pd.Series, window: int = 20) -> pd.Series:
