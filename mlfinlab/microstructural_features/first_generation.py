@@ -1,35 +1,71 @@
+"""
+First generation features (Roll Measure/Impact, Corwin-Schultz spread estimator)
+"""
+
 import numpy as np
 import pandas as pd
 
 
-def get_roll_measure(close_prices, window=20):
+def get_roll_measure(close_prices: pd.Series, window: int = 20) -> pd.Series:
+    """
+    Get Roll Measure
+    :param close_prices: (pd.Series) Close prices
+    :param window: (int) estimation window
+    :return: (pd.Series) of Roll measure
+    """
     price_diff = close_prices.diff()
     price_diff_lag = price_diff.shift(1)
     return 2 * np.sqrt(abs(price_diff.rolling(window=window).cov(price_diff_lag)))
 
 
-def get_roll_impact(close_prices, dollar_volume, window=20):
+def get_roll_impact(close_prices: pd.Series, dollar_volume: pd.Series, window: int = 20) -> pd.Series:
+    """
+        Get Roll Impact
+        :param close_prices: (pd.Series) Close prices
+        :param dollar_volume: (pd.Series) Dollar volume series
+        :param window: (int) estimation window
+        :return: (pd.Series) of Roll impact
+        """
     roll_measure = get_roll_measure(close_prices, window)
     return roll_measure / dollar_volume
 
 
 # Corwin-Schultz algorithm
-def _get_beta(high, low, sample_length):
+def _get_beta(high: pd.Series, low: pd.Series, window: int) -> pd.Series:
+    """
+    Get beta estimate from Corwin-Schultz algorithm
+    :param high: (pd.Series) High prices
+    :param low: (pd.Series) Low prices
+    :param window: (int) estimation window
+    :return: (pd.Series) of beta estimates
+    """
     ret = np.log(high / low)
-    hl = ret ** 2
-    beta = hl.rolling(window=2).sum()
-    beta = beta.rolling(window=sample_length).mean()
+    high_low_ret = ret ** 2
+    beta = high_low_ret.rolling(window=2).sum()
+    beta = beta.rolling(window=window).mean()
     return beta.dropna()
 
 
-def _get_gamma(high, low):
-    h2 = high.rolling(window=2).max()
-    l2 = low.rolling(window=2).min()
-    gamma = np.log(h2 / l2) ** 2
+def _get_gamma(high: pd.Series, low: pd.Series) -> pd.Series:
+    """
+    Get gamma estimate from Corwin-Schultz algorithm
+    :param high: (pd.Series) High prices
+    :param low: (pd.Series) Low prices
+    :return: (pd.Series) of gamma estimates
+    """
+    high_max = high.rolling(window=2).max()
+    low_min = low.rolling(window=2).min()
+    gamma = np.log(high_max / low_min) ** 2
     return gamma.dropna()
 
 
-def _get_alpha(beta, gamma):
+def _get_alpha(beta: pd.Series, gamma: pd.Series) -> pd.Series:
+    """
+    Get alpha from Corwin-Schultz algorithm
+    :param beta: (pd.Series) of beta estimates
+    :param gamma: (pd.Series) of gamma estimates
+    :return: (pd.Series) of alphas
+    """
     den = 3 - 2 * 2 ** .5
     alpha = (2 ** .5 - 1) * (beta ** .5) / den
     alpha -= (gamma / den) ** .5
@@ -37,9 +73,16 @@ def _get_alpha(beta, gamma):
     return alpha.dropna()
 
 
-def get_corwin_schultz_estimator(high, low, sample_length=20):
+def get_corwin_schultz_estimator(high: pd.Series, low: pd.Series, window: int = 20) -> pd.Series:
+    """
+    Get Corwin-Schultz spread estimator
+    :param high: (pd.Series) High prices
+    :param low: (pd.Series) Low prices
+    :param window: (int) estimation window
+    :return: (pd.Series) of Corwin-Schultz spread estimators
+    """
     # Note: S<0 iif alpha<0
-    beta = _get_beta(high, low, sample_length)
+    beta = _get_beta(high, low, window)
     gamma = _get_gamma(high, low)
     alpha = _get_alpha(beta, gamma)
     spread = 2 * (np.exp(alpha) - 1) / (1 + np.exp(alpha))
@@ -49,8 +92,16 @@ def get_corwin_schultz_estimator(high, low, sample_length=20):
     return spread.Spread
 
 
-def get_bekker_parkinson_vol(high, low, sample_length=20):
-    beta = _get_beta(high, low, sample_length)
+def get_bekker_parkinson_vol(high: pd.Series, low: pd.Series, window: int = 20) -> pd.Series:
+    """
+    Get Bekker-Parkinson volatility from gamma and beta in Corwin-Schultz algorithm
+    :param high: (pd.Series) High prices
+    :param low: (pd.Series) Low prices
+    :param window: (int) estimation window
+    :return: (pd.Series) of Bekker-Parkinson volatility estimates
+    """
+    # pylint: disable=invalid-name
+    beta = _get_beta(high, low, window)
     gamma = _get_gamma(high, low)
 
     k2 = (8 / np.pi) ** 0.5

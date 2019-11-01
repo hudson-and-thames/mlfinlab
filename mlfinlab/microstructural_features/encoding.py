@@ -19,7 +19,7 @@ def encode_tick_rule_array(tick_rule_array: list) -> str:
         elif element == 0:
             message += 'c'
         else:
-            raise ValueError('Unknown value for tick rule: {}'.format(el))
+            raise ValueError('Unknown value for tick rule: {}'.format(element))
     return message
 
 

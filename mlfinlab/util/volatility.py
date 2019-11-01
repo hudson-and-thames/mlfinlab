@@ -4,6 +4,7 @@ Various volatility estimators
 import pandas as pd
 import numpy as np
 
+
 # pylint: disable=redefined-builtin
 
 def get_daily_vol(close: pd.Series, lookback: int = 100) -> pd.Series:
