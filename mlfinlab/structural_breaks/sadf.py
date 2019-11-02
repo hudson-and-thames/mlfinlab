@@ -1,20 +1,28 @@
 """
-Explosivness tests: SADF
+Explosiveness tests: SADF
 """
 
+from typing import Union, Tuple
 import pandas as pd
 import numpy as np
 from mlfinlab.util.multiprocess import mp_pandas_obj
 
 
-def _get_sadf_at_t(X, y, min_length):
+# pylint: disable=invalid-name
+
+def _get_sadf_at_t(X: pd.DataFrame, y: pd.DataFrame, min_length: int) -> float:
     """
     Snippet 17.2, page 258. SADF's Inner Loop (get sadf value at t)
+
+    :param X: (pd.DataFrame) of lagged values, constants, trend coefficients
+    :param y: (pd.DataFrame) of y values (either y or y.diff())
+    :param min_length: (int) minimum number of samples needed for estimation
+    :return: (float) of SADF statistics for y.index[-1]
     """
     start_points, bsadf = range(0, y.shape[0] - min_length + 1), -np.inf
     for start in start_points:
-        y_, x_ = y[start:], X[start:]
-        b_mean_, b_std_ = _get_betas(y_, x_)
+        y_, X_ = y[start:], X[start:]
+        b_mean_, b_std_ = _get_betas(X_, y_)
         if not np.isnan(b_mean_[0]):
             b_mean_, b_std_ = b_mean_[0, 0], b_std_[0, 0] ** 0.5
             all_adf = b_mean_ / b_std_
@@ -23,9 +31,16 @@ def _get_sadf_at_t(X, y, min_length):
     return bsadf
 
 
-def _get_y_x(series, model, lags, add_const):
+def _get_y_x(series: pd.Series, model: str, lags: Union[int, list],
+             add_const: bool) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Snippet 17.2, page 258-259. Preparing The Datasets
+
+    :param series: (pd.Series) to prepare for test statistics generation (for example log prices)
+    :param model: (str) either 'linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
+    :param lags: (str or list) either number of lags to use or array of specified lags
+    :param add_const: (bool) flag to add constant
+    :return: (pd.DataFrame, pd.DataFrame) prepared y and X for SADF generation
     """
     series = pd.DataFrame(series)
     series_diff = series.diff().dropna()
@@ -76,7 +91,7 @@ def _get_y_x(series, model, lags, add_const):
     return x, y
 
 
-def _lag_df(df, lags):
+def _lag_df(df: pd.DataFrame, lags: Union[str, list]) -> pd.DataFrame:
     """
     Snipet 17.3, page 259. Apply Lags to DataFrame
     """
@@ -93,25 +108,33 @@ def _lag_df(df, lags):
     return df_lagged
 
 
-def _get_betas(y, x):
+def _get_betas(X: pd.DataFrame, y: pd.DataFrame) -> Tuple[np.array, np.array]:
     """
-    Snippet 17.4, page 259. Fitting The ADF Specification
+    Snippet 17.4, page 259. Fitting The ADF Specification (get beta estimate and estimate variance)
+    :param X: (pd.DataFrame) of features(factors)
+    :param y: (pd.DataFrame) of outcomes
+    :return: (np.array, np.array) of betas and variances of estimates
     """
-    xy = np.dot(x.T, y)
-    xx = np.dot(x.T, x)
+    xy = np.dot(X.T, y)
+    xx = np.dot(X.T, X)
     try:
         xx_inv = np.linalg.inv(xx)
     except np.linalg.LinAlgError:
         return [np.nan], [[np.nan, np.nan]]
     b_mean = np.dot(xx_inv, xy)
-    err = y - np.dot(x, b_mean)
-    b_var = np.dot(err.T, err) / (x.shape[0] - x.shape[1]) * xx_inv
+    err = y - np.dot(X, b_mean)
+    b_var = np.dot(err.T, err) / (X.shape[0] - X.shape[1]) * xx_inv
     return b_mean, b_var
 
 
-def _sadf_outer_loop(X, y, min_length, molecule):
+def _sadf_outer_loop(X: pd.DataFrame, y: pd.DataFrame, min_length: int, molecule: list) -> pd.Series:
     """
     This function gets SADF for t times from molecule
+    :param X: (pd.DataFrame) of features(factors)
+    :param y: (pd.DataFrame) of outcomes
+    :param min_length: (int) minimum number of observations
+    :param molecule: (list) of indices to get SADF
+    :return: (pd.Series) of SADF statistics
     """
     sadf_series = pd.Series(index=molecule)
     for index in molecule:
@@ -122,11 +145,19 @@ def _sadf_outer_loop(X, y, min_length, molecule):
     return sadf_series
 
 
-def get_sadf(df, min_length, model, add_const, lags, num_threads=8):
+def get_sadf(series: pd.Series, model: str, lags: Union[str, list], min_length: int, add_const: bool = False,
+             num_threads: int = 8) -> pd.Series:
     """
     Multithread implementation of SADF
+    :param series: (pd.Series) for which SADF statistics are generated
+    :param model: (str) either 'linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
+    :param lags: (str or list) either number of lags to use or array of specified lags
+    :param min_length: (int) minimum number of observations needed for estimation
+    :param add_const: (bool) flag to add constant
+    :param num_threads: (int) number of cores to use
+    :return (pd.Series) of SADF statistics
     """
-    X, y = _get_y_x(df, model, lags, add_const)
+    X, y = _get_y_x(series, model, lags, add_const)
     molecule = y.index[min_length:y.shape[0]]
 
     sadf_series = mp_pandas_obj(func=_sadf_outer_loop,
