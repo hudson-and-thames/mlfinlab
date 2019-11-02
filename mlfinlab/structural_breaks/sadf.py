@@ -38,7 +38,7 @@ def _get_y_x(series: pd.Series, model: str, lags: Union[int, list],
 
     :param series: (pd.Series) to prepare for test statistics generation (for example log prices)
     :param model: (str) either 'linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
-    :param lags: (str or list) either number of lags to use or array of specified lags
+    :param lags: (int or list) either number of lags to use or array of specified lags
     :param add_const: (bool) flag to add constant
     :return: (pd.DataFrame, pd.DataFrame) prepared y and X for SADF generation
     """
@@ -82,7 +82,10 @@ def _get_y_x(series: pd.Series, model: str, lags: Union[int, list],
         x = pd.DataFrame(index=y.index)
         x['const'] = 1
         x['log_trend'] = np.log(np.arange(x.shape[0]))
+        x, y = x.iloc[1:], y.iloc[1:]  # Drop the first inf value (log(0))
         beta_column = 'log_trend'
+    else:
+        raise ValueError('Unknown model')
 
     # Move y_lagged column to the front for further extraction
     columns = list(x.columns)
@@ -91,7 +94,7 @@ def _get_y_x(series: pd.Series, model: str, lags: Union[int, list],
     return x, y
 
 
-def _lag_df(df: pd.DataFrame, lags: Union[str, list]) -> pd.DataFrame:
+def _lag_df(df: pd.DataFrame, lags: Union[int, list]) -> pd.DataFrame:
     """
     Snipet 17.3, page 259. Apply Lags to DataFrame
     """
@@ -145,13 +148,13 @@ def _sadf_outer_loop(X: pd.DataFrame, y: pd.DataFrame, min_length: int, molecule
     return sadf_series
 
 
-def get_sadf(series: pd.Series, model: str, lags: Union[str, list], min_length: int, add_const: bool = False,
+def get_sadf(series: pd.Series, model: str, lags: Union[int, list], min_length: int, add_const: bool = False,
              num_threads: int = 8) -> pd.Series:
     """
     Multithread implementation of SADF
     :param series: (pd.Series) for which SADF statistics are generated
     :param model: (str) either 'linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
-    :param lags: (str or list) either number of lags to use or array of specified lags
+    :param lags: (int or list) either number of lags to use or array of specified lags
     :param min_length: (int) minimum number of observations needed for estimation
     :param add_const: (bool) flag to add constant
     :param num_threads: (int) number of cores to use
