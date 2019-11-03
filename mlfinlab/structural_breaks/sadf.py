@@ -58,31 +58,30 @@ def _get_y_x(series: pd.Series, model: str, lags: Union[int, list],
         x['trend'] = np.arange(x.shape[0]) ** 2  # Add t^2 to the model (0, 1, 4, 9, ....)
         beta_column = 'y_lagged'  # Column which is used to estimate test beta statistics
     elif model == 'sm_poly_1':
-        y = series
+        y = series.loc[y.index]
         x = pd.DataFrame(index=y.index)
         x['const'] = 1
         x['trend'] = np.arange(x.shape[0])
         x['quad_trend'] = np.arange(x.shape[0]) ** 2
         beta_column = 'quad_trend'
     elif model == 'sm_poly_2':
-        y = np.log(series)
+        y = np.log(series.loc[y.index])
         x = pd.DataFrame(index=y.index)
         x['const'] = 1
         x['trend'] = np.arange(x.shape[0])
         x['quad_trend'] = np.arange(x.shape[0]) ** 2
         beta_column = 'quad_trend'
     elif model == 'sm_exp':
-        y = np.log(series)
+        y = np.log(series.loc[y.index])
         x = pd.DataFrame(index=y.index)
         x['const'] = 1
         x['trend'] = np.arange(x.shape[0])
         beta_column = 'trend'
     elif model == 'sm_power':
-        y = np.log(series)
+        y = np.log(series.loc[y.index])
         x = pd.DataFrame(index=y.index)
         x['const'] = 1
         x['log_trend'] = np.log(np.arange(x.shape[0]))
-        x, y = x.iloc[1:], y.iloc[1:]  # Drop the first inf value (log(0))
         beta_column = 'log_trend'
     else:
         raise ValueError('Unknown model')
