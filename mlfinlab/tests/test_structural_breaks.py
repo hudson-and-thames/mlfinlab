@@ -38,6 +38,10 @@ class TesStructuralBreaks(unittest.TestCase):
         self.assertAlmostEqual(stats[3], -0.6649, delta=1e-3)
 
     def test_chu_stinchcombe_white_test(self):
+        """
+        Test get_chu_stinchcombe_white_statistics function
+        """
+
         log_prices = np.log(self.data.close)
         one_sided_test = get_chu_stinchcombe_white_statistics(log_prices, test_type='one_sided')
         two_sided_test = get_chu_stinchcombe_white_statistics(log_prices, test_type='two_sided')
@@ -66,6 +70,10 @@ class TesStructuralBreaks(unittest.TestCase):
             one_sided_test += get_chu_stinchcombe_white_statistics(log_prices, test_type='abs')
 
     def test_asdf_test(self):
+        """
+        Test get_sadf function
+        """
+
         log_prices = np.log(self.data.close)
         lags_int = 5
         lags_array = [1, 2, 5, 7]
@@ -81,6 +89,34 @@ class TesStructuralBreaks(unittest.TestCase):
         sm_poly_1_sadf = get_sadf(log_prices, model='sm_poly_1', add_const=True, min_length=min_length, lags=lags_int)
         sm_poly_2_sadf = get_sadf(log_prices, model='sm_poly_2', add_const=True, min_length=min_length, lags=lags_int)
         sm_exp_sadf = get_sadf(log_prices, model='sm_exp', add_const=True, min_length=min_length, lags=lags_int)
+
+        self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_power_sadf.shape[0])  # -1 for series_diff
+        self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, linear_sadf.shape[0])
+        self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, quandratic_sadf.shape[0])
+        self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_poly_1_sadf.shape[0])
+        self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_poly_2_sadf.shape[0])
+        self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_exp_sadf.shape[0])
+
+        self.assertAlmostEqual(sm_power_sadf.mean(), 17.814, delta=1e-3)
+        self.assertAlmostEqual(sm_power_sadf.iloc[29], -4.281, delta=1e-3)
+
+        self.assertAlmostEqual(linear_sadf.mean(), -0.669, delta=1e-3)
+        self.assertAlmostEqual(linear_sadf[29], -0.717, delta=1e-3)
+
+        self.assertAlmostEqual(linear_sadf_no_const_lags_arr.mean(), 1.899, delta=1e-3)
+        self.assertAlmostEqual(linear_sadf_no_const_lags_arr[29], 1.252, delta=1e-3)
+
+        self.assertAlmostEqual(quandratic_sadf.mean(), -0.651, delta=1e-3)
+        self.assertAlmostEqual(quandratic_sadf[29], -1.065, delta=1e-3)
+
+        self.assertAlmostEqual(sm_poly_1_sadf.mean(), 21.020, delta=1e-3)
+        self.assertAlmostEqual(sm_poly_1_sadf[29], 0.8268, delta=1e-3)
+
+        self.assertAlmostEqual(sm_poly_2_sadf.mean(), 21.01, delta=1e-3)
+        self.assertAlmostEqual(sm_poly_2_sadf[29], 0.822, delta=1e-3)
+
+        self.assertAlmostEqual(sm_exp_sadf.mean(), 17.632, delta=1e-3)
+        self.assertAlmostEqual(sm_exp_sadf[29], -5.821, delta=1e-3)
 
         with self.assertRaises(ValueError):
             linear_sadf += get_sadf(log_prices, model='cubic', add_const=True, min_length=min_length, lags=lags_int)
