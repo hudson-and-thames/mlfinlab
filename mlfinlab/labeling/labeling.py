@@ -148,7 +148,8 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
                                       events=events,
                                       pt_sl=pt_sl_)
 
-    events['t1'] = first_touch_dates.dropna(how='all').min(axis=1)  # pd.min ignores nan
+    for ind in events.index:
+        events.loc[ind, 't1'] = first_touch_dates.loc[ind, :].dropna().min()
 
     if side_prediction is None:
         events = events.drop('side', axis=1)
