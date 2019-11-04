@@ -29,6 +29,6 @@ def get_daily_vol(close, lookback=100):
     df0 = df0[df0 > 0]
     df0 = (pd.Series(close.index[df0 - 1], index=close.index[close.shape[0] - df0.shape[0]:]))
 
-    df0 = close.loc[df0.index] / close.loc[df0.values].values - 1  # daily returns
+    df0 = close.loc[df0.index] / close.loc[df0.array].arrayf - 1  # daily returns
     df0 = df0.ewm(span=lookback).std()
     return df0
