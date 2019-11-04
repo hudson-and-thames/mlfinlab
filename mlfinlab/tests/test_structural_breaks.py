@@ -118,5 +118,10 @@ class TesStructuralBreaks(unittest.TestCase):
         self.assertAlmostEqual(sm_exp_sadf.mean(), 17.632, delta=1e-3)
         self.assertAlmostEqual(sm_exp_sadf[29], -5.821, delta=1e-3)
 
+        # trivial series case
+        ones_series = pd.Series(index=log_prices.index, data=np.ones(shape=log_prices.shape[0]))
+        trivial_sadf = get_sadf(ones_series, model='sm_power', add_const=True, min_length=min_length, lags=lags_int)
+        self.assertTrue((trivial_sadf.unique() == [-np.inf]).all())  # All values should be -np.inf
+
         with self.assertRaises(ValueError):
             linear_sadf += get_sadf(log_prices, model='cubic', add_const=True, min_length=min_length, lags=lags_int)
