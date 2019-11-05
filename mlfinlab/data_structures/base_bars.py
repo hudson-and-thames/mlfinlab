@@ -41,7 +41,7 @@ class BaseBars(ABC):
         """
 
         if isinstance(file_path_or_df, str):
-            self.generator_object = pd.read_csv(file_path_or_df, chunksize=batch_size)
+            self.generator_object = pd.read_csv(file_path_or_df, chunksize=batch_size, index_col=0, parse_dates=[0])
             # Read in the first row & assert format
             first_row = pd.read_csv(file_path_or_df, nrows=1)
             self._assert_csv(first_row)
