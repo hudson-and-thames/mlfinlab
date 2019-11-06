@@ -24,7 +24,7 @@ class TimeBars(BaseBars):
         # Threshold at which to sample (in seconds)
         self.resolution = resolution  # Type of bar resolution: 'D', 'H', 'MIN', 'S'
         self.num_units = num_units  # Number of days/minutes/...
-        self.time_bar_thresh_mapping = {'D': 86400, 'H': 3600, 'N': 60, 'S': 1}  # Number of seconds
+        self.time_bar_thresh_mapping = {'D': 86400, 'H': 3600, 'MIN': 60, 'S': 1}  # Number of seconds
         self.threshold = self.num_units * self.time_bar_thresh_mapping[self.resolution]
         self.timestamp = None  # Next bar timestamp
 

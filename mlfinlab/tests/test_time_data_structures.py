@@ -25,19 +25,20 @@ class TestTimeDataStructures(unittest.TestCase):
         project_path = os.path.dirname(__file__)
         self.path = project_path + '/test_data/tick_data.csv'
 
-    def test_daily_bars(self):
+    def test_minute_bars(self):
         """
-        Tests the dollar bars implementation.
+        Tests the minute bars implementation.
         """
 
-        db1 = ds.get_time_bars(self.path, resolution='D', num_units=1, batch_size=1000, verbose=False)
-        db2 = ds.get_time_bars(self.path, resolution='D', num_units=1,  batch_size=50, verbose=False)
-        db3 = ds.get_time_bars(self.path, resolution='D', num_units=1, batch_size=10, verbose=False)
-        ds.get_time_bars(self.path, resolution='D', num_units=1, batch_size=50, verbose=False,
-                           to_csv=True, output_path='test.csv')
+        db1 = ds.get_time_bars(self.path, resolution='MIN', num_units=1, batch_size=1000, verbose=False)
+        db2 = ds.get_time_bars(self.path, resolution='MIN', num_units=1, batch_size=50, verbose=False)
+        db3 = ds.get_time_bars(self.path, resolution='MIN', num_units=1, batch_size=10, verbose=False)
+        ds.get_time_bars(self.path, resolution='MIN', num_units=1, batch_size=50, verbose=False,
+                         to_csv=True, output_path='test.csv')
         db4 = pd.read_csv('test.csv')
 
         # Assert diff batch sizes have same number of bars
+        self.assertEqual(db1.shape[0], 2)
         self.assertTrue(db1.shape == db2.shape)
         self.assertTrue(db1.shape == db3.shape)
         self.assertTrue(db4.shape == db1.shape)
@@ -48,7 +49,7 @@ class TestTimeDataStructures(unittest.TestCase):
         self.assertTrue(np.all(db4.values == db1.values))
 
         # Assert OHLC is correct
-        self.assertTrue(db1.loc[0, 'open'] == 1205)
+        self.assertTrue(db1.loc[0, 'open'] == 1205.0)
         self.assertTrue(db1.loc[0, 'high'] == 1904.75)
         self.assertTrue(db1.loc[0, 'low'] == 1005.0)
         self.assertTrue(db1.loc[0, 'close'] == 1304.5)
@@ -56,51 +57,20 @@ class TestTimeDataStructures(unittest.TestCase):
         # delete generated csv file (if it wasn't generated test would fail)
         os.remove('test.csv')
 
-    def test_volume_bars(self):
+    def test_seconds_bars(self):
         """
-        Tests the volume bars implementation.
+        Tests the seconds bars implementation.
         """
-        threshold = 30
-        db1 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
-        db2 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
-        db3 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
-        ds.get_volume_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
-                           to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
 
-        # Assert diff batch sizes have same number of bars
-        self.assertTrue(db1.shape == db2.shape)
-        self.assertTrue(db1.shape == db3.shape)
-        self.assertTrue(db4.shape == db1.shape)
-
-        # Assert same values
-        self.assertTrue(np.all(db1.values == db2.values))
-        self.assertTrue(np.all(db1.values == db3.values))
-        self.assertTrue(np.all(db4.values == db1.values))
-
-        # Assert OHLC is correct
-        self.assertTrue(db1.loc[0, 'open'] == 1205)
-        self.assertTrue(db1.loc[0, 'high'] == 1904.75)
-        self.assertTrue(db1.loc[0, 'low'] == 1005.0)
-        self.assertTrue(db1.loc[0, 'close'] == 1304.75)
-
-        # delete generated csv file (if it wasn't generated test would fail)
-        os.remove('test.csv')
-
-    def test_tick_bars(self):
-        """
-        Test the tick bars implementation.
-        """
-        threshold = 10
-
-        db1 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
-        db2 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
-        db3 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
-        ds.get_tick_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
+        db1 = ds.get_time_bars(self.path, resolution='S', num_units=10, batch_size=1000, verbose=False)
+        db2 = ds.get_time_bars(self.path, resolution='S', num_units=10, batch_size=50, verbose=False)
+        db3 = ds.get_time_bars(self.path, resolution='S', num_units=10, batch_size=10, verbose=False)
+        ds.get_time_bars(self.path, resolution='S', num_units=10, batch_size=50, verbose=False,
                          to_csv=True, output_path='test.csv')
         db4 = pd.read_csv('test.csv')
 
         # Assert diff batch sizes have same number of bars
+        self.assertEqual(db1.shape[0], 11)
         self.assertTrue(db1.shape == db2.shape)
         self.assertTrue(db1.shape == db3.shape)
         self.assertTrue(db4.shape == db1.shape)
@@ -111,41 +81,20 @@ class TestTimeDataStructures(unittest.TestCase):
         self.assertTrue(np.all(db4.values == db1.values))
 
         # Assert OHLC is correct
-        self.assertTrue(db1.loc[0, 'open'] == 1205)
-        self.assertTrue(db1.loc[0, 'high'] == 1904.75)
-        self.assertTrue(db1.loc[0, 'low'] == 1005.0)
-        self.assertTrue(db1.loc[0, 'close'] == 1304.50)
+        self.assertTrue(db1.loc[10, 'open'] == 1305.25)
+        self.assertTrue(db1.loc[10, 'high'] == 1305.25)
+        self.assertTrue(db1.loc[10, 'low'] == 1305.25)
+        self.assertTrue(db1.loc[10, 'close'] == 1305.25)
 
         # delete generated csv file (if it wasn't generated test would fail)
         os.remove('test.csv')
-
-    def test_df_as_input(self):
-        """
-        Tests that bars generated for csv file and Pandas Data Frame yield the same result
-        """
-        threshold = 100000
-        tick_data = pd.read_csv(self.path)
-
-        db1 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
-        ds.get_dollar_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
-                           to_csv=True, output_path='test.csv')
-        db2 = pd.read_csv('test.csv')
-        db3 = ds.get_dollar_bars(tick_data, threshold=threshold, batch_size=10, verbose=False)
-
-        # Assert diff batch sizes have same number of bars
-        self.assertTrue(db1.shape == db2.shape)
-        self.assertTrue(db1.shape == db3.shape)
-
-        # Assert same values
-        self.assertTrue(np.all(db1.values == db2.values))
-        self.assertTrue(np.all(db1.values == db3.values))
 
     def test_wrong_input_value_error_raise(self):
         """
         Tests ValueError raise when neither pd.DataFrame nor path to csv file are passed to function call
         """
         with self.assertRaises(ValueError):
-            ds.get_dollar_bars(None, threshold=20, batch_size=1000, verbose=False)
+            ds.get_time_bars(None, resolution='MIN', num_units=1, batch_size=1000, verbose=False)
 
     def test_csv_format(self):
         """
@@ -158,18 +107,16 @@ class TestTimeDataStructures(unittest.TestCase):
 
         # pylint: disable=protected-access
         self.assertRaises(ValueError,
-                          ds.StandardBars._assert_csv(pd.DataFrame(wrong_date).T))
+                          ds.TimeBars._assert_csv(pd.DataFrame(wrong_date).T))
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds.StandardBars._assert_csv,
+                          ds.TimeBars._assert_csv,
                           pd.DataFrame(too_many_cols).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds.StandardBars._assert_csv,
+                          ds.TimeBars._assert_csv,
                           pd.DataFrame(wrong_price).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
-                          ds.StandardBars._assert_csv,
+                          ds.TimeBars._assert_csv,
                           pd.DataFrame(wrong_volume).T)
-
-
