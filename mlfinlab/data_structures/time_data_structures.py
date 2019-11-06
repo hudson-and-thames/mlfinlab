@@ -19,15 +19,14 @@ class TimeBars(BaseBars):
 
     def __init__(self, file_path, resolution, num_units, batch_size=20000000):
 
-        BaseBars.__init__(self, file_path, metric=None, batch_size)
+        BaseBars.__init__(self, file_path, metric=None, batch_size=batch_size)
 
         # Threshold at which to sample (in seconds)
-        self.threshold = threshold
-        self.resolution = resolution # Type of bar resolution: 'D', 'H', 'MIN', 'S'
-        self.num_units = num_units # Number of days/minutes/...
-        self.time_bar_thresh_mapping = {'D': 86400, 'H': 3600, 'N': 60, 'S': 1} # Number of seconds
-        self.threshold = self.num_units * self.time_bar_thresh_mapping[self.resolution_type]
-        self.timestamp = None # Next bar timestamp
+        self.resolution = resolution  # Type of bar resolution: 'D', 'H', 'MIN', 'S'
+        self.num_units = num_units  # Number of days/minutes/...
+        self.time_bar_thresh_mapping = {'D': 86400, 'H': 3600, 'N': 60, 'S': 1}  # Number of seconds
+        self.threshold = self.num_units * self.time_bar_thresh_mapping[self.resolution]
+        self.timestamp = None  # Next bar timestamp
 
     def _reset_cache(self):
         """
@@ -50,13 +49,13 @@ class TimeBars(BaseBars):
 
         for row in data.values:
             # Set variables
-            date_time = row[0]
+            date_time = row[0].timestamp()  # Convert to UTC timestamp
             price = np.float(row[1])
             volume = row[2]
             dollar_value = price * volume
             signed_tick = self._apply_tick_rule(price)
 
-            timestamp_threshold = (int(float(date_time)) // self.threshold + 1) * self.threshold # Boundary timestamp
+            timestamp_threshold = (int(float(date_time)) // self.threshold + 1) * self.threshold  # Boundary timestamp
 
             if self.timestamp is None:
                 self.timestamp = timestamp_threshold
@@ -67,7 +66,7 @@ class TimeBars(BaseBars):
 
                 # Reset cache
                 self._reset_cache()
-                self.timestamp = timestamp_threshold # Next time bar
+                self.timestamp = timestamp_threshold  # Next time bar
 
             # Update counters
             if self.open_price is None:
@@ -86,10 +85,11 @@ class TimeBars(BaseBars):
 
             self.prev_price = price
 
-
         return list_bars
 
-def get_time_bars(file_path, resolution='D', num_units=1, batch_size=20000000, verbose=True, to_csv=False, output_path=None):
+
+def get_time_bars(file_path, resolution='D', num_units=1, batch_size=20000000, verbose=True, to_csv=False,
+                  output_path=None):
     """
     Creates Time Bars: date_time, open, high, low, close.
 
@@ -105,4 +105,4 @@ def get_time_bars(file_path, resolution='D', num_units=1, batch_size=20000000, v
 
     bars = TimeBars(file_path=file_path, resolution=resolution, num_units=num_units, batch_size=batch_size)
     time_bars = bars.batch_run(verbose=verbose, to_csv=to_csv, output_path=output_path)
-    return dollar_bars
+    return time_bars
