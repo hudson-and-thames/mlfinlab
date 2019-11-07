@@ -276,8 +276,7 @@ class CLA:
                     del self.free_weights[index_1]
                     repeat = True
                     break
-                else:
-                    index_2 += 1
+                index_2 += 1
 
     @staticmethod
     def _golden_section(obj, left, right, **kwargs):
