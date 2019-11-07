@@ -36,7 +36,7 @@ class TestDataStructures(unittest.TestCase):
         db3 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
         ds.get_dollar_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
                            to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
+        db4 = pd.read_csv('test.csv', parse_dates=[0])
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -67,7 +67,7 @@ class TestDataStructures(unittest.TestCase):
         db3 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
         ds.get_volume_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
                            to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
+        db4 = pd.read_csv('test.csv', parse_dates=[0])
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -99,7 +99,7 @@ class TestDataStructures(unittest.TestCase):
         db3 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
         ds.get_tick_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
                          to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
+        db4 = pd.read_csv('test.csv', parse_dates=[0])
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)

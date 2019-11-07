@@ -45,7 +45,7 @@ class TestDataStructures(unittest.TestCase):
                                          expected_imbalance_window=10000,
                                          num_prev_bars=num_prev_bars, batch_size=50, verbose=False,
                                          to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
+        db4 = pd.read_csv('test.csv', parse_dates=[0])
 
         self.assertEqual(db1.shape, (4770, 9))
 
@@ -98,7 +98,7 @@ class TestDataStructures(unittest.TestCase):
                                          expected_imbalance_window=10000,
                                          num_prev_bars=num_prev_bars, batch_size=50, verbose=False,
                                          to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
+        db4 = pd.read_csv('test.csv', parse_dates=[0])
 
         self.assertEqual(db1.shape, (4770, 9))
 
@@ -149,7 +149,7 @@ class TestDataStructures(unittest.TestCase):
                                        expected_imbalance_window=10000,
                                        num_prev_bars=num_prev_bars, batch_size=50, verbose=False,
                                        to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
+        db4 = pd.read_csv('test.csv', parse_dates=[0])
 
         self.assertEqual(db1.shape, (7704, 9))
 
@@ -205,7 +205,7 @@ class TestDataStructures(unittest.TestCase):
                                          exp_num_ticks_constraints=exp_num_ticks_constraints,
                                          num_prev_bars=num_prev_bars, batch_size=50, verbose=False,
                                          to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
+        db4 = pd.read_csv('test.csv', parse_dates=[0])
 
         self.assertEqual(db1.shape, (1396, 9))
 
@@ -257,7 +257,7 @@ class TestDataStructures(unittest.TestCase):
                                            expected_imbalance_window=10000,
                                            batch_size=50, verbose=False,
                                            to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
+        db4 = pd.read_csv('test.csv', parse_dates=[0])
 
         self.assertEqual(db1.shape, (204, 9))
 
@@ -309,7 +309,7 @@ class TestDataStructures(unittest.TestCase):
                                            expected_imbalance_window=10000,
                                            batch_size=50, verbose=False,
                                            to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
+        db4 = pd.read_csv('test.csv', parse_dates=[0])
 
         self.assertEqual(db1.shape, (215, 9))
 
@@ -363,7 +363,7 @@ class TestDataStructures(unittest.TestCase):
                                          expected_imbalance_window=10000,
                                          batch_size=50, verbose=False,
                                          to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
+        db4 = pd.read_csv('test.csv', parse_dates=[0])
 
         self.assertEqual(db1.shape, (78, 9))
 
