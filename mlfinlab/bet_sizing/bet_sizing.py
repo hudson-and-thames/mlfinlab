@@ -183,8 +183,7 @@ def confirm_and_cast_to_df(d_vars):
 
     # Combine Series to form a DataFrame.
     events = pd.concat(list(d_vars.values()), axis=1)
-    d_col_names = {i: k_i for i, k_i in enumerate(d_vars.keys())}
-    events = events.rename(columns=d_col_names)
+    events.columns = list(d_vars.keys())
 
     return events
 

@@ -41,7 +41,7 @@ class TestFractionalDifferentiation(unittest.TestCase):
         self.assertTrue(weights[-1] == 1.0)
 
         # Size matches
-        self.assertTrue(weights.shape[0] == number_ele)
+        self.assertTrue(weights.shape[0] == number_ele)  # pylint: disable=unsubscriptable-object
 
     def test_get_weights_ffd(self):
         """
@@ -61,7 +61,7 @@ class TestFractionalDifferentiation(unittest.TestCase):
         self.assertTrue(weights[-1] == 1.0)
 
         # Size matches
-        self.assertTrue(weights.shape[0] == 12)
+        self.assertTrue(weights.shape[0] == 12)  # pylint: disable=unsubscriptable-object
 
     def test_frac_diff(self):
         """
