@@ -91,9 +91,10 @@ def bet_size_budget(events_t1, sides):
      active long and short bets, as well as the bet size, in additional columns.
     """
     events_1 = get_concurrent_sides(events_t1, sides)
-    avg_active_long = events_1['active_long'] / events_1['active_long'].max()
-    avg_active_short = events_1['active_short'] / events_1['active_short'].max()
-    events_1['bet_size'] = avg_active_long - avg_active_short
+    active_long_max, active_short_max = events_1['active_long'].max(), events_1['active_short'].max()
+    frac_active_long = events_1['active_long'] / active_long_max if active_long_max > 0 else 0
+    frac_active_short = events_1['active_short'] / active_short_max if active_short_max > 0 else 0
+    events_1['bet_size'] = frac_active_long - frac_active_short
 
     return events_1
 
