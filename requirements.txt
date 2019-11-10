@@ -1,14 +1,14 @@
 codecov==2.0.15
 coverage==4.5.2
-pandas==0.24.2
-pylint==2.3.0
-numpy==1.16.4
-xmlrunner==1.7.7
-numba==0.43.0
-scikit-learn==0.21
-scipy==1.2.1
-toolz==0.10.0  # =needed for dask
 cloudpickle==1.2.1  # needed for dask
-sphinx==2.2.0 # needed for docs
-sphinx-rtd-theme==0.4.3 # needed for docs
+numba==0.46.0
+numpy==1.17.3
 matplotlib==3.1.1
+pandas==0.25.3
+pylint==2.4.3
+scikit-learn==0.21.3
+scipy==1.3.1
+sphinx==2.2.1 # needed for docs
+sphinx-rtd-theme==0.4.3 # needed for docs
+toolz==0.10.0  # =needed for dask
+xmlrunner==1.7.7

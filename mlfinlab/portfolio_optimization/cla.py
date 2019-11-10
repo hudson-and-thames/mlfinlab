@@ -259,7 +259,7 @@ class CLA:
         while True:
             if repeat is False:
                 index_1 += 1
-            if index_1 == len(self.weights) - 1:
+            if index_1 >= len(self.weights) - 1:
                 break
             weights = self.weights[index_1]
             mean = np.dot(weights.T, self.expected_returns)[0, 0]
@@ -276,8 +276,7 @@ class CLA:
                     del self.free_weights[index_1]
                     repeat = True
                     break
-                else:
-                    index_2 += 1
+                index_2 += 1
 
     @staticmethod
     def _golden_section(obj, left, right, **kwargs):
