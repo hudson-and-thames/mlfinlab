@@ -162,7 +162,7 @@ class TestFeatureImportance(unittest.TestCase):
         pca_corr_res = feature_pca_analysis(self.X_train, mdi_feat_imp)
 
         # Check correlation metrics results
-        self.assertAlmostEqual(pca_corr_res['Weighted_Kendall_Rank'][0], 0.26, delta=1e-1)
+        self.assertAlmostEqual(pca_corr_res['Weighted_Kendall_Rank'][0], 0.0677, delta=1e-1)
 
     def test_feature_importance(self):
         """
@@ -196,7 +196,7 @@ class TestFeatureImportance(unittest.TestCase):
         self.assertAlmostEqual(mdi_feat_imp.loc['label_prob_0.1_sma_5', 'mean'], 0.06253, delta=0.5)
 
         # MDA(log_loss) assertions
-        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['label_prob_0.1', 'mean'], 0.234, delta=0.3)
+        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['label_prob_0.1', 'mean'], -0.61, delta=0.3)
         self.assertAlmostEqual(mda_feat_imp_log_loss.loc['label_prob_0.2', 'mean'], 0.3222, delta=0.3)
 
         # MDA(f1) assertions
