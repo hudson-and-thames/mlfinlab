@@ -122,6 +122,7 @@ def feature_importance_sfi(clf, X, y, cv_gen, sample_weight=None, scoring='neg_l
         feat_cross_val_scores = ml_cross_val_score(clf, X=X[[feat]], y=y, sample_weight=sample_weight,
                                                    scoring=scoring, cv_gen=cv_gen)
         imp.loc[feat, 'mean'] = feat_cross_val_scores.mean()
+        # pylint: disable=unsubscriptable-object
         imp.loc[feat, 'std'] = feat_cross_val_scores.std() * feat_cross_val_scores.shape[0] ** -.5
     return imp
 
