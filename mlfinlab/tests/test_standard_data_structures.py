@@ -126,11 +126,13 @@ class TestDataStructures(unittest.TestCase):
         """
         threshold = 100000
         tick_data = pd.read_csv(self.path)
+        tick_data['Date and Time'] = pd.to_datetime(tick_data['Date and Time'])
 
         db1 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
         ds.get_dollar_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
                            to_csv=True, output_path='test.csv')
         db2 = pd.read_csv('test.csv')
+        db2['date_time'] = pd.to_datetime(db2.date_time)
         db3 = ds.get_dollar_bars(tick_data, threshold=threshold, batch_size=10, verbose=False)
 
         # Assert diff batch sizes have same number of bars
