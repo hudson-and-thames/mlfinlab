@@ -174,5 +174,3 @@ class TestDataStructures(unittest.TestCase):
         self.assertRaises(AssertionError,
                           ds.StandardBars._assert_csv,
                           pd.DataFrame(wrong_volume).T)
-
-
