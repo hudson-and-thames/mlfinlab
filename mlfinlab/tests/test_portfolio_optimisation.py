@@ -50,7 +50,7 @@ class TestCLA(unittest.TestCase):
         cla = CLA(weight_bounds=([0]*self.data.shape[1], [1]*self.data.shape[1]), calculate_returns="mean")
         cla.allocate(asset_prices=self.data)
         weights = cla.weights.values
-        weights[weights <= 1e-15] = 0 # Convert very very small numbers to 0
+        weights[weights <= 1e-15] = 0  # Convert very very small numbers to 0
         for turning_point in weights:
             assert (turning_point >= 0).all()
             assert len(turning_point) == self.data.shape[1]
