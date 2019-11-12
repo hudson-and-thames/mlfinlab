@@ -10,6 +10,8 @@ import pandas as pd
 from mlfinlab.structural_breaks import get_chow_type_stat, get_sadf, get_chu_stinchcombe_white_statistics
 
 
+# pylint: disable=unsubscriptable-object
+
 class TesStructuralBreaks(unittest.TestCase):
     """
     Test Chow-type, CUSUM, SADF tests
