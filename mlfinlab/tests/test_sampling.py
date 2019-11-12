@@ -2,18 +2,14 @@
 Test various functions regarding chapter 4: Sampling (Bootstrapping, Concurrency).
 """
 
-import os
 import unittest
 
 import numpy as np
 import pandas as pd
 
-from mlfinlab.filters.filters import cusum_filter
-from mlfinlab.labeling.labeling import get_events, add_vertical_barrier
 from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix, get_ind_mat_average_uniqueness, \
     _bootstrap_loop_run, get_ind_mat_label_uniqueness  # pylint: disable=protected-access
 from mlfinlab.sampling.concurrent import get_av_uniqueness_from_triple_barrier, num_concurrent_events
-from mlfinlab.util.utils import get_daily_vol
 
 
 def book_ind_mat_implementation(bar_index, label_endtime):
