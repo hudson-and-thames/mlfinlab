@@ -160,7 +160,7 @@ class MicrostructuralFeaturesGenerator:
             dollar_value = price * volume
             signed_tick = self._apply_tick_rule(price)
 
-            # derivative variables
+            # Derivative variables
             price_diff = self._get_price_diff(price)
             log_ret = self._get_log_ret(price)
 

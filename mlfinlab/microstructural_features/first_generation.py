@@ -8,7 +8,8 @@ import pandas as pd
 
 def get_roll_measure(close_prices: pd.Series, window: int = 20) -> pd.Series:
     """
-    Get Roll Measure
+    Get Roll Measure (p.282, Roll Model). Roll Measure gives the estimate of effective bid-ask spread
+    without using quote-data.
     :param close_prices: (pd.Series) Close prices
     :param window: (int) estimation window
     :return: (pd.Series) of Roll measure
@@ -20,12 +21,12 @@ def get_roll_measure(close_prices: pd.Series, window: int = 20) -> pd.Series:
 
 def get_roll_impact(close_prices: pd.Series, dollar_volume: pd.Series, window: int = 20) -> pd.Series:
     """
-        Get Roll Impact
-        :param close_prices: (pd.Series) Close prices
-        :param dollar_volume: (pd.Series) Dollar volume series
-        :param window: (int) estimation window
-        :return: (pd.Series) of Roll impact
-        """
+    Get Roll Impact. Derivate from Roll Measure which takes into account dollar volume traded
+    :param close_prices: (pd.Series) Close prices
+    :param dollar_volume: (pd.Series) Dollar volume series
+    :param window: (int) estimation window
+    :return: (pd.Series) of Roll impact
+    """
     roll_measure = get_roll_measure(close_prices, window)
     return roll_measure / dollar_volume
 
@@ -33,7 +34,7 @@ def get_roll_impact(close_prices: pd.Series, dollar_volume: pd.Series, window: i
 # Corwin-Schultz algorithm
 def _get_beta(high: pd.Series, low: pd.Series, window: int) -> pd.Series:
     """
-    Get beta estimate from Corwin-Schultz algorithm
+    Get beta estimate from Corwin-Schultz algorithm (p.285, Snipet 19.1)
     :param high: (pd.Series) High prices
     :param low: (pd.Series) Low prices
     :param window: (int) estimation window
@@ -61,7 +62,7 @@ def _get_gamma(high: pd.Series, low: pd.Series) -> pd.Series:
 
 def _get_alpha(beta: pd.Series, gamma: pd.Series) -> pd.Series:
     """
-    Get alpha from Corwin-Schultz algorithm
+    Get alpha from Corwin-Schultz algorithm, (p.285, Snipet 19.1)
     :param beta: (pd.Series) of beta estimates
     :param gamma: (pd.Series) of gamma estimates
     :return: (pd.Series) of alphas
@@ -75,7 +76,7 @@ def _get_alpha(beta: pd.Series, gamma: pd.Series) -> pd.Series:
 
 def get_corwin_schultz_estimator(high: pd.Series, low: pd.Series, window: int = 20) -> pd.Series:
     """
-    Get Corwin-Schultz spread estimator
+    Get Corwin-Schultz spread estimator using high-low prices, (p.285, Snipet 19.1)
     :param high: (pd.Series) High prices
     :param low: (pd.Series) Low prices
     :param window: (int) estimation window

@@ -13,7 +13,6 @@ def get_shannon_entropy(message: str) -> float:
     :param message: (str) encoded message
     :return: (float) Shannon entropy
     """
-    log2 = lambda x: math.log(x) / math.log(2)
     exr = {}
     entropy = 0
     for each in message:
@@ -24,7 +23,7 @@ def get_shannon_entropy(message: str) -> float:
     textlen = len(message)
     for value in exr.values():
         freq = 1.0 * value / textlen
-        entropy += freq * log2(freq)
+        entropy += freq * math.log(freq) / math.log(2)
     entropy *= -1
     return entropy
 
@@ -57,7 +56,7 @@ def get_plug_in_entropy(message: str, word_length: int = None) -> float:
     if word_length is None:
         word_length = 2
 
-    def pmf1(message, word_length):
+    def _pmf1(message, word_length):
         lib = {}
         if not isinstance(message, str):
             message = ''.join(map(str, message))
@@ -71,6 +70,6 @@ def get_plug_in_entropy(message: str, word_length: int = None) -> float:
         pmf = {i: len(lib[i]) / pmf for i in lib}
         return pmf
 
-    pmf = pmf1(message, word_length)
+    pmf = _pmf1(message, word_length)
     out = -sum([pmf[i] * np.log2(pmf[i]) for i in pmf]) / word_length
     return out

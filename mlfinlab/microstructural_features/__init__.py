@@ -1,5 +1,5 @@
 """
-Functions derived from Chapter 19: Useful Financial Features
+Functions derived from Chapter 19: Market Microstructural features
 """
 
 from mlfinlab.microstructural_features.first_generation import get_corwin_schultz_estimator, get_roll_measure, \
