@@ -213,7 +213,7 @@ class TestMicrostructuralFeatures(unittest.TestCase):
         with self.assertRaises(KeyError):
             features['tick_rule_entropy'] = features_no_entropy['pct_entropy_plug_in']
 
-        gen_csv.batch_run(to_csv=True, output_path='features.csv')
+        gen_csv.get_features(to_csv=True, output_path='features.csv')
         features_from_csv = pd.read_csv('features.csv', parse_dates=[0])
 
         self.assertTrue((features.values == features_1.values).all())
