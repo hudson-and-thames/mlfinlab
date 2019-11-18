@@ -200,11 +200,11 @@ class TestMicrostructuralFeatures(unittest.TestCase):
                                                   pct_encoding=returns_mapping, batch_size=20)
         gen_df = MicrostructuralFeaturesGenerator(df_trades, bar_index, volume_encoding=volume_mapping,
                                                   pct_encoding=returns_mapping, batch_size=20)
-        features = gen.batch_run(to_csv=False, verbose=False)
-        features_1 = gen_1.batch_run(to_csv=False, verbose=False)
-        features_20 = gen_20.batch_run(to_csv=False, verbose=False)
-        features_from_df = gen_df.batch_run(to_csv=False, verbose=False)
-        features_no_entropy = gen_no_entropy.batch_run(verbose=False)
+        features = gen.get_features(to_csv=False, verbose=False)
+        features_1 = gen_1.get_features(to_csv=False, verbose=False)
+        features_20 = gen_20.get_features(to_csv=False, verbose=False)
+        features_from_df = gen_df.get_features(to_csv=False, verbose=False)
+        features_no_entropy = gen_no_entropy.get_features(verbose=False)
 
         # No volume/pct entropy columns check
         with self.assertRaises(KeyError):
@@ -252,7 +252,7 @@ class TestMicrostructuralFeatures(unittest.TestCase):
         gen = MicrostructuralFeaturesGenerator(self.trades_path, bar_index, volume_encoding=volume_mapping,
                                                pct_encoding=returns_mapping)
 
-        features = gen.batch_run(to_csv=False, verbose=False)
+        features = gen.get_features(to_csv=False, verbose=False)
         features.set_index('date_time', inplace=True)
 
         # Check individual feature values

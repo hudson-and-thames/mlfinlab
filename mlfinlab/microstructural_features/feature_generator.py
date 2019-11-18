@@ -30,7 +30,7 @@ def _crop_data_frame_in_batches(df: pd.DataFrame, chunksize: int):
 
 class MicrostructuralFeaturesGenerator:
     """
-    Class which is used to generate inter-bar features when bars are already compressed
+    Class which is used to generate inter-bar features when bars are already compressed.
     """
 
     def __init__(self, trades_input: (str, pd.DataFrame), bar_index: pd.DatetimeIndex, batch_size: int = 2e7,
@@ -73,14 +73,17 @@ class MicrostructuralFeaturesGenerator:
         self.prev_price = None
         self.prev_tick_rule = 0
 
-    def batch_run(self, verbose=True, to_csv=False, output_path=None):
+    def get_features(self, verbose=True, to_csv=False, output_path=None):
         """
-        Reads a csv file in batches and then constructs the financial data structure in the form of a DataFrame.
+        Reads a csv file of ticks or pd.DataFrame in batches and then constructs corresponding microstructural intra-bar features:
+        average tick size, tick rule sum, vwap, kyla lambda, amihud lambda, hasbrouck lambda, tick/volume/pct Shannon, Lempel-Ziv,
+        Plug-in entropies if corresponding mapping dictionaries are provided (self.volume_encoding, self.pct_encoding).
         The csv file must have only 3 columns: date_time, price, & volume.
+
         :param verbose: (Boolean) Flag whether to print message on each processed batch or not
         :param to_csv: (Boolean) Flag for writing the results of bars generation to local csv file, or to in-memory DataFrame
         :param output_path: (Boolean) Path to results file, if to_csv = True
-        :return: (DataFrame or None) Financial data structure
+        :return: (DataFrame or None) of microstructural features for bar index
         """
 
         if to_csv is True:
