@@ -8,7 +8,6 @@ from sklearn.linear_model import LinearRegression
 
 
 # pylint: disable=invalid-name
-
 def get_bar_based_kyle_lambda(close: pd.Series, volume: pd.Series, window: int = 20) -> pd.Series:
     """
     Get Kyle lambda from bars data, p.286-288.
@@ -63,7 +62,6 @@ def get_trades_based_kyle_lambda(price_diff: list, volume: list, aggressor_flags
     :param aggressor_flags: (list) of trade directions [-1, 1]  (tick rule or aggressor side can be used to define)
     :return: (float) Kyle lambda for a bar
     """
-
     model = LinearRegression(fit_intercept=False, copy_X=False)
     signed_volume = np.array(volume) * np.array(aggressor_flags)
     X = np.array(signed_volume).reshape(-1, 1)
@@ -80,7 +78,6 @@ def get_trades_based_amihud_lambda(log_ret: list, dollar_volume: list) -> float:
     :param dollar_volume: (list) of dollar volumes (price * size)
     :return: (float) Amihud lambda for a bar
     """
-
     model = LinearRegression(fit_intercept=False, copy_X=False)
     X = np.array(dollar_volume).reshape(-1, 1)
     y = np.abs(np.array(log_ret))
@@ -91,7 +88,7 @@ def get_trades_based_amihud_lambda(log_ret: list, dollar_volume: list) -> float:
 def get_trades_based_hasbrouck_lambda(log_ret: list, dollar_volume: list, aggressor_flags: list) -> float:
     """
     Get Amihud lambda from trades data, p.289-290.
-    
+
     :param log_ret: (list) of log returns
     :param dollar_volume: (list) of dollar volumes (price * size)
     :param aggressor_flags: (list) of trade directions [-1, 1]  (tick rule or aggressor side can be used to define)

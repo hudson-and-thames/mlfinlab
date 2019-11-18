@@ -80,7 +80,7 @@ def _get_letter_from_encoding(value: float, encoding_dict: dict) -> str:
 def encode_array(array: list, encoding_dict: dict) -> str:
     """
     Encode array with strings using encoding dict.
-    
+
     :param array: (list) of values to encode
     :param encoding_dict: (dict) of quantile-symbol
     :return: (str): encoded message

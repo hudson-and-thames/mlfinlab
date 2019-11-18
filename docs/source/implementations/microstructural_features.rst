@@ -4,7 +4,11 @@
 Microstructural Features
 ============================
 
-This module implements features from Chapter 18: Entropy features, Chapter 19: Microstructural Features
+This module implements features from Chapter 18: Entropy features, Chapter 19: Microstructural features
+
+.. image:: microstructural_features_images/kyle_lambda.png
+   :scale: 50 %
+   :align: center
 
 Entropy features
 ================
