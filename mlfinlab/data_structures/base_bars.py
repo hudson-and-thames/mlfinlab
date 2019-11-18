@@ -38,9 +38,10 @@ class BaseBars(ABC):
         """
         Constructor
 
-        :param file_path_or_df: (String or pd.DataFrame) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
-        :param metric: (String) type of imbalance bar to create. Example: dollar_imbalance.
-        :param batch_size: (Int) Number of rows to read in from the csv, per batch.
+       :param file_path_or_df: (str or pd.DataFrame) Path to the csv file or Pandas Data Frame containing
+                                raw tick data  in the format[date_time, price, volume]
+        :param metric: (str) type of imbalance bar to create. Example: dollar_imbalance.
+        :param batch_size: (int) Number of rows to read in from the csv, per batch.
         """
 
         if isinstance(file_path_or_df, str):
@@ -65,8 +66,8 @@ class BaseBars(ABC):
         # Batch_run properties
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
 
-    def batch_run(self, verbose: bool = True, to_csv: bool = False, output_path: str = None) -> Tuple[
-        pd.DataFrame, None]:
+    def batch_run(self, verbose: bool = True, to_csv: bool = False, output_path: str = None) -> \
+            Tuple[pd.DataFrame, None]:
         """
         Reads a csv file or pd.DataFrame in batches and then constructs the financial data structure in the form of a DataFrame.
         The csv file must have only 3 columns: date_time, price, & volume.
@@ -247,8 +248,8 @@ class BaseImbalanceBars(BaseBars):
         """
         Constructor
 
-
-        :param file_path_or_df: (String or pd.DataFrame) Path to the csv file or Pandas Dat Frame containing raw tick data in the format[date_time, price, volume]
+        :param file_path_or_df: (String or pd.DataFrame) Path to the csv file or Pandas Data Frame containing
+                                raw tick data  in the format[date_time, price, volume]
         :param metric: (String) type of imbalance bar to create. Example: dollar_imbalance.
         :param batch_size: (Int) Number of rows to read in from the csv, per batch.
         :param expected_imbalance_window: (Int) Window used to estimate expected imbalance from previous trades
@@ -385,20 +386,20 @@ class BaseRunBars(BaseBars):
     Base class for Run Bars (EMA and Const) which implements run bars calculation logic
     """
 
-    def __init__(self, file_path_or_df: Tuple[std, pd.DataFrame], metric: str, batch_size: int, num_prev_bars: int,
+    def __init__(self, file_path_or_df: Tuple[str, pd.DataFrame], metric: str, batch_size: int, num_prev_bars: int,
                  expected_imbalance_window: int,
                  exp_num_ticks_init: int, analyse_thresholds: bool):
         """
         Constructor
 
-
-        :param file_path_or_df: (String or pd.DataFrame) Path to the csv file or Pandas Dat Frame containing raw tick data in the format[date_time, price, volume]
-        :param metric: (String) type of imbalance bar to create. Example: dollar_imbalance.
-        :param batch_size: (Int) Number of rows to read in from the csv, per batch.
+        :param file_path_or_df: (str or pd.DataFrame) Path to the csv file or Pandas Data Frame containing
+                                raw tick data  in the format[date_time, price, volume]
+        :param metric: (str) type of imbalance bar to create. Example: dollar_imbalance.
+        :param batch_size: (int) Number of rows to read in from the csv, per batch.
         :param expected_imbalance_window: (Int) Window used to estimate expected imbalance from previous trades
-        :param exp_num_ticks_init: (Int) Initial estimate for expected number of ticks in bar.
+        :param exp_num_ticks_init: (int) Initial estimate for expected number of ticks in bar.
                                          For Const Imbalance Bars expected number of ticks equals expected number of ticks init
-        :param analyse_thresholds: (Bool) flag to return thresholds values (thetas, exp_num_ticks, exp_runs) in Pandas DataFrame
+        :param analyse_thresholds: (bool) flag to return thresholds values (thetas, exp_num_ticks, exp_runs) in Pandas DataFrame
         """
         BaseBars.__init__(self, file_path_or_df, metric, batch_size)
 
