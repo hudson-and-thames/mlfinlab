@@ -117,7 +117,7 @@ def get_ema_dollar_run_bars(file_path_or_df: Tuple[str, pd.DataFrame], num_prev_
     :param num_prev_bars: (int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
     :param expected_imbalance_window: (int) EMA window used to estimate expected run
     :param exp_num_ticks_init: (int) initial expected number of ticks per bar
-    :param exp_num_ticks_constraints (list) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
+    :param exp_num_ticks_constraints: (list) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
@@ -147,7 +147,7 @@ def get_ema_volume_run_bars(file_path_or_df: Tuple[str, pd.DataFrame], num_prev_
     :param num_prev_bars: (int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
     :param expected_imbalance_window: (int) EMA window used to estimate expected run
     :param exp_num_ticks_init: (int) initial expected number of ticks per bar
-    :param exp_num_ticks_constraints (list) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
+    :param exp_num_ticks_constraints: (list) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
@@ -177,7 +177,7 @@ def get_ema_tick_run_bars(file_path_or_df: Tuple[str, pd.DataFrame], num_prev_ba
     :param num_prev_bars: (int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
     :param expected_imbalance_window: (int) EMA window used to estimate expected run
     :param exp_num_ticks_init: (int) initial expected number of ticks per bar
-    :param exp_num_ticks_constraints (list) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
+    :param exp_num_ticks_constraints: (list) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
