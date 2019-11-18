@@ -12,6 +12,7 @@ from sklearn.linear_model import LinearRegression
 def get_bar_based_kyle_lambda(close: pd.Series, volume: pd.Series, window: int = 20) -> pd.Series:
     """
     Get Kyle lambda from bars data, p.286-288.
+
     :param close: (pd.Series) Close prices
     :param volume: (pd.Series) Bar volume
     :param window: (int) rolling window used for estimation
@@ -27,6 +28,7 @@ def get_bar_based_kyle_lambda(close: pd.Series, volume: pd.Series, window: int =
 def get_bar_based_amihud_lambda(close: pd.Series, dollar_volume: pd.Series, window: int = 20) -> pd.Series:
     """
     Get Amihud lambda from bars data, p.288-289.
+
     :param close: (pd.Series) Close prices
     :param dollar_volume: (pd.Series) Dollar volumes
     :param window: (int) rolling window used for estimation
@@ -39,6 +41,7 @@ def get_bar_based_amihud_lambda(close: pd.Series, dollar_volume: pd.Series, wind
 def get_bar_based_hasbrouck_lambda(close: pd.Series, dollar_volume: pd.Series, window: int = 20) -> pd.Series:
     """
     Get Hasbrouck lambda from bars data, p.289-290.
+
     :param close: (pd.Series) Close prices
     :param dollar_volume: (pd.Series) Dollar volumes
     :param window: (int) rolling window used for estimation
@@ -54,6 +57,7 @@ def get_bar_based_hasbrouck_lambda(close: pd.Series, dollar_volume: pd.Series, w
 def get_trades_based_kyle_lambda(price_diff: list, volume: list, aggressor_flags: list) -> float:
     """
     Get Kyle lambda from trades data, p.286-288.
+
     :param price_diff: (list) of price diffs
     :param volume: (list) of trades sizes
     :param aggressor_flags: (list) of trade directions [-1, 1]  (tick rule or aggressor side can be used to define)
@@ -71,6 +75,7 @@ def get_trades_based_kyle_lambda(price_diff: list, volume: list, aggressor_flags
 def get_trades_based_amihud_lambda(log_ret: list, dollar_volume: list) -> float:
     """
     Get Amihud lambda from trades data, p.288-289.
+
     :param log_ret: (list) of log returns
     :param dollar_volume: (list) of dollar volumes (price * size)
     :return: (float) Amihud lambda for a bar
@@ -86,6 +91,7 @@ def get_trades_based_amihud_lambda(log_ret: list, dollar_volume: list) -> float:
 def get_trades_based_hasbrouck_lambda(log_ret: list, dollar_volume: list, aggressor_flags: list) -> float:
     """
     Get Amihud lambda from trades data, p.289-290.
+    
     :param log_ret: (list) of log returns
     :param dollar_volume: (list) of dollar volumes (price * size)
     :param aggressor_flags: (list) of trade directions [-1, 1]  (tick rule or aggressor side can be used to define)

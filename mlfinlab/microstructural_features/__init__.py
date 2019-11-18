@@ -9,6 +9,6 @@ from mlfinlab.microstructural_features.second_generation import get_bar_based_ky
     get_trades_based_hasbrouck_lambda
 from mlfinlab.microstructural_features.misc import get_avg_tick_size, vwap
 from mlfinlab.microstructural_features.third_generation import get_vpin
-from mlfinlab.microstructural_features.encoding import quantile_mapping, encode_array
+from mlfinlab.microstructural_features.encoding import quantile_mapping, encode_array, encode_tick_rule_array
 from mlfinlab.microstructural_features.entropy import get_lempel_ziv_entropy, get_shannon_entropy, get_plug_in_entropy
 from mlfinlab.microstructural_features.feature_generator import MicrostructuralFeaturesGenerator

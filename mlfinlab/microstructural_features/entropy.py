@@ -70,6 +70,7 @@ def _prob_mass_function(message: str, word_length: int) -> dict:
 def get_plug_in_entropy(message: str, word_length: int = None) -> float:
     """
     Get Plug-in entropy estimator, Snippet 18.1, page 266.
+    
     :param message: (str or array) encoded message
     :param word_length: (int) approximate word length
     :return: (float) Plug-in entropy

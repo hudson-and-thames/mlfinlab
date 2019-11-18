@@ -18,6 +18,7 @@ def _crop_data_frame_in_batches(df: pd.DataFrame, chunksize: int):
     # pylint: disable=invalid-name
     """
     Splits df into chunks of chunksize
+
     :param df: (pd.DataFrame) to split
     :param chunksize: (Int) number of rows in chunk
     :return: (list) of chunks (pd.DataFrames)
@@ -31,13 +32,21 @@ def _crop_data_frame_in_batches(df: pd.DataFrame, chunksize: int):
 class MicrostructuralFeaturesGenerator:
     """
     Class which is used to generate inter-bar features when bars are already compressed.
+
+    :param trades_input: (Str or pd.DataFrame) Path to the csv file or Pandas Dat Frame containing raw tick data in the format[date_time, price, volume]
+    :param bar_index: (pd.DatetimeIndex) bars index used for feature calculations, should be sorted
+    :param batch_size: (int) Number of rows to read in from the csv, per batch.
+    :param volume_encoding: (dict) Dictionary of encoding trades size anc calculate entropy on encoded messages
+    :param pct_encoding: (dict) Dictionary of encoding log returns anc calculate entropy on encoded messages
+
     """
 
     def __init__(self, trades_input: (str, pd.DataFrame), bar_index: pd.DatetimeIndex, batch_size: int = 2e7,
                  volume_encoding: dict = None, pct_encoding: dict = None):
         """
         Constructor
-        :param trades_input: (String) Path to the csv file or Pandas Dat Frame containing raw tick data in the format[date_time, price, volume]
+
+        :param trades_input: (Str or pd.DataFrame) Path to the csv file or Pandas Dat Frame containing raw tick data in the format[date_time, price, volume]
         :param bar_index: (pd.DatetimeIndex) bars index used for feature calculations, should be sorted
         :param batch_size: (int) Number of rows to read in from the csv, per batch.
         :param volume_encoding: (dict) Dictionary of encoding trades size anc calculate entropy on encoded messages
@@ -76,7 +85,7 @@ class MicrostructuralFeaturesGenerator:
     def get_features(self, verbose=True, to_csv=False, output_path=None):
         """
         Reads a csv file of ticks or pd.DataFrame in batches and then constructs corresponding microstructural intra-bar features:
-        average tick size, tick rule sum, vwap, kyla lambda, amihud lambda, hasbrouck lambda, tick/volume/pct Shannon, Lempel-Ziv,
+        average tick size, tick rule sum, VWAP, Kyle lambda, Amihud lambda, Hasbrouck lambda, tick/volume/pct Shannon, Lempel-Ziv,
         Plug-in entropies if corresponding mapping dictionaries are provided (self.volume_encoding, self.pct_encoding).
         The csv file must have only 3 columns: date_time, price, & volume.
 
@@ -138,7 +147,8 @@ class MicrostructuralFeaturesGenerator:
         """
         Reset price_diff, trade_size, tick_rule, log_ret arrays to empty when bar is formed and features are
         calculated
-        :return:
+
+        :return: None
         """
         self.price_diff = []
         self.trade_size = []
@@ -191,6 +201,7 @@ class MicrostructuralFeaturesGenerator:
     def _get_bar_features(self, date_time: pd.Timestamp, list_bars: list) -> list:
         """
         Calculate inter-bar features: lambdas, entropies, avg_tick_size, vwap
+
         :param date_time: (pd.Timestamp) when bar was formed
         :param list_bars: (list) of previously formed bars
         :return: (list) of inter-bar features

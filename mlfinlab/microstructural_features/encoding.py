@@ -7,6 +7,7 @@ import numpy as np
 def encode_tick_rule_array(tick_rule_array: list) -> str:
     """
     Encode array of tick signs (-1, 1, 0)
+
     :param tick_rule_array: (list) of tick rules
     :return: (str) encoded message
     """
@@ -26,6 +27,7 @@ def encode_tick_rule_array(tick_rule_array: list) -> str:
 def _get_ascii_table() -> list:
     """
     Get all ASCII symbols
+
     :return: (list) of ASCII symbols
     """
     # ASCII table consists of 256 characters
@@ -38,6 +40,7 @@ def _get_ascii_table() -> list:
 def quantile_mapping(array: list, num_letters: int = 26) -> dict:
     """
     Generate dictionary of quantile-letters based on values from array and dictionary length (num_letters).
+
     :param array: (list) of values to split on quantiles
     :param num_letters: (int) number of letters(quantiles) to encode
     :return: (dict) of quantile-symbol
@@ -53,6 +56,7 @@ def quantile_mapping(array: list, num_letters: int = 26) -> dict:
 def _find_nearest(array: list, value: float) -> float:
     """
     Find the nearest element from array to value.
+
     :param array: (list) of values
     :param value: (float) value for which the nearest element needs to be found
     :return: (float) the nearest to the value element in array
@@ -65,6 +69,7 @@ def _find_nearest(array: list, value: float) -> float:
 def _get_letter_from_encoding(value: float, encoding_dict: dict) -> str:
     """
     Get letter for float/int value from encoding dict.
+
     :param value: (float/int)
     :param encoding_dict: (dict)
     :return: (str): letter from encoding dict
@@ -75,6 +80,7 @@ def _get_letter_from_encoding(value: float, encoding_dict: dict) -> str:
 def encode_array(array: list, encoding_dict: dict) -> str:
     """
     Encode array with strings using encoding dict.
+    
     :param array: (list) of values to encode
     :param encoding_dict: (dict) of quantile-symbol
     :return: (str): encoded message
