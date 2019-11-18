@@ -21,7 +21,7 @@ https://towardsdatascience.com/financial-machine-learning-part-0-bars-745897d4e4
 """
 
 # Imports
-from typing import Tuple
+from typing import Tuple, List
 
 import numpy as np
 import pandas as pd
@@ -41,7 +41,7 @@ class EMARunBars(BaseRunBars):
 
     def __init__(self, file_path_or_df: Tuple[str, pd.DataFrame], metric: str, num_prev_bars: int,
                  expected_imbalance_window: int, exp_num_ticks_init: int,
-                 exp_num_ticks_constraints: list, batch_size: int, analyse_thresholds: bool):
+                 exp_num_ticks_constraints: List[float], batch_size: int, analyse_thresholds: bool):
         """
         Constructor
 
@@ -107,7 +107,7 @@ class ConstRunBars(BaseRunBars):
 
 def get_ema_dollar_run_bars(file_path_or_df: Tuple[str, pd.DataFrame], num_prev_bars: int = 3,
                             expected_imbalance_window: int = 10000, exp_num_ticks_init: int = 20000,
-                            exp_num_ticks_constraints: list = None, batch_size: int = 2e7,
+                            exp_num_ticks_constraints: List[float] = None, batch_size: int = 2e7,
                             analyse_thresholds: bool = False,
                             verbose: bool = True, to_csv: bool = False, output_path: str = None):
     """
@@ -137,7 +137,7 @@ def get_ema_dollar_run_bars(file_path_or_df: Tuple[str, pd.DataFrame], num_prev_
 
 def get_ema_volume_run_bars(file_path_or_df: Tuple[str, pd.DataFrame], num_prev_bars: int = 3,
                             expected_imbalance_window: int = 10000, exp_num_ticks_init: int = 20000,
-                            exp_num_ticks_constraints: list = None, batch_size: int = 2e7,
+                            exp_num_ticks_constraints: List[float] = None, batch_size: int = 2e7,
                             analyse_thresholds: bool = False,
                             verbose: bool = True, to_csv: bool = False, output_path: str = None):
     """
@@ -167,7 +167,7 @@ def get_ema_volume_run_bars(file_path_or_df: Tuple[str, pd.DataFrame], num_prev_
 
 def get_ema_tick_run_bars(file_path_or_df: Tuple[str, pd.DataFrame], num_prev_bars: int = 3,
                           expected_imbalance_window: int = 10000, exp_num_ticks_init: int = 20000,
-                          exp_num_ticks_constraints: list = None, batch_size: int = 2e7,
+                          exp_num_ticks_constraints: List[float] = None, batch_size: int = 2e7,
                           analyse_thresholds: bool = False,
                           verbose: bool = True, to_csv: bool = False, output_path: str = None):
     """
