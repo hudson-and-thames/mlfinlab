@@ -113,6 +113,7 @@ def _lag_df(df: pd.DataFrame, lags: Union[int, list]) -> pd.DataFrame:
 def _get_betas(X: pd.DataFrame, y: pd.DataFrame) -> Tuple[np.array, np.array]:
     """
     Snippet 17.4, page 259. Fitting The ADF Specification (get beta estimate and estimate variance)
+
     :param X: (pd.DataFrame) of features(factors)
     :param y: (pd.DataFrame) of outcomes
     :return: (np.array, np.array) of betas and variances of estimates
@@ -132,6 +133,7 @@ def _get_betas(X: pd.DataFrame, y: pd.DataFrame) -> Tuple[np.array, np.array]:
 def _sadf_outer_loop(X: pd.DataFrame, y: pd.DataFrame, min_length: int, molecule: list) -> pd.Series:
     """
     This function gets SADF for t times from molecule
+
     :param X: (pd.DataFrame) of features(factors)
     :param y: (pd.DataFrame) of outcomes
     :param min_length: (int) minimum number of observations
@@ -150,14 +152,15 @@ def _sadf_outer_loop(X: pd.DataFrame, y: pd.DataFrame, min_length: int, molecule
 def get_sadf(series: pd.Series, model: str, lags: Union[int, list], min_length: int, add_const: bool = False,
              num_threads: int = 8) -> pd.Series:
     """
-    Multithread implementation of SADF
+    Multithread implementation of SADF, p. 258-259
+
     :param series: (pd.Series) for which SADF statistics are generated
     :param model: (str) either 'linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
     :param lags: (int or list) either number of lags to use or array of specified lags
     :param min_length: (int) minimum number of observations needed for estimation
     :param add_const: (bool) flag to add constant
     :param num_threads: (int) number of cores to use
-    :return (pd.Series) of SADF statistics
+    :return: (pd.Series) of SADF statistics
     """
     X, y = _get_y_x(series, model, lags, add_const)
     molecule = y.index[min_length:y.shape[0]]

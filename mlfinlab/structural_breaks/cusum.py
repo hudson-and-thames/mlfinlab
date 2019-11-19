@@ -50,7 +50,7 @@ def _get_s_n_for_t(series: pd.Series, test_type: str, molecule: list) -> pd.Seri
 def get_chu_stinchcombe_white_statistics(series: pd.Series, test_type: str = 'one_sided',
                                          num_threads: int = 8) -> pd.Series:
     """
-    Multithread Chu-Stinchcombe-White test implementation
+    Multithread Chu-Stinchcombe-White test implementation, p.251
 
     :param series: (pd.Series) to get statistics for
     :param test_type: (str): two-sided or one-sided test
