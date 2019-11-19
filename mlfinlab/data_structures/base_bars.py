@@ -38,7 +38,7 @@ class BaseBars(ABC):
         """
         Constructor
 
-       :param file_path_or_df: (str or pd.DataFrame) Path to the csv file or Pandas Data Frame containing
+        :param file_path_or_df: (str or pd.DataFrame) Path to the csv file or Pandas Data Frame containing
                                 raw tick data  in the format[date_time, price, volume]
         :param metric: (str) type of imbalance bar to create. Example: dollar_imbalance.
         :param batch_size: (int) Number of rows to read in from the csv, per batch.
@@ -166,7 +166,7 @@ class BaseBars(ABC):
         if price > high_price:
             high_price = price
 
-        if price <= low_price:
+        if price < low_price:
             low_price = price
 
         return high_price, low_price
@@ -215,6 +215,7 @@ class BaseBars(ABC):
         else:
             signed_tick = self.prev_tick_rule
 
+        self.prev_price = price  # Update previous price used for tick rule calculations
         return signed_tick
 
     def _get_imbalance(self, price: float, signed_tick: int, volume: float) -> float:
@@ -319,8 +320,6 @@ class BaseImbalanceBars(BaseBars):
             self.imbalance_tick_statistics['imbalance_array'].append(imbalance)
             self.thresholds['cum_theta'] += imbalance
 
-            self.prev_price = price  # Update previous price for tick rule calculations
-
             # Get expected imbalance for the first time, when num_ticks_init passed
             if not list_bars and np.isnan(self.thresholds['expected_imbalance']):
                 self.thresholds['expected_imbalance'] = self._get_expected_imbalance(
@@ -329,8 +328,6 @@ class BaseImbalanceBars(BaseBars):
             if self.bars_thresholds is not None:
                 self.thresholds['timestamp'] = date_time
                 self.bars_thresholds.append(dict(self.thresholds))
-
-            self.prev_price = price  # Update previous price used for tick rule calculations
 
             # Check expression for possible bar generation
             if np.abs(self.thresholds['cum_theta']) > self.thresholds['exp_num_ticks'] * np.abs(
