@@ -95,7 +95,7 @@ class StandardBars(BaseBars):
 def get_dollar_bars(file_path_or_df: Tuple[str, pd.DataFrame], threshold: float = 70000000, batch_size: int = 20000000,
                     verbose: bool = True, to_csv: bool = False, output_path: str = None):
     """
-    Creates the dollar bars: date_time, open, high, low, close.
+    Creates the dollar bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
     Following the paper "The Volume Clock: Insights into the high frequency paradigm" by Lopez de Prado, et al,
     it is suggested that using 1/50 of the average daily dollar value, would result in more desirable statistical
@@ -119,7 +119,7 @@ def get_dollar_bars(file_path_or_df: Tuple[str, pd.DataFrame], threshold: float 
 def get_volume_bars(file_path_or_df: Tuple[str, pd.DataFrame], threshold: float = 70000000, batch_size: int = 20000000,
                     verbose: bool = True, to_csv: bool = False, output_path: str = None):
     """
-    Creates the volume bars: date_time, open, high, low, close.
+    Creates the volume bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
     Following the paper "The Volume Clock: Insights into the high frequency paradigm" by Lopez de Prado, et al,
     it is suggested that using 1/50 of the average daily volume, would result in more desirable statistical properties.
@@ -141,7 +141,7 @@ def get_volume_bars(file_path_or_df: Tuple[str, pd.DataFrame], threshold: float 
 def get_tick_bars(file_path_or_df: Tuple[str, pd.DataFrame], threshold: float = 70000000, batch_size: int = 20000000,
                   verbose: bool = True, to_csv: bool = False, output_path: str = None):
     """
-    Creates the tick bars: date_time, open, high, low, close.
+    Creates the tick bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
     :param file_path_or_df: (str or pd.DataFrame) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
     :param threshold: (float) A cumulative value above this threshold triggers a sample to be taken.

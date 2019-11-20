@@ -48,8 +48,8 @@ Initially, your instinct may be to pass mlfinlab package an in-memory DataFrame 
 Time Bars
 =========
 
-.. py:currentmodule:: mlfinlab.data_structures.time_data_sctuctures
-.. automodule:: mlfinlab.data_structures.time_data_sctuctures
+.. py:currentmodule:: mlfinlab.data_structures.time_data_structures
+.. automodule:: mlfinlab.data_structures.time_data_structures
    :members: get_time_bars
 
 

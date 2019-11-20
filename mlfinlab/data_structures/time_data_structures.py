@@ -89,7 +89,7 @@ class TimeBars(BaseBars):
 def get_time_bars(file_path_or_df, resolution='D', num_units=1, batch_size=20000000, verbose=True, to_csv=False,
                   output_path=None):
     """
-    Creates Time Bars: date_time, open, high, low, close.
+    Creates Time Bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
     :param file_path_or_df: (str or pd.DataFrame) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
     :param resolution: (str) Resolution type ('D', 'H', 'MIN', 'S')
