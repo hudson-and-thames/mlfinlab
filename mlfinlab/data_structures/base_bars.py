@@ -153,8 +153,7 @@ class BaseBars(ABC):
             print('csv file, column 0, not a date time format:',
                   test_batch.iloc[0, 0])
 
-    @staticmethod
-    def _update_high_low(price: float) -> Union[float, float]:
+    def _update_high_low(self, price: float) -> Union[float, float]:
         """
         Update the high and low prices using the current price.
 
