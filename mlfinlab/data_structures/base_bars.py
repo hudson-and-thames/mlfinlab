@@ -470,11 +470,11 @@ class BaseRunBars(BaseBars):
                 self.imbalance_tick_statistics['imbalance_array_sell'].append(abs(imbalance))
                 self.thresholds['cum_theta_sell'] += abs(imbalance)
 
-            self.imbalances_are_counted_flag = ~np.isnan([self.thresholds['exp_imbalance_buy'], self.thresholds[
-                'exp_imbalance_sell']]).all()  # Flag indicating that both buy and sell imbalances are counted
+            self.warm_up_flag = np.isnan([self.thresholds['exp_imbalance_buy'], self.thresholds[
+                'exp_imbalance_sell']]).any()  # Flag indicating that one of imbalances is not counted (warm-up)
 
             # Get expected imbalance for the first time, when num_ticks_init passed
-            if not list_bars and self.imbalances_are_counted_flag:
+            if not list_bars and self.warm_up_flag:
                 self.thresholds['exp_imbalance_buy'] = self._get_expected_imbalance(
                     self.imbalance_tick_statistics['imbalance_array_buy'], self.expected_imbalance_window, warm_up=True)
                 self.thresholds['exp_imbalance_sell'] = self._get_expected_imbalance(
