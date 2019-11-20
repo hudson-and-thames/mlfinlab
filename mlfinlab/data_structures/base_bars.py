@@ -154,19 +154,17 @@ class BaseBars(ABC):
                   test_batch.iloc[0, 0])
 
     @staticmethod
-    def _update_high_low(high_price: float, low_price: float, price: float) -> Union[float, float]:
+    def _update_high_low(price: float) -> Union[float, float]:
         """
         Update the high and low prices using the current price.
 
-        :param high_price: Current high price that needs to be updated
-        :param low_price: Current low price that needs to be updated
         :param price: Current price
         :return: Updated high and low prices
         """
-        if price > high_price:
+        if price > self.high_price:
             high_price = price
 
-        if price < low_price:
+        if price < self.low_price:
             low_price = price
 
         return high_price, low_price
@@ -305,8 +303,7 @@ class BaseImbalanceBars(BaseBars):
                 self.open_price = price
 
             # Update high low prices
-            self.high_price, self.low_price = self._update_high_low(
-                self.high_price, self.low_price, price)
+            self.high_price, self.low_price = self._update_high_low(price)
 
             # Bar statistics calculations
             self.cum_statistics['cum_ticks'] += 1
@@ -450,8 +447,7 @@ class BaseRunBars(BaseBars):
                 self.open_price = price
 
             # Update high low prices
-            self.high_price, self.low_price = self._update_high_low(
-                self.high_price, self.low_price, price)
+            self.high_price, self.low_price = self._update_high_low(price)
 
             # Bar statistics calculations
             self.cum_statistics['cum_ticks'] += 1
@@ -471,14 +467,11 @@ class BaseRunBars(BaseBars):
                 self.imbalance_tick_statistics['imbalance_array_sell'].append(abs(imbalance))
                 self.thresholds['cum_theta_sell'] += abs(imbalance)
 
-            self.imbalances_are_counted_flag = np.isnan([self.thresholds['exp_imbalance_buy'], self.thresholds[
-                'exp_imbalance_sell']]).any()  # Flag indicating that both buy and sell imbalances are counted
-
-            self.prev_price = price  # Update previous price for tick rule calculations
+            self.imbalances_are_counted_flag = ~np.isnan([self.thresholds['exp_imbalance_buy'], self.thresholds[
+                'exp_imbalance_sell']]).all()  # Flag indicating that both buy and sell imbalances are counted
 
             # Get expected imbalance for the first time, when num_ticks_init passed
             if not list_bars and self.imbalances_are_counted_flag:
-
                 self.thresholds['exp_imbalance_buy'] = self._get_expected_imbalance(
                     self.imbalance_tick_statistics['imbalance_array_buy'], self.expected_imbalance_window, warm_up=True)
                 self.thresholds['exp_imbalance_sell'] = self._get_expected_imbalance(
@@ -494,8 +487,6 @@ class BaseRunBars(BaseBars):
             if self.bars_thresholds is not None:
                 self.thresholds['timestamp'] = date_time
                 self.bars_thresholds.append(dict(self.thresholds))
-
-            self.prev_price = price  # Update previous price used for tick rule calculations
 
             # Check expression for possible bar generation
             max_proportion = max(

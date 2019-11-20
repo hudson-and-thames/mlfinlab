@@ -82,8 +82,6 @@ class StandardBars(BaseBars):
             if signed_tick == 1:
                 self.cum_statistics['cum_buy_volume'] += volume
 
-            self.prev_price = price
-
             # If threshold reached then take a sample
             if self.cum_statistics[self.metric] >= self.threshold:  # pylint: disable=eval-used
                 self._create_bars(date_time, price,

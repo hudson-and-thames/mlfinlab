@@ -123,7 +123,7 @@ def get_ema_dollar_imbalance_bars(file_path_or_df: Tuple[str, pd.DataFrame], num
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
     :param analyse_thresholds: (bool) Flag to save  and return thresholds used to sample imbalance bars
     :param output_path: (str) Path to csv file, if to_csv is True
-    :return: (pd.DataFrame) DataFrame of dollar imbalance bars and DataFrame of thresholds
+    :return: (pd.DataFrame) DataFrame of dollar imbalance bars and DataFrame of thresholds, if to_csv=True returns None
     """
     bars = EMAImbalanceBars(file_path_or_df=file_path_or_df, metric='dollar_imbalance', num_prev_bars=num_prev_bars,
                             expected_imbalance_window=expected_imbalance_window,
@@ -153,7 +153,7 @@ def get_ema_volume_imbalance_bars(file_path_or_df: Tuple[str, pd.DataFrame], num
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
     :param analyse_thresholds: (bool) Flag to save  and return thresholds used to sample imbalance bars
     :param output_path: (str) Path to csv file, if to_csv is True
-    :return: (pd.DataFrame) DataFrame of volume imbalance bars and DataFrame of thresholds
+    :return: (pd.DataFrame) DataFrame of volume imbalance bars and DataFrame of thresholds, if to_csv=True returns None
     """
     bars = EMAImbalanceBars(file_path_or_df=file_path_or_df, metric='volume_imbalance', num_prev_bars=num_prev_bars,
                             expected_imbalance_window=expected_imbalance_window,
@@ -183,7 +183,7 @@ def get_ema_tick_imbalance_bars(file_path_or_df: Tuple[str, pd.DataFrame], num_p
     :param to_csv: (Boolean) Save bars to csv after every batch run (True or False)
     :param analyse_thresholds: (bool) Flag to save  and return thresholds used to sample imbalance bars
     :param output_path: (str) Path to csv file, if to_csv is True
-    :return: (pd.DataFrame) DataFrame of tick imbalance bars and DataFrame of thresholds
+    :return: (pd.DataFrame) DataFrame of tick imbalance bars and DataFrame of thresholds, if to_csv=True returns None
     """
     bars = EMAImbalanceBars(file_path_or_df=file_path_or_df, metric='tick_imbalance', num_prev_bars=num_prev_bars,
                             expected_imbalance_window=expected_imbalance_window,
@@ -211,7 +211,7 @@ def get_const_dollar_imbalance_bars(file_path_or_df: Tuple[str, pd.DataFrame], e
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
     :param analyse_thresholds: (bool) Flag to save  and return thresholds used to sample imbalance bars
     :param output_path: (str) Path to csv file, if to_csv is True
-    :return: (pd.DataFrame) DataFrame of dollar imbalance bars and DataFrame of thresholds
+    :return: (pd.DataFrame) DataFrame of dollar imbalance bars and DataFrame of thresholds, if to_csv=True returns None
     """
     bars = ConstImbalanceBars(file_path_or_df=file_path_or_df, metric='dollar_imbalance',
                               expected_imbalance_window=expected_imbalance_window,
@@ -239,7 +239,7 @@ def get_const_volume_imbalance_bars(file_path_or_df: Tuple[str, pd.DataFrame], e
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
     :param analyse_thresholds: (bool) Flag to save  and return thresholds used to sample imbalance bars
     :param output_path: (str) Path to csv file, if to_csv is True
-    :return: (pd.DataFrame) DataFrame of volume imbalance bars and DataFrame of thresholds
+    :return: (pd.DataFrame) DataFrame of volume imbalance bars and DataFrame of thresholds, if to_csv=True returns None
     """
     bars = ConstImbalanceBars(file_path_or_df=file_path_or_df, metric='volume_imbalance',
                               expected_imbalance_window=expected_imbalance_window,
@@ -267,7 +267,7 @@ def get_const_tick_imbalance_bars(file_path_or_df: Tuple[str, pd.DataFrame], exp
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
     :param analyse_thresholds: (bool) Flag to save  and return thresholds used to sample imbalance bars
     :param output_path: (str) Path to csv file, if to_csv is True
-    :return: (pd.DataFrame) DataFrame of tick imbalance bars and DataFrame of thresholds
+    :return: (pd.DataFrame) DataFrame of tick imbalance bars and DataFrame of thresholds, if to_csv=True returns None
     """
     bars = ConstImbalanceBars(file_path_or_df=file_path_or_df, metric='tick_imbalance',
                               expected_imbalance_window=expected_imbalance_window,

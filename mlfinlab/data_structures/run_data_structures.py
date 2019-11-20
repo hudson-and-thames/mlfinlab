@@ -204,15 +204,15 @@ def get_const_dollar_run_bars(file_path_or_df: Tuple[str, pd.DataFrame], num_pre
     Creates the Const dollar run bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
     :param file_path_or_df: (str or pd.DataFrame) File path pointing to csv data or pd.DataFrame.
-    :param num_prev_bars: (Int) Window size for estimating buy ticks proportion (number of previous bars to use in EWMA)
-    :param expected_imbalance_window: (Int) EMA window used to estimate expected imbalance
-    :param exp_num_ticks_init: initial expected number of ticks per bar
-    :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
-    :param verbose: Print out batch numbers (True or False)
-    :param to_csv: Save bars to csv after every batch run (True or False)
-    :param analyse_thresholds: (Boolean) Flag to save  and return thresholds used to sample run bars
-    :param output_path: Path to csv file, if to_csv is True
-    :return: DataFrame of dollar bars and DataFrame of thresholds
+    :param num_prev_bars: (int) Window size for estimating buy ticks proportion (number of previous bars to use in EWMA)
+    :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
+    :param exp_num_ticks_init: (int) initial expected number of ticks per bar
+    :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
+    :param verbose: (bool) Print out batch numbers (True or False)
+    :param to_csv: (bool) Save bars to csv after every batch run (True or False)
+    :param analyse_thresholds: (bool) Flag to save  and return thresholds used to sample run bars
+    :param output_path: (str) Path to csv file, if to_csv is True
+    :return: DataFrame of dollar bars and DataFrame of thresholds, if to_csv=True returns None
     """
     bars = ConstRunBars(file_path_or_df=file_path_or_df, metric='dollar_run', num_prev_bars=num_prev_bars,
                         expected_imbalance_window=expected_imbalance_window,
@@ -233,14 +233,14 @@ def get_const_volume_run_bars(file_path_or_df: Tuple[str, pd.DataFrame], num_pre
     Creates the Const volume run bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
     :param file_path_or_df: (str or pd.DataFrame) File path pointing to csv data or pd.DataFrame.
-    :param num_prev_bars: (Int) Window size for estimating buy ticks proportion (number of previous bars to use in EWMA)
-    :param expected_imbalance_window: (Int) EMA window used to estimate expected imbalance
-    :param exp_num_ticks_init: initial expected number of ticks per bar
-    :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
-    :param verbose: Print out batch numbers (True or False)
-    :param to_csv: Save bars to csv after every batch run (True or False)
-    :param analyse_thresholds: (Boolean) Flag to save  and return thresholds used to sample run bars
-    :param output_path: Path to csv file, if to_csv is True
+    :param num_prev_bars: (int) Window size for estimating buy ticks proportion (number of previous bars to use in EWMA)
+    :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
+    :param exp_num_ticks_init: (int) initial expected number of ticks per bar
+    :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
+    :param verbose: (bool) Print out batch numbers (True or False)
+    :param to_csv: (bool) Save bars to csv after every batch run (True or False)
+    :param analyse_thresholds: (bool) Flag to save  and return thresholds used to sample run bars
+    :param output_path: (str) Path to csv file, if to_csv is True
     :return: DataFrame of volume bars and DataFrame of thresholds
     """
     bars = ConstRunBars(file_path_or_df=file_path_or_df, metric='volume_run', num_prev_bars=num_prev_bars,
@@ -262,14 +262,14 @@ def get_const_tick_run_bars(file_path_or_df: Tuple[str, pd.DataFrame], num_prev_
     Creates the Const tick run bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
     :param file_path_or_df: (str or pd.DataFrame) File path pointing to csv data or pd.DataFrame.
-    :param num_prev_bars: (Int) Window size for estimating buy ticks proportion (number of previous bars to use in EWMA)
-    :param expected_imbalance_window: (Int) EMA window used to estimate expected imbalance
-    :param exp_num_ticks_init: initial expected number of ticks per bar
-    :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
-    :param verbose: Print out batch numbers (True or False)
-    :param to_csv: Save bars to csv after every batch run (True or False)
-    :param analyse_thresholds: (Boolean) Flag to save  and return thresholds used to sample run bars
-    :param output_path: Path to csv file, if to_csv is True
+    :param num_prev_bars: (int) Window size for estimating buy ticks proportion (number of previous bars to use in EWMA)
+    :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
+    :param exp_num_ticks_init: (int) initial expected number of ticks per bar
+    :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
+    :param verbose: (bool) Print out batch numbers (True or False)
+    :param to_csv: (bool) Save bars to csv after every batch run (True or False)
+    :param analyse_thresholds: (bool) Flag to save  and return thresholds used to sample run bars
+    :param output_path: (str) Path to csv file, if to_csv is True
     :return: DataFrame of tick bars and DataFrame of thresholds
     """
     bars = ConstRunBars(file_path_or_df=file_path_or_df, metric='tick_run', num_prev_bars=num_prev_bars,

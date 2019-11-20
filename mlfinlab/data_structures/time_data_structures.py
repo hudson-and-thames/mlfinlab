@@ -17,9 +17,9 @@ class TimeBars(BaseBars):
     Use get_time_bars instead
     """
 
-    def __init__(self, file_path, resolution, num_units, batch_size=20000000):
+    def __init__(self, file_path_or_df, resolution, num_units, batch_size=20000000):
 
-        BaseBars.__init__(self, file_path, metric=None, batch_size=batch_size)
+        BaseBars.__init__(self, file_path_or_df, metric=None, batch_size=batch_size)
 
         # Threshold at which to sample (in seconds)
         self.resolution = resolution  # Type of bar resolution: 'D', 'H', 'MIN', 'S'
@@ -83,26 +83,24 @@ class TimeBars(BaseBars):
             if signed_tick == 1:
                 self.cum_statistics['cum_buy_volume'] += volume
 
-            self.prev_price = price
-
         return list_bars
 
 
-def get_time_bars(file_path, resolution='D', num_units=1, batch_size=20000000, verbose=True, to_csv=False,
+def get_time_bars(file_path_or_df, resolution='D', num_units=1, batch_size=20000000, verbose=True, to_csv=False,
                   output_path=None):
     """
     Creates Time Bars: date_time, open, high, low, close.
 
-    :param file_path: File path pointing to csv data.
-    :param resolution: Resolution type ('D', 'H', 'MIN', 'S')
-    :param num_units: Number of resolution units (3 days for example, 2 hours)
-    :param batch_size: The number of rows per batch. Less RAM = smaller batch size.
-    :param verbose: Print out batch numbers (True or False)
-    :param to_csv: Save bars to csv after every batch run (True or False)
-    :param output_path: Path to csv file, if to_csv is True
-    :return: Dataframe of dollar bars
+    :param file_path_or_df: (str or pd.DataFrame) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
+    :param resolution: (str) Resolution type ('D', 'H', 'MIN', 'S')
+    :param num_units: (int) Number of resolution units (3 days for example, 2 hours)
+    :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
+    :param verbose: (int) Print out batch numbers (True or False)
+    :param to_csv: (bool) Save bars to csv after every batch run (True or False)
+    :param output_path: (str) Path to csv file, if to_csv is True
+    :return: Dataframe of time bars, if to_csv=True return None
     """
 
-    bars = TimeBars(file_path=file_path, resolution=resolution, num_units=num_units, batch_size=batch_size)
+    bars = TimeBars(file_path_or_df=file_path_or_df, resolution=resolution, num_units=num_units, batch_size=batch_size)
     time_bars = bars.batch_run(verbose=verbose, to_csv=to_csv, output_path=output_path)
     return time_bars

@@ -5,7 +5,7 @@ Data Structures
 ===============
 
 When analyzing financial data, unstructured datasets are commonly transformed into a structured format referred to as bars, where a bar represents a row in a table.
-mlfinlab implements tick, volume, and dollar bars using traditional standard bar methods as well as the less common information driven bars. 
+mlfinlab implements tick, volume, and dollar bars using traditional standard bar methods as well as the less common information driven bars.
 
 
 Data Preparation
@@ -45,6 +45,13 @@ Initially, your instinct may be to pass mlfinlab package an in-memory DataFrame 
 	new_data.to_csv('FILE_PATH', index=False)
 
 
+Time Bars
+=========
+
+.. py:currentmodule:: mlfinlab.data_structures.time_data_sctuctures
+.. automodule:: mlfinlab.data_structures.time_data_sctuctures
+   :members: get_time_bars
+
 
 Standard Bars
 =============
@@ -66,12 +73,12 @@ Tick Bars
    :members: get_tick_bars
 
 ::
-	
+
 	from mlfinlab.data_structures import standard_data_structures
 
 
 	# Tick Bars
-	tick = standard_data_structures.get_tick_bars('FILE_PATH', threshold=5500, 
+	tick = standard_data_structures.get_tick_bars('FILE_PATH', threshold=5500,
 	batch_size=1000000, verbose=False)
 
 
@@ -87,9 +94,9 @@ Volume Bars
 
 	from mlfinlab.data_structures import standard_data_structures
 
-	
+
 	# Volume Bars
-	volume = standard_data_structures.get_volume_bars('FILE_PATH', threshold=28000, 
+	volume = standard_data_structures.get_volume_bars('FILE_PATH', threshold=28000,
 	batch_size=1000000, verbose=False)
 
 Dollar Bars
@@ -100,12 +107,12 @@ Dollar Bars
    :members: get_dollar_bars
 
 ::
-	
+
 	from mlfinlab.data_structures import standard_data_structures
 
-	
+
 	# Dollar Bars
-	dollar = standard_data_structures.get_dollar_bars('FILE_PATH', threshold=70000000, 
+	dollar = standard_data_structures.get_dollar_bars('FILE_PATH', threshold=70000000,
 	batch_size=1000000, verbose=True)
 
 Statistical Properties
@@ -152,7 +159,7 @@ Next we need to define :math:`E_0[T]` as expected number of ticks, the book sugg
 
 Here we face the problem of first bar generation, because we don't know expected number of ticks with no bars generated. To solve this we introduce the second hyperparameter: expected_num_ticks_init which corresponds to initial guess for **expected number of ticks** before the first imbalance bar is generated.
 
-Bar is sampled when: 
+Bar is sampled when:
 
 						:math:`|\theta_t| \geq E_0[T]*[2v^+ - E_0[v_t]]`
 
@@ -175,7 +182,7 @@ Now we have understood the logic of imbalance bar generation, let's understand h
 	imbalance_bars = []
 	bar_length_array = []
 	for row in data.rows:
-	    #track high,low,close, volume info  
+	    #track high,low,close, volume info
 	    num_ticks += 1
 	    tick_rule = get_tick_rule(price, prev_price)
 	    volume_imbalance = tick_rule * row['volume']
@@ -229,7 +236,7 @@ Examples
 
 
 ::
-	
+
 	from mlfinlab.data_structures import get_ema_dollar_imbalance_bars, get_const_dollar_imbalance_bars
 
 	# EMA, Const Dollar Imbalance Bars
