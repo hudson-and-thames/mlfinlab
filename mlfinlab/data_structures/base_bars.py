@@ -162,9 +162,13 @@ class BaseBars(ABC):
         """
         if price > self.high_price:
             high_price = price
+        else:
+            high_price = self.high_price
 
         if price < self.low_price:
             low_price = price
+        else:
+            low_price = self.low_price
 
         return high_price, low_price
 

@@ -72,8 +72,7 @@ class StandardBars(BaseBars):
                 self.open_price = price
 
             # Update high low prices
-            self.high_price, self.low_price = self._update_high_low(
-                self.high_price, self.low_price, price)
+            self.high_price, self.low_price = self._update_high_low(price)
 
             # Calculations
             self.cum_statistics['cum_ticks'] += 1
