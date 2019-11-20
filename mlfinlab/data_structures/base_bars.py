@@ -417,7 +417,7 @@ class BaseRunBars(BaseBars):
         else:
             self.bars_thresholds = None
 
-        self.imbalances_are_counted_flag = False
+        self.warm_up_flag = False
 
     def _reset_cache(self):
         """
