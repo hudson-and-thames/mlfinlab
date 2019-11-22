@@ -2,19 +2,21 @@
 Test various functions regarding chapter 18: Microstructural Features.
 """
 
-import unittest
 import os
+import unittest
+
 import numpy as np
 import pandas as pd
 
-from mlfinlab.microstructural_features.encoding import encode_tick_rule_array
-from mlfinlab.microstructural_features.entropy import get_plug_in_entropy, get_shannon_entropy, get_lempel_ziv_entropy
+from mlfinlab.data_structures import get_volume_bars
 from mlfinlab.microstructural_features import (get_vpin, get_bar_based_amihud_lambda, get_bar_based_kyle_lambda,
                                                get_bekker_parkinson_vol, get_corwin_schultz_estimator,
                                                get_bar_based_hasbrouck_lambda, get_roll_impact, get_roll_measure,
                                                quantile_mapping, MicrostructuralFeaturesGenerator)
+from mlfinlab.microstructural_features.encoding import encode_tick_rule_array
+from mlfinlab.microstructural_features.entropy import get_plug_in_entropy, get_shannon_entropy, get_lempel_ziv_entropy, \
+    get_konto_entropy, _match_length
 from mlfinlab.util import get_bvc_buy_volume
-from mlfinlab.data_structures import get_volume_bars
 
 
 class TestMicrostructuralFeatures(unittest.TestCase):
@@ -127,16 +129,24 @@ class TestMicrostructuralFeatures(unittest.TestCase):
         """
         Test entropy functions
         """
-        message = 'abcaa'
-        message_array = ['a', 'b', 'c', 'a', 'a']
+        message = '11100001'
+        message_array = [1, 1, 1, 0, 0, 0, 0, 1]
         shannon = get_shannon_entropy(message)
         plug_in = get_plug_in_entropy(message, word_length=1)
         plug_in_arr = get_plug_in_entropy(message_array, word_length=1)
         lempel = get_lempel_ziv_entropy(message)
+        konto = get_konto_entropy(message)
 
         self.assertEqual(plug_in, plug_in_arr)
-        self.assertAlmostEqual(shannon, 1.3709, delta=1e-3)
-        self.assertAlmostEqual(lempel, 0.8, delta=1e-3)
+        self.assertAlmostEqual(shannon, 1.0, delta=1e-3)
+        self.assertAlmostEqual(lempel, 0.625, delta=1e-3)
+        self.assertAlmostEqual(plug_in, 0.985, delta=1e-3)
+        self.assertAlmostEqual(konto, 0.9682, delta=1e-3)
+
+        # Konto entropy boundary conditions
+        konto_2 = get_konto_entropy(message, 2)
+        _match_length('1101111', 2, 3)
+        self.assertAlmostEqual(konto_2, 0.8453, delta=1e-4)
 
     def test_csv_format(self):
         """
@@ -292,16 +302,21 @@ class TestMicrostructuralFeatures(unittest.TestCase):
         self.assertAlmostEqual(features.tick_rule_entropy_shannon[3], 0.41381, delta=1e-4)
 
         # Volume entropy plug-in
-        self.assertAlmostEqual(features.volume_entropy_plug_in.max(), 1.1609, delta=1e-4)
-        self.assertAlmostEqual(features.volume_entropy_plug_in.mean(), 0.639247, delta=1e-5)
-        self.assertAlmostEqual(features.volume_entropy_plug_in[3], 0.46096, delta=1e-5)
+        self.assertAlmostEqual(features.volume_entropy_plug_in.max(), 1.9182, delta=1e-4)
+        self.assertAlmostEqual(features.volume_entropy_plug_in.mean(), 0.9018, delta=1e-5)
+        self.assertAlmostEqual(features.volume_entropy_plug_in[3], 0.4394, delta=1e-4)
 
         # Volume entropy Lempel-Ziv
         self.assertAlmostEqual(features.volume_entropy_lempel_ziv.max(), 1.0, delta=1e-4)
-        self.assertAlmostEqual(features.volume_entropy_plug_in.mean(), 0.63924716, delta=1e-5)
-        self.assertAlmostEqual(features.volume_entropy_plug_in[3], 0.460964, delta=1e-5)
+        self.assertAlmostEqual(features.volume_entropy_lempel_ziv.mean(), 0.6321, delta=1e-4)
+        self.assertAlmostEqual(features.volume_entropy_lempel_ziv[3], 0.4166, delta=1e-4)
 
         # Pct entropy Lempel-Ziv
         self.assertAlmostEqual(features.pct_entropy_lempel_ziv.max(), 0.8, delta=1e-4)
         self.assertAlmostEqual(features.pct_entropy_lempel_ziv.mean(), 0.541649, delta=1e-5)
         self.assertAlmostEqual(features.pct_entropy_lempel_ziv[3], 0.5, delta=1e-5)
+
+        # Pct entropy Konto
+        self.assertAlmostEqual(features.pct_entropy_konto.max(), 1.361, delta=1e-4)
+        self.assertAlmostEqual(features.pct_entropy_konto.mean(), 0.88915, delta=1e-5)
+        self.assertAlmostEqual(features.pct_entropy_konto[3], 1.067022, delta=1e-5)

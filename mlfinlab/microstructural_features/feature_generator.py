@@ -86,11 +86,11 @@ class MicrostructuralFeaturesGenerator:
                 'hasbrouck_lambda']
 
         # Entropy features columns
-        for en_type in self.entropy_type:
+        for en_type in self.entropy_types:
             cols += ['tick_rule_entropy_' + en_type]
 
         if self.volume_encoding is not None:
-            for en_type in self.entropy_type:
+            for en_type in self.entropy_types:
                 cols += ['volume_entropy_' + en_type]
 
         if self.pct_encoding is not None:

@@ -90,18 +90,18 @@ def _match_length(message: str, start_index: int, window: int) -> Union[int, str
     Snippet 18.3, Function That Computes the Length of the Longest Match, p.267
     :param message: (str or array) encoded message
     :start_index: (int) start index for search
-    :window: (int) window lenght
-    :return: (int, str) match lenght and matched string
+    :window: (int) window length
+    :return: (int, str) match length and matched string
     """
     # Maximum matched length+1, with overlap.
-    sub_str = np.empty(shape=(0))
+    sub_str = np.empty(shape=0)
     for length in range(window):
         msg1 = message[start_index: start_index + length + 1]
         for j in range(start_index - window, start_index):
             msg0 = message[j: j + length + 1]
-            if msg1.shape[0] != msg0.shape[0]:
+            if len(msg1) != len(msg0):
                 continue
-            if np.all(msg1 == msg0):
+            if msg1 == msg0:
                 sub_str = msg1
                 break  # Search for higher l.
     return len(sub_str) + 1, sub_str  # Matched length + 1
@@ -112,7 +112,7 @@ def get_konto_entropy(message: str, window: int = 0) -> float:
     Get Kontoyiannis entropy
     Snippet 18.4, Implementations of Algorithms Discussed in Gao et al.[2008]
     :param message: (str or array) encoded message
-    :param window: (int) expanding window length
+    :param window: (int) expanding window length, can be negative
     :return: (float) Kontoyiannis entropy
     """
     out = {
