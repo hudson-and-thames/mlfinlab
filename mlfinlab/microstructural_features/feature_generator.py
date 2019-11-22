@@ -10,34 +10,19 @@ from mlfinlab.microstructural_features.second_generation import get_trades_based
     get_trades_based_amihud_lambda, get_trades_based_hasbrouck_lambda
 from mlfinlab.microstructural_features.misc import get_avg_tick_size, vwap
 from mlfinlab.microstructural_features.encoding import encode_tick_rule_array
-
+from mlfinlab.util.misc import crop_data_frame_in_batches
 
 # pylint: disable=too-many-instance-attributes
-
-def _crop_data_frame_in_batches(df: pd.DataFrame, chunksize: int):
-    # pylint: disable=invalid-name
-    """
-    Splits df into chunks of chunksize
-
-    :param df: (pd.DataFrame) to split
-    :param chunksize: (Int) number of rows in chunk
-    :return: (list) of chunks (pd.DataFrames)
-    """
-    generator_object = []
-    for _, chunk in df.groupby(np.arange(len(df)) // chunksize):
-        generator_object.append(chunk)
-    return generator_object
-
 
 class MicrostructuralFeaturesGenerator:
     """
     Class which is used to generate inter-bar features when bars are already compressed.
 
-    :param trades_input: (Str or pd.DataFrame) Path to the csv file or Pandas Dat Frame containing raw tick data in the format[date_time, price, volume]
+    :param trades_input: (Str or pd.DataFrame) Path to the csv file or Pandas DataFrame containing raw tick data in the format[date_time, price, volume]
     :param bar_index: (pd.DatetimeIndex) bars index used for feature calculations, should be sorted
     :param batch_size: (int) Number of rows to read in from the csv, per batch.
-    :param volume_encoding: (dict) Dictionary of encoding trades size anc calculate entropy on encoded messages
-    :param pct_encoding: (dict) Dictionary of encoding log returns anc calculate entropy on encoded messages
+    :param volume_encoding: (dict) Dictionary of encoding scheme for trades size used to calculate entropy on encoded messages
+    :param pct_encoding: (dict)  Dictionary of encoding scheme for log returns used to calculate entropy on encoded messages
 
     """
 
@@ -45,12 +30,6 @@ class MicrostructuralFeaturesGenerator:
                  volume_encoding: dict = None, pct_encoding: dict = None):
         """
         Constructor
-
-        :param trades_input: (Str or pd.DataFrame) Path to the csv file or Pandas Dat Frame containing raw tick data in the format[date_time, price, volume]
-        :param bar_index: (pd.DatetimeIndex) bars index used for feature calculations, should be sorted
-        :param batch_size: (int) Number of rows to read in from the csv, per batch.
-        :param volume_encoding: (dict) Dictionary of encoding trades size anc calculate entropy on encoded messages
-        :param pct_encoding: (dict) Dictionary of encoding log returns anc calculate entropy on encoded messages
         """
 
         if isinstance(trades_input, str):
@@ -59,7 +38,7 @@ class MicrostructuralFeaturesGenerator:
             first_row = pd.read_csv(trades_input, nrows=1)
             self._assert_csv(first_row)
         elif isinstance(trades_input, pd.DataFrame):
-            self.generator_object = _crop_data_frame_in_batches(trades_input, batch_size)
+            self.generator_object = crop_data_frame_in_batches(trades_input, batch_size)
         else:
             raise ValueError('trades_input is neither string(path to a csv file) nor pd.DataFrame')
 
@@ -77,6 +56,7 @@ class MicrostructuralFeaturesGenerator:
         # Entropy properties
         self.volume_encoding = volume_encoding
         self.pct_encoding = pct_encoding
+        self.entropy_types = ['shannon', 'plug_in', 'lempel_ziv']
 
         # Batch_run properties
         self.prev_price = None
@@ -106,15 +86,15 @@ class MicrostructuralFeaturesGenerator:
                 'hasbrouck_lambda']
 
         # Entropy features columns
-        for en_type in ['shannon', 'plug_in', 'lempel_ziv']:
+        for en_type in self.entropy_type:
             cols += ['tick_rule_entropy_' + en_type]
 
         if self.volume_encoding is not None:
-            for en_type in ['shannon', 'plug_in', 'lempel_ziv']:
+            for en_type in self.entropy_type:
                 cols += ['volume_entropy_' + en_type]
 
         if self.pct_encoding is not None:
-            for en_type in ['shannon', 'plug_in', 'lempel_ziv']:
+            for en_type in self.entropy_types:
                 cols += ['pct_entropy_' + en_type]
 
         for batch in self.generator_object:

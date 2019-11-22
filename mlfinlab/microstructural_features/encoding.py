@@ -79,7 +79,8 @@ def _get_letter_from_encoding(value: float, encoding_dict: dict) -> str:
 
 def encode_array(array: list, encoding_dict: dict) -> str:
     """
-    Encode array with strings using encoding dict.
+    Encode array with strings using encoding dict, in case of multiple occurrences of the minimum values,
+    the indices corresponding to the first occurrence are returned
 
     :param array: (list) of values to encode
     :param encoding_dict: (dict) of quantile-symbol
