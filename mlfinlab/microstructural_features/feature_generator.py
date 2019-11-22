@@ -203,7 +203,7 @@ class MicrostructuralFeaturesGenerator:
         features.append(get_shannon_entropy(encode_tick_rule_array(self.tick_rule)))
         features.append(get_plug_in_entropy(encode_tick_rule_array(self.tick_rule)))
         features.append(get_lempel_ziv_entropy(encode_tick_rule_array(self.tick_rule)))
-        features.append(get_konto_entropy(encode_tick_rule_array(self.tick_rule))
+        features.append(get_konto_entropy(encode_tick_rule_array(self.tick_rule)))
 
         if self.volume_encoding is not None:
             message = encode_array(self.trade_size, self.volume_encoding)

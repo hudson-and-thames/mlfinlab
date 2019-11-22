@@ -3,6 +3,7 @@ Various useful functions
 """
 
 import pandas as pd
+import numpy as np
 
 def crop_data_frame_in_batches(df: pd.DataFrame, chunksize: int):
     # pylint: disable=invalid-name
