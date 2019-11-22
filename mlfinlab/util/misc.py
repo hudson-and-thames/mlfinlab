@@ -2,6 +2,8 @@
 Various useful functions
 """
 
+import pandas as pd
+
 def crop_data_frame_in_batches(df: pd.DataFrame, chunksize: int):
     # pylint: disable=invalid-name
     """

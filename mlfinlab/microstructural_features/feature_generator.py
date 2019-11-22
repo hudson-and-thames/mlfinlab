@@ -4,7 +4,7 @@ Inter-bar feature generator which uses trades data and bars index to calculate i
 
 import pandas as pd
 import numpy as np
-from mlfinlab.microstructural_features.entropy import get_shannon_entropy, get_plug_in_entropy, get_lempel_ziv_entropy
+from mlfinlab.microstructural_features.entropy import get_shannon_entropy, get_plug_in_entropy, get_lempel_ziv_entropy, get_konto_entropy
 from mlfinlab.microstructural_features.encoding import encode_array
 from mlfinlab.microstructural_features.second_generation import get_trades_based_kyle_lambda, \
     get_trades_based_amihud_lambda, get_trades_based_hasbrouck_lambda
@@ -56,7 +56,7 @@ class MicrostructuralFeaturesGenerator:
         # Entropy properties
         self.volume_encoding = volume_encoding
         self.pct_encoding = pct_encoding
-        self.entropy_types = ['shannon', 'plug_in', 'lempel_ziv']
+        self.entropy_types = ['shannon', 'plug_in', 'lempel_ziv', 'konto']
 
         # Batch_run properties
         self.prev_price = None
@@ -203,18 +203,21 @@ class MicrostructuralFeaturesGenerator:
         features.append(get_shannon_entropy(encode_tick_rule_array(self.tick_rule)))
         features.append(get_plug_in_entropy(encode_tick_rule_array(self.tick_rule)))
         features.append(get_lempel_ziv_entropy(encode_tick_rule_array(self.tick_rule)))
+        features.append(get_konto_entropy(encode_tick_rule_array(self.tick_rule))
 
         if self.volume_encoding is not None:
             message = encode_array(self.trade_size, self.volume_encoding)
             features.append(get_shannon_entropy(message))
             features.append(get_plug_in_entropy(message))
             features.append(get_lempel_ziv_entropy(message))
+            features.append(get_konto_entropy(message))
 
         if self.pct_encoding is not None:
             message = encode_array(self.log_ret, self.pct_encoding)
             features.append(get_shannon_entropy(message))
             features.append(get_plug_in_entropy(message))
             features.append(get_lempel_ziv_entropy(message))
+            features.append(get_konto_entropy(message))
 
         list_bars.append(features)
 

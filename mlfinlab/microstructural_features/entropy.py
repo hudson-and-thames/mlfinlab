@@ -77,7 +77,61 @@ def get_plug_in_entropy(message: str, word_length: int = None) -> float:
     :return: (float) Plug-in entropy
     """
     if word_length is None:
-        word_length = 2
+        word_length = 1
     pmf = _prob_mass_function(message, word_length)
     out = -sum([pmf[i] * np.log2(pmf[i]) for i in pmf]) / word_length
     return out
+
+def _match_length(message:str, start_index:int, window:int) -> Union[int, str]:
+    """
+    Snippet 18.3, Function That Computes the Length of the Longest Match, p.267
+    :param message: (str or array) encoded message
+    :start_index: (int) start index for search
+    :window: (int) window lenght
+    :return: (int, str) match lenght and matched string
+    """
+    # Maximum matched length+1, with overlap.
+    sub_str = np.empty(shape=(0))
+    for l in range(window):
+        msg1 = message[start_index: start_index+l+1]
+        for j in range(start_index-window, start_index):
+            msg0 = message[j: j+l+1]
+            if msg1.shape[0] != msg0.shape[0]:
+                continue
+            if np.all(msg1==msg0):
+                sub_str = msg1
+                break           # Search for higher l.
+    return len(sub_str)+1, sub_str    # Matched length + 1
+
+def get_konto_entropy(message:str, window:int=0) -> float:
+    """
+    Get Kontoyiannis entropy
+    Snippet 18.4, Implementations of Algorithms Discussed in Gao et al.[2008]
+    :param message: (str or array) encoded message
+    :window: (int) expanding window length
+    :return: (float) Kontoyiannis entropy
+    """
+    out={
+        'h': 0,
+        'r': 0,
+        'num':0,
+        'sum':0,
+        'sub_str':[]
+    }
+    if window <= 0:
+        points = range(1, len(msg)//2+1)
+    else:
+        window = min(window, len(msg)//2)
+        points = range(window, len(msg)-window+1)
+    for i in points:
+        if window <= 0:
+            l, msg_ = matchLength(msg, i, i)
+            out['sum'] += np.log2(i+1) / l       # To avoid Doeblin condition
+        else:
+            l, msg_ = matchLength(msg, i, window)
+            out['sum'] += np.log2(window+1) / l  # To avoid Doeblin condition
+        out['sub_str'].append(msg_)
+        out['num']+=1
+    out['h'] = out['sum']/out['num']
+    out['r'] = 1-out['h']/np.log2(len(msg)) # Redundancy, 0<=r<=1
+    return out['h']
