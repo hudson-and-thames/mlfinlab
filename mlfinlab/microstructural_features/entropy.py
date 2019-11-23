@@ -136,6 +136,9 @@ def get_konto_entropy(message: str, window: int = 0) -> float:
             out['sum'] += np.log2(window + 1) / length  # To avoid Doeblin condition
         out['sub_str'].append(msg_)
         out['num'] += 1
-    out['h'] = out['sum'] / out['num']
+    try:
+        out['h'] = out['sum'] / out['num']
+    except ZeroDivisionError:
+        out['h'] = 0
     out['r'] = 1 - out['h'] / np.log2(len(message))  # Redundancy, 0<=r<=1
     return out['h']

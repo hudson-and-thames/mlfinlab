@@ -147,6 +147,7 @@ class TestMicrostructuralFeatures(unittest.TestCase):
         konto_2 = get_konto_entropy(message, 2)
         _match_length('1101111', 2, 3)
         self.assertAlmostEqual(konto_2, 0.8453, delta=1e-4)
+        self.assertEqual(get_konto_entropy('a'), 0) #  one-character message entropy = 0
 
     def test_csv_format(self):
         """

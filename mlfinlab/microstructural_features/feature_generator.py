@@ -200,10 +200,11 @@ class MicrostructuralFeaturesGenerator:
             get_trades_based_hasbrouck_lambda(self.log_ret, self.dollar_size, self.tick_rule))  # Hasbrouck lambda
 
         # Entropy features
-        features.append(get_shannon_entropy(encode_tick_rule_array(self.tick_rule)))
-        features.append(get_plug_in_entropy(encode_tick_rule_array(self.tick_rule)))
-        features.append(get_lempel_ziv_entropy(encode_tick_rule_array(self.tick_rule)))
-        features.append(get_konto_entropy(encode_tick_rule_array(self.tick_rule)))
+        encoded_tick_rule_message = encode_tick_rule_array(self.tick_rule)
+        features.append(get_shannon_entropy(encoded_tick_rule_message))
+        features.append(get_plug_in_entropy(encoded_tick_rule_message))
+        features.append(get_lempel_ziv_entropy(encoded_tick_rule_message))
+        features.append(get_konto_entropy(encoded_tick_rule_message))
 
         if self.volume_encoding is not None:
             message = encode_array(self.trade_size, self.volume_encoding)
