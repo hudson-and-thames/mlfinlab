@@ -12,3 +12,4 @@ import mlfinlab.sample_weights as sample_weights
 import mlfinlab.sampling as sampling
 import mlfinlab.bet_sizing as bet_sizing
 import mlfinlab.util as util
+import mlfinlab.portfolio_optimization as portfolio_optimization
