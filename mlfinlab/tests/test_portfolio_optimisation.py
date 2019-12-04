@@ -147,7 +147,7 @@ class TestCLA(unittest.TestCase):
         cla.allocate(asset_prices=self.data, solution='min_volatility')
         data = self.data.copy()
         data.iloc[:, :] = 0.02320653
-        cla._initialise(asset_prices=data, resample_by='B')
+        cla._initialise(asset_prices=data, resample_by='B', mean_asset_returns=None, returns_matrix=None)
         assert cla.expected_returns[-1, 0] == 1e-5
 
     def test_lambda_for_zero_matrices(self):
@@ -250,6 +250,15 @@ class TestCLA(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
+    def test_all_inputs_None(self):
+        """
+        Test allocation when all inputs are None
+        """
+
+        with self.assertRaises(ValueError):
+            cla = CLA()
+            cla.allocate()
+
 class TestHRP(unittest.TestCase):
     """
     Tests different functions of the HRP algorithm class.
@@ -343,6 +352,15 @@ class TestHRP(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
+    def test_all_inputs_None(self):
+        """
+        Test allocation when all inputs are None
+        """
+
+        with self.assertRaises(ValueError):
+            hrp = HierarchicalRiskParity()
+            hrp.allocate()
+
 class TestMVO(unittest.TestCase):
     """
     Tests the different functions of the Mean Variance Optimisation class
@@ -407,3 +425,14 @@ class TestMVO(unittest.TestCase):
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_all_inputs_None(self):
+        """
+        Test allocation when all inputs are None
+        """
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation()
+            mvo.allocate()
+
+unittest.main()

@@ -385,38 +385,48 @@ class CLA:
                     lambda_out, i_out = lambda_i, i
         return lambda_out, i_out
 
-    def _initialise(self, asset_prices, resample_by):
+    def _initialise(self, asset_prices, mean_asset_returns, returns_matrix, resample_by):
         '''
         Initialise covariances, upper-counds, lower-bounds and storage buffers
 
-        :param asset_prices: (pd.Dataframe) dataframe of asset prices
+        :param asset_prices: (pd.Dataframe) dataframe of asset prices indexed by date
+        :param mean_asset_returns: (pd.Dataframe) a list of mean stock returns (mu)
+        :param returns_matrix: (pd.Dataframe) user supplied dataframe of asset returns indexed by date
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   'B' meaning daily business days which is equivalent to no resampling
         '''
 
         # Initial checks
-        if not isinstance(asset_prices, pd.DataFrame):
+        if asset_prices is None and (mean_asset_returns is None or returns_matrix is None):
+            raise ValueError("Either supply your own asset returns matrix or pass the asset prices as input")
+        if asset_prices is not None and not isinstance(asset_prices, pd.DataFrame):
             raise ValueError("Asset prices matrix must be a dataframe")
-        if not isinstance(asset_prices.index, pd.DatetimeIndex):
+        if asset_prices is not None and not isinstance(asset_prices.index, pd.DatetimeIndex):
             raise ValueError("Asset prices dataframe must be indexed by date.")
+        if returns_matrix is not None and not isinstance(returns_matrix, pd.DataFrame):
+            raise ValueError("Asset returns matrix must be a dataframe")
+        if returns_matrix is not None and not isinstance(returns_matrix.index, pd.DatetimeIndex):
+            raise ValueError("Asset returns dataframe must be indexed by date.")
 
-        # Resample the asset prices
-        if resample_by:
-            asset_prices = asset_prices.resample(resample_by).last()
-
-        # Calculate the expected returns
-        if self.calculate_returns == "mean":
-            self.expected_returns = self._calculate_mean_historical_returns(asset_prices=asset_prices)
-        elif self.calculate_returns == "exponential":
-            self.expected_returns = self._calculate_exponential_historical_returns(asset_prices=asset_prices)
-        else:
-            raise ValueError("Unknown returns specified. Supported returns - mean, exponential")
+        # Calculate the returns if the user does not supply a returns matrix
+        self.expected_returns = mean_asset_returns
+        if mean_asset_returns is None:
+            if self.calculate_returns == "mean":
+                self.expected_returns = self._calculate_mean_historical_returns(asset_prices=asset_prices,
+                                                                                resample_by=resample_by)
+            elif self.calculate_returns == "exponential":
+                self.expected_returns = self._calculate_exponential_historical_returns(asset_prices=asset_prices,
+                                                                                       resample_by=resample_by)
+            else:
+                raise ValueError("Unknown returns specified. Supported returns - mean, exponential")
         self.expected_returns = np.array(self.expected_returns).reshape((len(self.expected_returns), 1))
         if (self.expected_returns == np.ones(self.expected_returns.shape) * self.expected_returns.mean()).all():
             self.expected_returns[-1, 0] += 1e-5
 
         # Calculate the covariance matrix
-        self.cov_matrix = np.asarray(asset_prices.cov())
+        if returns_matrix is None:
+            returns_matrix = self._calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
+        self.cov_matrix = np.asarray(returns_matrix.cov())
 
         # Intialise lower bounds
         if isinstance(self.weight_bounds[0], numbers.Real):
@@ -437,7 +447,7 @@ class CLA:
         self.free_weights = []
 
     @staticmethod
-    def _calculate_mean_historical_returns(asset_prices, frequency=252):
+    def _calculate_mean_historical_returns(asset_prices, resample_by, frequency=252):
         '''
         Calculate the annualised mean historical returns from asset price data
 
@@ -445,12 +455,15 @@ class CLA:
         :return: (np.array) returns per asset
         '''
 
+        # Resample the asset prices
+        if resample_by:
+            asset_prices = asset_prices.resample(resample_by).last()
         returns = asset_prices.pct_change().dropna(how="all")
         returns = returns.mean() * frequency
         return returns
 
     @staticmethod
-    def _calculate_exponential_historical_returns(asset_prices, frequency=252, span=500):
+    def _calculate_exponential_historical_returns(asset_prices, resample_by, frequency=252, span=500):
         '''
         Calculate the exponentially-weighted mean of (daily) historical returns, giving
         higher weight to more recent data.
@@ -459,16 +472,43 @@ class CLA:
         :return: (np.array) returns per asset
         '''
 
+        # Resample the asset prices
+        if resample_by:
+            asset_prices = asset_prices.resample(resample_by).last()
         returns = asset_prices.pct_change().dropna(how="all")
         returns = returns.ewm(span=span).mean().iloc[-1] * frequency
         return returns
 
-    def allocate(self, asset_prices, solution="cla_turning_points", resample_by=None):
+    @staticmethod
+    def _calculate_returns(asset_prices, resample_by):
+        '''
+        Calculate the annualised mean historical returns from asset price data
+
+        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+                                  None for no resampling
+        :return: (pd.Dataframe) stock returns
+        '''
+
+        if resample_by:
+            asset_prices = asset_prices.resample(resample_by).last()
+        asset_returns = asset_prices.pct_change()
+        asset_returns = asset_returns.dropna(how='all')
+        return asset_returns
+
+    def allocate(self,
+                 asset_prices=None,
+                 mean_historical_asset_returns=None,
+                 returns_matrix=None,
+                 solution="cla_turning_points",
+                 resample_by=None):
         # pylint: disable=consider-using-enumerate,too-many-locals,too-many-branches,too-many-statements
         '''
         Calculate the portfolio asset allocations using the method specified.
 
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (adj closed)
+        :param mean_historical_asset_returns: (list) a list of mean stock returns (mu)
+        :param returns_matrix: (pd.Dataframe) user supplied dataframe of asset returns indexed by date
         :param solution: (str) specify the type of solution to compute. Options are: cla_turning_points, max_sharpe,
                                min_volatility, efficient_frontier
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
@@ -476,8 +516,11 @@ class CLA:
         '''
 
         # Some initial steps before the algorithm runs
-        self._initialise(asset_prices=asset_prices, resample_by=resample_by)
-        assets = asset_prices.columns
+        self._initialise(asset_prices=asset_prices,
+                         resample_by=resample_by,
+                         mean_asset_returns=mean_historical_asset_returns,
+                         returns_matrix=returns_matrix)
+        assets = asset_prices.columns if asset_prices is not None else returns_matrix.columns
 
         # Compute the turning points, free sets and weights
         free_weights, weights = self._init_algo()

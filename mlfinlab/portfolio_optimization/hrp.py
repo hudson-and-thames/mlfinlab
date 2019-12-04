@@ -174,24 +174,32 @@ class HierarchicalRiskParity:
         corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
         return corr
 
-    def allocate(self, asset_prices, resample_by=None, use_shrinkage=False):
+    def allocate(self, asset_prices=None, asset_returns=None, resample_by=None, use_shrinkage=False):
         '''
         Calculate asset allocations using HRP algorithm
 
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
                                             indexed by date
+        :param asset_returns: (pd.Dataframe) user supplied dataframe of asset returns indexed by date
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         :param use_shrinkage: (Boolean) specifies whether to shrink the covariances
         '''
 
-        if not isinstance(asset_prices, pd.DataFrame):
+        if asset_prices is None and asset_returns is None:
+            raise ValueError("Either supply your own asset returns matrix or pass the asset prices as input")
+        if asset_prices is not None and not isinstance(asset_prices, pd.DataFrame):
             raise ValueError("Asset prices matrix must be a dataframe")
-        if not isinstance(asset_prices.index, pd.DatetimeIndex):
+        if asset_prices is not None and not isinstance(asset_prices.index, pd.DatetimeIndex):
             raise ValueError("Asset prices dataframe must be indexed by date.")
+        if asset_returns is not None and not isinstance(asset_returns, pd.DataFrame):
+            raise ValueError("Asset returns matrix must be a dataframe")
+        if asset_returns is not None and not isinstance(asset_returns.index, pd.DatetimeIndex):
+            raise ValueError("Asset returns dataframe must be indexed by date.")
 
-        # Calculate the returns
-        asset_returns = self._calculate_returns(asset_prices, resample_by=resample_by)
+        # Calculate the returns if the user does not supply a returns matrix
+        if asset_returns is None:
+            asset_returns = self._calculate_returns(asset_prices, resample_by=resample_by)
 
         num_assets = asset_returns.shape[1]
         assets = asset_returns.columns
