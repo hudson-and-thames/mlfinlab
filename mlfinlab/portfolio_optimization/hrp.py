@@ -175,6 +175,7 @@ class HierarchicalRiskParity:
         return corr
 
     def allocate(self, asset_prices=None, asset_returns=None, resample_by=None, use_shrinkage=False):
+        # pylint: disable=invalid-name, too-many-branches
         '''
         Calculate asset allocations using HRP algorithm
 

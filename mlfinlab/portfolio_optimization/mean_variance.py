@@ -17,6 +17,7 @@ class MeanVarianceOptimisation:
         self.weights = list()
 
     def allocate(self, asset_prices=None, asset_returns=None, solution='inverse_variance', resample_by=None):
+        # pylint: disable=invalid-name, too-many-branches
         '''
         Calculate the portfolio asset allocations using the method specified.
 

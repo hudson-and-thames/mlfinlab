@@ -386,6 +386,7 @@ class CLA:
         return lambda_out, i_out
 
     def _initialise(self, asset_prices, expected_asset_returns, returns_matrix, resample_by):
+        # pylint: disable=invalid-name, too-many-branches
         '''
         Initialise covariances, upper-counds, lower-bounds and storage buffers
 
