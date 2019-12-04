@@ -434,5 +434,3 @@ class TestMVO(unittest.TestCase):
         with self.assertRaises(ValueError):
             mvo = MeanVarianceOptimisation()
             mvo.allocate()
-
-unittest.main()
