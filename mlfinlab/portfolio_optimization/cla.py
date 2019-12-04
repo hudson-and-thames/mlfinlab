@@ -401,7 +401,8 @@ class CLA:
             raise ValueError("Asset prices dataframe must be indexed by date.")
 
         # Resample the asset prices
-        asset_prices = asset_prices.resample(resample_by).last()
+        if resample_by:
+            asset_prices = asset_prices.resample(resample_by).last()
 
         # Calculate the expected returns
         if self.calculate_returns == "mean":
@@ -462,7 +463,7 @@ class CLA:
         returns = returns.ewm(span=span).mean().iloc[-1] * frequency
         return returns
 
-    def allocate(self, asset_prices, solution="cla_turning_points", resample_by="B"):
+    def allocate(self, asset_prices, solution="cla_turning_points", resample_by=None):
         # pylint: disable=consider-using-enumerate,too-many-locals,too-many-branches,too-many-statements
         '''
         Calculate the portfolio asset allocations using the method specified.
@@ -471,7 +472,7 @@ class CLA:
         :param solution: (str) specify the type of solution to compute. Options are: cla_turning_points, max_sharpe,
                                min_volatility, efficient_frontier
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                  'B' meaning daily business days which is equivalent to no resampling
+                                  None for no resampling
         '''
 
         # Some initial steps before the algorithm runs

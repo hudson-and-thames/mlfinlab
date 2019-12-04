@@ -238,6 +238,18 @@ class TestCLA(unittest.TestCase):
             cla = CLA(calculate_returns="unknown_returns")
             cla.allocate(asset_prices=self.data, solution='cla_turning_points')
 
+    def test_resampling_asset_prices(self):
+        """
+        Test resampling of asset prices
+        """
+
+        cla = CLA()
+        cla.allocate(asset_prices=self.data, resample_by='B', solution='min_volatility')
+        weights = cla.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
 class TestHRP(unittest.TestCase):
     """
     Tests different functions of the HRP algorithm class.
@@ -319,6 +331,18 @@ class TestHRP(unittest.TestCase):
             data = self.data.reset_index()
             hrp.allocate(asset_prices=data)
 
+    def test_resampling_asset_prices(self):
+        """
+        Test resampling of asset prices
+        """
+
+        hrp = HierarchicalRiskParity()
+        hrp.allocate(asset_prices=self.data, resample_by='B')
+        weights = hrp.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
 class TestMVO(unittest.TestCase):
     """
     Tests the different functions of the Mean Variance Optimisation class
@@ -371,3 +395,15 @@ class TestMVO(unittest.TestCase):
             mvo = MeanVarianceOptimisation()
             data = self.data.reset_index()
             mvo.allocate(asset_prices=data, solution='inverse_variance')
+
+    def test_resampling_asset_prices(self):
+        """
+        Test resampling of asset prices
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data, solution='inverse_variance', resample_by='B')
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)

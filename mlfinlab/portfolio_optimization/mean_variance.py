@@ -16,14 +16,14 @@ class MeanVarianceOptimisation:
     def __init__(self):
         self.weights = list()
 
-    def allocate(self, asset_prices, solution='inverse_variance', resample_by='B'):
+    def allocate(self, asset_prices, solution='inverse_variance', resample_by=None):
         '''
         Calculate the portfolio asset allocations using the method specified.
 
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
         :param solution: (str) the type of solution/algorithm to use to calculate the weights
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                  'B' meaning daily business days which is equivalent to no resampling
+                                  None for no resampling
         '''
 
         if not isinstance(asset_prices, pd.DataFrame):
@@ -51,11 +51,12 @@ class MeanVarianceOptimisation:
 
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                  'B' meaning daily business days which is equivalent to no resampling
+                                  None for no resampling
         :return: (pd.Dataframe) stock returns
         '''
 
-        asset_prices = asset_prices.resample(resample_by).last()
+        if resample_by:
+            asset_prices = asset_prices.resample(resample_by).last()
         asset_returns = asset_prices.pct_change()
         asset_returns = asset_returns.dropna(how='all')
         return asset_returns
