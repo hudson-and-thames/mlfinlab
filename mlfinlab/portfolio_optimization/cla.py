@@ -392,7 +392,8 @@ class CLA:
 
         :param asset_prices: (pd.Dataframe) dataframe of asset prices indexed by date
         :param expected_asset_returns: (pd.Dataframe) a list of mean stock returns (mu)
-        :param returns_matrix: (pd.Dataframe) user supplied dataframe of asset returns indexed by date
+        :param returns_matrix: (pd.Dataframe) user supplied dataframe of asset returns indexed by date. Used for
+                                              calculation of covariance matrix
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   'B' meaning daily business days which is equivalent to no resampling
         '''
