@@ -200,7 +200,7 @@ class HierarchicalRiskParity:
 
         # Calculate the returns if the user does not supply a returns matrix
         if asset_returns is None:
-            asset_returns = self._calculate_returns(asset_prices, resample_by=resample_by)
+            asset_returns = self._calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
 
         num_assets = asset_returns.shape[1]
         assets = asset_returns.columns

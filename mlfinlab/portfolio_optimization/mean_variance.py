@@ -41,7 +41,7 @@ class MeanVarianceOptimisation:
 
         # Calculate the returns if the user does not supply a asset returns matrix
         if asset_returns is None:
-            asset_returns = self._calculate_returns(asset_prices, resample_by=resample_by)
+            asset_returns = self._calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
         assets = asset_returns.columns
 
         if solution == 'inverse_variance':
