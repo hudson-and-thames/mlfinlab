@@ -12,6 +12,7 @@ from mlfinlab.portfolio_optimization.mean_variance import MeanVarianceOptimisati
 
 
 class TestCLA(unittest.TestCase):
+    # pylint: disable=too-many-public-methods
     """
     Tests different functions of the CLA class.
     """
