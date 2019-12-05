@@ -18,7 +18,7 @@ percent changes between ticks. Estimating entropy requires the encoding of a mes
 
 .. py:currentmodule:: mlfinlab.microstructural_features.encoding
 .. automodule:: mlfinlab.microstructural_features.encoding
-   :members: encode_tick_rule_array, quantile_mapping, encode_array
+   :members: encode_tick_rule_array, quantile_mapping, sigma_mapping, encode_array
 
 There are various ways to estimate entropy: Shannon, Lempel-Ziv, Plug-In, Kontoyiannis
 

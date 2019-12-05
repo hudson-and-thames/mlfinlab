@@ -12,7 +12,7 @@ from mlfinlab.data_structures import get_volume_bars
 from mlfinlab.microstructural_features import (get_vpin, get_bar_based_amihud_lambda, get_bar_based_kyle_lambda,
                                                get_bekker_parkinson_vol, get_corwin_schultz_estimator,
                                                get_bar_based_hasbrouck_lambda, get_roll_impact, get_roll_measure,
-                                               quantile_mapping, MicrostructuralFeaturesGenerator)
+                                               quantile_mapping, sigma_mapping, MicrostructuralFeaturesGenerator)
 from mlfinlab.microstructural_features.encoding import encode_tick_rule_array
 from mlfinlab.microstructural_features.entropy import get_plug_in_entropy, get_shannon_entropy, get_lempel_ziv_entropy, \
     get_konto_entropy, _match_length
@@ -147,7 +147,22 @@ class TestMicrostructuralFeatures(unittest.TestCase):
         konto_2 = get_konto_entropy(message, 2)
         _match_length('1101111', 2, 3)
         self.assertAlmostEqual(konto_2, 0.8453, delta=1e-4)
-        self.assertEqual(get_konto_entropy('a'), 0) #  one-character message entropy = 0
+        self.assertEqual(get_konto_entropy('a'), 0)  # one-character message entropy = 0
+
+    def test_encoding_schemes(self):
+        """
+        Test quantile and sigma encoding
+        """
+        values = np.arange(0, 1000, 1)
+        quantile_dict = quantile_mapping(values, num_letters=10)
+        sigma_dict = sigma_mapping(values, step=20)
+        self.assertEqual(len(quantile_dict), 10)
+        self.assertEqual(quantile_dict[229.77], '\x02')
+        self.assertEqual(len(sigma_dict), np.ceil((max(values) - min(values)) / 20))
+        self.assertEqual(sigma_dict[100], '\x05')
+
+        with self.assertRaises(ValueError):
+            sigma_mapping(values, step=1)  # Length of dice > ASCII table
 
     def test_csv_format(self):
         """

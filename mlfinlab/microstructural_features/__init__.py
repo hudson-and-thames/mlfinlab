@@ -2,7 +2,8 @@
 Functions derived from Chapter 19: Market Microstructural features
 """
 
-from mlfinlab.microstructural_features.encoding import quantile_mapping, encode_array, encode_tick_rule_array
+from mlfinlab.microstructural_features.encoding import quantile_mapping, encode_array, encode_tick_rule_array, \
+    sigma_mapping
 from mlfinlab.microstructural_features.entropy import get_lempel_ziv_entropy, get_shannon_entropy, get_plug_in_entropy, \
     get_konto_entropy
 from mlfinlab.microstructural_features.feature_generator import MicrostructuralFeaturesGenerator

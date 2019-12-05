@@ -53,6 +53,29 @@ def quantile_mapping(array: list, num_letters: int = 26) -> dict:
     return encoding_dict
 
 
+def sigma_mapping(array: list, step: float = 0.01) -> dict:
+    """
+    Generate dictionary of sigma encoded letters based on values from array and discretization step.
+
+    :param array: (list) of values to split on quantiles
+    :param step: (float) discretization step (sigma)
+    :return: (dict) of value-symbol
+    """
+    i = 0
+    ascii_table = _get_ascii_table()
+    encoding_dict = {}
+    encoding_steps = np.arange(min(array), max(array), step)
+    for element in encoding_steps:
+        try:
+            encoding_dict[element] = ascii_table[i]
+        except IndexError:
+            raise ValueError(
+                'Length of dictionary ceil((max(arr) - min(arr)) / step = {} is more than ASCII table lenght)'.format(
+                    len(encoding_steps)))
+        i += 1
+    return encoding_dict
+
+
 def _find_nearest(array: list, value: float) -> float:
     """
     Find the nearest element from array to value.
