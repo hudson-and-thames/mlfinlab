@@ -229,7 +229,7 @@ class TestCLA(unittest.TestCase):
             data = self.data.reset_index()
             cla.allocate(asset_prices=data, solution='cla_turning_points')
 
-    def test_value_error_for_non_dataframe_returns(self):
+    def test_error_for_non_dataframe_returns(self):
         """
         Test ValueError on passing non-dataframe asset returns
         """
@@ -238,7 +238,7 @@ class TestCLA(unittest.TestCase):
             cla = CLA()
             cla.allocate(returns_matrix=self.data.values, solution='cla_turning_points')
 
-    def test_value_error_for_non_date_index_in_returns(self):
+    def test_error_for_non_date_index_in_returns(self):
         """
         Test ValueError on passing asset returns dataframe not indexed by date
         """
@@ -269,7 +269,7 @@ class TestCLA(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
-    def test_all_inputs_None(self):
+    def test_all_inputs_none(self):
         """
         Test allocation when all inputs are None
         """
@@ -359,7 +359,7 @@ class TestHRP(unittest.TestCase):
             data = self.data.reset_index()
             hrp.allocate(asset_prices=data)
 
-    def test_value_error_for_non_dataframe_returns(self):
+    def test_error_for_non_dataframe_returns(self):
         """
         Test ValueError on passing non-dataframe asset returns
         """
@@ -368,7 +368,7 @@ class TestHRP(unittest.TestCase):
             hrp = HierarchicalRiskParity()
             hrp.allocate(asset_returns=self.data.values)
 
-    def test_value_error_for_non_date_index_in_returns(self):
+    def test_error_for_non_date_index_in_returns(self):
         """
         Test ValueError on passing asset returns dataframe not indexed by date
         """
@@ -390,7 +390,7 @@ class TestHRP(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
-    def test_all_inputs_None(self):
+    def test_all_inputs_none(self):
         """
         Test allocation when all inputs are None
         """
@@ -452,7 +452,7 @@ class TestMVO(unittest.TestCase):
             data = self.data.reset_index()
             mvo.allocate(asset_prices=data, solution='inverse_variance')
 
-    def test_value_error_for_non_dataframe_returns(self):
+    def test_error_for_non_dataframe_returns(self):
         """
         Test ValueError on passing non-dataframe asset returns
         """
@@ -461,7 +461,7 @@ class TestMVO(unittest.TestCase):
             mvo = MeanVarianceOptimisation()
             mvo.allocate(asset_returns=self.data.values, solution='inverse_variance')
 
-    def test_value_error_for_non_date_index_in_returns(self):
+    def test_error_for_non_date_index_in_returns(self):
         """
         Test ValueError on passing asset returns dataframe not indexed by date
         """
@@ -483,7 +483,7 @@ class TestMVO(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
-    def test_all_inputs_None(self):
+    def test_all_inputs_none(self):
         """
         Test allocation when all inputs are None
         """
@@ -491,4 +491,3 @@ class TestMVO(unittest.TestCase):
         with self.assertRaises(ValueError):
             mvo = MeanVarianceOptimisation()
             mvo.allocate()
-unittest.main()
