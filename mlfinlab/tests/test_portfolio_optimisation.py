@@ -230,25 +230,6 @@ class TestCLA(unittest.TestCase):
             data = self.data.reset_index()
             cla.allocate(asset_prices=data, solution='cla_turning_points')
 
-    def test_error_for_non_dataframe_returns(self):
-        """
-        Test ValueError on passing non-dataframe asset returns
-        """
-
-        with self.assertRaises(ValueError):
-            cla = CLA()
-            cla.allocate(returns_matrix=self.data.values, solution='cla_turning_points')
-
-    def test_error_for_non_date_index_in_returns(self):
-        """
-        Test ValueError on passing asset returns dataframe not indexed by date
-        """
-
-        with self.assertRaises(ValueError):
-            cla = CLA()
-            data = self.data.reset_index()
-            cla.allocate(returns_matrix=data, solution='cla_turning_points')
-
     def test_value_error_for_unknown_returns(self):
         """
         Test ValueError on passing unknown returns string
@@ -360,25 +341,6 @@ class TestHRP(unittest.TestCase):
             data = self.data.reset_index()
             hrp.allocate(asset_prices=data)
 
-    def test_error_for_non_dataframe_returns(self):
-        """
-        Test ValueError on passing non-dataframe asset returns
-        """
-
-        with self.assertRaises(ValueError):
-            hrp = HierarchicalRiskParity()
-            hrp.allocate(asset_returns=self.data.values)
-
-    def test_error_for_non_date_index_in_returns(self):
-        """
-        Test ValueError on passing asset returns dataframe not indexed by date
-        """
-
-        with self.assertRaises(ValueError):
-            hrp = HierarchicalRiskParity()
-            data = self.data.reset_index()
-            hrp.allocate(asset_returns=data)
-
     def test_resampling_asset_prices(self):
         """
         Test resampling of asset prices
@@ -452,25 +414,6 @@ class TestMVO(unittest.TestCase):
             mvo = MeanVarianceOptimisation()
             data = self.data.reset_index()
             mvo.allocate(asset_prices=data, solution='inverse_variance')
-
-    def test_error_for_non_dataframe_returns(self):
-        """
-        Test ValueError on passing non-dataframe asset returns
-        """
-
-        with self.assertRaises(ValueError):
-            mvo = MeanVarianceOptimisation()
-            mvo.allocate(asset_returns=self.data.values, solution='inverse_variance')
-
-    def test_error_for_non_date_index_in_returns(self):
-        """
-        Test ValueError on passing asset returns dataframe not indexed by date
-        """
-
-        with self.assertRaises(ValueError):
-            mvo = MeanVarianceOptimisation()
-            data = self.data.reset_index()
-            mvo.allocate(asset_returns=data, solution='inverse_invariance')
 
     def test_resampling_asset_prices(self):
         """

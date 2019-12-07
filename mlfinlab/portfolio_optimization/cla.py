@@ -385,30 +385,18 @@ class CLA:
                     lambda_out, i_out = lambda_i, i
         return lambda_out, i_out
 
-    def _initialise(self, asset_prices, expected_asset_returns, returns_matrix, resample_by):
+    def _initialise(self, asset_prices, expected_asset_returns, covariance_matrix, resample_by):
         # pylint: disable=invalid-name, too-many-branches
         '''
         Initialise covariances, upper-counds, lower-bounds and storage buffers
 
         :param asset_prices: (pd.Dataframe) dataframe of asset prices indexed by date
         :param expected_asset_returns: (pd.Dataframe) a list of mean stock returns (mu)
-        :param returns_matrix: (pd.Dataframe) user supplied dataframe of asset returns indexed by date. Used for
+        :param covariance_matrix: (pd.Dataframe) user supplied dataframe of asset returns indexed by date. Used for
                                               calculation of covariance matrix
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   'B' meaning daily business days which is equivalent to no resampling
         '''
-
-        # Initial checks
-        if asset_prices is None and (expected_asset_returns is None or returns_matrix is None):
-            raise ValueError("Either supply your own asset returns matrix or pass the asset prices as input")
-        if asset_prices is not None and not isinstance(asset_prices, pd.DataFrame):
-            raise ValueError("Asset prices matrix must be a dataframe")
-        if asset_prices is not None and not isinstance(asset_prices.index, pd.DatetimeIndex):
-            raise ValueError("Asset prices dataframe must be indexed by date.")
-        if returns_matrix is not None and not isinstance(returns_matrix, pd.DataFrame):
-            raise ValueError("Asset returns matrix must be a dataframe")
-        if returns_matrix is not None and not isinstance(returns_matrix.index, pd.DatetimeIndex):
-            raise ValueError("Asset returns dataframe must be indexed by date.")
 
         # Calculate the returns if the user does not supply a returns matrix
         self.expected_returns = expected_asset_returns
@@ -426,9 +414,10 @@ class CLA:
             self.expected_returns[-1, 0] += 1e-5
 
         # Calculate the covariance matrix
-        if returns_matrix is None:
-            returns_matrix = self._calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
-        self.cov_matrix = np.asarray(returns_matrix.cov())
+        if covariance_matrix is None:
+            returns = self._calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
+            covariance_matrix = returns.cov()
+        self.cov_matrix = np.asarray(covariance_matrix)
 
         # Intialise lower bounds
         if isinstance(self.weight_bounds[0], numbers.Real):
@@ -499,30 +488,41 @@ class CLA:
         return asset_returns
 
     def allocate(self,
+                 asset_names,
                  asset_prices=None,
                  expected_asset_returns=None,
-                 returns_matrix=None,
+                 covariance_matrix=None,
                  solution="cla_turning_points",
                  resample_by=None):
         # pylint: disable=consider-using-enumerate,too-many-locals,too-many-branches,too-many-statements
         '''
         Calculate the portfolio asset allocations using the method specified.
 
+        :param asset_names: (list) a list of strings containing the asset names
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (adj closed)
         :param expected_asset_returns: (list) a list of mean stock returns (mu)
-        :param returns_matrix: (pd.Dataframe) user supplied dataframe of asset returns indexed by date
+        :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns
         :param solution: (str) specify the type of solution to compute. Options are: cla_turning_points, max_sharpe,
                                min_volatility, efficient_frontier
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         '''
 
+        # Initial checks
+        if asset_prices is None and (expected_asset_returns is None or covariance_matrix is None):
+            raise ValueError("Either supply your own asset returns matrix or pass the asset prices as input")
+
+        if asset_prices is not None:
+            if not isinstance(asset_prices, pd.DataFrame):
+                raise ValueError("Asset prices matrix must be a dataframe")
+            if not isinstance(asset_prices.index, pd.DatetimeIndex):
+                raise ValueError("Asset prices dataframe must be indexed by date.")
+
         # Some initial steps before the algorithm runs
         self._initialise(asset_prices=asset_prices,
                          resample_by=resample_by,
                          expected_asset_returns=expected_asset_returns,
-                         returns_matrix=returns_matrix)
-        assets = asset_prices.columns if asset_prices is not None else returns_matrix.columns
+                         covariance_matrix=covariance_matrix)
 
         # Compute the turning points, free sets and weights
         free_weights, weights = self._init_algo()
@@ -572,7 +572,7 @@ class CLA:
         self._purge_excess()
 
         # Compute the specified solution
-        self._compute_solution(assets=assets, solution=solution)
+        self._compute_solution(assets=asset_names, solution=solution)
 
     def _compute_solution(self, assets, solution):
         '''
