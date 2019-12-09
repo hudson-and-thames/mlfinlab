@@ -9,6 +9,7 @@ import numbers
 from math import log, ceil
 import numpy as np
 import pandas as pd
+from mlfinlab.portfolio_optimization.expected_returns import *
 
 
 class CLA:
@@ -20,17 +21,17 @@ class CLA:
     maximum sharpe solution and finally the solution to the efficient frontier.
     '''
 
-    def __init__(self, weight_bounds=(0, 1), calculate_returns="mean"):
+    def __init__(self, weight_bounds=(0, 1), calculate_expected_returns="mean"):
         '''
         Initialise the storage arrays and some preprocessing.
 
         :param weight_bounds: (tuple) a tuple specifying the lower and upper bound ranges for the portfolio weights
-        :param calculate_returns: (str) the method to use for calculation of expected returns.
+        :param calculate_expected_returns: (str) the method to use for calculation of expected returns.
                                         Currently supports "mean" and "exponential"
         '''
 
         self.weight_bounds = weight_bounds
-        self.calculate_returns = calculate_returns
+        self.calculate_expected_returns = calculate_expected_returns
         self.weights = list()
         self.lambdas = list()
         self.gammas = list()
@@ -391,7 +392,7 @@ class CLA:
         Initialise covariances, upper-counds, lower-bounds and storage buffers
 
         :param asset_prices: (pd.Dataframe) dataframe of asset prices indexed by date
-        :param expected_asset_returns: (pd.Dataframe) a list of mean stock returns (mu)
+        :param expected_asset_returns: (list) a list of mean stock returns (mu)
         :param covariance_matrix: (pd.Dataframe) user supplied dataframe of asset returns indexed by date. Used for
                                               calculation of covariance matrix
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
@@ -401,12 +402,12 @@ class CLA:
         # Calculate the returns if the user does not supply a returns matrix
         self.expected_returns = expected_asset_returns
         if expected_asset_returns is None:
-            if self.calculate_returns == "mean":
-                self.expected_returns = self._calculate_mean_historical_returns(asset_prices=asset_prices,
-                                                                                resample_by=resample_by)
-            elif self.calculate_returns == "exponential":
-                self.expected_returns = self._calculate_exponential_historical_returns(asset_prices=asset_prices,
-                                                                                       resample_by=resample_by)
+            if self.calculate_expected_returns == "mean":
+                self.expected_returns = calculate_mean_historical_returns(asset_prices=asset_prices,
+                                                                          resample_by=resample_by)
+            elif self.calculate_expected_returns == "exponential":
+                self.expected_returns = calculate_exponential_historical_returns(asset_prices=asset_prices,
+                                                                                 resample_by=resample_by)
             else:
                 raise ValueError("Unknown returns specified. Supported returns - mean, exponential")
         self.expected_returns = np.array(self.expected_returns).reshape((len(self.expected_returns), 1))
@@ -415,7 +416,7 @@ class CLA:
 
         # Calculate the covariance matrix
         if covariance_matrix is None:
-            returns = self._calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
+            returns = calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
             covariance_matrix = returns.cov()
         self.cov_matrix = np.asarray(covariance_matrix)
 

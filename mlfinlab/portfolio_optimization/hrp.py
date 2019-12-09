@@ -188,7 +188,7 @@ class HierarchicalRiskParity:
         :param asset_names: (list) a list of strings containing the asset names
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
                                             indexed by date
-        :param asset_returns: (pd.Dataframe/numpy matrix) user supplied matrix of asset returns indexed by date
+        :param asset_returns: (pd.Dataframe/numpy matrix) user supplied matrix of asset returns
         :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
