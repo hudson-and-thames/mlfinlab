@@ -28,13 +28,15 @@ class MeanVarianceOptimisation:
                  covariance_matrix=None,
                  solution='inverse_variance',
                  risk_free_rate=0.05,
+                 target_return=0.5,
+                 custom_objective_func=None,
                  resample_by=None):
         # pylint: disable=invalid-name, too-many-branches
         '''
         Calculate the portfolio asset allocations using the method specified.
 
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
-        :param expected_asset_returns: (list) a list of mean stock returns (mu)
+        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
         :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns (sigma)
         :param solution: (str) the type of solution/algorithm to use to calculate the weights
         :param risk_free_rate: (float) the rate of return for a risk-free asset.
@@ -77,10 +79,17 @@ class MeanVarianceOptimisation:
         elif solution == 'min_volatility':
             self.weights, self.portfolio_risk = self._min_volatility(covariance=cov, num_assets=len(asset_names))
         elif solution == 'max_sharpe':
-            self.weights, self.portfolio_risk = self._max_sharpe(covariance=cov,
-                                                                 expected_returns=expected_asset_returns,
-                                                                 risk_free_rate=risk_free_rate,
-                                                                 num_assets=len(asset_names))
+            self.weights, self.portfolio_risk, self.portfolio_return = self._max_sharpe(
+                                                                                    covariance=cov,
+                                                                                    expected_returns=expected_asset_returns,
+                                                                                    risk_free_rate=risk_free_rate,
+                                                                                    num_assets=len(asset_names))
+        elif solution == 'efficient_risk':
+            self.weights, self.portfolio_risk, self.portfolio_return = self._min_volatility_for_target_return(
+                                                                                    covariance=cov,
+                                                                                    expected_returns=expected_asset_returns,
+                                                                                    target_return=target_return,
+                                                                                    num_assets=len(asset_names))
         else:
             raise ValueError("Unknown solution string specified. Supported solutions - inverse_variance.")
         self.weights = pd.DataFrame(self.weights)
@@ -103,16 +112,17 @@ class MeanVarianceOptimisation:
     @staticmethod
     def _min_volatility(covariance, num_assets):
         '''
+        Compute minimum volatility portfolio allocation
 
-        :param covariance:
-        :param num_assets:
-        :return:
+        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
+        :param num_assets: (int) number of assets in the portfolio
+        :return: (np.array, float) portfolio weights and risk value
         '''
 
         weights = cp.Variable(num_assets)
         risk = cp.quad_form(weights, covariance)
 
-        # Define optimisation objective and constraints
+        # Optimisation objective and constraints
         allocation_objective = cp.Minimize(risk)
         allocation_constraints = [
             cp.sum(weights) == 1,
@@ -127,27 +137,29 @@ class MeanVarianceOptimisation:
         problem.solve()
         return weights.value, risk.value
 
-    def _max_sharpe(self, covariance, expected_returns, risk_free_rate, num_assets):
+    @staticmethod
+    def _max_sharpe(covariance, expected_returns, risk_free_rate, num_assets):
         '''
+        Compute maximum Sharpe portfolio allocation.
 
-        :param covariance:
-        :param expected_returns:
-        :param risk_free_rate:
-        :param num_assets:
-        :return:
+        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
+        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
+        :param risk_free_rate: (float) the rate of return for a risk-free asset.
+        :param num_assets: (int) number of assets in the portfolio
+        :return: (np.array, float) portfolio weights and risk value
         '''
         
         y = cp.Variable(num_assets)
-        tau = cp.Variable(1)
+        kappa = cp.Variable(1)
         risk = cp.quad_form(y, covariance)
 
-        # Define optimisation objective and constraints
+        # Optimisation objective and constraints
         allocation_objective = cp.Minimize(risk)
         allocation_constraints = [
             cp.sum((expected_returns - risk_free_rate).T @ y) == 1,
-            cp.sum(y) == tau,
+            cp.sum(y) == kappa,
             y >= 0,
-            tau >= 0
+            kappa >= 0
         ]
 
         # Define and solve the problem
@@ -156,15 +168,34 @@ class MeanVarianceOptimisation:
             constraints=allocation_constraints
         )
         problem.solve()
-        weights = y.value / tau.value
-        return weights, risk.value
+        weights = y.value / kappa.value
+        portfolio_return = (expected_returns.T @ weights)[0]
+        return weights, risk.value, portfolio_return
 
     @staticmethod
-    def _efficient_risk():
-        return
+    def _min_volatility_for_target_return(covariance, expected_returns, target_return, num_assets):
+        weights = cp.Variable(num_assets)
+        risk = cp.quad_form(weights, covariance)
+
+        # Optimisation objective and constraints
+        allocation_objective = cp.Minimize(risk)
+        allocation_constraints = [
+            cp.sum(weights) == 1,
+            (expected_returns.T @ weights)[0] == target_return,
+            weights >= 0
+        ]
+
+        # Define and solve the problem
+        problem = cp.Problem(
+            objective=allocation_objective,
+            constraints=allocation_constraints
+        )
+        problem.solve()
+        portfolio_return = (expected_returns.T @ weights.value)[0]
+        return weights.value, risk.value, portfolio_return
 
     @staticmethod
-    def _efficient_return():
+    def _custom_allocation():
         return
 
     @staticmethod
