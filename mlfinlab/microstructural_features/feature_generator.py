@@ -4,13 +4,15 @@ Inter-bar feature generator which uses trades data and bars index to calculate i
 
 import pandas as pd
 import numpy as np
-from mlfinlab.microstructural_features.entropy import get_shannon_entropy, get_plug_in_entropy, get_lempel_ziv_entropy, get_konto_entropy
+from mlfinlab.microstructural_features.entropy import get_shannon_entropy, get_plug_in_entropy, get_lempel_ziv_entropy, \
+    get_konto_entropy
 from mlfinlab.microstructural_features.encoding import encode_array
 from mlfinlab.microstructural_features.second_generation import get_trades_based_kyle_lambda, \
     get_trades_based_amihud_lambda, get_trades_based_hasbrouck_lambda
 from mlfinlab.microstructural_features.misc import get_avg_tick_size, vwap
 from mlfinlab.microstructural_features.encoding import encode_tick_rule_array
 from mlfinlab.util.misc import crop_data_frame_in_batches
+
 
 # pylint: disable=too-many-instance-attributes
 
@@ -19,14 +21,14 @@ class MicrostructuralFeaturesGenerator:
     Class which is used to generate inter-bar features when bars are already compressed.
 
     :param trades_input: (Str or pd.DataFrame) Path to the csv file or Pandas DataFrame containing raw tick data in the format[date_time, price, volume]
-    :param bar_index: (pd.DatetimeIndex) bars index used for feature calculations, should be sorted
+    :param tick_num_series: (pd.Series) of tick number where bar was formed.
     :param batch_size: (int) Number of rows to read in from the csv, per batch.
     :param volume_encoding: (dict) Dictionary of encoding scheme for trades size used to calculate entropy on encoded messages
     :param pct_encoding: (dict)  Dictionary of encoding scheme for log returns used to calculate entropy on encoded messages
 
     """
 
-    def __init__(self, trades_input: (str, pd.DataFrame), bar_index: pd.DatetimeIndex, batch_size: int = 2e7,
+    def __init__(self, trades_input: (str, pd.DataFrame), tick_num_series: pd.Series, batch_size: int = 2e7,
                  volume_encoding: dict = None, pct_encoding: dict = None):
         """
         Constructor
@@ -43,8 +45,8 @@ class MicrostructuralFeaturesGenerator:
             raise ValueError('trades_input is neither string(path to a csv file) nor pd.DataFrame')
 
         # Base properties
-        self.bar_index_iterator = iter(bar_index)
-        self.current_date_time = self.bar_index_iterator.__next__()
+        self.tick_num_generator = iter(tick_num_series)
+        self.current_bar_tick_num = self.tick_num_generator.__next__()
 
         # Cache properties
         self.price_diff = []
@@ -61,6 +63,7 @@ class MicrostructuralFeaturesGenerator:
         # Batch_run properties
         self.prev_price = None
         self.prev_tick_rule = 0
+        self.tick_num = 0
 
     def get_features(self, verbose=True, to_csv=False, output_path=None):
         """
@@ -153,6 +156,8 @@ class MicrostructuralFeaturesGenerator:
             dollar_value = price * volume
             signed_tick = self._apply_tick_rule(price)
 
+            self.tick_num += 1
+
             # Derivative variables
             price_diff = self._get_price_diff(price)
             log_ret = self._get_log_ret(price)
@@ -166,12 +171,12 @@ class MicrostructuralFeaturesGenerator:
             self.prev_price = price
 
             # If date_time reached bar index
-            if date_time >= self.current_date_time:
+            if self.tick_num >= self.current_bar_tick_num:
                 self._get_bar_features(date_time, list_bars)
 
-                # Take the next timestamp
+                # Take the next tick number
                 try:
-                    self.current_date_time = self.bar_index_iterator.__next__()
+                    self.current_bar_tick_num = self.tick_num_generator.__next__()
                 except StopIteration:
                     return list_bars, True  # Looped through all bar index
                 # Reset cache
