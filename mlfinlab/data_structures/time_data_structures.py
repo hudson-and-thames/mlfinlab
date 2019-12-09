@@ -50,6 +50,7 @@ class TimeBars(BaseBars):
         for row in data.values:
             # Set variables
             date_time = row[0].timestamp()  # Convert to UTC timestamp
+            self.tick_num += 1
             price = np.float(row[1])
             volume = row[2]
             dollar_value = price * volume

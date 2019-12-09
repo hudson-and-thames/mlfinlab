@@ -62,6 +62,7 @@ class BaseBars(ABC):
         self.open_price, self.prev_price = None, None
         self.high_price, self.low_price = -np.inf, np.inf
         self.cum_statistics = {'cum_ticks': 0, 'cum_dollar_value': 0, 'cum_volume': 0, 'cum_buy_volume': 0}
+        self.tick_num = 0  # Tick number when bar was formed
 
         # Batch_run properties
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
@@ -89,7 +90,7 @@ class BaseBars(ABC):
         # Read csv in batches
         count = 0
         final_bars = []
-        cols = ['date_time', 'open', 'high', 'low', 'close', 'volume', 'cum_buy_volume', 'cum_ticks',
+        cols = ['date_time', 'tick_num', 'open', 'high', 'low', 'close', 'volume', 'cum_buy_volume', 'cum_ticks',
                 'cum_dollar_value']
         for batch in self.generator_object:
             if verbose:  # pragma: no cover
@@ -195,8 +196,10 @@ class BaseBars(ABC):
         cum_dollar_value = self.cum_statistics['cum_dollar_value']
 
         # Update bars
-        list_bars.append([date_time, open_price, high_price, low_price, close_price, volume, cum_buy_volume, cum_ticks,
-                          cum_dollar_value])
+        list_bars.append(
+            [date_time, self.tick_num, open_price, high_price, low_price, close_price, volume, cum_buy_volume,
+             cum_ticks,
+             cum_dollar_value])
 
     def _apply_tick_rule(self, price: float) -> int:
         """
@@ -297,6 +300,7 @@ class BaseImbalanceBars(BaseBars):
         for row in data.values:
             # Set variables
             date_time = row[0]
+            self.tick_num += 1
             price = np.float(row[1])
             volume = row[2]
             dollar_value = price * volume
@@ -441,6 +445,7 @@ class BaseRunBars(BaseBars):
         for row in data.values:
             # Set variables
             date_time = row[0]
+            self.tick_num += 1
             price = np.float(row[1])
             volume = row[2]
             dollar_value = price * volume
