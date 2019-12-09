@@ -9,7 +9,7 @@ import numbers
 from math import log, ceil
 import numpy as np
 import pandas as pd
-from mlfinlab.portfolio_optimization.expected_returns import *
+from mlfinlab.portfolio_optimization.returns_estimation import calculate_returns, calculate_exponential_historical_returns, calculate_mean_historical_returns
 
 
 class CLA:
@@ -437,56 +437,6 @@ class CLA:
         self.lambdas = []
         self.gammas = []
         self.free_weights = []
-
-    @staticmethod
-    def _calculate_mean_historical_returns(asset_prices, resample_by, frequency=252):
-        '''
-        Calculate the annualised mean historical returns from asset price data
-
-        :param asset_prices: (pd.DataFrame) asset price data
-        :return: (np.array) returns per asset
-        '''
-
-        # Resample the asset prices
-        if resample_by:
-            asset_prices = asset_prices.resample(resample_by).last()
-        returns = asset_prices.pct_change().dropna(how="all")
-        returns = returns.mean() * frequency
-        return returns
-
-    @staticmethod
-    def _calculate_exponential_historical_returns(asset_prices, resample_by, frequency=252, span=500):
-        '''
-        Calculate the exponentially-weighted mean of (daily) historical returns, giving
-        higher weight to more recent data.
-
-        :param asset_prices: (pd.DataFrame) asset price data
-        :return: (np.array) returns per asset
-        '''
-
-        # Resample the asset prices
-        if resample_by:
-            asset_prices = asset_prices.resample(resample_by).last()
-        returns = asset_prices.pct_change().dropna(how="all")
-        returns = returns.ewm(span=span).mean().iloc[-1] * frequency
-        return returns
-
-    @staticmethod
-    def _calculate_returns(asset_prices, resample_by):
-        '''
-        Calculate the annualised mean historical returns from asset price data
-
-        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
-        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                  None for no resampling
-        :return: (pd.Dataframe) stock returns
-        '''
-
-        if resample_by:
-            asset_prices = asset_prices.resample(resample_by).last()
-        asset_returns = asset_prices.pct_change()
-        asset_returns = asset_returns.dropna(how='all')
-        return asset_returns
 
     def allocate(self,
                  asset_names,
