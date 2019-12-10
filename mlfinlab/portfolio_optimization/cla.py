@@ -9,7 +9,7 @@ import numbers
 from math import log, ceil
 import numpy as np
 import pandas as pd
-from mlfinlab.portfolio_optimization.returns_estimation import calculate_returns, calculate_exponential_historical_returns, calculate_mean_historical_returns
+from mlfinlab.portfolio_optimization.returns_estimators import calculate_returns, calculate_exponential_historical_returns, calculate_mean_historical_returns
 
 
 class CLA:
