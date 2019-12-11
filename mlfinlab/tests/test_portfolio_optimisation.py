@@ -34,7 +34,7 @@ class TestCLA(unittest.TestCase):
         self.data.iloc[11:20, :] = 50
         self.data.iloc[21, :] = 100
         cla = CLA(weight_bounds=(0, 1), calculate_expected_returns="mean")
-        cla.allocate(asset_prices=self.data)
+        cla.allocate(asset_prices=self.data, asset_names=self.data.columns)
         weights = cla.weights.values
         weights[weights <= 1e-15] = 0 # Convert very very small numbers to 0
         for turning_point in weights:
@@ -49,7 +49,7 @@ class TestCLA(unittest.TestCase):
         """
 
         cla = CLA(weight_bounds=([0]*self.data.shape[1], [1]*self.data.shape[1]), calculate_expected_returns="mean")
-        cla.allocate(asset_prices=self.data)
+        cla.allocate(asset_prices=self.data, asset_names=self.data.columns)
         weights = cla.weights.values
         weights[weights <= 1e-15] = 0  # Convert very very small numbers to 0
         for turning_point in weights:
@@ -63,7 +63,7 @@ class TestCLA(unittest.TestCase):
         """
 
         cla = CLA(weight_bounds=(0, 1), calculate_expected_returns="exponential")
-        cla.allocate(asset_prices=self.data)
+        cla.allocate(asset_prices=self.data, asset_names=self.data.columns)
         weights = cla.weights.values
         weights[weights <= 1e-15] = 0 # Convert very very small numbers to 0
         for turning_point in weights:
@@ -77,7 +77,7 @@ class TestCLA(unittest.TestCase):
         """
 
         cla = CLA(weight_bounds=(0, 1), calculate_expected_returns="mean")
-        cla.allocate(asset_prices=self.data, solution='max_sharpe')
+        cla.allocate(asset_prices=self.data, solution='max_sharpe', asset_names=self.data.columns)
         weights = cla.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -89,7 +89,7 @@ class TestCLA(unittest.TestCase):
         """
 
         cla = CLA(weight_bounds=(0, 1), calculate_expected_returns="mean")
-        cla.allocate(asset_prices=self.data, solution='min_volatility')
+        cla.allocate(asset_prices=self.data, solution='min_volatility', asset_names=self.data.columns)
         weights = cla.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -101,7 +101,7 @@ class TestCLA(unittest.TestCase):
         """
 
         cla = CLA(weight_bounds=(0, 1), calculate_expected_returns="mean")
-        cla.allocate(asset_prices=self.data, solution='efficient_frontier')
+        cla.allocate(asset_prices=self.data, solution='efficient_frontier', asset_names=self.data.columns)
         assert len(cla.efficient_frontier_means) == len(cla.efficient_frontier_sigma) and \
                len(cla.efficient_frontier_sigma) == len(cla.weights.values)
         assert cla.efficient_frontier_sigma[-1] <= cla.efficient_frontier_sigma[0] and \
@@ -114,7 +114,7 @@ class TestCLA(unittest.TestCase):
         """
 
         cla = CLA(weight_bounds=(0, 1), calculate_expected_returns="mean")
-        cla.allocate(asset_prices=self.data, solution='min_volatility')
+        cla.allocate(asset_prices=self.data, solution='min_volatility', asset_names=self.data.columns)
         data = self.data.cov()
         data = data.values
         x, y = cla._compute_lambda(covar_f_inv=data,
@@ -133,7 +133,7 @@ class TestCLA(unittest.TestCase):
         """
 
         cla = CLA(weight_bounds=(0, 1), calculate_expected_returns="mean")
-        cla.allocate(asset_prices=self.data, solution='min_volatility')
+        cla.allocate(asset_prices=self.data, solution='min_volatility', asset_names=self.data.columns)
         x, y = cla._free_bound_weight(free_weights=[1]*(cla.expected_returns.shape[0]+1))
         assert not x
         assert not y
@@ -145,10 +145,10 @@ class TestCLA(unittest.TestCase):
         """
 
         cla = CLA(weight_bounds=(0, 1), calculate_expected_returns="mean")
-        cla.allocate(asset_prices=self.data, solution='min_volatility')
+        cla.allocate(asset_prices=self.data, solution='min_volatility', asset_names=self.data.columns)
         data = self.data.copy()
         data.iloc[:, :] = 0.02320653
-        cla._initialise(asset_prices=data, resample_by='B', expected_asset_returns=None, returns_matrix=None)
+        cla._initialise(asset_prices=data, resample_by='B', expected_asset_returns=None, covariance_matrix=None)
         assert cla.expected_returns[-1, 0] == 1e-5
 
     def test_lambda_for_zero_matrices(self):
@@ -159,7 +159,7 @@ class TestCLA(unittest.TestCase):
         """
 
         cla = CLA(weight_bounds=(0, 1), calculate_expected_returns="mean")
-        cla.allocate(asset_prices=self.data, solution='min_volatility')
+        cla.allocate(asset_prices=self.data, solution='min_volatility', asset_names=self.data.columns)
         data = self.data.cov()
         data = data.values
         data[:, :] = 0
@@ -179,7 +179,7 @@ class TestCLA(unittest.TestCase):
         """
 
         cla = CLA(weight_bounds=(0, 1), calculate_expected_returns="mean")
-        cla.allocate(asset_prices=self.data, solution='min_volatility')
+        cla.allocate(asset_prices=self.data, solution='min_volatility', asset_names=self.data.columns)
         data = self.data.cov()
         data = data.values
         x, y = cla._compute_w(covar_f_inv=data,
@@ -197,7 +197,7 @@ class TestCLA(unittest.TestCase):
 
         with self.assertRaises(IndexError):
             cla = CLA(weight_bounds=(0, 1), calculate_expected_returns="mean")
-            cla.allocate(asset_prices=self.data, solution='cla_turning_points')
+            cla.allocate(asset_prices=self.data, solution='cla_turning_points', asset_names=self.data.columns)
             cla.weights = list(cla.weights.values)
             cla.weights = cla.weights*100
             cla._purge_num_err(tol=1e-18)
@@ -209,7 +209,7 @@ class TestCLA(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             cla = CLA()
-            cla.allocate(asset_prices=self.data, solution='unknown_string')
+            cla.allocate(asset_prices=self.data, solution='unknown_string', asset_names=self.data.columns)
 
     def test_value_error_for_non_dataframe_input(self):
         """
@@ -218,7 +218,7 @@ class TestCLA(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             cla = CLA()
-            cla.allocate(asset_prices=self.data.values, solution='cla_turning_points')
+            cla.allocate(asset_prices=self.data.values, solution='cla_turning_points', asset_names=self.data.columns)
 
     def test_value_error_for_non_date_index(self):
         """
@@ -228,7 +228,7 @@ class TestCLA(unittest.TestCase):
         with self.assertRaises(ValueError):
             cla = CLA()
             data = self.data.reset_index()
-            cla.allocate(asset_prices=data, solution='cla_turning_points')
+            cla.allocate(asset_prices=data, solution='cla_turning_points', asset_names=self.data.columns)
 
     def test_value_error_for_unknown_returns(self):
         """
@@ -237,7 +237,7 @@ class TestCLA(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             cla = CLA(calculate_expected_returns="unknown_returns")
-            cla.allocate(asset_prices=self.data, solution='cla_turning_points')
+            cla.allocate(asset_prices=self.data, solution='cla_turning_points', asset_names=self.data.columns)
 
     def test_resampling_asset_prices(self):
         """
@@ -245,7 +245,7 @@ class TestCLA(unittest.TestCase):
         """
 
         cla = CLA()
-        cla.allocate(asset_prices=self.data, resample_by='B', solution='min_volatility')
+        cla.allocate(asset_prices=self.data, resample_by='B', solution='min_volatility', asset_names=self.data.columns)
         weights = cla.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -261,6 +261,7 @@ class TestCLA(unittest.TestCase):
             cla.allocate(asset_names=self.data.columns)
 
 class TestHRP(unittest.TestCase):
+    # pylint: disable=too-many-public-methods
     """
     Tests different functions of the HRP algorithm class.
     """
@@ -280,7 +281,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        hrp.allocate(asset_prices=self.data)
+        hrp.allocate(asset_prices=self.data, asset_names=self.data.columns)
         weights = hrp.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -292,7 +293,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        hrp.allocate(asset_prices=self.data, use_shrinkage=True)
+        hrp.allocate(asset_prices=self.data, use_shrinkage=True, asset_names=self.data.columns)
         weights = hrp.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -304,7 +305,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        hrp.allocate(asset_prices=self.data, use_shrinkage=True)
+        hrp.allocate(asset_prices=self.data, use_shrinkage=True, asset_names=self.data.columns)
         dendrogram = hrp.plot_clusters(assets=self.data.columns)
         assert dendrogram.get('icoord')
         assert dendrogram.get('dcoord')
@@ -318,7 +319,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        hrp.allocate(asset_prices=self.data)
+        hrp.allocate(asset_prices=self.data, asset_names=self.data.columns)
         assert hrp.ordered_indices == [13, 9, 10, 8, 14, 7, 1, 6, 4, 16, 3, 17,
                                        12, 18, 22, 0, 15, 21, 11, 2, 20, 5, 19]
 
@@ -329,7 +330,7 @@ class TestHRP(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             hrp = HierarchicalRiskParity()
-            hrp.allocate(asset_prices=self.data.values)
+            hrp.allocate(asset_prices=self.data.values, asset_names=self.data.columns)
 
     def test_value_error_for_non_date_index(self):
         """
@@ -339,7 +340,7 @@ class TestHRP(unittest.TestCase):
         with self.assertRaises(ValueError):
             hrp = HierarchicalRiskParity()
             data = self.data.reset_index()
-            hrp.allocate(asset_prices=data)
+            hrp.allocate(asset_prices=data, asset_names=self.data.columns)
 
     def test_resampling_asset_prices(self):
         """
@@ -347,7 +348,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        hrp.allocate(asset_prices=self.data, resample_by='B')
+        hrp.allocate(asset_prices=self.data, resample_by='B', asset_names=self.data.columns)
         weights = hrp.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -360,9 +361,10 @@ class TestHRP(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             hrp = HierarchicalRiskParity()
-            hrp.allocate()
+            hrp.allocate(asset_names=self.data.columns)
 
 class TestMVO(unittest.TestCase):
+    # pylint: disable=too-many-public-methods
     """
     Tests the different functions of the Mean Variance Optimisation class
     """
@@ -375,17 +377,80 @@ class TestMVO(unittest.TestCase):
         data_path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
-    def test_inverse_variance(self):
+    def test_inverse_variance_solution(self):
         """
         Test the calculation of inverse-variance portfolio weights
         """
 
         mvo = MeanVarianceOptimisation()
-        mvo.allocate(asset_prices=self.data, solution='inverse_variance')
+        mvo.allocate(asset_prices=self.data, solution='inverse_variance', asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_min_volatility_solution(self):
+        """
+        Test the calculation of inverse-variance portfolio weights
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data, solution='min_volatility', asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_max_sharpe_solution(self):
+        """
+        Test the calculation of inverse-variance portfolio weights
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data, solution='max_sharpe', asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_min_volatility_with_target_return(self):
+        """
+        Test the calculation of inverse-variance portfolio weights
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data, solution='efficient_risk', asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_plotting_efficient_frontier(self):
+        """
+        Test the calculation of inverse-variance portfolio weights
+        """
+        pass
+
+    def test_mvo_with_exponential_returns(self):
+        """
+        Test the calculation of inverse-variance portfolio weights
+        """
+
+        mvo = MeanVarianceOptimisation(calculate_expected_returns='exponential')
+        mvo.allocate(asset_prices=self.data, solution='inverse_variance', asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_unknown_returns_calculation(self):
+        """
+        Test ValueError on passing unknown returns calculation string
+        """
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation(calculate_expected_returns='unknown_returns')
+            mvo.allocate(asset_prices=self.data, asset_names=self.data.columns)
 
     def test_value_error_for_unknown_solution(self):
         """
@@ -394,7 +459,7 @@ class TestMVO(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             mvo = MeanVarianceOptimisation()
-            mvo.allocate(asset_prices=self.data, solution='ivp')
+            mvo.allocate(asset_prices=self.data, solution='ivp', asset_names=self.data.columns)
 
     def test_value_error_for_non_dataframe_input(self):
         """
@@ -403,7 +468,25 @@ class TestMVO(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             mvo = MeanVarianceOptimisation()
-            mvo.allocate(asset_prices=self.data.values, solution='inverse_variance')
+            mvo.allocate(asset_prices=self.data.values, solution='inverse_variance', asset_names=self.data.columns)
+
+    def test_value_error_for_no_min_volatility_optimal_weights(self):
+        """
+        Test ValueError when no optimal weights are found for minimum volatility solution
+        """
+        return
+
+    def test_value_error_for_no_max_sharpe_optimal_weights(self):
+        """
+        Test ValueError when no optimal weights are found for maximum Sharpe solution
+        """
+        return
+
+    def test_value_error_for_no_efficient_risk_optimal_weights(self):
+        """
+        Test ValueError when no optimal weights are found for efficient risk solution
+        """
+        return
 
     def test_value_error_for_non_date_index(self):
         """
@@ -413,7 +496,7 @@ class TestMVO(unittest.TestCase):
         with self.assertRaises(ValueError):
             mvo = MeanVarianceOptimisation()
             data = self.data.reset_index()
-            mvo.allocate(asset_prices=data, solution='inverse_variance')
+            mvo.allocate(asset_prices=data, solution='inverse_variance', asset_names=self.data.columns)
 
     def test_resampling_asset_prices(self):
         """
@@ -421,7 +504,7 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        mvo.allocate(asset_prices=self.data, solution='inverse_variance', resample_by='B')
+        mvo.allocate(asset_prices=self.data, solution='inverse_variance', resample_by='B', asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -434,4 +517,6 @@ class TestMVO(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             mvo = MeanVarianceOptimisation()
-            mvo.allocate()
+            mvo.allocate(asset_names=self.data.columns)
+
+

@@ -16,13 +16,12 @@ class MeanVarianceOptimisation:
     problem.
     '''
 
-    def __init__(self, calculate_expected_returns='mean', weight_bounds=(0,1)):
+    def __init__(self, calculate_expected_returns='mean'):
         self.weights = list()
         self.portfolio_risk = None
         self.portfolio_return = None
         self.portfolio_sharpe_ratio = None
         self.calculate_expected_returns = calculate_expected_returns
-        self.weight_bounds = weight_bounds
 
     def allocate(self,
                  asset_names,
@@ -32,6 +31,7 @@ class MeanVarianceOptimisation:
                  solution='inverse_variance',
                  risk_free_rate=0.05,
                  target_return=0.2,
+                 weight_bounds=(0,1),
                  resample_by=None):
         # pylint: disable=invalid-name, too-many-branches
         '''
@@ -43,6 +43,9 @@ class MeanVarianceOptimisation:
         :param solution: (str) the type of solution/algorithm to use to calculate the weights
         :param risk_free_rate: (float) the rate of return for a risk-free asset.
         :param target_return: (float) target return of the portfolio
+        :param weight_bounds: (dict/tuple) can be wither a single tuple of upper and lower bounds for all portfolio weights or
+                                           a dictionary mapping individual asset indices to tuples of upper and lower bounds.
+                                           Those indices which do not have any mapping will have a (0, 1) default bound.
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         '''
@@ -56,6 +59,9 @@ class MeanVarianceOptimisation:
                 raise ValueError("Asset prices matrix must be a dataframe")
             if not isinstance(asset_prices.index, pd.DatetimeIndex):
                 raise ValueError("Asset prices dataframe must be indexed by date.")
+
+        # Weight bounds
+        self.weight_bounds = weight_bounds
 
         # Calculate the expected returns if the user does not supply any returns
         if expected_asset_returns is None:
@@ -132,9 +138,24 @@ class MeanVarianceOptimisation:
         allocation_objective = cp.Minimize(risk)
         allocation_constraints = [
             cp.sum(weights) == 1,
-            weights >= self.weight_bounds[0],
-            weights <= self.weight_bounds[1]
         ]
+        if isinstance(self.weight_bounds, tuple):
+            allocation_constraints.extend(
+                [
+                    weights >= self.weight_bounds[0]
+                    weights <= min(self.weight_bounds[1], 1)
+                ]
+            )
+        if isinstance(self.weight_bounds, dict):
+            asset_indices = list(range(num_assets))
+            for asset_index in asset_indices:
+                lower_bound, upper_bound = self.weight_bounds.get(asset_index, (0, 1))
+                allocation_constraints.extend(
+                    [
+                        weights[asset_index] >= lower_bound,
+                        weights[asset_index] <= min(upper_bound, 1)
+                    ]
+                )
 
         # Define and solve the problem
         problem = cp.Problem(
@@ -144,7 +165,7 @@ class MeanVarianceOptimisation:
         problem.solve(warm_start=True)
         if weights.value is None:
             raise ValueError('No optimal set of weights found.')
-        return weights.value, risk.value
+        return weights.value, risk.value ** 0.5
 
     def _max_sharpe(self, covariance, expected_returns, risk_free_rate, num_assets):
         '''
@@ -167,9 +188,25 @@ class MeanVarianceOptimisation:
         allocation_constraints = [
             cp.sum((expected_returns - risk_free_rate).T @ y) == 1,
             cp.sum(y) == kappa,
-            y >= 0,
             kappa >= 0
         ]
+        if isinstance(self.weight_bounds, tuple):
+            allocation_constraints.extend(
+                [
+                    y >= kappa * self.weight_bounds[0],
+                    y <= min(kappa * self.weight_bounds[1], kappa)
+                ]
+            )
+        if isinstance(self.weight_bounds, dict):
+            asset_indices = list(range(num_assets))
+            for asset_index in asset_indices:
+                lower_bound, upper_bound = self.weight_bounds.get(asset_index, (0, 1))
+                allocation_constraints.extend(
+                    [
+                        y[asset_index] >= kappa * lower_bound,
+                        y[asset_index] <= min(kappa * upper_bound, kappa)
+                    ]
+                )
 
         # Define and solve the problem
         problem = cp.Problem(
@@ -181,7 +218,7 @@ class MeanVarianceOptimisation:
         if weights is None:
             raise ValueError('No optimal set of weights found.')
         portfolio_return = (expected_returns.T @ weights)[0]
-        return weights, risk.value, portfolio_return
+        return weights, risk.value ** 0.5, portfolio_return
 
     def _min_volatility_for_target_return(self, covariance, expected_returns, target_return, num_assets):
         '''
@@ -202,9 +239,24 @@ class MeanVarianceOptimisation:
         allocation_constraints = [
             cp.sum(weights) == 1,
             (expected_returns.T @ weights)[0] == target_return,
-            weights >= self.weight_bounds[0],
-            weights <= self.weight_bounds[1]
         ]
+        if isinstance(self.weight_bounds, tuple):
+            allocation_constraints.extend(
+                [
+                    weights >= self.weight_bounds[0],
+                    weights <= min(self.weight_bounds[1], 1)
+                ]
+            )
+        if isinstance(self.weight_bounds, dict):
+            asset_indices = list(range(num_assets))
+            for asset_index in asset_indices:
+                lower_bound, upper_bound = self.weight_bounds.get(asset_index, (0, 1))
+                allocation_constraints.extend(
+                    [
+                        weights[asset_index] >= lower_bound,
+                        weights[asset_index] <= min(upper_bound, 1)
+                    ]
+                )
 
         # Define and solve the problem
         problem = cp.Problem(
@@ -214,15 +266,23 @@ class MeanVarianceOptimisation:
         problem.solve()
         if weights.value is None:
             raise ValueError('No optimal set of weights found.')
-        return weights.value, risk.value, target_return
+        return weights.value, risk.value ** 0.5, target_return
 
-    def plot_efficient_frontier(self, covariance, expected_returns, num_assets, risk_free_rate=0.05):
+    def plot_efficient_frontier(self,
+                                covariance,
+                                expected_returns,
+                                num_assets,
+                                min_return=0,
+                                max_return=0.4,
+                                risk_free_rate=0.05):
         '''
         Plot the Markowitz efficient frontier.
-        
+
         param covariance: (pd.Dataframe) covariance dataframe of asset returns
         :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
         :param num_assets: (int) number of assets in the portfolio
+        :param min_return: (float)
+        :param max_return: (float)
         :param risk_free_rate: (float) the rate of return for a risk-free asset.
         '''
 
@@ -230,21 +290,28 @@ class MeanVarianceOptimisation:
         if (expected_asset_returns == np.ones(expected_asset_returns.shape) * expected_asset_returns.mean()).all():
             expected_asset_returns[-1, 0] += 1e-5
 
-        sigma = []
+        volatilities = []
         returns = []
         sharpe_ratios = []
-        for portfolio_return in np.linspace(0, 0.4, 100):
-            _, risk, _ = self._min_volatility_for_target_return(covariance=covariance,
-                                                   expected_returns=expected_returns,
-                                                   target_return=portfolio_return,
-                                                   num_assets=num_assets)
-            sigma.append(risk ** 0.5)
+        for portfolio_return in np.linspace(min_return, max_return, 100):
+            try:
+                _, risk, _ = self._min_volatility_for_target_return(covariance=covariance,
+                                                       expected_returns=expected_returns,
+                                                       target_return=portfolio_return,
+                                                       num_assets=num_assets)
+            except Exception:
+                risk = 0
+
+            volatilities.append(risk)
             returns.append(portfolio_return)
-            sharpe_ratios.append( (portfolio_return - risk_free_rate)/(risk ** 0.5) )
+            if risk == 0:
+                sharpe_ratios.append(0)
+            else:
+                sharpe_ratios.append( (portfolio_return - risk_free_rate)/(risk ** 0.5) )
         max_sharpe_ratio_index = sharpe_ratios.index(max(sharpe_ratios))
-        plt.scatter(sigma, returns, c=sharpe_ratios, cmap='viridis')
+        plt.scatter(volatilities, returns, c=sharpe_ratios, cmap='viridis')
         plt.colorbar(label='Sharpe Ratio')
-        plt.scatter(sigma[max_sharpe_ratio_index], returns[max_sharpe_ratio_index], c='red', s=50)  # red dot
+        plt.scatter(volatilities[max_sharpe_ratio_index], returns[max_sharpe_ratio_index], c='red', s=50)  # red dot
         plt.xlabel('Volatility')
         plt.ylabel('Return')
         plt.show()
