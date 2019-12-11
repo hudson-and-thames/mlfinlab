@@ -270,7 +270,7 @@ class MeanVarianceOptimisation:
 
     def plot_efficient_frontier(self,
                                 covariance,
-                                expected_returns,
+                                expected_asset_returns,
                                 num_assets,
                                 min_return=0,
                                 max_return=0.4,
@@ -286,9 +286,9 @@ class MeanVarianceOptimisation:
         :param risk_free_rate: (float) the rate of return for a risk-free asset.
         '''
 
-        expected_asset_returns = np.array(expected_returns).reshape((len(expected_returns), 1))
-        if (expected_asset_returns == np.ones(expected_asset_returns.shape) * expected_asset_returns.mean()).all():
-            expected_asset_returns[-1, 0] += 1e-5
+        expected_returns = np.array(expected_asset_returns).reshape((len(expected_asset_returns), 1))
+        if (expected_returns == np.ones(expected_returns.shape) * expected_returns.mean()).all():
+            expected_returns[-1, 0] += 1e-5
 
         volatilities = []
         returns = []
