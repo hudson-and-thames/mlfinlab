@@ -142,7 +142,7 @@ class MeanVarianceOptimisation:
         if isinstance(self.weight_bounds, tuple):
             allocation_constraints.extend(
                 [
-                    weights >= self.weight_bounds[0]
+                    weights >= self.weight_bounds[0],
                     weights <= min(self.weight_bounds[1], 1)
                 ]
             )
