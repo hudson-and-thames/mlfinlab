@@ -23,6 +23,7 @@ class MeanVarianceOptimisation:
         self.portfolio_sharpe_ratio = None
         self.calculate_expected_returns = calculate_expected_returns
         self.returns_estimator = ReturnsEstimation()
+        self.weight_bounds = None
 
     def allocate(self,
                  asset_names,
@@ -32,7 +33,7 @@ class MeanVarianceOptimisation:
                  solution='inverse_variance',
                  risk_free_rate=0.05,
                  target_return=0.2,
-                 weight_bounds=(0,1),
+                 weight_bounds=(0, 1),
                  resample_by=None):
         # pylint: disable=invalid-name, too-many-branches, bad-continuation
         '''
@@ -181,6 +182,7 @@ class MeanVarianceOptimisation:
         return weights.value, risk.value ** 0.5
 
     def _max_sharpe(self, covariance, expected_returns, risk_free_rate, num_assets):
+        # pylint: disable=invalid-name
         '''
         Compute maximum Sharpe portfolio allocation.
 
@@ -288,6 +290,7 @@ class MeanVarianceOptimisation:
                                 min_return=0,
                                 max_return=0.4,
                                 risk_free_rate=0.05):
+        # pylint: disable=bad-continuation
         '''
         Plot the Markowitz efficient frontier.
 
@@ -320,7 +323,7 @@ class MeanVarianceOptimisation:
             if risk == 0:
                 sharpe_ratios.append(0)
             else:
-                sharpe_ratios.append( (portfolio_return - risk_free_rate)/(risk ** 0.5) )
+                sharpe_ratios.append((portfolio_return - risk_free_rate) / (risk ** 0.5))
         max_sharpe_ratio_index = sharpe_ratios.index(max(sharpe_ratios))
         plt.scatter(volatilities, returns, c=sharpe_ratios, cmap='viridis')
         plt.colorbar(label='Sharpe Ratio')

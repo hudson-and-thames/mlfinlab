@@ -469,12 +469,11 @@ class TestMVO(unittest.TestCase):
         """
         pass
 
-    def test_mvo_with_specific_weight_bounds(self):
+    def test_min_volatility_with_specific_weight_bounds(self):
         """
         Test the calculation of weights when specific bounds are supplied
         """
 
-        # Minimum Volatility Solution
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data,
                      solution='min_volatility',
@@ -485,7 +484,11 @@ class TestMVO(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
-        # Maximum Sharpe Solution
+    def test_max_sharpe_with_specific_weight_bounds(self):
+        """
+        Test the calculation of weights when specific bounds are supplied
+        """
+
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data,
                      solution='max_sharpe',
@@ -496,7 +499,11 @@ class TestMVO(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
-        # Efficient Risk Solution
+    def test_efficient_risk_with_specific_weight_bounds(self):
+        """
+        Test the calculation of weights when specific bounds are supplied
+        """
+
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data,
                      solution='efficient_risk',

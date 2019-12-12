@@ -3,7 +3,8 @@ class ReturnsEstimation:
     def __init__(self):
         return
 
-    def calculate_mean_historical_returns(self, asset_prices, resample_by=None, frequency=252):
+    @staticmethod
+    def calculate_mean_historical_returns(asset_prices, resample_by=None, frequency=252):
         '''
         Calculate the annualised mean historical returns from asset price data
 
@@ -18,7 +19,8 @@ class ReturnsEstimation:
         returns = returns.mean() * frequency
         return returns
 
-    def calculate_exponential_historical_returns(self, asset_prices, resample_by=None, frequency=252, span=500):
+    @staticmethod
+    def calculate_exponential_historical_returns(asset_prices, resample_by=None, frequency=252, span=500):
         '''
         Calculate the exponentially-weighted mean of (daily) historical returns, giving
         higher weight to more recent data.
@@ -34,7 +36,8 @@ class ReturnsEstimation:
         returns = returns.ewm(span=span).mean().iloc[-1] * frequency
         return returns
 
-    def calculate_returns(self, asset_prices, resample_by=None):
+    @staticmethod
+    def calculate_returns(asset_prices, resample_by=None):
         '''
         Calculate the annualised mean historical returns from asset price data
 
