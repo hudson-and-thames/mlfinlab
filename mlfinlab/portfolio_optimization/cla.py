@@ -388,7 +388,7 @@ class CLA:
         return lambda_out, i_out
 
     def _initialise(self, asset_prices, expected_asset_returns, covariance_matrix, resample_by):
-        # pylint: disable=invalid-name, too-many-branches
+        # pylint: disable=invalid-name, too-many-branches, bad-continuation
         '''
         Initialise covariances, upper-counds, lower-bounds and storage buffers
 
@@ -448,7 +448,7 @@ class CLA:
                  covariance_matrix=None,
                  solution="cla_turning_points",
                  resample_by=None):
-        # pylint: disable=consider-using-enumerate,too-many-locals,too-many-branches,too-many-statements
+        # pylint: disable=consider-using-enumerate,too-many-locals,too-many-branches,too-many-statements,bad-continuation
         '''
         Calculate the portfolio asset allocations using the method specified.
 

@@ -34,7 +34,7 @@ class MeanVarianceOptimisation:
                  target_return=0.2,
                  weight_bounds=(0,1),
                  resample_by=None):
-        # pylint: disable=invalid-name, too-many-branches
+        # pylint: disable=invalid-name, too-many-branches, bad-continuation
         '''
         Calculate the portfolio asset allocations using the method specified.
 
@@ -44,7 +44,10 @@ class MeanVarianceOptimisation:
         :param solution: (str) the type of solution/algorithm to use to calculate the weights
         :param risk_free_rate: (float) the rate of return for a risk-free asset.
         :param target_return: (float) target return of the portfolio
-        :param weight_bounds: (dict/tuple) can be either a single tuple of upper and lower bounds for all portfolio weights or a dictionary mapping of individual asset indices to tuples of upper and lower bounds. Those indices which do not have any mapping will have a (0, 1) default bound.
+        :param weight_bounds: (dict/tuple) can be either a single tuple of upper and lower bounds
+                                          for all portfolio weights or a dictionary mapping of individual asset indices
+                                          to tuples of upper and lower bounds. Those indices which do not have any mapping
+                                          will have a (0, 1) default bound.
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         '''
@@ -104,13 +107,15 @@ class MeanVarianceOptimisation:
             raise ValueError("Unknown solution string specified. Supported solutions - "
                              "inverse_variance, min_volatility, max_sharpe and efficient_risk.")
 
+        # Round weights which are very very small negative numbers (e.g. -4.7e-16) to 0
         negative_weight_indices = np.argwhere(self.weights < 0)
         self.weights[negative_weight_indices] = np.round(self.weights[negative_weight_indices], 3)
+
         if self.portfolio_risk is None:
-            self.portfolio_risk = self.weights @ cov @ self.weights.T
+            self.portfolio_risk = (self.weights @ cov @ self.weights.T)[0]
         if self.portfolio_return is None:
-            self.portfolio_return = self.weights @ expected_asset_returns
-        self.portfolio_sharpe_ratio = (self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5)
+            self.portfolio_return = (self.weights @ expected_asset_returns)[0]
+        self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))[0]
 
         self.weights = pd.DataFrame(self.weights)
         self.weights.index = asset_names
@@ -185,7 +190,7 @@ class MeanVarianceOptimisation:
         :param num_assets: (int) number of assets in the portfolio
         :return: (np.array, float, float) portfolio weights, risk value and return value
         '''
-        
+
         y = cp.Variable(num_assets)
         y.value = np.array([1 / num_assets] * num_assets)
         kappa = cp.Variable(1)
