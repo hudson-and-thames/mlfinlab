@@ -10,6 +10,7 @@ import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 from sklearn.covariance import OAS
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 
 class HierarchicalRiskParity:
@@ -25,6 +26,7 @@ class HierarchicalRiskParity:
         self.seriated_distances = None
         self.ordered_indices = None
         self.clusters = None
+        self.returns_estimator = ReturnsEstimation()
 
     @staticmethod
     def _tree_clustering(correlation, method='single'):
@@ -127,23 +129,6 @@ class HierarchicalRiskParity:
         return dendrogram_plot
 
     @staticmethod
-    def _calculate_returns(asset_prices, resample_by):
-        '''
-        Calculate the annualised mean historical returns from asset price data
-
-        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
-        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                  None for no resampling
-        :return: (pd.Dataframe) stock returns
-        '''
-
-        if resample_by:
-            asset_prices = asset_prices.resample(resample_by).last()
-        asset_returns = asset_prices.pct_change()
-        asset_returns = asset_returns.dropna(how='all')
-        return asset_returns
-
-    @staticmethod
     def _shrink_covariance(covariance):
         '''
         Regularise/Shrink the asset covariances
@@ -206,7 +191,7 @@ class HierarchicalRiskParity:
 
         # Calculate the returns if the user does not supply a returns dataframe
         if asset_returns is None and covariance_matrix is None:
-            asset_returns = self._calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
+            asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
         asset_returns = pd.DataFrame(asset_returns, columns=asset_names)
 
         # Calculate covariance of returns or use the user specified covariance matrix

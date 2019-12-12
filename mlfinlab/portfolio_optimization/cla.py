@@ -9,7 +9,7 @@ import numbers
 from math import log, ceil
 import numpy as np
 import pandas as pd
-from mlfinlab.portfolio_optimization.returns_estimators import calculate_returns, calculate_exponential_historical_returns, calculate_mean_historical_returns
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 
 class CLA:
@@ -44,6 +44,7 @@ class CLA:
         self.min_var = None
         self.efficient_frontier_means = None
         self.efficient_frontier_sigma = None
+        self.returns_estimator = ReturnsEstimation()
 
     @staticmethod
     def _infnone(number):
@@ -403,11 +404,13 @@ class CLA:
         self.expected_returns = expected_asset_returns
         if expected_asset_returns is None:
             if self.calculate_expected_returns == "mean":
-                self.expected_returns = calculate_mean_historical_returns(asset_prices=asset_prices,
-                                                                          resample_by=resample_by)
+                self.expected_returns = self.returns_estimator.calculate_mean_historical_returns(
+                                                                        asset_prices=asset_prices,
+                                                                        resample_by=resample_by)
             elif self.calculate_expected_returns == "exponential":
-                self.expected_returns = calculate_exponential_historical_returns(asset_prices=asset_prices,
-                                                                                 resample_by=resample_by)
+                self.expected_returns = self.returns_estimator.calculate_exponential_historical_returns(
+                                                                        asset_prices=asset_prices,
+                                                                        resample_by=resample_by)
             else:
                 raise ValueError("Unknown returns specified. Supported returns - mean, exponential")
         self.expected_returns = np.array(self.expected_returns).reshape((len(self.expected_returns), 1))
@@ -416,7 +419,7 @@ class CLA:
 
         # Calculate the covariance matrix
         if covariance_matrix is None:
-            returns = calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
+            returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
             covariance_matrix = returns.cov()
         self.cov_matrix = np.asarray(covariance_matrix)
 

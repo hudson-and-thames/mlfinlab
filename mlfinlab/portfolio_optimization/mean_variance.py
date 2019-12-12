@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import cvxpy as cp
 import matplotlib.pyplot as plt
-from mlfinlab.portfolio_optimization.returns_estimators import calculate_returns, calculate_mean_historical_returns, calculate_exponential_historical_returns
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 
 class MeanVarianceOptimisation:
@@ -22,6 +22,7 @@ class MeanVarianceOptimisation:
         self.portfolio_return = None
         self.portfolio_sharpe_ratio = None
         self.calculate_expected_returns = calculate_expected_returns
+        self.returns_estimator = ReturnsEstimation()
 
     def allocate(self,
                  asset_names,
@@ -43,9 +44,7 @@ class MeanVarianceOptimisation:
         :param solution: (str) the type of solution/algorithm to use to calculate the weights
         :param risk_free_rate: (float) the rate of return for a risk-free asset.
         :param target_return: (float) target return of the portfolio
-        :param weight_bounds: (dict/tuple) can be wither a single tuple of upper and lower bounds for all portfolio weights or
-                                           a dictionary mapping individual asset indices to tuples of upper and lower bounds.
-                                           Those indices which do not have any mapping will have a (0, 1) default bound.
+        :param weight_bounds: (dict/tuple) can be either a single tuple of upper and lower bounds for all portfolio weights or a dictionary mapping of individual asset indices to tuples of upper and lower bounds. Those indices which do not have any mapping will have a (0, 1) default bound.
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         '''
@@ -66,11 +65,13 @@ class MeanVarianceOptimisation:
         # Calculate the expected returns if the user does not supply any returns
         if expected_asset_returns is None:
             if self.calculate_expected_returns == "mean":
-                expected_asset_returns = calculate_mean_historical_returns(asset_prices=asset_prices,
-                                                                          resample_by=resample_by)
+                expected_asset_returns = self.returns_estimator.calculate_mean_historical_returns(
+                                                                        asset_prices=asset_prices,
+                                                                        resample_by=resample_by)
             elif self.calculate_expected_returns == "exponential":
-                expected_asset_returns = calculate_exponential_historical_returns(asset_prices=asset_prices,
-                                                                                 resample_by=resample_by)
+                expected_asset_returns = self.returns_estimator.calculate_exponential_historical_returns(
+                                                                        asset_prices=asset_prices,
+                                                                        resample_by=resample_by)
             else:
                 raise ValueError("Unknown returns specified. Supported returns - mean, exponential")
         expected_asset_returns = np.array(expected_asset_returns).reshape((len(expected_asset_returns), 1))
@@ -79,7 +80,7 @@ class MeanVarianceOptimisation:
 
         # Calculate covariance of returns or use the user specified covariance matrix
         if covariance_matrix is None:
-            returns = calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
+            returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
             covariance_matrix = returns.cov()
         cov = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
 
@@ -103,7 +104,14 @@ class MeanVarianceOptimisation:
             raise ValueError("Unknown solution string specified. Supported solutions - "
                              "inverse_variance, min_volatility, max_sharpe and efficient_risk.")
 
+        negative_weight_indices = np.argwhere(self.weights < 0)
+        self.weights[negative_weight_indices] = np.round(self.weights[negative_weight_indices], 3)
+        if self.portfolio_risk is None:
+            self.portfolio_risk = self.weights @ cov @ self.weights.T
+        if self.portfolio_return is None:
+            self.portfolio_return = self.weights @ expected_asset_returns
         self.portfolio_sharpe_ratio = (self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5)
+
         self.weights = pd.DataFrame(self.weights)
         self.weights.index = asset_names
         self.weights = self.weights.T
@@ -194,7 +202,7 @@ class MeanVarianceOptimisation:
             allocation_constraints.extend(
                 [
                     y >= kappa * self.weight_bounds[0],
-                    y <= min(kappa * self.weight_bounds[1], kappa)
+                    y <= kappa * self.weight_bounds[1]
                 ]
             )
         if isinstance(self.weight_bounds, dict):
@@ -204,7 +212,7 @@ class MeanVarianceOptimisation:
                 allocation_constraints.extend(
                     [
                         y[asset_index] >= kappa * lower_bound,
-                        y[asset_index] <= min(kappa * upper_bound, kappa)
+                        y[asset_index] <= kappa * upper_bound
                     ]
                 )
 
@@ -214,9 +222,9 @@ class MeanVarianceOptimisation:
             constraints=allocation_constraints
         )
         problem.solve(warm_start=True)
-        weights = y.value / kappa.value
-        if weights is None:
+        if y.value is None or kappa.value is None:
             raise ValueError('No optimal set of weights found.')
+        weights = y.value / kappa.value
         portfolio_return = (expected_returns.T @ weights)[0]
         return weights, risk.value ** 0.5, portfolio_return
 
@@ -281,8 +289,8 @@ class MeanVarianceOptimisation:
         param covariance: (pd.Dataframe) covariance dataframe of asset returns
         :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
         :param num_assets: (int) number of assets in the portfolio
-        :param min_return: (float)
-        :param max_return: (float)
+        :param min_return: (float) minimum target return
+        :param max_return: (float) maximum target return
         :param risk_free_rate: (float) the rate of return for a risk-free asset.
         '''
 

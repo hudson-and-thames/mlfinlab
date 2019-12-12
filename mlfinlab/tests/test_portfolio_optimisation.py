@@ -9,6 +9,7 @@ import pandas as pd
 from mlfinlab.portfolio_optimization.hrp import HierarchicalRiskParity
 from mlfinlab.portfolio_optimization.cla import CLA
 from mlfinlab.portfolio_optimization.mean_variance import MeanVarianceOptimisation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 
 class TestCLA(unittest.TestCase):
@@ -260,6 +261,25 @@ class TestCLA(unittest.TestCase):
             cla = CLA()
             cla.allocate(asset_names=self.data.columns)
 
+    def test_cla_with_input_as_returns_and_covariance(self):
+        """
+        Test CLA when we pass expected returns and covariance matrix as input
+        """
+
+        cla = CLA()
+        expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data)
+        covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data).cov()
+        cla.allocate(covariance_matrix=covariance,
+                     expected_asset_returns=expected_returns,
+                     asset_names=self.data.columns)
+        weights = cla.weights.values
+        weights[weights <= 1e-15] = 0  # Convert very very small numbers to 0
+        for turning_point in weights:
+            assert (turning_point >= 0).all()
+            assert len(turning_point) == self.data.shape[1]
+            np.testing.assert_almost_equal(np.sum(turning_point), 1)
+
+
 class TestHRP(unittest.TestCase):
     # pylint: disable=too-many-public-methods
     """
@@ -363,6 +383,24 @@ class TestHRP(unittest.TestCase):
             hrp = HierarchicalRiskParity()
             hrp.allocate(asset_names=self.data.columns)
 
+    def test_hrp_with_input_as_returns(self):
+        hrp = HierarchicalRiskParity()
+        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        hrp.allocate(asset_returns=returns, asset_names=self.data.columns)
+        weights = hrp.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_hrp_with_input_as_covariance_matrix(self):
+        hrp = HierarchicalRiskParity()
+        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        hrp.allocate(asset_names=self.data.columns, covariance_matrix=returns.cov())
+        weights = hrp.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
 class TestMVO(unittest.TestCase):
     # pylint: disable=too-many-public-methods
     """
@@ -419,7 +457,7 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        mvo.allocate(asset_prices=self.data, solution='efficient_risk', asset_names=self.data.columns)
+        mvo.allocate(asset_prices=self.data, solution='efficient_risk', asset_names=self.data.columns, resample_by='W')
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -430,6 +468,45 @@ class TestMVO(unittest.TestCase):
         Test the calculation of inverse-variance portfolio weights
         """
         pass
+
+    def test_mvo_with_specific_weight_bounds(self):
+        """
+        Test the calculation of weights when specific bounds are supplied
+        """
+
+        # Minimum Volatility Solution
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data,
+                     solution='min_volatility',
+                     weight_bounds={0:(0.3,1)},
+                     asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+        # Maximum Sharpe Solution
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data,
+                     solution='max_sharpe',
+                     weight_bounds={0: (0.3, 1)},
+                     asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+        # Efficient Risk Solution
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data,
+                     solution='efficient_risk',
+                     target_return=0.01,
+                     weight_bounds={0: (0.3, 1)},
+                     asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_mvo_with_exponential_returns(self):
         """
@@ -474,19 +551,37 @@ class TestMVO(unittest.TestCase):
         """
         Test ValueError when no optimal weights are found for minimum volatility solution
         """
-        return
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation()
+            mvo.allocate(asset_prices=self.data,
+                         solution='min_volatility',
+                         weight_bounds=(0.9, 1),
+                         asset_names=self.data.columns)
 
     def test_value_error_for_no_max_sharpe_optimal_weights(self):
         """
         Test ValueError when no optimal weights are found for maximum Sharpe solution
         """
-        return
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation()
+            mvo.allocate(asset_prices=self.data,
+                         solution='max_sharpe',
+                         weight_bounds=(0.9, 1),
+                         asset_names=self.data.columns)
 
     def test_value_error_for_no_efficient_risk_optimal_weights(self):
         """
         Test ValueError when no optimal weights are found for efficient risk solution
         """
-        return
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation()
+            mvo.allocate(asset_prices=self.data,
+                         solution='efficient_risk',
+                         weight_bounds=(0.9, 1),
+                         asset_names=self.data.columns)
 
     def test_value_error_for_non_date_index(self):
         """
