@@ -237,7 +237,7 @@ class CLA:
             if abs(sum(self.weights[index_1]) - 1) > tol:
                 flag = True
             else:
-                for index_2 in range(self.weights[index_1].shape[0]):
+                for index_2 in range(len(self.weights[index_1])):
                     if (
                             self.weights[index_1][index_2] - self.lower_bounds[index_2] < -tol
                             or self.weights[index_1][index_2] - self.upper_bounds[index_2] > tol

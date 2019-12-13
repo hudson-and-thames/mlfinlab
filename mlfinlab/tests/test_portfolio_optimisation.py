@@ -190,7 +190,7 @@ class TestCLA(unittest.TestCase):
         assert isinstance(x, np.ndarray)
         assert isinstance(y, float)
 
-    def test_purge_num_excess(self):
+    def test_purge_excess(self):
         # pylint: disable=protected-access,invalid-name
         """
         Test purge number excess for very very small tolerance
@@ -202,6 +202,24 @@ class TestCLA(unittest.TestCase):
             cla.weights = list(cla.weights.values)
             cla.weights = cla.weights*100
             cla._purge_num_err(tol=1e-18)
+
+    def test_flag_true_for_purge_num_err(self):
+        """
+        Test whether the flag becomes True in the purge num error function
+        """
+
+        cla = CLA()
+        cla.weights = [[1]]
+        cla.lower_bounds = [100]
+        cla.upper_bounds = [1]
+        cla.lambdas = [[1]]
+        cla.gammas = [[1]]
+        cla.free_weights = [[1]]
+        cla._purge_num_err(tol=1)
+        assert not cla.weights
+        assert not cla.lambdas
+        assert not cla.gammas
+
 
     def test_value_error_for_unknown_solution(self):
         """
@@ -384,6 +402,10 @@ class TestHRP(unittest.TestCase):
             hrp.allocate(asset_names=self.data.columns)
 
     def test_hrp_with_input_as_returns(self):
+        """
+        Test HRP when passing asset returns dataframe as input
+        """
+
         hrp = HierarchicalRiskParity()
         returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
         hrp.allocate(asset_returns=returns, asset_names=self.data.columns)
@@ -393,6 +415,10 @@ class TestHRP(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_hrp_with_input_as_covariance_matrix(self):
+        """
+        Test HRP when passing a covariance matrix as input
+        """
+
         hrp = HierarchicalRiskParity()
         returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
         hrp.allocate(asset_names=self.data.columns, covariance_matrix=returns.cov())
@@ -452,6 +478,7 @@ class TestMVO(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_min_volatility_with_target_return(self):
+        # pylint: disable=invalid-name
         """
         Test the calculation of inverse-variance portfolio weights
         """
@@ -470,6 +497,7 @@ class TestMVO(unittest.TestCase):
         pass
 
     def test_min_volatility_with_specific_weight_bounds(self):
+        # pylint: disable=invalid-name
         """
         Test the calculation of weights when specific bounds are supplied
         """
@@ -477,7 +505,7 @@ class TestMVO(unittest.TestCase):
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data,
                      solution='min_volatility',
-                     weight_bounds={0:(0.3,1)},
+                     weight_bounds={0:(0.3, 1)},
                      asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
@@ -485,6 +513,7 @@ class TestMVO(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_max_sharpe_with_specific_weight_bounds(self):
+        # pylint: disable=invalid-name
         """
         Test the calculation of weights when specific bounds are supplied
         """
@@ -500,6 +529,7 @@ class TestMVO(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_efficient_risk_with_specific_weight_bounds(self):
+        # pylint: disable=invalid-name
         """
         Test the calculation of weights when specific bounds are supplied
         """
@@ -516,6 +546,7 @@ class TestMVO(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_mvo_with_exponential_returns(self):
+        # pylint: disable=invalid-name
         """
         Test the calculation of inverse-variance portfolio weights
         """
@@ -528,6 +559,7 @@ class TestMVO(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_unknown_returns_calculation(self):
+        # pylint: disable=invalid-name
         """
         Test ValueError on passing unknown returns calculation string
         """
@@ -537,6 +569,7 @@ class TestMVO(unittest.TestCase):
             mvo.allocate(asset_prices=self.data, asset_names=self.data.columns)
 
     def test_value_error_for_unknown_solution(self):
+        # pylint: disable=invalid-name
         """
         Test ValueError on passing unknown solution string
         """
@@ -546,6 +579,7 @@ class TestMVO(unittest.TestCase):
             mvo.allocate(asset_prices=self.data, solution='ivp', asset_names=self.data.columns)
 
     def test_value_error_for_non_dataframe_input(self):
+        # pylint: disable=invalid-name
         """
         Test ValueError on passing non-dataframe input
         """
@@ -555,6 +589,7 @@ class TestMVO(unittest.TestCase):
             mvo.allocate(asset_prices=self.data.values, solution='inverse_variance', asset_names=self.data.columns)
 
     def test_value_error_for_no_min_volatility_optimal_weights(self):
+        # pylint: disable=invalid-name
         """
         Test ValueError when no optimal weights are found for minimum volatility solution
         """
@@ -567,6 +602,7 @@ class TestMVO(unittest.TestCase):
                          asset_names=self.data.columns)
 
     def test_value_error_for_no_max_sharpe_optimal_weights(self):
+        # pylint: disable=invalid-name
         """
         Test ValueError when no optimal weights are found for maximum Sharpe solution
         """
@@ -579,6 +615,7 @@ class TestMVO(unittest.TestCase):
                          asset_names=self.data.columns)
 
     def test_value_error_for_no_efficient_risk_optimal_weights(self):
+        # pylint: disable=invalid-name
         """
         Test ValueError when no optimal weights are found for efficient risk solution
         """
@@ -620,5 +657,5 @@ class TestMVO(unittest.TestCase):
         with self.assertRaises(ValueError):
             mvo = MeanVarianceOptimisation()
             mvo.allocate(asset_names=self.data.columns)
-
+unittest.main()
 

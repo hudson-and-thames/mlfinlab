@@ -112,11 +112,16 @@ class MeanVarianceOptimisation:
         negative_weight_indices = np.argwhere(self.weights < 0)
         self.weights[negative_weight_indices] = np.round(self.weights[negative_weight_indices], 3)
 
+        # Calculate the portfolio risk and return if it has not been calculated
         if self.portfolio_risk is None:
-            self.portfolio_risk = (self.weights @ cov @ self.weights.T)[0]
+            self.portfolio_risk = self.weights @ cov @ self.weights.T
+            if isinstance(self.portfolio_risk, np.ndarray):
+                self.portfolio_risk = self.portfolio_risk[0]
         if self.portfolio_return is None:
-            self.portfolio_return = (self.weights @ expected_asset_returns)[0]
-        self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))[0]
+            self.portfolio_return = self.weights @ expected_asset_returns
+            if isinstance(self.portfolio_return, np.ndarray):
+                self.portfolio_return = self.portfolio_return[0]
+        self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))
 
         self.weights = pd.DataFrame(self.weights)
         self.weights.index = asset_names
@@ -290,7 +295,7 @@ class MeanVarianceOptimisation:
                                 min_return=0,
                                 max_return=0.4,
                                 risk_free_rate=0.05):
-        # pylint: disable=bad-continuation
+        # pylint: disable=bad-continuation, broad-except
         '''
         Plot the Markowitz efficient frontier.
 
