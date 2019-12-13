@@ -79,8 +79,6 @@ class MeanVarianceOptimisation:
             else:
                 raise ValueError("Unknown returns specified. Supported returns - mean, exponential")
         expected_asset_returns = np.array(expected_asset_returns).reshape((len(expected_asset_returns), 1))
-        if (expected_asset_returns == np.ones(expected_asset_returns.shape) * expected_asset_returns.mean()).all():
-            expected_asset_returns[-1, 0] += 1e-5
 
         # Calculate covariance of returns or use the user specified covariance matrix
         if covariance_matrix is None:
@@ -308,9 +306,6 @@ class MeanVarianceOptimisation:
         '''
 
         expected_returns = np.array(expected_asset_returns).reshape((len(expected_asset_returns), 1))
-        if (expected_returns == np.ones(expected_returns.shape) * expected_returns.mean()).all():
-            expected_returns[-1, 0] += 1e-5
-
         volatilities = []
         returns = []
         sharpe_ratios = []
@@ -330,9 +325,9 @@ class MeanVarianceOptimisation:
             else:
                 sharpe_ratios.append((portfolio_return - risk_free_rate) / (risk ** 0.5))
         max_sharpe_ratio_index = sharpe_ratios.index(max(sharpe_ratios))
-        plt.scatter(volatilities, returns, c=sharpe_ratios, cmap='viridis')
+        figure = plt.scatter(volatilities, returns, c=sharpe_ratios, cmap='viridis')
         plt.colorbar(label='Sharpe Ratio')
         plt.scatter(volatilities[max_sharpe_ratio_index], returns[max_sharpe_ratio_index], c='red', s=50)  # red dot
         plt.xlabel('Volatility')
         plt.ylabel('Return')
-        plt.show()
+        return figure
