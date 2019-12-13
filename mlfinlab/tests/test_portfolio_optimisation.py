@@ -204,6 +204,7 @@ class TestCLA(unittest.TestCase):
             cla._purge_num_err(tol=1e-18)
 
     def test_flag_true_for_purge_num_err(self):
+        # pylint: disable=protected-access
         """
         Test whether the flag becomes True in the purge num error function
         """
@@ -280,6 +281,7 @@ class TestCLA(unittest.TestCase):
             cla.allocate(asset_names=self.data.columns)
 
     def test_cla_with_input_as_returns_and_covariance(self):
+        # pylint: disable=invalid-name
         """
         Test CLA when we pass expected returns and covariance matrix as input
         """
