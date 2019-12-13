@@ -204,7 +204,7 @@ class TestCLA(unittest.TestCase):
             cla._purge_num_err(tol=1e-18)
 
     def test_flag_true_for_purge_num_err(self):
-        # pylint: disable=protected-access
+        # pylint: disable=protected-access, no-self-use
         """
         Test whether the flag becomes True in the purge num error function
         """
@@ -659,5 +659,3 @@ class TestMVO(unittest.TestCase):
         with self.assertRaises(ValueError):
             mvo = MeanVarianceOptimisation()
             mvo.allocate(asset_names=self.data.columns)
-unittest.main()
-

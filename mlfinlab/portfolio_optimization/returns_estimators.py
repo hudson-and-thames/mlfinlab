@@ -1,4 +1,13 @@
+'''
+This is a sub-module of the portfolio-optimisation module for estimation of expected returns
+'''
+
 class ReturnsEstimation:
+    '''
+    This class contains methods for estimating expected returns. A good estimation of the expected returns is very important
+    for portfolio optimisation problems and so it is necessary to use good estimates of returns and not just rely on
+    simple techniques.
+    '''
 
     def __init__(self):
         return
