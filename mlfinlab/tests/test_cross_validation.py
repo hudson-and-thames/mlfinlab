@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import TimeSeriesSplit
+from sklearn.metrics import log_loss, accuracy_score
 
 from mlfinlab.cross_validation.cross_validation import (
     ml_get_train_times,
@@ -293,27 +294,6 @@ class TestCrossValidation(unittest.TestCase):
         decision_tree = DecisionTreeClassifier(random_state=0)
         return info_sets, records, labels, sample_weights, decision_tree
 
-    def test_ml_cross_val_score_00_exception(self):
-        """
-        Test the ml_cross_val_score function with an artificial dataset. In this case we give it the wrong scoring
-        method - jaccard_score.
-        """
-        info_sets, records, labels, sample_weights, decision_tree = self._test_ml_cross_val_score__data()
-        cv_gen = PurgedKFold(samples_info_sets=info_sets, n_splits=3, pct_embargo=0.01)
-        try:
-            ml_cross_val_score(
-                classifier=decision_tree,
-                X=records,
-                y=labels,
-                sample_weight=sample_weights.values,
-                scoring='jaccard_score',
-                cv_gen=cv_gen,
-            )
-        except ValueError:
-            pass
-        else:
-            self.fail("ValueError not raised")
-
     def test_ml_cross_val_score_01_accuracy(self):
         """
         Test the ml_cross_val_score function with an artificial dataset.
@@ -325,7 +305,7 @@ class TestCrossValidation(unittest.TestCase):
             X=records,
             y=labels,
             sample_weight=sample_weights.values,
-            scoring='accuracy',
+            scoring=accuracy_score,
             cv_gen=cv_gen,
         )
         self.log(f"score1= {scores}")
@@ -347,7 +327,7 @@ class TestCrossValidation(unittest.TestCase):
             X=records,
             y=labels,
             sample_weight=sample_weights.values,
-            scoring='neg_log_loss',
+            scoring=log_loss,
             cv_gen=cv_gen,
         )
         self.log(f"scores= {scores}")
@@ -368,7 +348,7 @@ class TestCrossValidation(unittest.TestCase):
             X=records,
             y=labels,
             sample_weight=sample_weights.values,
-            scoring='neg_log_loss',
+            scoring=log_loss,
             cv_gen=TimeSeriesSplit(max_train_size=None, n_splits=3),
         )
         self.log(f"scores= {scores}")
@@ -391,7 +371,7 @@ class TestCrossValidation(unittest.TestCase):
             X=records,
             y=labels,
             sample_weight=None,
-            scoring='accuracy',
+            scoring=accuracy_score,
             cv_gen=cv_gen,
         )
         self.log(f"score1= {scores}")
