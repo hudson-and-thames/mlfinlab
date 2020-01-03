@@ -2,10 +2,11 @@
 Implements the book chapter 7 on Cross Validation for financial data.
 """
 
+from typing import Callable
 import pandas as pd
 import numpy as np
 
-from sklearn.metrics import log_loss, accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
+from sklearn.metrics import log_loss
 from sklearn.model_selection import KFold
 from sklearn.base import ClassifierMixin
 from sklearn.model_selection import BaseCrossValidator
@@ -103,8 +104,9 @@ def ml_cross_val_score(
         y: pd.Series,
         cv_gen: BaseCrossValidator,
         sample_weight: np.ndarray = None,
-        scoring: str = 'neg_log_loss'):
+        scoring: Callable[[np.array, np.array], float] = log_loss):
     # pylint: disable=invalid-name
+    # pylint: disable=comparison-with-callable
     """
     Snippet 7.4, page 110, Using the PurgedKFold Class.
     Function to run a cross-validation evaluation of the using sample weights and a custom CV generator.
@@ -119,24 +121,16 @@ def ml_cross_val_score(
     .. code-block:: python
 
         cv_gen = PurgedKFold(n_splits=n_splits, samples_info_sets=samples_info_sets, pct_embargo=pct_embargo)
-        scores_array = ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss')
+        scores_array = ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring=accuracy_score)
 
     :param classifier: A sk-learn Classifier object instance.
     :param X: The dataset of records to evaluate.
     :param y: The labels corresponding to the X dataset.
     :param cv_gen: Cross Validation generator object instance.
     :param sample_weight: A numpy array of weights for each record in the dataset.
-    :param scoring: A metric name to use for scoring; currently supports `neg_log_loss`, `accuracy`, `f1`, `precision`,
-        `recall`, and `roc_auc`.
+    :param scoring: A metric scoring, can be custom sklearn metric.
     :return: The computed score as a numpy array.
     """
-    # Define scoring metrics
-    scoring_func_dict = {'neg_log_loss': log_loss, 'accuracy': accuracy_score, 'f1': f1_score,
-                         'precision': precision_score, 'recall': recall_score, 'roc_auc': roc_auc_score}
-    try:
-        scoring_func = scoring_func_dict[scoring]
-    except KeyError:
-        raise ValueError('Wrong scoring method. Select from: neg_log_loss, accuracy, f1, precision, recall, roc_auc')
 
     # If no sample_weight then broadcast a value of 1 to all samples (full weight).
     if sample_weight is None:
@@ -146,11 +140,11 @@ def ml_cross_val_score(
     ret_scores = []
     for train, test in cv_gen.split(X=X, y=y):
         fit = classifier.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight[train])
-        if scoring == 'neg_log_loss':
+        if scoring == log_loss:
             prob = fit.predict_proba(X.iloc[test, :])
-            score = -1 * scoring_func(y.iloc[test], prob, sample_weight=sample_weight[test], labels=classifier.classes_)
+            score = -1 * scoring(y.iloc[test], prob, sample_weight=sample_weight[test], labels=classifier.classes_)
         else:
             pred = fit.predict(X.iloc[test, :])
-            score = scoring_func(y.iloc[test], pred, sample_weight=sample_weight[test])
+            score = scoring(y.iloc[test], pred, sample_weight=sample_weight[test])
         ret_scores.append(score)
     return np.array(ret_scores)
