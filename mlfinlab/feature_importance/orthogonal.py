@@ -93,7 +93,7 @@ def feature_pca_analysis(feature_df, feature_importance, variance_thresh=0.95):
     all_eigen_values = []  # All eigen values in eigen vectors
     corr_dict = {'Pearson': [], 'Spearman': [], 'Kendall': []}  # Dictionary containing correlation metrics
     for vec in eigen_vec.columns:
-        all_eigen_values.extend(eigen_vec[vec].values * eigen_val[vec])
+        all_eigen_values.extend(abs(eigen_vec[vec].values * eigen_val[vec]))
 
     # We need to repeat importance array # of eigen vector times to generate correlation for all_eigen_values
     repeated_importance_array = np.tile(feature_importance['mean'].values, len(eigen_vec.columns))
