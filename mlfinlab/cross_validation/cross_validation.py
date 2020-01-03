@@ -121,14 +121,14 @@ def ml_cross_val_score(
     .. code-block:: python
 
         cv_gen = PurgedKFold(n_splits=n_splits, samples_info_sets=samples_info_sets, pct_embargo=pct_embargo)
-        scores_array = ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring='neg_log_loss')
+        scores_array = ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring=accuracy_score)
 
     :param classifier: A sk-learn Classifier object instance.
     :param X: The dataset of records to evaluate.
     :param y: The labels corresponding to the X dataset.
     :param cv_gen: Cross Validation generator object instance.
     :param sample_weight: A numpy array of weights for each record in the dataset.
-    :param scoring: A metric scoring, can be custom sklearn metric
+    :param scoring: A metric scoring, can be custom sklearn metric.
     :return: The computed score as a numpy array.
     """
 
