@@ -11,6 +11,7 @@ from mlfinlab.structural_breaks import get_chow_type_stat, get_sadf, get_chu_sti
 
 
 # pylint: disable=unsubscriptable-object
+from mlfinlab.structural_breaks.cusum import _get_values_diff
 from mlfinlab.structural_breaks.sadf import _get_betas
 
 
@@ -40,6 +41,18 @@ class TesStructuralBreaks(unittest.TestCase):
         self.assertAlmostEqual(stats.max(), 0.179, delta=1e-3)
         self.assertAlmostEqual(stats.mean(), -0.653, delta=1e-3)
         self.assertAlmostEqual(stats[3], -0.6649, delta=1e-3)
+
+    def test_chu_stinchcombe_value_diff_function(self):
+        """
+        Test the values diff hidden function.
+        """
+        # Test values diff function
+        one_sided_diff = _get_values_diff(test_type='one_sided', series=pd.Series([1, 2, 3, 4, 5]), index=0, ind=1)
+        two_sided_diff = _get_values_diff(test_type='two_sided', series=pd.Series([1, 2, 3, 4, 5]), index=0, ind=1)
+        self.assertEqual(-1, one_sided_diff)
+        self.assertEqual(1, two_sided_diff)
+        self.assertRaises(ValueError, _get_values_diff, test_type='rubbish',
+                          series=pd.Series([1, 2, 3, 4, 5]), index=0, ind=1)
 
     def test_chu_stinchcombe_white_test(self):
         """

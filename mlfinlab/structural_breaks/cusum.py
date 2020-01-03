@@ -7,6 +7,25 @@ import numpy as np
 from mlfinlab.util import mp_pandas_obj
 
 
+def _get_values_diff(test_type, series, index, ind):
+    """
+    Gets the difference between two values given a test type.
+    :param test_type: one_sided or two_sided
+    :param series: Series of values
+    :param index: primary index
+    :param ind: secondary index
+    :return: Difference between 2 values
+    """
+    if test_type == 'one_sided':
+        values_diff = series.loc[index] - series.loc[ind]
+    elif test_type == 'two_sided':
+        values_diff = abs(series.loc[index] - series.loc[ind])
+    else:
+        raise ValueError('Test type is unknown: can be either one_sided or two_sided')
+
+    return values_diff
+
+
 def _get_s_n_for_t(series: pd.Series, test_type: str, molecule: list) -> pd.Series:
     """
     Get maximum S_n_t value for each value from molecule for Chu-Stinchcombe-White test
@@ -30,13 +49,7 @@ def _get_s_n_for_t(series: pd.Series, test_type: str, molecule: list) -> pd.Seri
         # Indices difference for the last index would yield 0 -> division by zero warning,
         # no need to index last value iteration
         for ind in series_t.index[:-1]:
-            if test_type == 'one_sided':
-                values_diff = series.loc[index] - series.loc[ind]
-            elif test_type == 'two_sided':
-                values_diff = abs(series.loc[index] - series.loc[ind])
-            else:
-                raise ValueError('Test type is unknown: can be either one_sided or two_sided')
-
+            values_diff = _get_values_diff(test_type, series, index, ind)
             temp_integer_index = series_t.index.get_loc(ind)
             s_n_t = 1 / (sigma_sq_t * np.sqrt(integer_index - temp_integer_index)) * values_diff
             if s_n_t > max_s_n_value:
