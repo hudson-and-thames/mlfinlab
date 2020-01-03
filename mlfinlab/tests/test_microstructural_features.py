@@ -273,7 +273,6 @@ class TestMicrostructuralFeatures(unittest.TestCase):
         compressed_bars = get_volume_bars(self.trades_path, threshold=20, verbose=False)
         compressed_bars.set_index('date_time', inplace=True)
         compressed_bars.index = pd.to_datetime(compressed_bars.index)
-        bar_index = compressed_bars.index
 
         gen = MicrostructuralFeaturesGenerator(self.trades_path, compressed_bars.tick_num, volume_encoding=volume_mapping,
                                                pct_encoding=returns_mapping)
