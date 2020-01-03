@@ -36,7 +36,7 @@ class TestDataStructures(unittest.TestCase):
         db3 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
         ds.get_dollar_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
                            to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
+        db4 = pd.read_csv('test.csv', parse_dates=[0])
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -62,13 +62,12 @@ class TestDataStructures(unittest.TestCase):
         Tests the volume bars implementation.
         """
         threshold = 30
-
         db1 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
         db2 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
         db3 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
         ds.get_volume_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
                            to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
+        db4 = pd.read_csv('test.csv', parse_dates=[0])
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -100,7 +99,7 @@ class TestDataStructures(unittest.TestCase):
         db3 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
         ds.get_tick_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
                          to_csv=True, output_path='test.csv')
-        db4 = pd.read_csv('test.csv')
+        db4 = pd.read_csv('test.csv', parse_dates=[0])
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -120,6 +119,36 @@ class TestDataStructures(unittest.TestCase):
 
         # delete generated csv file (if it wasn't generated test would fail)
         os.remove('test.csv')
+
+    def test_df_as_input(self):
+        """
+        Tests that bars generated for csv file and Pandas Data Frame yield the same result
+        """
+        threshold = 100000
+        tick_data = pd.read_csv(self.path)
+        tick_data['Date and Time'] = pd.to_datetime(tick_data['Date and Time'])
+
+        db1 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
+        ds.get_dollar_bars(self.path, threshold=threshold, batch_size=50, verbose=False,
+                           to_csv=True, output_path='test.csv')
+        db2 = pd.read_csv('test.csv')
+        db2['date_time'] = pd.to_datetime(db2.date_time)
+        db3 = ds.get_dollar_bars(tick_data, threshold=threshold, batch_size=10, verbose=False)
+
+        # Assert diff batch sizes have same number of bars
+        self.assertTrue(db1.shape == db2.shape)
+        self.assertTrue(db1.shape == db3.shape)
+
+        # Assert same values
+        self.assertTrue(np.all(db1.values == db2.values))
+        self.assertTrue(np.all(db1.values == db3.values))
+
+    def test_wrong_input_value_error_raise(self):
+        """
+        Tests ValueError raise when neither pd.DataFrame nor path to csv file are passed to function call
+        """
+        with self.assertRaises(ValueError):
+            ds.get_dollar_bars(None, threshold=20, batch_size=1000, verbose=False)
 
     def test_csv_format(self):
         """
