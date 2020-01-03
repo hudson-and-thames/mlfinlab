@@ -41,7 +41,8 @@ def _get_s_n_for_t(series: pd.Series, test_type: str, molecule: list) -> pd.Seri
             s_n_t = 1 / (sigma_sq_t * np.sqrt(integer_index - temp_integer_index)) * values_diff
             if s_n_t > max_s_n_value:
                 max_s_n_value = s_n_t
-                max_s_n_critical_value = np.sqrt(4.6 + np.log(integer_index - temp_integer_index))
+                max_s_n_critical_value = np.sqrt(
+                    4.6 + np.log(integer_index - temp_integer_index))  # 4.6 is b_a estimate derived via Monte-Carlo
 
         s_n_t_series.loc[index, ['stat', 'critical_value']] = max_s_n_value, max_s_n_critical_value
     return s_n_t_series
