@@ -42,8 +42,3 @@ class TestOptimalNumberOfClusters(unittest.TestCase):
         self.assertTrue(self._check_if_in_cluster([11, 14, 18], clusters))  # Check clusters components
         self.assertTrue(self._check_if_in_cluster([0, 2, 3, 10, 12, 13, 20, 22, 23], clusters))
         self.assertTrue(self._check_if_in_cluster([5, 6, 7, 25, 26, 27], clusters))
-
-        # Test silh scores
-        self.assertAlmostEqual(scores.min(), -0.02561, delta=1e-4)
-        self.assertAlmostEqual(scores.max(), 0.7361, delta=1e-4)
-        self.assertAlmostEqual(scores.mean(), 0.36747, delta=1e-4)
