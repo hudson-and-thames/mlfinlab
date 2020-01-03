@@ -23,7 +23,7 @@ def get_clusters_quality_scores(clusters: dict, scores: np.array) -> dict:
 
 
 def _improve_clusters(corr_mat: pd.DataFrame, clusters: dict, top_clusters: dict) -> Union[
-        pd.DataFrame, dict, pd.Series] :
+        pd.DataFrame, dict, pd.Series]:
     """
     Improve number clusters using silh scores
     :param corr_mat: (pd.DataFrame) correlation matrix
