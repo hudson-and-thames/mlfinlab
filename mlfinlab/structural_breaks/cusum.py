@@ -25,7 +25,7 @@ def _get_s_n_for_t(series: pd.Series, test_type: str, molecule: list) -> pd.Seri
         sigma_sq_t = 1 / (integer_index - 1) * sum(squared_diff)
 
         max_s_n_value = -np.inf
-        max_s_n_critical_value = None  # Corresponds to c_aplha[n,t]
+        max_s_n_critical_value = None  # Corresponds to c_alpha[n,t]
 
         # Indices difference for the last index would yield 0 -> division by zero warning,
         # no need to index last value iteration

@@ -11,6 +11,8 @@ from mlfinlab.structural_breaks import get_chow_type_stat, get_sadf, get_chu_sti
 
 
 # pylint: disable=unsubscriptable-object
+from mlfinlab.structural_breaks.sadf import _get_betas
+
 
 class TesStructuralBreaks(unittest.TestCase):
     """
@@ -68,9 +70,9 @@ class TesStructuralBreaks(unittest.TestCase):
         self.assertAlmostEqual(two_sided_test.stat.mean(), 1264.582, delta=1e-3)
         self.assertAlmostEqual(two_sided_test.stat[20], 921.2979, delta=1e-3)
 
-        self.assertRaises(ValueError, get_chu_stinchcombe_white_statistics(log_prices, test_type='rubbish text'))
+        self.assertRaises(ValueError, get_chu_stinchcombe_white_statistics, log_prices, 'rubbish text')
 
-    def test_asdf_test(self):
+    def test_sadf_test(self):
         """
         Test get_sadf function
         """
@@ -119,10 +121,17 @@ class TesStructuralBreaks(unittest.TestCase):
         self.assertAlmostEqual(sm_exp_sadf.mean(), 17.632, delta=1e-3)
         self.assertAlmostEqual(sm_exp_sadf[29], -5.821, delta=1e-3)
 
-        # trivial series case
+        # Trivial series case.
         ones_series = pd.Series(index=log_prices.index, data=np.ones(shape=log_prices.shape[0]))
         trivial_sadf = get_sadf(ones_series, model='sm_power', add_const=True, min_length=min_length, lags=lags_int)
         self.assertTrue((trivial_sadf.unique() == [-np.inf]).all())  # All values should be -np.inf
 
-        self.assertRaises(np.linalg.LinAlgError,
-                          get_sadf(log_prices, model='cubic', add_const=True, min_length=min_length, lags=lags_int))
+        # Test rubbish model argument.
+        self.assertRaises(ValueError, get_sadf, series=log_prices, model='rubbish_string', add_const=True,
+                          min_length=min_length, lags=lags_int)
+
+        # Assert that nans are parsed if singular matrix
+        singular_matrix = np.array([[1, 0, 0], [-1, 3, 3], [1, 2, 2]])
+        b_mean, b_var = _get_betas(singular_matrix, singular_matrix)
+        self.assertTrue(b_mean, [np.nan])
+        self.assertTrue(b_var, [[np.nan, np.nan]])
