@@ -211,20 +211,20 @@ class TestMicrostructuralFeatures(unittest.TestCase):
 
         # Test None input ValureError raise
         with self.assertRaises(ValueError):
-            MicrostructuralFeaturesGenerator(None, bar_index, volume_encoding=volume_mapping,
+            MicrostructuralFeaturesGenerator(None, compressed_bars.tick_num, volume_encoding=volume_mapping,
                                              pct_encoding=returns_mapping)
 
-        gen = MicrostructuralFeaturesGenerator(self.trades_path, bar_index, volume_encoding=volume_mapping,
+        gen = MicrostructuralFeaturesGenerator(self.trades_path, compressed_bars.tick_num, volume_encoding=volume_mapping,
                                                pct_encoding=returns_mapping)
-        gen_no_entropy = MicrostructuralFeaturesGenerator(self.trades_path, bar_index, volume_encoding=None,
+        gen_no_entropy = MicrostructuralFeaturesGenerator(self.trades_path, compressed_bars.tick_num, volume_encoding=None,
                                                           pct_encoding=None)
-        gen_csv = MicrostructuralFeaturesGenerator(self.trades_path, bar_index, volume_encoding=volume_mapping,
+        gen_csv = MicrostructuralFeaturesGenerator(self.trades_path, compressed_bars.tick_num, volume_encoding=volume_mapping,
                                                    pct_encoding=returns_mapping)
-        gen_1 = MicrostructuralFeaturesGenerator(self.trades_path, bar_index, volume_encoding=volume_mapping,
+        gen_1 = MicrostructuralFeaturesGenerator(self.trades_path, compressed_bars.tick_num, volume_encoding=volume_mapping,
                                                  pct_encoding=returns_mapping, batch_size=1)
-        gen_20 = MicrostructuralFeaturesGenerator(self.trades_path, bar_index, volume_encoding=volume_mapping,
+        gen_20 = MicrostructuralFeaturesGenerator(self.trades_path, compressed_bars.tick_num, volume_encoding=volume_mapping,
                                                   pct_encoding=returns_mapping, batch_size=20)
-        gen_df = MicrostructuralFeaturesGenerator(df_trades, bar_index, volume_encoding=volume_mapping,
+        gen_df = MicrostructuralFeaturesGenerator(df_trades, compressed_bars.tick_num, volume_encoding=volume_mapping,
                                                   pct_encoding=returns_mapping, batch_size=20)
         features = gen.get_features(to_csv=False, verbose=False)
         features_1 = gen_1.get_features(to_csv=False, verbose=False)
@@ -275,7 +275,7 @@ class TestMicrostructuralFeatures(unittest.TestCase):
         compressed_bars.index = pd.to_datetime(compressed_bars.index)
         bar_index = compressed_bars.index
 
-        gen = MicrostructuralFeaturesGenerator(self.trades_path, bar_index, volume_encoding=volume_mapping,
+        gen = MicrostructuralFeaturesGenerator(self.trades_path, compressed_bars.tick_num, volume_encoding=volume_mapping,
                                                pct_encoding=returns_mapping)
 
         features = gen.get_features(to_csv=False, verbose=False)
@@ -283,56 +283,56 @@ class TestMicrostructuralFeatures(unittest.TestCase):
 
         # Check individual feature values
         # Avg tick size
-        self.assertAlmostEqual(features.avg_tick_size.max(), 7.5, delta=1e-1)
-        self.assertAlmostEqual(features.avg_tick_size.mean(), 3.4259, delta=1e-4)
-        self.assertAlmostEqual(features.avg_tick_size[3], 1.416, delta=1e-3)
+        self.assertAlmostEqual(features.avg_tick_size.max(), 8.0, delta=1e-1)
+        self.assertAlmostEqual(features.avg_tick_size.mean(), 3.1931, delta=1e-4)
+        self.assertAlmostEqual(features.avg_tick_size[3], 1.6153, delta=1e-3)
 
         # Tick rule sum
         self.assertAlmostEqual(features.tick_rule_sum.max(), 7.0, delta=1e-1)
-        self.assertAlmostEqual(features.tick_rule_sum.mean(), -3.8, delta=1e-4)
-        self.assertAlmostEqual(features.tick_rule_sum[3], -10, delta=1e-3)
+        self.assertAlmostEqual(features.tick_rule_sum.mean(), -3.4, delta=1e-4)
+        self.assertAlmostEqual(features.tick_rule_sum[3], -11.0, delta=1e-3)
 
         # VWAP
         self.assertAlmostEqual(features.vwap.max(), 1311.663, delta=1e-1)
-        self.assertAlmostEqual(features.vwap.mean(), 1305.139, delta=1e-4)
-        self.assertAlmostEqual(features.vwap[3], 1304.514, delta=1e-3)
+        self.assertAlmostEqual(features.vwap.mean(), 1304.94542, delta=1e-4)
+        self.assertAlmostEqual(features.vwap[3], 1304.5119, delta=1e-3)
 
         # Kyle lambda
-        self.assertAlmostEqual(features.kyle_lambda.max(), 63.775, delta=1e-1)
-        self.assertAlmostEqual(features.kyle_lambda.mean(), 9.72389, delta=1e-4)
-        self.assertAlmostEqual(features.kyle_lambda[3], 0.0106, delta=1e-3)
+        self.assertAlmostEqual(features.kyle_lambda.max(), 197.958, delta=1e-1)
+        self.assertAlmostEqual(features.kyle_lambda.mean(), 23.13859, delta=1e-4)
+        self.assertAlmostEqual(features.kyle_lambda[3], 0.007936, delta=1e-3)
 
         # Amihud lambda
-        self.assertAlmostEqual(features.amihud_lambda.max(), 2.723e-5, delta=1e-7)
-        self.assertAlmostEqual(features.amihud_lambda.mean(), 4.453e-6, delta=1e-8)
-        self.assertAlmostEqual(features.amihud_lambda[3], 6.25144e-9, delta=1e-11)
+        self.assertAlmostEqual(features.amihud_lambda.max(), 8.291e-5, delta=1e-7)
+        self.assertAlmostEqual(features.amihud_lambda.mean(), 1.001e-5, delta=1e-8)
+        self.assertAlmostEqual(features.amihud_lambda[3], 4.663786e-9, delta=1e-11)
 
         # Hasbrouck lambda
-        self.assertAlmostEqual(features.hasbrouck_lambda.max(), 0.0015506, delta=1e-5)
-        self.assertAlmostEqual(features.hasbrouck_lambda.mean(), 8.1187e-5, delta=1e-8)
-        self.assertAlmostEqual(features.hasbrouck_lambda[3], 2.99e-11, delta=1e-13)
+        self.assertAlmostEqual(features.hasbrouck_lambda.max(), 0.0025621, delta=1e-5)
+        self.assertAlmostEqual(features.hasbrouck_lambda.mean(), 0.00018253, delta=1e-5)
+        self.assertAlmostEqual(features.hasbrouck_lambda[3], 2.42e-11, delta=1e-13)
 
         # Tick rule entropy shannon
         self.assertAlmostEqual(features.tick_rule_entropy_shannon.max(), 1.52192, delta=1e-4)
-        self.assertAlmostEqual(features.tick_rule_entropy_shannon.mean(), 0.5235, delta=1e-4)
-        self.assertAlmostEqual(features.tick_rule_entropy_shannon[3], 0.41381, delta=1e-4)
+        self.assertAlmostEqual(features.tick_rule_entropy_shannon.mean(), 0.499, delta=1e-4)
+        self.assertAlmostEqual(features.tick_rule_entropy_shannon[3], 0.39124, delta=1e-4)
 
         # Volume entropy plug-in
-        self.assertAlmostEqual(features.volume_entropy_plug_in.max(), 1.9182, delta=1e-4)
-        self.assertAlmostEqual(features.volume_entropy_plug_in.mean(), 0.9018, delta=1e-5)
-        self.assertAlmostEqual(features.volume_entropy_plug_in[3], 0.4394, delta=1e-4)
+        self.assertAlmostEqual(features.volume_entropy_plug_in.max(), 1.92192, delta=1e-4)
+        self.assertAlmostEqual(features.volume_entropy_plug_in.mean(), 1.052201, delta=1e-5)
+        self.assertAlmostEqual(features.volume_entropy_plug_in[3], 0.41381, delta=1e-4)
 
         # Volume entropy Lempel-Ziv
         self.assertAlmostEqual(features.volume_entropy_lempel_ziv.max(), 1.0, delta=1e-4)
-        self.assertAlmostEqual(features.volume_entropy_lempel_ziv.mean(), 0.6321, delta=1e-4)
-        self.assertAlmostEqual(features.volume_entropy_lempel_ziv[3], 0.4166, delta=1e-4)
+        self.assertAlmostEqual(features.volume_entropy_lempel_ziv.mean(), 0.5904612, delta=1e-4)
+        self.assertAlmostEqual(features.volume_entropy_lempel_ziv[3], 0.46153, delta=1e-4)
 
         # Pct entropy Lempel-Ziv
         self.assertAlmostEqual(features.pct_entropy_lempel_ziv.max(), 0.8, delta=1e-4)
-        self.assertAlmostEqual(features.pct_entropy_lempel_ziv.mean(), 0.541649, delta=1e-5)
-        self.assertAlmostEqual(features.pct_entropy_lempel_ziv[3], 0.5, delta=1e-5)
+        self.assertAlmostEqual(features.pct_entropy_lempel_ziv.mean(), 0.56194, delta=1e-5)
+        self.assertAlmostEqual(features.pct_entropy_lempel_ziv[3], 0.46153, delta=1e-5)
 
         # Pct entropy Konto
         self.assertAlmostEqual(features.pct_entropy_konto.max(), 1.361, delta=1e-4)
-        self.assertAlmostEqual(features.pct_entropy_konto.mean(), 0.88915, delta=1e-5)
+        self.assertAlmostEqual(features.pct_entropy_konto.mean(), 0.83039791, delta=1e-5)
         self.assertAlmostEqual(features.pct_entropy_konto[3], 1.067022, delta=1e-5)
