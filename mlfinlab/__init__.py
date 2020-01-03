@@ -14,3 +14,4 @@ import mlfinlab.bet_sizing as bet_sizing
 import mlfinlab.util as util
 import mlfinlab.feature_importance as feature_importance
 import mlfinlab.ensemble as ensemble
+import mlfinlab.portfolio_optimization as portfolio_optimization
