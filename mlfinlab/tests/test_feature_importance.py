@@ -12,7 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score, accuracy_score
 
-from mlfinlab.util.utils import get_daily_vol
+from mlfinlab.util.volatility import get_daily_vol
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier, get_bins
 from mlfinlab.sampling.bootstrapping import get_ind_mat_label_uniqueness, get_ind_matrix
