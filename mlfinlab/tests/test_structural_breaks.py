@@ -68,8 +68,7 @@ class TesStructuralBreaks(unittest.TestCase):
         self.assertAlmostEqual(two_sided_test.stat.mean(), 1264.582, delta=1e-3)
         self.assertAlmostEqual(two_sided_test.stat[20], 921.2979, delta=1e-3)
 
-        with self.assertRaises(ValueError):
-            one_sided_test += get_chu_stinchcombe_white_statistics(log_prices, test_type='abs')
+        self.assertRaises(ValueError, get_chu_stinchcombe_white_statistics(log_prices, test_type='rubbish text'))
 
     def test_asdf_test(self):
         """
@@ -125,5 +124,5 @@ class TesStructuralBreaks(unittest.TestCase):
         trivial_sadf = get_sadf(ones_series, model='sm_power', add_const=True, min_length=min_length, lags=lags_int)
         self.assertTrue((trivial_sadf.unique() == [-np.inf]).all())  # All values should be -np.inf
 
-        with self.assertRaises(ValueError):
-            linear_sadf += get_sadf(log_prices, model='cubic', add_const=True, min_length=min_length, lags=lags_int)
+        self.assertRaises(np.linalg.LinAlgError,
+                          get_sadf(log_prices, model='cubic', add_const=True, min_length=min_length, lags=lags_int))
