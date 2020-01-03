@@ -10,7 +10,7 @@ import pandas as pd
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier
 from mlfinlab.sample_weights.attribution import get_weights_by_return, get_weights_by_time_decay
-from mlfinlab.util.utils import get_daily_vol
+from mlfinlab.util.volatility import get_daily_vol
 
 
 class TestSampling(unittest.TestCase):
