@@ -123,7 +123,9 @@ Implementations
    implementations/feature_importance
    implementations/bet_sizing
    implementations/portfolio_optimisation
+   implementations/structural_breaks
    implementations/microstructural_features
+
 
 
 * :doc:`implementations/data_structures`
@@ -136,6 +138,7 @@ Implementations
 * :doc:`implementations/feature_importance`
 * :doc:`implementations/bet_sizing`
 * :doc:`implementations/portfolio_optimisation`
+* :doc:`implementations/structural_breaks`
 * :doc:`implementations/microstructural_features`
 
 Additional Information

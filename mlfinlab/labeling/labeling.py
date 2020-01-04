@@ -274,7 +274,7 @@ def drop_labels(events, min_pct=.05):
         if df0.min() > min_pct or df0.shape[0] < 3:
             break
 
-        print('dropped label: ', df0.argmin(), df0.min())
-        events = events[events['bin'] != df0.argmin()]
+        print('dropped label: ', df0.idxmin(), df0.min())
+        events = events[events['bin'] != df0.idxmin()]
 
     return events
