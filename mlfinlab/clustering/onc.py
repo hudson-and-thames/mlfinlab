@@ -11,17 +11,6 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_samples
 
 
-def get_clusters_quality_scores(clusters: dict, scores: np.array) -> dict:
-    """
-    Calculates clusters quality scores
-
-    :param clusters: (dict) clusters elements
-    :param scores: (np.array) scores for each element of cluster
-    :return: (dict) Cluster quality scores
-    """
-    return {i: np.mean(scores[clusters[i]]) / np.std(scores[clusters[i]]) for i in clusters.keys()}
-
-
 def _improve_clusters(corr_mat: pd.DataFrame, clusters: dict, top_clusters: dict) -> Union[
         pd.DataFrame, dict, pd.Series]:
     """
