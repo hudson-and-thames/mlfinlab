@@ -85,14 +85,25 @@ def _cluster_kmeans_base(corr_mat: pd.DataFrame, max_num_clusters: int = 10, rep
     return corr1, clusters, silh
 
 
-def cluster_kmeans_top(corr_mat: pd.DataFrame, repeat: int = 10) -> Union[pd.DataFrame, dict, pd.Series]:
+def _check_redo_condition(new_tstat_mean: float, mean_redo_tstat: float) -> bool:
+    """
+    Checks cluster improvement condition based on t-statistic.
+    :param new_tstat_mean: (float) t-statistics
+    :param mean_redo_tstat: (float) average t-statistcs for cluster improvement
+    :return: (bool) flag
+    """
+
+    return new_tstat_mean > mean_redo_tstat
+
+
+def cluster_kmeans_top(corr_mat: pd.DataFrame, repeat: int = 10) -> Union[pd.DataFrame, dict, pd.Series, bool]:
     """
     Improve the initial clustering by leaving clusters with high scores unchanged and modifying clusters with
     below average scores.
 
     :param corr_mat: (pd.DataFrame) correlation matrix
     :param repeat: number of clustering algorithm repetitions.
-    :return: 3 tuple (correlation matrix, optimized clusters, silh scores)
+    :return: tuple of 4 elements(correlation matrix, optimized clusters, silh scores, boolean to rerun ONC)
     """
     # pylint: disable=no-else-return
 
@@ -106,7 +117,7 @@ def cluster_kmeans_top(corr_mat: pd.DataFrame, repeat: int = 10) -> Union[pd.Dat
 
     if len(redo_clusters) <= 2:
         # If 2 or less clusters have a quality rating less than the average then stop.
-        return corr1, clusters, silh
+        return corr1, clusters, silh, False
     else:
         keys_redo = []
         for i in redo_clusters:
@@ -114,7 +125,7 @@ def cluster_kmeans_top(corr_mat: pd.DataFrame, repeat: int = 10) -> Union[pd.Dat
 
         corr_tmp = corr_mat.loc[keys_redo, keys_redo]
         mean_redo_tstat = np.mean([cluster_quality[i] for i in redo_clusters])
-        _, top_clusters, _ = cluster_kmeans_top(corr_tmp, repeat=repeat)
+        _, top_clusters, _, _ = cluster_kmeans_top(corr_tmp, repeat=repeat)
 
         # Make new clusters (improved)
         corr_new, clusters_new, silh_new = _improve_clusters(corr_mat,
@@ -124,10 +135,12 @@ def cluster_kmeans_top(corr_mat: pd.DataFrame, repeat: int = 10) -> Union[pd.Dat
         new_tstat_mean = np.mean(
             [np.mean(silh_new[clusters_new[i]]) / np.std(silh_new[clusters_new[i]]) for i in clusters_new])
 
-        if new_tstat_mean <= mean_redo_tstat:
-            return corr1, clusters, silh, cluster_quality
+        redo_flag = _check_redo_condition(new_tstat_mean, mean_redo_tstat)
+
+        if redo_flag is True:
+            return corr_new, clusters_new, silh_new, redo_flag
         else:
-            return corr_new, clusters_new, silh_new
+            return corr1, clusters, silh, redo_flag
 
 
 def get_onc_clusters(corr_mat: pd.DataFrame, repeat: int = 10) -> Union[pd.DataFrame, dict, pd.Series]:

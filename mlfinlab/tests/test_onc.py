@@ -7,6 +7,7 @@ import pandas as pd
 from sklearn.datasets import load_breast_cancer
 
 from mlfinlab.clustering import get_onc_clusters
+from mlfinlab.clustering.onc import _check_redo_condition
 
 
 class TestOptimalNumberOfClusters(unittest.TestCase):
@@ -37,8 +38,14 @@ class TestOptimalNumberOfClusters(unittest.TestCase):
         Test get_onc_clusters function on Breast Cancer data set from sklearn
         """
 
-        _, clusters, _ = get_onc_clusters(pd.DataFrame(self.data).corr(), repeat=50)
+        _, clusters, _, _ = get_onc_clusters(pd.DataFrame(self.data).corr(), repeat=50)
         self.assertGreaterEqual(len(clusters.keys()), 5)  # Optimal number of clusters
         self.assertTrue(self._check_if_in_cluster([11, 14, 18], clusters))  # Check clusters components
         self.assertTrue(self._check_if_in_cluster([0, 2, 3, 10, 12, 13, 20, 22, 23], clusters))
         self.assertTrue(self._check_if_in_cluster([5, 6, 7, 25, 26, 27], clusters))
+
+    def test_check_redo_condition(self):
+        """
+        Function to test redo condition helper function
+        """
+        self.assertFalse(_check_redo_condition(2, 3))
