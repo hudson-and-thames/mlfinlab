@@ -1,5 +1,7 @@
 """
 Optimal Number of Clusters (ONC Algorithm)
+Detection of False Investment Strategies using Unsupervised Learning Methods
+https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3167017
 """
 
 from typing import Union
