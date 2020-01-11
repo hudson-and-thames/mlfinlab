@@ -125,6 +125,7 @@ Implementations
    implementations/portfolio_optimisation
    implementations/structural_breaks
    implementations/microstructural_features
+   implementations/clustering
 
 
 
@@ -140,6 +141,7 @@ Implementations
 * :doc:`implementations/portfolio_optimisation`
 * :doc:`implementations/structural_breaks`
 * :doc:`implementations/microstructural_features`
+* :doc:`implementations/clustering`
 
 Additional Information
 ======================
