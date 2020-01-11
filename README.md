@@ -30,7 +30,7 @@ A special thank you to our sponsors! It is because of your contributions that we
 * [Machine Factor Technologies](https://www.linkedin.com/in/proskurinolexandr/)
 
 ### Gold Sponsors:
-* [Dr. Ernest P. Chan](https://www.linkedin.com/in/epchan/)
+* [Dr. Ernest P. Chan](https://www.epchan.com/)
 
 ### Supporter Sponsors:
 * [John B. Keown](https://www.linkedin.com/in/john-keown-quantitative-finance-big-data-ml/)
