@@ -123,7 +123,7 @@ On your local machine open the terminal and cd into the working dir.
 * Done Chapter 19: Microstructural Features
 
 **Additional**
-* Done Optimal Number of Clusters (ONC) Algorithm
+* Done Optimal Number of Clusters (ONC) Algorithm.
 
 ---
 
