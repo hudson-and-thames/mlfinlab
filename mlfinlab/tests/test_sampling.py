@@ -2,18 +2,14 @@
 Test various functions regarding chapter 4: Sampling (Bootstrapping, Concurrency).
 """
 
-import os
 import unittest
 
 import numpy as np
 import pandas as pd
 
-from mlfinlab.filters.filters import cusum_filter
-from mlfinlab.labeling.labeling import get_events, add_vertical_barrier
 from mlfinlab.sampling.bootstrapping import seq_bootstrap, get_ind_matrix, get_ind_mat_average_uniqueness, \
     _bootstrap_loop_run, get_ind_mat_label_uniqueness  # pylint: disable=protected-access
 from mlfinlab.sampling.concurrent import get_av_uniqueness_from_triple_barrier, num_concurrent_events
-from mlfinlab.util.utils import get_daily_vol
 
 
 def book_ind_mat_implementation(bar_index, label_endtime):
@@ -25,6 +21,7 @@ def book_ind_mat_implementation(bar_index, label_endtime):
         ind_mat.loc[start:end, i] = 1.
     return ind_mat
 
+
 class TestSampling(unittest.TestCase):
     """
     Test Triple barrier, meta-labeling, dropping rare labels, and daily volatility.
@@ -32,85 +29,68 @@ class TestSampling(unittest.TestCase):
 
     def setUp(self):
         """
-        Set the file path for the sample dollar bars data and get triple barrier events
+        Set samples_info_sets (t1), price bars
         """
-        project_path = os.path.dirname(__file__)
-        self.path = project_path + '/test_data/dollar_bar_sample.csv'
-        self.data = pd.read_csv(self.path, index_col='date_time')
-        self.data.index = pd.to_datetime(self.data.index)
-
-        daily_vol = get_daily_vol(close=self.data['close'], lookback=100)
-        cusum_events = cusum_filter(self.data['close'], threshold=0.02)
-        vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'],
-                                                 num_days=2)
-
-        self.data['side'] = 1
-        self.meta_labeled_events = get_events(close=self.data['close'],
-                                              t_events=cusum_events,
-                                              pt_sl=[4, 4],
-                                              target=daily_vol,
-                                              min_ret=0.005,
-                                              num_threads=3,
-                                              vertical_barrier_times=vertical_barriers,
-                                              side_prediction=self.data['side'])
+        self.price_bars = pd.Series(index=pd.date_range(start="1/1/2018", end='1/8/2018', freq='H'))
+        self.samples_info_sets = pd.DataFrame(index=self.price_bars.index[[1, 2, 5, 7, 10, 11, 12, 20]])
+        self.samples_info_sets['t1'] = self.samples_info_sets.index + pd.Timedelta('2H')
 
     def test_num_concurrent_events(self):
         """
         Assert that number of concurent events have are available for all labels and equal to particular values
         """
 
-        num_conc_events = num_concurrent_events(self.data['close'].index, self.meta_labeled_events['t1'],
-                                                self.meta_labeled_events.index)
+        num_conc_events = num_concurrent_events(self.price_bars.index, self.samples_info_sets['t1'],
+                                                self.samples_info_sets.index)
         # Assert for each label we have concurrency value
-        self.assertTrue(num_conc_events[self.meta_labeled_events.index].shape[0] == self.meta_labeled_events.shape[0])
-        self.assertTrue(num_conc_events.value_counts()[0] == 186)
-        self.assertTrue(num_conc_events.value_counts()[1] == 505)
-        self.assertTrue(num_conc_events.value_counts()[2] == 92)
+        self.assertTrue(num_conc_events[self.samples_info_sets.index].shape[0] == self.samples_info_sets.shape[0])
+        self.assertTrue(num_conc_events.value_counts()[0] == 5)  # Hours between 14 and 20 label
+        self.assertTrue(num_conc_events.value_counts()[1] == 11)
+        self.assertTrue(num_conc_events.value_counts()[2] == 5)
+        self.assertTrue(num_conc_events.value_counts()[3] == 1)  # Label # 10
 
     def test_get_av_uniqueness(self):
         """
         Assert that average event uniqueness is available for all labels and equals to particular values
         """
 
-        av_un = get_av_uniqueness_from_triple_barrier(self.meta_labeled_events, self.data['close'], num_threads=4)
+        av_un = get_av_uniqueness_from_triple_barrier(self.samples_info_sets, self.price_bars, num_threads=4)
         # Assert for each label we have uniqueness value
-        self.assertTrue(av_un.shape[0] == self.meta_labeled_events.shape[0])
-        self.assertTrue(av_un['tW'].iloc[0] == 1)
-        self.assertTrue(av_un['tW'].iloc[4] == 0.5)
-        self.assertTrue(av_un['tW'].iloc[6] == 0.85)
-        self.assertTrue(bool(pd.isnull(av_un['tW'].iloc[-1])) is True)
+        self.assertTrue(av_un.shape[0] == self.samples_info_sets.shape[0])
+        self.assertAlmostEqual(av_un['tW'].iloc[0], 0.66, delta=1e-2)
+        self.assertAlmostEqual(av_un['tW'].iloc[2], 0.83, delta=1e-2)
+        self.assertAlmostEqual(av_un['tW'].iloc[5], 0.44, delta=1e-2)
+        self.assertAlmostEqual(av_un['tW'].iloc[-1], 1.0, delta=1e-2)
 
     def test_seq_bootstrap(self):
         """
         Test sequential bootstrapping length, indicator matrix length and NaN checks
         """
 
-        non_nan_meta_labels = self.meta_labeled_events.dropna()
-        ind_mat = get_ind_matrix(non_nan_meta_labels.t1, self.data)
+        ind_mat = get_ind_matrix(self.samples_info_sets.t1, self.price_bars)
 
-        label_endtime = non_nan_meta_labels.t1
-        trimmed_price_bars_index = self.data[(self.data.index >= non_nan_meta_labels.index.min()) &
-                                             (self.data.index <= non_nan_meta_labels.t1.max())].index
-        bar_index = list(non_nan_meta_labels.index)  # Generate index for indicator matrix from t1 and index
-        bar_index.extend(non_nan_meta_labels.t1)
+        label_endtime = self.samples_info_sets.t1
+        trimmed_price_bars_index = self.price_bars[(self.price_bars.index >= self.samples_info_sets.index.min()) &
+                                                   (self.price_bars.index <= self.samples_info_sets.t1.max())].index
+        bar_index = list(self.samples_info_sets.index)  # Generate index for indicator matrix from t1 and index
+        bar_index.extend(self.samples_info_sets.t1)
         bar_index.extend(trimmed_price_bars_index)
         bar_index = sorted(list(set(bar_index)))  # Drop duplicates and sort
         ind_mat_book_implementation = book_ind_mat_implementation(bar_index, label_endtime)
 
         self.assertTrue(bool((ind_mat_book_implementation.values == ind_mat).all()) is True)
         # Indicator matrix shape should be (unique(meta_label_index+t1+price_bars_index), t1)
-        self.assertTrue(ind_mat.shape == (782, 7))
+        self.assertTrue(ind_mat.shape == (22, 8))
 
         # Check indicator matrix values for specific labels
-        self.assertTrue(bool((ind_mat[:100, 0] == np.ones(100)).all()) is True)
-        self.assertTrue(bool((ind_mat[191:340, 2] == np.ones(149)).all()) is True)
-        self.assertTrue(bool((ind_mat[341:420, 2] == np.zeros(79)).all()) is True)
-        self.assertTrue(bool((ind_mat[406:412, 4] == np.ones(6)).all()) is True)
-        self.assertTrue(bool((ind_mat[662:, 6] == np.ones(120)).all()) is True)
+        self.assertTrue(bool((ind_mat[:3, 0] == np.ones(3)).all()) is True)
+        self.assertTrue(bool((ind_mat[1:4, 1] == np.ones(3)).all()) is True)
+        self.assertTrue(bool((ind_mat[4:7, 2] == np.ones(3)).all()) is True)
+        self.assertTrue(bool((ind_mat[14:, 6] == np.zeros(8)).all()) is True)
 
         bootstrapped_samples = seq_bootstrap(ind_mat, compare=False, verbose=True, warmup_samples=None)
         bootstrapped_samples_1000 = seq_bootstrap(ind_mat, compare=True, sample_length=100)
-        self.assertTrue(len(bootstrapped_samples) == non_nan_meta_labels.shape[0])
+        self.assertTrue(len(bootstrapped_samples) == self.samples_info_sets.shape[0])
         self.assertTrue(len(bootstrapped_samples_1000) == 100)
 
         # Test sequential bootstrapping on example from a book
@@ -199,6 +179,7 @@ class TestSampling(unittest.TestCase):
         """
         Test seq_bootstrap and ind_matrix functions for raising ValueError on nan values
         """
-
+        nan_samples_info_sets = self.samples_info_sets.copy()
+        nan_samples_info_sets.loc[pd.Timestamp(2019, 1, 1), 't1'] = None
         with self.assertRaises(ValueError):
-            get_ind_matrix(self.meta_labeled_events.t1, self.data)
+            get_ind_matrix(nan_samples_info_sets.t1, self.price_bars)
