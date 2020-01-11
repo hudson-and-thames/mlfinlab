@@ -100,29 +100,30 @@ On your local machine open the terminal and cd into the working dir.
 ---
 ## Progress
 
-* Done Optimal Number of Clusters (ONC) Algorithm
-
-**Part 4: Useful Financial Features**
-* Done Chapter 19: Microstructural Features
-* Done Chapter 18: Entropy Features
-* Done Chapter 17: Structural Breaks
-
-**Part 3: Backtesting**
-* Done Chapter 16: Asset Allocation
-* Done Chapter 10: Bet Sizing
-
-**Part 2: Modelling**
-* Done Chapter 8: Feature Importance
-* Done Chapter 7: Cross-Validation
-* Done Chapter 6: Ensemble Methods (Sequential Bootstrap Ensemble)
-
 **Part 1: Data Analysis**
-* Done Chapter 5: Fractional Differentiation
-* Done Chapter 4: Sample Weights
-* Done Chapter 3: Labeling
-* Done Chapter 2: Data Structures
 * Purchased high quality raw tick data.
 * Email us if you would like a sample of the standard bars.
+* Done Chapter 2: Data Structures
+* Done Chapter 3: Labeling
+* Done Chapter 4: Sample Weights
+* Done Chapter 5: Fractional Differentiation
+
+**Part 2: Modelling**
+* Done Chapter 6: Ensemble Methods (Sequential Bootstrap Ensemble)
+* Done Chapter 7: Cross-Validation
+* Done Chapter 8: Feature Importance
+
+**Part 3: Backtesting**
+* Done Chapter 10: Bet Sizing
+* Done Chapter 16: Asset Allocation
+
+**Part 4: Useful Financial Features**
+* Done Chapter 17: Structural Breaks
+* Done Chapter 18: Entropy Features
+* Done Chapter 19: Microstructural Features
+
+**Additional**
+* Done Optimal Number of Clusters (ONC) Algorithm
 
 ---
 
