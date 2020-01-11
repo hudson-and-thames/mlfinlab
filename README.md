@@ -19,6 +19,23 @@ Advances in Financial Machine Learning. This implementation started out as a spr
 
 The following is the online documentation for the package: [read-the-docs](https://mlfinlab.readthedocs.io/en/latest/#).
 
+## Sponsors and Donating
+<div align="center">
+  <img src="https://c10.patreonusercontent.com/3/eyJ3Ijo0MDB9/patreon-media/p/reward/4147409/f7efccf1978a48539c89d391b043d59a/1.jpeg?token-time=2145916800&token-hash=zeFaJkV-h3kfjYB7WpLI-vjMS3etSmJE_nalor8GzWc%3D" height="200"><br>
+</div>
+A special thank you to our sponsors! It is beacuase of your contributions that we are able to continue the development of academic research for open source. If you would like to become a sponsor and help support our research, please sign up on [Patreon](https://www.patreon.com/HudsonThames). 
+
+### Platinum Sponsor:
+* [Machine Factor Technologies](https://www.linkedin.com/in/proskurinolexandr/)
+
+### Gold Sponsors:
+* [Dr. Ernest P. Chan](https://www.linkedin.com/in/epchan/)
+
+### Supporter Sponsors:
+* [John B. Keown](https://www.linkedin.com/in/john-keown-quantitative-finance-big-data-ml/)
+* [Roberto Spadim](https://www.linkedin.com/in/roberto-spadim/)
+* [Zack Gow](https://www.linkedin.com/in/zackgow/)
+
 ## Barriers to Entry
 As most of you know, getting through the first 3 chapters of the book is challenging as it relies on HFT data to 
 create the new financial data structures. Sourcing the HFT data is very difficult and thus we have resorted to purchasing the full history of S&P500 Emini futures tick data from [TickData LLC](https://www.tickdata.com/).
