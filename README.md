@@ -21,9 +21,9 @@ The following is the online documentation for the package: [read-the-docs](https
 
 ## Sponsors and Donating
 <div align="center">
-  <img src="https://c10.patreonusercontent.com/3/eyJ3Ijo0MDB9/patreon-media/p/reward/4147409/f7efccf1978a48539c89d391b043d59a/1.jpeg?token-time=2145916800&token-hash=zeFaJkV-h3kfjYB7WpLI-vjMS3etSmJE_nalor8GzWc%3D" height="200"><br>
+  <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/.github/logo/support.png" height="300"><br>
 </div>
-A special thank you to our sponsors! It is beacuase of your contributions that we are able to continue the development of academic research for open source. If you would like to become a sponsor and help support our research, please sign up on [Patreon](https://www.patreon.com/HudsonThames). 
+A special thank you to our sponsors! It is beacuase of your contributions that we are able to continue the development of academic research for open source. If you would like to become a sponsor and help support our research, please sign up on Patreon
 
 ### Platinum Sponsor:
 * [Machine Factor Technologies](https://www.linkedin.com/in/proskurinolexandr/)
