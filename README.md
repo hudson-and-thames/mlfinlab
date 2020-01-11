@@ -41,10 +41,12 @@ You should be able to work on a few implementations of the code with this set.
 
 ## Progress
 
+* Done Optimal Number of Clusters (ONC) Algorithm
+
 **Part 4: Useful Financial Features**
-* Working on Chapter 19: Microstructural Features (Alex Proskurin)
-* Working on Chapter 18: Entropy Features (Alex Proskurin)
-* Working on Chapter 17: Structural Breaks (Alex Proskurin)
+* Done Chapter 19: Microstructural Features
+* Done Chapter 18: Entropy Features
+* Done Chapter 17: Structural Breaks
 
 **Part 3: Backtesting**
 * Done Chapter 16: Asset Allocation
@@ -104,12 +106,6 @@ On your local machine open the terminal and cd into the working dir.
 ## Built With
 * [Github](https://github.com/hudson-and-thames/mlfinlab) - Development platform and repo
 * [Travis-CI](https://www.travis-ci.com) - Continuous integration, test and deploy
-
-## Authors
-
-* **Ashutosh Singh** - [LinkedIn](https://www.linkedin.com/in/ashusinghpenn/)
-* **Jacques Joubert** - [LinkedIn](https://www.linkedin.com/in/jacquesjoubert/)
-* **Oleksandr Proskurin** - [LinkedIn](https://www.linkedin.com/in/proskurinolexandr/)
 
 
 ## Additional Research Repo
