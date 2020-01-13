@@ -5,9 +5,9 @@
 
 |
 
-================================================
+************************************************
 Machine Learning Financial Laboratory (mlfinlab)
-================================================
+************************************************
 
 
 	|Build Status| |codecov| |pylint Score| |License: BSD3|
@@ -39,49 +39,38 @@ Advances in Financial Machine Learning. This implementation started out as a spr
 
 .. _Masters in Financial Engineering programme at WorldQuant University: https://wqu.org/
 
+Sponsors and Donating
+#####################
+.. image:: logo/support.png
+   :scale: 100 %
+   :align: center
 
-Notes
-=====
+A special thank you to our sponsors! It is because of your contributions that we are able to continue the development of academic research for open source. If you would like to become a sponsor and help support our research, please sign up on `Patreon`_.
 
-mlfinlab is a living, breathing project, and new functionalities are consistently being added.
+.. _Patreon: https://www.patreon.com/HudsonThames
 
-The implementations that will be added in the future as well as the implementations that are currently supported can be seen below:
+Platinum Sponsor:
+*****************
+* `Machine Factor Technologies`_
 
-* **Part 4: Useful Financial Features**
-* Working on Chapter 19: Microstructural Features (Maksim)
+Gold Sponsors:
+**************
+* `Dr. Ernest P. Chan`_
 
-.. raw:: latex
+Supporter Sponsors:
+*******************
+* `John B. Keown`_
+* `Roberto Spadim`_
+* `Zack Gow`_
 
-    \vspace{5mm}
-
-* **Part 3: Backtesting**
-* Done Chapter 16: ML Asset Allocation
-* Done Chapter 10: Bet Sizing
-
-.. raw:: latex
-
-    \vspace{5mm}
-
-* **Part 2: Modelling**
-* Done Chapter 8: Feature Importance
-* Done Chapter 7: Cross-Validation
-* Done Chapter 6: Ensemble Methods
-* Done Sequential Bootstrap Ensemble
-
-.. raw:: latex
-
-    \vspace{5mm}
-
-* **Part 1: Data Analysis**
-* Done Chapter 5: Fractionally Differentiated Features
-* Done Chapter 4: Sample Weights
-* Done Chapter 3: Labeling
-* Done Chapter 2: Data Structures
-* Purchased high quality raw tick data.
-* Email us if you would like a sample of the standard bars.
+.. _`Machine Factor Technologies`: https://www.linkedin.com/in/proskurinolexandr/
+.. _`Dr. Ernest P. Chan`: https://www.epchan.com/
+.. _`John B. Keown`: https://www.linkedin.com/in/john-keown-quantitative-finance-big-data-ml/
+.. _`Roberto Spadim`: https://www.linkedin.com/in/roberto-spadim/
+.. _`Zack Gow`: https://www.linkedin.com/in/zackgow/
 
 Built With
-==========
+##########
 
 * `Github`_ - Development platform and repo
 * `Travis CI`_ - Continuous integration, test and deploy
@@ -90,7 +79,7 @@ Built With
 .. _Travis CI: https://www.travis-ci.com
 
 Getting Started
-===============
+###############
 
 .. toctree::
    :caption: Getting Started
@@ -107,7 +96,7 @@ Getting Started
 * :doc:`getting_started/requirements`
 
 Implementations
-===============
+###############
 
 .. toctree::
    :caption: Implementations
@@ -123,6 +112,10 @@ Implementations
    implementations/feature_importance
    implementations/bet_sizing
    implementations/portfolio_optimisation
+   implementations/structural_breaks
+   implementations/microstructural_features
+   implementations/clustering
+
 
 
 * :doc:`implementations/data_structures`
@@ -135,10 +128,12 @@ Implementations
 * :doc:`implementations/feature_importance`
 * :doc:`implementations/bet_sizing`
 * :doc:`implementations/portfolio_optimisation`
+* :doc:`implementations/structural_breaks`
+* :doc:`implementations/microstructural_features`
+* :doc:`implementations/clustering`
 
 Additional Information
-======================
-
+######################
 .. toctree::
    :caption: Additional Information
    :hidden:

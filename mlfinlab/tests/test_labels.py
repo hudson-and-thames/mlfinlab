@@ -10,7 +10,7 @@ import pandas as pd
 
 from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import add_vertical_barrier, get_events, get_bins, drop_labels
-from mlfinlab.util.utils import get_daily_vol
+from mlfinlab.util.volatility import get_daily_vol
 
 
 class TestChapter3(unittest.TestCase):
@@ -40,6 +40,11 @@ class TestChapter3(unittest.TestCase):
 
         # Size matches
         self.assertTrue(daily_vol.shape[0] == 960)
+
+        # test localized datetimes
+        self.data.index = self.data.index.tz_localize(tz='UTC')
+        daily_vol_tz = get_daily_vol(close=self.data['close'], lookback=100)
+        self.assertTrue((daily_vol.dropna().values == daily_vol_tz.dropna().values).all())
 
     def test_vertical_barriers(self):
         """
@@ -86,6 +91,9 @@ class TestChapter3(unittest.TestCase):
         Assert that the different version of triple barrier labeling match our expected output.
         Assert that trgts are the same for all 3 methods.
         """
+
+        # Test how labelling works with tz-aware timestamp
+        self.data.index = self.data.index.tz_localize(tz='US/Eastern')
         daily_vol = get_daily_vol(close=self.data['close'], lookback=100)
         cusum_events = cusum_filter(self.data['close'], threshold=0.02)
         vertical_barriers = add_vertical_barrier(t_events=cusum_events, close=self.data['close'], num_days=1)

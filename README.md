@@ -19,6 +19,24 @@ Advances in Financial Machine Learning. This implementation started out as a spr
 
 The following is the online documentation for the package: [read-the-docs](https://mlfinlab.readthedocs.io/en/latest/#).
 
+## Sponsors and Donating
+<div align="center">
+  <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/.github/logo/support.png" height="300"><br>
+</div>
+
+A special thank you to our sponsors! It is because of your contributions that we are able to continue the development of academic research for open source. If you would like to become a sponsor and help support our research, please sign up on [Patreon](https://www.patreon.com/HudsonThames).
+
+### Platinum Sponsor:
+* [Machine Factor Technologies](https://www.linkedin.com/in/proskurinolexandr/)
+
+### Gold Sponsors:
+* [Dr. Ernest P. Chan](https://www.epchan.com/)
+
+### Supporter Sponsors:
+* [John B. Keown](https://www.linkedin.com/in/john-keown-quantitative-finance-big-data-ml/)
+* [Roberto Spadim](https://www.linkedin.com/in/roberto-spadim/)
+* [Zack Gow](https://www.linkedin.com/in/zackgow/)
+
 ## Barriers to Entry
 As most of you know, getting through the first 3 chapters of the book is challenging as it relies on HFT data to 
 create the new financial data structures. Sourcing the HFT data is very difficult and thus we have resorted to purchasing the full history of S&P500 Emini futures tick data from [TickData LLC](https://www.tickdata.com/).
@@ -36,30 +54,6 @@ You should be able to work on a few implementations of the code with this set.
 <div align="center">
   <img src="https://raw.githubusercontent.com/hudson-and-thames/research/master/Chapter3/readme_image.png" height="350"><br>
 </div>
-
----
-
-## Progress
-
-**Part 4: Useful Financial Features**
-* Working on Chapter 19: Microstructural Features (Maksim)
-
-**Part 3: Backtesting**
-* Done Chapter 16: Asset Allocation
-* Done Chapter 10: Bet Sizing
-
-**Part 2: Modelling**
-* Done Chapter 8: Feature Importance
-* Done Chapter 7: Cross-Validation
-* Done Chapter 6: Ensemble Methods (Sequential Bootstrap Ensemble)
-
-**Part 1: Data Analysis**
-* Done Chapter 5: Fractional Differentiation
-* Done Chapter 4: Sample Weights
-* Done Chapter 3: Labeling
-* Done Chapter 2: Data Structures
-* Purchased high quality raw tick data.
-* Email us if you would like a sample of the standard bars.
 
 ---
 
@@ -103,12 +97,35 @@ On your local machine open the terminal and cd into the working dir.
 * [Github](https://github.com/hudson-and-thames/mlfinlab) - Development platform and repo
 * [Travis-CI](https://www.travis-ci.com) - Continuous integration, test and deploy
 
-## Authors
+---
+## Progress
 
-* **Ashutosh Singh** - [LinkedIn](https://www.linkedin.com/in/ashusinghpenn/)
-* **Jacques Joubert** - [LinkedIn](https://www.linkedin.com/in/jacquesjoubert/)
-* **Oleksandr Proskurin** - [LinkedIn](https://www.linkedin.com/in/proskurinolexandr/)
+**Part 1: Data Analysis**
+* Purchased high quality raw tick data.
+* Email us if you would like a sample of the standard bars.
+* Done Chapter 2: Data Structures
+* Done Chapter 3: Labeling
+* Done Chapter 4: Sample Weights
+* Done Chapter 5: Fractional Differentiation
 
+**Part 2: Modelling**
+* Done Chapter 6: Ensemble Methods (Sequential Bootstrap Ensemble)
+* Done Chapter 7: Cross-Validation
+* Done Chapter 8: Feature Importance
+
+**Part 3: Backtesting**
+* Done Chapter 10: Bet Sizing
+* Done Chapter 16: Asset Allocation
+
+**Part 4: Useful Financial Features**
+* Done Chapter 17: Structural Breaks
+* Done Chapter 18: Entropy Features
+* Done Chapter 19: Microstructural Features
+
+**Additional**
+* Done Optimal Number of Clusters (ONC) Algorithm.
+
+---
 
 ## Additional Research Repo
 BlackArbsCEO has a great repo based on de Prado's research. It covers many of the questions at the back of every chapter and was the first source on Github to do so. It has also been a good source of inspiration for our research. 
