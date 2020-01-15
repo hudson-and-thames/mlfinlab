@@ -316,7 +316,7 @@ class MeanVarianceOptimisation:
                                                        target_return=portfolio_return,
                                                        num_assets=num_assets)
             except Exception:
-                risk = 0
+                continue
 
             volatilities.append(risk)
             returns.append(portfolio_return)

@@ -493,7 +493,7 @@ class TestMVO(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_plotting_efficient_frontier(self):
-        # pylint: disable=invalid-name, bad-continuation
+        # pylint: disable=invalid-name, bad-continuation, protected-access
         """
         Test the calculation of inverse-variance portfolio weights
         """
