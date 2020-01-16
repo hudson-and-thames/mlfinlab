@@ -113,12 +113,8 @@ class MeanVarianceOptimisation:
         # Calculate the portfolio risk and return if it has not been calculated
         if self.portfolio_risk is None:
             self.portfolio_risk = self.weights @ cov @ self.weights.T
-            if isinstance(self.portfolio_risk, np.ndarray):
-                self.portfolio_risk = self.portfolio_risk[0]
         if self.portfolio_return is None:
             self.portfolio_return = self.weights @ expected_asset_returns
-            if isinstance(self.portfolio_return, np.ndarray):
-                self.portfolio_return = self.portfolio_return[0]
         self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))
 
         self.weights = pd.DataFrame(self.weights)
@@ -310,20 +306,13 @@ class MeanVarianceOptimisation:
         returns = []
         sharpe_ratios = []
         for portfolio_return in np.linspace(min_return, max_return, 100):
-            try:
-                _, risk, _ = self._min_volatility_for_target_return(covariance=covariance,
-                                                       expected_returns=expected_returns,
-                                                       target_return=portfolio_return,
-                                                       num_assets=num_assets)
-            except Exception:
-                continue
-
+            _, risk, _ = self._min_volatility_for_target_return(covariance=covariance,
+                                                   expected_returns=expected_returns,
+                                                   target_return=portfolio_return,
+                                                   num_assets=num_assets)
             volatilities.append(risk)
             returns.append(portfolio_return)
-            if risk == 0:
-                sharpe_ratios.append(0)
-            else:
-                sharpe_ratios.append((portfolio_return - risk_free_rate) / (risk ** 0.5))
+            sharpe_ratios.append((portfolio_return - risk_free_rate) / (risk ** 0.5 + 1e-16))
         max_sharpe_ratio_index = sharpe_ratios.index(max(sharpe_ratios))
         figure = plt.scatter(volatilities, returns, c=sharpe_ratios, cmap='viridis')
         plt.colorbar(label='Sharpe Ratio')
