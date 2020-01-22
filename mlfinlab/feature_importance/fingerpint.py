@@ -23,7 +23,6 @@ class ModelFingerprint:
 
         self.features = X.columns
 
-
         # TODO: take into account feature values, or drop them
         # Get possible feature values (Step 1)
         self.feature_values = {}  # Dictionary of feature values range used to build dependence functions
@@ -146,7 +145,7 @@ class ModelFingerprint:
         :return: None
         """
 
-        pd.DataFrame(effect_dict).T.plot(kind='bar', title='Linear Precition Effect', legend=False)
+        pd.DataFrame(effect_dict).T.plot(kind='bar', title='Effect plot', legend=False)
         plt.ylabel('Effect values')
         plt.xlabel('Features')
         plt.show()
