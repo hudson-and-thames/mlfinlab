@@ -16,6 +16,11 @@ class ModelFingerprint:
         self.non_linear_effect = None
         self.pair_wise_effect = None
 
+        if len(self.y.unique()) == 2:
+            self.model_type = 'classification'
+        else:
+            self.model_type = 'regression'
+
         if num_values is None:
             self.num_values = self.X.shape[0]
         else:
@@ -61,7 +66,11 @@ class ModelFingerprint:
                 X_[:, col_k_position] = x_k
 
                 # Step 3
-                y_pred = self.clf.predict(X_)
+                if self.model_type == 'classification':
+                    y_pred = pd.DataFrame(self.clf.predict_proba(X_))[0]
+                else:
+                    y_pred = self.clf.predict(X_)
+
                 y_pred_mean = y_pred.mean()
 
                 y_mean_arr.append(y_pred_mean)
