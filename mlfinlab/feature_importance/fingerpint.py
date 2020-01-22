@@ -90,7 +90,7 @@ class ModelFingerprint:
             lmodel = LinearRegression(fit_intercept=True, normalize=False)
             lmodel.fit(x, y)
             y_mean = np.mean(y)
-            linear_effect = np.mean(np.abs(lmodel.predict(x).T[0] - y_mean))
+            linear_effect = np.mean(np.abs(lmodel.predict(x) - y_mean))
             store[col] = np.array([linear_effect])
         return store
 
@@ -106,7 +106,7 @@ class ModelFingerprint:
 
             lmodel = LinearRegression(fit_intercept=True, normalize=False)
             lmodel.fit(x, y)
-            nonlinear_effect = np.mean(np.abs(lmodel.predict(x).T[0] - y.values))
+            nonlinear_effect = np.mean(np.abs(lmodel.predict(x) - y.values))
             store[col] = np.array([nonlinear_effect])
         return store
 
