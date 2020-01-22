@@ -11,6 +11,11 @@ class ModelFingerprint:
         self.y = y
         self.clf = clf
 
+        # Effects containers
+        self.linear_effect = None
+        self.non_linear_effect = None
+        self.pair_wise_effect = None
+
         if num_values is None:
             self.num_values = self.X.shape[0]
         else:
@@ -18,11 +23,15 @@ class ModelFingerprint:
 
         self.features = X.columns
 
+
+        # TODO: take into account feature values, or drop them
         # Get possible feature values (Step 1)
         self.feature_values = {}  # Dictionary of feature values range used to build dependence functions
         for feature in self.features:
-            values = np.random.choice(self.X[feature], size=self.num_values)
-            self.feature_values[feature] = values
+            values = []
+            for q in np.linspace(0, 1, self.num_values):
+                values.append(np.quantile(self.X[feature], q=q))
+            self.feature_values[feature] = np.array(values)
 
         # DataFrame with partial dependence function values for columns from X (f_k)
         self.ind_partial_dep_functions = pd.DataFrame(index=list(range(self.num_values)), columns=self.X.columns)
@@ -38,9 +47,8 @@ class ModelFingerprint:
 
         # Get partial dependency functions
         self._get_individual_partial_dependence()
-        self.pairwise_x_values = self._get_pairwise_partial_dependence()
 
-    def _get_individual_partial_dependence(self):
+    def _get_individual_partial_dependence(self) -> None:
         """
         Get individual partial dependence function values for each column.
         :return: None
@@ -61,38 +69,11 @@ class ModelFingerprint:
 
             self.ind_partial_dep_functions[col] = y_mean_arr
 
-    def _get_pairwise_partial_dependence(self):
+    def _get_linear_effect_estimation(self) -> dict:
         """
-        Get pairwise partial dependence function values for feature pairs.
-        :return: None
+        Get linear effect estimates
+        :return: (dict) of linear effect estimates for each feature column
         """
-        x_values_dict = {}  # Dict of pair1: [(x_k, x_l), ...], pair2: [...]
-        for pair in self.pairwise_partial_dep_functions.columns:
-            col_k = pair.split('_')[0]
-            col_l = pair.split('_')[1]
-
-            x_values = []  # Array of (x_k, x_l values)
-            y_mean_arr = []  # Array of mean(prediction) for each feature value
-            for x_k in self.feature_values[col_k]:
-                for x_l in self.feature_values[col_l]:
-                    col_k_position = self.feature_column_position_mapping[col_k]
-                    col_l_position = self.feature_column_position_mapping[col_l]
-                    X_ = self.X.values.copy()
-                    X_[:, col_k_position] = x_k
-                    X_[:, col_l_position] = x_l
-
-                    x_values.append((x_k, x_l))
-
-                    y_pred = self.clf.predict(X_)
-                    y_pred_mean = y_pred.mean()
-                    y_mean_arr.append(y_pred_mean)
-
-            self.pairwise_partial_dep_functions[pair] = y_mean_arr
-            x_values_dict[pair] = x_values
-
-        return x_values_dict
-
-    def _get_linear_effect_estimation(self):
         store = {}
         for col in self.features:
             x = self.feature_values[col].reshape(-1, 1)
@@ -105,7 +86,11 @@ class ModelFingerprint:
             store[col] = np.array([linear_effect])
         return store
 
-    def _get_non_linear_effect_estimation(self):
+    def _get_non_linear_effect_estimation(self) -> dict:
+        """
+        Get non-linear effect estimates.
+        :return: (dict) of non-linear effect estimates for each feature column
+        """
         store = {}
         for col in self.features:
             x = self.feature_values[col].reshape(-1, 1)
@@ -117,6 +102,51 @@ class ModelFingerprint:
             store[col] = np.array([nonlinear_effect])
         return store
 
-    def fit(self):
-        linear_effect = self._get_linear_effect_estimation()
-        non_linear_effect = self._get_non_linear_effect_estimation()
+    def _get_pairwise_effect_estimation(self) -> dict:
+        """
+        Get pairwise effect estimates.
+        :return: (dict) of pairwise effect estimates for each feature column.
+        """
+        store = {}
+        for pair in self.pairwise_partial_dep_functions.columns:
+            col_k = pair.split('_')[0]
+            col_l = pair.split('_')[1]
+
+            func_value = 0  # cumulative pairwise effect value for a given feature
+            for x_k, y_cdf_k in zip(self.feature_values[col_k], self.ind_partial_dep_functions[col_k]):
+                for x_l, y_cdf_l in zip(self.feature_values[col_l], self.ind_partial_dep_functions[col_l]):
+                    col_k_position = self.feature_column_position_mapping[col_k]
+                    col_l_position = self.feature_column_position_mapping[col_l]
+                    X_ = self.X.values.copy()
+                    X_[:, col_k_position] = x_k
+                    X_[:, col_l_position] = x_l
+
+                    y_pred = self.clf.predict(X_)
+                    y_cdf_k_l = y_pred.mean()
+
+                    func_value += abs(y_cdf_k_l - y_cdf_k - y_cdf_l)
+
+            store[pair] = [func_value]
+
+        return store
+
+    def fit(self) -> None:
+        """
+        Get linear, non-linear, pairwise effects estimation.
+        :return: None
+        """
+        self.linear_effect = self._get_linear_effect_estimation()
+        self.non_linear_effect = self._get_non_linear_effect_estimation()
+        self.pair_wise_effect = self._get_pairwise_effect_estimation()
+
+    def plot_effect(self, effect_dict: dict) -> None:
+        """
+        Plot the effect on a bar plot.
+        :param effect_dict: (dict) of effect values for each feature
+        :return: None
+        """
+
+        pd.DataFrame(effect_dict).T.plot(kind='bar', title='Linear Precition Effect', legend=False)
+        plt.ylabel('Effect values')
+        plt.xlabel('Features')
+        plt.show()
