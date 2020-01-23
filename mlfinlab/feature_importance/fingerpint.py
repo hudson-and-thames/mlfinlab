@@ -1,3 +1,8 @@
+"""
+Implements model fingerprint algorithm from 'Beyond the Black Box' paper
+https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023
+"""
+
 import itertools
 import pandas as pd
 import numpy as np
@@ -5,21 +10,26 @@ from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 
 
-class ModelFingerprint:
-    def __init__(self, clf: object, X: pd.DataFrame, y: pd.Series, num_values=None):
+class RegressionModelFingerprint:
+    """
+    Regression Fingerprint class
+    """
+
+    def __init__(self, clf: object, X: pd.DataFrame, num_values=50):
+        """
+        Constructs Regression model fingerprint.
+        :param clf: (object) trained regression model
+        :param X: (pd.DataFrame) of features
+        :param num_values: (int) number of values to fix for each feature
+        """
+
         self.X = X
-        self.y = y
         self.clf = clf
 
         # Effects containers
         self.linear_effect = None
         self.non_linear_effect = None
         self.pair_wise_effect = None
-
-        if len(self.y.unique()) == 2:
-            self.model_type = 'classification'
-        else:
-            self.model_type = 'regression'
 
         if num_values is None:
             self.num_values = self.X.shape[0]
@@ -66,10 +76,7 @@ class ModelFingerprint:
                 X_[:, col_k_position] = x_k
 
                 # Step 3
-                if self.model_type == 'classification':
-                    y_pred = pd.DataFrame(self.clf.predict_proba(X_))[0]
-                else:
-                    y_pred = self.clf.predict(X_)
+                y_pred = self.clf.predict(X_)
 
                 y_pred_mean = y_pred.mean()
 
@@ -79,7 +86,7 @@ class ModelFingerprint:
 
     def _get_linear_effect_estimation(self) -> dict:
         """
-        Get linear effect estimates
+        Get linear effect estimates.
         :return: (dict) of linear effect estimates for each feature column
         """
         store = {}
@@ -91,7 +98,7 @@ class ModelFingerprint:
             lmodel.fit(x, y)
             y_mean = np.mean(y)
             linear_effect = np.mean(np.abs(lmodel.predict(x) - y_mean))
-            store[col] = np.array([linear_effect])
+            store[col] = linear_effect
         return store
 
     def _get_non_linear_effect_estimation(self) -> dict:
@@ -107,7 +114,7 @@ class ModelFingerprint:
             lmodel = LinearRegression(fit_intercept=True, normalize=False)
             lmodel.fit(x, y)
             nonlinear_effect = np.mean(np.abs(lmodel.predict(x) - y.values))
-            store[col] = np.array([nonlinear_effect])
+            store[col] = nonlinear_effect
         return store
 
     def _get_pairwise_effect_estimation(self) -> dict:
@@ -120,7 +127,7 @@ class ModelFingerprint:
             col_k = pair.split('_')[0]
             col_l = pair.split('_')[1]
 
-            func_value = 0  # cumulative pairwise effect value for a given feature
+            func_value = 0  # Cumulative pairwise effect value for a given feature
             for x_k, y_cdf_k in zip(self.feature_values[col_k], self.ind_partial_dep_functions[col_k]):
                 for x_l, y_cdf_l in zip(self.feature_values[col_l], self.ind_partial_dep_functions[col_l]):
                     col_k_position = self.feature_column_position_mapping[col_k]
@@ -134,18 +141,33 @@ class ModelFingerprint:
 
                     func_value += abs(y_cdf_k_l - y_cdf_k - y_cdf_l)
 
-            store[pair] = [func_value]
+            store[pair] = func_value / (self.num_values ** 2)
 
         return store
+
+    def _normalize(self, effect: dict) -> dict:
+        """
+        Normalize effect values (sum equals 1)
+        :param effect: (dict) of effect values
+        :return: (dict) of normalized effect values
+        """
+        values_sum = sum(effect.values())
+        updated_effect = {}
+        if values_sum > 1e-3:
+            for k, v in effect.items():
+                updated_effect[k] = effect[k] / values_sum
+        else:
+            updated_effect = effect
+        return updated_effect
 
     def fit(self) -> None:
         """
         Get linear, non-linear, pairwise effects estimation.
         :return: None
         """
-        self.linear_effect = self._get_linear_effect_estimation()
-        self.non_linear_effect = self._get_non_linear_effect_estimation()
-        self.pair_wise_effect = self._get_pairwise_effect_estimation()
+        self.linear_effect = self._normalize(self._get_linear_effect_estimation())
+        self.non_linear_effect = self._normalize(self._get_non_linear_effect_estimation())
+        self.pair_wise_effect = self._normalize(self._get_pairwise_effect_estimation())
 
     def plot_effect(self, effect_dict: dict) -> None:
         """
