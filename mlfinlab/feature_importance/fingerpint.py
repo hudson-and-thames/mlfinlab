@@ -169,14 +169,25 @@ class RegressionModelFingerprint:
         self.non_linear_effect = self._normalize(self._get_non_linear_effect_estimation())
         self.pair_wise_effect = self._normalize(self._get_pairwise_effect_estimation())
 
-    def plot_effect(self, effect_dict: dict) -> None:
+    def plot_effects(self) -> None:
         """
-        Plot the effect on a bar plot.
-        :param effect_dict: (dict) of effect values for each feature
+        Plot each effect on a bar plot, plots only top n_features pairwise effects.
         :return: None
         """
+        # Sorted dict
+        sorted_pairwise_effects = {k: v for k, v in sorted(self.pair_wise_effect.items(), key=lambda item: item[1])}
+        top_pairwise_effects = {}  # Top pairwise effect dict
+        for k in list(sorted_pairwise_effects.keys())[-self.features.shape[0]:]:
+            top_pairwise_effects[k] = sorted_pairwise_effects[k]
 
-        pd.DataFrame(effect_dict).T.plot(kind='bar', title='Effect plot', legend=False)
-        plt.ylabel('Effect values')
-        plt.xlabel('Features')
+        fig, (ax1, ax2, ax3) = plt.subplots(3, 1)
+        ax1.set_title('Linear effect')
+        ax1.bar(*zip(*self.linear_effect.items()))
+
+        ax2.set_title('Non-Linear effect')
+        ax2.bar(*zip(*self.non_linear_effect.items()))
+
+        ax3.set_title('Pair-wise effect (top values)')
+        ax3.bar(*zip(*top_pairwise_effects.items()))
+        # fig.tight_layout()
         plt.show()
