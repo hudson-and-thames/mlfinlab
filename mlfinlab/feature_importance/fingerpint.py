@@ -3,7 +3,6 @@ Implements model fingerprint algorithm from 'Beyond the Black Box' paper
 https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023
 """
 
-import itertools
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
@@ -132,7 +131,7 @@ class RegressionModelFingerprint:
 
                     func_value += abs(y_cdf_k_l - y_cdf_k - y_cdf_l)
 
-            store[pair] = func_value / (self.num_values ** 2)
+            store[str(pair)] = func_value / (self.num_values ** 2)
 
         self.pair_wise_effect = _normalize(store)
 

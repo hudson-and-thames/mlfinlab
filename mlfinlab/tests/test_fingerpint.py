@@ -3,13 +3,14 @@ Test RegressionModelFingerprint, ClassificationModelFingerprint implementations
 """
 
 import unittest
-import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
-from mlfinlab.feature_importance import RegressionModelFingerprint
 from sklearn.datasets import load_boston
+from mlfinlab.feature_importance import RegressionModelFingerprint
 
+
+# pylint: disable=invalid-name
 
 class TestModelFingerprint(unittest.TestCase):
     """
@@ -38,7 +39,7 @@ class TestModelFingerprint(unittest.TestCase):
 
     def test_linear_effect(self):
         """
-        Test test_linear_effect for various regression models and num_values
+        Test get_linear_effect for various regression models and num_values.
         """
 
         # Test the most informative feature effects for reg_1
@@ -69,7 +70,7 @@ class TestModelFingerprint(unittest.TestCase):
 
     def test_non_linear_effect(self):
         """
-        Test test_non_linear_effect for various regression models and num_values
+        Test get_non_linear_effect for various regression models and num_values.
         """
 
         # Test the most informative feature effects for reg_1
@@ -95,3 +96,30 @@ class TestModelFingerprint(unittest.TestCase):
 
         for effect_value in reg_2_fingerpint_70.non_linear_effect.values():
             self.assertAlmostEqual(effect_value, 0, delta=1e-8)
+
+    def test_pairwise_effect(self):
+        """
+        Test get_pairwise_effect for various regression models and num_values.
+        """
+
+        combinations = [(0, 5), (0, 12), (1, 2), (5, 7), (3, 6), (4, 9)]
+        self.reg_1_fingerprint.get_pairwise_effect(combinations)
+        self.reg_2_fingerprint.get_pairwise_effect(combinations)
+
+        for pair, effect_value in zip(combinations, [0.167, 0.167, 0.166, 0.166, 0.166, 0.166]):
+            self.assertAlmostEqual(self.reg_1_fingerprint.pair_wise_effect[str(pair)], effect_value, delta=1e-3)
+
+        # Pairwise effect for linear model should be the same for all combinations
+        for pair in combinations:
+            self.assertEqual(self.reg_2_fingerprint.pair_wise_effect[str((0, 5))],
+                             self.reg_2_fingerprint.pair_wise_effect[str(pair)])
+
+    def test_plot_effects(self):
+        """
+        Test plot_effects function
+        """
+
+        self.reg_1_fingerprint.pair_wise_effect = None
+        self.reg_1_fingerprint.plot_effects()
+        self.reg_1_fingerprint.get_pairwise_effect([(1, 2), (3, 5)])
+        self.reg_1_fingerprint.plot_effects()
