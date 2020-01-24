@@ -138,7 +138,7 @@ class RegressionModelFingerprint:
 
     def fit(self) -> None:
         """
-        Get linear, non-linear, pairwise effects estimation.
+        Get linear, non-linear effects estimation.
         :return: None
         """
         self.linear_effect = _normalize(self._get_linear_effect_estimation())
@@ -150,7 +150,7 @@ class RegressionModelFingerprint:
         :return: None
         """
         if self.pair_wise_effect is None:
-            fig, (ax1, ax2, ax3) = plt.subplots(2, 1)
+            fig, (ax1, ax2) = plt.subplots(2, 1)
         else:
             fig, (ax1, ax2, ax3) = plt.subplots(3, 1)
             ax3.set_title('Pair-wise effect')
