@@ -112,7 +112,7 @@ class TestModelFingerprint(unittest.TestCase):
         # Pairwise effect for linear model should be the same for all combinations
         for pair in combinations:
             self.assertAlmostEqual(self.reg_2_fingerprint.pair_wise_effect[str((0, 5))],
-                             self.reg_2_fingerprint.pair_wise_effect[str(pair)], delta=1e-9)
+                                   self.reg_2_fingerprint.pair_wise_effect[str(pair)], delta=1e-9)
 
     def test_plot_effects(self):
         """
