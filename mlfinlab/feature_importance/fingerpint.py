@@ -1,6 +1,9 @@
 """
-Implements model fingerprint algorithm from 'Beyond the Black Box' paper
-https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023
+Interpreting how feature values influence a prediction makes a model more interpretable and intuitive.
+Yimou Li, David Turkington, Alireza Yazdani published a paper
+'Beyond the Black Box: An Intuitive Approach to Investment Prediction with Machine Learning'
+(https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023) which describes how feature effect
+can be decomposed into linear, non-linear and pairwise effect. The module implements this paper.
 """
 
 import pandas as pd
@@ -13,7 +16,8 @@ import matplotlib.pyplot as plt
 
 class RegressionModelFingerprint:
     """
-    Regression Fingerprint class
+    Regression Fingerprint class. Decomposes feature effects into linear, non-linear and pairwise
+    effects using the algorithm described in https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023
     """
 
     def __init__(self, model: object, X: pd.DataFrame, num_values=50):
@@ -21,7 +25,7 @@ class RegressionModelFingerprint:
         Constructs Regression model fingerprint.
         :param model: (object) trained regression model
         :param X: (pd.DataFrame) of features
-        :param num_values: (int) number of values to fix for each feature
+        :param num_values: (int) number of values used to estimate feature effect
         """
 
         self.X = X
@@ -34,7 +38,6 @@ class RegressionModelFingerprint:
 
         self.num_values = num_values
 
-        # TODO: drop binary features?
         # Get possible feature values (Step 1)
         self.feature_values = {}  # Dictionary of feature values range used to build dependence functions
         for feature in self.X.columns:
@@ -133,19 +136,22 @@ class RegressionModelFingerprint:
 
             store[str(pair)] = func_value / (self.num_values ** 2)
 
-        self.pair_wise_effect = _normalize(store)
+        self.pair_wise_effect = {'raw': store, 'norm': _normalize(store)}
 
     def fit(self) -> None:
         """
         Get linear, non-linear effects estimation.
         :return: None
         """
-        self.linear_effect = _normalize(self._get_linear_effect_estimation())
-        self.non_linear_effect = _normalize(self._get_non_linear_effect_estimation())
+        linear_effect = self._get_linear_effect_estimation()
+        non_linear_effect = self._get_non_linear_effect_estimation()
+
+        self.linear_effect = {'raw': linear_effect, 'norm': _normalize(linear_effect)}
+        self.non_linear_effect = {'raw': non_linear_effect, 'norm': _normalize(non_linear_effect)}
 
     def plot_effects(self) -> None:
         """
-        Plot each effect on a bar plot, plots only top n_features pairwise effects.
+        Plot each effect (normalized) on a bar plot, plots only top n_features pairwise effects.
         :return: None
         """
         if self.pair_wise_effect is None:
@@ -153,13 +159,13 @@ class RegressionModelFingerprint:
         else:
             fig, (ax1, ax2, ax3) = plt.subplots(3, 1)
             ax3.set_title('Pair-wise effect')
-            ax3.bar(*zip(*self.pair_wise_effect.items()))
+            ax3.bar(*zip(*self.pair_wise_effect['norm'].items()))
 
         ax1.set_title('Linear effect')
-        ax1.bar(*zip(*self.linear_effect.items()))
+        ax1.bar(*zip(*self.linear_effect['norm'].items()))
 
         ax2.set_title('Non-Linear effect')
-        ax2.bar(*zip(*self.non_linear_effect.items()))
+        ax2.bar(*zip(*self.non_linear_effect['norm'].items()))
 
         fig.tight_layout()
         plt.show()
@@ -173,9 +179,7 @@ def _normalize(effect: dict) -> dict:
     """
     values_sum = sum(effect.values())
     updated_effect = {}
-    if values_sum > 1e-3:
-        for k, v in effect.items():
-            updated_effect[k] = v / values_sum
-    else:
-        updated_effect = effect
+
+    for k, v in effect.items():
+        updated_effect[k] = v / values_sum
     return updated_effect
