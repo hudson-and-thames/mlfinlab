@@ -78,7 +78,7 @@ class RegressionModelFingerprint:
 
     def _get_linear_effect_estimation(self) -> dict:
         """
-        Get linear effect estimates.
+        Get linear effect estimates as the mean absolute deviation of the linear predictions around their average value.
         :return: (dict) of linear effect estimates for each feature column.
         """
         store = {}
@@ -95,7 +95,8 @@ class RegressionModelFingerprint:
 
     def _get_non_linear_effect_estimation(self) -> dict:
         """
-        Get non-linear effect estimates.
+        Get non-linear effect estimates as as the mean absolute deviation of the total marginal (single variable) effect
+        around its corresponding linear effect.
         :return: (dict) of non-linear effect estimates for each feature column
         """
         store = {}
@@ -111,7 +112,8 @@ class RegressionModelFingerprint:
 
     def get_pairwise_effect(self, combinations: list) -> dict:
         """
-        Get pairwise effect estimates.
+        Get pairwise effect estimates as the de-meaned joint partial prediction of the two variables minus the de-meaned
+        partial predictions of each variable independently.
         :param combinations: (list) of tuples (feature_i, feature_j) to test pairwise effect
         """
         store = {}
