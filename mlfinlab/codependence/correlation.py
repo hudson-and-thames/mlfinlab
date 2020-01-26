@@ -1,9 +1,10 @@
 """
-Correlation based distances (angular, absolute, squared) described in
+Correlation based distances and various modifications (angular, absolute, squared) described in
 https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes
 """
 
 import numpy as np
+from scipy.spatial.distance import squareform, pdist
 
 
 def angular_distance(x: np.array, y: np.array) -> float:
@@ -40,3 +41,25 @@ def squared_angular_distance(x: np.array, y: np.array) -> float:
 
     corr_coef = np.corrcoef(x, y)[0][1]
     return np.sqrt(0.5 * (1 - corr_coef ** 2))
+
+
+def distance_correlation(x: np.array, y: np.array) -> float:
+    """
+    Distance correlation coefficient described at https://en.wikipedia.org/wiki/Distance_correlation
+    :param x: (np.array) X vector
+    :param y: (np.array) Y vector
+    :return: (float) distance correlation coefficient
+    """
+    a = squareform(pdist(x))
+    b = squareform(pdist(y))
+
+    A = a - a.mean(axis=0)[None, :] - a.mean(axis=1)[None, :] + a.mean()
+    B = b - b.mean(axis=0)[None, :] - a.mean(axis=1)[None, :] + a.mean()
+
+    d_cov_xx = (A * A).sum() / (x.shape[0] ** 2)
+    d_cov_xy = (A * A).sum() / (x.shape[0] ** 2)
+    d_cov_yy = (B * B).sum() / (x.shape[0] ** 2)
+
+    coef = np.sqrt(d_cov_xy) / np.sqrt(np.sqrt(d_cov_xx) * np.sqrt(d_cov_yy))
+
+    return coef
