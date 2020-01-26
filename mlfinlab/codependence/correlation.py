@@ -53,14 +53,21 @@ def distance_correlation(x: np.array, y: np.array) -> float:
     :param y: (np.array) Y vector
     :return: (float) distance correlation coefficient
     """
+
+    x = x[:, None]
+    y = y[:, None]
+
+    x = np.atleast_2d(x)
+    y = np.atleast_2d(y)
+
     a = squareform(pdist(x))
     b = squareform(pdist(y))
 
-    A = a - a.mean(axis=0)[None, :] - a.mean(axis=1)[None, :] + a.mean()
-    B = b - b.mean(axis=0)[None, :] - a.mean(axis=1)[None, :] + a.mean()
+    A = a - a.mean(axis=0)[None, :] - a.mean(axis=1)[:, None] + a.mean()
+    B = b - b.mean(axis=0)[None, :] - b.mean(axis=1)[:, None] + b.mean()
 
     d_cov_xx = (A * A).sum() / (x.shape[0] ** 2)
-    d_cov_xy = (A * A).sum() / (x.shape[0] ** 2)
+    d_cov_xy = (A * B).sum() / (x.shape[0] ** 2)
     d_cov_yy = (B * B).sum() / (x.shape[0] ** 2)
 
     coef = np.sqrt(d_cov_xy) / np.sqrt(np.sqrt(d_cov_xx) * np.sqrt(d_cov_yy))
