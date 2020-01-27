@@ -31,7 +31,7 @@ def get_optimal_number_of_bins(num_obs: int, corr_coef: float = None) -> int:
 
 def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: bool = False) -> float:
     """
-    Get mutual info score for X and Y described in
+    Get mutual info score for x and y described in
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes (p.16).
 
     :param x: (np.array) x vector
@@ -48,8 +48,8 @@ def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: boo
     contingency = np.histogram2d(x, y, n_bins)[0]
     mutual_info = mutual_info_score(None, None, contingency=contingency)  # Mutual information
     if normalize is True:
-        marginal_x = ss.entropy(np.histogram(x, n_bins)[0])  # Marginal for X
-        marginal_y = ss.entropy(np.histogram(y, n_bins)[0])  # Marginal for Y
+        marginal_x = ss.entropy(np.histogram(x, n_bins)[0])  # Marginal for x
+        marginal_y = ss.entropy(np.histogram(y, n_bins)[0])  # Marginal for y
         mutual_info /= min(marginal_x, marginal_y)
     return mutual_info
 
@@ -72,8 +72,8 @@ def variation_of_information_score(x: np.array, y: np.array, n_bins: int = None,
 
     contingency = np.histogram2d(x, y, n_bins)[0]
     mutual_info = mutual_info_score(None, None, contingency=contingency)  # Mutual information
-    marginal_x = ss.entropy(np.histogram(x, n_bins)[0])  # Marginal for X
-    marginal_y = ss.entropy(np.histogram(y, n_bins)[0])  # Marginal for Y
+    marginal_x = ss.entropy(np.histogram(x, n_bins)[0])  # Marginal for x
+    marginal_y = ss.entropy(np.histogram(y, n_bins)[0])  # Marginal for y
     score = marginal_x + marginal_y - 2 * mutual_info  # Variation of information
 
     if normalize is True:

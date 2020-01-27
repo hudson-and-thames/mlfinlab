@@ -15,7 +15,7 @@ from mlfinlab.codependence.information import (get_mutual_info, variation_of_inf
 
 class TestCodependence(unittest.TestCase):
     """
-    Test codependence module
+    Test codependence module.
     """
 
     def setUp(self):
@@ -46,7 +46,7 @@ class TestCodependence(unittest.TestCase):
 
     def test_information_metrics(self):
         """
-        Test mutual info, information variability metrics
+        Test mutual info, information variability metrics.
         """
         mut_info = get_mutual_info(self.x, self.y_1, normalize=False)
         mut_info_norm = get_mutual_info(self.x, self.y_1, normalize=True)
@@ -68,7 +68,7 @@ class TestCodependence(unittest.TestCase):
 
     def test_number_of_bins(self):
         """
-        Test get_optimal_number_of_bins functions
+        Test get_optimal_number_of_bins functions.
         """
 
         n_bins_x = get_optimal_number_of_bins(self.x.shape[0])
