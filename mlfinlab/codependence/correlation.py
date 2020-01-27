@@ -27,8 +27,8 @@ def absolute_angular_distance(x: np.array, y: np.array) -> float:
     """
     Returns a modification of angular distance where absolute value of correlation coefficient is used.
 
-    :param x: (np.array) X vector
-    :param y: (np.array) Y vector
+    :param x: (np.array) x vector
+    :param y: (np.array) y vector
     :return: (float) absolute angular distance
     """
 
@@ -40,8 +40,8 @@ def squared_angular_distance(x: np.array, y: np.array) -> float:
     """
     Returns a modification of angular distance where square of correlation coefficient is used.
 
-    :param x: (np.array) X vector
-    :param y: (np.array) Y vector
+    :param x: (np.array) x vector
+    :param y: (np.array) y vector
     :return: (float) squared angular distance
     """
 
@@ -54,8 +54,8 @@ def distance_correlation(x: np.array, y: np.array) -> float:
     Distance correlation captures both linear and non-linear dependencies.
     Distance correlation coefficient is described in https://en.wikipedia.org/wiki/Distance_correlation
 
-    :param x: (np.array) X vector
-    :param y: (np.array) Y vector
+    :param x: (np.array) x vector
+    :param y: (np.array) y vector
     :return: (float) distance correlation coefficient
     """
 

@@ -35,8 +35,8 @@ def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: boo
     Get mutual info score for X and Y described in
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes (p.16)
 
-    :param x: (np.array) X vector
-    :param y: (np.array) Y vector
+    :param x: (np.array) x vector
+    :param y: (np.array) y vector
     :param n_bins: (int) number of bins for discretization, if None get number of bins based on correlation coefficient.
     :param normalize: (bool) True to normalize the result to [0, 1]
     :return: (float) mutual info score
@@ -60,8 +60,8 @@ def variation_of_information_score(x: np.array, y: np.array, n_bins: int = None,
     Get Variantion of Information (VI) score for X and Y described in
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes (p.19)
 
-    :param x: (np.array) X vector
-    :param y: (np.array) Y vector
+    :param x: (np.array) x vector
+    :param y: (np.array) y vector
     :param n_bins: (int) number of bins for discretization, if None get number of bins based on correlation coefficient.
     :param normalize: (bool) True to normalize the result to [0, 1]
     :return: (float) variation of information score
