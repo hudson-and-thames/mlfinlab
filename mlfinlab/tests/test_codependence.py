@@ -5,10 +5,10 @@ Test functions from codependence module: correlation distances, mutual info, var
 import unittest
 import numpy as np
 
-from mlfinlab.codependence.correlation import squared_angular_distance, angular_distance, absolute_angular_distance, \
-    distance_correlation
-from mlfinlab.codependence.information import get_mutual_info, variation_of_information_score, \
-    get_optimal_number_of_bins
+from mlfinlab.codependence.correlation import (squared_angular_distance, angular_distance, absolute_angular_distance,
+                                               distance_correlation)
+from mlfinlab.codependence.information import (get_mutual_info, variation_of_information_score,
+                                               get_optimal_number_of_bins)
 
 
 # pylint: disable=invalid-name
