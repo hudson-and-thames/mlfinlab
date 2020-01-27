@@ -14,7 +14,8 @@ def get_optimal_number_of_bins(num_obs: int, corr_coef: float = None) -> int:
     """
     Get optimal number of bins for discretization based on number of observations
     and correlation coefficient (univariate case).
-    The algorithm is described at https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes (p.26)
+    The algorithm is described in https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes (p.26)
+
     :param num_obs: (int) number of observations
     :param corr_coef: (int) correlation coefficient, used to estimate the number of bins for univariate case
     :return: (int) optimal number of bins
@@ -33,6 +34,7 @@ def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: boo
     """
     Get mutual info score for X and Y described in
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes (p.16)
+
     :param x: (np.array) X vector
     :param y: (np.array) Y vector
     :param n_bins: (int) number of bins for discretization, if None get number of bins based on correlation coefficient.
@@ -57,6 +59,7 @@ def variation_of_information_score(x: np.array, y: np.array, n_bins: int = None,
     """
     Get Variantion of Information (VI) score for X and Y described in
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes (p.19)
+
     :param x: (np.array) X vector
     :param y: (np.array) Y vector
     :param n_bins: (int) number of bins for discretization, if None get number of bins based on correlation coefficient.
