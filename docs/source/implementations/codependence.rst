@@ -4,9 +4,17 @@
 Codependence
 ============
 
-This module implements various dependence measures described in Marcos Lopez de Prado slides 'Codependence':
+This module implements various dependence measures described in Dr. Marcos Lopez de Prado's slides `Codependence`_ from Cornell University.
 
-https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994
+**Abstract**:
+
+"Two random variables are codependent when knowing the value of one helps us determine the value of the other. This should not be confounded with the notion of causality.
+
+Correlation is perhaps the best known measure of codependence in econometric studies. Despite its popularity among economists, correlation has many known limitations in the contexts of financial studies.
+
+In these slides we will explore more modern measures of codependence, based on information theory, which overcome some of the limitations of correlations."
+
+.. _`Codependence`: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994
 
 Pearson correlation suffers from 2 major drawbacks:
 
