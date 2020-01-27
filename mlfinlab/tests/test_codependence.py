@@ -4,11 +4,14 @@ Test functions from codependence module: correlation distances, mutual info, var
 
 import unittest
 import numpy as np
-import pandas as pd
 
 from mlfinlab.codependence.correlation import squared_angular_distance, angular_distance, absolute_angular_distance, \
     distance_correlation
+from mlfinlab.codependence.information import get_mutual_info, variation_of_information_score, \
+    get_optimal_number_of_bins
 
+
+# pylint: disable=invalid-name
 
 class TestCodependence(unittest.TestCase):
     """
@@ -40,3 +43,36 @@ class TestCodependence(unittest.TestCase):
 
         dist_corr_y_2 = distance_correlation(self.x, self.y_2)
         self.assertAlmostEqual(dist_corr_y_2, 0.5216, delta=1e-2)
+
+    def test_information_metrics(self):
+        """
+        Test mutual info, information variability metrics
+        """
+        mut_info = get_mutual_info(self.x, self.y_1, normalize=False)
+        mut_info_norm = get_mutual_info(self.x, self.y_1, normalize=True)
+        mut_info_bins = get_mutual_info(self.x, self.y_1, n_bins=10)
+
+        # Test mutual info score
+        self.assertAlmostEqual(mut_info, 0.522, delta=1e-2)
+        self.assertAlmostEqual(mut_info_norm, 0.64, delta=1e-2)
+        self.assertAlmostEqual(mut_info_bins, 0.626, delta=1e-2)
+
+        # Test information variation score
+        info_var = variation_of_information_score(self.x, self.y_1, normalize=False)
+        info_var_norm = variation_of_information_score(self.x, self.y_1, normalize=True)
+        info_var_bins = variation_of_information_score(self.x, self.y_1, n_bins=10)
+
+        self.assertAlmostEqual(info_var, 1.4256, delta=1e-2)
+        self.assertAlmostEqual(info_var_norm, 0.7316, delta=1e-2)
+        self.assertAlmostEqual(info_var_bins, 1.418, delta=1e-2)
+
+    def test_number_of_bins(self):
+        """
+        Test get_optimal_number_of_bins functions
+        """
+
+        n_bins_x = get_optimal_number_of_bins(self.x.shape[0])
+        n_bins_x_y = get_optimal_number_of_bins(self.x.shape[0], np.corrcoef(self.x, self.y_1)[0, 1])
+
+        self.assertEqual(n_bins_x, 15)
+        self.assertEqual(n_bins_x_y, 9)
