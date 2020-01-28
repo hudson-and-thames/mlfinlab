@@ -33,6 +33,7 @@ class TimeBars(BaseBars):
         Implementation of abstract method _reset_cache for standard bars
         """
         self.open_price = None
+        self.close_price = None
         self.high_price, self.low_price = -np.inf, np.inf
         self.cum_statistics = {'cum_ticks': 0, 'cum_dollar_value': 0, 'cum_volume': 0, 'cum_buy_volume': 0}
 
@@ -62,7 +63,7 @@ class TimeBars(BaseBars):
                 self.timestamp = timestamp_threshold
             # Bar generation condition
             elif self.timestamp < timestamp_threshold:
-                self._create_bars(self.timestamp, price,
+                self._create_bars(self.timestamp, self.close_price,
                                   self.high_price, self.low_price, list_bars)
 
                 # Reset cache
@@ -75,6 +76,8 @@ class TimeBars(BaseBars):
 
             # Update high low prices
             self.high_price, self.low_price = self._update_high_low(price)
+
+            self.close_price = price
 
             # Calculations
             self.cum_statistics['cum_ticks'] += 1
