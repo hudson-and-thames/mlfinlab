@@ -22,15 +22,16 @@ class TimeBars(BaseBars):
         BaseBars.__init__(self, file_path_or_df, metric=None, batch_size=batch_size)
 
         # Threshold at which to sample (in seconds)
+        self.time_bar_thresh_mapping = {'D': 86400, 'H': 3600, 'MIN': 60, 'S': 1}  # Number of seconds
+        assert resolution in self.time_bar_thresh_mapping, "{} resolution is not implemented".format(resolution)
         self.resolution = resolution  # Type of bar resolution: 'D', 'H', 'MIN', 'S'
         self.num_units = num_units  # Number of days/minutes/...
-        self.time_bar_thresh_mapping = {'D': 86400, 'H': 3600, 'MIN': 60, 'S': 1}  # Number of seconds
         self.threshold = self.num_units * self.time_bar_thresh_mapping[self.resolution]
-        self.timestamp = None  # Next bar timestamp
+        self.timestamp = None  # Current bar timestamp
 
     def _reset_cache(self):
         """
-        Implementation of abstract method _reset_cache for standard bars
+        Implementation of abstract method _reset_cache for time bars
         """
         self.open_price = None
         self.close_price = None
@@ -39,7 +40,7 @@ class TimeBars(BaseBars):
 
     def _extract_bars(self, data):
         """
-        For loop which compiles the various bars: dollar, volume, or tick.
+        For loop which compiles time bars.
         We did investigate the use of trying to solve this in a vectorised manner but found that a For loop worked well.
 
         :param data: Contains 3 columns - date_time, price, and volume.
@@ -57,18 +58,21 @@ class TimeBars(BaseBars):
             dollar_value = price * volume
             signed_tick = self._apply_tick_rule(price)
 
-            timestamp_threshold = (int(float(date_time)) // self.threshold + 1) * self.threshold  # Boundary timestamp
+            timestamp_threshold = (int(
+                float(date_time)) // self.threshold + 1) * self.threshold  # Current tick boundary timestamp
 
+            # Init current bar timestamp with first ticks boundary timestamp
             if self.timestamp is None:
                 self.timestamp = timestamp_threshold
             # Bar generation condition
+            # Current ticks bar timestamp differs from current bars timestamp
             elif self.timestamp < timestamp_threshold:
                 self._create_bars(self.timestamp, self.close_price,
                                   self.high_price, self.low_price, list_bars)
 
                 # Reset cache
                 self._reset_cache()
-                self.timestamp = timestamp_threshold  # Next time bar
+                self.timestamp = timestamp_threshold  # Current bar timestamp update
 
             # Update counters
             if self.open_price is None:
@@ -77,6 +81,7 @@ class TimeBars(BaseBars):
             # Update high low prices
             self.high_price, self.low_price = self._update_high_low(price)
 
+            # Update close price
             self.close_price = price
 
             # Calculations
