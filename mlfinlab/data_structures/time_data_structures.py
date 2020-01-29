@@ -11,6 +11,7 @@ import numpy as np
 from mlfinlab.data_structures.base_bars import BaseBars
 
 
+# pylint: disable=too-many-instance-attributes
 class TimeBars(BaseBars):
     """
     Contains all of the logic to construct the time bars. This class shouldn't be used directly.
