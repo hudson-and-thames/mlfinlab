@@ -26,6 +26,8 @@ def _crop_data_frame_in_batches(df: pd.DataFrame, chunksize: int) -> list:
         generator_object.append(chunk)
     return generator_object
 
+# pylint: disable=too-many-instance-attributes
+
 
 class BaseBars(ABC):
     """
@@ -59,7 +61,7 @@ class BaseBars(ABC):
         self.prev_tick_rule = 0
 
         # Cache properties
-        self.open_price, self.prev_price = None, None
+        self.open_price, self.prev_price, self.close_price = None, None, None
         self.high_price, self.low_price = -np.inf, np.inf
         self.cum_statistics = {'cum_ticks': 0, 'cum_dollar_value': 0, 'cum_volume': 0, 'cum_buy_volume': 0}
         self.tick_num = 0  # Tick number when bar was formed
