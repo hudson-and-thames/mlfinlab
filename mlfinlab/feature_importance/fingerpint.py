@@ -8,8 +8,9 @@ can be decomposed into linear, non-linear and pairwise effect. The module implem
 
 import pandas as pd
 import numpy as np
-from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
+
+from sklearn.linear_model import LinearRegression
 
 
 # pylint: disable=invalid-name
@@ -119,12 +120,15 @@ class RegressionModelFingerprint:
         store = {}
 
         for pair in combinations:
+            function_values = []  # Array of pairwise interactions [f_k_l(not centered), f_k(centered), f_l(centered)]
             col_k = pair[0]
             col_l = pair[1]
 
-            func_value = 0  # Cumulative pairwise effect value for a given feature
-            for x_k, y_cdf_k in zip(self.feature_values[col_k], self.ind_partial_dep_functions[col_k]):
-                for x_l, y_cdf_l in zip(self.feature_values[col_l], self.ind_partial_dep_functions[col_l]):
+            y_cdf_k_centered = self.ind_partial_dep_functions[col_k] - np.mean(self.ind_partial_dep_functions[col_k])
+            y_cdf_l_centered = self.ind_partial_dep_functions[col_l] - np.mean(self.ind_partial_dep_functions[col_l])
+
+            for x_k, y_cdf_k in zip(self.feature_values[col_k], y_cdf_k_centered):
+                for x_l, y_cdf_l in zip(self.feature_values[col_l], y_cdf_l_centered):
                     col_k_position = self.feature_column_position_mapping[col_k]
                     col_l_position = self.feature_column_position_mapping[col_l]
                     X_ = self.X.values.copy()
@@ -134,7 +138,14 @@ class RegressionModelFingerprint:
                     y_pred = self.model.predict(X_)
                     y_cdf_k_l = y_pred.mean()
 
-                    func_value += abs(y_cdf_k_l - y_cdf_k - y_cdf_l)
+                    function_values.append([y_cdf_k_l, y_cdf_k, y_cdf_l])
+
+            function_values = np.array(function_values)  # Convert to np.array to vectorize operations
+
+            # Cumulative pairwise effect value for a given feature
+            # Need to center f_k_l as f_k, f_l have been already centered
+            func_value = sum(abs((function_values[:, 0] - np.mean(function_values[:, 0]) - function_values[:,
+                                                                                                           1] - function_values[:, 2])))
 
             store[str(pair)] = func_value / (self.num_values ** 2)
 
