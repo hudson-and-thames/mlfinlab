@@ -19,7 +19,7 @@ def get_optimal_number_of_bins(num_obs: int, corr_coef: float = None) -> int:
     :param corr_coef: (int) correlation coefficient, used to estimate the number of bins for univariate case.
     :return: (int) optimal number of bins.
     """
-    if corr_coef is None or corr_coef == 1:  # Univariate case
+    if corr_coef is None or abs(corr_coef - 1) <= 1e-4:  # Univariate case
         z = (8 + 324 * num_obs + 12 * (36 * num_obs + 729 * num_obs ** 2) ** .5) ** (1 / 3.)
         bins = round(z / 6. + 2. / (3 * z) + 1. / 3)
 
