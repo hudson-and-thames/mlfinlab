@@ -6,19 +6,18 @@ Yimou Li, David Turkington, Alireza Yazdani published a paper
 can be decomposed into linear, non-linear and pairwise effect. The module implements this paper.
 """
 
+from abc import ABC, abstractmethod
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
 from sklearn.linear_model import LinearRegression
 
 
 # pylint: disable=invalid-name
 
-class RegressionModelFingerprint:
+class AbstractModelFingerprint(ABC):
     """
-    Regression Fingerprint class. Decomposes feature effects into linear, non-linear and pairwise
-    effects using the algorithm described in https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023
+    Abstract class for RegressionModelFingerprint and ClassificationModelFingerprint.
     """
 
     def __init__(self, model: object, X: pd.DataFrame, num_values=50):
@@ -55,6 +54,15 @@ class RegressionModelFingerprint:
         # Get partial dependency functions
         self._get_individual_partial_dependence()
 
+    @abstractmethod
+    def _get_model_predictions(self, X_):
+        """
+        Get model predictions based on problem type (predict for regression, predict_proba for classification)
+        :param X_: (np.array) feature set
+        :return: (np.array) of predictions
+        """
+        raise NotImplementedError('Must implement _get_model_predictions')
+
     def _get_individual_partial_dependence(self) -> None:
         """
         Get individual partial dependence function values for each column.
@@ -69,9 +77,8 @@ class RegressionModelFingerprint:
                 X_[:, col_k_position] = x_k
 
                 # Step 3
-                y_pred = self.model.predict(X_)
-
-                y_pred_mean = y_pred.mean()
+                y_pred = self._get_model_predictions(X_)
+                y_pred_mean = np.mean(y_pred)
 
                 y_mean_arr.append(y_pred_mean)
 
@@ -135,7 +142,7 @@ class RegressionModelFingerprint:
                     X_[:, col_k_position] = x_k
                     X_[:, col_l_position] = x_l
 
-                    y_pred = self.model.predict(X_)
+                    y_pred = self._get_model_predictions(X_)
                     y_cdf_k_l = y_pred.mean()
 
                     function_values.append([y_cdf_k_l, y_cdf_k, y_cdf_l])
@@ -196,3 +203,33 @@ def _normalize(effect: dict) -> dict:
     for k, v in effect.items():
         updated_effect[k] = v / values_sum
     return updated_effect
+
+
+class RegressionModelFingerprint(AbstractModelFingerprint):
+    """
+    Regression Fingerprint class. Decomposes feature effects into linear, non-linear and pairwise
+    effects using the algorithm described in https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023
+    """
+
+    def _get_model_predictions(self, X_):
+        """
+        Abstract method _get_model_predictions implementation.
+        :param X_: (np.array) feature set
+        :return: (np.array) of predictions
+        """
+        return self.model.predict(X_)
+
+
+class ClassificationModelFingerprint(AbstractModelFingerprint):
+    """
+    Classification Fingerprint class. Decomposes feature effects into linear, non-linear and pairwise
+    effects using the algorithm described in https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023
+    """
+
+    def _get_model_predictions(self, X_):
+        """
+        Abstract method _get_model_predictions implementation.
+        :param X_: (np.array) feature set
+        :return: (np.array) of predictions
+        """
+        return self.model.predict_proba(X_)[1]
