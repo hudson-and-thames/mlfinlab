@@ -105,14 +105,12 @@ class TestModelFingerprint(unittest.TestCase):
         combinations = [(0, 5), (0, 12), (1, 2), (5, 7), (3, 6), (4, 9)]
         self.reg_1_fingerprint.get_pairwise_effect(combinations)
         self.reg_2_fingerprint.get_pairwise_effect(combinations)
+        for pair, effect_value in zip(combinations, [0.203, 0.17327, 0.005, 0.032, 0, 0.00004]):
+            self.assertAlmostEqual(self.reg_1_fingerprint.pair_wise_effect['raw'][str(pair)], effect_value, delta=1e-3)
 
-        for pair, effect_value in zip(combinations, [0.167, 0.167, 0.166, 0.166, 0.166, 0.166]):
-            self.assertAlmostEqual(self.reg_1_fingerprint.pair_wise_effect['norm'][str(pair)], effect_value, delta=1e-3)
-
-        # Pairwise effect for linear model should be the same for all combinations
+        # Pairwise effect for linear model should be zero
         for pair in combinations:
-            self.assertAlmostEqual(self.reg_2_fingerprint.pair_wise_effect['raw'][str((0, 5))],
-                                   self.reg_2_fingerprint.pair_wise_effect['raw'][str(pair)], delta=1e-9)
+            self.assertAlmostEqual(self.reg_2_fingerprint.pair_wise_effect['raw'][str(pair)], 0, delta=1e-9)
 
     def test_plot_effects(self):
         """
