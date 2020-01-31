@@ -50,7 +50,7 @@ An example showing how to use various feature importance functions::
                                                   price_bars=price_bars, oob_score=True)
   clf.fit(X_train, y_train)
 
-  oos_score = ml_cross_val_score(sclf, X_train, y_train, cv_gen=cv_gen, sample_weight=None,
+  oos_score = ml_cross_val_score(clf, X_train, y_train, cv_gen=cv_gen, sample_weight=None,
                                        scoring='accuracy').mean()
 
   mdi_feature_imp = feature_importance_mean_imp_reduction(clf, X_train.columns)
