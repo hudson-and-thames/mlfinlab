@@ -7,4 +7,4 @@ from mlfinlab.feature_importance.importance import (feature_importance_mean_decr
                                                     plot_feature_importance)
 from mlfinlab.feature_importance.orthogonal import feature_pca_analysis, get_pca_rank_weighted_kendall_tau, \
                                                    get_orthogonal_features
-from mlfinlab.feature_importance.fingerpint import RegressionModelFingerprint
+from mlfinlab.feature_importance.fingerpint import RegressionModelFingerprint, ClassificationModelFingerprint

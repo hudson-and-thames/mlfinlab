@@ -4,13 +4,14 @@ Test RegressionModelFingerprint, ClassificationModelFingerprint implementations
 
 import unittest
 import pandas as pd
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.linear_model import LinearRegression
-from sklearn.datasets import load_boston
-from mlfinlab.feature_importance import RegressionModelFingerprint
+from sklearn.datasets import load_boston, load_breast_cancer
+from mlfinlab.feature_importance import RegressionModelFingerprint, ClassificationModelFingerprint
 
 
 # pylint: disable=invalid-name
+# pylint: disable=unsubscriptable-object
 
 class TestModelFingerprint(unittest.TestCase):
     """
@@ -112,9 +113,30 @@ class TestModelFingerprint(unittest.TestCase):
         for pair in combinations:
             self.assertAlmostEqual(self.reg_2_fingerprint.pair_wise_effect['raw'][str(pair)], 0, delta=1e-9)
 
+    def test_classification_fingerpint(self):
+        """
+        Test model fingerprint values (linear, non-linear, pairwise) for classification model.
+        """
+        X, y = load_breast_cancer(return_X_y=True)
+        X, y = pd.DataFrame(X), pd.Series(y)
+        clf = RandomForestClassifier(n_estimators=10, random_state=42)
+        clf.fit(X, y)
+        clf_fingerpint = ClassificationModelFingerprint(clf, X, num_values=20)
+        clf_fingerpint.fit()
+        clf_fingerpint.get_pairwise_effect([(0, 1), (2, 3), (8, 9)])
+
+        for feature, effect in zip([0, 2, 3, 8, 9], [0.0068, 0.0249, 0.014, 0]):
+            self.assertAlmostEqual(clf_fingerpint.linear_effect['raw'][feature], effect, delta=1e-3)
+
+        for feature, effect in zip([0, 2, 3, 8, 9], [0.0062, 0.0217, 0.0155, 0.0013]):
+            self.assertAlmostEqual(clf_fingerpint.non_linear_effect['raw'][feature], effect, delta=1e-3)
+
+        for comb, effect in zip([(0, 1), (2, 3), (8, 9)], [0.008, 0.0087, 0]):
+            self.assertAlmostEqual(clf_fingerpint.pair_wise_effect['raw'][str(comb)], effect, delta=1e-3)
+
     def test_plot_effects(self):
         """
-        Test plot_effects function
+        Test plot_effects function.
         """
 
         self.reg_1_fingerprint.pair_wise_effect = None

@@ -22,7 +22,7 @@ class AbstractModelFingerprint(ABC):
 
     def __init__(self, model: object, X: pd.DataFrame, num_values=50):
         """
-        Constructs Regression model fingerprint.
+        Model fingerprint constructor.
         :param model: (object) trained regression model
         :param X: (pd.DataFrame) of features
         :param num_values: (int) number of values used to estimate feature effect
@@ -211,6 +211,15 @@ class RegressionModelFingerprint(AbstractModelFingerprint):
     effects using the algorithm described in https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023
     """
 
+    def __init__(self, model: object, X: pd.DataFrame, num_values=50):
+        """
+        Regression model fingerprint constructor.
+        :param model: (object) trained regression model
+        :param X: (pd.DataFrame) of features
+        :param num_values: (int) number of values used to estimate feature effect
+        """
+        AbstractModelFingerprint.__init__(self, model, X, num_values)
+
     def _get_model_predictions(self, X_):
         """
         Abstract method _get_model_predictions implementation.
@@ -226,10 +235,19 @@ class ClassificationModelFingerprint(AbstractModelFingerprint):
     effects using the algorithm described in https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023
     """
 
+    def __init__(self, model: object, X: pd.DataFrame, num_values=50):
+        """
+        Classification model fingerprint constructor.
+        :param model: (object) trained regression model
+        :param X: (pd.DataFrame) of features
+        :param num_values: (int) number of values used to estimate feature effect
+        """
+        AbstractModelFingerprint.__init__(self, model, X, num_values)
+
     def _get_model_predictions(self, X_):
         """
         Abstract method _get_model_predictions implementation.
         :param X_: (np.array) feature set
         :return: (np.array) of predictions
         """
-        return self.model.predict_proba(X_)[1]
+        return self.model.predict_proba(X_)[:, 1]
