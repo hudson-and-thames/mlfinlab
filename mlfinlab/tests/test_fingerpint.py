@@ -140,6 +140,6 @@ class TestModelFingerprint(unittest.TestCase):
         """
 
         self.reg_1_fingerprint.pair_wise_effect = None
-        self.reg_1_fingerprint.plot_effects()
+        fig_1 = self.reg_1_fingerprint.plot_effects()
         self.reg_1_fingerprint.get_pairwise_effect([(1, 2), (3, 5)])
-        self.reg_1_fingerprint.plot_effects()
+        fig_2 = self.reg_1_fingerprint.plot_effects()

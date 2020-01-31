@@ -1,9 +1,7 @@
 """
-Interpreting how feature values influence a prediction makes a model more interpretable and intuitive.
-Yimou Li, David Turkington, Alireza Yazdani published a paper
+Implementation of an algorithm described in Yimou Li, David Turkington, Alireza Yazdani
 'Beyond the Black Box: An Intuitive Approach to Investment Prediction with Machine Learning'
-(https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023) which describes how feature effect
-can be decomposed into linear, non-linear and pairwise effect. The module implements this paper.
+(https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023)
 """
 
 from abc import ABC, abstractmethod
@@ -17,15 +15,17 @@ from sklearn.linear_model import LinearRegression
 
 class AbstractModelFingerprint(ABC):
     """
-    Abstract class for RegressionModelFingerprint and ClassificationModelFingerprint.
+    Model fingerprint constructor.
+    This is an abstract class, use RegressionModelFingerprint or ClassificationModelFingerprint.
+
+    :param model: (object) trained regression model
+    :param X: (pd.DataFrame) of features
+    :param num_values: (int) number of values used to estimate feature effect
     """
 
     def __init__(self, model: object, X: pd.DataFrame, num_values=50):
         """
         Model fingerprint constructor.
-        :param model: (object) trained regression model
-        :param X: (pd.DataFrame) of features
-        :param num_values: (int) number of values used to estimate feature effect
         """
 
         self.X = X
@@ -58,6 +58,7 @@ class AbstractModelFingerprint(ABC):
     def _get_model_predictions(self, X_):
         """
         Get model predictions based on problem type (predict for regression, predict_proba for classification)
+
         :param X_: (np.array) feature set
         :return: (np.array) of predictions
         """
@@ -66,6 +67,7 @@ class AbstractModelFingerprint(ABC):
     def _get_individual_partial_dependence(self) -> None:
         """
         Get individual partial dependence function values for each column.
+
         :return: None
         """
         for col in self.X.columns:
@@ -87,6 +89,7 @@ class AbstractModelFingerprint(ABC):
     def _get_linear_effect_estimation(self) -> dict:
         """
         Get linear effect estimates as the mean absolute deviation of the linear predictions around their average value.
+
         :return: (dict) of linear effect estimates for each feature column.
         """
         store = {}
@@ -122,7 +125,9 @@ class AbstractModelFingerprint(ABC):
         """
         Get pairwise effect estimates as the de-meaned joint partial prediction of the two variables minus the de-meaned
         partial predictions of each variable independently.
+
         :param combinations: (list) of tuples (feature_i, feature_j) to test pairwise effect
+        :return: None
         """
         store = {}
 
@@ -161,6 +166,7 @@ class AbstractModelFingerprint(ABC):
     def fit(self) -> None:
         """
         Get linear, non-linear effects estimation.
+
         :return: None
         """
         linear_effect = self._get_linear_effect_estimation()
@@ -171,8 +177,9 @@ class AbstractModelFingerprint(ABC):
 
     def plot_effects(self) -> None:
         """
-        Plot each effect (normalized) on a bar plot, plots only top n_features pairwise effects.
-        :return: None
+        Plot each effect (normalized) on a bar plot (linear, non-linear). Also plots pairwise effects if calculated.
+
+        :return: (plt.figure) plot figure
         """
         if self.pair_wise_effect is None:
             fig, (ax1, ax2) = plt.subplots(2, 1)
@@ -188,12 +195,13 @@ class AbstractModelFingerprint(ABC):
         ax2.bar(*zip(*self.non_linear_effect['norm'].items()))
 
         fig.tight_layout()
-        plt.show()
+        return fig
 
 
 def _normalize(effect: dict) -> dict:
     """
     Normalize effect values (sum equals 1)
+
     :param effect: (dict) of effect values
     :return: (dict) of normalized effect values
     """
@@ -207,8 +215,7 @@ def _normalize(effect: dict) -> dict:
 
 class RegressionModelFingerprint(AbstractModelFingerprint):
     """
-    Regression Fingerprint class. Decomposes feature effects into linear, non-linear and pairwise
-    effects using the algorithm described in https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023
+    Regression Fingerprint class used for regression type of models.
     """
 
     def __init__(self, model: object, X: pd.DataFrame, num_values=50):
@@ -231,8 +238,7 @@ class RegressionModelFingerprint(AbstractModelFingerprint):
 
 class ClassificationModelFingerprint(AbstractModelFingerprint):
     """
-    Classification Fingerprint class. Decomposes feature effects into linear, non-linear and pairwise
-    effects using the algorithm described in https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023
+    Classification Fingerprint class used for classification type of models.
     """
 
     def __init__(self, model: object, X: pd.DataFrame, num_values=50):

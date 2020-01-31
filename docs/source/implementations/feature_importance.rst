@@ -79,6 +79,54 @@ Resulting images for MDI, MDA, SFI feature importances respectively:
    :align: center
 
 
+
+Model fingerpints algorithm
+=============================
+
+Another way to get a better understanding of a machine learning model is to understand how feature values influence model predictions. Feature effecs can be decomposed into 3 components(fingerprints):
+
+- **Linear component**
+- **Non-linear component**
+- **Pairwise interaction component** (how a pair of features affect model predictions)
+
+Yimou Li, David Turkington, Alireza Yazdani published a paper in a Journal of Financial Data Science 'Beyond the Black Box: An Intuitive Approach to Investment Prediction with Machine Learning'
+(https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023) which describes in details the algorithm of extracting **linear**, **non-linear** and **pairwise** feature effects.
+This module implements the algorithm described in the article.
+
+
+.. py:currentmodule:: mlfinlab.feature_importance.fingerpint
+.. automodule:: mlfinlab.feature_importance.fingerpint
+   :members:
+
+Numerical example::
+
+    from sklearn.datasets import load_boston
+    from sklearn.ensemble import RandomForestRegressor
+    from mlfinlab.feature_importance import RegressionModelFingerprint
+
+    data = load_boston() # Get a dataset
+    X = pd.DataFrame(columns=data['feature_names'], data=data['data'])
+    y = pd.Series(data['target'])
+
+    # Fit the model
+    clf = RandomForestRegressor(n_estimators=10, random_state=42)
+    clf.fit(X, y)
+
+    clf_fingerpint = RegressionModelFingerprint(clf, X, num_values=20)
+    clf_fingerpint.fit() # Get linear and non-linear effects
+    clf_fingerpint.get_pairwise_effect([('CRIM', 'ZN'), ('RM', 'AGE'), ('LSTAT', 'DIS')]) # Get pairwise effects
+
+    # Plot the results
+    fig = clf_fingerpint.plot_effects()
+    fig.show()
+
+.. image:: feature_imp_images/effects.png
+   :scale: 70 %
+   :align: center
+
+
+
+
 PCA features and analysis
 ================================
 
