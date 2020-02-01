@@ -80,7 +80,7 @@ Resulting images for MDI, MDA, SFI feature importances respectively:
 
 
 
-Model fingerpints algorithm
+Model fingerprints algorithm
 =============================
 
 Another way to get a better understanding of a machine learning model is to understand how feature values influence model predictions. Feature effecs can be decomposed into 3 components(fingerprints):
@@ -112,9 +112,10 @@ Numerical example::
     reg = RandomForestRegressor(n_estimators=10, random_state=42)
     reg.fit(X, y)
 
-    reg_fingerpint = RegressionModelFingerprint(clf, X, num_values=20)
-    reg_fingerpint.fit() # Get linear and non-linear effects
-    reg_fingerpint.get_pairwise_effect([('CRIM', 'ZN'), ('RM', 'AGE'), ('LSTAT', 'DIS')]) # Get pairwise effects
+    reg_fingerpint = RegressionModelFingerprint()
+    reg_fingerprint.fit(clf, X, num_values=20, pairwise_combinations=[('CRIM', 'ZN'), ('RM', 'AGE'), ('LSTAT', 'DIS')])
+    reg_fingerpint.fit() # Fit the model
+    linear_effect, non_linear_effect, pair_wise_effect = reg_fingerpint.get_effects() # Get linear non-linear effects and pairwise effects
 
     # Plot the results
     fig = reg_fingerpint.plot_effects()
