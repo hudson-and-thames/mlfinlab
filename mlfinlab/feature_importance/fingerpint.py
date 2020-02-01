@@ -216,7 +216,7 @@ class AbstractModelFingerprint(ABC):
 
             # See the paper to make use of notation
             f_k = function_values[:, 1]
-            f_l = function_values[:,2]
+            f_l = function_values[:, 2]
             func_value = sum(abs((centered_y_cdf_k_l - f_k - f_l)))
 
             store[str(pair)] = func_value / (num_values ** 2)
