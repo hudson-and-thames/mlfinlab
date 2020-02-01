@@ -212,11 +212,12 @@ class AbstractModelFingerprint(ABC):
 
             # Cumulative pairwise effect value for a given feature
             # Need to center f_k_l as f_k, f_l have been already centered
-            # See the paper to make sense of this notation.
-            f_kl = function_values[:, 0]
+            centered_y_cdf_k_l = function_values[:, 0] - np.mean(function_values[:, 0])
+
+            # See the paper to make use of notation
             f_k = function_values[:, 1]
-            f_l = function_values[:, 2]
-            func_value = sum(abs((f_kl - np.mean(f_kl) - f_k - f_l)))
+            f_l = function_values[:,2]
+            func_value = sum(abs((centered_y_cdf_k_l - f_k - f_l)))
 
             store[str(pair)] = func_value / (num_values ** 2)
 
