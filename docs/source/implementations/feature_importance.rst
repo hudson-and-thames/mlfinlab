@@ -109,15 +109,15 @@ Numerical example::
     y = pd.Series(data['target'])
 
     # Fit the model
-    clf = RandomForestRegressor(n_estimators=10, random_state=42)
-    clf.fit(X, y)
+    reg = RandomForestRegressor(n_estimators=10, random_state=42)
+    reg.fit(X, y)
 
-    clf_fingerpint = RegressionModelFingerprint(clf, X, num_values=20)
-    clf_fingerpint.fit() # Get linear and non-linear effects
-    clf_fingerpint.get_pairwise_effect([('CRIM', 'ZN'), ('RM', 'AGE'), ('LSTAT', 'DIS')]) # Get pairwise effects
+    reg_fingerpint = RegressionModelFingerprint(clf, X, num_values=20)
+    reg_fingerpint.fit() # Get linear and non-linear effects
+    reg_fingerpint.get_pairwise_effect([('CRIM', 'ZN'), ('RM', 'AGE'), ('LSTAT', 'DIS')]) # Get pairwise effects
 
     # Plot the results
-    fig = clf_fingerpint.plot_effects()
+    fig = reg_fingerpint.plot_effects()
     fig.show()
 
 .. image:: feature_imp_images/effects.png

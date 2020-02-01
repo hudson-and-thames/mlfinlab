@@ -121,13 +121,13 @@ class AbstractModelFingerprint(ABC):
             store[col] = nonlinear_effect
         return store
 
-    def get_pairwise_effect(self, combinations: list) -> dict:
+    def compute_pairwise_effect(self, combinations: list) -> dict:
         """
         Get pairwise effect estimates as the de-meaned joint partial prediction of the two variables minus the de-meaned
         partial predictions of each variable independently.
 
         :param combinations: (list) of tuples (feature_i, feature_j) to test pairwise effect
-        :return: None
+        :return: (dict) of raw and normalised pairwise effects.
         """
         store = {}
 
@@ -162,12 +162,13 @@ class AbstractModelFingerprint(ABC):
             store[str(pair)] = func_value / (self.num_values ** 2)
 
         self.pair_wise_effect = {'raw': store, 'norm': _normalize(store)}
+        return self.pair_wise_effect
 
     def fit(self) -> None:
         """
         Get linear, non-linear effects estimation.
 
-        :return: None
+        :return:
         """
         linear_effect = self._get_linear_effect_estimation()
         non_linear_effect = self._get_non_linear_effect_estimation()
