@@ -1,5 +1,5 @@
 """
-Test RegressionModelFingerprint, ClassificationModelFingerprint implementations
+Test RegressionModelFingerprint and ClassificationModelFingerprint implementations.
 """
 
 import unittest
@@ -125,7 +125,6 @@ class TestModelFingerprint(unittest.TestCase):
         clf_fingerpint.fit(clf, X, num_values=20, pairwise_combinations=[(0, 1), (2, 3), (8, 9)])
 
         linear_effect, non_linear_effect, pair_wise_effect = clf_fingerpint.get_effects()
-
 
         for feature, effect in zip([0, 2, 3, 8, 9], [0.0068, 0.0249, 0.014, 0]):
             self.assertAlmostEqual(linear_effect['raw'][feature], effect, delta=1e-3)
