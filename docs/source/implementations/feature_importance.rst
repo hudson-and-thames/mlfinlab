@@ -29,7 +29,7 @@ An example showing how to use various feature importance functions::
   import pandas as pd
   from sklearn.ensemble import RandomForestClassifier
   from mlfinlab.ensemble import SequentiallyBootstrappedBaggingClassifier
-	from mlfinlab.feature_importance import feature_importance_mean_imp_reduction, feature_importance_mean_decrease_accuracy, feature_importance_sfi, plot_feature_importance
+  from mlfinlab.feature_importance import (feature_importance_mean_imp_reduction, feature_importance_mean_decrease_accuracy, feature_importance_sfi, plot_feature_importance)
   from mlfinlab.cross_validation import PurgedKFold, ml_cross_val_score
   from mlfinlab.ensemble import SequentiallyBootstrappedBaggingClassifier
 
@@ -113,7 +113,7 @@ Numerical example::
     reg.fit(X, y)
 
     reg_fingerpint = RegressionModelFingerprint()
-    reg_fingerprint.fit(clf, X, num_values=20, pairwise_combinations=[('CRIM', 'ZN'), ('RM', 'AGE'), ('LSTAT', 'DIS')])
+    reg_fingerprint.fit(reg, X, num_values=20, pairwise_combinations=[('CRIM', 'ZN'), ('RM', 'AGE'), ('LSTAT', 'DIS')])
     reg_fingerpint.fit() # Fit the model
     linear_effect, non_linear_effect, pair_wise_effect = reg_fingerpint.get_effects() # Get linear non-linear effects and pairwise effects
 
