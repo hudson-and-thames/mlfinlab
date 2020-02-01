@@ -1,5 +1,6 @@
 """
 Module which implements feature importance algorithms described in Chapter 8 and other interpretability tools
+from the Journal of Financial Data Science.
 """
 
 from mlfinlab.feature_importance.importance import (feature_importance_mean_decrease_accuracy,
