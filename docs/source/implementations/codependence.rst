@@ -77,7 +77,19 @@ Let's see how various metrics work for different variable dependencies:
 
     import numpy as np
     import matplotlib.pyplot as plt
+    from ace import model # ace package is used for max correlation estimation
     from mlfinlab.codependece import distance_correlation, get_mutual_info, variation_of_information_score
+
+    def max_correlation(x: np.array, y: np.array) -> float:
+        """
+        Get max correlation using ace package.
+        """
+
+        x_input = [x]
+        y_input = y
+        ace_model = model.Model()
+        ace_model.build_model_from_xy(x_input, y_input)
+        return np.corrcoef(ace_model.ace.x_transforms[0], ace_model.ace.y_transform)[0][1]
 
     state = np.random.RandomState(42)
     x = state.normal(size=1000)
@@ -87,8 +99,8 @@ Let's see how various metrics work for different variable dependencies:
     y_4 = np.random.RandomState(0).normal(size=1000) * np.random.RandomState(5).normal(size=1000) # independent
 
     for y, dependency in zip([y_1, y_2, y_3, y_4], ['linear', 'squared', 'y=|x|', 'independent']):
-        text = 'Pearson corr: {:0.2f} \nNorm.mutual info: {:0.2f}\nDistance correlation: {:0.2f} \nInformation variation: {:0.2f}'.format(
-        np.corrcoef(x, y)[0, 1], get_mutual_info(x, y, normalize=True), distance_correlation(x, y), variation_of_information_score(x, y, normalize=True))
+        text = 'Pearson corr: {:0.2f} \nNorm.mutual info: {:0.2f}\nDistance correlation: {:0.2f} \nInformation variation: {:0.2f} \nMax correlation: {:0.2f}'.format(
+        np.corrcoef(x, y)[0, 1], get_mutual_info(x, y, normalize=True), distance_correlation(x, y), variation_of_information_score(x, y, normalize=True), max_correlation(x, y))
 
         fig, ax = plt.subplots(figsize=(8,7))
         props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
@@ -96,6 +108,6 @@ Let's see how various metrics work for different variable dependencies:
                 verticalalignment='top', bbox=props)
         plt.title(dependency)
         ax.plot(x, y, 'ro')
-        plt.show()
+        plt.savefig('{}.png'.format(dependency))
 
 ::
