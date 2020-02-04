@@ -62,12 +62,14 @@ Supporter Sponsors:
 * `John B. Keown`_
 * `Roberto Spadim`_
 * `Zack Gow`_
+* `Jack Yu`_
 
 .. _`Machine Factor Technologies`: https://www.linkedin.com/in/proskurinolexandr/
 .. _`Dr. Ernest P. Chan`: https://www.epchan.com/
 .. _`John B. Keown`: https://www.linkedin.com/in/john-keown-quantitative-finance-big-data-ml/
 .. _`Roberto Spadim`: https://www.linkedin.com/in/roberto-spadim/
 .. _`Zack Gow`: https://www.linkedin.com/in/zackgow/
+.. _`Jack Yu`: https://www.linkedin.com/in/jihao-yu/
 
 Built With
 ##########
@@ -115,6 +117,7 @@ Implementations
    implementations/structural_breaks
    implementations/microstructural_features
    implementations/clustering
+   implementations/codependence
 
 
 
@@ -131,6 +134,7 @@ Implementations
 * :doc:`implementations/structural_breaks`
 * :doc:`implementations/microstructural_features`
 * :doc:`implementations/clustering`
+* :doc:`implementations/codependence`
 
 Additional Information
 ######################

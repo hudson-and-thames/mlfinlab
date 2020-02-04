@@ -29,7 +29,7 @@ An example showing how to use various feature importance functions::
   import pandas as pd
   from sklearn.ensemble import RandomForestClassifier
   from mlfinlab.ensemble import SequentiallyBootstrappedBaggingClassifier
-	from mlfinlab.feature_importance import feature_importance_mean_imp_reduction, feature_importance_mean_decrease_accuracy, feature_importance_sfi, plot_feature_importance
+  from mlfinlab.feature_importance import (feature_importance_mean_imp_reduction, feature_importance_mean_decrease_accuracy, feature_importance_sfi, plot_feature_importance)
   from mlfinlab.cross_validation import PurgedKFold, ml_cross_val_score
   from mlfinlab.ensemble import SequentiallyBootstrappedBaggingClassifier
 
@@ -50,7 +50,7 @@ An example showing how to use various feature importance functions::
                                                   price_bars=price_bars, oob_score=True)
   clf.fit(X_train, y_train)
 
-  oos_score = ml_cross_val_score(sclf, X_train, y_train, cv_gen=cv_gen, sample_weight=None,
+  oos_score = ml_cross_val_score(clf, X_train, y_train, cv_gen=cv_gen, sample_weight=None,
                                        scoring='accuracy').mean()
 
   mdi_feature_imp = feature_importance_mean_imp_reduction(clf, X_train.columns)
@@ -77,6 +77,55 @@ Resulting images for MDI, MDA, SFI feature importances respectively:
 .. image:: feature_imp_images/sfi_feat_imp.png
    :scale: 40 %
    :align: center
+
+
+
+Model fingerprints algorithm
+=============================
+
+Another way to get a better understanding of a machine learning model is to understand how feature values influence model predictions. Feature effecs can be decomposed into 3 components(fingerprints):
+
+- **Linear component**
+- **Non-linear component**
+- **Pairwise interaction component** (how a pair of features affect model predictions)
+
+Yimou Li, David Turkington, Alireza Yazdani published a paper in a Journal of Financial Data Science 'Beyond the Black Box: An Intuitive Approach to Investment Prediction with Machine Learning'
+(https://jfds.pm-research.com/content/early/2019/12/11/jfds.2019.1.023) which describes in details the algorithm of extracting **linear**, **non-linear** and **pairwise** feature effects.
+This module implements the algorithm described in the article.
+
+
+.. py:currentmodule:: mlfinlab.feature_importance.fingerpint
+.. automodule:: mlfinlab.feature_importance.fingerpint
+   :members:
+
+Numerical example::
+
+    from sklearn.datasets import load_boston
+    from sklearn.ensemble import RandomForestRegressor
+    from mlfinlab.feature_importance import RegressionModelFingerprint
+
+    data = load_boston() # Get a dataset
+    X = pd.DataFrame(columns=data['feature_names'], data=data['data'])
+    y = pd.Series(data['target'])
+
+    # Fit the model
+    reg = RandomForestRegressor(n_estimators=10, random_state=42)
+    reg.fit(X, y)
+
+    reg_fingerpint = RegressionModelFingerprint()
+    reg_fingerprint.fit(reg, X, num_values=20, pairwise_combinations=[('CRIM', 'ZN'), ('RM', 'AGE'), ('LSTAT', 'DIS')])
+    reg_fingerpint.fit() # Fit the model
+    linear_effect, non_linear_effect, pair_wise_effect = reg_fingerpint.get_effects() # Get linear non-linear effects and pairwise effects
+
+    # Plot the results
+    fig = reg_fingerpint.plot_effects()
+    fig.show()
+
+.. image:: feature_imp_images/effects.png
+   :scale: 70 %
+   :align: center
+
+
 
 
 PCA features and analysis
