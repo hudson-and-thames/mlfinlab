@@ -36,6 +36,7 @@ A special thank you to our sponsors! It is because of your contributions that we
 * [John B. Keown](https://www.linkedin.com/in/john-keown-quantitative-finance-big-data-ml/)
 * [Roberto Spadim](https://www.linkedin.com/in/roberto-spadim/)
 * [Zack Gow](https://www.linkedin.com/in/zackgow/)
+* [Jack Yu](https://www.linkedin.com/in/jihao-yu/)
 
 ## Barriers to Entry
 As most of you know, getting through the first 3 chapters of the book is challenging as it relies on HFT data to 
