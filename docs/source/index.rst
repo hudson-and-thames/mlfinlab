@@ -117,6 +117,7 @@ Implementations
    implementations/structural_breaks
    implementations/microstructural_features
    implementations/clustering
+   implementations/codependence
 
 
 
@@ -133,6 +134,7 @@ Implementations
 * :doc:`implementations/structural_breaks`
 * :doc:`implementations/microstructural_features`
 * :doc:`implementations/clustering`
+* :doc:`implementations/codependence`
 
 Additional Information
 ######################
