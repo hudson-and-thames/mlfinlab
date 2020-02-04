@@ -39,6 +39,7 @@ class MeanVarianceOptimisation:
         '''
         Calculate the portfolio asset allocations using the method specified.
 
+        :param asset_names: (list) a list of strings containing the asset names
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
         :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
         :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns (sigma)
