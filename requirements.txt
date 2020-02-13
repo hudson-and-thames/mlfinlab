@@ -1,6 +1,7 @@
 codecov==2.0.15
 coverage==4.5.2
 cloudpickle==1.2.1  # needed for dask
+cvxpy==1.0.25
 numba==0.46.0
 numpy==1.17.3
 matplotlib==3.1.1
