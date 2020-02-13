@@ -27,10 +27,11 @@ The following is the online documentation for the package: [read-the-docs](https
 A special thank you to our sponsors! It is because of your contributions that we are able to continue the development of academic research for open source. If you would like to become a sponsor and help support our research, please sign up on [Patreon](https://www.patreon.com/HudsonThames).
 
 ### Platinum Sponsor:
-* [Machine Factor Technologies](https://www.linkedin.com/in/proskurinolexandr/)
+* [Machine Factor Technologies](https://machinefactor.tech/)
 
 ### Gold Sponsors:
-* [Dr. Ernest P. Chan](https://www.epchan.com/)
+* [E.P. Chan & Associates](https://www.epchan.com/)
+* [Markov Capital](http://www.markovcapital.se/)
 
 ### Supporter Sponsors:
 * [John B. Keown](https://www.linkedin.com/in/john-keown-quantitative-finance-big-data-ml/)
