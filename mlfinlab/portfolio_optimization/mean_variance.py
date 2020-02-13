@@ -45,7 +45,7 @@ class MeanVarianceOptimisation:
         :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns (sigma)
         :param solution: (str) the type of solution/algorithm to use to calculate the weights.
                                Currently supported solution strings - inverse_variance, min_volatility, max_sharpe and
-                               efficient_risk."
+                               efficient_risk"
         :param risk_free_rate: (float) the rate of return for a risk-free asset.
         :param target_return: (float) target return of the portfolio
         :param weight_bounds: (dict/tuple) can be either a single tuple of upper and lower bounds
