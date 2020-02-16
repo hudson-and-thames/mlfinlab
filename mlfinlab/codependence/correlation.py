@@ -4,6 +4,7 @@ Codependence: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&downlo
 """
 
 import numpy as np
+import numpy.ma as ma
 from scipy.spatial.distance import squareform, pdist
 
 
@@ -19,7 +20,7 @@ def angular_distance(x: np.array, y: np.array) -> float:
     :param y: (np.array) Y vector.
     :return: (float) angular distance.
     """
-    corr_coef = np.corrcoef(x, y)[0][1]
+    corr_coef = ma.corrcoef(ma.masked_invalid(x), ma.masked_invalid(y))[0][1]
     return np.sqrt(0.5 * (1 - corr_coef))
 
 
@@ -32,7 +33,7 @@ def absolute_angular_distance(x: np.array, y: np.array) -> float:
     :return: (float) absolute angular distance
     """
 
-    corr_coef = np.corrcoef(x, y)[0][1]
+    corr_coef = ma.corrcoef(ma.masked_invalid(x), ma.masked_invalid(y))[0][1]
     return np.sqrt(0.5 * (1 - abs(corr_coef)))
 
 
@@ -45,7 +46,7 @@ def squared_angular_distance(x: np.array, y: np.array) -> float:
     :return: (float) squared angular distance
     """
 
-    corr_coef = np.corrcoef(x, y)[0][1]
+    corr_coef = ma.corrcoef(ma.masked_invalid(x), ma.masked_invalid(y))[0][1]
     return np.sqrt(0.5 * (1 - corr_coef ** 2))
 
 
@@ -61,19 +62,20 @@ def distance_correlation(x: np.array, y: np.array) -> float:
 
     x = x[:, None]
     y = y[:, None]
+    good_indices = ~(np.isnan(x) | np.isnan(y) | np.isinf(x) | np.isinf(y))
 
-    x = np.atleast_2d(x)
-    y = np.atleast_2d(y)
+    x = np.atleast_2d(x[good_indices])
+    y = np.atleast_2d(y[good_indices])
 
-    a = squareform(pdist(x))
-    b = squareform(pdist(y))
+    a = squareform(pdist(x[good_indices]))
+    b = squareform(pdist(y[good_indices]))
 
     A = a - a.mean(axis=0)[None, :] - a.mean(axis=1)[:, None] + a.mean()
     B = b - b.mean(axis=0)[None, :] - b.mean(axis=1)[:, None] + b.mean()
 
-    d_cov_xx = (A * A).sum() / (x.shape[0] ** 2)
-    d_cov_xy = (A * B).sum() / (x.shape[0] ** 2)
-    d_cov_yy = (B * B).sum() / (x.shape[0] ** 2)
+    d_cov_xx = (A * A).sum() / (x[good_indices].shape[0] ** 2)
+    d_cov_xy = (A * B).sum() / (x[good_indices].shape[0] ** 2)
+    d_cov_yy = (B * B).sum() / (x[good_indices].shape[0] ** 2)
 
     coef = np.sqrt(d_cov_xy) / np.sqrt(np.sqrt(d_cov_xx) * np.sqrt(d_cov_yy))
 
