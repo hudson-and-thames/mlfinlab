@@ -41,15 +41,17 @@ def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: boo
     :return: (float) mutual info score.
     """
 
+    good_indices = ~(np.isnan(x) | np.isnan(y) | np.isinf(x) | np.isinf(y))
     if n_bins is None:
-        corr_coef = np.corrcoef(x, y)[0][1]
-        n_bins = get_optimal_number_of_bins(x.shape[0], corr_coef=corr_coef)
+        import numpy.ma as ma
+        corr_coef = ma.corrcoef(ma.masked_invalid(x), ma.masked_invalid(y))[0][1]
+        n_bins = get_optimal_number_of_bins(x[good_indices].shape[0], corr_coef=corr_coef)
 
-    contingency = np.histogram2d(x, y, n_bins)[0]
+    contingency = np.histogram2d(x[good_indices], y[good_indices], n_bins)[0]
     mutual_info = mutual_info_score(None, None, contingency=contingency)  # Mutual information
     if normalize is True:
-        marginal_x = ss.entropy(np.histogram(x, n_bins)[0])  # Marginal for x
-        marginal_y = ss.entropy(np.histogram(y, n_bins)[0])  # Marginal for y
+        marginal_x = ss.entropy(np.histogram(x[good_indices], n_bins)[0])  # Marginal for x
+        marginal_y = ss.entropy(np.histogram(y[good_indices], n_bins)[0])  # Marginal for y
         mutual_info /= min(marginal_x, marginal_y)
     return mutual_info
 
@@ -66,14 +68,16 @@ def variation_of_information_score(x: np.array, y: np.array, n_bins: int = None,
     :return: (float) variation of information score.
     """
 
+    good_indices = ~(np.isnan(x) | np.isnan(y) | np.isinf(x) | np.isinf(y))
     if n_bins is None:
-        corr_coef = np.corrcoef(x, y)[0][1]
-        n_bins = get_optimal_number_of_bins(x.shape[0], corr_coef=corr_coef)
+        import numpy.ma as ma
+        corr_coef = ma.corrcoef(ma.masked_invalid(x), ma.masked_invalid(y))[0][1]
+        n_bins = get_optimal_number_of_bins(x[good_indices].shape[0], corr_coef=corr_coef)
 
-    contingency = np.histogram2d(x, y, n_bins)[0]
+    contingency = np.histogram2d(x[good_indices], y[good_indices], n_bins)[0]
     mutual_info = mutual_info_score(None, None, contingency=contingency)  # Mutual information
-    marginal_x = ss.entropy(np.histogram(x, n_bins)[0])  # Marginal for x
-    marginal_y = ss.entropy(np.histogram(y, n_bins)[0])  # Marginal for y
+    marginal_x = ss.entropy(np.histogram(x[good_indices], n_bins)[0])  # Marginal for x
+    marginal_y = ss.entropy(np.histogram(y[good_indices], n_bins)[0])  # Marginal for y
     score = marginal_x + marginal_y - 2 * mutual_info  # Variation of information
 
     if normalize is True:
