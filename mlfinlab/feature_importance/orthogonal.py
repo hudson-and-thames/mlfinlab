@@ -1,5 +1,5 @@
 """
-Module which implements feature PCA compression and PCA analysis of feature importance
+Module which implements feature PCA compression and PCA analysis of feature importance.
 """
 
 import pandas as pd
@@ -11,10 +11,11 @@ def _get_eigen_vector(dot_matrix, variance_thresh):
     """
     Snippet 8.5, page 119. Computation of Orthogonal Features
 
-    Get eigen values and eigen vector from matrix which explain % variance_thresh of total variance
-    :param dot_matrix: (np.array): matrix for which eigen values/vectors should be computed
-    :param variance_thresh: (float): % of overall variance which compressed vectors should explain
-    :return: (pd.Series, pd.DataFrame): eigen values, eigen vectors
+    Get eigen values and eigen vector from matrix which explain % variance_thresh of total variance.
+
+    :param dot_matrix: (np.array): Matrix for which eigen values/vectors should be computed.
+    :param variance_thresh: (float): Percentage % of overall variance which compressed vectors should explain.
+    :return: (pd.Series, pd.DataFrame): Eigen values, Eigen vectors.
     """
     # Compute eigen_vec from dot prod matrix, reduce dimension
     eigen_val, eigen_vec = np.linalg.eigh(dot_matrix)
@@ -47,13 +48,13 @@ def get_orthogonal_features(feature_df, variance_thresh=.95):
     """
     Snippet 8.5, page 119. Computation of Orthogonal Features.
 
-    Get PCA orthogonal features
+    Get PCA orthogonal features.
 
-    :param feature_df: (pd.DataFrame): with features
-    :param variance_thresh: (float): % of overall variance which compressed vectors should explain
-    :return: (pd.DataFrame): compressed PCA features which explain %variance_thresh of variance
+    :param feature_df: (pd.DataFrame): Dataframe of features.
+    :param variance_thresh: (float): Percentage % of overall variance which compressed vectors should explain.
+    :return: (pd.DataFrame): Compressed PCA features which explain %variance_thresh of variance.
     """
-    # Given a dataframe of features, compute orthofeatures
+    # Given a dataframe of features, compute orthogonal features
     feature_df_standard = _standardize_df(feature_df)  # Standardize
     dot_matrix = pd.DataFrame(np.dot(feature_df_standard.T, feature_df_standard), index=feature_df.columns,
                               columns=feature_df.columns)
@@ -64,25 +65,24 @@ def get_orthogonal_features(feature_df, variance_thresh=.95):
 
 def get_pca_rank_weighted_kendall_tau(feature_imp, pca_rank):
     """
-    Snippet 8.6, page 121. Computation of Weighted Kendall's Tau Between Feature Importance and Inverse PCA Ranking
+    Snippet 8.6, page 121. Computation of Weighted Kendall's Tau Between Feature Importance and Inverse PCA Ranking.
 
-    :param feature_imp: (np.array): with feature mean importance
-    :param pca_rank: (np.array): PCA based feature importance rank
-    :return: (float): weighted Kendall tau of feature importance and inverse PCA rank with p_value
+    :param feature_imp: (np.array): Feature mean importance.
+    :param pca_rank: (np.array): PCA based feature importance rank.
+    :return: (float): Weighted Kendall Tau of feature importance and inverse PCA rank with p_value.
     """
-    return weightedtau(feature_imp, pca_rank ** -1.)
+    return weightedtau(feature_imp, pca_rank ** -1.0)
 
 
 def feature_pca_analysis(feature_df, feature_importance, variance_thresh=0.95):
     """
-    Perform correlation analysis between feature importance (MDI for example, supervised)
-    and PCA eigen values (unsupervised). High correlation means that probably the pattern identified
-    by the ML algorithm is not entirely overfit.
+    Perform correlation analysis between feature importance (MDI for example, supervised) and PCA eigen values
+    (unsupervised). High correlation means that probably the pattern identified by the ML algorithm is not entirely overfit.
 
-    :param feature_df: (pd.DataFrame): with features
-    :param feature_importance: (pd.DataFrame): individual MDI feature importance
-    :param variance_thresh: (float): % of overall variance which compressed vectors should explain in PCA compression
-    :return: (dict): with kendall, spearman, pearson and weighted_kendall correlations and p_values
+    :param feature_df: (pd.DataFrame): Features dataframe.
+    :param feature_importance: (pd.DataFrame): Individual MDI feature importance.
+    :param variance_thresh: (float): Percentage % of overall variance which compressed vectors should explain in PCA compression.
+    :return: (dict): Dictionary with kendall, spearman, pearson and weighted_kendall correlations and p_values.
     """
     feature_df_standard = _standardize_df(feature_df)  # Standardize
     dot = pd.DataFrame(np.dot(feature_df_standard.T, feature_df_standard), index=feature_df.columns,
