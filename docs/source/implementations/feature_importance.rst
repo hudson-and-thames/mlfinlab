@@ -12,13 +12,9 @@ One of the key research principles of Advances in Financial Machine learning is:
 
 The book describes three methods to get importance scores:
 
-1) Mean Decrease Impurity (MDI): This score can be obtained from tree-based classifiers and corresponds to sklearn's
-feature_importances attribute. MDI uses in-sample (IS) performance to estimate feature importance.
-2) Mean Decrease Accuracy (MDA): This method can be applied to any classifier, not only tree based. MDA uses out-of-sample
-(OOS) performance in order to estimate feature importance.
-3) Single Feature Importance (SFI): MDA and MDI feature suffer from substitution effects. If two features are highly
-correlated, one of them will be considered as important while the other one will be redundant. SFI is a OOS feature
-importance estimator which doesn't suffer from substitution effects because it estimates each feature importance separately.
+1) Mean Decrease Impurity (MDI): This score can be obtained from tree-based classifiers and corresponds to sklearn's feature_importances attribute. MDI uses in-sample (IS) performance to estimate feature importance.
+2) Mean Decrease Accuracy (MDA): This method can be applied to any classifier, not only tree based. MDA uses out-of-sample (OOS) performance in order to estimate feature importance.
+3) Single Feature Importance (SFI): MDA and MDI feature suffer from substitution effects. If two features are highly correlated, one of them will be considered as important while the other one will be redundant. SFI is a OOS feature importance estimator which doesn't suffer from substitution effects because it estimates each feature importance separately.
 
 MDI, MDA, and SFI Feature Importance
 ====================================
