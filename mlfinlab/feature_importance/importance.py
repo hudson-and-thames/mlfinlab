@@ -146,7 +146,7 @@ def single_feature_importance(clf, X, y, cv_gen, sample_weight=None, scoring=log
     OOS performance score of each feature in isolation. A few considerations:
 
     * This method can be applied to any classifier, not only tree-based classifiers.
-    * SFI is not limited to accuracy as the sole performance score. 3.
+    * SFI is not limited to accuracy as the sole performance score.
     * Unlike MDI and MDA, no substitution effects take place, since only one feature is taken into consideration at a time.
     * Like MDA, it can conclude that all features are unimportant, because performance is evaluated via OOS CV.
 
