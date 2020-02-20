@@ -17,8 +17,8 @@ from mlfinlab.filters.filters import cusum_filter
 from mlfinlab.labeling.labeling import get_events, add_vertical_barrier, get_bins
 from mlfinlab.sampling.bootstrapping import get_ind_mat_label_uniqueness, get_ind_matrix
 from mlfinlab.ensemble.sb_bagging import SequentiallyBootstrappedBaggingClassifier
-from mlfinlab.feature_importance.importance import (feature_importance_mean_decrease_impurity,
-                                                    feature_importance_mean_decrease_accuracy, feature_importance_sfi,
+from mlfinlab.feature_importance.importance import (mean_decrease_impurity,
+                                                    mean_decrease_accuracy, single_feature_importance,
                                                     plot_feature_importance)
 from mlfinlab.feature_importance.orthogonal import feature_pca_analysis, get_orthogonal_features
 from mlfinlab.cross_validation.cross_validation import PurgedKFold, ml_cross_val_score
@@ -159,7 +159,7 @@ class TestFeatureImportance(unittest.TestCase):
         self.assertAlmostEqual(np.std(pca_features[:, 4]), 0.948, delta=0.2)
 
         sb_clf.fit(self.X_train, self.y_train_clf)
-        mdi_feat_imp = feature_importance_mean_decrease_impurity(sb_clf, self.X_train.columns)
+        mdi_feat_imp = mean_decrease_impurity(sb_clf, self.X_train.columns)
         pca_corr_res = feature_pca_analysis(self.X_train, mdi_feat_imp)
 
         # Check correlation metrics results
@@ -172,21 +172,20 @@ class TestFeatureImportance(unittest.TestCase):
         sb_clf, cv_gen = self._prepare_clf_data_set(oob_score=False)
 
         # MDI feature importance
-        mdi_feat_imp = feature_importance_mean_decrease_impurity(sb_clf, self.X_train.columns)
+        mdi_feat_imp = mean_decrease_impurity(sb_clf, self.X_train.columns)
 
         # MDA feature importance
-        mda_feat_imp_log_loss = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
-                                                                          cv_gen,
-                                                                          sample_weight=np.ones(
-                                                                              (self.X_train.shape[0],)))
-        mda_feat_imp_f1 = feature_importance_mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
-                                                                    cv_gen, scoring=f1_score)
+        mda_feat_imp_log_loss = mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf, cv_gen,
+                                                       sample_weight=np.ones((self.X_train.shape[0],)))
+        mda_feat_imp_f1 = mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
+                                                 cv_gen, scoring=f1_score)
         # SFI feature importance
-        sfi_feat_imp_log_loss = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
-                                                       cv_gen=cv_gen, sample_weight=np.ones((self.X_train.shape[0],)))
-        sfi_feat_imp_f1 = feature_importance_sfi(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
-                                                 cv_gen=cv_gen,
-                                                 scoring=f1_score)  # Take only 5 features for faster test run
+        # Take only 5 features for faster test run
+        sfi_feat_imp_log_loss = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]],
+                                                          self.y_train_clf, cv_gen=cv_gen,
+                                                          sample_weight=np.ones((self.X_train.shape[0],)))
+        sfi_feat_imp_f1 = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
+                                                    cv_gen=cv_gen, scoring=f1_score)
 
         # MDI assertions
         self.assertAlmostEqual(mdi_feat_imp['mean'].sum(), 1, delta=0.001)
@@ -224,10 +223,10 @@ class TestFeatureImportance(unittest.TestCase):
 
         sb_clf.fit(self.X_train, self.y_train_clf)
 
-        mdi_feat_imp = feature_importance_mean_decrease_impurity(sb_clf, self.X_train.columns)
+        mdi_feat_imp = mean_decrease_impurity(sb_clf, self.X_train.columns)
         plot_feature_importance(mdi_feat_imp, oob_score=sb_clf.oob_score_, oos_score=oos_score)
         plot_feature_importance(mdi_feat_imp, oob_score=sb_clf.oob_score_, oos_score=oos_score,
-                                savefig=True, output_path='test.png')
+                                save_fig=True, output_path='test.png')
 
         os.remove('test.png')
 

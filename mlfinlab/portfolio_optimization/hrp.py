@@ -10,9 +10,7 @@ import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 from sklearn.covariance import OAS
-import matplotlib
-
-matplotlib.use('Agg')
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 
 class HierarchicalRiskParity:
@@ -28,6 +26,7 @@ class HierarchicalRiskParity:
         self.seriated_distances = None
         self.ordered_indices = None
         self.clusters = None
+        self.returns_estimator = ReturnsEstimation()
 
     @staticmethod
     def _tree_clustering(correlation, method='single'):
@@ -130,22 +129,6 @@ class HierarchicalRiskParity:
         return dendrogram_plot
 
     @staticmethod
-    def _calculate_returns(asset_prices, resample_by):
-        '''
-        Calculate the annualised mean historical returns from asset price data
-
-        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
-        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                  'B' meaning daily business days which is equivalent to no resampling
-        :return: (pd.Dataframe) stock returns
-        '''
-
-        asset_prices = asset_prices.resample(resample_by).last()
-        asset_returns = asset_prices.pct_change()
-        asset_returns = asset_returns.dropna(how='all')
-        return asset_returns
-
-    @staticmethod
     def _shrink_covariance(covariance):
         '''
         Regularise/Shrink the asset covariances
@@ -176,42 +159,62 @@ class HierarchicalRiskParity:
         corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
         return corr
 
-    def allocate(self, asset_prices, resample_by='B', use_shrinkage=False):
+    def allocate(self,
+                 asset_names,
+                 asset_prices=None,
+                 asset_returns=None,
+                 covariance_matrix=None,
+                 resample_by=None,
+                 use_shrinkage=False):
+        # pylint: disable=invalid-name, too-many-branches
         '''
         Calculate asset allocations using HRP algorithm
 
+        :param asset_names: (list) a list of strings containing the asset names
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
                                             indexed by date
+        :param asset_returns: (pd.Dataframe/numpy matrix) user supplied matrix of asset returns
+        :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                          'B' meaning daily business days which is equivalent to no resampling
+                                  None for no resampling
         :param use_shrinkage: (Boolean) specifies whether to shrink the covariances
         '''
 
-        if not isinstance(asset_prices, pd.DataFrame):
-            raise ValueError("Asset prices matrix must be a dataframe")
-        if not isinstance(asset_prices.index, pd.DatetimeIndex):
-            raise ValueError("Asset prices dataframe must be indexed by date.")
+        if asset_prices is None and asset_returns is None and covariance_matrix is None:
+            raise ValueError("You need to supply either raw prices or returns or a covariance matrix of asset returns")
 
-        # Calculate the returns
-        asset_returns = self._calculate_returns(asset_prices, resample_by=resample_by)
+        if asset_prices is not None:
+            if not isinstance(asset_prices, pd.DataFrame):
+                raise ValueError("Asset prices matrix must be a dataframe")
+            if not isinstance(asset_prices.index, pd.DatetimeIndex):
+                raise ValueError("Asset prices dataframe must be indexed by date.")
 
-        num_assets = asset_returns.shape[1]
-        assets = asset_returns.columns
+        # Calculate the returns if the user does not supply a returns dataframe
+        if asset_returns is None and covariance_matrix is None:
+            asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
+        asset_returns = pd.DataFrame(asset_returns, columns=asset_names)
 
-        # Covariance and correlation
-        cov = asset_returns.cov()
+        # Calculate covariance of returns or use the user specified covariance matrix
+        if covariance_matrix is None:
+            covariance_matrix = asset_returns.cov()
+        cov = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
+
+        # Shrink covariance
         if use_shrinkage:
             cov = self._shrink_covariance(covariance=cov)
+
+        # Calculate correlation from covariance matrix
         corr = self._cov2corr(covariance=cov)
 
         # Step-1: Tree Clustering
         distances, self.clusters = self._tree_clustering(correlation=corr)
 
         # Step-2: Quasi Diagnalization
+        num_assets = len(asset_names)
         self.ordered_indices = self._quasi_diagnalization(num_assets, 2 * num_assets - 2)
-        self.seriated_distances, self.seriated_correlations = self._get_seriated_matrix(assets=assets,
+        self.seriated_distances, self.seriated_correlations = self._get_seriated_matrix(assets=asset_names,
                                                                                         distances=distances,
                                                                                         correlations=corr)
 
         # Step-3: Recursive Bisection
-        self._recursive_bisection(covariances=cov, assets=assets)
+        self._recursive_bisection(covariances=cov, assets=asset_names)
