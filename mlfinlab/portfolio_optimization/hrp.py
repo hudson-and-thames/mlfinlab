@@ -79,7 +79,7 @@ class HierarchicalRiskParity:
         '''
         Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets
 
-        :param covariances: (np.array) the covariance matrix
+        :param covariances: (pd.Dataframe) the covariance matrix
         :param assets: (list) list of asset names in the portfolio
         '''
 

@@ -299,7 +299,6 @@ class TestCLA(unittest.TestCase):
             assert len(turning_point) == self.data.shape[1]
             np.testing.assert_almost_equal(np.sum(turning_point), 1)
 
-
 class TestHRP(unittest.TestCase):
     # pylint: disable=too-many-public-methods
     """
@@ -428,6 +427,21 @@ class TestHRP(unittest.TestCase):
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
+
+class TestHCAA(unittest.TestCase):
+    # pylint: disable=too-many-public-methods
+    """
+    Tests different functions of the HCAA algorithm class.
+    """
+
+    def setUp(self):
+        """
+        Set the file path for the tick data csv
+        """
+        project_path = os.path.dirname(__file__)
+        data_path = project_path + '/test_data/stock_prices.csv'
+        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
+
 
 class TestMVO(unittest.TestCase):
     # pylint: disable=too-many-public-methods
