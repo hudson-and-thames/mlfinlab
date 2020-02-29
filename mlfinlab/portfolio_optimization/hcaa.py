@@ -1,5 +1,8 @@
 '''
-This module implements the Hierarchical Equal Risk Contribution (HERC) algorithm and its extended components mentioned in the following papers: `Raffinot, Thomas, The Hierarchical Equal Risk Contribution Portfolio (August 23, 2018). <https://ssrn.com/abstract=3237540>`_; and `Raffinot, Thomas, Hierarchical Clustering Based Asset Allocation (May 2017). <https://ssrn.com/abstract=2840729>`_;
+This module implements the Hierarchical Equal Risk Contribution (HERC) algorithm and its extended components mentioned in the
+ following papers: `Raffinot, Thomas, The Hierarchical Equal Risk Contribution Portfolio (August 23,
+ 2018). <https://ssrn.com/abstract=3237540>`_; and `Raffinot, Thomas, Hierarchical Clustering Based Asset Allocation (May 2017).
+ <https://ssrn.com/abstract=2840729>`_;
 '''
 
 import numpy as np
@@ -11,7 +14,11 @@ from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 class HierarchicalClusteringAssetAllocation:
     '''
-    The class extends the Hierarchical Risk Parity (HRP) algorithm first proposed by `Lopez de Prado <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_; While the vanilla HRP algorithm uses only the variance as a risk measure for assigning weights, the HERC algorithm proposed by Raffinot, allows investors to use other risk metrics like Expected Shortfall, Sharpe Ratio and Conditional Drawdown. Furthermore, this can be easily extended to include custom risk measures of our own.
+    The class extends the Hierarchical Risk Parity (HRP) algorithm first proposed by `Lopez de Prado
+    <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_; While the vanilla HRP algorithm uses only the variance as a
+    risk measure for assigning weights, the HERC algorithm proposed by Raffinot, allows investors to use other risk metrics like
+    Expected Shortfall, Sharpe Ratio and Conditional Drawdown. Furthermore, this can be easily extended to include custom risk
+     measures of our own.
     '''
 
     def __init__(self, calculate_expected_returns='mean'):
@@ -227,13 +234,13 @@ class HierarchicalClusteringAssetAllocation:
                 right_cluster = clustered_alphas[subcluster + 1]
 
                 # Calculate allocation factor based on the metric
-                if allocation_metric == '1/n':
+                if allocation_metric == 'equal_weighting':
                     alloc_factor = 0.5
                 elif allocation_metric == 'minimum_variance':
                     left_cluster_variance = self._get_cluster_variance(covariance_matrix, left_cluster)
                     right_cluster_variance = self._get_cluster_variance(covariance_matrix, right_cluster)
                     alloc_factor = 1 - left_cluster_variance / (left_cluster_variance + right_cluster_variance)
-                elif allocation_metric == 'minimum_sd':
+                elif allocation_metric == 'minimum_standard_deviation':
                     left_cluster_sd = np.sqrt(self._get_cluster_variance(covariance_matrix, left_cluster))
                     right_cluster_sd = np.sqrt(self._get_cluster_variance(covariance_matrix, right_cluster))
                     alloc_factor = 1 - left_cluster_sd / (left_cluster_sd + right_cluster_sd)
@@ -250,7 +257,7 @@ class HierarchicalClusteringAssetAllocation:
                         left_cluster_variance = self._get_cluster_variance(covariance_matrix, left_cluster)
                         right_cluster_variance = self._get_cluster_variance(covariance_matrix, right_cluster)
                         alloc_factor = 1 - left_cluster_variance / (left_cluster_variance + right_cluster_variance)
-                elif allocation_metric == 'es':
+                elif allocation_metric == 'expected_shortfall':
                     left_cluster_expected_shortfall = self._get_cluster_expected_shortfall(asset_returns=asset_returns,
                                                                                            covariance=covariance_matrix,
                                                                                            confidence_level=confidence_level,
@@ -261,7 +268,7 @@ class HierarchicalClusteringAssetAllocation:
                                                                                            cluster_indices=right_cluster)
                     alloc_factor = \
                         left_cluster_expected_shortfall / (left_cluster_expected_shortfall + right_cluster_expected_shortfall)
-                elif allocation_metric == 'cdd':
+                elif allocation_metric == 'conditional_drawdown_risk':
                     left_cluster_conditional_drawdown = self._get_cluster_conditional_drawdown_at_risk(asset_returns=asset_returns,
                                                          covariance=covariance_matrix,
                                                          confidence_level=confidence_level,
@@ -335,9 +342,9 @@ class HierarchicalClusteringAssetAllocation:
             if not isinstance(asset_prices.index, pd.DatetimeIndex):
                 raise ValueError("Asset prices dataframe must be indexed by date.")
 
-        if allocation_metric not in {'minimum_variance', 'minimum_sd', 'sharpe_ratio', '1/n', 'es', 'cdd'}:
+        if allocation_metric not in {'minimum_variance', 'minimum_standard_deviation', 'sharpe_ratio', 'equal_weighting', 'expected_shortfall', 'conditional_drawdown_risk'}:
             raise ValueError("Unknown allocation metric specified. Supported metrics are - minimum_variance, "
-                         "minimum_sd, sharpe_ratio, 1/n, es, cdd")
+                         "minimum_standard_deviation, sharpe_ratio, equal_weighting, expected_shortfall, conditional_drawdown_risk")
 
         # Calculate the expected returns if the user does not supply any returns
         if allocation_metric == 'sharpe_ratio' and expected_asset_returns is None:
