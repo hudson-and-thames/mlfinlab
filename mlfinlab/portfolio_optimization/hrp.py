@@ -11,6 +11,7 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 from sklearn.covariance import OAS
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
 
 
 class HierarchicalRiskParity:
@@ -27,6 +28,7 @@ class HierarchicalRiskParity:
         self.ordered_indices = None
         self.clusters = None
         self.returns_estimator = ReturnsEstimation()
+        self.risk_metrics = RiskMetrics()
 
     @staticmethod
     def _tree_clustering(correlation, method='single'):
@@ -75,11 +77,37 @@ class HierarchicalRiskParity:
         seriated_correlations = correlations.loc[ordering, ordering]
         return seriated_distances, seriated_correlations
 
-    def _recursive_bisection(self, covariances, assets):
+    def _get_inverse_variance_weights(self, covariance):
+        '''
+        Calculate the inverse variance weight allocations.
+
+        :param covariance: (pd.Dataframe) covariance matrix of assets
+        :return: (list) inverse variance weight values
+        '''
+
+        inv_diag = 1 / np.diag(covariance.values)
+        parity_w = inv_diag * (1 / np.sum(inv_diag))
+        return parity_w
+
+    def _get_cluster_variance(self, covariance, cluster_indices):
+        '''
+        Calculate cluster variance.
+
+        :param covariance: (pd.Dataframe) covariance matrix of assets
+        :param cluster_indices: (list) list of asset indices for the cluster
+        :return: (float) variance of the cluster
+        '''
+
+        cluster_covariance = covariance.iloc[cluster_indices, cluster_indices]
+        parity_w = self._get_inverse_variance_weights(cluster_covariance)
+        cluster_variance = self.risk_metrics.calculate_variance(covariance=cluster_covariance, weights=parity_w)
+        return cluster_variance
+
+    def _recursive_bisection(self, covariance, assets):
         '''
         Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets
 
-        :param covariances: (pd.Dataframe) the covariance matrix
+        :param covariance: (pd.Dataframe) the covariance matrix
         :param assets: (list) list of asset names in the portfolio
         '''
 
@@ -96,20 +124,12 @@ class HierarchicalRiskParity:
                 left_cluster = clustered_alphas[subcluster]
                 right_cluster = clustered_alphas[subcluster + 1]
 
-                # Get left cluster variance
-                left_subcovar = covariances.iloc[left_cluster, left_cluster]
-                inv_diag = 1 / np.diag(left_subcovar.values)
-                parity_w = inv_diag * (1 / np.sum(inv_diag))
-                left_cluster_var = np.dot(parity_w, np.dot(left_subcovar, parity_w))
+                # Get left and right cluster variances and calculate allocation factor
+                left_cluster_variance = self._get_cluster_variance(covariance, left_cluster)
+                right_cluster_variance = self._get_cluster_variance(covariance, right_cluster)
+                alloc_factor = 1 - left_cluster_variance / (left_cluster_variance + right_cluster_variance)
 
-                # Get right cluster variance
-                right_subcovar = covariances.iloc[right_cluster, right_cluster]
-                inv_diag = 1 / np.diag(right_subcovar.values)
-                parity_w = inv_diag * (1 / np.sum(inv_diag))
-                right_cluster_var = np.dot(parity_w, np.dot(right_subcovar, parity_w))
-
-                # Calculate allocation factor and weights
-                alloc_factor = 1 - left_cluster_var / (left_cluster_var + right_cluster_var)
+                # Assign weights to each sub-cluster
                 self.weights[left_cluster] *= alloc_factor
                 self.weights[right_cluster] *= 1 - alloc_factor
 
@@ -217,4 +237,4 @@ class HierarchicalRiskParity:
                                                                                         correlations=corr)
 
         # Step-3: Recursive Bisection
-        self._recursive_bisection(covariances=cov, assets=asset_names)
+        self._recursive_bisection(covariance=cov, assets=asset_names)
