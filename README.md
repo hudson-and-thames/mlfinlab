@@ -15,7 +15,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
 
 MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
-Advances in Financial Machine Learning. This implementation started out as a spring board for a research project in the [Masters in Financial Engineering programme at WorldQuant University](https://wqu.org/) and has grown into a mini research group called [Hudson and Thames Quantitative Research](https://hudsonthames.org/) (not affiliated with the university).
+Advances in Financial Machine Learning as well as various implementations from the [Journal of Financial Data Science](https://jfds.pm-research.com/). This implementation started out as a spring board for a research project in the [Masters in Financial Engineering programme at WorldQuant University](https://wqu.org/) and has grown into a mini research group called [Hudson and Thames Quantitative Research](https://hudsonthames.org/) (not affiliated with the university).
 
 The following is the online documentation for the package: [read-the-docs](https://mlfinlab.readthedocs.io/en/latest/#).
 
@@ -100,34 +100,6 @@ On your local machine open the terminal and cd into the working dir.
 * [Travis-CI](https://www.travis-ci.com) - Continuous integration, test and deploy
 
 ---
-## Progress
-
-**Part 1: Data Analysis**
-* Purchased high quality raw tick data.
-* Email us if you would like a sample of the standard bars.
-* Done Chapter 2: Data Structures
-* Done Chapter 3: Labeling
-* Done Chapter 4: Sample Weights
-* Done Chapter 5: Fractional Differentiation
-
-**Part 2: Modelling**
-* Done Chapter 6: Ensemble Methods (Sequential Bootstrap Ensemble)
-* Done Chapter 7: Cross-Validation
-* Done Chapter 8: Feature Importance
-
-**Part 3: Backtesting**
-* Done Chapter 10: Bet Sizing
-* Done Chapter 16: Asset Allocation
-
-**Part 4: Useful Financial Features**
-* Done Chapter 17: Structural Breaks
-* Done Chapter 18: Entropy Features
-* Done Chapter 19: Microstructural Features
-
-**Additional**
-* Done Optimal Number of Clusters (ONC) Algorithm.
-
----
 
 ## Additional Research Repo
 BlackArbsCEO has a great repo based on de Prado's research. It covers many of the questions at the back of every chapter and was the first source on Github to do so. It has also been a good source of inspiration for our research. 
@@ -135,9 +107,7 @@ BlackArbsCEO has a great repo based on de Prado's research. It covers many of th
 * [Adv Fin ML Exercises](https://github.com/BlackArbsCEO/Adv_Fin_ML_Exercises)
 
 ## Contact us
-At the moment the project is still rather small and thus I would recommend getting in touch with us over email so that we can further discuss the areas of contribution that interest you the most. We have a slack channel where we all communicate.
-
-For now you can get hold us at: research@hudsonthames.org
+We have recently opened access to our [Slack channel](https://join.slack.com/t/mlfinlab/shared_invite/enQtOTUzNjAyNDI1NTc1LTU0NTczNWRlM2U5ZDZiZTUxNTgzNzBlNDU3YmY5MThkODdiMTgwNzI5NDQ2NWI0YTYyMmI3MjBkMzY2YjVkNzc) to help form a community and encourage contributions.
 
 Looking forward to hearing from you!
 
