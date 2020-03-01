@@ -308,11 +308,13 @@ class HierarchicalClusteringAssetAllocation:
 
     def _perform_checks(self, asset_prices, asset_returns, covariance_matrix, allocation_metric):
         '''
-
-        :param asset_prices:
-        :param asset_returns:
-        :param covariance_matrix:
-        :param allocation_metric:
+        Perform initial warning checks
+        
+        :param asset_prices: (pd.DataFrame) a dataframe of historical asset prices (daily close)
+                                            indexed by date
+        :param asset_returns: (pd.DataFrame/numpy matrix) user supplied matrix of asset returns
+        :param covariance_matrix: (pd.DataFrame/numpy matrix) user supplied covariance matrix of asset returns
+        :param allocation_metric: (str) the metric used for calculating weight allocations
         :return:
         '''
 
