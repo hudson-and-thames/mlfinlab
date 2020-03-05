@@ -10,31 +10,16 @@ import pandas as pd
 import mlfinlab as ml
 from sklearn.metrics import log_loss
 from scipy.cluster.hierarchy import linkage, fcluster
-from mlfinlab.codependence import variation_of_information_score
+from information_matrix import  get_dependence_matrix , get_distance_matrix
 
-def get_VI_matrix(df : pd.DataFrame):
-    '''
-    Get Variation of Information (VI) matrix.
 
-    :param df: (pd.DataFrame) of features
-    :return: (pd.DataFrame) of VI matrix
-    '''
-    VI = pd.DataFrame(index=df.columns)
-    features_cols = df.columns.values
-    for col0 in features_cols:
-        vi = []
-        for col1 in features_cols:
-            x = df[col0].values
-            y = df[col1].values
-            vi.append(variation_of_information_score(x,y,n_bins=None,normalize=True))
-        VI[col0] = vi
-    return VI
-
-def cluster_features(X : pd.DataFrame, C : int = None):
+def cluster_features(X : pd.DataFrame , linkage_method : str , n_clusters : int = None ):
     '''
     Get Clusters containing features subsets
 
     (param) X : (pd.DataFrame) of features
+    (param) linkage_method : (str) method of linkage to be used for clustering. Methods include -
+                                  'single' , 'ward' , 'complete' , 'average' , 'weighted' and 'centroid'.
     (param) C : (int) number of clusters to form.
                       Must be less the total number of features.
                       If None then it returns optimal number of clusters
@@ -42,24 +27,24 @@ def cluster_features(X : pd.DataFrame, C : int = None):
 
     (return) : (array) of feature subsets
     '''
+    vi_matrix = get_dependence_matrix(df =X , base_algorithm = 'variation_of_information')
+    dist_matrix = get_distance_matrix(vi_matrix)
+    link = linkage(dist_matrix, method = linkage_method)
 
-    vi_matrix =  get_VI_matrix(X)
-    link = linkage(vi_matrix, 'single')
-
-    if C is not None:
-        if C >= len(X.columns):
+    if n_clusters is not None:
+        if n_clusters >= len(X.columns):
             raise ValueError('Number of Clusters Must be less than the number of features')
-        clusters = fcluster(link, t = C, criterion='maxclust')
-        clustered_subsets = [[f for c, f in zip(clusters, X.columns) if c == ci] for ci in range(1, C+1)]
+        clusters = fcluster(link, t = n_clusters, criterion='maxclust')
+        clustered_subsets = [[f for c, f in zip(clusters, X.columns) if c == ci] for ci in range(1, n_clusters+1)]
         return clustered_subsets
 
     else:
-        C = len(ml.clustering.get_onc_clusters(vi_matrix)[1])
-        clusters = fcluster(link, t = C, criterion='maxclust')
-        clustered_subsets = [[f for c, f in zip(clusters, X.columns) if c == ci] for ci in range(1, C+1)]
+        n_clusters = len(ml.clustering.get_onc_clusters(vi_matrix)[1])
+        clusters = fcluster(link, t = n_clusters, criterion='maxclust')
+        clustered_subsets = [[f for c, f in zip(clusters, X.columns) if c == ci] for ci in range(1, n_clusters+1)]
         return clustered_subsets
 
-def clustered_feature_importance(model, X, y, cv_gen, n_clusters=None, sample_weight=None, scoring=log_loss):
+def clustered_feature_importance(model, X, y, cv_gen, n_clusters=None, linkage_method='single', sample_weight=None, scoring=log_loss):
     """
     Clustered Feature Importnance or Clustered MDA is modified verison of MDA (Mean Decreased Accuracy). It is very
     robust to substitution effect that takes place when two or more explanatory variables share a substantial amount of
@@ -76,12 +61,14 @@ def clustered_feature_importance(model, X, y, cv_gen, n_clusters=None, sample_we
     :param cv_gen: (cross_validation.PurgedKFold): Cross-validation object.
     :param n_clusters: (int): number of clustered subsets of features to form,
                               if None then optimal number of clusters is decided by the ONC Algorithm.
+    :param linkage_method : (str) method of linkage to be used for clustering. Methods include -
+                                  'single' , 'ward' , 'complete' , 'average' , 'weighted' and 'centroid'.
     :param sample_weight: (np.array): Sample weights, if None equal to ones.
     :param scoring: (function): Scoring function used to determine importance.
     :return: (pd.DataFrame): Mean and standard deviation of feature importance.
     """
 
-    clustered_subsets = cluster_features(X,C=n_clusters)
+    clustered_subsets = cluster_features(X,linkage_method,n_clusters)
 
     if sample_weight is None:
         sample_weight = np.ones((X.shape[0],))
