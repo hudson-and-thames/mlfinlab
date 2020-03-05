@@ -67,6 +67,9 @@ Supporter Sponsors:
 * `Roberto Spadim`_
 * `Zack Gow`_
 * `Jack Yu`_
+* Егор Тарасенок
+* Joseph Matthew
+* Justin Gerard
 
 .. _`Machine Factor Technologies`: https://machinefactor.tech/
 .. _`E.P. Chan & Associates`: https://www.epchan.com/
