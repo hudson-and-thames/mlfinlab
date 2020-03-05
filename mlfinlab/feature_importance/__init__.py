@@ -8,3 +8,5 @@ from mlfinlab.feature_importance.importance import (mean_decrease_impurity, mean
 from mlfinlab.feature_importance.orthogonal import (feature_pca_analysis, get_pca_rank_weighted_kendall_tau,
                                                     get_orthogonal_features)
 from mlfinlab.feature_importance.fingerpint import RegressionModelFingerprint, ClassificationModelFingerprint
+
+from mlfinlab.feature_importance.cfi import clustered_feature_importance
