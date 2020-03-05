@@ -34,7 +34,7 @@ Machine Learning Financial Laboratory (mlfinlab)
 	.. |Python| image:: https://img.shields.io/pypi/pyversions/mlfinlab.svg
 		:target: https://pypi.org/project/mlfinlab/
 
-MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado (`QuantResearch.org`_) in his new book Advances in Financial Machine Learning as well as various implementations from the `Journal of Financial Data Science`_. This implementation started out as a spring board for a research project in the [Masters in Financial Engineering programme at `WorldQuant University`_ and has grown into a mini research group called `Hudson and Thames Quantitative Research`_ (not affiliated with the university).
+MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado (`QuantResearch.org`_) in his new book Advances in Financial Machine Learning as well as various implementations from the `Journal of Financial Data Science`_. This implementation started out as a spring board for a research project in the Masters in Financial Engineering programme at `WorldQuant University`_ and has grown into a mini research group called `Hudson and Thames Quantitative Research`_ (not affiliated with the university).
 
 .. _Hudson and Thames Quantitative Research: https://hudsonthames.org/
 .. _WorldQuant University: https://wqu.org/
