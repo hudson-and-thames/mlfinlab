@@ -157,5 +157,3 @@ Additional Information
 * :doc:`additional_information/contact`
 * :doc:`additional_information/contributing`
 * :doc:`additional_information/license`
-
-:module: mlfinlab
