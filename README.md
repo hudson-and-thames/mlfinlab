@@ -14,7 +14,7 @@
 [![Downloads](https://img.shields.io/pypi/dm/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
 [![Python](https://img.shields.io/pypi/pyversions/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
 
-MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
+MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado ([QuantResearch.org](http://www.quantresearch.org/)) in his new book
 Advances in Financial Machine Learning as well as various implementations from the [Journal of Financial Data Science](https://jfds.pm-research.com/). This implementation started out as a spring board for a research project in the [Masters in Financial Engineering programme at WorldQuant University](https://wqu.org/) and has grown into a mini research group called [Hudson and Thames Quantitative Research](https://hudsonthames.org/) (not affiliated with the university).
 
 The following is the online documentation for the package: [read-the-docs](https://mlfinlab.readthedocs.io/en/latest/#).
@@ -38,6 +38,9 @@ A special thank you to our sponsors! It is because of your contributions that we
 * [Roberto Spadim](https://www.linkedin.com/in/roberto-spadim/)
 * [Zack Gow](https://www.linkedin.com/in/zackgow/)
 * [Jack Yu](https://www.linkedin.com/in/jihao-yu/)
+* Егор Тарасенок
+* Joseph Matthew
+* Justin Gerard
 
 ## Barriers to Entry
 As most of you know, getting through the first 3 chapters of the book is challenging as it relies on HFT data to 
