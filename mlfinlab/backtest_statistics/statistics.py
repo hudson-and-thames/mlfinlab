@@ -220,7 +220,7 @@ def deflated_sharpe_ratio(observed_SR: float, SR_estimates: list,
     :param  number_of_returns: (int) times returns are recorded for observed_SR
     :param skewness_of_returns: (float) skewness of returns (as Gaussian by default)
     :param kurtosis_of_returns: (float) kurtosis of returns (as Gaussian by default)
-    :return: (float) Probabalistic Sharpe Ratio
+    :return: (float) Deflated Sharpe Ratio
     """  
     # Calculating benchmark_SR from a list of estimates
     benchmark_SR = np.array(SR_estimates).std() * ((1 - np.euler_gamma) * 
