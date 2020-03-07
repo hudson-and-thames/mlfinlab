@@ -1,5 +1,10 @@
 """
-Implements the book Chapter 14 on Backtest Statistics
+Implements statistics related to:
+- flattening and flips
+- average period of position holding
+- concentration of bets
+- drawdowns
+- various Sharpe ratios
 """
 
 import pandas as pd
@@ -17,14 +22,18 @@ def timing_of_flattening_and_flips(target_positions: pd.Series) -> pd.DatetimeIn
     """
     empty_positions = target_positions[(target_positions==0)].index # Empty positions index
     previous_positions = target_positions.shift(1) # Timestamps pointing at previous positions
-    previous_positions = previous_positions[(previous_positions!=0)].index # Index of positions where previous one wasn't empty
-    flattening = empty_positions.intersection(previous_positions) # FLATTENING - if previous position was open, but current is empty
-    multiplied_posions = target_positions.iloc[1:] * target_positions.iloc[:-1].values # Multiplies current position with value of next one
-    flips = multiplied_posions[(multiplied_posions<0)].index # FLIPS - if current position has another direction compared to the next
-    res = flattening.union(flips).sort_values()
-    if target_positions.index[-1] not in res:
-        res=res.append(target_positions.index[-1:]) # Appending with last bet
-    return res
+    # Index of positions where previous one wasn't empty
+    previous_positions = previous_positions[(previous_positions!=0)].index 
+    # FLATTENING - if previous position was open, but current is empty
+    flattening = empty_positions.intersection(previous_positions)
+    # Multiplies current position with value of next one
+    multiplied_posions = target_positions.iloc[1:] * target_positions.iloc[:-1].values 
+    # FLIPS - if current position has another direction compared to the next
+    flips = multiplied_posions[(multiplied_posions<0)].index 
+    flips_and_flattening = flattening.union(flips).sort_values()
+    if target_positions.index[-1] not in flips_and_flattening: # Appending with last bet
+        flips_and_flattenings = flips_and_flattening.append(target_positions.index[-1:]) 
+    return flips_and_flattenings
 
 
 def average_holding_period(target_positions: pd.Series) -> float:
@@ -36,35 +45,48 @@ def average_holding_period(target_positions: pd.Series) -> float:
     - entry_time = (previous_time * weight_of_previous_position + 
                     time_since_beginning_of_trade * increase_in_position ) /
                     weight_of_current_position
-    - holding_period ['holding_time' = time a position was held, 'weight' = weight of position closed]
+    - holding_period ['holding_time' = time a position was held, 
+                      'weight' = weight of position closed]
     - res = weighted average time a trade was held
     
     :param target_positions: (pd.Series) target position series with timestamps as indices
     :return: (float) estimated average holding period, NaN if zero or unpredicted
     """
-    holding_period, entry_time = pd.DataFrame(columns=['holding_time','weight']), 0
+    holding_period = pd.DataFrame(columns=['holding_time','weight'])
+    entry_time = 0
     position_difference = target_positions.diff() 
     
     # Time elapsed from the starting time for each position
-    time_difference = (target_positions.index-target_positions.index[0]) / np.timedelta64(1,'D')
+    time_difference = (target_positions.index-target_positions.index[0]) / \
+                       np.timedelta64(1,'D')
     for i in range(1, target_positions.shape[0]):
-        if float(position_difference.iloc[i] * target_positions.iloc[i-1]) >= 0: # Increased or unchanged position
+        
+        # Increased or unchanged position
+        if float(position_difference.iloc[i] * target_positions.iloc[i-1]) >= 0:
             if float(target_positions.iloc[i]) != 0: # And not an empty position
                 entry_time = (entry_time * target_positions.iloc[i-1] + 
-                              time_difference[i] * position_difference.iloc[i]) / target_positions.iloc[i]
+                              time_difference[i] * position_difference.iloc[i]) / \
+                              target_positions.iloc[i]
         else: # Decreased
-            if float(target_positions.iloc[i] * target_positions.iloc[i-1]) < 0: # Flip of a position
-                holding_period.loc[target_positions.index[i], ['holding_time','weight']] = (time_difference[i] - entry_time, abs(target_positions.iloc[i-1]))
+            # Flip of a position
+            if float(target_positions.iloc[i] * target_positions.iloc[i-1]) < 0:
+                holding_period.loc[target_positions.index[i], 
+                                   ['holding_time','weight']] = \
+                (time_difference[i] - entry_time, abs(target_positions.iloc[i-1]))
                 entry_time = time_difference[i] # Reset entry time
             else: # Only a part of position is closed
-                holding_period.loc[target_positions.index[i], ['holding_time','weight']] = (time_difference[i] - entry_time, abs(position_difference.iloc[i]))
+                holding_period.loc[target_positions.index[i], 
+                                   ['holding_time','weight']] = \
+                (time_difference[i] - entry_time, abs(position_difference.iloc[i]))
                 
     if float(holding_period['weight'].sum()) > 0: # If there were closed trades at all
-        res = float((holding_period['holding_time'] * holding_period['weight']).sum() / holding_period['weight'].sum())
+        average_holding_period = float((holding_period['holding_time'] * \
+                                        holding_period['weight']).sum() / \
+                                        holding_period['weight'].sum())
     else:
-        res = float('nan')
+        average_holding_period = float('nan')
         
-    return res
+    return average_holding_period
 
 
 def bets_concentration(returns: pd.Series) -> float:
@@ -86,7 +108,7 @@ def bets_concentration(returns: pd.Series) -> float:
     return hhi
 
 
-def positive_negative_bets_concentration(returns: pd.Series, freq: str = 'M') -> tuple:
+def all_bets_concentration(returns: pd.Series, freq: str = 'M') -> tuple:
     """
     Snippet 14.3, page 201, Derives positive, negative and time consentration of 
     bets in a given dp.Series of returns.
@@ -108,11 +130,13 @@ def positive_negative_bets_concentration(returns: pd.Series, freq: str = 'M') ->
     # Concentration of negative returns per bet
     negative_concentration = bets_concentration(returns[returns < 0]) 
     # Concentration of bets/time period (month by default)
-    time_concentration = bets_concentration(returns.groupby(pd.Grouper(freq='M')).count()) 
+    time_concentration = \
+            bets_concentration(returns.groupby(pd.Grouper(freq='M')).count()) 
     return (positive_concentration, negative_concentration, time_concentration)
 
 
-def compute_drawdown_and_time_under_water(returns: pd.Series, dollars: bool = False) -> tuple:
+def compute_drawdown_and_time_under_water(returns: pd.Series, 
+                                          dollars: bool = False) -> tuple:
     """
     Snippet 14.4, page 201, Calculates drawdowns and time under water for pd.Series
     of returns or dollar performance.
@@ -155,7 +179,7 @@ def compute_drawdown_and_time_under_water(returns: pd.Series, dollars: bool = Fa
 def sharpe_ratio(returns: pd.Series, cumulative: bool = False, 
                  entries_per_year:int = 252, risk_free_rate:float = 0) -> float:
     """
-    Calculates Annualized Sharpe Ratio for pd.Series of returns.
+    Calculates Annualized Sharpe Ratio for pd.Series of  normal (not log) returns.
         
     :param returns: (pd.Series) returns
     :param cumulative: (bool) flag if returns are cumulative (no by default)
@@ -163,9 +187,11 @@ def sharpe_ratio(returns: pd.Series, cumulative: bool = False,
     :param risk_free_rate: (float) risk-free rate (0 by default)
     :return: (float) Annualized Sharpe Ratio
     """  
-    if cumulative:
-        returns = returns.diff() # Converting to simple returns
-    sharpe_ratio = (returns.mean() - risk_free_rate) / returns.std() * (entries_per_year)**(1/2)
+    if cumulative: 
+        returns = returns / returnd.shift(1) - 1 # Inverting cumulative returns
+        returns = returns[1:] # Excluding empty value
+    sharpe_ratio = (returns.mean() - risk_free_rate) / returns.std() * \
+                   (entries_per_year)**(1/2)
 
     return sharpe_ratio
 
@@ -193,11 +219,11 @@ def probabalistic_sharpe_ratio(observed_SR: float, benchmark_SR: float,
     """  
     
     
-    PSR = ss.norm.cdf(((observed_SR - benchmark_SR) * (number_of_returns - 1)**(1/2)) / \
-                      (1 - skewness_of_returns * observed_SR + 
-                       (kurtosis_of_returns - 1)/4 * observed_SR**2)**(1/2))
+    probab_SR = ss.norm.cdf(((observed_SR - benchmark_SR) * (number_of_returns - 1)**(1/2)) / \
+                            (1 - skewness_of_returns * observed_SR + 
+                            (kurtosis_of_returns - 1)/4 * observed_SR**2)**(1/2))
 
-    return PSR
+    return probab_SR
 
 
 def deflated_sharpe_ratio(observed_SR: float, SR_estimates: list, 
@@ -215,7 +241,7 @@ def deflated_sharpe_ratio(observed_SR: float, SR_estimates: list,
     - It should exceed 0.95, for the standard significance level of 5%. 
     - It can be computed on absolute or relative returns.
     
-    :param observed_SR: (list) Sharpe Ratios that is being tested
+    :param observed_SR: (list) Sharpe Ratio that is being tested
     :param SR_estimates: (float) Sharpe Ratios estimates trials
     :param  number_of_returns: (int) times returns are recorded for observed_SR
     :param skewness_of_returns: (float) skewness of returns (as Gaussian by default)
@@ -223,11 +249,43 @@ def deflated_sharpe_ratio(observed_SR: float, SR_estimates: list,
     :return: (float) Deflated Sharpe Ratio
     """  
     # Calculating benchmark_SR from a list of estimates
-    benchmark_SR = np.array(SR_estimates).std() * ((1 - np.euler_gamma) * 
-                                                   ss.norm.ppf(1 - 1/len(SR_estimates)) + 
-                                                   np.euler_gamma * ss.norm.ppf(1 - 1/len(SR_estimates) * np.e**(-1)))
+    benchmark_SR = np.array(SR_estimates).std() * \
+                   ((1 - np.euler_gamma) * ss.norm.ppf(1 - 1/len(SR_estimates)) +
+                    np.euler_gamma * ss.norm.ppf(1 - 1/len(SR_estimates) * np.e**(-1)))
     
-    DSR = probabalistic_sharpe_ratio(observed_SR, benchmark_SR, number_of_returns, skewness_of_returns, 
-                                     kurtosis_of_returns)
+    deflated_SR = probabalistic_sharpe_ratio(observed_SR, benchmark_SR, number_of_returns, 
+                                     skewness_of_returns, kurtosis_of_returns)
 
-    return DSR
+    return deflated_SR
+
+
+def minimum_track_record_length(observed_SR: float, benchmark_SR: float, 
+                                number_of_returns: int, skewness_of_returns:float = 0, 
+                                kurtosis_of_returns: float = 3, 
+                                alpha: float = 0.05) -> float:
+    """
+    Calculates the Minimum Track Record Length - "How long should a track record be 
+    in order to have statistical confidence that its Sharpe ratio is above a given 
+    threshold?”
+    
+    If a track record is shorter than MinTRL, we do not  have  enough  confidence  
+    that  the  observed Sharpe ratio ̂is  above  the  designated Sharpe ratio 
+    threshold. 
+    
+    MinTRLis expressed in terms of number of observations, not annual or calendar terms.
+       
+    :param observed_SR: (float) Sharpe Ratio that is being tested
+    :param benchmark_SR: (float) Sharpe Ratio to which observed_SR is tested against
+    :param  number_of_returns: (int) times returns are recorded for observed_SR
+    :param skewness_of_returns: (float) skewness of returns (as Gaussian by default)
+    :param kurtosis_of_returns: (float) kurtosis of returns (as Gaussian by default)
+    :param alpha: (float) desired significance level
+    :return: (float) Probabalistic Sharpe Ratio
+    """  
+    
+    track_rec_length = 1 + (1 - skewness_of_returns * observed_SR + 
+                       (kurtosis_of_returns - 1)/4 * observed_SR**2) * \
+                       (ss.norm.ppf(1 - alpha) / (observed_SR - benchmark_SR))**(2)
+
+
+    return  track_rec_length
