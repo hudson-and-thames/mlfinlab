@@ -25,11 +25,13 @@ class HierarchicalClusteringAssetAllocation:
     def __init__(self, calculate_expected_returns='mean'):
         self.weights = list()
         self.clusters = None
+        self.ordered_indices = None
         self.returns_estimator = ReturnsEstimation()
         self.risk_metrics = RiskMetrics()
         self.calculate_expected_returns = calculate_expected_returns
 
-    def _compute_cluster_inertia(self, labels, asset_returns):
+    @staticmethod
+    def _compute_cluster_inertia(labels, asset_returns):
         '''
         Calculate the cluster inertia (within cluster sum-of-squares).
 
@@ -39,9 +41,9 @@ class HierarchicalClusteringAssetAllocation:
         '''
 
         unique_labels = np.unique(labels)
-        W = [np.mean(pairwise_distances(asset_returns[:, labels == label])) for label in unique_labels]
-        W = np.log(np.sum(W))
-        return W
+        inertia = [np.mean(pairwise_distances(asset_returns[:, labels == label])) for label in unique_labels]
+        inertia = np.log(np.sum(inertia))
+        return inertia
 
     def _get_optimal_number_of_clusters(self,
                                         correlation,
@@ -88,7 +90,8 @@ class HierarchicalClusteringAssetAllocation:
 
         return np.argmax(gap_values)
 
-    def _tree_clustering(self, correlation, num_clusters):
+    @staticmethod
+    def _tree_clustering(correlation, num_clusters):
         '''
         Perform agglomerative clustering on the current portfolio.
 
@@ -121,7 +124,8 @@ class HierarchicalClusteringAssetAllocation:
 
         return (self._quasi_diagnalization(num_assets, left) + self._quasi_diagnalization(num_assets, right))
 
-    def _get_inverse_variance_weights(self, covariance):
+    @staticmethod
+    def _get_inverse_variance_weights(covariance):
         '''
         Calculate the inverse variance weight allocations.
 
@@ -209,6 +213,7 @@ class HierarchicalClusteringAssetAllocation:
                              assets,
                              allocation_metric,
                              confidence_level):
+        # pylint: disable=bad-continuation, too-many-locals
         '''
         Recursively assign weights to the clusters - ultimately assigning weights to the individual assets.
 
@@ -306,10 +311,12 @@ class HierarchicalClusteringAssetAllocation:
         corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
         return corr
 
-    def _perform_checks(self, asset_prices, asset_returns, covariance_matrix, allocation_metric):
+    @staticmethod
+    def _perform_checks(asset_prices, asset_returns, covariance_matrix, allocation_metric):
+        # pylint: disable=bad-continuation
         '''
         Perform initial warning checks
-        
+
         :param asset_prices: (pd.DataFrame) a dataframe of historical asset prices (daily close)
                                             indexed by date
         :param asset_returns: (pd.DataFrame/numpy matrix) user supplied matrix of asset returns
@@ -327,7 +334,9 @@ class HierarchicalClusteringAssetAllocation:
             if not isinstance(asset_prices.index, pd.DatetimeIndex):
                 raise ValueError("Asset prices dataframe must be indexed by date.")
 
-        if allocation_metric not in {'minimum_variance', 'minimum_standard_deviation', 'sharpe_ratio', 'equal_weighting', 'expected_shortfall', 'conditional_drawdown_risk'}:
+        if allocation_metric not in \
+                {'minimum_variance', 'minimum_standard_deviation', 'sharpe_ratio',
+                 'equal_weighting', 'expected_shortfall', 'conditional_drawdown_risk'}:
             raise ValueError("Unknown allocation metric specified. Supported metrics are - minimum_variance, "
                          "minimum_standard_deviation, sharpe_ratio, equal_weighting, expected_shortfall, conditional_drawdown_risk")
 

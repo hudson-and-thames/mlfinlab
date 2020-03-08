@@ -14,7 +14,8 @@ class RiskMetrics:
     def __init__(self):
         return
 
-    def calculate_variance(self, covariance, weights):
+    @staticmethod
+    def calculate_variance(covariance, weights):
         '''
         Calculate variance of portfolio.
 
@@ -25,7 +26,8 @@ class RiskMetrics:
 
         return np.dot(weights, np.dot(covariance, weights))
 
-    def calculate_value_at_risk(self, returns, confidence_level=0.05):
+    @staticmethod
+    def calculate_value_at_risk(returns, confidence_level=0.05):
         '''
         Calculate the value at risk (VaR) of the portfolio.
 
@@ -55,7 +57,8 @@ class RiskMetrics:
         expected_shortfall = np.nanmean(returns[returns < value_at_risk])
         return expected_shortfall
 
-    def calculate_conditional_drawdown_risk(self, returns, confidence_level):
+    @staticmethod
+    def calculate_conditional_drawdown_risk(returns, confidence_level):
         '''
         Calculate the conditional drawdown of risk (CDaR) of the portfolio.
 
