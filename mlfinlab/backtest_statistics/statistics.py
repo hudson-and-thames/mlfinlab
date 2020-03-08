@@ -5,6 +5,7 @@ Implements statistics related to:
 - concentration of bets
 - drawdowns
 - various Sharpe ratios
+- minimum track record length
 """
 
 import pandas as pd
@@ -15,7 +16,12 @@ import numpy as np
 def timing_of_flattening_and_flips(target_positions: pd.Series) -> pd.DatetimeIndex:
     """
     Snippet 14.1, page 197, Derives the timestamps of flattening or flipping
-    trades from a pandas series of target positions.
+    trades from a pandas series of target positions. Can be used for position
+    changes analysis, such as frequency and balance of position changes.
+
+    Flattenings - times when open position is bing closed (final target position is 0).
+    Flips - times when positive position is reversed to negative and vice versa.
+
     :param target_positions: (pd.Series) target position series with timestamps as indices
     :return: (pd.DatetimeIndex) timestamps of trades flattening, flipping and last bet
     """
@@ -39,6 +45,7 @@ def average_holding_period(target_positions: pd.Series) -> float:
     """
     Snippet 14.2, page 197, Estimates the average holding period (in days) of a strategy,
     given a pandas series of target positions using average entry time pairing algorithm.
+
     Idea of an algorithm:
     - entry_time = (previous_time * weight_of_previous_position +
                     time_since_beginning_of_trade * increase_in_position ) /
@@ -46,6 +53,7 @@ def average_holding_period(target_positions: pd.Series) -> float:
     - holding_period ['holding_time' = time a position was held,
                       'weight' = weight of position closed]
     - res = weighted average time a trade was held
+
     :param target_positions: (pd.Series) target position series with timestamps as indices
     :return: (float) estimated average holding period, NaN if zero or unpredicted
     """
@@ -64,22 +72,28 @@ def average_holding_period(target_positions: pd.Series) -> float:
                 entry_time = (entry_time * target_positions.iloc[i - 1] +
                               time_difference[i] * position_difference.iloc[i]) / \
                              target_positions.iloc[i]
-        else:  # Decreased
+
+        # Decreased
+        if float(position_difference.iloc[i] * target_positions.iloc[i - 1]) < 0:
+            hold_time = time_difference[i] - entry_time
+
             # Flip of a position
             if float(target_positions.iloc[i] * target_positions.iloc[i - 1]) < 0:
+                weight = abs(target_positions.iloc[i - 1])
                 holding_period.loc[target_positions.index[i],
-                                   ['holding_time', 'weight']] = \
-                    (time_difference[i] - entry_time, abs(target_positions.iloc[i - 1]))
+                                   ['holding_time', 'weight']] = (hold_time, weight)
                 entry_time = time_difference[i]  # Reset entry time
-            else:  # Only a part of position is closed
+
+            # Only a part of position is closed
+            else:
+                weight = abs(target_positions.iloc[i])
                 holding_period.loc[target_positions.index[i],
-                                   ['holding_time', 'weight']] = \
-                    (time_difference[i] - entry_time, abs(position_difference.iloc[i]))
+                                   ['holding_time', 'weight']] = (hold_time, weight)
 
     if float(holding_period['weight'].sum()) > 0:  # If there were closed trades at all
         avg_holding_period = float((holding_period['holding_time'] * \
-                                        holding_period['weight']).sum() / \
-                                        holding_period['weight'].sum())
+                                    holding_period['weight']).sum() / \
+                                   holding_period['weight'].sum())
     else:
         avg_holding_period = float('nan')
 
@@ -90,8 +104,10 @@ def bets_concentration(returns: pd.Series) -> float:
     """
     Snippet 14.3, page 201, Derives the concentration of bets across months
     from given pd.Series of returns.
+
     Algorithm is based on Herfindahl-Hirschman Index where return weights
     are taken as an input.
+
     :param returns: (pd.Series) returns from bets
     :return: (float) concentration of returns (nan if less than 3 returns)
     """
@@ -105,14 +121,19 @@ def bets_concentration(returns: pd.Series) -> float:
 
 def all_bets_concentration(returns: pd.Series, frequency: str = 'M') -> tuple:
     """
-    Snippet 14.3, page 201, Derives positive, negative and time consentration of
-    bets in a given dp.Series of returns.
-    Properties:
-    - low positive_concentration -> no right fat-tail (desirable)
-    - low negative_concentration -> no left fat-tail (desirable)
-    - low time_concentration -> bets are not concentrated in time (desirable)
-    - positive_concentration = 0 ⇔ uniform returns
-    - positive_concentration = 1 ⇔ only one non-zero return
+    Snippet 14.3, page 201, Given a pd.Series of returns, derives concentration of
+    positive returns, negative returns and concentration of bets grouped by
+    time intervals (daily, monthly etc.). If after time grouping less than
+    2 observations, returns nan.
+
+    Properties or results:
+    - low positive_concentration -> no right fat-tail of returns (desirable)
+    - low negative_concentration -> no left fat-tail of returns (desirable)
+    - low time_concentration -> bets are not concentrated in time, or
+                                are evenly concentrated (desirable)
+    - positive_concentration == 0 ⇔ returns are uniform
+    - positive_concentration == 1 ⇔ only one non-zero return exists
+
     :param returns: (pd.Series) returns from bets
     :param frequency: (str) desired time grouping frequency from pd.Grouper
     :return: (tuple of floats) concentration of positive, negative
@@ -128,8 +149,7 @@ def all_bets_concentration(returns: pd.Series, frequency: str = 'M') -> tuple:
     return (positive_concentration, negative_concentration, time_concentration)
 
 
-def compute_drawdown_and_time_under_water(returns: pd.Series,
-                                          dollars: bool = False) -> tuple:
+def drawdown_and_time_under_water(returns: pd.Series, dollars: bool = False) -> tuple:
     """
     Snippet 14.4, page 201, Calculates drawdowns and time under water for pd.Series
     of returns or dollar performance.
@@ -137,10 +157,12 @@ def compute_drawdown_and_time_under_water(returns: pd.Series,
     two consecutive high-watermarks. The time under water is the time
     elapsed between an high watermark and the moment the PnL (profit and loss)
     exceeds the previous maximum PnL.
+
     Return details:
     - Drawdown series index is time of a high watermark and value of a drawdown after.
     - Time under water index is time of a high watermark and how much time passed till
     next high watermark in years.
+
     :param returns: (pd.Series) returns from bets
     :param dollars: (bool) flag if given dollar performance and not returns
     :return: (tuple of pd.Series) series of drawdowns and time under water
@@ -169,6 +191,7 @@ def sharpe_ratio(returns: pd.Series, cumulative: bool = False,
                  entries_per_year: int = 252, risk_free_rate: float = 0) -> float:
     """
     Calculates Annualized Sharpe Ratio for pd.Series of  normal (not log) returns.
+
     :param returns: (pd.Series) returns
     :param cumulative: (bool) flag if returns are cumulative (no by default)
     :param entries_per_year: (int) times returns are recorded per year (days by default)
@@ -179,7 +202,7 @@ def sharpe_ratio(returns: pd.Series, cumulative: bool = False,
         returns = returns / returns.shift(1) - 1  # Inverting cumulative returns
         returns = returns[1:]  # Excluding empty value
     sharpe_r = (returns.mean() - risk_free_rate) / returns.std() * \
-                   (entries_per_year) ** (1 / 2)
+               (entries_per_year) ** (1 / 2)
 
     return sharpe_r
 
@@ -191,10 +214,12 @@ def probabalistic_sharpe_ratio(observed_sr: float, benchmark_sr: float,
     Calculates the probabilistic Sharpe ratio (PSR) that provides an adjusted estimate of SR,
     by removing the inflationary effect caused by short series with skewed and/or
     fat-tailed returns.
+
     Given a user-defined benchmark Sharpe ratio and an observed Sharpe ratio,
     PSR estimates the probability that SR ̂is greater than a hypothetical SR.
     - It should exceed 0.95, for the standard significance level of 5%.
     - It can be computed on absolute or relative returns.
+
     :param observed_sr: (float) Sharpe Ratio that is observed
     :param benchmark_sr: (float) Sharpe Ratio to which observed_SR is tested against
     :param  number_of_returns: (int) times returns are recorded for observed_SR
@@ -218,10 +243,12 @@ def deflated_sharpe_ratio(observed_sr: float, sr_estimates: list,
     adjusted to reflect the multiplicity of trials. DSR is estimated as PSR[SR∗], where
     the benchmark Sharpe ratio, SR∗, is no longer user-defined, but calculated from
     SR estimate trails.
+
     DSR corrects SR for inflationary effects caused by non-Normal returns, track record
     length, and multiple testing/selection bias.
     - It should exceed 0.95, for the standard significance level of 5%.
     - It can be computed on absolute or relative returns.
+
     :param observed_sr: (list) Sharpe Ratio that is being tested
     :param sr_estimates: (float) Sharpe Ratios estimates trials
     :param  number_of_returns: (int) times returns are recorded for observed_SR
@@ -248,10 +275,12 @@ def minimum_track_record_length(observed_sr: float, benchmark_sr: float,
     Calculates the Minimum Track Record Length - "How long should a track record be
     in order to have statistical confidence that its Sharpe ratio is above a given
     threshold?”
+
     If a track record is shorter than MinTRL, we do not  have  enough  confidence
     that  the  observed Sharpe ratio ̂is  above  the  designated Sharpe ratio
     threshold.
     MinTRLis expressed in terms of number of observations, not annual or calendar terms.
+
     :param observed_sr: (float) Sharpe Ratio that is being tested
     :param benchmark_sr: (float) Sharpe Ratio to which observed_SR is tested against
     :param  number_of_returns: (int) times returns are recorded for observed_SR

@@ -10,7 +10,7 @@ import numpy as np
 
 from mlfinlab.backtest_statistics.statistics import (timing_of_flattening_and_flips, average_holding_period,
                                                      bets_concentration, all_bets_concentration,
-                                                     compute_drawdown_and_time_under_water, sharpe_ratio,
+                                                     drawdown_and_time_under_water, sharpe_ratio,
                                                      probabalistic_sharpe_ratio, deflated_sharpe_ratio,
                                                      minimum_track_record_length)
 
@@ -43,16 +43,13 @@ class TestBacktestStatistics(unittest.TestCase):
         normal_ret = np.array([0.01, 0.03, 0.02, 0.01, -0.01, 0.02, 0.01, 0.0, -0.01, 0.01])
         cumulated_ret = np.cumprod(1 + normal_ret)
 
-        self.flip_flattening_positions = pd.Series(data=flip_positions,
-                                                   index=dates)
+        self.flip_flattening_positions = pd.Series(data=flip_positions, index=dates)
         self.flips = pd.DatetimeIndex([dt.datetime(2000, 1, 7)])
         self.flattenings = pd.DatetimeIndex([dt.datetime(2000, 1, 4), dt.datetime(2000, 1, 10)])
         self.hold_positions = pd.Series(data=hold_positions, index=dates)
         self.no_closed_positions = pd.Series(data=no_closed_positions, index=dates)
-        self.negative_positions = pd.Series(data=negative_concentrated,
-                                            index=dates)
-        self.positive_positions = pd.Series(data=positive_concentrated,
-                                            index=dates)
+        self.negative_positions = pd.Series(data=negative_concentrated, index=dates)
+        self.positive_positions = pd.Series(data=positive_concentrated, index=dates)
         self.dollar_returns = pd.Series(data=dollar_ret, index=dates)
         # Dropping first observation as it's being lost in conversion
         self.normal_returns = pd.Series(data=normal_ret, index=dates)[1:]
@@ -116,15 +113,15 @@ class TestBacktestStatistics(unittest.TestCase):
         self.assertAlmostEqual(all_negative_concentration[1], 0.074829,
                                delta=1e-4)
 
-    def test_compute_drawdown_and_tuw(self):
+    def test_drawdown_and_time_under_water(self):
         """
         Check if drawdowns and time under water calculated correctly for
         dollar and non-dollar test sets.
         """
-        drawdown_dol, time_under_water_dol = compute_drawdown_and_time_under_water(self.dollar_returns,
-                                                                                   dollars=True)
-        _, time_under_water = compute_drawdown_and_time_under_water(self.dollar_returns / 100,
-                                                                    dollars=False)
+        drawdown_dol, time_under_water_dol = drawdown_and_time_under_water(self.dollar_returns,
+                                                                           dollars=True)
+        _, time_under_water = drawdown_and_time_under_water(self.dollar_returns / 100,
+                                                            dollars=False)
 
         self.assertTrue(list(drawdown_dol) == [20.0, 30.0, 10.0])
         self.assertTrue(list(time_under_water) == list(time_under_water_dol))
