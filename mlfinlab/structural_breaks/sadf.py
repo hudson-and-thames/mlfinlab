@@ -12,7 +12,7 @@ from mlfinlab.util.multiprocess import mp_pandas_obj
 
 def _get_sadf_at_t(X: pd.DataFrame, y: pd.DataFrame, min_length: int, model: str, phi: float) -> float:
     """
-    Snippet 17.2, page 258. SADF's Inner Loop (get sadf value at t)
+    Snippet 17.2, page 258. SADF's Inner Loop (get SADF value at t)
 
     :param X: (pd.DataFrame) of lagged values, constants, trend coefficients
     :param y: (pd.DataFrame) of y values (either y or y.diff())
@@ -28,7 +28,7 @@ def _get_sadf_at_t(X: pd.DataFrame, y: pd.DataFrame, min_length: int, model: str
         if not np.isnan(b_mean_[0]):
             b_mean_, b_std_ = b_mean_[0, 0], b_std_[0, 0] ** 0.5
             all_adf = b_mean_ / b_std_
-            if model != 'linear' and model != 'quadratic':
+            if model[:2] == 'sm':
                 all_adf = np.abs(all_adf) / (y.shape[0]**phi)
             if all_adf > bsadf:
                 bsadf = all_adf
@@ -159,7 +159,13 @@ def _sadf_outer_loop(X: pd.DataFrame, y: pd.DataFrame, min_length: int, model: s
 def get_sadf(series: pd.Series, model: str, lags: Union[int, list], min_length: int, add_const: bool = False,
              phi: float = 0, num_threads: int = 8) -> pd.Series:
     """
-    Multithread implementation of SADF, p. 258-259
+    Multithread implementation of SADF, p. 258-259. SADF fits the ADF regression at each end point t
+    with backwards expanding start points. For the estimation of SADF(t), the right side of the window is fixed at t.
+    SADF recursively expands the beginning of the sample up to t - min_length, and returns the sup of this set.
+    When doing with sub- or super-martingale test, the variance of beta of a weak long-run bubble may be smaller than
+    one of a strong short-run bubble, hence biasing the method towards long-run bubbles. To correct for this bias, we
+    can penalize large sample lengths by determining the coefficient phi in [0, 1] that yields best explosiveness
+    signals.
 
     :param series: (pd.Series) for which SADF statistics are generated
     :param model: (str) either 'linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
