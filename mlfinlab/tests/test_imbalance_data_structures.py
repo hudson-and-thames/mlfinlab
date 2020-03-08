@@ -426,8 +426,8 @@ class TestDataStructures(unittest.TestCase):
         """
         Tests ValueError raise when wrong imbalance was passed
         """
-        bar_gen = ds.ConstImbalanceBars(self.path, metric='cum_buy_volume', expected_imbalance_window=10,
+        bar_gen = ds.ConstImbalanceBars(metric='cum_buy_volume', expected_imbalance_window=10,
                                         exp_num_ticks_init=100,
                                         analyse_thresholds=False, batch_size=10000)
         with self.assertRaises(ValueError):
-            bar_gen.batch_run(verbose=False)
+            bar_gen.batch_run(self.path, verbose=False)
