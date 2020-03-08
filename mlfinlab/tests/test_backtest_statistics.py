@@ -34,7 +34,7 @@ class TestBacktestStatistics(unittest.TestCase):
         Set the data for tests.
         """
         dates = np.array([dt.datetime(2000, 1, 1) + i * dt.timedelta(days=1) for i in range(10)])
-        flip_positions = np.array([1.0, 1.5, 0.5, 0, -0.5, -1.0, 0.5, 1.5, 1.5, 0])
+        flip_positions = np.array([1.0, 1.5, 0.5, 0, -0.5, -1.0, 0.5, 1.5, 1.5, 1.5])
         hold_positions = np.array([0, 1, 1, -1, -1, 0, 0, 2, 2, 0])
         no_closed_positions = np.array([0, 1, 1, 1, 1, 2, 2, 2, 2, 2])
         positive_concentrated = np.array([-1, 1, 1, 0, 0, 3, 0, 2, -2, 0])
@@ -117,8 +117,8 @@ class TestBacktestStatistics(unittest.TestCase):
         """
         drawdown_dol, time_under_water_dol = compute_drawdown_and_time_under_water(self.dollar_returns,
                                                                                    dollars=True)
-        drawdown, time_under_water = compute_drawdown_and_time_under_water(self.dollar_returns / 100,
-                                                                           dollars=False)
+        _, time_under_water = compute_drawdown_and_time_under_water(self.dollar_returns / 100,
+                                                                    dollars=False)
 
         self.assertTrue(list(drawdown_dol) == [20.0, 30.0, 10.0])
         self.assertTrue(list(time_under_water) == list(time_under_water_dol))
