@@ -29,9 +29,9 @@ def timing_of_flattening_and_flips(target_positions: pd.Series) -> pd.DatetimeIn
     multiplied_posions = target_positions.iloc[1:] * target_positions.iloc[:-1].values
     # FLIPS - if current position has another direction compared to the next
     flips = multiplied_posions[(multiplied_posions < 0)].index
-    flips_and_flattening = flattening.union(flips).sort_values()
-    if target_positions.index[-1] not in flips_and_flattening:  # Appending with last bet
-        flips_and_flattenings = flips_and_flattening.append(target_positions.index[-1:])
+    flips_and_flattenings = flattening.union(flips).sort_values()
+    if target_positions.index[-1] not in flips_and_flattenings:  # Appending with last bet
+        flips_and_flattenings = flips_and_flattenings.append(target_positions.index[-1:])
     return flips_and_flattenings
 
 
