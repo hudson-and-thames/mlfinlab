@@ -11,7 +11,6 @@ from mlfinlab.portfolio_optimization.hcaa import HierarchicalClusteringAssetAllo
 from mlfinlab.portfolio_optimization.cla import CLA
 from mlfinlab.portfolio_optimization.mean_variance import MeanVarianceOptimisation
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
-import unittest
 
 
 class TestCLA(unittest.TestCase):
@@ -445,7 +444,7 @@ class TestHCAA(unittest.TestCase):
 
     def test_hcaa_equal_weight(self):
         """
-        Test the weights calculated by the HRP algorithm - if all the weights are positive and
+        Test the weights calculated by the HCAA algorithm - if all the weights are positive and
         their sum is equal to 1.
         """
 
@@ -461,7 +460,7 @@ class TestHCAA(unittest.TestCase):
 
     def test_hcaa_min_variance(self):
         """
-        Test the weights calculated by the HRP algorithm - if all the weights are positive and
+        Test the weights calculated by the HCAA algorithm - if all the weights are positive and
         their sum is equal to 1.
         """
 
@@ -477,7 +476,7 @@ class TestHCAA(unittest.TestCase):
 
     def test_hcaa_min_standard_deviation(self):
         """
-        Test the weights calculated by the HRP algorithm - if all the weights are positive and
+        Test the weights calculated by the HCAA algorithm - if all the weights are positive and
         their sum is equal to 1.
         """
 
@@ -493,7 +492,7 @@ class TestHCAA(unittest.TestCase):
 
     def test_hcaa_sharpe_ratio(self):
         """
-        Test the weights calculated by the HRP algorithm - if all the weights are positive and
+        Test the weights calculated by the HCAA algorithm - if all the weights are positive and
         their sum is equal to 1.
         """
 
@@ -509,7 +508,7 @@ class TestHCAA(unittest.TestCase):
 
     def test_hcaa_expected_shortfall(self):
         """
-        Test the weights calculated by the HRP algorithm - if all the weights are positive and
+        Test the weights calculated by the HCAA algorithm - if all the weights are positive and
         their sum is equal to 1.
         """
 
@@ -525,7 +524,7 @@ class TestHCAA(unittest.TestCase):
 
     def test_hcaa_conditional_drawdown_risk(self):
         """
-        Test the weights calculated by the HRP algorithm - if all the weights are positive and
+        Test the weights calculated by the HCAA algorithm - if all the weights are positive and
         their sum is equal to 1.
         """
 
@@ -541,7 +540,7 @@ class TestHCAA(unittest.TestCase):
 
     def test_quasi_diagnalization(self):
         """
-        Test the quasi-diagnalisation step of HRP algorithm
+        Test the quasi-diagnalisation step of HCAA algorithm
         """
 
         hrp = HierarchicalRiskParity()
@@ -579,7 +578,7 @@ class TestHCAA(unittest.TestCase):
 
     def test_hcaa_with_input_as_returns(self):
         """
-        Test HRP when passing asset returns dataframe as input
+        Test HCAA when passing asset returns dataframe as input
         """
 
         hcaa = HierarchicalClusteringAssetAllocation()
@@ -592,7 +591,7 @@ class TestHCAA(unittest.TestCase):
 
     def test_hcaa_with_input_as_covariance_matrix(self):
         """
-        Test HRP when passing a covariance matrix as input
+        Test HCAA when passing a covariance matrix as input
         """
 
         hcaa = HierarchicalClusteringAssetAllocation()
@@ -861,4 +860,3 @@ class TestMVO(unittest.TestCase):
         with self.assertRaises(ValueError):
             mvo = MeanVarianceOptimisation()
             mvo.allocate(asset_names=self.data.columns)
-unittest.main()

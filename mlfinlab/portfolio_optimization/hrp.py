@@ -77,7 +77,8 @@ class HierarchicalRiskParity:
         seriated_correlations = correlations.loc[ordering, ordering]
         return seriated_distances, seriated_correlations
 
-    def _get_inverse_variance_weights(self, covariance):
+    @staticmethod
+    def _get_inverse_variance_weights(covariance):
         '''
         Calculate the inverse variance weight allocations.
 
