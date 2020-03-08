@@ -61,13 +61,19 @@ class TestBacktestStatistics(unittest.TestCase):
 
     def test_timing_of_flattening_and_flips(self):
         """
-        Check that moments of flips and flattenings are picked correctly
+        Check that moments of flips and flattenings are picked correctly and
+        that last is added
         """
         flattenings_and_flips = timing_of_flattening_and_flips(self.flip_flattening_positions)
         test_flat_flip = self.flips.append(self.flattenings)
 
+        #In case last bet is already included
+        altered_flips = self.flip_flattening_positions.copy()
+        altered_flips[-1:] = 0
+        flattenings_and_flips_last = timing_of_flattening_and_flips(altered_flips)
 
         self.assertTrue(test_flat_flip.sort_values().equals(flattenings_and_flips.sort_values()))
+        self.assertTrue(flattenings_and_flips_last.sort_values().equals(flattenings_and_flips.sort_values()))
 
     def test_average_holding_period(self):
         """
