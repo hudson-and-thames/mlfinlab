@@ -35,7 +35,8 @@ class TestBacktestStatistics(unittest.TestCase):
         """
         dates = np.array([dt.datetime(2000, 1, 1) + i * dt.timedelta(days=1) for i in range(10)])
         flip_positions = np.array([1.0, 1.5, 0.5, 0, -0.5, -1.0, 0.5, 1.5, 1.5, 0])
-        hold_positions = np.array([0, 1, 1, 0, -1, -1, 0, 2, 2, 0])
+        hold_positions = np.array([0, 1, 1, -1, -1, 0, 0, 2, 2, 0])
+        no_closed_positions = np.array([0, 1, 1, 1, 1, 2, 2, 2, 2, 2])
         positive_concentrated = np.array([-1, 1, 1, 0, 0, 3, 0, 2, -2, 0])
         negative_concentrated = np.array([0, 1, -1, 0, -2, -1, 0, 2, -3, 0])
         dollar_ret = np.array([100, 110, 90, 100, 120, 130, 100, 120, 140, 130])
@@ -45,9 +46,9 @@ class TestBacktestStatistics(unittest.TestCase):
         self.flip_flattening_positions = pd.Series(data=flip_positions,
                                                    index=dates)
         self.flips = pd.DatetimeIndex([dt.datetime(2000, 1, 7)])
-        self.flattenings = pd.DatetimeIndex([dt.datetime(2000, 1, 4),
-                                             dt.datetime(2000, 1, 10)])
+        self.flattenings = pd.DatetimeIndex([dt.datetime(2000, 1, 4), dt.datetime(2000, 1, 10)])
         self.hold_positions = pd.Series(data=hold_positions, index=dates)
+        self.no_closed_positions = pd.Series(data=no_closed_positions, index=dates)
         self.negative_positions = pd.Series(data=negative_concentrated,
                                             index=dates)
         self.positive_positions = pd.Series(data=positive_concentrated,
@@ -73,9 +74,11 @@ class TestBacktestStatistics(unittest.TestCase):
         Check average holding period calculation
         """
         average_holding = average_holding_period(self.hold_positions)
+        nan_average_holding = average_holding_period(self.no_closed_positions)
 
         # As seen from example set, positions are kept 2 days on average
         self.assertAlmostEqual(average_holding, 2, delta=1e-4)
+        self.assertTrue(np.isnan(nan_average_holding))
 
     def test_bets_concentration(self):
         """
@@ -110,12 +113,15 @@ class TestBacktestStatistics(unittest.TestCase):
     def test_compute_drawdown_and_tuw(self):
         """
         Check if drawdowns and time under water calculated correctly for
-        dollar returns tet set.
+        dollar and non-dollar test sets.
         """
-        drawdown, time_under_water = compute_drawdown_and_time_under_water(self.dollar_returns,
-                                                                           dollars=True)
+        drawdown_dol, time_under_water_dol = compute_drawdown_and_time_under_water(self.dollar_returns,
+                                                                                   dollars=True)
+        drawdown, time_under_water = compute_drawdown_and_time_under_water(self.dollar_returns / 100,
+                                                                           dollars=False)
 
-        self.assertTrue(list(drawdown) == [20.0, 30.0, 10.0])
+        self.assertTrue(list(drawdown_dol) == [20.0, 30.0, 10.0])
+        self.assertTrue(list(time_under_water) == list(time_under_water_dol))
         self.assertAlmostEqual(time_under_water[0], 0.010951,
                                delta=1e-4)
         self.assertAlmostEqual(time_under_water[1], 0.008213,
