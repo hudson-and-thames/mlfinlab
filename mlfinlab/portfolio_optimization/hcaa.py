@@ -239,9 +239,7 @@ class HierarchicalClusteringAssetAllocation:
                 right_cluster = clustered_alphas[subcluster + 1]
 
                 # Calculate allocation factor based on the metric
-                if allocation_metric == 'equal_weighting':
-                    alloc_factor = 0.5
-                elif allocation_metric == 'minimum_variance':
+                if allocation_metric == 'minimum_variance':
                     left_cluster_variance = self._get_cluster_variance(covariance_matrix, left_cluster)
                     right_cluster_variance = self._get_cluster_variance(covariance_matrix, right_cluster)
                     alloc_factor = 1 - left_cluster_variance / (left_cluster_variance + right_cluster_variance)
@@ -284,6 +282,8 @@ class HierarchicalClusteringAssetAllocation:
                                                          cluster_indices=right_cluster)
                     alloc_factor = \
                         1 - left_cluster_conditional_drawdown / (left_cluster_conditional_drawdown + right_cluster_conditional_drawdown)
+                else:
+                    alloc_factor = 0.5 # equal weighting
 
                 # Assign weights to each sub-cluster
                 self.weights[left_cluster] *= alloc_factor
