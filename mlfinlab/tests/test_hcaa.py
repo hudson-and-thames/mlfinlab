@@ -89,7 +89,7 @@ class TestHCAA(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_hcaa_sharpe_ratio_with_exponential_returns(self):
-        # pylint: disable=invalid - name
+        # pylint: disable=invalid-name
         """
         Test the weights calculated by the HCAA algorithm - if all the weights are positive and
         their sum is equal to 1.
