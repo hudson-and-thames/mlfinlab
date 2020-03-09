@@ -48,7 +48,7 @@ metrics:
 2. ``minimum_standard_deviation`` : Standard deviation of the clusters is used as a risk metric.
 3. ``sharpe_ratio`` : Sharpe ratio of the clusters is used as a risk metric.
 4. ``equal_weighting`` : All clusters are weighed equally in terms of risk.
-5. ``expected_shortfall`` : Expected shortfall (VaR) of the clusters is used as a risk metric.
+5. ``expected_shortfall`` : Expected shortfall (CVaR) of the clusters is used as a risk metric.
 6. ``conditional_drawdown_at_risk`` : Conditional drawdown at risk (CDaR) of the clusters is used as a risk metric.
 
 Implementation
@@ -57,6 +57,27 @@ Implementation
 .. automodule:: mlfinlab.portfolio_optimization.hcaa
 
     .. autoclass:: HierarchicalClusteringAssetAllocation
+        :members:
+
+        .. automethod:: __init__
+
+Risk Metrics
+============
+
+The RiskMetrics class contains functions for calculation of common risk metrics used by investment professionals. With time, we
+will keep adding new metrics. For now, it supports the following risk calculations:
+
+1. ``Variance``
+2. ``Value at Risk (VaR)``
+3. ``Expected Shortfall (CVaR)``
+4. ``Conditional Drawdown at Risk (CDaR)``
+
+Implementation
+~~~~~~~~~~~~~~
+
+.. automodule:: mlfinlab.portfolio_optimization.risk_metrics
+
+    .. autoclass:: RiskMetrics
         :members:
 
         .. automethod:: __init__
@@ -118,7 +139,7 @@ Examples
 In this section, we provide some code snippets for new users to get started with the portfolio optimisation module.
 
 Importing the Classes
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 ::
 

@@ -17,7 +17,7 @@ class RiskMetrics:
     @staticmethod
     def calculate_variance(covariance, weights):
         '''
-        Calculate variance of portfolio.
+        Calculate the variance of a portfolio/asset.
 
         :param covariance: (pd.DataFrame/np.matrix) covariance matrix of assets
         :param weights: (list) list of asset weights
@@ -29,7 +29,7 @@ class RiskMetrics:
     @staticmethod
     def calculate_value_at_risk(returns, confidence_level=0.05):
         '''
-        Calculate the value at risk (VaR) of the portfolio.
+        Calculate the value at risk (VaR) of a portfolio/asset.
 
         :param returns: (pd.DataFrame/np.array) asset/portfolio historical returns
         :param confidence_level: (float) confidence level (alpha)
@@ -43,7 +43,7 @@ class RiskMetrics:
 
     def calculate_expected_shortfall(self, returns, confidence_level=0.05):
         '''
-        Calculate the expected shortfall (CVaR) of the portfolio.
+        Calculate the expected shortfall (CVaR) of a portfolio/asset.
 
         :param returns: (pd.DataFrame/np.array) asset/portfolio historical returns
         :param confidence_level: (float) confidence level (alpha)
@@ -60,7 +60,7 @@ class RiskMetrics:
     @staticmethod
     def calculate_conditional_drawdown_risk(returns, confidence_level=0.05):
         '''
-        Calculate the conditional drawdown of risk (CDaR) of the portfolio.
+        Calculate the conditional drawdown of risk (CDaR) of a portfolio/asset.
 
         :param returns: (pd.DataFrame/np.array) asset/portfolio historical returns
         :param confidence_level: (float) confidence level (alpha)
