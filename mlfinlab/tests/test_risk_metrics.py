@@ -32,33 +32,51 @@ class TestRiskMetrics(unittest.TestCase):
         Test the calculation of value at risk.
         """
 
-        test_returns_array = self.data.iloc[:, 0].values
-        test_returns_df = self.data.iloc[:, 0]
-        value_at_risk_1 = RiskMetrics().calculate_value_at_risk(test_returns_array)
-        value_at_risk_2 = RiskMetrics().calculate_value_at_risk(test_returns_df)
-        assert isinstance(value_at_risk_1, float)
-        assert isinstance(value_at_risk_2, float)
+        test_returns = self.data.iloc[:, 0].values
+        value_at_risk = RiskMetrics().calculate_value_at_risk(test_returns)
+        assert isinstance(value_at_risk, float)
 
     def test_expected_shortfall_calculation(self):
         """
         Test the calculation of expected shortfall.
         """
 
-        test_returns_array = self.data.iloc[:, 0].values
-        test_returns_df = self.data.iloc[:, 0]
-        expected_shortfall_1 = RiskMetrics().calculate_expected_shortfall(test_returns_array)
-        expected_shortfall_2 = RiskMetrics().calculate_expected_shortfall(test_returns_df)
-        assert isinstance(expected_shortfall_1, float)
-        assert isinstance(expected_shortfall_2, float)
+        test_returns = self.data.iloc[:, 0].values
+        expected_shortfall = RiskMetrics().calculate_expected_shortfall(test_returns)
+        assert isinstance(expected_shortfall, float)
 
     def test_conditional_drawdown_calculation(self):
         """
         Test the calculation of conditional drawdown at risk.
         """
 
-        test_returns_array = self.data.iloc[:, 0].values
-        test_returns_df = self.data.iloc[:, 0]
-        conditional_drawdown_1 = RiskMetrics().calculate_conditional_drawdown_risk(test_returns_array)
-        conditional_drawdown_2 = RiskMetrics().calculate_conditional_drawdown_risk(test_returns_df)
-        assert isinstance(conditional_drawdown_1, float)
-        assert isinstance(conditional_drawdown_2, float)
+        test_returns = self.data.iloc[:, 0].values
+        conditional_drawdown = RiskMetrics().calculate_conditional_drawdown_risk(test_returns)
+        assert isinstance(conditional_drawdown, float)
+
+    def test_value_at_risk_for_dataframe(self):
+        """
+        Test the calculation of value at risk.
+        """
+
+        test_returns = self.data.iloc[:, 0]
+        value_at_risk = RiskMetrics().calculate_value_at_risk(test_returns)
+        assert isinstance(value_at_risk, float)
+
+    def test_expected_shortfall_for_dataframe(self):
+        """
+        Test the calculation of expected shortfall.
+        """
+
+        test_returns = self.data.iloc[:, 0]
+        expected_shortfall = RiskMetrics().calculate_expected_shortfall(test_returns)
+        assert isinstance(expected_shortfall, float)
+
+    def test_conditional_drawdown_for_dataframe(self):
+        """
+        Test the calculation of conditional drawdown at risk.
+        """
+
+        test_returns = self.data.iloc[:, 0]
+        conditional_drawdown = RiskMetrics().calculate_conditional_drawdown_risk(test_returns)
+        assert isinstance(conditional_drawdown, float)
