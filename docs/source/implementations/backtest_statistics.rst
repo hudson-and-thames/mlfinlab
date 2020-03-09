@@ -6,6 +6,14 @@ Backtest Statistics
 
 Backtest statistics module contains functions related to characteristics analysis of returns and target positions. These include filtering flips and flattenings from series of returns, calculating average holding period from series of positions, concentration of bets for positive and negative returns, drawdown and time under water calculation, Sharpe ratios - annualised, probabalistic, deflated, minimum required track record length. Each statistic has it's own function and small description of statistic in docstring and detailed list of inputs required.
 
+Introduction
+==============================
+More information on functions implemented in this part, as well as use cases and deeper results descriptions can be found in the following sources:
+
+- **Advances in Financial Machine Learning** *by* Marcos Lopez de Prado. *Page numbers in the code are referring to the pages in this book.*
+
+- **The Sharpe Ratio Efficient Frontier** *by* David H. Bailey *and* Marcos Lopez de Prado `available here <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1821643>`_. *Provides a deeper understanding of Sharpe ratios implemented and Minimum track record length.*
+
 Flattening and Flips
 ==============================
 
