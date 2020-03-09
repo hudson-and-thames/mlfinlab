@@ -89,6 +89,7 @@ class TestHCAA(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_hcaa_sharpe_ratio_with_exponential_returns(self):
+        # pylint: disable=invalid - name
         """
         Test the weights calculated by the HCAA algorithm - if all the weights are positive and
         their sum is equal to 1.
@@ -171,7 +172,7 @@ class TestHCAA(unittest.TestCase):
                       optimal_num_clusters=5,
                       asset_names=self.data.columns)
         assert hcaa.ordered_indices == [13, 9, 10, 8, 14, 7, 1, 6, 4, 16, 3, 17,
-                                       12, 18, 22, 0, 15, 21, 11, 2, 20, 5, 19]
+                                        12, 18, 22, 0, 15, 21, 11, 2, 20, 5, 19]
 
     def test_value_error_for_non_dataframe_input(self):
         """
