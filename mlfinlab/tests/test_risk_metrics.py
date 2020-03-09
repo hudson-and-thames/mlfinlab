@@ -1,3 +1,4 @@
+# pylint: disable=missing-module-docstring
 import unittest
 import os
 import pandas as pd
@@ -5,7 +6,6 @@ from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
 
 
 class TestRiskMetrics(unittest.TestCase):
-    # pylint: disable=missing-module-docstring
     """
     Tests different risk metrics calculation from the RiskMetrics class.
     """
