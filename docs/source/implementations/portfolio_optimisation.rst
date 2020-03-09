@@ -6,6 +6,9 @@ Portfolio Optimisation
 
 The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies. Each algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them. Next up, lets discuss about some of these implementations and the different parameters they require.
 
+
+
+
 Hierarchical Risk Parity (HRP)
 ==============================
 
@@ -32,6 +35,9 @@ Implementation
         :members:
 
         .. automethod:: __init__
+
+
+
 
 Hierarchical Clustering Asset Allocation (HCAA)
 ===============================================
@@ -61,26 +67,8 @@ Implementation
 
         .. automethod:: __init__
 
-Risk Metrics
-============
 
-The RiskMetrics class contains functions for calculation of common risk metrics used by investment professionals. With time, we
-will keep adding new metrics. For now, it supports the following risk calculations:
 
-1. ``Variance``
-2. ``Value at Risk (VaR)``
-3. ``Expected Shortfall (CVaR)``
-4. ``Conditional Drawdown at Risk (CDaR)``
-
-Implementation
-~~~~~~~~~~~~~~
-
-.. automodule:: mlfinlab.portfolio_optimization.risk_metrics
-
-    .. autoclass:: RiskMetrics
-        :members:
-
-        .. automethod:: __init__
 
 The Critical Line Algorithm (CLA)
 =================================
@@ -110,6 +98,9 @@ Implementation
 
         .. automethod:: __init__
 
+
+
+
 Mean-Variance Optimisation
 ==========================
 
@@ -131,6 +122,48 @@ Currently, the following solution strings are supported by MVO class:
 2. ``max_sharpe`` : Calculates the weights relating to the maximum Sharpe Ratio portfolio.
 3. ``min_volatility`` : Calculates the weights relating to Minimum Variance portfolio.
 4. ``efficient_risk`` : Calculates an efficient risk portfolio for a specified target return
+
+
+
+
+Risk Metrics
+============
+
+The RiskMetrics class contains functions for calculation of common risk metrics used by investment professionals. With time, we
+will keep adding new metrics. For now, it supports the following risk calculations:
+
+1. ``Variance``
+2. ``Value at Risk (VaR)``
+3. ``Expected Shortfall (CVaR)``
+4. ``Conditional Drawdown at Risk (CDaR)``
+
+Implementation
+~~~~~~~~~~~~~~
+
+.. automodule:: mlfinlab.portfolio_optimization.risk_metrics
+
+    .. autoclass:: RiskMetrics
+        :members:
+
+        .. automethod:: __init__
+
+
+
+
+Estimation of Returns
+=====================
+
+Implementation
+~~~~~~~~~~~~~~
+
+.. automodule:: mlfinlab.portfolio_optimization.returns_estimators
+
+    .. autoclass:: ReturnsEstimation
+        :members:
+
+        .. automethod:: __init__
+
+
 
 
 Examples
