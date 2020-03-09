@@ -270,7 +270,7 @@ class HierarchicalClusteringAssetAllocation:
                                                                                            confidence_level=confidence_level,
                                                                                            cluster_indices=right_cluster)
                     alloc_factor = \
-                        left_cluster_expected_shortfall / (left_cluster_expected_shortfall + right_cluster_expected_shortfall)
+                        1 - left_cluster_expected_shortfall / (left_cluster_expected_shortfall + right_cluster_expected_shortfall)
                 elif allocation_metric == 'conditional_drawdown_risk':
                     left_cluster_conditional_drawdown = self._get_cluster_conditional_drawdown_at_risk(asset_returns=asset_returns,
                                                          covariance=covariance_matrix,
