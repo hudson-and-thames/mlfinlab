@@ -120,7 +120,7 @@ Implementations
    implementations/microstructural_features
    implementations/clustering
    implementations/codependence
-
+   implementations/backtest_statistics
 
 
 * :doc:`implementations/data_structures`
@@ -137,6 +137,7 @@ Implementations
 * :doc:`implementations/microstructural_features`
 * :doc:`implementations/clustering`
 * :doc:`implementations/codependence`
+* :doc:`implementations/backtest_statistics`
 
 Additional Information
 ######################

@@ -86,7 +86,7 @@ def average_holding_period(target_positions: pd.Series) -> float:
 
             # Only a part of position is closed
             else:
-                weight = abs(target_positions.iloc[i])
+                weight = abs(position_difference.iloc[i])
                 holding_period.loc[target_positions.index[i],
                                    ['holding_time', 'weight']] = (hold_time, weight)
 
@@ -102,8 +102,8 @@ def average_holding_period(target_positions: pd.Series) -> float:
 
 def bets_concentration(returns: pd.Series) -> float:
     """
-    Snippet 14.3, page 201, Derives the concentration of bets across months
-    from given pd.Series of returns.
+    Snippet 14.3, page 201, Derives the concentration of returns from given
+    pd.Series of returns.
 
     Algorithm is based on Herfindahl-Hirschman Index where return weights
     are taken as an input.
@@ -124,7 +124,7 @@ def all_bets_concentration(returns: pd.Series, frequency: str = 'M') -> tuple:
     Snippet 14.3, page 201, Given a pd.Series of returns, derives concentration of
     positive returns, negative returns and concentration of bets grouped by
     time intervals (daily, monthly etc.). If after time grouping less than
-    2 observations, returns nan.
+    3 observations, returns nan.
 
     Properties or results:
     - low positive_concentration -> no right fat-tail of returns (desirable)
@@ -190,7 +190,7 @@ def drawdown_and_time_under_water(returns: pd.Series, dollars: bool = False) -> 
 def sharpe_ratio(returns: pd.Series, cumulative: bool = False,
                  entries_per_year: int = 252, risk_free_rate: float = 0) -> float:
     """
-    Calculates Annualized Sharpe Ratio for pd.Series of  normal (not log) returns.
+    Calculates Annualized Sharpe Ratio for pd.Series of normal (not log) returns.
 
     :param returns: (pd.Series) returns
     :param cumulative: (bool) flag if returns are cumulative (no by default)
