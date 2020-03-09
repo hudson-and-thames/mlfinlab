@@ -39,7 +39,7 @@ class RiskMetrics:
         if not isinstance(returns, pd.DataFrame):
             returns = pd.DataFrame(returns)
 
-        return returns.quantile(confidence_level, interpolation='higher')
+        return returns.quantile(confidence_level, interpolation='higher')[0]
 
     def calculate_expected_shortfall(self, returns, confidence_level=0.05):
         '''
@@ -58,7 +58,7 @@ class RiskMetrics:
         return expected_shortfall
 
     @staticmethod
-    def calculate_conditional_drawdown_risk(returns, confidence_level):
+    def calculate_conditional_drawdown_risk(returns, confidence_level=0.05):
         '''
         Calculate the conditional drawdown of risk (CDaR) of the portfolio.
 

@@ -19,7 +19,7 @@ Marcos Lopez de Prado. The working of the algorithm can be broken down into 3 st
 3. Finally, the weights are assigned to each cluster in a recursive manner. At each node, the weights are broken
    down into the sub-cluster until all the individual assets are assigned a unique weight.
 
-Although, it is a simple algorithm, HRP has been found to be a very stable algorithm as compared to its older counterparts.
+Although, it is a simple algorithm, HRP has been found to be very stable as compared to its older counterparts.
 This is because, HRP does not involve taking inverse of the covariance matrix matrix which makes it robust to small changes
 in the covariances of the asset returns. For a detailed explanation of how HRP works, we have written an excellent `blog post <https://hudsonthames.org/an-introduction-to-the-hierarchical-risk-parity-algorithm/>`_ about it.
 
@@ -29,6 +29,34 @@ Implementation
 .. automodule:: mlfinlab.portfolio_optimization.hrp
 
     .. autoclass:: HierarchicalRiskParity
+        :members:
+
+        .. automethod:: __init__
+
+Hierarchical Clustering Asset Allocation (HCAA)
+===============================================
+
+The HRP algorithm focuses on allocation of risk using a hierarchical clustering approach and using the variance of the clusters to
+allocate weights. While variance is a very simple and popular representation of risk used in the investing world, it is not the
+optimal one and can underestimate the true risk of a portfolio which is why there are many other important risk metrics used by
+investment managers that can correctly reflect the true risk of a portfolio/asset. With respect to this, the original HRP
+algorithm can be tweaked to allocate its weights based on different risk representations of the clusters and generate better
+weights. This class implements an improved hierarchical clustering algorithm which gives the option of using the following
+metrics:
+
+1. ``minimum_variance`` : Variance of the clusters is used as a risk metric.
+2. ``minimum_standard_deviation`` : Standard deviation of the clusters is used as a risk metric.
+3. ``sharpe_ratio`` : Sharpe ratio of the clusters is used as a risk metric.
+4. ``equal_weighting`` : All clusters are weighed equally in terms of risk.
+5. ``expected_shortfall`` : Expected shortfall (VaR) of the clusters is used as a risk metric.
+6. ``conditional_drawdown_at_risk`` : Conditional drawdown at risk (CDaR) of the clusters is used as a risk metric.
+
+Implementation
+~~~~~~~~~~~~~~
+
+.. automodule:: mlfinlab.portfolio_optimization.hcaa
+
+    .. autoclass:: HierarchicalClusteringAssetAllocation
         :members:
 
         .. automethod:: __init__
@@ -85,7 +113,7 @@ Currently, the following solution strings are supported by MVO class:
 
 
 Examples
-=======
+========
 
 In this section, we provide some code snippets for new users to get started with the portfolio optimisation module.
 
@@ -101,7 +129,7 @@ Importing the Classes
 	import pandas as pd
 
 Reading Data
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 It is fairly straightforward to read the data using pandas and pass it to the public methods. Here, we read a csv file of historical stock prices.
 ::
@@ -115,7 +143,7 @@ It is fairly straightforward to read the data using pandas and pass it to the pu
 
 
 Allocating the Weights
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 

@@ -1,8 +1,8 @@
 '''
-This module implements the Hierarchical Equal Risk Contribution (HERC) algorithm and its extended components mentioned in the
- following papers: `Raffinot, Thomas, The Hierarchical Equal Risk Contribution Portfolio (August 23,
- 2018). <https://ssrn.com/abstract=3237540>`_; and `Raffinot, Thomas, Hierarchical Clustering Based Asset Allocation (May 2017).
- <https://ssrn.com/abstract=2840729>`_;
+This module implements the Hierarchical Equal Risk Contribution (HERC) algorithm and it's extended components mentioned in the
+following papers: `Raffinot, Thomas, The Hierarchical Equal Risk Contribution Portfolio (August 23,
+2018). <https://ssrn.com/abstract=3237540>`_; and `Raffinot, Thomas, Hierarchical Clustering Based Asset Allocation (May 2017)
+<https://ssrn.com/abstract=2840729>`_;
 '''
 
 import numpy as np
