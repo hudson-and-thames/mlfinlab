@@ -59,7 +59,7 @@ class TestRiskMetrics(unittest.TestCase):
         Test the calculation of value at risk.
         """
 
-        test_returns = self.data.iloc[:, 0]
+        test_returns = pd.DataFrame(self.data.iloc[:, 0])
         value_at_risk = RiskMetrics().calculate_value_at_risk(test_returns)
         assert isinstance(value_at_risk, float)
 
@@ -68,7 +68,7 @@ class TestRiskMetrics(unittest.TestCase):
         Test the calculation of expected shortfall.
         """
 
-        test_returns = self.data.iloc[:, 0]
+        test_returns = pd.DataFrame(self.data.iloc[:, 0])
         expected_shortfall = RiskMetrics().calculate_expected_shortfall(test_returns)
         assert isinstance(expected_shortfall, float)
 
@@ -77,6 +77,6 @@ class TestRiskMetrics(unittest.TestCase):
         Test the calculation of conditional drawdown at risk.
         """
 
-        test_returns = self.data.iloc[:, 0]
+        test_returns = pd.DataFrame(self.data.iloc[:, 0])
         conditional_drawdown = RiskMetrics().calculate_conditional_drawdown_risk(test_returns)
         assert isinstance(conditional_drawdown, float)
