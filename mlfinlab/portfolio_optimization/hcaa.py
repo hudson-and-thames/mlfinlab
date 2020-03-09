@@ -283,7 +283,7 @@ class HierarchicalClusteringAssetAllocation:
                                                          confidence_level=confidence_level,
                                                          cluster_indices=right_cluster)
                     alloc_factor = \
-                        left_cluster_conditional_drawdown / (left_cluster_conditional_drawdown + right_cluster_conditional_drawdown)
+                        1 - left_cluster_conditional_drawdown / (left_cluster_conditional_drawdown + right_cluster_conditional_drawdown)
 
                 # Assign weights to each sub-cluster
                 self.weights[left_cluster] *= alloc_factor
@@ -338,7 +338,8 @@ class HierarchicalClusteringAssetAllocation:
                 {'minimum_variance', 'minimum_standard_deviation', 'sharpe_ratio',
                  'equal_weighting', 'expected_shortfall', 'conditional_drawdown_risk'}:
             raise ValueError("Unknown allocation metric specified. Supported metrics are - minimum_variance, "
-                         "minimum_standard_deviation, sharpe_ratio, equal_weighting, expected_shortfall, conditional_drawdown_risk")
+                             "minimum_standard_deviation, sharpe_ratio, equal_weighting, expected_shortfall, "
+                             "conditional_drawdown_risk")
 
     def allocate(self,
                  asset_names,
