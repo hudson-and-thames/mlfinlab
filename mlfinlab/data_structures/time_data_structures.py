@@ -6,7 +6,9 @@ Time bars generation logic
 """
 
 # Imports
+from typing import Union, Iterable, Optional
 import numpy as np
+import pandas as pd
 
 from mlfinlab.data_structures.base_bars import BaseBars
 
@@ -18,9 +20,9 @@ class TimeBars(BaseBars):
     Use get_time_bars instead
     """
 
-    def __init__(self, file_path_or_df, resolution, num_units, batch_size=20000000):
+    def __init__(self, resolution: str, num_units: int, batch_size: int = 20000000):
 
-        BaseBars.__init__(self, file_path_or_df, metric=None, batch_size=batch_size)
+        BaseBars.__init__(self, metric=None, batch_size=batch_size)
 
         # Threshold at which to sample (in seconds)
         self.time_bar_thresh_mapping = {'D': 86400, 'H': 3600, 'MIN': 60, 'S': 1}  # Number of seconds
@@ -39,7 +41,7 @@ class TimeBars(BaseBars):
         self.high_price, self.low_price = -np.inf, np.inf
         self.cum_statistics = {'cum_ticks': 0, 'cum_dollar_value': 0, 'cum_volume': 0, 'cum_buy_volume': 0}
 
-    def _extract_bars(self, data):
+    def _extract_bars(self, data: Union[list, tuple, np.ndarray]) -> list:
         """
         For loop which compiles time bars.
         We did investigate the use of trying to solve this in a vectorised manner but found that a For loop worked well.
@@ -50,7 +52,7 @@ class TimeBars(BaseBars):
         # Iterate over rows
         list_bars = []
 
-        for row in data.values:
+        for row in data:
             # Set variables
             date_time = row[0].timestamp()  # Convert to UTC timestamp
             self.tick_num += 1
@@ -95,12 +97,13 @@ class TimeBars(BaseBars):
         return list_bars
 
 
-def get_time_bars(file_path_or_df, resolution='D', num_units=1, batch_size=20000000, verbose=True, to_csv=False,
-                  output_path=None):
+def get_time_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], resolution: str = 'D', num_units: int = 1, batch_size: int = 20000000,
+                  verbose: bool = True, to_csv: bool = False, output_path: Optional[str] = None):
     """
     Creates Time Bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
-    :param file_path_or_df: (str or pd.DataFrame) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
+    :param file_path_or_df: (str, iterable of str, or pd.DataFrame) Path to the csv file(s) or Pandas Data Frame containing raw tick data
+                            in the format[date_time, price, volume]
     :param resolution: (str) Resolution type ('D', 'H', 'MIN', 'S')
     :param num_units: (int) Number of resolution units (3 days for example, 2 hours)
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
@@ -110,6 +113,6 @@ def get_time_bars(file_path_or_df, resolution='D', num_units=1, batch_size=20000
     :return: Dataframe of time bars, if to_csv=True return None
     """
 
-    bars = TimeBars(file_path_or_df=file_path_or_df, resolution=resolution, num_units=num_units, batch_size=batch_size)
-    time_bars = bars.batch_run(verbose=verbose, to_csv=to_csv, output_path=output_path)
+    bars = TimeBars(resolution=resolution, num_units=num_units, batch_size=batch_size)
+    time_bars = bars.batch_run(file_path_or_df=file_path_or_df, verbose=verbose, to_csv=to_csv, output_path=output_path)
     return time_bars

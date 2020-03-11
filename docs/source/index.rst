@@ -112,37 +112,38 @@ Implementations
    :caption: Implementations
    :hidden:
 
-   implementations/data_structures
-   implementations/filters
-   implementations/labeling
-   implementations/sampling
-   implementations/frac_diff
-   implementations/cross_validation
-   implementations/sb_bagging
-   implementations/feature_importance
+   implementations/backtest_statistics
    implementations/bet_sizing
-   implementations/portfolio_optimisation
-   implementations/structural_breaks
+   implementations/codependence
+   implementations/cross_validation
+   implementations/data_structures
+   implementations/feature_importance
+   implementations/filters
+   implementations/frac_diff
+   implementations/labeling
    implementations/microstructural_features
    implementations/clustering
-   implementations/codependence
+   implementations/portfolio_optimisation
+   implementations/sampling
+   implementations/sb_bagging
+   implementations/structural_breaks
 
 
-
-* :doc:`implementations/data_structures`
-* :doc:`implementations/filters`
-* :doc:`implementations/labeling`
-* :doc:`implementations/sampling`
-* :doc:`implementations/frac_diff`
-* :doc:`implementations/cross_validation`
-* :doc:`implementations/sb_bagging`
-* :doc:`implementations/feature_importance`
+* :doc:`implementations/backtest_statistics`
 * :doc:`implementations/bet_sizing`
-* :doc:`implementations/portfolio_optimisation`
-* :doc:`implementations/structural_breaks`
+* :doc:`implementations/codependence`
+* :doc:`implementations/cross_validation`
+* :doc:`implementations/data_structures`
+* :doc:`implementations/feature_importance`
+* :doc:`implementations/filters`
+* :doc:`implementations/frac_diff`
+* :doc:`implementations/labeling`
 * :doc:`implementations/microstructural_features`
 * :doc:`implementations/clustering`
-* :doc:`implementations/codependence`
+* :doc:`implementations/portfolio_optimisation`
+* :doc:`implementations/sampling`
+* :doc:`implementations/sb_bagging`
+* :doc:`implementations/structural_breaks`
 
 Additional Information
 ######################

@@ -4,7 +4,7 @@ duplicated code.
 """
 
 from abc import ABC, abstractmethod
-from typing import Tuple, Union
+from typing import Tuple, Union, Generator, Iterable, Optional
 
 import numpy as np
 import pandas as pd
@@ -36,28 +36,17 @@ class BaseBars(ABC):
     they are included here so as to avoid a complicated nested class structure.
     """
 
-    def __init__(self, file_path_or_df: Tuple[str, pd.DataFrame], metric: str, batch_size: int = 2e7):
+    def __init__(self, metric: str, batch_size: int = 2e7):
         """
         Constructor
 
-        :param file_path_or_df: (str or pd.DataFrame) Path to the csv file or Pandas Data Frame containing
-                                raw tick data  in the format[date_time, price, volume]
         :param metric: (str) type of imbalance bar to create. Example: dollar_imbalance.
         :param batch_size: (int) Number of rows to read in from the csv, per batch.
         """
 
-        if isinstance(file_path_or_df, str):
-            self.generator_object = pd.read_csv(file_path_or_df, chunksize=batch_size, parse_dates=[0])
-            # Read in the first row & assert format
-            first_row = pd.read_csv(file_path_or_df, nrows=1)
-            self._assert_csv(first_row)
-        elif isinstance(file_path_or_df, pd.DataFrame):
-            self.generator_object = _crop_data_frame_in_batches(file_path_or_df, batch_size)
-        else:
-            raise ValueError('file_path_or_df is neither string(path to a csv file) nor pd.DataFrame')
-
         # Base properties
         self.metric = metric
+        self.batch_size = batch_size
         self.prev_tick_rule = 0
 
         # Cache properties
@@ -69,12 +58,15 @@ class BaseBars(ABC):
         # Batch_run properties
         self.flag = False  # The first flag is false since the first batch doesn't use the cache
 
-    def batch_run(self, verbose: bool = True, to_csv: bool = False, output_path: str = None) -> \
-            Tuple[pd.DataFrame, None]:
-        """
-        Reads a csv file or pd.DataFrame in batches and then constructs the financial data structure in the form of a DataFrame.
-        The csv file must have only 3 columns: date_time, price, & volume.
 
+    def batch_run(self, file_path_or_df: Union[str, Iterable[str], pd.DataFrame], verbose: bool = True, to_csv: bool = False,
+                  output_path: Optional[str] = None) -> Union[pd.DataFrame, None]:
+        """
+        Reads csv file(s) or pd.DataFrame in batches and then constructs the financial data structure in the form of a DataFrame.
+        The csv file or DataFrame must have only 3 columns: date_time, price, & volume.
+
+        :param file_path_or_df: (str, iterable of str, or pd.DataFrame) Path to the csv file(s) or Pandas Data Frame containing
+                                raw tick data  in the format[date_time, price, volume]
         :param verbose: (Boolean) Flag whether to print message on each processed batch or not
         :param to_csv: (Boolean) Flag for writing the results of bars generation to local csv file, or to in-memory DataFrame
         :param output_path: (Boolean) Path to results file, if to_csv = True
@@ -94,11 +86,11 @@ class BaseBars(ABC):
         final_bars = []
         cols = ['date_time', 'tick_num', 'open', 'high', 'low', 'close', 'volume', 'cum_buy_volume', 'cum_ticks',
                 'cum_dollar_value']
-        for batch in self.generator_object:
+        for batch in self._batch_iterator(file_path_or_df):
             if verbose:  # pragma: no cover
                 print('Batch number:', count)
 
-            list_bars = self._extract_bars(data=batch)
+            list_bars = self.run(data=batch)
 
             if to_csv is True:
                 pd.DataFrame(list_bars, columns=cols).to_csv(output_path, header=header, index=False, mode='a')
@@ -107,9 +99,6 @@ class BaseBars(ABC):
                 # Append to bars list
                 final_bars += list_bars
             count += 1
-
-            # Set flag to True: notify function to use cache
-            self.flag = True
 
         if verbose:  # pragma: no cover
             print('Returning bars \n')
@@ -121,6 +110,65 @@ class BaseBars(ABC):
 
         # Processed DataFrame is stored in .csv file, return None
         return None
+
+    def _batch_iterator(self, file_path_or_df: Union[str, Iterable[str], pd.DataFrame]) -> Generator[pd.DataFrame, None, None]:
+        """
+        :param file_path_or_df: (str, iterable of str, or pd.DataFrame) Path to the csv file(s) or Pandas Data Frame
+                                containing raw tick data in the format[date_time, price, volume]
+        """
+        if isinstance(file_path_or_df, (list, tuple)):
+            # Assert format of all files
+            for file_path in file_path_or_df:
+                self._read_first_row(file_path)
+            for file_path in file_path_or_df:
+                for batch in pd.read_csv(file_path, chunksize=self.batch_size, parse_dates=[0]):
+                    yield batch
+
+        elif isinstance(file_path_or_df, str):
+            self._read_first_row(file_path_or_df)
+            for batch in pd.read_csv(file_path_or_df, chunksize=self.batch_size, parse_dates=[0]):
+                yield batch
+
+        elif isinstance(file_path_or_df, pd.DataFrame):
+            for batch in _crop_data_frame_in_batches(file_path_or_df, self.batch_size):
+                yield batch
+
+        else:
+            raise ValueError('file_path_or_df is neither string(path to a csv file), iterable of strings, nor pd.DataFrame')
+
+    def _read_first_row(self, file_path: str):
+        """
+        :param file_path: (str) Path to the csv file containing raw tick data in the format[date_time, price, volume]
+        """
+        # Read in the first row & assert format
+        first_row = pd.read_csv(file_path, nrows=1)
+        self._assert_csv(first_row)
+
+    def run(self, data: Union[list, tuple, pd.DataFrame]) -> list:
+        """
+        Reads a List, Tuple, or Dataframe and then constructs the financial data structure in the form of a list.
+        The List, Tuple, or DataFrame must have only 3 attrs: date_time, price, & volume.
+
+        :param data: (List, Tuple, or DataFrame) Dict or ndarray containing raw tick data in the format[date_time, price, volume]
+
+        :return: (List) Financial data structure
+        """
+
+        if isinstance(data, (list, tuple)):
+            values = data
+
+        elif isinstance(data, pd.DataFrame):
+            values = data.values
+
+        else:
+            raise ValueError('data is neither list nor tuple nor pd.DataFrame')
+
+        list_bars = self._extract_bars(data=values)
+
+        # Set flag to True: notify function to use cache
+        self.flag = True
+
+        return list_bars
 
     @abstractmethod
     def _extract_bars(self, data: pd.DataFrame) -> list:
@@ -249,14 +297,12 @@ class BaseImbalanceBars(BaseBars):
     Base class for Imbalance Bars (EMA and Const) which implements imbalance bars calculation logic
     """
 
-    def __init__(self, file_path_or_df: Tuple[str, pd.DataFrame], metric: str, batch_size: int,
+    def __init__(self, metric: str, batch_size: int,
                  expected_imbalance_window: int, exp_num_ticks_init: int,
                  analyse_thresholds: bool):
         """
         Constructor
 
-        :param file_path_or_df: (String or pd.DataFrame) Path to the csv file or Pandas Data Frame containing
-                                raw tick data  in the format[date_time, price, volume]
         :param metric: (String) type of imbalance bar to create. Example: dollar_imbalance.
         :param batch_size: (Int) Number of rows to read in from the csv, per batch.
         :param expected_imbalance_window: (Int) Window used to estimate expected imbalance from previous trades
@@ -265,7 +311,7 @@ class BaseImbalanceBars(BaseBars):
         :param analyse_thresholds: (Bool) flag to return thresholds values (theta, exp_num_ticks, exp_imbalance) in a
                                           form of Pandas DataFrame
         """
-        BaseBars.__init__(self, file_path_or_df, metric, batch_size)
+        BaseBars.__init__(self, metric, batch_size)
 
         self.expected_imbalance_window = expected_imbalance_window
 
@@ -289,7 +335,7 @@ class BaseImbalanceBars(BaseBars):
         self.cum_statistics = {'cum_ticks': 0, 'cum_dollar_value': 0, 'cum_volume': 0, 'cum_buy_volume': 0}
         self.thresholds['cum_theta'] = 0
 
-    def _extract_bars(self, data: pd.DataFrame) -> list:
+    def _extract_bars(self, data: Tuple[dict, pd.DataFrame]) -> list:
         """
         For loop which compiles the various imbalance bars: dollar, volume, or tick.
 
@@ -299,7 +345,7 @@ class BaseImbalanceBars(BaseBars):
 
         # Iterate over rows
         list_bars = []
-        for row in data.values:
+        for row in data:
             # Set variables
             date_time = row[0]
             self.tick_num += 1
@@ -389,14 +435,12 @@ class BaseRunBars(BaseBars):
     Base class for Run Bars (EMA and Const) which implements run bars calculation logic
     """
 
-    def __init__(self, file_path_or_df: Tuple[str, pd.DataFrame], metric: str, batch_size: int, num_prev_bars: int,
+    def __init__(self, metric: str, batch_size: int, num_prev_bars: int,
                  expected_imbalance_window: int,
                  exp_num_ticks_init: int, analyse_thresholds: bool):
         """
         Constructor
 
-        :param file_path_or_df: (str or pd.DataFrame) Path to the csv file or Pandas Data Frame containing
-                                raw tick data  in the format[date_time, price, volume]
         :param metric: (str) type of imbalance bar to create. Example: dollar_imbalance.
         :param batch_size: (int) Number of rows to read in from the csv, per batch.
         :param expected_imbalance_window: (Int) Window used to estimate expected imbalance from previous trades
@@ -404,7 +448,7 @@ class BaseRunBars(BaseBars):
                                          For Const Imbalance Bars expected number of ticks equals expected number of ticks init
         :param analyse_thresholds: (bool) flag to return thresholds values (thetas, exp_num_ticks, exp_runs) in Pandas DataFrame
         """
-        BaseBars.__init__(self, file_path_or_df, metric, batch_size)
+        BaseBars.__init__(self, metric, batch_size)
 
         self.num_prev_bars = num_prev_bars
         self.expected_imbalance_window = expected_imbalance_window
@@ -434,17 +478,17 @@ class BaseRunBars(BaseBars):
         self.cum_statistics = {'cum_ticks': 0, 'cum_dollar_value': 0, 'cum_volume': 0, 'cum_buy_volume': 0}
         self.thresholds['cum_theta_buy'], self.thresholds['cum_theta_sell'], self.thresholds['buy_ticks_num'] = 0, 0, 0
 
-    def _extract_bars(self, data: pd.DataFrame) -> list:
+    def _extract_bars(self, data: Tuple[list, np.ndarray]) -> list:
         """
         For loop which compiles the various run bars: dollar, volume, or tick.
 
-        :param data: (DataFrame) Contains 3 columns - date_time, price, and volume.
+        :param data: (list or ndarray) Contains 3 columns - date_time, price, and volume.
         :return: (List) of bars built using the current batch.
         """
 
         # Iterate over rows
         list_bars = []
-        for row in data.values:
+        for row in data:
             # Set variables
             date_time = row[0]
             self.tick_num += 1
