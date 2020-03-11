@@ -1,7 +1,6 @@
 """
 Package based on the text book: Advances in Financial Machine Learning, by Marcos Lopez de Prado
 """
-import time
 import webbrowser
 import textwrap
 
@@ -23,8 +22,16 @@ import mlfinlab.clustering as clustering
 
 
 # Sponsorship notification
-webbrowser.open('https://www.patreon.com/HudsonThames', new=1, autoraise=False)
-time.sleep(4)  # Add 2 second wait to override user input.
+try:
+    webbrowser.get('google-chrome').open_new('https://www.patreon.com/HudsonThames')
+except webbrowser.Error as error:
+    try:
+        webbrowser.get('firefox').open_new('https://www.patreon.com/HudsonThames')
+    except webbrowser.Error as error:
+        try:
+            webbrowser.get('windows-default').open_new('https://www.patreon.com/HudsonThames')
+        except webbrowser.Error as error:
+            print('Support us on Patreon: https://www.patreon.com/HudsonThames')
 
 print()
 print()
