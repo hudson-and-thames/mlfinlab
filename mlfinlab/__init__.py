@@ -24,7 +24,7 @@ import mlfinlab.clustering as clustering
 
 # Sponsorship notification
 webbrowser.open('https://www.patreon.com/HudsonThames', new=1, autoraise=False)
-time.sleep(2)  # Add 2 second wait to override user input.
+time.sleep(4)  # Add 2 second wait to override user input.
 
 print()
 print()
