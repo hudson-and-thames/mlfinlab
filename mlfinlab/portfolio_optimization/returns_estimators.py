@@ -1,10 +1,7 @@
-'''
-This is a sub-module of the portfolio-optimisation module for estimation of expected returns
-'''
-
+# pylint: disable=module-doc-strings
 class ReturnsEstimation:
     '''
-    This class contains methods for estimating expected returns. A good estimation of the expected returns is very important
+    This class contains methods for estimating expected returns. A good estimation of the asset expected returns is very important
     for portfolio optimisation problems and so it is necessary to use good estimates of returns and not just rely on
     simple techniques.
     '''
@@ -15,7 +12,7 @@ class ReturnsEstimation:
     @staticmethod
     def calculate_mean_historical_returns(asset_prices, resample_by=None, frequency=252):
         '''
-        Calculate the annualised mean historical returns from asset price data
+        Calculate the annualised mean historical returns from asset price data.
 
         :param asset_prices: (pd.DataFrame) asset price data
         :return: (np.array) returns per asset
@@ -48,7 +45,7 @@ class ReturnsEstimation:
     @staticmethod
     def calculate_returns(asset_prices, resample_by=None):
         '''
-        Calculate the annualised mean historical returns from asset price data
+        Calculate the annualised mean historical returns from asset price data.
 
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to

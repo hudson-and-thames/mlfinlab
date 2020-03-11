@@ -1,7 +1,4 @@
-'''
-This is a sub-module of the portfolio-optimisation module for calculating different risk metrics
-'''
-
+# pylint: disable=module-doc-strings
 import numpy as np
 import pandas as pd
 

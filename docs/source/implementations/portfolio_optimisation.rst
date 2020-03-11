@@ -4,7 +4,10 @@
 Portfolio Optimisation
 ========
 
-The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies. Each algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them. Next up, lets discuss about some of these implementations and the different parameters they require.
+The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies. Each
+algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
+on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
+Next up, lets discuss about some of these implementations and the different parameters they require.
 
 
 
@@ -42,13 +45,13 @@ Implementation
 Hierarchical Clustering Asset Allocation (HCAA)
 ===============================================
 
-The HRP algorithm focuses on allocation of risk using a hierarchical clustering approach and using the variance of the clusters to
-allocate weights. While variance is a very simple and popular representation of risk used in the investing world, it is not the
-optimal one and can underestimate the true risk of a portfolio which is why there are many other important risk metrics used by
-investment managers that can correctly reflect the true risk of a portfolio/asset. With respect to this, the original HRP
-algorithm can be tweaked to allocate its weights based on different risk representations of the clusters and generate better
-weights. This class implements an improved hierarchical clustering algorithm which gives the option of using the following
-metrics:
+The Hierarchical Risk Parity algorithm focuses on allocation of risk using a hierarchical clustering approach and using the
+variance of the clusters to allocate weights. While variance is a very simple and popular representation of risk used in the
+investing world, it is not the optimal one and can underestimate the true risk of a portfolio which is why there are many other
+important risk metrics used by investment managers that can correctly reflect the true risk of a portfolio/asset. With respect to
+this, the original HRP algorithm can be tweaked to allocate its weights based on different risk representations of the clusters
+and generate better weights. This class implements an improved hierarchical clustering algorithm which gives the option of using
+the following metrics:
 
 1. ``minimum_variance`` : Variance of the clusters is used as a risk metric.
 2. ``minimum_standard_deviation`` : Standard deviation of the clusters is used as a risk metric.
@@ -106,6 +109,21 @@ Mean-Variance Optimisation
 
 This class contains some classic Mean-Variance optimisation techniques based on Harry Markowitz's methods. We use `cvxopt <https://cvxopt.org/>`_ as our quadratic optimiser instead of the more frequently used `scipy.optimize <https://docs.scipy.org/doc/scipy/reference/optimize.html>`_. This was a design choice for two reasons: (a) the documentation of cvxopt is better than that of scipy and (b) cvxopt's code is much more readable and easier to understand.
 
+Currently, the following solution strings are supported by MVO class:
+
+1. ``inverse_variance`` : Calculates the weights according to simple inverse-variance allocation.
+2. ``max_sharpe`` : Calculates the weights relating to the maximum Sharpe Ratio portfolio. Users can specify the risk free return value through the :py:mod:`risk_free_rate` parameter.
+3. ``min_volatility`` : Calculates the weights relating to Minimum Variance portfolio.
+4. ``efficient_risk`` : Calculates an efficient risk portfolio for a specified target return. Users can specify their target return value through the :py:mod:`target_return` parameter.
+
+.. tip::
+
+    Note that users can also specify upper and lower bounds for asset weights:
+
+    - Either a single upper and lower bound value can be applied for to all the asset weights in which case a single tuple needs to be passed: (:math:`low`, :math:`high`). By default a bound of (0, 1) is applied.
+
+    - If individual bounds are required, then a dictionary needs to be passed with the key being the asset index and the value being the tuple of lower and higher bound values. Something like this: :math:`{ asset\_index : (low_i, high_i) }`
+
 Implementation
 ~~~~~~~~~~~~~~
 
@@ -115,13 +133,6 @@ Implementation
         :members:
 
         .. automethod:: __init__
-
-Currently, the following solution strings are supported by MVO class:
-
-1. ``inverse_variance`` : Calculates the weights according to simple inverse-variance allocation.
-2. ``max_sharpe`` : Calculates the weights relating to the maximum Sharpe Ratio portfolio.
-3. ``min_volatility`` : Calculates the weights relating to Minimum Variance portfolio.
-4. ``efficient_risk`` : Calculates an efficient risk portfolio for a specified target return
 
 
 

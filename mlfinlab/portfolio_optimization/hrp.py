@@ -1,10 +1,4 @@
-'''
-This module implements the HRP algorithm mentioned in the following paper:
-`López de Prado, Marcos, Building Diversified Portfolios that Outperform Out-of-Sample (May 23, 2016).
-Journal of Portfolio Management, 2016 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_;
-The code is reproduced with modification from his book: Advances in Financial Machine Learning, Chp-16
-'''
-
+# pylint: disable=module-doc-strings
 import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
@@ -16,9 +10,17 @@ from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
 
 class HierarchicalRiskParity:
     '''
-    The HRP algorithm is a robust algorithm which tries to overcome the limitations of the CLA algorithm. It has three
-    important steps - hierarchical tree clustering, quasi diagnalisation and recursive bisection. Non-inversion of
-    covariance matrix makes HRP a very stable algorithm and insensitive to small changes in covariances.
+    This class implements the Hierarchical Risk Parity algorithm mentioned in the following paper: `López de Prado, Marcos,
+    Building Diversified Portfolios that Outperform Out-of-Sample (May 23, 2016). Journal of Portfolio Management,
+    2016 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_; The code is reproduced with modification from his book:
+    Advances in Financial Machine Learning, Chp-16
+
+    By removing exact analytical approach to the calculation of weights and instead relying on an approximate
+    machine learning based approach (hierarchical tree-clustering), Hierarchical Risk Parity produces weights which are stable to
+    random shocks in the stock-market. Moreover, previous algorithms like CLA involve the inversion of covariance matrix which is
+    a highly unstable operation and tends to have major impacts on the performance due to slight changes in the covariance matrix.
+    By removing dependence on the inversion of covariance matrix completely, the Hierarchical Risk Parity algorithm is fast,
+    robust and flexible.
     '''
 
     def __init__(self):
@@ -33,7 +35,7 @@ class HierarchicalRiskParity:
     @staticmethod
     def _tree_clustering(correlation, method='single'):
         '''
-        Perform the traditional heirarchical tree clustering
+        Perform the traditional heirarchical tree clustering.
 
         :param correlation: (np.array) correlation matrix of the assets
         :param method: (str) the type of clustering to be done
@@ -106,7 +108,7 @@ class HierarchicalRiskParity:
 
     def _recursive_bisection(self, covariance, assets):
         '''
-        Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets
+        Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets.
 
         :param covariance: (pd.Dataframe) the covariance matrix
         :param assets: (list) list of asset names in the portfolio
@@ -141,7 +143,7 @@ class HierarchicalRiskParity:
 
     def plot_clusters(self, assets):
         '''
-        Plot a dendrogram of the hierarchical clusters
+        Plot a dendrogram of the hierarchical clusters.
 
         :param assets: (list) list of asset names in the portfolio
         '''
@@ -152,7 +154,7 @@ class HierarchicalRiskParity:
     @staticmethod
     def _shrink_covariance(covariance):
         '''
-        Regularise/Shrink the asset covariances
+        Regularise/Shrink the asset covariances.
 
         :param covariance: (pd.Dataframe) asset returns covariances
         :return: (pd.Dataframe) shrinked asset returns covariances
@@ -166,7 +168,7 @@ class HierarchicalRiskParity:
     @staticmethod
     def _cov2corr(covariance):
         '''
-        Calculate the correlations from asset returns covariance matrix
+        Calculate the correlations from asset returns covariance matrix.
 
         :param covariance: (pd.Dataframe) asset returns covariances
         :return: (pd.Dataframe) correlations between asset returns
@@ -189,7 +191,7 @@ class HierarchicalRiskParity:
                  use_shrinkage=False):
         # pylint: disable=invalid-name, too-many-branches
         '''
-        Calculate asset allocations using HRP algorithm
+        Calculate asset allocations using HRP algorithm.
 
         :param asset_names: (list) a list of strings containing the asset names
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)

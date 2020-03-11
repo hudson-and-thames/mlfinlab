@@ -1,10 +1,4 @@
-'''
-This module implements the Hierarchical Equal Risk Contribution (HERC) algorithm and it's extended components mentioned in the
-following papers: `Raffinot, Thomas, The Hierarchical Equal Risk Contribution Portfolio (August 23,
-2018). <https://ssrn.com/abstract=3237540>`_; and `Raffinot, Thomas, Hierarchical Clustering Based Asset Allocation (May 2017)
-<https://ssrn.com/abstract=2840729>`_;
-'''
-
+# pylint: disable=module-doc-strings
 import numpy as np
 import pandas as pd
 from sklearn.cluster import AgglomerativeClustering
@@ -15,11 +9,14 @@ from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
 
 class HierarchicalClusteringAssetAllocation:
     '''
-    The class extends the Hierarchical Risk Parity (HRP) algorithm first proposed by `Lopez de Prado
-    <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_; While the vanilla HRP algorithm uses only the variance as a
-    risk measure for assigning weights, the HERC algorithm proposed by Raffinot, allows investors to use other risk metrics like
-    Expected Shortfall, Sharpe Ratio and Conditional Drawdown. Furthermore, this can be easily extended to include custom risk
-     measures of our own.
+    This class implements the Hierarchical Equal Risk Contribution (HERC) algorithm and it's extended components mentioned in the
+    following papers: `Raffinot, Thomas, The Hierarchical Equal Risk Contribution Portfolio (August 23,
+    2018). <https://ssrn.com/abstract=3237540>`_; and `Raffinot, Thomas, Hierarchical Clustering Based Asset Allocation (May 2017)
+    <https://ssrn.com/abstract=2840729>`_;
+
+    While the vanilla Hierarchical Risk Parity algorithm uses only the variance as a risk measure for assigning weights, the HERC
+    algorithm proposed by Raffinot, allows investors to use other risk metrics like Expected Shortfall, Sharpe Ratio and
+    Conditional Drawdown. Furthermore, it is flexible enough to be easily extended to include custom risk measures of our own.
     '''
 
     def __init__(self, calculate_expected_returns='mean'):
@@ -315,7 +312,7 @@ class HierarchicalClusteringAssetAllocation:
     def _perform_checks(asset_prices, asset_returns, covariance_matrix, allocation_metric):
         # pylint: disable=bad-continuation
         '''
-        Perform initial warning checks
+        Perform initial warning checks.
 
         :param asset_prices: (pd.DataFrame) a dataframe of historical asset prices (daily close)
                                             indexed by date

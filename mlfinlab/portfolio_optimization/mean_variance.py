@@ -1,8 +1,4 @@
-'''
-This module implements some classic mean-variance optimisation techniques for calculating the efficient frontier.
-It uses typical quadratic optimisers to generate optimal portfolios for different objective functions.
-'''
-
+# pylint: disable=module-doc-strings
 import numpy as np
 import pandas as pd
 import cvxpy as cp
@@ -12,8 +8,13 @@ from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 class MeanVarianceOptimisation:
     '''
-    This class contains a variety of methods dealing with different solutions to the mean variance optimisation
-    problem.
+    This class implements some classic mean-variance optimisation techniques for calculating the efficient frontier solutions.
+    With the help of quadratic optimisers, users can generate optimal portfolios for different objective functions. Currently
+    solutions to the following portfolios can be generated:
+        1. Inverse Variance
+        2. Maximum Sharpe
+        3. Minimum Volatility
+        4. Efficient Risk
     '''
 
     def __init__(self, calculate_expected_returns='mean'):
@@ -45,7 +46,7 @@ class MeanVarianceOptimisation:
         :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns (sigma)
         :param solution: (str) the type of solution/algorithm to use to calculate the weights.
                                Currently supported solution strings - inverse_variance, min_volatility, max_sharpe and
-                               efficient_risk"
+                               efficient_risk
         :param risk_free_rate: (float) the rate of return for a risk-free asset.
         :param target_return: (float) target return of the portfolio
         :param weight_bounds: (dict/tuple) can be either a single tuple of upper and lower bounds
@@ -127,7 +128,7 @@ class MeanVarianceOptimisation:
     @staticmethod
     def _inverse_variance(covariance):
         '''
-        Calculate weights using inverse-variance allocation
+        Calculate weights using inverse-variance allocation.
 
         :param covariance: (pd.Dataframe) covariance dataframe of asset returns
         :return: (np.array) array of portfolio weights
@@ -139,7 +140,7 @@ class MeanVarianceOptimisation:
 
     def _min_volatility(self, covariance, num_assets):
         '''
-        Compute minimum volatility portfolio allocation
+        Compute minimum volatility portfolio allocation.
 
         :param covariance: (pd.Dataframe) covariance dataframe of asset returns
         :param num_assets: (int) number of assets in the portfolio
@@ -296,7 +297,7 @@ class MeanVarianceOptimisation:
         '''
         Plot the Markowitz efficient frontier.
 
-        param covariance: (pd.Dataframe) covariance dataframe of asset returns
+        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
         :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
         :param num_assets: (int) number of assets in the portfolio
         :param min_return: (float) minimum target return
@@ -317,9 +318,12 @@ class MeanVarianceOptimisation:
             returns.append(portfolio_return)
             sharpe_ratios.append((portfolio_return - risk_free_rate) / (risk ** 0.5 + 1e-16))
         max_sharpe_ratio_index = sharpe_ratios.index(max(sharpe_ratios))
+        min_volatility_index = volatilities.index(min(volatilities))
         figure = plt.scatter(volatilities, returns, c=sharpe_ratios, cmap='viridis')
         plt.colorbar(label='Sharpe Ratio')
-        plt.scatter(volatilities[max_sharpe_ratio_index], returns[max_sharpe_ratio_index], c='red', s=50)  # red dot
+        plt.scatter(volatilities[max_sharpe_ratio_index], returns[max_sharpe_ratio_index], marker='*', color='g', s=400, label='Maximum Sharpe Ratio')
+        plt.scatter(volatilities[min_volatility_index], returns[min_volatility_index], marker='*', color='r', s=400, label='Minimum Volatility')
         plt.xlabel('Volatility')
         plt.ylabel('Return')
+        plt.legend(loc='upper left')
         return figure
