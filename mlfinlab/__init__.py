@@ -26,8 +26,8 @@ import mlfinlab.clustering as clustering
 try:
     webbrowser.open('https://www.patreon.com/HudsonThames', new=1, autoraise=False)
     time.sleep(2)  # Add 2 second wait to override user input.
-except Exception as e:
-    pass
+except Exception as error_msg:
+    print('Sponsorship URL: https://www.patreon.com/HudsonThames')
 
 print()
 print()
