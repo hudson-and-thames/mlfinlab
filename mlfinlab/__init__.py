@@ -23,13 +23,13 @@ import mlfinlab.clustering as clustering
 
 # Sponsorship notification
 try:
-    webbrowser.get('google-chrome').open_new('https://www.patreon.com/HudsonThames')
+    webbrowser.get('google-chrome').open('https://www.patreon.com/HudsonThames', new=2)
 except webbrowser.Error as error:
     try:
-        webbrowser.get('firefox').open_new('https://www.patreon.com/HudsonThames')
+        webbrowser.get('firefox').open('https://www.patreon.com/HudsonThames', new=2)
     except webbrowser.Error as error:
         try:
-            webbrowser.get('windows-default').open_new('https://www.patreon.com/HudsonThames')
+            webbrowser.get('windows-default').open('https://www.patreon.com/HudsonThames', new=2)
         except webbrowser.Error as error:
             print('Support us on Patreon: https://www.patreon.com/HudsonThames')
 
