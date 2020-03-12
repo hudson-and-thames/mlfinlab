@@ -18,6 +18,13 @@ class MeanVarianceOptimisation:
     '''
 
     def __init__(self, calculate_expected_returns='mean'):
+        '''
+        Initialise the storage arrays.
+
+        :param calculate_expected_returns: (str) the method to use for calculation of expected returns.
+                                        Currently supports "mean" and "exponential"
+        '''
+
         self.weights = list()
         self.portfolio_risk = None
         self.portfolio_return = None

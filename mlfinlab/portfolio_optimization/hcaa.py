@@ -20,6 +20,13 @@ class HierarchicalClusteringAssetAllocation:
     '''
 
     def __init__(self, calculate_expected_returns='mean'):
+        '''
+        Initialise the storage arrays.
+
+        :param calculate_expected_returns: (str) the method to use for calculation of expected returns.
+                                        Currently supports "mean" and "exponential"
+        '''
+
         self.weights = list()
         self.clusters = None
         self.ordered_indices = None
