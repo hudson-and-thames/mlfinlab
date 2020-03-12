@@ -1,4 +1,4 @@
-# pylint: disable=module-doc-strings
+# pylint: disable=missing-module-docstring
 class ReturnsEstimation:
     '''
     This class contains methods for estimating expected returns. A good estimation of the asset expected returns is very important

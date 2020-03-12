@@ -1,4 +1,4 @@
-# pylint: disable=module-doc-strings
+# pylint: disable=missing-module-docstring
 import numbers
 from math import log, ceil
 import numpy as np

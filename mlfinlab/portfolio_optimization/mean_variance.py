@@ -1,4 +1,4 @@
-# pylint: disable=module-doc-strings
+# pylint: disable=missing-module-docstring
 import numpy as np
 import pandas as pd
 import cvxpy as cp
