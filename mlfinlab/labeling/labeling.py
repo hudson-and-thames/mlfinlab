@@ -121,7 +121,7 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
     """
 
     # 1) Get target
-    target = target.loc[t_events]
+    target = target.reindex(t_events)
     target = target[target > min_ret]  # min_ret
 
     # 2) Get vertical barrier (max holding period)
@@ -133,7 +133,7 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
         side_ = pd.Series(1.0, index=target.index)
         pt_sl_ = [pt_sl[0], pt_sl[0]]
     else:
-        side_ = side_prediction.loc[target.index]  # Subset side_prediction on target index.
+        side_ = side_prediction.reindex(target.index)  # Subset side_prediction on target index.
         pt_sl_ = pt_sl[:2]
 
     # Create a new df with [v_barrier, target, side] and drop rows that are NA in target
