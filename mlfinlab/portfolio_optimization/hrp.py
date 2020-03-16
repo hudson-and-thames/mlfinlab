@@ -152,18 +152,18 @@ class HierarchicalRiskParity:
         return dendrogram_plot
 
     @staticmethod
-    def _shrink_covariance(covariance):
+    def _shrink_covariance(asset_returns):
         """
         Regularise/Shrink the asset covariances.
 
-        :param covariance: (pd.Dataframe) asset returns covariances
+        :param asset_returns: (pd.Dataframe) asset returns
         :return: (pd.Dataframe) shrinked asset returns covariances
         """
 
         oas = OAS()
-        oas.fit(covariance)
+        oas.fit(asset_returns)
         shrinked_covariance = oas.covariance_
-        return pd.DataFrame(shrinked_covariance, index=covariance.columns, columns=covariance.columns)
+        return shrinked_covariance
 
     @staticmethod
     def _cov2corr(covariance):
@@ -219,12 +219,11 @@ class HierarchicalRiskParity:
 
         # Calculate covariance of returns or use the user specified covariance matrix
         if covariance_matrix is None:
-            covariance_matrix = asset_returns.cov()
+            if use_shrinkage:
+                covariance_matrix = self._shrink_covariance(asset_returns=asset_returns)
+            else:
+                covariance_matrix = asset_returns.cov()
         cov = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
-
-        # Shrink covariance
-        if use_shrinkage:
-            cov = self._shrink_covariance(covariance=cov)
 
         # Calculate correlation from covariance matrix
         corr = self._cov2corr(covariance=cov)
