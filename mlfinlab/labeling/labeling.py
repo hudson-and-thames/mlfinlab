@@ -180,8 +180,8 @@ def barrier_touched(out_df, events):
         ret = values['ret']
         target = values['trgt']
 
-        pt_level_reached = ret > target * events.loc[date_time, 'pt']
-        sl_level_reached = ret < -target * events.loc[date_time, 'sl']
+        pt_level_reached = ret > np.log(1 + target) * events.loc[date_time, 'pt']
+        sl_level_reached = ret < -np.log(1 + target) * events.loc[date_time, 'sl']
 
         if ret > 0.0 and pt_level_reached:
             # Top barrier reached
