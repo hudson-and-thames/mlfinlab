@@ -69,6 +69,7 @@ which calculates features for generated bars using trade data and bar date_time 
     from mlfinlab.microstructural_features import quantile_mapping, MicrostructuralFeaturesGenerator
 
     df_trades = pd.read_csv('TRADES_PATH', parse_dates=[0])
+    df_trades = df_trades.iloc[:10000] # Take subsample to avoid look-ahead bias
     df_trades['log_ret'] = np.log(df_trades.Price / df_trades.Price.shift(1)).dropna()
     non_null_log_ret = df_trades[df_trades.log_ret != 0].log_ret.dropna()
 
@@ -79,8 +80,8 @@ which calculates features for generated bars using trade data and bar date_time 
 
     # Compress bars from ticks
     compressed_bars = pd.read_csv('BARS_PATH', index_col=0, parse_dates=[0])
-    bar_index = compressed_bars.index
+    tick_number = compressed_bars.tick_num # tick number where bar was formed
 
-    gen = MicrostructuralFeaturesGenerator('TRADES_PATH', bar_index, volume_encoding=volume_mapping,
+    gen = MicrostructuralFeaturesGenerator('TRADES_PATH', tick_number, volume_encoding=volume_mapping,
                                                pct_encoding=returns_mapping)
     features = gen.get_features(to_csv=False, verbose=False)

@@ -1,6 +1,5 @@
 codecov==2.0.15
 coverage==4.5.2
-cloudpickle==1.2.1  # needed for dask
 cvxpy==1.0.25
 numba==0.46.0
 numpy==1.17.3
@@ -11,5 +10,4 @@ scikit-learn==0.21.3
 scipy==1.3.1
 sphinx==2.2.1 # needed for docs
 sphinx-rtd-theme==0.4.3 # needed for docs
-toolz==0.10.0  # =needed for dask
 xmlrunner==1.7.7
