@@ -29,9 +29,9 @@ class TestChapter3(unittest.TestCase):
         self.data.index = pd.to_datetime(self.data.index)
 
         # data set used for trend scanning labels
-        self.stock_prices = pd.read_csv('/test_data/stock_prices.csv', index_col=0, parse_dates=[0])
+        self.eem_close = pd.read_csv('./test_data/stock_prices.csv', index_col=0, parse_dates=[0])
         # In 2008, EEM had some clear trends
-        self.stock_prices = self.stock_prices['EEM'].loc[pd.Timestamp(2008, 4, 1):pd.Timestamp(2008, 10, 1)]
+        self.eem_close = self.eem_close['EEM'].loc[pd.Timestamp(2008, 4, 1):pd.Timestamp(2008, 10, 1)]
 
     def test_daily_volatility(self):
         """
@@ -303,8 +303,8 @@ class TestChapter3(unittest.TestCase):
         Test trend scanning labels
         """
 
-        t_events = self.stock_prices.index
-        trend_scanning_labels = get_trend_scanning_labels(self.stock_prices, t_events, 20)
+        t_events = self.eem_close.index
+        trend_scanning_labels = get_trend_scanning_labels(self.eem_close, t_events, 20)
 
         self.assertEqual(trend_scanning_labels.shape[0], len(t_events))  # we have label value for all t events
 
