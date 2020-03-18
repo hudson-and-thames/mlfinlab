@@ -4,22 +4,30 @@
 Backtest Statistics
 ==============================
 
-Backtest statistics module contains functions related to characteristics analysis of returns and target positions. These include filtering flips and flattenings from series of returns, calculating average holding period from series of positions, concentration of bets for positive and negative returns, drawdown and time under water calculation, Information ratio, Sharpe ratios - annualised, probabilistic, deflated, minimum required track record length. Each statistic has it's own function and small description of statistic in docstring and detailed list of inputs required.
+Backtest statistics module contains functions related to characteristic analysis of returns and target positions. These include:
+
+* Filtering flips and flattenings from a series of returns.
+* Average holding period from a series of positions.
+* Concentration of bets for positive and negative returns.
+* Drawdown & Time Under Water.
+* Information ratio.
+* Sharpe ratios (annualised, probabilistic, deflated).
+* Minimum Required Track Record Length.
 
 Introduction
 ==============================
-More information on functions implemented in this part, as well as use cases and deeper results descriptions can be found in the following sources:
+The following sources elaborate extensively on the topic:
 
 - **Advances in Financial Machine Learning** *by* Marcos Lopez de Prado. *Page numbers in the code are referring to the pages in this book.*
 
 - **The Sharpe Ratio Efficient Frontier** *by* David H. Bailey *and* Marcos Lopez de Prado `available here <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1821643>`_. *Provides a deeper understanding of Sharpe ratios implemented and Minimum track record length.*
 
 Flattening and Flips
-==============================
+=====================
 
 Snippet 14.1, page 197, Deriving Flattening and Flips from series of target positions.
 
-Points of Flattening - When target position changes sign (For example, changing from 1.5 (long position) to -0.5 (short position) on th next timestamp)
+Points of Flattening - When target position changes sign (For example, changing from 1.5 (long position) to -0.5 (short position) on the next timestamp)
 
 Points of Flipping - When target position changes from nonzero to zero (For example, changing from 1.5 (long position) to 0 (no positions) on the next timestamp)
 
