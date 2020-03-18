@@ -1,10 +1,10 @@
 .. _implementations-backtest_statistics:
 
-===================
+==============================
 Backtest Statistics
-===================
+==============================
 
-Backtest statistics module contains functions related to characteristics analysis of returns and target positions. These include filtering flips and flattenings from series of returns, calculating average holding period from series of positions, concentration of bets for positive and negative returns, drawdown and time under water calculation, Sharpe ratios - annualised, probabalistic, deflated, minimum required track record length. Each statistic has it's own function and small description of statistic in docstring and detailed list of inputs required.
+Backtest statistics module contains functions related to characteristics analysis of returns and target positions. These include filtering flips and flattenings from series of returns, calculating average holding period from series of positions, concentration of bets for positive and negative returns, drawdown and time under water calculation, Information ratio, Sharpe ratios - annualised, probabilistic, deflated, minimum required track record length. Each statistic has it's own function and small description of statistic in docstring and detailed list of inputs required.
 
 Introduction
 ==============================
@@ -82,7 +82,7 @@ Bets Concentration
 
 Snippet 14.3, page 201, Derives the concentration of returns.
 
-Concentration of returns measures the uniformity of returns from bets. Metric is incpired by Herfindahl-Hirschman Index and is calculated as follows:
+Concentration of returns measures the uniformity of returns from bets. Metric is inspired by Herfindahl-Hirschman Index and is calculated as follows:
 
         :math:`Weight_{i} = \frac{Return_{i}}{\sum_{i}Return_{i}}`
 
@@ -110,7 +110,7 @@ All Bets Concentration
 
 Snippet 14.3, page 201, Derives a more detailed concentration of returns.
 
-Concentration of returns measures the uniformity of returns from bets. Metric is incpired by Herfindahl-Hirschman Index and is calculated as follows:
+Concentration of returns measures the uniformity of returns from bets. Metric is inspired by Herfindahl-Hirschman Index and is calculated as follows:
 
         :math:`Weight_{i} = \frac{Return_{i}}{\sum_{i}Return_{i}}`
 
@@ -148,22 +148,22 @@ Intuitively, a drawdown is the maximum loss suffered by an investment between tw
 
 The time under water is the time elapsed between an high watermark and the moment the PnL (profit and loss) exceeds the previous maximum PnL.
 
-Data is taken in a form of series of cumulated returns, or account balance. Can be in dollars or other currency, then returned drawdown will be in this currency units. Otherwise the drawdowns are in percentage of account at high-watermarks.
+Input data in a form of series of cumulated returns, or account balance. Can be in dollars or other currency, then returned drawdown will be in this currency units. Otherwise the drawdowns are in percentage of account at high-watermarks.
 
 The function returns two series:
 
 1.Drawdown series index is time of a high watermark and value of a drawdown after
 
 
-2.Time under water index is time of a high watermark and how much time passed till next high watermark in years.
+2.Time under water index is time of a high watermark and how much time passed till next high watermark in years. Also includes time between the last high watermark and last observation in returns as the last Time under water element. Without this element the estimations of Time under water can be biased.
 
 
 .. function:: drawdown_and_time_under_water(returns: pd.Series, dollars: bool = False) -> tuple:
 
     :param returns: (pd.Series) returns from bets
-    :param dollars: (bool) flag if given dollar performance and not returns
+    :param dollars: (bool) flag if given dollar performance and not returns.
+                    If dollars, then drawdowns are in dollars, else as a %.
     :return: (tuple of pd.Series) series of drawdowns and time under water
-                                if dollars, then in dollars, else as a %
 
 An example showing how Drawdown and Time Under Water function is used with account data in dollars::
 
@@ -171,24 +171,52 @@ An example showing how Drawdown and Time Under Water function is used with accou
 
 	drawdown, tuw = drawdown_and_time_under_water(returns, dollars = True)
 
-Annual Sharpe Ratio
+Information Ratio
 ==============================
 
-Calculates Annualized Sharpe Ratio for Series of normal (not log) returns.
+Calculates Annualized Information Ratio for pd.Series of normal or log returns.
 
-A usual metric of returns in relation to risk. Also takes into account number of return entries per year and risk-free rate. Calculated as:
+It is the annualized ratio between the average excess return and the tracking error. The excess return is measured as the portfolio’s return in excess of the benchmark’s return. The tracking error is estimated as the standard deviation of the excess returns.
+
+Benchmark should be provided as a return for the same time period as that between input returns. For example, for the daily observations it should be the benchmark of daily returns.
+
+Calculated as:
+
+        :math:`SharpeRatio = \frac{E[Returns - Benchmark]}{\sqrt{V[Returns - Benchmark]}} * \sqrt{n}`
+
+.. function:: information_ratio(returns: pd.Series, benchmark: float = 0,
+                                entries_per_year: int = 252) -> float:
+
+    :param returns: (pd.Series) returns - normal or log
+    :param benchmark: (float) benchmark for performance comparison (0 by default)
+    :param entries_per_year: (int) times returns are recorded per year (daily by default)
+    :return: (float) Annualized Information Ratio
+
+An example showing how Annualized Information Ratio function is used with monthly cumulative returns data::
+
+	from mlfinlab.backtest_statistics import information_ratio
+
+	information_r = information(returns, benchmark=0.005, entries_per_year=12)
+
+Annualized Sharpe Ratio
+==============================
+
+Calculates Annualized Sharpe Ratio for pd.Series of normal or log returns.
+
+A usual metric of returns in relation to risk. Also takes into account number of return entries per year and risk-free rate.
+Risk-free rate should be given for the same period the returns are given. For example, if the input returns are observed in 3 months, the risk-free rate given should be the 3-month risk-free rate.
+
+Calculated as:
 
         :math:`SharpeRatio = \frac{E[Returns] - RiskFreeRate}{\sqrt{V[Returns]}} * \sqrt{n}`
 
-Can calculate Sharpe Ratio for both cumulative and normal returns.
 Generally, the higher Sharpe Ratio is, the better.
 
-.. function:: def sharpe_ratio(returns: pd.Series, cumulative: bool = False,
-                 entries_per_year: int = 252, risk_free_rate: float = 0) -> float:
+.. function:: sharpe_ratio(returns: pd.Series, entries_per_year: int = 252,
+                           risk_free_rate: float = 0) -> float:
 
-    :param returns: (pd.Series) returns
-    :param cumulative: (bool) flag if returns are cumulative (no by default)
-    :param entries_per_year: (int) times returns are recorded per year (days by default)
+    :param returns: (pd.Series) returns - normal or log
+    :param entries_per_year: (int) times returns are recorded per year (daily by default)
     :param risk_free_rate: (float) risk-free rate (0 by default)
     :return: (float) Annualized Sharpe Ratio
 
@@ -196,9 +224,9 @@ An example showing how Annualized Sharpe Ratio function is used with monthly cum
 
 	from mlfinlab.backtest_statistics import sharpe_ratio
 
-	sr = sharpe_ratio(returns, cumulative=True, entries_per_year=12)
+	sr = sharpe_ratio(returns, entries_per_year=12)
 
-Probabalistic Sharpe Ratio
+Probabilistic Sharpe Ratio
 ==============================
 
 Calculates the probabilistic Sharpe ratio (PSR) that provides an adjusted estimate of SR, by removing the inflationary effect caused by short series with skewed and/or fat-tailed returns.
@@ -225,7 +253,7 @@ Where:
 
     :math:`\gamma_4` - kurtosis of the returns
 
-.. function:: probabalistic_sharpe_ratio(observed_sr: float, benchmark_sr: float,
+.. function:: probabilistic_sharpe_ratio(observed_sr: float, benchmark_sr: float,
                                          number_of_returns: int, skewness_of_returns: float = 0,
                                          kurtosis_of_returns: float = 3) -> float:
 
@@ -234,13 +262,13 @@ Where:
     :param  number_of_returns: (int) times returns are recorded for observed_SR
     :param skewness_of_returns: (float) skewness of returns (as Gaussian by default)
     :param kurtosis_of_returns: (float) kurtosis of returns (as Gaussian by default)
-    :return: (float) Probabalistic Sharpe Ratio
+    :return: (float) Probabilistic Sharpe Ratio
 
-An example showing how Probabalistic Sharpe Ratio function is used with an example of data with normal returns::
+An example showing how Probabilistic Sharpe Ratio function is used with an example of data with normal returns::
 
-	from mlfinlab.backtest_statistics import probabalistic_sharpe_ratio
+	from mlfinlab.backtest_statistics import probabilistic_sharpe_ratio
 
-	psr = probabalistic_sharpe_ratio(1.2, 1.0, 200)
+	psr = probabilistic_sharpe_ratio(1.2, 1.0, 200)
 
 Deflated Sharpe Ratio
 ==============================
@@ -249,7 +277,7 @@ Calculates the deflated Sharpe ratio (DSR) - a PSR where the rejection threshold
 
 DSR corrects SR for inflationary effects caused by non-Normal returns, track record length, and multiple testing/selection bias.
 
-Given a user-defined benchmark Sharpe ratio and an observed Sharpe estimates, DSR estimates the probability that SR ̂is greater than a hypothetical SR.
+Given a user-defined benchmark Sharpe ratio and an observed Sharpe estimates (or their properties - standard deviations and number of trails), DSR estimates the probability that SR is greater than a hypothetical SR. Allows the output of the hypothetical (benchmark) SR.
 
 If DSR exceeds 0.95, then SR is higher than the hypothetical (benchmark) SR at the standard significance level of 5%.
 
@@ -271,22 +299,28 @@ Where:
 
     :math:`e` - Euler constant
 
-.. function:: deflated_sharpe_ratio(observed_sr: float, sr_estimates: list,
-                                    number_of_returns: int, skewness_of_returns: float = 0,
-                                    kurtosis_of_returns: float = 3) -> float:
+.. function:: deflated_sharpe_ratio(observed_sr: float, sr_estimates: list, number_of_returns: int,
+                                    skewness_of_returns: float = 0, kurtosis_of_returns: float = 3,
+                                    estimates_param: bool = False, benchmark_out: bool = False) -> float:
 
-    :param observed_sr: (list) Sharpe Ratio that is being tested
-    :param sr_estimates: (float) Sharpe Ratios estimates trials
+    :param observed_sr: (float) Sharpe Ratio that is being tested
+    :param sr_estimates: (list) Sharpe Ratios estimates trials list or
+        properties list: [Standard deviation of estimates, Number of estimates]
+        if estimates_param flag is set to True.
     :param  number_of_returns: (int) times returns are recorded for observed_SR
     :param skewness_of_returns: (float) skewness of returns (as Gaussian by default)
     :param kurtosis_of_returns: (float) kurtosis of returns (as Gaussian by default)
-    :return: (float) Deflated Sharpe Ratio
+    :param estimates_param: (bool) allows to use properties of estimates instead of full list
+    :param benchmark_out: (bool) flag to output the calculated benchmark instead of DSR
+    :return: (float) Deflated Sharpe Ratio or Benchmark SR (if benchmark_out)
 
-An example showing how Deflated Sharpe Ratio function is used with an example of data with normal returns::
+An example showing how Deflated Sharpe Ratio function with list of SR estimates as well as properties of SR estimates and benchmark output::
 
 	from mlfinlab.backtest_statistics import deflated_sharpe_ratio
 
 	psr = deflated_sharpe_ratio(1.2, [1.0, 1.1, 1.0], 200)
+
+	psr = deflated_sharpe_ratio(1.2, [0.7, 50], 200, estimates_param=True, benchmark_out=True)
 
 Minimum Track Record Length
 ==============================
@@ -322,8 +356,8 @@ Where:
     :param  number_of_returns: (int) times returns are recorded for observed_SR
     :param skewness_of_returns: (float) skewness of returns (as Gaussian by default)
     :param kurtosis_of_returns: (float) kurtosis of returns (as Gaussian by default)
-    :param alpha: (float) desired significance level
-    :return: (float) Probabalistic Sharpe Ratio
+    :param alpha: (float) desired significance level (0.05 by default)
+    :return: (float) Minimum number of track records
 
 An example showing how Minimum Track Record Length function is used with an example of data with normal returns::
 
@@ -331,4 +365,11 @@ An example showing how Minimum Track Record Length function is used with an exam
 
 	min_record_length = minimum_track_record_length(1.2, 1.0)
 
+Research Notebooks
+==============================
 
+The following research notebooks can be used to better understand how the statistics within this module can be used on real data.
+
+* `Chapter 14 Exercise Notebook`_
+
+.. _Chapter 14 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Chapter14_BacktestStatistics/Chapter14_BacktestStatistics.ipynb

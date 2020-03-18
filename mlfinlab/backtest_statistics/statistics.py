@@ -202,7 +202,7 @@ def sharpe_ratio(returns: pd.Series, entries_per_year: int = 252,
                  risk_free_rate: float = 0) -> float:
     """
     Calculates Annualized Sharpe Ratio for pd.Series of normal or log returns.
-    Risk-free_rate should be given for the same period the returns are given.
+    Risk_free_rate should be given for the same period the returns are given.
     For example, if the input returns are observed in 3 months, the risk-free
     rate given should be the 3-month risk-free rate.
 
@@ -289,13 +289,13 @@ def deflated_sharpe_ratio(observed_sr: float, sr_estimates: list, number_of_retu
     :param observed_sr: (float) Sharpe Ratio that is being tested
     :param sr_estimates: (list) Sharpe Ratios estimates trials list or
         properties list: [Standard deviation of estimates, Number of estimates]
-        if estimates_param is flag set to True.
+        if estimates_param flag is set to True.
     :param  number_of_returns: (int) times returns are recorded for observed_SR
     :param skewness_of_returns: (float) skewness of returns (as Gaussian by default)
     :param kurtosis_of_returns: (float) kurtosis of returns (as Gaussian by default)
-    :param estimates_param: (bool) allows to use variation and number of SR estimates
+    :param estimates_param: (bool) allows to use properties of estimates instead of full list
     :param benchmark_out: (bool) flag to output the calculated benchmark instead of DSR
-    :return: (float) Deflated Sharpe Ratio
+    :return: (float) Deflated Sharpe Ratio or Benchmark SR (if benchmark_out)
     """
     # Calculating benchmark_SR from the parameters of estimates
     if estimates_param:
