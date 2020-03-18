@@ -52,9 +52,10 @@ Average Holding Period
 Snippet 14.2, page 197, Deriving average holding period of a position.
 
 Estimates the average holding period (in days) of a strategy, given series of target positions using average entry time pairing algorithm.
+
 Parameters of the algorithm are calculated as follows:
 
-1. When the size of the position in increasing
+1. When the size of the position is increasing
 
 
 Updating EntryTime - time when a trade was opened, adjusted by increases in positions. Takes into account weight of the position increase.
@@ -98,7 +99,7 @@ Concentration of returns measures the uniformity of returns from bets. Metric is
 
         :math:`HHI = \frac{SumSquares - \frac{1}{i}}{1 - \frac{1}{i}}`
 
-The closer concentration is to 0, the more uniform are the returns (When 0, returns are uniform). If concentration is close to 1, returns highly concentrated (When 1, only one non-zero return).
+The closer the concentration is to 0, the more uniform the distribution of returns (When 0, returns are uniform). If concentration value is close to 1, returns highly concentrated (When 1, only one non-zero return).
 
 Returns :math:`nan` if less than 3 returns in series.
 
@@ -126,7 +127,7 @@ Concentration of returns measures the uniformity of returns from bets. Metric is
 
         :math:`HHI = \frac{SumSquares - \frac{1}{i}}{1 - \frac{1}{i}}`
 
-The closer concentration is to 0, the more uniform are the returns (When 0, returns are uniform). If concentration is close to 1, returns highly concentrated (When 1, only one non-zero return).
+The closer concentration is to 0, the more uniform the distribution of returns (When 0, returns are uniform). If concentration is close to 1, returns highly concentrated (When 1, only one non-zero return).
 
 This function calculates concentration separately for positive returns, negative returns and concentration of bets grouped by time intervals (daily, monthly etc.) separately.
 If concentration of positive returns is low, there is no right fat tail in returns distribution.
@@ -154,16 +155,15 @@ Snippet 14.4, page 201, Calculates drawdowns and time under water
 
 Intuitively, a drawdown is the maximum loss suffered by an investment between two consecutive high-watermarks.
 
-The time under water is the time elapsed between an high watermark and the moment the PnL (profit and loss) exceeds the previous maximum PnL.
+The time under water is the time elapsed between a high watermark and the moment the PnL (profit and loss) exceeds the previous maximum PnL.
 
-Input data in a form of series of cumulated returns, or account balance. Can be in dollars or other currency, then returned drawdown will be in this currency units. Otherwise the drawdowns are in percentage of account at high-watermarks.
+Input a series of cumulated returns, or account balance. Can be in dollars or other currency, then the function returns the respective drawdowns. 
 
 The function returns two series:
 
-1.Drawdown series index is time of a high watermark and value of a drawdown after
+1.Drawdown series index is time of a high watermark and the drawdown value.
 
-
-2.Time under water index is time of a high watermark and how much time passed till next high watermark in years. Also includes time between the last high watermark and last observation in returns as the last Time under water element. Without this element the estimations of Time under water can be biased.
+2.Time under water index is time of a high watermark and how much time passed till next high watermark is reached, in years. Also includes time between the last high watermark and last observation in returns as the last Time under water element. Without this element the estimations of Time under water can be biased.
 
 
 .. function:: drawdown_and_time_under_water(returns: pd.Series, dollars: bool = False) -> tuple:
@@ -177,12 +177,12 @@ An example showing how Drawdown and Time Under Water function is used with accou
 
 	from mlfinlab.backtest_statistics import drawdown_and_time_under_water
 
-	drawdown, tuw = drawdown_and_time_under_water(returns, dollars = True)
+	drawdown, tuw = drawdown_and_time_under_water(returns, dollars=True)
 
 Information Ratio
 ==============================
 
-Calculates Annualized Information Ratio for pd.Series of normal or log returns.
+Calculates Annualized Information Ratio for a given pandas Series of normal or log returns.
 
 It is the annualized ratio between the average excess return and the tracking error. The excess return is measured as the portfolio’s return in excess of the benchmark’s return. The tracking error is estimated as the standard deviation of the excess returns.
 
