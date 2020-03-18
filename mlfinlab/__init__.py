@@ -22,16 +22,16 @@ import mlfinlab.clustering as clustering
 
 
 # Sponsorship notification
-try:
-    webbrowser.get('google-chrome').open('https://www.patreon.com/HudsonThames', new=2)
-except webbrowser.Error as error:
-    try:
-        webbrowser.get('firefox').open('https://www.patreon.com/HudsonThames', new=2)
-    except webbrowser.Error as error:
-        try:
-            webbrowser.get('windows-default').open('https://www.patreon.com/HudsonThames', new=2)
-        except webbrowser.Error as error:
-            pass
+# try:
+#     webbrowser.get('google-chrome').open('https://www.patreon.com/HudsonThames', new=2)
+# except webbrowser.Error as error:
+#     try:
+#         webbrowser.get('firefox').open('https://www.patreon.com/HudsonThames', new=2)
+#     except webbrowser.Error as error:
+#         try:
+#             webbrowser.get('windows-default').open('https://www.patreon.com/HudsonThames', new=2)
+#         except webbrowser.Error as error:
+#             pass
 
 print()
 print()
