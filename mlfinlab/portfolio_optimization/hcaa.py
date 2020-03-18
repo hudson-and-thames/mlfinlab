@@ -359,6 +359,7 @@ class HierarchicalClusteringAssetAllocation:
                  confidence_level=0.05,
                  optimal_num_clusters=None,
                  resample_by=None):
+        # pylint: disable=too-many-arguments
         """
         Calculate asset allocations using the HCAA algorithm.
 
@@ -368,7 +369,9 @@ class HierarchicalClusteringAssetAllocation:
         :param asset_returns: (pd.DataFrame/numpy matrix) user supplied matrix of asset returns
         :param covariance_matrix: (pd.DataFrame/numpy matrix) user supplied covariance matrix of asset returns
         :param expected_asset_returns: (list) a list of mean asset returns (mu)
-        :param allocation_metric: (str) the metric used for calculating weight allocations. Supported strings - "equal_weighting", "minimum_variance", "minimum_standard_deviation", "sharpe_ratio", "expected_shortfall", "conditional_drawdown_risk"
+        :param allocation_metric: (str) the metric used for calculating weight allocations. Supported strings - "equal_weighting",
+                                        "minimum_variance", "minimum_standard_deviation", "sharpe_ratio", "expected_shortfall",
+                                        "conditional_drawdown_risk"
         :param linkage: (str) the type of linkage method to use for clustering. Supported strings - "single", "average", "complete"
         :param confidence_level: (float) the confidence level (alpha) used for calculating expected shortfall and conditional
                                          drawdown at risk
