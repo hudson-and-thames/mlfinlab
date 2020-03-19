@@ -85,8 +85,8 @@ class MicrostructuralFeaturesGenerator:
         # Read csv in batches
         count = 0
         final_bars = []
-        cols = ['date_time', 'avg_tick_size', 'tick_rule_sum', 'vwap', 'kyle_lambda', 'amihud_lambda',
-                'hasbrouck_lambda']
+        cols = ['date_time', 'avg_tick_size', 'tick_rule_sum', 'vwap', 'kyle_lambda', 'kyle_lambda_t_value',
+                'amihud_lambda', 'amihud_lambda_t_value', 'hasbrouck_lambda', 'hasbrouck_lambda_t_value']
 
         # Entropy features columns
         for en_type in self.entropy_types:
@@ -199,9 +199,9 @@ class MicrostructuralFeaturesGenerator:
         features.append(vwap(self.dollar_size, self.trade_size))
 
         # Lambdas
-        features.append(get_trades_based_kyle_lambda(self.price_diff, self.trade_size, self.tick_rule))  # Kyle lambda
-        features.append(get_trades_based_amihud_lambda(self.log_ret, self.dollar_size))  # Amihud lambda
-        features.append(
+        features.extend(get_trades_based_kyle_lambda(self.price_diff, self.trade_size, self.tick_rule))  # Kyle lambda
+        features.extend(get_trades_based_amihud_lambda(self.log_ret, self.dollar_size))  # Amihud lambda
+        features.extend(
             get_trades_based_hasbrouck_lambda(self.log_ret, self.dollar_size, self.tick_rule))  # Hasbrouck lambda
 
         # Entropy features
