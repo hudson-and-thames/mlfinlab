@@ -62,16 +62,14 @@ def average_holding_period(target_positions: pd.Series) -> float:
     position_difference = target_positions.diff()
 
     # Time elapsed from the starting time for each position
-    time_difference = (target_positions.index - target_positions.index[0]) / \
-                      np.timedelta64(1, 'D')
+    time_difference = (target_positions.index - target_positions.index[0]) / np.timedelta64(1, 'D')
     for i in range(1, target_positions.size):
 
         # Increased or unchanged position
         if float(position_difference.iloc[i] * target_positions.iloc[i - 1]) >= 0:
             if float(target_positions.iloc[i]) != 0:  # And not an empty position
                 entry_time = (entry_time * target_positions.iloc[i - 1] +
-                              time_difference[i] * position_difference.iloc[i]) / \
-                             target_positions.iloc[i]
+                              time_difference[i] * position_difference.iloc[i]) / target_positions.iloc[i]
 
         # Decreased
         if float(position_difference.iloc[i] * target_positions.iloc[i - 1]) < 0:
@@ -80,20 +78,17 @@ def average_holding_period(target_positions: pd.Series) -> float:
             # Flip of a position
             if float(target_positions.iloc[i] * target_positions.iloc[i - 1]) < 0:
                 weight = abs(target_positions.iloc[i - 1])
-                holding_period.loc[target_positions.index[i],
-                                   ['holding_time', 'weight']] = (hold_time, weight)
+                holding_period.loc[target_positions.index[i], ['holding_time', 'weight']] = (hold_time, weight)
                 entry_time = time_difference[i]  # Reset entry time
 
             # Only a part of position is closed
             else:
                 weight = abs(position_difference.iloc[i])
-                holding_period.loc[target_positions.index[i],
-                                   ['holding_time', 'weight']] = (hold_time, weight)
+                holding_period.loc[target_positions.index[i], ['holding_time', 'weight']] = (hold_time, weight)
 
     if float(holding_period['weight'].sum()) > 0:  # If there were closed trades at all
         avg_holding_period = float((holding_period['holding_time'] * \
-                                    holding_period['weight']).sum() / \
-                                   holding_period['weight'].sum())
+                                    holding_period['weight']).sum() / holding_period['weight'].sum())
     else:
         avg_holding_period = float('nan')
 
@@ -144,8 +139,7 @@ def all_bets_concentration(returns: pd.Series, frequency: str = 'M') -> tuple:
     # Concentration of negative returns per bet
     negative_concentration = bets_concentration(returns[returns < 0])
     # Concentration of bets/time period (month by default)
-    time_concentration = \
-        bets_concentration(returns.groupby(pd.Grouper(freq=frequency)).count())
+    time_concentration = bets_concentration(returns.groupby(pd.Grouper(freq=frequency)).count())
     return (positive_concentration, negative_concentration, time_concentration)
 
 
@@ -186,20 +180,17 @@ def drawdown_and_time_under_water(returns: pd.Series, dollars: bool = False) -> 
     else:
         drawdown = 1 - high_watermarks['min'] / high_watermarks['hwm']
 
-    time_under_water = ((high_watermarks.index[1:] -
-                         high_watermarks.index[:-1]) / np.timedelta64(1, 'Y')).values
+    time_under_water = ((high_watermarks.index[1:] - high_watermarks.index[:-1]) / np.timedelta64(1, 'Y')).values
 
     # Adding also period from last High watermark to last return observed.
     time_under_water = np.append(time_under_water,
-                                 (returns.index[-1] - high_watermarks.index[-1]) /
-                                 np.timedelta64(1, 'Y'))
+                                 (returns.index[-1] - high_watermarks.index[-1]) / np.timedelta64(1, 'Y'))
 
     time_under_water = pd.Series(time_under_water, index=high_watermarks.index)
     return drawdown, time_under_water
 
 
-def sharpe_ratio(returns: pd.Series, entries_per_year: int = 252,
-                 risk_free_rate: float = 0) -> float:
+def sharpe_ratio(returns: pd.Series, entries_per_year: int = 252, risk_free_rate: float = 0) -> float:
     """
     Calculates Annualized Sharpe Ratio for pd.Series of normal or log returns.
     Risk_free_rate should be given for the same period the returns are given.
@@ -212,14 +203,12 @@ def sharpe_ratio(returns: pd.Series, entries_per_year: int = 252,
     :return: (float) Annualized Sharpe Ratio
     """
 
-    sharpe_r = (returns.mean() - risk_free_rate) / returns.std() * \
-               (entries_per_year) ** (1 / 2)
+    sharpe_r = (returns.mean() - risk_free_rate) / returns.std() * (entries_per_year) ** (1 / 2)
 
     return sharpe_r
 
 
-def information_ratio(returns: pd.Series, benchmark: float = 0,
-                      entries_per_year: int = 252) -> float:
+def information_ratio(returns: pd.Series, benchmark: float = 0, entries_per_year: int = 252) -> float:
     """
     Calculates Annualized Information Ratio for pd.Series of normal or log returns.
     Benchmark should be provided as a return for the same time period as that between
@@ -241,9 +230,8 @@ def information_ratio(returns: pd.Series, benchmark: float = 0,
     return information_r
 
 
-def probabilistic_sharpe_ratio(observed_sr: float, benchmark_sr: float,
-                               number_of_returns: int, skewness_of_returns: float = 0,
-                               kurtosis_of_returns: float = 3) -> float:
+def probabilistic_sharpe_ratio(observed_sr: float, benchmark_sr: float, number_of_returns: int,
+                               skewness_of_returns: float = 0, kurtosis_of_returns: float = 3) -> float:
     """
     Calculates the probabilistic Sharpe ratio (PSR) that provides an adjusted estimate of SR,
     by removing the inflationary effect caused by short series with skewed and/or

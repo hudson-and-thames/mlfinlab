@@ -27,9 +27,9 @@ Flattening and Flips
 
 Snippet 14.1, page 197, Deriving Flattening and Flips from series of target positions.
 
-Points of Flattening - When target position changes sign (For example, changing from 1.5 (long position) to -0.5 (short position) on the next timestamp)
+Points of Flipping - When target position changes sign (For example, changing from 1.5 (long position) to -0.5 (short position) on the next timestamp)
 
-Points of Flipping - When target position changes from nonzero to zero (For example, changing from 1.5 (long position) to 0 (no positions) on the next timestamp)
+Points of Flattening - When target position changes from nonzero to zero (For example, changing from 1.5 (long position) to 0 (no positions) on the next timestamp)
 
 Filtering timestamps of Flattenings and Flips may be used for analysis of position changing frequency as well as checking moments when positions are closed by the strategy.
 
@@ -190,7 +190,7 @@ Benchmark should be provided as a return for the same time period as that betwee
 
 Calculated as:
 
-        :math:`SharpeRatio = \frac{E[Returns - Benchmark]}{\sqrt{V[Returns - Benchmark]}} * \sqrt{n}`
+        :math:`InformationRatio = \frac{E[Returns - Benchmark]}{\sqrt{V[Returns - Benchmark]}} * \sqrt{n}`
 
 .. function:: information_ratio(returns: pd.Series, benchmark: float = 0,
                                 entries_per_year: int = 252) -> float:
@@ -204,7 +204,7 @@ An example showing how Annualized Information Ratio function is used with monthl
 
 	from mlfinlab.backtest_statistics import information_ratio
 
-	information_r = information(returns, benchmark=0.005, entries_per_year=12)
+	information_r = information_ratio(returns, benchmark=0.005, entries_per_year=12)
 
 Annualized Sharpe Ratio
 ==============================
@@ -267,7 +267,7 @@ Where:
 
     :param observed_sr: (float) Sharpe Ratio that is observed
     :param benchmark_sr: (float) Sharpe Ratio to which observed_SR is tested against
-    :param  number_of_returns: (int) times returns are recorded for observed_SR
+    :param number_of_returns: (int) The number of times a return is recorded.
     :param skewness_of_returns: (float) skewness of returns (as Gaussian by default)
     :param kurtosis_of_returns: (float) kurtosis of returns (as Gaussian by default)
     :return: (float) Probabilistic Sharpe Ratio
@@ -315,7 +315,7 @@ Where:
     :param sr_estimates: (list) Sharpe Ratios estimates trials list or
         properties list: [Standard deviation of estimates, Number of estimates]
         if estimates_param flag is set to True.
-    :param  number_of_returns: (int) times returns are recorded for observed_SR
+    :param number_of_returns: (int) The number of times a return is recorded.
     :param skewness_of_returns: (float) skewness of returns (as Gaussian by default)
     :param kurtosis_of_returns: (float) kurtosis of returns (as Gaussian by default)
     :param estimates_param: (bool) allows to use properties of estimates instead of full list
@@ -361,7 +361,7 @@ Where:
 
     :param observed_sr: (float) Sharpe Ratio that is being tested
     :param benchmark_sr: (float) Sharpe Ratio to which observed_SR is tested against
-    :param  number_of_returns: (int) times returns are recorded for observed_SR
+    :param number_of_returns: (int) The number of times a return is recorded.
     :param skewness_of_returns: (float) skewness of returns (as Gaussian by default)
     :param kurtosis_of_returns: (float) kurtosis of returns (as Gaussian by default)
     :param alpha: (float) desired significance level (0.05 by default)
