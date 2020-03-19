@@ -2,10 +2,11 @@
 Second generation models features: Kyle lambda, Amihud Lambda, Hasbrouck lambda (bar and trade based)
 """
 
+from typing import List
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LinearRegression
 
+from mlfinlab.structural_breaks.sadf import _get_betas
 
 # pylint: disable=invalid-name
 def get_bar_based_kyle_lambda(close: pd.Series, volume: pd.Series, window: int = 20) -> pd.Series:
@@ -53,24 +54,24 @@ def get_bar_based_hasbrouck_lambda(close: pd.Series, dollar_volume: pd.Series, w
     return (log_ret / signed_dollar_volume_sqrt).rolling(window=window).mean()
 
 
-def get_trades_based_kyle_lambda(price_diff: list, volume: list, aggressor_flags: list) -> float:
+def get_trades_based_kyle_lambda(price_diff: list, volume: list, aggressor_flags: list) -> List[float]:
     """
     Get Kyle lambda from trades data, p.286-288.
 
     :param price_diff: (list) of price diffs
     :param volume: (list) of trades sizes
     :param aggressor_flags: (list) of trade directions [-1, 1]  (tick rule or aggressor side can be used to define)
-    :return: (float) Kyle lambda for a bar
+    :return: (list) Kyle lambda for a bar and t-value
     """
-    model = LinearRegression(fit_intercept=False, copy_X=False)
     signed_volume = np.array(volume) * np.array(aggressor_flags)
     X = np.array(signed_volume).reshape(-1, 1)
     y = np.array(price_diff)
-    model.fit(X, y)
-    return model.coef_[0]
+    coef, std = _get_betas(X, y)
+    t_value = coef[0] / std[0]
+    return [coef[0], t_value[0]]
 
 
-def get_trades_based_amihud_lambda(log_ret: list, dollar_volume: list) -> float:
+def get_trades_based_amihud_lambda(log_ret: list, dollar_volume: list) -> List[float]:
     """
     Get Amihud lambda from trades data, p.288-289.
 
@@ -78,24 +79,24 @@ def get_trades_based_amihud_lambda(log_ret: list, dollar_volume: list) -> float:
     :param dollar_volume: (list) of dollar volumes (price * size)
     :return: (float) Amihud lambda for a bar
     """
-    model = LinearRegression(fit_intercept=False, copy_X=False)
     X = np.array(dollar_volume).reshape(-1, 1)
     y = np.abs(np.array(log_ret))
-    model.fit(X, y)
-    return model.coef_[0]
+    coef, std = _get_betas(X, y)
+    t_value = coef[0] / std[0]
+    return [coef[0], t_value[0]]
 
 
-def get_trades_based_hasbrouck_lambda(log_ret: list, dollar_volume: list, aggressor_flags: list) -> float:
+def get_trades_based_hasbrouck_lambda(log_ret: list, dollar_volume: list, aggressor_flags: list) -> List[float]:
     """
-    Get Amihud lambda from trades data, p.289-290.
+    Get Hasbrouck lambda from trades data, p.289-290.
 
     :param log_ret: (list) of log returns
     :param dollar_volume: (list) of dollar volumes (price * size)
     :param aggressor_flags: (list) of trade directions [-1, 1]  (tick rule or aggressor side can be used to define)
-    :return: (float) Amihud lambda for a bar
+    :return: (list) Hasbrouck lambda for a bar and t value
     """
-    model = LinearRegression(fit_intercept=False, copy_X=False)
     X = (np.sqrt(np.array(dollar_volume)) * np.array(aggressor_flags)).reshape(-1, 1)
     y = np.abs(np.array(log_ret))
-    model.fit(X, y)
-    return model.coef_[0]
+    coef, std = _get_betas(X, y)
+    t_value = coef[0] / std[0]
+    return [coef[0], t_value[0]]
