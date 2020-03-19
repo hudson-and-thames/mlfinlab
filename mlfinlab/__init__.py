@@ -19,19 +19,20 @@ import mlfinlab.feature_importance as feature_importance
 import mlfinlab.ensemble as ensemble
 import mlfinlab.portfolio_optimization as portfolio_optimization
 import mlfinlab.clustering as clustering
+import mlfinlab.backtest_statistics.statistics as backtest_statistics
 
 
 # Sponsorship notification
-try:
-    webbrowser.get('google-chrome').open('https://www.patreon.com/HudsonThames', new=2)
-except webbrowser.Error as error:
-    try:
-        webbrowser.get('firefox').open('https://www.patreon.com/HudsonThames', new=2)
-    except webbrowser.Error as error:
-        try:
-            webbrowser.get('windows-default').open('https://www.patreon.com/HudsonThames', new=2)
-        except webbrowser.Error as error:
-            pass
+# try:
+#     webbrowser.get('google-chrome').open('https://www.patreon.com/HudsonThames', new=2)
+# except webbrowser.Error as error:
+#     try:
+#         webbrowser.get('firefox').open('https://www.patreon.com/HudsonThames', new=2)
+#     except webbrowser.Error as error:
+#         try:
+#             webbrowser.get('windows-default').open('https://www.patreon.com/HudsonThames', new=2)
+#         except webbrowser.Error as error:
+#             pass
 
 print()
 print()
