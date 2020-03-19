@@ -2,7 +2,6 @@
 Logic regarding concurrent labels from chapter 4.
 """
 
-import numpy as np
 import pandas as pd
 
 from mlfinlab.util.multiprocess import mp_pandas_obj
