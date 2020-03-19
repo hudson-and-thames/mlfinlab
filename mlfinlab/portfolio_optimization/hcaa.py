@@ -24,7 +24,7 @@ class HierarchicalClusteringAssetAllocation:
         Constructor.
 
         :param calculate_expected_returns: (str) the method to use for calculation of expected returns.
-        Currently supports "mean" and "exponential"
+                                        Currently supports "mean" and "exponential"
         """
 
         self.weights = list()
@@ -52,6 +52,7 @@ class HierarchicalClusteringAssetAllocation:
     def _get_optimal_number_of_clusters(self,
                                         correlation,
                                         asset_returns,
+                                        linkage,
                                         num_reference_datasets=5,
                                         max_number_of_clusters=10):
         """
@@ -59,12 +60,13 @@ class HierarchicalClusteringAssetAllocation:
 
         :param correlation: (np.array) matrix of asset correlations
         :param asset_returns: (pd.DataFrame) historical asset returns
+        :param linkage: (str) the type of linkage method to use for clustering
         :param num_reference_datasets: (int) the number of reference datasets to generate for calculating expected inertia
         :param max_number_of_clusters: (int) the maximum number of clusters to check for finding the optimal value
         :return: (int) the optimal number of clusters
         """
 
-        cluster_func = AgglomerativeClustering(affinity='precomputed', linkage='single')
+        cluster_func = AgglomerativeClustering(affinity='precomputed', linkage=linkage)
         original_distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
         gap_values = []
         for num_clusters in range(1, max_number_of_clusters + 1):
@@ -95,18 +97,19 @@ class HierarchicalClusteringAssetAllocation:
         return np.argmax(gap_values)
 
     @staticmethod
-    def _tree_clustering(correlation, num_clusters):
+    def _tree_clustering(correlation, num_clusters, linkage):
         """
         Perform agglomerative clustering on the current portfolio.
 
         :param correlation: (np.array) matrix of asset correlations
         :param num_clusters: (int) the number of clusters
+        :param linkage (str): the type of linkage method to use for clustering
         :return: (list) structure of hierarchical tree
         """
 
         cluster_func = AgglomerativeClustering(n_clusters=num_clusters,
                                                affinity='precomputed',
-                                               linkage='single')
+                                               linkage=linkage)
         distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
         cluster_func.fit(distance_matrix)
         return cluster_func.children_
@@ -130,12 +133,12 @@ class HierarchicalClusteringAssetAllocation:
 
     @staticmethod
     def _get_inverse_variance_weights(covariance):
-        '''
+        """
         Calculate the inverse variance weight allocations.
 
         :param covariance: (pd.DataFrame) covariance matrix of assets
         :return: (list) inverse variance weight values
-        '''
+        """
 
         inv_diag = 1 / np.diag(covariance.values)
         parity_w = inv_diag * (1 / np.sum(inv_diag))
@@ -352,9 +355,11 @@ class HierarchicalClusteringAssetAllocation:
                  covariance_matrix=None,
                  expected_asset_returns=None,
                  allocation_metric='equal_weighting',
+                 linkage='average',
                  confidence_level=0.05,
                  optimal_num_clusters=None,
                  resample_by=None):
+        # pylint: disable=too-many-arguments
         """
         Calculate asset allocations using the HCAA algorithm.
 
@@ -364,7 +369,10 @@ class HierarchicalClusteringAssetAllocation:
         :param asset_returns: (pd.DataFrame/numpy matrix) user supplied matrix of asset returns
         :param covariance_matrix: (pd.DataFrame/numpy matrix) user supplied covariance matrix of asset returns
         :param expected_asset_returns: (list) a list of mean asset returns (mu)
-        :param allocation_metric: (str) the metric used for calculating weight allocations
+        :param allocation_metric: (str) the metric used for calculating weight allocations. Supported strings - "equal_weighting",
+                                        "minimum_variance", "minimum_standard_deviation", "sharpe_ratio", "expected_shortfall",
+                                        "conditional_drawdown_risk"
+        :param linkage: (str) the type of linkage method to use for clustering. Supported strings - "single", "average", "complete"
         :param confidence_level: (float) the confidence level (alpha) used for calculating expected shortfall and conditional
                                          drawdown at risk
         :param optimal_num_clusters: (int) optimal number of clusters for hierarchical clustering
@@ -407,10 +415,12 @@ class HierarchicalClusteringAssetAllocation:
 
         # Calculate the optimal number of clusters using the Gap statistic
         if not optimal_num_clusters:
-            optimal_num_clusters = self._get_optimal_number_of_clusters(correlation=corr, asset_returns=asset_returns)
+            optimal_num_clusters = self._get_optimal_number_of_clusters(correlation=corr,
+                                                                        linkage=linkage,
+                                                                        asset_returns=asset_returns)
 
         # Tree Clustering
-        self.clusters = self._tree_clustering(correlation=corr, num_clusters=optimal_num_clusters)
+        self.clusters = self._tree_clustering(correlation=corr, num_clusters=optimal_num_clusters, linkage=linkage)
 
         # Quasi Diagnalization
         num_assets = len(asset_names)
