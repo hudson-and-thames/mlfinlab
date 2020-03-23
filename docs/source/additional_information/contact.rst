@@ -4,10 +4,8 @@
 Contact
 =======
 
-At the moment the project is still rather small and thus I would recommend getting in touch with us over email so that we can further discuss the areas of contribution that interest you the most. We have a slack channel where we all communicate.
-
-For now you can get hold us at: research@hudsonthames.org
+We have recently opened access to our Slack channel_ to help form a community and encourage contributions.
 
 Looking forward to hearing from you!
 
-.. _email: research@hudsonthames.org
+.. _channel: https://join.slack.com/t/mlfinlab/shared_invite/enQtOTUzNjAyNDI1NTc1LTU0NTczNWRlM2U5ZDZiZTUxNTgzNzBlNDU3YmY5MThkODdiMTgwNzI5NDQ2NWI0YTYyMmI3MjBkMzY2YjVkNzc

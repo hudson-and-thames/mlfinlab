@@ -39,7 +39,7 @@ For this tutorial we will assume that you need to first do some preprocessing an
 	new_data.columns = ['date', 'price', 'volume']
 
 
-Initially, your instinct may be to pass mlfinlab package an in-memory DataFrame object but the truth is when you're running the function in production, your raw tick data csv files will be way too large to hold in memory. We used the subset 2011 to 2019 and it was more than 25 gigs. It is for this reason that the mlfinlab package requires a file path to read the raw data files from disk::
+Initially, your instinct may be to pass mlfinlab package an in-memory DataFrame object but the truth is when you're running the function in production, your raw tick data csv files will be way too large to hold in memory. We used the subset 2011 to 2019 and it was more than 25 gigs. It is for this reason that the mlfinlab package suggests using a file path to read the raw data files from disk::
 
 	# Save to csv
 	new_data.to_csv('FILE_PATH', index=False)
