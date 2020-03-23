@@ -457,8 +457,8 @@ class CLA:
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (adj closed)
         :param expected_asset_returns: (list) a list of mean stock returns (mu)
         :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns
-        :param solution: (str) specify the type of solution to compute. Options are: cla_turning_points, max_sharpe,
-                               min_volatility, efficient_frontier
+        :param solution: (str) specify the type of solution to compute. Supported strings: "cla_turning_points", "max_sharpe",
+                               "min_volatility", "efficient_frontier"
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         """

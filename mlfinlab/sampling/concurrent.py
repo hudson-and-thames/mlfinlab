@@ -2,7 +2,6 @@
 Logic regarding concurrent labels from chapter 4.
 """
 
-import numpy as np
 import pandas as pd
 
 from mlfinlab.util.multiprocess import mp_pandas_obj
@@ -26,7 +25,7 @@ def num_concurrent_events(close_series_index, label_endtime, molecule):
     label_endtime = label_endtime.loc[:label_endtime[molecule].max()]
 
     # Count events spanning a bar
-    nearest_index = close_series_index.searchsorted(np.array([label_endtime.index[0], label_endtime.max()]))
+    nearest_index = close_series_index.searchsorted(pd.DatetimeIndex([label_endtime.index[0], label_endtime.max()]))
     count = pd.Series(0, index=close_series_index[nearest_index[0]:nearest_index[1] + 1])
     for t_in, t_out in label_endtime.iteritems():
         count.loc[t_in:t_out] += 1
