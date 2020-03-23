@@ -1,8 +1,8 @@
 """
-This script implements the creation of dependence and distance matrix for the
-methods of Information Codependence.
+An Implementation of the Clustered Feature Importance algorithm described by
+Dr Marcos Lopez de Prado in 'Clustered Feature Importance (Presentation Slides)'
+(https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595)
 """
-
 #Imports
 import numpy as np
 import pandas as pd
