@@ -80,9 +80,9 @@ class TestCampbellBacktesting(unittest.TestCase):
         """
 
         p_values_simulation = [0.1, 0.11, 0.12, 0.13]
+        p_values_simulation_low = [0.001, 0.0011, 0.0012, 0.0013]
         num_mult_test = 4
         alpha_sig = 0.05
-        parameters = (p_values_simulation, num_mult_test, alpha_sig)
 
         backtesting = CampbellBacktesting(200)
 
@@ -91,7 +91,11 @@ class TestCampbellBacktesting(unittest.TestCase):
         self.assertEqual(tstat, 1.96)
 
         # If no exceeding p-values
-        tstat = backtesting._bhy_method_returns(*parameters)
+        tstat = backtesting._bhy_method_returns(p_values_simulation, num_mult_test, alpha_sig)
+        self.assertEqual(tstat, 1.96)
+
+        # If exceeding value is first
+        tstat = backtesting._bhy_method_returns(p_values_simulation_low, num_mult_test, alpha_sig)
         self.assertEqual(tstat, 1.96)
 
     def test_parameter_calculation(self):

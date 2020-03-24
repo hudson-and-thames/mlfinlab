@@ -112,6 +112,7 @@ Implementations
    :caption: Implementations
    :hidden:
 
+   implementations/backtests
    implementations/backtest_statistics
    implementations/bet_sizing
    implementations/codependence
@@ -129,6 +130,7 @@ Implementations
    implementations/structural_breaks
 
 
+* :doc:`implementations/backtests`
 * :doc:`implementations/backtest_statistics`
 * :doc:`implementations/bet_sizing`
 * :doc:`implementations/codependence`

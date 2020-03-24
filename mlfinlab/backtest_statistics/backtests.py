@@ -351,7 +351,7 @@ class CampbellBacktesting:
                 p_val = p_desc[exceeding_pval == 1]
                 p_val_pos = np.argmin(abs(p_desc - p_val[0]))
 
-                if p_val_pos == 1:  # If exceeding value is first
+                if p_val_pos == 0:  # If exceeding value is first
                     p_chosen = p_val[0]
                 else:  # If not first
                     p_chosen = p_desc[p_val_pos - 1]
