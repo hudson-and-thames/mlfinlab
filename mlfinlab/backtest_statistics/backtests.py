@@ -196,9 +196,9 @@ class CampbellBacktesting:
         return monthly_obs
 
     @staticmethod
-    def _holm_method(all_p_values, num_mult_test, p_val):
+    def _holm_method_sharpe(all_p_values, num_mult_test, p_val):
         """
-        Runs one cycle of the Holm method.
+        Runs one cycle of the Holm method for Shape ratio haircuts.
 
         :param all_p_values: (np.array) Sorted p-values to adjust
         :param num_mult_test: (int) Number of multiple tests allowed
@@ -225,9 +225,9 @@ class CampbellBacktesting:
         return p_holm_result
 
     @staticmethod
-    def _bhy_method(all_p_values, num_mult_test, p_val):
+    def _bhy_method_sharpe(all_p_values, num_mult_test, p_val):
         """
-        Runs one cycle of the BHY method.
+        Runs one cycle of the BHY method for Shape ratio haircuts.
 
         :param all_p_values: (np.array) Sorted p-values to adjust
         :param num_mult_test: (int) Number of multiple tests allowed
@@ -280,6 +280,85 @@ class CampbellBacktesting:
         haircut = (sr_annual - sr_adjusted) / sr_annual * 100
 
         return (sr_adjusted, haircut)
+
+    @staticmethod
+    def _holm_method_returns(p_values_simulation, num_mult_test, alpha_sig):
+        """
+        Runs one cycle of the Holm method for Minimum Average Monthly Returns.
+
+        :param p_values_simulation: (np.array) Sorted p-values to adjust
+        :param num_mult_test: (int) Number of multiple tests allowed
+        :param alpha_sig: (float) Significance level (e.g., 5%)
+        :return: (np.float64) P-value adjusted at a significant level
+        """
+        # Array for adjusted significance levels
+        sign_levels = np.zeros(num_mult_test)
+
+        # Creating adjusted levels of significance
+        for trail_number in range(1, num_mult_test + 1):
+            sign_levels[trail_number - 1] = alpha_sig / (num_mult_test + 1 - trail_number)
+
+        # Where the simulations have higher p-values
+        exceeding_pval = (p_values_simulation > sign_levels)
+        # Used to find the first exceeding p-value
+        exceeding_cumsum = np.cumsum(exceeding_pval)
+
+        if sum(exceeding_cumsum) == 0:  # If no exceeding p-values
+            tstat_h = 1.96
+        else:
+            # Getting the first exceeding p-value
+            p_val = p_values_simulation[exceeding_cumsum == 1]
+            # And the corresponding t-statistic
+            tstat_h = ss.norm.ppf((1 - p_val / 2), 0, 1)
+
+        return tstat_h
+
+    @staticmethod
+    def _bhy_method_returns(p_values_simulation, num_mult_test, alpha_sig):
+        """
+        Runs one cycle of the BHY method for Minimum Average Monthly Returns.
+
+        :param p_values_simulation: (np.array) Sorted p-values to adjust
+        :param num_mult_test: (int) Number of multiple tests allowed
+        :param alpha_sig: (float) Significance level (e.g., 5%)
+        :return: (np.float64) P-value adjusted at a significant level
+        """
+        if num_mult_test <= 1:  # If only one multiple test
+            tstat_b = 1.96
+        else:
+            # Sort in descending order
+            p_desc = np.sort(p_values_simulation)[::-1]
+
+            # Calculating BHY constant
+            index_vector = np.arange(1, num_mult_test + 1)
+            c_constant = sum(1 / index_vector)
+
+            # Array for adjusted significance levels
+            sign_levels = np.zeros(num_mult_test)
+
+            # Creating adjusted levels of significance
+            for trail_number in range(1, num_mult_test + 1):
+                sign_levels[trail_number - 1] = (alpha_sig * trail_number) / (num_mult_test * c_constant)
+
+            # Finding the first exceeding value
+            sign_levels_desc = np.sort(sign_levels)[::-1]
+            exceeding_pval = (p_desc <= sign_levels_desc)
+
+            if sum(exceeding_pval) == 0:  # If no exceeding p-values
+                tstat_b = 1.96
+            else:
+                # Getting the first exceeding p-value
+                p_val = p_desc[exceeding_pval == 1]
+                p_val_pos = np.argmin(abs(p_desc - p_val[0]))
+
+                if p_val_pos == 1:  # If exceeding value is first
+                    p_chosen = p_val[0]
+                else:  # If not first
+                    p_chosen = p_desc[p_val_pos - 1]
+                # And the corresponding t-statistic from p-value
+                tstat_b = ss.norm.ppf((1 - (p_val[0] + p_chosen) / 4), 0, 1)
+
+        return tstat_b
 
     def haircut_sharpe_ratios(self, sampling_frequency, num_obs, sharpe_ratio, annualized,
                               autocorr_adjusted, rho_a, num_mult_test, rho):
@@ -352,10 +431,10 @@ class CampbellBacktesting:
             all_p_values = np.sort(all_p_values)
 
             # Holm method
-            p_holm[simulation_number - 1] = self._holm_method(all_p_values, num_mult_test, p_val)
+            p_holm[simulation_number - 1] = self._holm_method_sharpe(all_p_values, num_mult_test, p_val)
 
             # BHY method
-            p_bhy[simulation_number - 1] = self._bhy_method(all_p_values, num_mult_test, p_val)
+            p_bhy[simulation_number - 1] = self._bhy_method_sharpe(all_p_values, num_mult_test, p_val)
 
         # Calculating the resulting p-values of methods from simulations
         # Array with adjusted p-values
@@ -379,6 +458,7 @@ class CampbellBacktesting:
         return results
 
     def profit_hurdle(self, num_mult_test, num_obs, alpha_sig, vol_anu, rho):
+        # pylint: disable=too-many-locals
         '''
         Calculates the Required returns due to testing multiplicity.
 
@@ -392,8 +472,8 @@ class CampbellBacktesting:
         :param alpha_sig: (float) Significance level (e.g., 5%)
         :param vol_anu: (float) Annual return volatility (e.g., 0.05 or 5%)
         :param rho: (float) Average correlation among strategy returns
-        :return: (np.ndarray) Minimum Average Monthly Returns for Independent tests,
-                              Bonferroni, Holm, BHY and Average for Multiple tests.
+        :return: (np.ndarray) Minimum Average Monthly Returns for
+                              [Independent tests, Bonferroni, Holm, BHY and Average for Multiple tests]
         '''
         # Independent test t-statistic
         tstat_independent = ss.norm.ppf((1 - alpha_sig / 2), 0, 1)
@@ -426,25 +506,8 @@ class CampbellBacktesting:
             p_values_simulation = 2 * (1 - ss.norm.cdf(t_values_simulation))
             p_values_simulation = np.sort(p_values_simulation)
 
-            # Array for adjusted significance levels
-            sign_levels = np.zeros(num_mult_test)
-
-            # Creating adjusted levels of significance
-            for trail_number in range(1, num_mult_test + 1):
-                sign_levels[trail_number - 1] = alpha_sig / (num_mult_test + 1 - trail_number)
-
-            # Where the simulations have higher p-values
-            exceeding_pval = (p_values_simulation > sign_levels)
-            # Used to find the first exceeding p-value
-            exceeding_cumsum = np.cumsum(exceeding_pval)
-
-            if sum(exceeding_cumsum) == 0:  # If no exceeding p-values
-                tstat_h = 1.96
-            else:
-                # Getting the first exceeding p-value
-                p_val = p_values_simulation[exceeding_cumsum == 1]
-                # And the corresponding t-statistic
-                tstat_h = ss.norm.ppf((1 - p_val / 2), 0, 1)
+            # Holm method itself
+            tstat_h = self._holm_method_returns(p_values_simulation, num_mult_test, alpha_sig)
 
             # Adding to array of t-statistics
             tstats_holm = np.append(tstats_holm, tstat_h)
@@ -462,39 +525,10 @@ class CampbellBacktesting:
             # Calculating p-values from the simulated t-ratios
             p_values_simulation = 2 * (1 - ss.norm.cdf(t_values_simulation))
 
-            if num_mult_test <= 1:  # If only one multiple test
-                tstat_b = 1.96
-            else:
-                # Sort in descending order
-                p_desc = np.sort(p_values_simulation)[::-1]
+            # BHY method itself
+            tstat_b = self._bhy_method_returns(p_values_simulation, num_mult_test, alpha_sig)
 
-                # Calculating BHY constant
-                index_vector = np.arange(1, num_mult_test + 1)
-                c_constant = sum(1 / index_vector)
-
-                # Array for adjusted significance levels
-                sign_levels = np.zeros(num_mult_test)
-
-                # Creating adjusted levels of significance
-                for trail_number in range(1, num_mult_test + 1):
-                    sign_levels[trail_number - 1] = (alpha_sig * trail_number) / (num_mult_test * c_constant)
-
-                # Finding the first exceeding value
-                sign_levels_desc = np.sort(sign_levels)[::-1]
-                exceeding_pval = (p_desc <= sign_levels_desc)
-
-            if sum(exceeding_pval) == 0:  # If no exceeding p-values
-                tstat_b = 1.96
-            else:
-                # Getting the first exceeding p-value
-                p_val = p_desc[exceeding_pval == 1]
-                p_val_pos = np.argmin(abs(p_desc - p_val[0]))
-
-                if p_val_pos == 1:  # If exceeding value is first
-                    p_chosen = p_val[0]
-                else:  # If not first
-                    p_chosen = p_desc[p_val_pos - 1]
-                tstat_b = ss.norm.ppf((1 - (p_val[0] + p_chosen) / 4), 0, 1)
+            # Adding to array of t-statistics
             tstats_bhy = np.append(tstats_bhy, tstat_b)
 
         # Array of t-values for every method
@@ -503,21 +537,7 @@ class CampbellBacktesting:
         # Array of minimum average monthly returns for every method
         ret_hur = ((vol_anu / 12 ** (1 / 2)) / num_obs ** (1 / 2)) * tcut_vec
 
-        print('Inputs:')
-        print('Significance Level =', alpha_sig * 100)
-        print('Number of Observations =', num_obs)
-        print('Annualized Return Volatility =', vol_anu * 100)
-        print('Assumed Number of Tests =', num_mult_test)
-        print('Assumed Average Correlation =', rho)
-
-        print('Outputs:')
-        print('Minimum Average Monthly Return:')
-        print('Independent =', ret_hur[0] * 100)
-        print('Bonferroni =', ret_hur[1] * 100)
-        print('Holm =', ret_hur[2] * 100)
-        print('BHY =', ret_hur[3] * 100)
-        print('Average for Multiple Tests =', np.mean(ret_hur[1:-1]) * 100)
-
+        # Preparing array of results
         results = np.array([ret_hur[0], ret_hur[1], ret_hur[2], ret_hur[3], np.mean(ret_hur[1:-1])]) * 100
 
         return results
