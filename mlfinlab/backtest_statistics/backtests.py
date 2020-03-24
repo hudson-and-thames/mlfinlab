@@ -7,7 +7,6 @@ import scipy.stats as ss
 from scipy import linalg
 
 
-
 class CampbellBacktesting:
     """
     This class implements the Haircut Sharpe Ratios and Profit Hurdles algorithms described in the following paper:
@@ -106,7 +105,7 @@ class CampbellBacktesting:
         # Linear interpolation for parameter estimates
         if (rho < 0):
             parameters = parameter_levels[1]  # Set at the preferred level if rho is misspecified
-        elif(rho < 0.2):
+        elif (rho < 0.2):
             parameters = ((0.2 - rho) / 0.2) * parameter_levels[0] + ((rho - 0) / 0.2) * parameter_levels[1]
         elif (rho < 0.4):
             parameters = ((0.4 - rho) / 0.2) * parameter_levels[1] + ((rho - 0.2) / 0.2) * parameter_levels[2]
@@ -114,7 +113,7 @@ class CampbellBacktesting:
             parameters = ((0.6 - rho) / 0.2) * parameter_levels[2] + ((rho - 0.4) / 0.2) * parameter_levels[3]
         elif (rho < 0.8):
             parameters = ((0.8 - rho) / 0.2) * parameter_levels[3] + ((rho - 0.6) / 0.2) * parameter_levels[4]
-        elif (rho < 1.0): #Interpolation based on the previous level here
+        elif (rho < 1.0):  # Interpolation based on the previous level here
             parameters = ((0.8 - rho) / 0.2) * parameter_levels[3] + ((rho - 0.6) / 0.2) * parameter_levels[4]
         else:
             parameters = parameter_levels[1]  # Set at the preferred level if rho is misspecified
@@ -122,7 +121,8 @@ class CampbellBacktesting:
         return parameters
 
     @staticmethod
-    def _annualized_sharpe_ratio(sharpe_ratio, sampling_frequency='A', rho=0, annualized=False, autocorr_adjusted=False):
+    def _annualized_sharpe_ratio(sharpe_ratio, sampling_frequency='A', rho=0, annualized=False,
+                                 autocorr_adjusted=False):
         """
         Calculate the equivalent annualized Sharpe ratio after taking the autocorrelation of returns into account
 
@@ -238,7 +238,7 @@ class CampbellBacktesting:
         # Array for final p-values of the BHY method
         p_bhy_values = np.array([])
 
-        #BHY constant
+        # BHY constant
         index_vector = np.arange(1, num_mult_test + 1)
         c_constant = sum(1 / index_vector)
 
@@ -307,7 +307,8 @@ class CampbellBacktesting:
                               for Bonferroni, Holm, BHY and average adjustment as columns
         """
         # Calculating the annual Sharpe ratio adjusted for the autocorrelation of returns
-        sr_annual = self._annualized_sharpe_ratio(sharpe_ratio, sampling_frequency, rho_a, annualized, autocorr_adjusted)
+        sr_annual = self._annualized_sharpe_ratio(sharpe_ratio, sampling_frequency, rho_a, annualized,
+                                                  autocorr_adjusted)
 
         # Estimating the parameters used for distributions based on HLZ model
         # Result is [rho, n_simulations, prob_zero_mean, lambd]
@@ -319,7 +320,8 @@ class CampbellBacktesting:
         # Needed number of trails inside a simulation with the check of (num_simulations >= num_mul_tests)
         num_trails = int((np.floor(num_mult_test / parameters[1]) + 1) * np.floor(parameters[1] + 1))
         # Generating a panel of t-ratios (of size self.simulations * num_simulations)
-        t_sample = self._sample_random_multest(parameters[0], num_trails, parameters[2], parameters[3], self.simulations)
+        t_sample = self._sample_random_multest(parameters[0], num_trails, parameters[2], parameters[3],
+                                               self.simulations)
 
         # Annual Sharpe ratio, adjusted to monthly
         sr_monthly = sr_annual / 12 ** (1 / 2)
@@ -359,7 +361,7 @@ class CampbellBacktesting:
         # Array with adjusted p-values
         # [Bonferroni, Holm, BHY, Average]
         p_val_adj = np.array([np.minimum(num_mult_test * p_val, 1), np.median(p_holm), np.median(p_bhy)])
-        p_val_adj = np.append(p_val_adj, (p_val_adj[0] + p_val_adj[1] + p_val_adj[2])/3)
+        p_val_adj = np.append(p_val_adj, (p_val_adj[0] + p_val_adj[1] + p_val_adj[2]) / 3)
 
         # Arrays with adjusted Sharpe ratios and haircuts
         sr_adj = np.zeros(4)
@@ -373,5 +375,149 @@ class CampbellBacktesting:
         results = np.array([p_val_adj,
                             sr_adj,
                             haircut])
+
+        return results
+
+    def profit_hurdle(self, num_mult_test, num_obs, alpha_sig, vol_anu, rho):
+        '''
+        Calculates the Required returns due to testing multiplicity.
+
+        Calculates the required mean return for a strategy at a given level of significance.
+
+        This function doesn't allow for any autocorrelation in the strategy returns.
+
+
+        :param num_mult_test: (int) Number of tests in multiple testing allowed (HLZ (2015) find at least 315 factors)
+        :param num_obs: (int) Number of monthly observations for a strategy
+        :param alpha_sig: (float) Significance level (e.g., 5%)
+        :param vol_anu: (float) Annual return volatility (e.g., 0.05 or 5%)
+        :param rho: (float) Average correlation among strategy returns
+        :return: (np.ndarray) Minimum Average Monthly Returns for Independent tests,
+                              Bonferroni, Holm, BHY and Average for Multiple tests.
+        '''
+        # Independent test t-statistic
+        tstat_independent = ss.norm.ppf((1 - alpha_sig / 2), 0, 1)
+
+        # Bonferroni t-statistic
+        p_value_bonferroni = np.divide(alpha_sig, num_mult_test)
+        tstat_bonderroni = ss.norm.ppf((1 - p_value_bonferroni / 2), 0, 1)
+
+        # Estimating the parameters used for distributions based on HLZ model
+        # Result is [rho, n_simulations, prob_zero_mean, lambd]
+        parameters = self._parameter_calculation(rho)
+
+        # Needed number of trails inside a simulation with the check of (num_simulations >= num_mul_tests)
+        num_trails = int((np.floor(num_mult_test / parameters[1]) + 1) * np.floor(parameters[1] + 1))
+        # Generating a panel of t-ratios (of size self.simulations * num_simulations)
+        t_sample = self._sample_random_multest(parameters[0], num_trails, parameters[2], parameters[3],
+                                               self.simulations)
+
+        # Holm method
+
+        # Array for final t-statistics for every simulation
+        tstats_holm = np.array([])
+
+        # Iterating through the simulations
+        for simulation_number in range(1, self.simulations + 1):
+
+            # Get one sample of previously generated simulation of t-values
+            t_values_simulation = t_sample[simulation_number - 1, 1:(num_mult_test + 1)]
+            # Calculating p-values from the simulated t-ratios
+            p_values_simulation = 2 * (1 - ss.norm.cdf(t_values_simulation))
+            p_values_simulation = np.sort(p_values_simulation)
+
+            # Array for adjusted significance levels
+            sign_levels = np.zeros(num_mult_test)
+
+            # Creating adjusted levels of significance
+            for trail_number in range(1, num_mult_test + 1):
+                sign_levels[trail_number - 1] = alpha_sig / (num_mult_test + 1 - trail_number)
+
+            # Where the simulations have higher p-values
+            exceeding_pval = (p_values_simulation > sign_levels)
+            # Used to find the first exceeding p-value
+            exceeding_cumsum = np.cumsum(exceeding_pval)
+
+            if sum(exceeding_cumsum) == 0:  # If no exceeding p-values
+                tstat_h = 1.96
+            else:
+                # Getting the first exceeding p-value
+                p_val = p_values_simulation[exceeding_cumsum == 1]
+                # And the corresponding t-statistic
+                tstat_h = ss.norm.ppf((1 - p_val / 2), 0, 1)
+
+            # Adding to array of t-statistics
+            tstats_holm = np.append(tstats_holm, tstat_h)
+
+        # BHY method
+
+        # Array for final t-statistics for every simulation
+        tstats_bhy = np.array([])
+
+        # Iterating through the simulations
+        for simulation_number in range(1, self.simulations + 1):
+
+            # Get one sample of previously generated simulation of t-values
+            t_values_simulation = t_sample[simulation_number - 1, 1:(num_mult_test + 1)]
+            # Calculating p-values from the simulated t-ratios
+            p_values_simulation = 2 * (1 - ss.norm.cdf(t_values_simulation))
+
+            if num_mult_test <= 1:  # If only one multiple test
+                tstat_b = 1.96
+            else:
+                # Sort in descending order
+                p_desc = np.sort(p_values_simulation)[::-1]
+
+                # Calculating BHY constant
+                index_vector = np.arange(1, num_mult_test + 1)
+                c_constant = sum(1 / index_vector)
+
+                # Array for adjusted significance levels
+                sign_levels = np.zeros(num_mult_test)
+
+                # Creating adjusted levels of significance
+                for trail_number in range(1, num_mult_test + 1):
+                    sign_levels[trail_number - 1] = (alpha_sig * trail_number) / (num_mult_test * c_constant)
+
+                # Finding the first exceeding value
+                sign_levels_desc = np.sort(sign_levels)[::-1]
+                exceeding_pval = (p_desc <= sign_levels_desc)
+
+            if sum(exceeding_pval) == 0:  # If no exceeding p-values
+                tstat_b = 1.96
+            else:
+                # Getting the first exceeding p-value
+                p_val = p_desc[exceeding_pval == 1]
+                p_val_pos = np.argmin(abs(p_desc - p_val[0]))
+
+                if p_val_pos == 1:  # If exceeding value is first
+                    p_chosen = p_val[0]
+                else:  # If not first
+                    p_chosen = p_desc[p_val_pos - 1]
+                tstat_b = ss.norm.ppf((1 - (p_val[0] + p_chosen) / 4), 0, 1)
+            tstats_bhy = np.append(tstats_bhy, tstat_b)
+
+        # Array of t-values for every method
+        tcut_vec = np.array([tstat_independent, tstat_bonderroni, np.median(tstats_holm), np.median(tstats_bhy)])
+
+        # Array of minimum average monthly returns for every method
+        ret_hur = ((vol_anu / 12 ** (1 / 2)) / num_obs ** (1 / 2)) * tcut_vec
+
+        print('Inputs:')
+        print('Significance Level =', alpha_sig * 100)
+        print('Number of Observations =', num_obs)
+        print('Annualized Return Volatility =', vol_anu * 100)
+        print('Assumed Number of Tests =', num_mult_test)
+        print('Assumed Average Correlation =', rho)
+
+        print('Outputs:')
+        print('Minimum Average Monthly Return:')
+        print('Independent =', ret_hur[0] * 100)
+        print('Bonferroni =', ret_hur[1] * 100)
+        print('Holm =', ret_hur[2] * 100)
+        print('BHY =', ret_hur[3] * 100)
+        print('Average for Multiple Tests =', np.mean(ret_hur[1:-1]) * 100)
+
+        results = np.array([ret_hur[0], ret_hur[1], ret_hur[2], ret_hur[3], np.mean(ret_hur[1:-1])]) * 100
 
         return results
