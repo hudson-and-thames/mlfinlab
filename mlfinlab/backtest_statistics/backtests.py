@@ -1,4 +1,7 @@
-# pylint: disable=missing-module-docstring
+"""
+Implements backtesting algorithms related to Sharpe ratio adjustments
+"""
+
 import numpy as np
 import scipy.stats as ss
 from scipy import linalg
@@ -101,7 +104,9 @@ class CampbellBacktesting:
                                      [0.8, 3109, 8.3901 * 0.1, 5.5956 * 0.001]])
 
         # Linear interpolation for parameter estimates
-        if (rho >= 0) and (rho < 0.2):
+        if (rho < 0):
+            parameters = parameter_levels[1]  # Set at the preferred level if rho is misspecified
+        elif(rho < 0.2):
             parameters = ((0.2 - rho) / 0.2) * parameter_levels[0] + ((rho - 0) / 0.2) * parameter_levels[1]
         elif (rho < 0.4):
             parameters = ((0.4 - rho) / 0.2) * parameter_levels[1] + ((rho - 0.2) / 0.2) * parameter_levels[2]
@@ -134,32 +139,28 @@ class CampbellBacktesting:
         """
 
         # If not annualized, calculating the appropriate multiplier for the Sharpe ratio
+        if sampling_frequency == 'D':
+            times_per_year = 360
+        elif sampling_frequency == 'W':
+            times_per_year = 52
+        elif sampling_frequency == 'M':
+            times_per_year = 12
+        elif sampling_frequency == 'Q':
+            times_per_year = 4
+        elif sampling_frequency == 'A':
+            times_per_year = 1
+        else:
+            times_per_year = 1  # Misspecified
+
         if not annualized:
-            if sampling_frequency == 'D':
-                annual_multiplier = (360) ** (1 / 2)
-            elif sampling_frequency == 'W':
-                annual_multiplier = (52) ** (1 / 2)
-            elif sampling_frequency == 'M':
-                annual_multiplier = (12) ** (1 / 2)
-            elif sampling_frequency == 'Q':
-                annual_multiplier = (4) ** (1 / 2)
-            elif sampling_frequency == 'A':
-                annual_multiplier = 1
+            annual_multiplier = times_per_year ** (1 / 2)
         else:
             annual_multiplier = 1
 
         # If not adjusted for returns autocorrelation, another multiplier
         if not autocorr_adjusted:
-            if sampling_frequency == 'D':
-                autocorr_multiplier = (1 + (2 * rho / (1 - rho)) * (1 - ((1 - rho ** (360)) / (360 * (1 - rho))))) ** (-0.5)
-            elif sampling_frequency == 'W':
-                autocorr_multiplier = (1 + (2 * rho / (1 - rho)) * (1 - ((1 - rho ** (52)) / (52 * (1 - rho))))) ** (-0.5)
-            elif sampling_frequency == 'M':
-                autocorr_multiplier = (1 + (2 * rho / (1 - rho)) * (1 - ((1 - rho ** (12)) / (12 * (1 - rho))))) ** (-0.5)
-            elif sampling_frequency == 'Q':
-                autocorr_multiplier = (1 + (2 * rho / (1 - rho)) * (1 - ((1 - rho ** (4)) / (4 * (1 - rho))))) ** (-0.5)
-            elif sampling_frequency == 'A':
-                autocorr_multiplier = 1
+            autocorr_multiplier = (1 + (2 * rho / (1 - rho)) * (1 - ((1 - rho ** (times_per_year)) /
+                                                                     (times_per_year * (1 - rho))))) ** (-0.5)
         else:
             autocorr_multiplier = 1
 
@@ -174,7 +175,7 @@ class CampbellBacktesting:
         Calculates the number of monthly observations based on sampling frequency and number of observations
 
         :param num_obs: (int) number of observations used for modelling
-        :param:sampling_frequency: (str) Sampling frequency of returns
+        :param sampling_frequency: (str) Sampling frequency of returns
                                    ['D','W','M','Q','A'] = [Daily, Weekly, Monthly, Quarterly, Annual]
         :return: (np.float64) number of monthly observations
         """
@@ -194,9 +195,95 @@ class CampbellBacktesting:
 
         return monthly_obs
 
+    @staticmethod
+    def _holm_method(all_p_values, num_mult_test, p_val):
+        """
+        Runs one cycle of the Holm method.
+
+        :param all_p_values: (np.array) Sorted p-values to adjust
+        :param num_mult_test: (int) Number of multiple tests allowed
+        :param p_val: (float) Significance level p-value
+        :return: (np.float64) P-value adjusted at a significant level
+        """
+        # Array for final p-values of the Holm method
+        p_holm_values = np.array([])
+        # Iterating through multiple tests
+        for i in range(1, (num_mult_test + 2)):
+            # Creating array for Holm adjusted p-values (M-j+1)*p(j) in the paper
+            p_adjusted_holm = np.array([])
+            # Iterating through the available subsets of Holm adjusted p-values
+            for j in range(1, i + 1):
+                # Holm adjusted p-values
+                p_adjusted_holm = np.append(p_adjusted_holm, (num_mult_test + 1 - j + 1) * all_p_values[j - 1])
+            # Calculating the final p-values of the Holm method and adding to array
+            p_holm_values = np.append(p_holm_values, min(max(p_adjusted_holm), 1))
+
+        # Getting the Holm adjusted p-value that is significant at our p_val level
+        p_holm_significant = p_holm_values[all_p_values == p_val]
+        p_holm_result = p_holm_significant[0]
+
+        return p_holm_result
+
+    @staticmethod
+    def _bhy_method(all_p_values, num_mult_test, p_val):
+        """
+        Runs one cycle of the BHY method.
+
+        :param all_p_values: (np.array) Sorted p-values to adjust
+        :param num_mult_test: (int) Number of multiple tests allowed
+        :param p_val: (float) Significance level p-value
+        :param c_constant: (float) Constant used in BHY method
+        :return: (np.float64) P-value adjusted at a significant level
+        """
+        # Array for final p-values of the BHY method
+        p_bhy_values = np.array([])
+
+        #BHY constant
+        index_vector = np.arange(1, num_mult_test + 1)
+        c_constant = sum(1 / index_vector)
+
+        # Iterating through multiple tests backwards
+        for i in range(num_mult_test + 1, 0, -1):
+            if i == (num_mult_test + 1):  # If it's the last observation
+                # The p-value stays the same
+                p_adjusted_holm = all_p_values[-1]
+            else:  # If it's the previous observations
+                # The p-value is adjusted according to the BHY method
+                p_adjusted_holm = min(((num_mult_test + 1) * c_constant / i) * all_p_values[i - 1], p_previous)
+            # Adding the final BHY method p-values to array
+            p_bhy_values = np.append(p_adjusted_holm, p_bhy_values)
+            p_previous = p_adjusted_holm
+
+        # Getting the BHY adjusted p-value that is significant at our p_val level
+        p_bhy_significant = p_bhy_values[all_p_values == p_val]
+        p_bhy_result = p_bhy_significant
+
+        return p_bhy_result
+
+    @staticmethod
+    def _sharpe_ratio_haircut(p_val, monthly_obs, sr_annual):
+        """
+        Calculates the Sharpe ratio and the haircut of the adjustment
+
+        :param p_val: (float) Adjusted p-value of the method
+        :param monthly_obs: (int) Number of monthly observations
+        :param sr_annual: (float) Annualized Sharpe ratio to compare to
+        :return: (np.array) Elements (Adjusted annual Sharpe ratio, Haircut percentage)
+        """
+        # Inverting to get z-score for a method
+        z_score = ss.t.ppf(1 - p_val / 2, monthly_obs - 1)
+
+        # Adjusted annualized Sharpe ratio of a method
+        sr_adjusted = (z_score / monthly_obs ** (1 / 2)) * 12 ** (1 / 2)
+
+        # Haircut of the Sharpe ratio for a method
+        haircut = (sr_annual - sr_adjusted) / sr_annual * 100
+
+        return (sr_adjusted, haircut)
+
     def haircut_sharpe_ratios(self, sampling_frequency, num_obs, sharpe_ratio, annualized,
                               autocorr_adjusted, rho_a, num_mult_test, rho):
-        # pylint: disable=invalid-name, too-many-branches
+        # pylint: disable=too-many-locals
         """
         Calculate Sharpe ratio adjustments due to testing multiplicity
 
@@ -216,8 +303,8 @@ class CampbellBacktesting:
                               wasn't corrected)
         :param num_mult_test: (int) Number of tests in multiple testing allowed (HLZ (2015) find at least 315 factors)
         :param rho: (float) Average correlation among strategy returns
-        :return: (np.ndarray) array with adjuted p-value, haircut sharpe ratio, percentage haircut as elements in a row
-                              for Bonferroni, Holm, BHY and average adjustment as rows
+        :return: (np.ndarray) array with adjuted p-value, haircut sharpe ratio, percentage haircut as rows
+                              for Bonferroni, Holm, BHY and average adjustment as columns
         """
         # Calculating the annual Sharpe ratio adjusted for the autocorrelation of returns
         sr_annual = self._annualized_sharpe_ratio(sharpe_ratio, sampling_frequency, rho_a, annualized, autocorr_adjusted)
@@ -233,10 +320,6 @@ class CampbellBacktesting:
         num_trails = int((np.floor(num_mult_test / parameters[1]) + 1) * np.floor(parameters[1] + 1))
         # Generating a panel of t-ratios (of size self.simulations * num_simulations)
         t_sample = self._sample_random_multest(parameters[0], num_trails, parameters[2], parameters[3], self.simulations)
-
-        # Constant used in BHY method
-        index_vector = np.arange(1, num_mult_test + 1)
-        c_constant = sum(1 / index_vector)
 
         # Annual Sharpe ratio, adjusted to monthly
         sr_monthly = sr_annual / 12 ** (1 / 2)
@@ -260,87 +343,35 @@ class CampbellBacktesting:
             # Calculating adjusted p-values from the simulated t-ratios
             p_values_simulation = 2 * (1 - ss.norm.cdf(t_values_simulation, 0, 1))
 
-            # Holm method
-
             # To the N (num_mult_test) other strategies tried (from the simulation),
             # we add the adjusted p_value of the real strategy.
             all_p_values = np.append(p_values_simulation, p_val)
             # Ordering p-values
             all_p_values = np.sort(all_p_values)
 
-            # Array for final p-values of the Holm method
-            p_holm_values = np.array([])
-            # Iterating through multiple tests
-            for i in range(1, (num_mult_test + 2)):
-                # Creating array for Holm adjusted p-values (M-j+1)*p(j) in the paper
-                p_adjusted_holm = np.array([])
-                # Iterating through the available subsets of Holm adjusted p-values
-                for j in range(1, i + 1):
-                    # Holm adjusted p-values
-                    p_adjusted_holm = np.append(p_adjusted_holm, (num_mult_test + 1 - j + 1) * all_p_values[j - 1])
-                # Calculating the final p-values of the Holm method and adding to array
-                p_holm_values = np.append(p_holm_values, min(max(p_adjusted_holm), 1))
-
-            # Getting the Holm adjusted p-value that is significant at our p_val level
-            p_holm_significant = p_holm_values[all_p_values == p_val]
-            # Adding this value to our array of simulations
-            p_holm[simulation_number - 1] = p_holm_significant[0]
+            # Holm method
+            p_holm[simulation_number - 1] = self._holm_method(all_p_values, num_mult_test, p_val)
 
             # BHY method
-
-            # Array for final p-values of the BHY method
-            p_bhy_values = np.array([])
-
-            # Iterating through multiple tests
-            for i in range(1, num_mult_test + 2):
-                # Iterating backwards here
-                kk = (num_mult_test + 1) - (i - 1)
-                if kk == (num_mult_test + 1):  # If it's the last observation
-                    # The p-value stays the same
-                    p_adjusted_holm = all_p_values[-1]
-                else: # If it's the previous observations
-                    # The p-value is adjusted according to the BHY method
-                    p_adjusted_holm = min(((num_mult_test + 1) * c_constant / kk) * all_p_values[kk - 1], p_previous)
-                # Adding the final BHY method p-values to array
-                p_bhy_values = np.append(p_adjusted_holm, p_bhy_values)
-                p_previous = p_adjusted_holm
-
-            # Getting the BHY adjusted p-value that is significant at our p_val level
-            p_holm_significant = p_bhy_values[all_p_values == p_val]
-            # Adding this value to our array of simulations
-            p_bhy[simulation_number - 1] = p_holm_significant[0]
+            p_bhy[simulation_number - 1] = self._bhy_method(all_p_values, num_mult_test, p_val)
 
         # Calculating the resulting p-values of methods from simulations
-        # Bonferroni
-        p_BON = np.minimum(num_mult_test * p_val, 1)
-        # Holm
-        p_HOL = np.median(p_holm)
-        # BHY
-        p_BHY = np.median(p_bhy)
-        # Average
-        p_avg = (p_BON + p_HOL + p_BHY) / 3
+        # Array with adjusted p-values
+        # [Bonferroni, Holm, BHY, Average]
+        p_val_adj = np.array([np.minimum(num_mult_test * p_val, 1), np.median(p_holm), np.median(p_bhy)])
+        p_val_adj = np.append(p_val_adj, (p_val_adj[0] + p_val_adj[1] + p_val_adj[2])/3)
 
-        # Inverting to get z-score for every method
-        z_BON = ss.t.ppf(1 - p_BON / 2, monthly_obs - 1)
-        z_HOL = ss.t.ppf(1 - p_HOL / 2, monthly_obs - 1)
-        z_BHY = ss.t.ppf(1 - p_BHY / 2, monthly_obs - 1)
-        z_avg = ss.t.ppf(1 - p_avg / 2, monthly_obs - 1)
+        # Arrays with adjusted Sharpe ratios and haircuts
+        sr_adj = np.zeros(4)
+        haircut = np.zeros(4)
+        # Adjusted Sharpe ratios and haircut percentages
+        sr_adj[0], haircut[0] = self._sharpe_ratio_haircut(p_val_adj[0], monthly_obs, sr_annual)
+        sr_adj[1], haircut[1] = self._sharpe_ratio_haircut(p_val_adj[1], monthly_obs, sr_annual)
+        sr_adj[2], haircut[2] = self._sharpe_ratio_haircut(p_val_adj[2], monthly_obs, sr_annual)
+        sr_adj[3], haircut[3] = self._sharpe_ratio_haircut(p_val_adj[3], monthly_obs, sr_annual)
 
-        # Adjusted annualized Sharpe ratio of methods
-        sr_BON = (z_BON / monthly_obs ** (1 / 2)) * 12 ** (1 / 2)
-        sr_HOL = (z_HOL / monthly_obs ** (1 / 2)) * 12 ** (1 / 2)
-        sr_BHY = (z_BHY / monthly_obs ** (1 / 2)) * 12 ** (1 / 2)
-        sr_avg = (z_avg / monthly_obs ** (1 / 2)) * 12 ** (1 / 2)
-
-        # Haircut of the Sharpe ratio for every method
-        hc_BON = (sr_annual - sr_BON) / sr_annual
-        hc_HOL = (sr_annual - sr_HOL) / sr_annual
-        hc_BHY = (sr_annual - sr_BHY) / sr_annual
-        hc_avg = (sr_annual - sr_avg) / sr_annual
-
-        results = np.array([[p_BON, sr_BON, hc_BON * 100],
-                            [p_HOL, sr_HOL, hc_HOL * 100],
-                            [p_BHY, sr_BHY, hc_BHY * 100],
-                            [p_avg, sr_avg, hc_avg * 100]])
+        results = np.array([p_val_adj,
+                            sr_adj,
+                            haircut])
 
         return results
