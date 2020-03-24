@@ -21,8 +21,8 @@ class CampbellBacktesting:
     significance, taking multiple testing into account.
     """
 
-    def __init__(self):
-        self.simulations = 2000
+    def __init__(self, simulations=2000):
+        self.simulations = simulations
 
     @staticmethod
     def _sample_random_multest(rho, n_trails, prob_zero_mean, lambd, n_simulations, annual_vol=0.15, n_obs=240):
@@ -415,9 +415,6 @@ class CampbellBacktesting:
 
         # Iterating through the simulations
         for simulation_number in range(1, self.simulations + 1):
-            # Test print to measure speed
-            if simulation_number % 100 == 0:
-                print(simulation_number)
 
             # Get one sample of previously generated simulation of t-values
             t_values_simulation = t_sample[simulation_number - 1, 1:(num_mult_test + 1)]
