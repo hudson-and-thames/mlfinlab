@@ -21,38 +21,38 @@ Haircut Sharpe Ratios
 
 Calculates Sharpe ratio adjustments due to testing multiplicity.
 
-This algorithm lets the user calculate Sharpe ratio adjustments and the corresponding haircuts based on the key parameters of the data used in the strategy backtesting. For each of the adjustment methods - Bonferroni, Holm, BHY (Benjamini, Hochberg and Yekutieli) and the Average the algorithm calculates adjusted p-value, haircut Sharpe ratio and the haircut.
+This algorithm lets the user calculate Sharpe ratio adjustments and the corresponding haircuts based on the key parameters of the data used in the strategy backtesting. For each of the adjustment methods - Bonferroni, Holm, BHY (Benjamini, Hochberg, and Yekutieli) and the Average the algorithm calculates an adjusted p-value, haircut Sharpe ratio, and the haircut.
 
 The haircut is the percentage difference between the original Sharpe ratio and the new Sharpe ratio.
 
-The inputs of the method include the information about the returns that were used to calculate the observed Sharpe ratio. In particular:
+The inputs of the method include information about the returns that were used to calculate the observed Sharpe ratio. In particular:
 
 - At what frequency where the returns observed.
 
-- Number of returns observed.
+- The number of returns observed.
 
 - Observed Sharpe ratio.
 
-- Information on if observed Sharpe ratio is annualized and if it's adjusted to autocorrelation of returns (described in the paper by Lo, A. from the introduction).
+- Information on if observed Sharpe ratio is annualized and if it's adjusted to the autocorrelation of returns (described in the paper by Lo, A. from the introduction).
 
 - Autocorrelation coefficient of returns.
 
-- Number of tests in multiple testing allowed (described in the first two papers from the introduction).
+- The number of tests in multiple testing allowed (described in the first two papers from the introduction).
 
 - Average correlation among strategy returns.
 
-Adjustement methods include:
+Adjustment methods include:
 
 - Bonferroni
 
 - Holm
 
-- Benjamini, Hochberg and Yekutieli (BHY)
+- Benjamini, Hochberg, and Yekutieli (BHY)
 
 - Average of the methods above
 
 
-Method returns np.array of adjusted p-values, adjusted Sharpe ratios and haircuts as rows. Elements in a row are ordered by adjustment methods in the following way [Bonferroni, Holm, BHY, Average].
+The method returns np.array of adjusted p-values, adjusted Sharpe ratios, and haircuts as rows. Elements in a row are ordered by adjustment methods in the following way [Bonferroni, Holm, BHY, Average].
 
 .. automodule:: mlfinlab.backtest_statistics.backtests
 
@@ -64,7 +64,7 @@ An example showing how Haircut Sharpe Ratios method is used can be seen below::
 
    from mlfinlab.backtests import CampbellBacktesting
 
-   # Specity the desired number of simulations
+   # Specify the desired number of simulations
    backtesting = CampbellBacktesting(4000)
 
    # In this example, annualized Sharpe ratio of 1, not adjusted to autocorrelation of returns at 0.1,
@@ -87,9 +87,9 @@ This algorithm calculates the Required Mean Return of a strategy at a given leve
 
 The method described below works only with characteristics of monthly returns that have no autocorrelation.
 
-The inputs of the method include the information about returns data. In particular:
+The inputs of the method includeinformation about returns data. In particular:
 
-- Number of tests in multiple testing allowed (described in the first two papers from the introduction).
+- The number of tests in multiple testing allowed (described in the first two papers from the introduction).
 
 - Number of monthly returns observed.
 
@@ -99,18 +99,18 @@ The inputs of the method include the information about returns data. In particul
 
 - Average correlation among strategy returns.
 
-Adjustement methods include:
+Adjustment methods include:
 
 - Bonferroni
 
 - Holm
 
-- Benjamini, Hochberg and Yekutieli (BHY)
+- Benjamini, Hochberg, and Yekutieli (BHY)
 
 - Average of the methods above
 
 
-Method returns np.array of minimum average monthly returns by method as elements. The order of the elements by method is [Bonferroni, Holm, BHY, Average].
+The method returns np.array of minimum average monthly returns by the method as elements. The order of the elements by method is [Bonferroni, Holm, BHY, Average].
 
 .. automodule:: mlfinlab.backtest_statistics.backtests
 
@@ -121,7 +121,7 @@ An example showing how Profit Hurdle method is used can be seen below::
 
    from mlfinlab.backtests import CampbellBacktesting
 
-   # Specity the desired number of simulations
+   # Specify the desired number of simulations
    backtesting = CampbellBacktesting(4000)
 
    # In this example, monthly observations of returns for two years (24 total observations),
@@ -139,7 +139,7 @@ An example showing how Profit Hurdle method is used can be seen below::
 Research Notebooks
 ============================================================
 
-The following research notebooks can be used to better understand how the algorithms within this module can be used on real data.
+The following research notebooks can be used to better understand how the algorithms within this module work and how they can be used on real data.
 
 * `Backtest Overfitting Notebook`_
 
