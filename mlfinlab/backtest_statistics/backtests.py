@@ -1,6 +1,4 @@
-"""
-Implements backtesting algorithms related to Sharpe ratio adjustments
-"""
+# pylint: disable=missing-module-docstring
 
 import numpy as np
 import scipy.stats as ss
@@ -22,6 +20,12 @@ class CampbellBacktesting:
     """
 
     def __init__(self, simulations=2000):
+        """
+        Set the desired number of simulations to make in Haircut Sharpe Ratios or Profit Hurdle algorithms.
+
+        :param simulations: (int) number of simulations
+        """
+
         self.simulations = simulations
 
     @staticmethod
@@ -457,12 +461,12 @@ class CampbellBacktesting:
     def profit_hurdle(self, num_mult_test, num_obs, alpha_sig, vol_anu, rho):
         # pylint: disable=too-many-locals
         '''
-        Calculates the Required returns due to testing multiplicity.
-
         Calculates the required mean return for a strategy at a given level of significance.
 
-        This function doesn't allow for any autocorrelation in the strategy returns.
+        This algorithm uses four adjustment methods - Bonferroni, Holm, BHY (Benjamini, Hochberg and Yekutieli)
+        and the Average to calculate the adjusted t-statistic and transform it into the required mean return.
 
+        This function doesn't allow for any autocorrelation in the strategy returns.
 
         :param num_mult_test: (int) Number of tests in multiple testing allowed (HLZ (2015) find at least 315 factors)
         :param num_obs: (int) Number of monthly observations for a strategy

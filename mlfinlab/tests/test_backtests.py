@@ -12,7 +12,7 @@ class TestCampbellBacktesting(unittest.TestCase):
     Tests functions of the CampbellBacktesting class.
     """
 
-    def test_haircut_sharpe_ratio_simple_input(self):
+    def test_haircut_sharpe_ratios_simple_input(self):
         """
         Test the calculation of haircuts with simple inputs
         """
@@ -95,8 +95,8 @@ class TestCampbellBacktesting(unittest.TestCase):
         self.assertEqual(tstat, 1.96)
 
         # If exceeding value is first
-        tstat = backtesting._bhy_method_returns(p_values_simulation_low, num_mult_test, alpha_sig)
-        self.assertEqual(tstat, 1.96)
+        tstat = round(backtesting._bhy_method_returns(p_values_simulation_low, num_mult_test, alpha_sig), 3)
+        self.assertEqual(tstat, 3.216)
 
     def test_parameter_calculation(self):
         """
