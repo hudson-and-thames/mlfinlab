@@ -53,8 +53,7 @@ class HierarchicalClusteringAssetAllocation:
                                         correlation,
                                         asset_returns,
                                         linkage,
-                                        num_reference_datasets=5,
-                                        max_number_of_clusters=10):
+                                        num_reference_datasets=5):
         """
         Find the optimal number of clusters for hierarchical clustering using the Gap statistic.
 
@@ -62,10 +61,10 @@ class HierarchicalClusteringAssetAllocation:
         :param asset_returns: (pd.DataFrame) historical asset returns
         :param linkage: (str) the type of linkage method to use for clustering
         :param num_reference_datasets: (int) the number of reference datasets to generate for calculating expected inertia
-        :param max_number_of_clusters: (int) the maximum number of clusters to check for finding the optimal value
         :return: (int) the optimal number of clusters
         """
 
+        max_number_of_clusters = min(10, asset_returns.shape[1])
         cluster_func = AgglomerativeClustering(affinity='precomputed', linkage=linkage)
         original_distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
         gap_values = []
@@ -94,7 +93,7 @@ class HierarchicalClusteringAssetAllocation:
             gap = expected_inertia - inertia
             gap_values.append(gap)
 
-        return np.argmax(gap_values)
+        return 1 + np.argmax(gap_values)
 
     @staticmethod
     def _tree_clustering(correlation, num_clusters, linkage):
