@@ -123,9 +123,9 @@ class MeanVarianceOptimisation:
 
         # Calculate the portfolio risk and return if it has not been calculated
         if self.portfolio_risk is None:
-            self.portfolio_risk = self.weights @ cov @ self.weights.T
+            self.portfolio_risk = np.dot(self.weights, np.dot(cov.values, self.weights.T))
         if self.portfolio_return is None:
-            self.portfolio_return = self.weights @ expected_asset_returns
+            self.portfolio_return = np.dot(self.weights, expected_asset_returns)
         self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))
 
         self.weights = pd.DataFrame(self.weights)

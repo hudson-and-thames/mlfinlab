@@ -19,6 +19,7 @@ import mlfinlab.feature_importance as feature_importance
 import mlfinlab.ensemble as ensemble
 import mlfinlab.portfolio_optimization as portfolio_optimization
 import mlfinlab.clustering as clustering
+import mlfinlab.backtest_statistics.statistics as backtest_statistics
 
 
 # Sponsorship notification
