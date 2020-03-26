@@ -1,10 +1,10 @@
-.. _implementations-backtest_overfitting:
+.. _implementations-backtesting:
 
 ============================================================
-Backtest Overfitting by Campbell R. Harvey and Yan Liu
+Backtesting by Campbell R. Harvey and Yan Liu
 ============================================================
 
-Backtest Overfitting module contains algorithms presented in the paper of Campbell R. Harvey and Yan Liu. These algorithms are focused on adjusting the reported Sharpe ratios to multiple testing and calculating the required mean return for a strategy at a given level of significance.
+Backtesting module contains algorithms presented in the paper of Campbell R. Harvey and Yan Liu. These algorithms are focused on adjusting the reported Sharpe ratios to multiple testing and calculating the required mean return for a strategy at a given level of significance.
 
 Introduction
 ============================================================
@@ -141,6 +141,6 @@ Research Notebooks
 
 The following research notebooks can be used to better understand how the algorithms within this module work and how they can be used on real data.
 
-* `Backtest Overfitting Notebook`_
+* `Backtesting Notebook`_
 
-.. _Backtest Overfitting: https://github.com/hudson-and-thames/research/blob/master/BacktestOverfitting/BacktestOverfitting.ipynb
+.. _Backtesting: https://github.com/hudson-and-thames/research/blob/master/Backtesting/Backtesting.ipynb
