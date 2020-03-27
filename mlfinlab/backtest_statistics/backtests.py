@@ -6,7 +6,7 @@ from scipy import linalg
 
 
 class CampbellBacktesting:
-    '''
+    """
     This class implements the Haircut Sharpe Ratios and Profit Hurdles algorithms described in the following paper:
     `Campbell R. Harvey and Yan Liu, Backtesting, (Fall 2015). Journal of Portfolio Management,
     2015 <https://papers.ssrn.com/abstract_id=2345489>`_; The code is based on the code provided by the authors of the paper.
@@ -17,20 +17,20 @@ class CampbellBacktesting:
 
     The Profit Hurdle algorithm lets the user calculate the required mean return for a strategy at a given level of
     significance, taking multiple testing into account.
-    '''
+    """
 
     def __init__(self, simulations=2000):
-        '''
+        """
         Set the desired number of simulations to make in Haircut Sharpe Ratios or Profit Hurdle algorithms.
 
         :param simulations: (int) number of simulations
-        '''
+        """
 
         self.simulations = simulations
 
     @staticmethod
     def _sample_random_multest(rho, n_trails, prob_zero_mean, lambd, n_simulations, annual_vol=0.15, n_obs=240):
-        '''
+        """
         Generates empirical p-value distributions.
 
         The algorithm is described in the paper and is based on the model estimated by `Harvey, C.R., Y. Liu,
@@ -54,7 +54,7 @@ class CampbellBacktesting:
                                    of zero and a standard deviation of ma = 15%
         :param n_obs: (int) Number of observations of used for volatility estimation from HLZ
         :return: (np.ndarray) array with distributions calculated
-        '''
+        """
 
         # Assumed level of monthly volatility = adjusted yearly volatility
         monthly_volatility = annual_vol / 12 ** (1 / 2)
@@ -90,7 +90,7 @@ class CampbellBacktesting:
 
     @staticmethod
     def _parameter_calculation(rho):
-        '''
+        """
         Estimates the parameters used to generate the distributions in _sample_random_multest - the HLZ model.
 
         Based on the work of HLZ, the pairwise correlation of returns is used to estimate the probability (prob_zero_mean),
@@ -99,7 +99,7 @@ class CampbellBacktesting:
 
         :param rho: (float) average correlation coefficient between strategy returns
         :return: (np.array) array of parameters
-        '''
+        """
         # Levels of parameters based on rho. [rho, n_simulations, prob_zero_mean, lambd]
         parameter_levels = np.array([[0, 1295, 3.9660 * 0.1, 5.4995 * 0.001],
                                      [0.2, 1377, 4.4589 * 0.1, 5.5508 * 0.001],
@@ -128,7 +128,7 @@ class CampbellBacktesting:
     @staticmethod
     def _annualized_sharpe_ratio(sharpe_ratio, sampling_frequency='A', rho=0, annualized=False,
                                  autocorr_adjusted=False):
-        '''
+        """
         Calculate the equivalent annualized Sharpe ratio after taking the autocorrelation of returns into account.
 
         Adjustments are based on the work of `Lo, A., The Statistics of Sharpe Ratios. Financial Analysts Journal,
@@ -141,7 +141,7 @@ class CampbellBacktesting:
         :param annualized: (bool) Flag if annualized, 'ind_an' = 1, otherwise = 0
         :param autocorr_adjusted: (bool) Flag if Sharpe ratio was adjusted for returns autocorrelation
         :return: (float) Adjusted annualized Sharpe ratio
-        '''
+        """
 
         # If not annualized, calculating the appropriate multiplier for the Sharpe ratio
         if sampling_frequency == 'D':
@@ -176,14 +176,14 @@ class CampbellBacktesting:
 
     @staticmethod
     def _monthly_observations(num_obs, sampling_frequency):
-        '''
+        """
         Calculates the number of monthly observations based on sampling frequency and number of observations.
 
         :param num_obs: (int) number of observations used for modelling
         :param sampling_frequency: (str) Sampling frequency of returns
                                    ['D','W','M','Q','A'] = [Daily, Weekly, Monthly, Quarterly, Annual]
         :return: (np.float64) number of monthly observations
-        '''
+        """
         # N - Number of monthly observations
         if sampling_frequency == 'D':
             monthly_obs = np.floor(num_obs * 12 / 360)
@@ -202,14 +202,14 @@ class CampbellBacktesting:
 
     @staticmethod
     def _holm_method_sharpe(all_p_values, num_mult_test, p_val):
-        '''
+        """
         Runs one cycle of the Holm method for the Haircut Shape ratio algorithm.
 
         :param all_p_values: (np.array) Sorted p-values to adjust
         :param num_mult_test: (int) Number of multiple tests allowed
         :param p_val: (float) Significance level p-value
         :return: (np.float64) P-value adjusted at a significant level
-        '''
+        """
         # Array for final p-values of the Holm method
         p_holm_values = np.array([])
         # Iterating through multiple tests
@@ -231,7 +231,7 @@ class CampbellBacktesting:
 
     @staticmethod
     def _bhy_method_sharpe(all_p_values, num_mult_test, p_val):
-        '''
+        """
         Runs one cycle of the BHY method for the Haircut Shape ratio algorithm.
 
         :param all_p_values: (np.array) Sorted p-values to adjust
@@ -239,7 +239,7 @@ class CampbellBacktesting:
         :param p_val: (float) Significance level p-value
         :param c_constant: (float) Constant used in BHY method
         :return: (np.float64) P-value adjusted at a significant level
-        '''
+        """
         # Array for final p-values of the BHY method
         p_bhy_values = np.array([])
 
@@ -267,14 +267,14 @@ class CampbellBacktesting:
 
     @staticmethod
     def _sharpe_ratio_haircut(p_val, monthly_obs, sr_annual):
-        '''
+        """
         Calculates the adjusted Sharpe ratio and the haircut based on the final p-value of the method.
 
         :param p_val: (float) Adjusted p-value of the method
         :param monthly_obs: (int) Number of monthly observations
         :param sr_annual: (float) Annualized Sharpe ratio to compare to
         :return: (np.array) Elements (Adjusted annual Sharpe ratio, Haircut percentage)
-        '''
+        """
         # Inverting to get z-score of the method
         z_score = ss.t.ppf(1 - p_val / 2, monthly_obs - 1)
 
@@ -288,14 +288,14 @@ class CampbellBacktesting:
 
     @staticmethod
     def _holm_method_returns(p_values_simulation, num_mult_test, alpha_sig):
-        '''
+        """
         Runs one cycle of the Holm method for the Profit Hurdle algorithm.
 
         :param p_values_simulation: (np.array) Sorted p-values to adjust
         :param num_mult_test: (int) Number of multiple tests allowed
         :param alpha_sig: (float) Significance level (e.g., 5%)
         :return: (np.float64) P-value adjusted at a significant level
-        '''
+        """
         # Array for adjusted significance levels
         sign_levels = np.zeros(num_mult_test)
 
@@ -320,14 +320,14 @@ class CampbellBacktesting:
 
     @staticmethod
     def _bhy_method_returns(p_values_simulation, num_mult_test, alpha_sig):
-        '''
+        """
         Runs one cycle of the BHY method for the Profit Hurdle algorithm.
 
         :param p_values_simulation: (np.array) Sorted p-values to adjust
         :param num_mult_test: (int) Number of multiple tests allowed
         :param alpha_sig: (float) Significance level (e.g., 5%)
         :return: (np.float64) P-value adjusted at a significant level
-        '''
+        """
         if num_mult_test <= 1:  # If only one multiple test
             tstat_b = 1.96
         else:
@@ -368,7 +368,7 @@ class CampbellBacktesting:
     def haircut_sharpe_ratios(self, sampling_frequency, num_obs, sharpe_ratio, annualized,
                               autocorr_adjusted, rho_a, num_mult_test, rho):
         # pylint: disable=too-many-locals
-        '''
+        """
         Calculates the adjusted Sharpe ratio due to testing multiplicity.
 
         This algorithm lets the user calculate Sharpe ratio adjustments and the corresponding haircuts based on
@@ -389,7 +389,7 @@ class CampbellBacktesting:
         :param rho: (float) Average correlation among returns of strategies tested
         :return: (np.ndarray) array with adjuted p-value, adjusted Sharpe ratio, and haircut as rows
                               for Bonferroni, Holm, BHY and average adjustment as columns
-        '''
+        """
         # Calculating the annual Sharpe ratio adjusted for the autocorrelation of returns
         sr_annual = self._annualized_sharpe_ratio(sharpe_ratio, sampling_frequency, rho_a, annualized,
                                                   autocorr_adjusted)
@@ -461,7 +461,7 @@ class CampbellBacktesting:
 
     def profit_hurdle(self, num_mult_test, num_obs, alpha_sig, vol_anu, rho):
         # pylint: disable=too-many-locals
-        '''
+        """
         Calculates the required mean monthly return for a strategy at a given level of significance.
 
         This algorithm uses four adjustment methods - Bonferroni, Holm, BHY (Benjamini, Hochberg and Yekutieli)
@@ -477,7 +477,7 @@ class CampbellBacktesting:
         :param rho: (float) Average correlation among returns of strategies tested
         :return: (np.ndarray) Minimum Average Monthly Returns for
                               [Independent tests, Bonferroni, Holm, BHY and Average for Multiple tests]
-        '''
+        """
         # Independent test t-statistic
         tstat_independent = ss.norm.ppf((1 - alpha_sig / 2), 0, 1)
 
