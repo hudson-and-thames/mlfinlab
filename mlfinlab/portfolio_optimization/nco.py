@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 from sklearn.covariance import LedoitWolf
 from sklearn.neighbors import KernelDensity
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_samples
 from scipy.optimize import minimize
 
 
@@ -256,3 +258,61 @@ class NCO:
         cov_denoised = self.corr_to_cov(corr, np.diag(cov) ** (1 / 2))
 
         return cov_denoised
+
+    @staticmethod
+    def cluster_kmeans_base(corr, max_num_clusters=None, n_init=10):
+        """
+        Finding the optimal partition of clusters using K-Means algorithm.
+
+        For the fit of K-Means algorithm a matrix of distances based on the correlation matrix is used.
+        The algorithm iterates through n_init - time K-Means can run with different seeds and
+        max_num_clusters - maximum number of clusters allowed.
+
+        The Silhouette Coefficient is used as a measure of how well samples are clustered
+        with samples that are similar to themselves.
+
+        :param corr: (np.array) Correlation matrix
+        :param max_num_clusters: (float) Maximum allowed number of clusters
+        :param n_init: (float) Number of time the k-means algorithm will be run with different centroid seeds
+        :return: (np.array, dict, pd.Series) Correlation matrix of clustered elements, dict with clusters,
+                                             Silhouette Coefficient series
+        """
+        # Distance matix from correlation matrix
+        dist_matrix = ((1 - corr.fillna(0)) / 2) ** (1 / 2)
+
+        # Series for Silhouette Coefficients - cluster fit measure
+        silh_coef_optimal = pd.Series()
+
+        # If maximum number of clusters undefined, it's equal to the half of the elements
+        if max_num_clusters is None:
+            max_num_clusters = corr.shape[0] / 2
+
+        # Iterating over the allowed iteration times for k-means
+        for init in range(n_init):
+            # Iterating through every number of clusters
+            for i in range(2, max_num_clusters + 1):
+                # Computing k-means clustering
+                kmeans = KMeans(n_clusters=i, n_jobs=1, n_init=init)
+                kmeans = kmeans.fit(dist_matrix)
+                # Computing a Silhouette Coefficient - cluster fit measure
+                silh_coef = silhouette_samples(dist_matrix, kmeans.labels_)
+                # Metrics to compare numbers of clusters
+                stat = (silh_coef.mean() / silh_coef.std(), silh_coef_optimal.mean() / silh_coef_optimal.std())
+                # If this is the first metric or better than the previous
+                # we set it as the optimal number of clusters
+                if np.isnan(stat[1]) or stat[0] > stat[1]:
+                    silh_coef_optimal = silh_coef
+                    kmeans_optimal = kmeans
+        # Sorting labels of clusters
+        new_index = np.argsort(kmeans_optimal.labels_)
+        # Reordering correlation matrix rows
+        corr = corr.iloc[new_index]
+        # Reordering correlation matrix columns
+        corr = corr.iloc[:, new_index]
+        # Preparing cluster members as dict
+        clusters = {i: corr.columns[np.where(kmeans_optimal.labels_ == i)[0]].tolist() for \
+                    i in np.unique(kmeans_optimal.labels_)}
+        # Silhouette Coefficient series
+        silh_coef_optimal = pd.Series(silh_coef_optimal, index=dist_matrix.index)
+
+        return corr, clusters, silh_coef_optimal
