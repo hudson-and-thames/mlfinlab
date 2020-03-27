@@ -58,21 +58,21 @@ class NCO:
                                        If not provided, the unique values of observations are used
         :return: (pd.Series) Series of log(density) of the eval_points
         """
-        if len(observations.shape) == 1:  # If the input vector is one-dimentrional, reshaping
+        if len(observations.shape) == 1:  # If the input vector is one-dimensional, reshaping
             observations = observations.reshape(-1, 1)
 
         # Estimating Kernel Density of the empirical distribution of eigenvalues
         kde = KernelDensity(kernel=kde_kernel, bandwidth=kde_bwidth).fit(observations)
 
-        # If no specific values provided, the fit KDE will be avalued on unique eigenvalues.
+        # If no specific values provided, the fit KDE will be valued on unique eigenvalues.
         if eval_points is None:
             eval_points = np.unique(observations).reshape(-1, 1)
 
-        # If the input vector is one-dimentrional, reshaping
+        # If the input vector is one-dimensional, reshaping
         if len(eval_points.shape) == 1:
             eval_points = eval_points.reshape(-1, 1)
 
-        # Evaluateing the log density model on the given values
+        # Evaluating the log density model on the given values
         log_prob = kde.score_samples(eval_points)
         # Preparing the output of log densities
         pdf = pd.Series(np.exp(log_prob), index=eval_points.flatten())
@@ -153,3 +153,106 @@ class NCO:
         maximum_eigen = var * (1 + (1 / tn_relation) ** (1 / 2)) ** 2
 
         return maximum_eigen, var
+
+    @staticmethod
+    def corr_to_cov(corr, std):
+        """
+        Recovers the covariance matrix from the de-noise correlation matrix.
+
+        :param corr: (np.array) Correlation matrix
+        :param std: (np.array) vector of standard deviations
+        :return: (np.array) Covariance matrix
+        """
+        cov = corr * np.outer(std, std)
+
+        return cov
+
+    @staticmethod
+    def cov_to_corr(cov):
+        """
+        Derives the correlation matrix from a covariance matrix.
+
+        :param cov: (np.array) Covariance matrix
+        :return: (np.array) Covariance matrix
+        """
+        # Calculating standard deviations of the elements
+        std = np.sqrt(np.diag(cov))
+        # Transforming to correlation matrix
+        corr = cov / np.outer(std, std)
+        # Making sure correlation coefficients are in (-1, 1) range
+        corr[corr < -1], corr[corr > 1] = -1, 1
+
+        return corr
+
+    @staticmethod
+    def get_pca(hermit_matrix):
+        """
+        Calculates eigenvalues and eigenvectors from a Hermitian matrix.
+
+        Eigenvalues in the output are on the main diagonal of a matrix.
+
+        :param hermit_matrix: (np.array) Hermitian matrix
+        :return: (np.array, np.array) Eigenvalues matrix, eigenvectors array
+        """
+        # Calculating eigenvalues and eigenvectors
+        eigenvalues, eigenvectors = np.linalg.eigh(hermit_matrix)
+        # Index to sort eigenvalues in descending order
+        indices = eigenvalues.argsort()[::-1]
+        # Sorting
+        eigenvalues = eigenvalues[indices]
+        eigenvectors = eigenvectors[:, indices]
+        # Outputting eigenvalues on the main diagonal of a matrix
+        eigenvalues = np.diagflat(eigenvalues)
+        return eigenvalues, eigenvectors
+
+    def denoised_corr(self, eigenvalues, eigenvectors, num_facts):
+        """
+        Shrinks the eigenvalues associated with noise, and returns a de-noised correlation matrix
+
+        Noise is removed from correlation matrix by fixing random eigenvalues.
+
+        :param eigenvalues: (np.array) Matrix with eigenvalues on the main diagonal
+        :param eigenvectors: (float) Eigenvectors array
+        :param num_facts: (float) Threshold for eigenvalues to be fixed
+        :return: (np.array) De-noised correlation matrix
+        """
+        # Vector of eigenvalues from main diagonal of a matrix
+        eigenval_vec = np.diag(eigenvalues).copy()
+        # Replacing eigenvalues after num_facts to their average value
+        eigenval_vec[num_facts:] = eigenval_vec[num_facts:].sum() / float(eigenval_vec.shape[0] - num_facts)
+        # Back to eigenvalues on main diagonal of a matrix
+        eigenvalues = np.diag(eigenval_vec)
+        # De-noised covariance matrix
+        cov = np.dot(eigenvectors, eigenvalues).dot(eigenvectors.T)
+        # Ne-noised correlation matrix
+        corr = self.cov_to_corr(cov)
+
+        return corr
+
+    def de_noise_cov(self, cov, tn_relation, kde_bwidth):
+        """
+        Computes a denoised covariation matrix from a given covariation matrix.
+
+        As a threshold for the denoising the correlation matrix, the maximum eigenvalue
+        that fits the theoretical distribution is used.
+
+        :param cov: (np.array) Covariance matrix
+        :param tn_relation: (float) Relation of sample length T to the number of variables N
+        :param kde_bwidth: (float) The bandwidth of the kernel
+        :return: (np.array) Maximum random eigenvalue, optimal variation of the Marcenko-Pastur distribution
+        """
+        # Correlation matrix computation
+        corr = self.cov_to_corr(cov)
+        # Calculating eigenvalues and eigenvectors
+        eigenval, eigenvec = self.get_pca(corr)
+        # Calculating the maximum eigenvalue to fit the theoretical distribution
+        maximum_eigen, _ = self.find_max_eval(np.diag(eigenval), tn_relation, kde_bwidth)
+        # Calculating the threshold of eigenvalues that fit theoretical distribution
+        # from our set of eigenvalues
+        num_facts = eigenval.shape[0] - np.diag(eigenval)[::-1].searchsorted(maximum_eigen)
+        # Based on the threshold, de-noising the correlation matrix
+        corr = self.denoised_corr(eigenval, eigenvec, num_facts)
+        # Calculating the covariance matrix
+        cov_denoised = self.corr_to_cov(corr, np.diag(cov) ** (1 / 2))
+
+        return cov_denoised
