@@ -23,7 +23,7 @@ class CampbellBacktesting:
         """
         Set the desired number of simulations to make in Haircut Sharpe Ratios or Profit Hurdle algorithms.
 
-        :param simulations: (int) number of simulations
+        :param simulations: (int) Number of simulations
         """
 
         self.simulations = simulations
@@ -53,7 +53,7 @@ class CampbellBacktesting:
         :param annual_vol: (float) HLZ assume that the innovations in returns follow a normal distribution with a mean
                                    of zero and a standard deviation of ma = 15%
         :param n_obs: (int) Number of observations of used for volatility estimation from HLZ
-        :return: (np.ndarray) array with distributions calculated
+        :return: (np.ndarray) Array with distributions calculated
         """
 
         # Assumed level of monthly volatility = adjusted yearly volatility
@@ -97,8 +97,8 @@ class CampbellBacktesting:
         total number of trials (n_simulations) and (lambd) - parameter of the exponential distribution. Levels and
         parameters taken from the HLZ research.
 
-        :param rho: (float) average correlation coefficient between strategy returns
-        :return: (np.array) array of parameters
+        :param rho: (float) Average correlation coefficient between strategy returns
+        :return: (np.array) Array of parameters
         """
         # Levels of parameters based on rho. [rho, n_simulations, prob_zero_mean, lambd]
         parameter_levels = np.array([[0, 1295, 3.9660 * 0.1, 5.4995 * 0.001],
@@ -179,10 +179,10 @@ class CampbellBacktesting:
         """
         Calculates the number of monthly observations based on sampling frequency and number of observations.
 
-        :param num_obs: (int) number of observations used for modelling
+        :param num_obs: (int) Number of observations used for modelling
         :param sampling_frequency: (str) Sampling frequency of returns
                                    ['D','W','M','Q','A'] = [Daily, Weekly, Monthly, Quarterly, Annual]
-        :return: (np.float64) number of monthly observations
+        :return: (np.float64) Number of monthly observations
         """
         # N - Number of monthly observations
         if sampling_frequency == 'D':
@@ -387,7 +387,7 @@ class CampbellBacktesting:
                               wasn't corrected)
         :param num_mult_test: (int) Number of other strategies tested (multiple tests)
         :param rho: (float) Average correlation among returns of strategies tested
-        :return: (np.ndarray) array with adjuted p-value, adjusted Sharpe ratio, and haircut as rows
+        :return: (np.ndarray) Array with adjuted p-value, adjusted Sharpe ratio, and haircut as rows
                               for Bonferroni, Holm, BHY and average adjustment as columns
         """
         # Calculating the annual Sharpe ratio adjusted for the autocorrelation of returns
