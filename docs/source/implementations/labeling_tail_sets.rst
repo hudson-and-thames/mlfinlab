@@ -37,7 +37,7 @@ The formula for the volatility-adjusted returns are as follows:
     :math:`r(t - t', t) = \frac{R(t-t',t)}{vol(t)}`
 
 Where :math:`R(t-t',t)` is the return for the asset, in our case we make use of daily (single period) returns, and
-:math:`vol(t-1)` us a measure for volatility on daily returns. We provide two implementations for estimations of
+:math:`vol(t-1)` is a measure for volatility on daily returns. We provide two implementations for estimations of
 volatility, first the exponential moving average of the mean absolute returns, and second the traditional standard
 deviation. (The paper suggests a 180 day window period.)
 
