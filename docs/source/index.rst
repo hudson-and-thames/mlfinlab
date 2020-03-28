@@ -120,7 +120,8 @@ Implementations
    implementations/feature_importance
    implementations/filters
    implementations/frac_diff
-   implementations/labeling
+   implementations/tb_meta_labeling
+   implementations/labeling_tail_sets
    implementations/microstructural_features
    implementations/clustering
    implementations/portfolio_optimisation
@@ -137,7 +138,8 @@ Implementations
 * :doc:`implementations/feature_importance`
 * :doc:`implementations/filters`
 * :doc:`implementations/frac_diff`
-* :doc:`implementations/labeling`
+* :doc:`implementations/tb_meta_labeling`
+* :doc:`implementations/labeling_tail_sets`
 * :doc:`implementations/microstructural_features`
 * :doc:`implementations/clustering`
 * :doc:`implementations/portfolio_optimisation`
