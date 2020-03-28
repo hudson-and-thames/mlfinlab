@@ -106,9 +106,6 @@ Implementation
         .. automethod:: __init__
 
 
-
-
-
 Research Notebooks
 ==================
 
@@ -116,21 +113,4 @@ The following research notebooks can be used to better understand the tail set l
 
 * `Tail Set Labels Example`_
 
-.. _Trend Follow Question: https://github.com/hudson-and-thames/research/blob/master/Chapter3/2019-03-06_JJ_Trend-Follow-Question.ipynb
-.. _Bollinger Band Question: https://github.com/hudson-and-thames/research/blob/master/Chapter3/2019-03-09_AS_BBand-Question.ipynb
-
-Meta-Labeling
-~~~~~~~~~~~~~~
-
-* `Meta Labeling MNIST`_
-
-.. _Meta Labeling MNIST: https://github.com/hudson-and-thames/research/blob/master/Chapter3/2019-03-06_JJ_Meta-Labels-MNIST.ipynb
-
-
-
-
-
-
-
-
-
+.. _`Tail Set Labels Example`: https://github.com/hudson-and-thames/research/blob/master/labels_tail_sets/tail_set_labels_example.ipynb
