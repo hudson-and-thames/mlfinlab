@@ -32,7 +32,6 @@ The ONC algorithm workflow
    :scale: 100 %
    :align: center 
 
-where  rho i,j is the correlation returns between strategies i and j
 
 4. calculating the Euclidean distance matrix of the proper distance matrix:
 
@@ -41,7 +40,6 @@ where  rho i,j is the correlation returns between strategies i and j
    :scale: 100 %
    :align: center 
  
- where D is the the direct proper distance number of rho
 
 5. The algorithm then will do the clustering of our distance matrix through K-means algorithm
 
@@ -54,7 +52,6 @@ where  rho i,j is the correlation returns between strategies i and j
    :scale: 100 %
    :align: center 
  
-where ai is the average distance between i and all other nodes in the same cluster, and bi is the smallest average distance between i and all the nodes in any other cluster
 
 8. Then the measure of quality q for each clustering is calculated as follows:
 
