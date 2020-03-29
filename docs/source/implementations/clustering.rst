@@ -26,6 +26,7 @@ The ONC algorithm workflow
 2. The process will take two steps of creating distance numbers:
     
    calculating the proper distance matrix:
+   
 .. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/proper_distance_matrix_formula.PNG
    :scale: 100 %
    :align: center 
