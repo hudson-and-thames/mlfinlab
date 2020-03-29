@@ -219,7 +219,7 @@ class TestFeatureImportance(unittest.TestCase):
         """
 
         sb_clf, cv_gen = self._prepare_clf_data_set(oob_score=True)
-        oos_score = ml_cross_val_score(sb_clf, self.X_train, self.y_train_clf, cv_gen=cv_gen, sample_weight_test=None,
+        oos_score = ml_cross_val_score(sb_clf, self.X_train, self.y_train_clf, cv_gen=cv_gen, sample_weight_score=None,
                                        scoring=accuracy_score).mean()
 
         sb_clf.fit(self.X_train, self.y_train_clf)
