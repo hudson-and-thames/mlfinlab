@@ -97,7 +97,7 @@ The result of this algorithm is a tupple that contains:
 2. Optimized Clusters
 3. Silhouette Scores
 
-Correlation Matrix show the matrix that are sorted by their relevance. Optimized Clustres show the optimal number of clustres and each of the culsters' contents.
+Correlation Matrix show the matrix that are sorted by their relevance. Optimized Clusters show the optimal number of clustres and each of the culsters' contents.
 
 ::
 
