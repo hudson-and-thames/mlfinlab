@@ -30,7 +30,7 @@ The ONC algorithm workflow
    :scale: 100 %
    :align: center 
 
-where  rho i,j is the correlation returns between strategies i and j
+   where  rho i,j is the correlation returns between strategies i and j
 
 calculating the Euclidean distance matrix of the proper distance matrix:
 
@@ -38,21 +38,21 @@ calculating the Euclidean distance matrix of the proper distance matrix:
    :scale: 100 %
    :align: center 
  
-where D is the the direct proper distance number of rho
+   where D is the the direct proper distance number of rho
 
 3. The algorithm then will do the clustering of our distance matrix through K-means algorithm
 
 4. Silhouette scores will be calculated from the distance numbers
    
-the formula to find the Silhouette score is as follows:
+   the formula to find the Silhouette score is as follows:
 	
 .. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/silhouette_score_formula.PNG
    :scale: 100 %
    :align: center 
  
 
-where ai is the average distance between i and all other nodes in the same cluster, 
-and bi is the smallest average distance between i and all the nodes in any other cluster
+   where ai is the average distance between i and all other nodes in the same cluster, 
+   and bi is the smallest average distance between i and all the nodes in any other cluster
 
 5. Then the measure of quality q for each clustering is calculated as follows:
 
@@ -61,20 +61,19 @@ and bi is the smallest average distance between i and all the nodes in any other
    :align: center 
  
 
-6. Step 3 is done in a for.. loop manner in which the first loop clusters an initialization that is evaluated by the quality of each clustering
+6. Step 3 is done in a for.. loop manner in which the first loop clusters an initialization that is evaluated by the quality of    each clustering
 
 7. The second loop repeats the first loop multiple times until it results in different initializations
 
 8. Then the module chooses the clustering with the highest quality measure, the process is known as the base clustering
 
-9. Further clustering is done in the next step in order for the module to evaluate the quality of each cluster k=1,...,K 
-   given the clustering and silhouette scores obtained from the base clustering algorithm
+9. Further clustering is done in the next step in order for the module to evaluate the quality of each cluster k=1,...,K given the clustering and silhouette scores obtained from the base clustering algorithm
 
 10. We then take the average quality value and find the set of clusters with below average quality
 
 11. The number of clusters in the set,K1 < K,  then are tested by the conditions of:
     - If the number of clusters to rerun is K1 <= 2, then we return the clustering that is given by the base algorithm
-    - If K1 > 2 then we rerun the clustering of the items in those K1 clusters, while the rest are considered as acceptably      clustered
+    - If K1 > 2 then we rerun the clustering of the items in those K1 clusters, while the rest are considered as acceptably   clustered
 
 12. The process will possibly return a new optimal clustering for the nodes
 
