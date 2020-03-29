@@ -21,11 +21,11 @@ The ONC algorithm workflow
 ==========================
 
 
-1. The module will initially transform the correlated numbers of investment strategies into correlated distance numbers
+1. The module initially transforms the correlated numbers of investment strategies into correlated distance numbers
 
-2. The process will take two steps of creating distance numbers
+2. The process takes two steps of creating distance numbers
     
-3. calculating the proper distance matrix:
+3. Calculating the proper distance matrix:
    
    
 .. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/proper_distance_matrix_formula.PNG
@@ -33,7 +33,7 @@ The ONC algorithm workflow
    :align: center 
 
 
-4. calculating the Euclidean distance matrix of the proper distance matrix:
+4. Calculating the Euclidean distance matrix of the proper distance matrix:
 
 
 .. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/Euclidean_distance_formula.PNG
@@ -41,9 +41,9 @@ The ONC algorithm workflow
    :align: center 
  
 
-5. The algorithm then will do the clustering of our distance matrix through K-means algorithm
+5. The algorithm then does the clustering of our distance matrix through K-means algorithm
 
-6. Silhouette scores will be calculated from the distance numbers
+6. Silhouette scores are calculated from the distance numbers
    
 7. the formula to find the Silhouette score is as follows:
 	
@@ -75,11 +75,11 @@ The ONC algorithm workflow
     - If the number of clusters to rerun is K1 <= 2, then we return the clustering that is given by the base algorithm
     - If K1 > 2 then we rerun the clustering of the items in those K1 clusters, while the rest are considered as acceptably   clustered
 
-15. The process will possibly return a new optimal clustering for the nodes
+15. The process possibly returns a new optimal clustering for the nodes
 
-16. The system will check whether the average quality of the clusters improve
+16. The system checks whether the average quality of the clusters improve
 
-17. The module will return the latest clustering that is concatenated to base clustering
+17. The module returns the latest clustering that is concatenated to base clustering
 
 18. Otherwise we return the clustering formed by the base algorithm
 
