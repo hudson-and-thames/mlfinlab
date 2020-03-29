@@ -61,7 +61,7 @@ The ONC algorithm workflow
    :align: center 
  
 
-9. Step 3 is done in a for.. loop manner in which the first loop clusters an initialization that is evaluated by the quality of    each clustering
+9. Step 5 is done in a for.. loop manner in which the first loop clusters an initialization that is evaluated by the quality of    each clustering
 
 10. The second loop repeats the first loop multiple times until it results in different initializations
 
