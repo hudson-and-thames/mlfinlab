@@ -89,8 +89,7 @@ Example
 
 Optimal Number of Clusters (ONC)
 
-Optimal Number of Clusters algorithm detects optimal number of K-Means clusters using feature correlation matrix and silhouette scores.
-This implementation is based on 'Detection of False Investment Strategies using Unsupervised Learning Methods' https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3167017
+ONC is an algorithm that will partition N series of correlations into an optimal number of clusters.
 
 The result of this algorithm is a tupple that contains:
 
