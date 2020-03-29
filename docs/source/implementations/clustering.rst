@@ -27,6 +27,7 @@ The ONC algorithm workflow
     
    calculating the proper distance matrix:
    
+   
 .. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/proper_distance_matrix_formula.PNG
    :scale: 100 %
    :align: center 
@@ -34,6 +35,7 @@ The ONC algorithm workflow
    where  rho i,j is the correlation returns between strategies i and j
 
    calculating the Euclidean distance matrix of the proper distance matrix:
+
 
 .. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/Euclidean_distance_formula.PNG
    :scale: 100 %
@@ -47,6 +49,7 @@ The ONC algorithm workflow
    
    the formula to find the Silhouette score is as follows:
 	
+	
 .. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/silhouette_score_formula.PNG
    :scale: 100 %
    :align: center 
@@ -56,6 +59,7 @@ The ONC algorithm workflow
    and bi is the smallest average distance between i and all the nodes in any other cluster
 
 5. Then the measure of quality q for each clustering is calculated as follows:
+
 
 .. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/quality_distance_formula.PNG
    :scale: 100 %
