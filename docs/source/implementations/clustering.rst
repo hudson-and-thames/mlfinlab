@@ -33,7 +33,7 @@ The ONC algorithm workflow
 
    where  rho i,j is the correlation returns between strategies i and j
 
-calculating the Euclidean distance matrix of the proper distance matrix:
+   calculating the Euclidean distance matrix of the proper distance matrix:
 
 .. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/Euclidean_distance_formula.PNG
    :scale: 100 %
