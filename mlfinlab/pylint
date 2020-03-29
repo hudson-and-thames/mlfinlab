@@ -1,0 +1,2 @@
+#!/bin/bash
+pylint mlfinlab --rcfile=.pylintrc -f text
