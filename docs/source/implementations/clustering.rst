@@ -95,9 +95,9 @@ This implementation is based on 'Detection of False Investment Strategies using 
 
 The result of this algorithm is a tupple that contains:
 
-    -Correlation Matrix
-    -Optimized Clusters
-    -Silhouette Scores
+-Correlation Matrix
+-Optimized Clusters
+-Silhouette Scores
 
 Correlation Matrix show the matrix that are sorted by their relevance. Optimized Clustres show the optimal number of clustres and each of the culsters' contents.
 
