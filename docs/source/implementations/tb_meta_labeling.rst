@@ -1,15 +1,23 @@
-.. _implementations-labeling:
+.. _implementations-tb_meta_labeling:
 
-========
-Labeling
-========
+==========================================
+Labeling: Triple-Barrier and Meta
+==========================================
 
-The primary labeling method used in financial academia is the fixed-time horizon method. While ubiquitous, this method has many faults which are remedied by the triple-barrier method discussed below. The triple-barrier method can be extended to incorporate meta-labeling which will also be demonstrated and discussed below.
+The primary labeling method used in financial academia is the fixed-time horizon method. While ubiquitous, this method
+has many faults which are remedied by the triple-barrier method discussed below. The triple-barrier method can be
+extended to incorporate meta-labeling which will also be demonstrated and discussed below.
 
 Triple-Barrier Method
 =====================
 
-The idea behind the triple-barrier method is that we have three barriers: an upper barrier, a lower barrier, and a vertical barrier. The upper barrier represents the threshold an observation's return needs to reach in order to be considered a buying opportunty (a label of 1), the lower barrier represents the threshold an observation's return needs to reach in order to be considered a selling opportunity (a label of -1), and the vertical barrier represents the amount of time an observation has to reach its given return in either direction before it is given a label of 0. This concept can be better understood visually and is shown in the figure below taken from Advances in Financial Machine Learning (`reference`_):
+The idea behind the triple-barrier method is that we have three barriers: an upper barrier, a lower barrier, and a
+vertical barrier. The upper barrier represents the threshold an observation's return needs to reach in order to be
+considered a buying opportunty (a label of 1), the lower barrier represents the threshold an observation's return needs
+to reach in order to be considered a selling opportunity (a label of -1), and the vertical barrier represents the amount
+of time an observation has to reach its given return in either direction before it is given a label of 0. This concept
+can be better understood visually and is shown in the figure below taken from Advances in Financial Machine
+Learning (`reference`_):
 
 .. image:: labeling_images/triple_barrier.png
    :scale: 100 %
