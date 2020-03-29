@@ -23,9 +23,9 @@ The ONC algorithm workflow
 
 1. The module will initially transform the correlated numbers of investment strategies into correlated distance numbers
 
-2. The process will take two steps of creating distance numbers:
+2. The process will take two steps of creating distance numbers
     
-   calculating the proper distance matrix:
+3. calculating the proper distance matrix:
    
    
 .. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/proper_distance_matrix_formula.PNG
@@ -34,7 +34,7 @@ The ONC algorithm workflow
 
    where  rho i,j is the correlation returns between strategies i and j
 
-   calculating the Euclidean distance matrix of the proper distance matrix:
+4. calculating the Euclidean distance matrix of the proper distance matrix:
 
 
 .. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/Euclidean_distance_formula.PNG
@@ -43,11 +43,11 @@ The ONC algorithm workflow
  
    where D is the the direct proper distance number of rho
 
-3. The algorithm then will do the clustering of our distance matrix through K-means algorithm
+5. The algorithm then will do the clustering of our distance matrix through K-means algorithm
 
-4. Silhouette scores will be calculated from the distance numbers
+6. Silhouette scores will be calculated from the distance numbers
    
-   the formula to find the Silhouette score is as follows:
+7. the formula to find the Silhouette score is as follows:
 	
 	
 .. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/silhouette_score_formula.PNG
@@ -58,7 +58,7 @@ The ONC algorithm workflow
    where ai is the average distance between i and all other nodes in the same cluster, 
    and bi is the smallest average distance between i and all the nodes in any other cluster
 
-5. Then the measure of quality q for each clustering is calculated as follows:
+8. Then the measure of quality q for each clustering is calculated as follows:
 
 
 .. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/quality_distance_formula.PNG
@@ -66,27 +66,27 @@ The ONC algorithm workflow
    :align: center 
  
 
-6. Step 3 is done in a for.. loop manner in which the first loop clusters an initialization that is evaluated by the quality of    each clustering
+9. Step 3 is done in a for.. loop manner in which the first loop clusters an initialization that is evaluated by the quality of    each clustering
 
-7. The second loop repeats the first loop multiple times until it results in different initializations
+10. The second loop repeats the first loop multiple times until it results in different initializations
 
-8. Then the module chooses the clustering with the highest quality measure, the process is known as the base clustering
+11. Then the module chooses the clustering with the highest quality measure, the process is known as the base clustering
 
-9. Further clustering is done in the next step in order for the module to evaluate the quality of each cluster k=1,...,K given the clustering and silhouette scores obtained from the base clustering algorithm
+12. Further clustering is done in the next step in order for the module to evaluate the quality of each cluster k=1,...,K given the clustering and silhouette scores obtained from the base clustering algorithm
 
-10. We then take the average quality value and find the set of clusters with below average quality
+13. We then take the average quality value and find the set of clusters with below average quality
 
-11. The number of clusters in the set,K1 < K,  then are tested by the conditions of:
+14. The number of clusters in the set,K1 < K,  then are tested by the conditions of:
     - If the number of clusters to rerun is K1 <= 2, then we return the clustering that is given by the base algorithm
     - If K1 > 2 then we rerun the clustering of the items in those K1 clusters, while the rest are considered as acceptably   clustered
 
-12. The process will possibly return a new optimal clustering for the nodes
+15. The process will possibly return a new optimal clustering for the nodes
 
-13. The system will check whether the average quality of the clusters improve
+16. The system will check whether the average quality of the clusters improve
 
-14. The module will return the latest clustering that is concatenated to base clustering
+17. The module will return the latest clustering that is concatenated to base clustering
 
-15. Otherwise we return the clustering formed by the base algorithm
+18. Otherwise we return the clustering formed by the base algorithm
 
 
 Example
