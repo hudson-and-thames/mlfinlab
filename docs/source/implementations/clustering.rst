@@ -26,7 +26,7 @@ The ONC algorithm workflow
 2. The process will take two steps of creating distance numbers:
     
    calculating the proper distance matrix:
-.. image:: mlfinlab/docs/source/implementations/labeling_images/proper_distance_matrix_formula.png
+.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/proper_distance_matrix_formula.PNG
    :scale: 100 %
    :align: center 
 
@@ -34,7 +34,7 @@ where  rho i,j is the correlation returns between strategies i and j
 
 calculating the Euclidean distance matrix of the proper distance matrix:
 
-.. image:: mlfinlab/docs/source/implementations/labeling_images/Euclidean_distance_formula.png
+.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/Euclidean_distance_formula.PNG
    :scale: 100 %
    :align: center 
  
@@ -46,7 +46,7 @@ where D is the the direct proper distance number of rho
    
 the formula to find the Silhouette score is as follows:
 	
-.. image:: mlfinlab/docs/source/implementations/labeling_images/silhouette_score_formula.png
+.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/silhouette_score_formula.PNG
    :scale: 100 %
    :align: center 
  
@@ -56,7 +56,7 @@ and bi is the smallest average distance between i and all the nodes in any other
 
 5. Then the measure of quality q for each clustering is calculated as follows:
 
-.. image:: mlfinlab/docs/source/implementations/labeling_images/quality_distance_formula.png
+.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/labeling_images/quality_distance_formula.PNG
    :scale: 100 %
    :align: center 
  
