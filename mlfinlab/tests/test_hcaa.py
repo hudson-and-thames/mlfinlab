@@ -169,6 +169,7 @@ class TestHCAA(unittest.TestCase):
 
         hcaa = HierarchicalClusteringAssetAllocation()
         hcaa.allocate(asset_prices=self.data,
+                      linkage='single',
                       optimal_num_clusters=5,
                       asset_names=self.data.columns)
         assert hcaa.ordered_indices == [13, 9, 10, 8, 14, 7, 1, 6, 4, 16, 3, 17,

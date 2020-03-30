@@ -242,14 +242,14 @@ class TestMicrostructuralFeatures(unittest.TestCase):
         gen_csv.get_features(to_csv=True, output_path='features.csv')
         features_from_csv = pd.read_csv('features.csv', parse_dates=[0])
 
-        self.assertTrue((features.values == features_1.values).all())
-        self.assertTrue((features.values == features_20.values).all())
-        self.assertTrue((features.values == features_from_df.values).all())
+        self.assertTrue((features.dropna().values == features_1.dropna().values).all())
+        self.assertTrue((features.dropna().values == features_20.dropna().values).all())
+        self.assertTrue((features.dropna().values == features_from_df.dropna().values).all())
 
         features.set_index('date_time', inplace=True)
         features_from_csv.set_index('date_time', inplace=True)
 
-        self.assertAlmostEqual((features - features_from_csv).sum().sum(), 0, delta=1e-12)
+        self.assertAlmostEqual((features - features_from_csv).sum().sum(), 0, delta=1e-6)
 
         self.assertEqual(bar_index.shape[0], features.shape[0])
         self.assertEqual(compressed_bars.loc[features.index].shape[0], compressed_bars.shape[0])
