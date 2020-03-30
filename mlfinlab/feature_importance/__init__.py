@@ -4,9 +4,8 @@ from the Journal of Financial Data Science.
 """
 
 from mlfinlab.feature_importance.importance import (mean_decrease_impurity, mean_decrease_accuracy,
-                                                    single_feature_importance, plot_feature_importance)
+                                                    single_feature_importance,clustered_feature_importance,
+                                                    plot_feature_importance)
 from mlfinlab.feature_importance.orthogonal import (feature_pca_analysis, get_pca_rank_weighted_kendall_tau,
                                                     get_orthogonal_features)
 from mlfinlab.feature_importance.fingerpint import RegressionModelFingerprint, ClassificationModelFingerprint
-
-from mlfinlab.feature_importance.cfi import clustered_feature_importance
