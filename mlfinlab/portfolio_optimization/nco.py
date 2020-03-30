@@ -101,6 +101,10 @@ class NCO:
         :return: (pd.Series) Series of pdf values
         """
 
+        # Changing the type as scipy.optimize.minimize outputs np.array
+        if not isinstance(var, float):
+            var = float(var)
+
         # Minimum and maximum expected eigenvalues
         eigen_min = var * (1 - (1 / tn_relation) ** (1 / 2)) ** 2
         eigen_max = var * (1 + (1 / tn_relation) ** (1 / 2)) ** 2
@@ -151,8 +155,8 @@ class NCO:
         """
 
         # Searching for the variation of Marcenko-Pastur distribution for the best fit with empirical distribution
-        optimization = minimize(lambda *x: self.pdf_fit(*x), x0=np.array(0.5), args=(eigen_observations, tn_relation, kde_bwidth),
-                                bounds=((1E-5, 1 - 1E-5),))
+        optimization = minimize(self.pdf_fit, x0=np.array(0.5), args=(eigen_observations, tn_relation, kde_bwidth),
+                                bounds=((1e-5, 1 - 1e-5),))
 
         if optimization['success']:  # If optimal variation found
             var = optimization['x'][0]
