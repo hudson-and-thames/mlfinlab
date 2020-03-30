@@ -1,8 +1,8 @@
 .. _implementations-portfolio_optimisation:
 
-========
+======================
 Portfolio Optimisation
-========
+======================
 
 The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies. Each
 algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
@@ -27,7 +27,12 @@ Marcos Lopez de Prado. The working of the algorithm can be broken down into 3 st
 
 Although, it is a simple algorithm, HRP has been found to be very stable as compared to its older counterparts.
 This is because, HRP does not involve taking inverse of the covariance matrix matrix which makes it robust to small changes
-in the covariances of the asset returns. For a detailed explanation of how HRP works, we have written an excellent `blog post <https://hudsonthames.org/an-introduction-to-the-hierarchical-risk-parity-algorithm/>`_ about it.
+in the covariances of the asset returns.
+
+.. note::
+    * For a detailed explanation of how HRP works, we have written an excellent `blog post <https://hudsonthames.org/an-introduction-to-the-hierarchical-risk-parity-algorithm/>`_ about it.
+    * HRP uses the single-linkage clustering algorithm. (See the tip under the HCAA algorithm for more details.)
+
 
 Implementation
 ~~~~~~~~~~~~~~
@@ -70,7 +75,38 @@ Implementation
 
         .. automethod:: __init__
 
+.. tip::
+    **What are the differences between the 3 Linkage Algorithms?**
 
+    The following is taken directly from and we highly recommend you read:
+
+    `Papenbrock, J., 2011. Asset Clusters and Asset Networks in Financial Risk Management and Portfolio Optimization (Doctoral
+    dissertation, Karlsruher Institut für Technologie (KIT)). <https://d-nb.info/1108447864/34>`_
+
+    **1. Single-Linkage**
+
+    The idea behind single-linkage is to form groups of elements, which have the smallest distance to each other (nearest
+    neighbouring clustering). This oftentimes leads to large groups/chaining.
+
+    The single-link algorithm oftentimes forms clusters that are chained together and leaves large clusters. It can probably
+    be best understood as a way to give a "more robust" estimation of the distance matrix and furthermore preserves the original
+    structure as much as possible. Elements departing early from the tree can be interpreted as "different" from the overall dataset.
+    In terms of application, the single-link clustering algorithm is very useful to gain insights in the correlation structure
+    between assets and separates assets that were very different from the rest. If this separation is preferred and high weights
+    should be put on "outliers" the single link certainly is a good choice.
+
+    **2. Complete-Linkage**
+
+    The complete-linkage algorithm tries to avoid those large groups by considering the largest distances between elements.
+    It is thus called the farthest neighbour clustering.
+
+    The complete-link algorithm has a different idea: elements should be grouped together in a way that they are not too
+    different from each other when merged in a cluster. It thus has a much stronger definition of "similar pair of clusters".
+    The complete-link algorithm therefore seems suitable for investors interested in grouping stocks that are similar in one cluster.
+
+    **3. Average-Linkage**
+
+    The average-linkage algorithm is a compromise between the single-linkage and complete-linkage algorithm.
 
 
 The Critical Line Algorithm (CLA)
