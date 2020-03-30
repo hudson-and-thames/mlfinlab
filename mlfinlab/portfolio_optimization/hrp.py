@@ -1,24 +1,27 @@
-'''
-This module implements the HRP algorithm mentioned in the following paper:
-`López de Prado, Marcos, Building Diversified Portfolios that Outperform Out-of-Sample (May 23, 2016).
-Journal of Portfolio Management, 2016 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_;
-The code is reproduced with modification from his book: Advances in Financial Machine Learning, Chp-16
-'''
-
+# pylint: disable=missing-module-docstring
 import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 from sklearn.covariance import OAS
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
 
 
 class HierarchicalRiskParity:
-    '''
-    The HRP algorithm is a robust algorithm which tries to overcome the limitations of the CLA algorithm. It has three
-    important steps - hierarchical tree clustering, quasi diagnalisation and recursive bisection. Non-inversion of
-    covariance matrix makes HRP a very stable algorithm and insensitive to small changes in covariances.
-    '''
+    """
+    This class implements the Hierarchical Risk Parity algorithm mentioned in the following paper: `López de Prado, Marcos,
+    Building Diversified Portfolios that Outperform Out-of-Sample (May 23, 2016). Journal of Portfolio Management,
+    2016 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_; The code is reproduced with modification from his book:
+    Advances in Financial Machine Learning, Chp-16
+
+    By removing exact analytical approach to the calculation of weights and instead relying on an approximate
+    machine learning based approach (hierarchical tree-clustering), Hierarchical Risk Parity produces weights which are stable to
+    random shocks in the stock-market. Moreover, previous algorithms like CLA involve the inversion of covariance matrix which is
+    a highly unstable operation and tends to have major impacts on the performance due to slight changes in the covariance matrix.
+    By removing dependence on the inversion of covariance matrix completely, the Hierarchical Risk Parity algorithm is fast,
+    robust and flexible.
+    """
 
     def __init__(self):
         self.weights = list()
@@ -27,29 +30,30 @@ class HierarchicalRiskParity:
         self.ordered_indices = None
         self.clusters = None
         self.returns_estimator = ReturnsEstimation()
+        self.risk_metrics = RiskMetrics()
 
     @staticmethod
     def _tree_clustering(correlation, method='single'):
-        '''
-        Perform the traditional heirarchical tree clustering
+        """
+        Perform the traditional heirarchical tree clustering.
 
         :param correlation: (np.array) correlation matrix of the assets
         :param method: (str) the type of clustering to be done
         :return: distance matrix and clusters
-        '''
+        """
 
         distances = np.sqrt((1 - correlation).round(5) / 2)
         clusters = linkage(squareform(distances.values), method=method)
         return distances, clusters
 
     def _quasi_diagnalization(self, num_assets, curr_index):
-        '''
+        """
         Rearrange the assets to reorder them according to hierarchical tree clustering order.
 
         :param num_assets: (int) the total number of assets
         :param curr_index: (int) current index
         :return: (list) the assets rearranged according to hierarchical clustering
-        '''
+        """
 
         if curr_index < num_assets:
             return [curr_index]
@@ -60,7 +64,7 @@ class HierarchicalRiskParity:
         return (self._quasi_diagnalization(num_assets, left) + self._quasi_diagnalization(num_assets, right))
 
     def _get_seriated_matrix(self, assets, distances, correlations):
-        '''
+        """
         Based on the quasi-diagnalization, reorder the original distance matrix, so that assets within
         the same cluster are grouped together.
 
@@ -68,20 +72,47 @@ class HierarchicalRiskParity:
         :param distances: (pd.Dataframe) distance values between asset returns
         :param correlations: (pd.Dataframe) correlations between asset returns
         :return: (np.array) re-arranged distance matrix based on tree clusters
-        '''
+        """
 
         ordering = assets[self.ordered_indices]
         seriated_distances = distances.loc[ordering, ordering]
         seriated_correlations = correlations.loc[ordering, ordering]
         return seriated_distances, seriated_correlations
 
-    def _recursive_bisection(self, covariances, assets):
-        '''
-        Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets
+    @staticmethod
+    def _get_inverse_variance_weights(covariance):
+        """
+        Calculate the inverse variance weight allocations.
 
-        :param covariances: (np.array) the covariance matrix
+        :param covariance: (pd.Dataframe) covariance matrix of assets
+        :return: (list) inverse variance weight values
+        """
+
+        inv_diag = 1 / np.diag(covariance.values)
+        parity_w = inv_diag * (1 / np.sum(inv_diag))
+        return parity_w
+
+    def _get_cluster_variance(self, covariance, cluster_indices):
+        """
+        Calculate cluster variance.
+
+        :param covariance: (pd.Dataframe) covariance matrix of assets
+        :param cluster_indices: (list) list of asset indices for the cluster
+        :return: (float) variance of the cluster
+        """
+
+        cluster_covariance = covariance.iloc[cluster_indices, cluster_indices]
+        parity_w = self._get_inverse_variance_weights(cluster_covariance)
+        cluster_variance = self.risk_metrics.calculate_variance(covariance=cluster_covariance, weights=parity_w)
+        return cluster_variance
+
+    def _recursive_bisection(self, covariance, assets):
+        """
+        Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets.
+
+        :param covariance: (pd.Dataframe) the covariance matrix
         :param assets: (list) list of asset names in the portfolio
-        '''
+        """
 
         self.weights = pd.Series(1, index=self.ordered_indices)
         clustered_alphas = [self.ordered_indices]
@@ -96,20 +127,12 @@ class HierarchicalRiskParity:
                 left_cluster = clustered_alphas[subcluster]
                 right_cluster = clustered_alphas[subcluster + 1]
 
-                # Get left cluster variance
-                left_subcovar = covariances.iloc[left_cluster, left_cluster]
-                inv_diag = 1 / np.diag(left_subcovar.values)
-                parity_w = inv_diag * (1 / np.sum(inv_diag))
-                left_cluster_var = np.dot(parity_w, np.dot(left_subcovar, parity_w))
+                # Get left and right cluster variances and calculate allocation factor
+                left_cluster_variance = self._get_cluster_variance(covariance, left_cluster)
+                right_cluster_variance = self._get_cluster_variance(covariance, right_cluster)
+                alloc_factor = 1 - left_cluster_variance / (left_cluster_variance + right_cluster_variance)
 
-                # Get right cluster variance
-                right_subcovar = covariances.iloc[right_cluster, right_cluster]
-                inv_diag = 1 / np.diag(right_subcovar.values)
-                parity_w = inv_diag * (1 / np.sum(inv_diag))
-                right_cluster_var = np.dot(parity_w, np.dot(right_subcovar, parity_w))
-
-                # Calculate allocation factor and weights
-                alloc_factor = 1 - left_cluster_var / (left_cluster_var + right_cluster_var)
+                # Assign weights to each sub-cluster
                 self.weights[left_cluster] *= alloc_factor
                 self.weights[right_cluster] *= 1 - alloc_factor
 
@@ -119,37 +142,37 @@ class HierarchicalRiskParity:
         self.weights = self.weights.T
 
     def plot_clusters(self, assets):
-        '''
-        Plot a dendrogram of the hierarchical clusters
+        """
+        Plot a dendrogram of the hierarchical clusters.
 
         :param assets: (list) list of asset names in the portfolio
-        '''
+        """
 
         dendrogram_plot = dendrogram(self.clusters, labels=assets)
         return dendrogram_plot
 
     @staticmethod
-    def _shrink_covariance(covariance):
-        '''
-        Regularise/Shrink the asset covariances
+    def _shrink_covariance(asset_returns):
+        """
+        Regularise/Shrink the asset covariances.
 
-        :param covariance: (pd.Dataframe) asset returns covariances
+        :param asset_returns: (pd.Dataframe) asset returns
         :return: (pd.Dataframe) shrinked asset returns covariances
-        '''
+        """
 
         oas = OAS()
-        oas.fit(covariance)
+        oas.fit(asset_returns)
         shrinked_covariance = oas.covariance_
-        return pd.DataFrame(shrinked_covariance, index=covariance.columns, columns=covariance.columns)
+        return shrinked_covariance
 
     @staticmethod
     def _cov2corr(covariance):
-        '''
-        Calculate the correlations from asset returns covariance matrix
+        """
+        Calculate the correlations from asset returns covariance matrix.
 
         :param covariance: (pd.Dataframe) asset returns covariances
         :return: (pd.Dataframe) correlations between asset returns
-        '''
+        """
 
         d_matrix = np.zeros_like(covariance)
         diagnoal_sqrt = np.sqrt(np.diag(covariance))
@@ -167,8 +190,8 @@ class HierarchicalRiskParity:
                  resample_by=None,
                  use_shrinkage=False):
         # pylint: disable=invalid-name, too-many-branches
-        '''
-        Calculate asset allocations using HRP algorithm
+        """
+        Calculate asset allocations using HRP algorithm.
 
         :param asset_names: (list) a list of strings containing the asset names
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
@@ -178,7 +201,7 @@ class HierarchicalRiskParity:
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         :param use_shrinkage: (Boolean) specifies whether to shrink the covariances
-        '''
+        """
 
         if asset_prices is None and asset_returns is None and covariance_matrix is None:
             raise ValueError("You need to supply either raw prices or returns or a covariance matrix of asset returns")
@@ -196,12 +219,11 @@ class HierarchicalRiskParity:
 
         # Calculate covariance of returns or use the user specified covariance matrix
         if covariance_matrix is None:
-            covariance_matrix = asset_returns.cov()
+            if use_shrinkage:
+                covariance_matrix = self._shrink_covariance(asset_returns=asset_returns)
+            else:
+                covariance_matrix = asset_returns.cov()
         cov = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
-
-        # Shrink covariance
-        if use_shrinkage:
-            cov = self._shrink_covariance(covariance=cov)
 
         # Calculate correlation from covariance matrix
         corr = self._cov2corr(covariance=cov)
@@ -217,4 +239,4 @@ class HierarchicalRiskParity:
                                                                                         correlations=corr)
 
         # Step-3: Recursive Bisection
-        self._recursive_bisection(covariances=cov, assets=asset_names)
+        self._recursive_bisection(covariance=cov, assets=asset_names)

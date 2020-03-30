@@ -1,10 +1,16 @@
 .. _implementations-portfolio_optimisation:
 
-========
+======================
 Portfolio Optimisation
-========
+======================
 
-The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies. Each algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them. Next up, lets discuss about some of these implementations and the different parameters they require.
+The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies. Each
+algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
+on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
+Next up, lets discuss about some of these implementations and the different parameters they require.
+
+
+
 
 Hierarchical Risk Parity (HRP)
 ==============================
@@ -19,9 +25,14 @@ Marcos Lopez de Prado. The working of the algorithm can be broken down into 3 st
 3. Finally, the weights are assigned to each cluster in a recursive manner. At each node, the weights are broken
    down into the sub-cluster until all the individual assets are assigned a unique weight.
 
-Although, it is a simple algorithm, HRP has been found to be a very stable algorithm as compared to its older counterparts.
+Although, it is a simple algorithm, HRP has been found to be very stable as compared to its older counterparts.
 This is because, HRP does not involve taking inverse of the covariance matrix matrix which makes it robust to small changes
-in the covariances of the asset returns. For a detailed explanation of how HRP works, we have written an excellent `blog post <https://hudsonthames.org/an-introduction-to-the-hierarchical-risk-parity-algorithm/>`_ about it.
+in the covariances of the asset returns.
+
+.. note::
+    * For a detailed explanation of how HRP works, we have written an excellent `blog post <https://hudsonthames.org/an-introduction-to-the-hierarchical-risk-parity-algorithm/>`_ about it.
+    * HRP uses the single-linkage clustering algorithm. (See the tip under the HCAA algorithm for more details.)
+
 
 Implementation
 ~~~~~~~~~~~~~~
@@ -32,6 +43,71 @@ Implementation
         :members:
 
         .. automethod:: __init__
+
+
+
+
+Hierarchical Clustering Asset Allocation (HCAA)
+===============================================
+
+The Hierarchical Risk Parity algorithm focuses on allocation of risk using a hierarchical clustering approach and using the
+variance of the clusters to allocate weights. While variance is a very simple and popular representation of risk used in the
+investing world, it is not the optimal one and can underestimate the true risk of a portfolio which is why there are many other
+important risk metrics used by investment managers that can correctly reflect the true risk of a portfolio/asset. With respect to
+this, the original HRP algorithm can be tweaked to allocate its weights based on different risk representations of the clusters
+and generate better weights. This class implements an improved hierarchical clustering algorithm which gives the option of using
+the following metrics:
+
+1. ``minimum_variance`` : Variance of the clusters is used as a risk metric.
+2. ``minimum_standard_deviation`` : Standard deviation of the clusters is used as a risk metric.
+3. ``sharpe_ratio`` : Sharpe ratio of the clusters is used as a risk metric.
+4. ``equal_weighting`` : All clusters are weighed equally in terms of risk.
+5. ``expected_shortfall`` : Expected shortfall (CVaR) of the clusters is used as a risk metric.
+6. ``conditional_drawdown_at_risk`` : Conditional drawdown at risk (CDaR) of the clusters is used as a risk metric.
+
+Implementation
+~~~~~~~~~~~~~~
+
+.. automodule:: mlfinlab.portfolio_optimization.hcaa
+
+    .. autoclass:: HierarchicalClusteringAssetAllocation
+        :members:
+
+        .. automethod:: __init__
+
+.. tip::
+    **What are the differences between the 3 Linkage Algorithms?**
+
+    The following is taken directly from and we highly recommend you read:
+
+    `Papenbrock, J., 2011. Asset Clusters and Asset Networks in Financial Risk Management and Portfolio Optimization (Doctoral
+    dissertation, Karlsruher Institut für Technologie (KIT)). <https://d-nb.info/1108447864/34>`_
+
+    **1. Single-Linkage**
+
+    The idea behind single-linkage is to form groups of elements, which have the smallest distance to each other (nearest
+    neighbouring clustering). This oftentimes leads to large groups/chaining.
+
+    The single-link algorithm oftentimes forms clusters that are chained together and leaves large clusters. It can probably
+    be best understood as a way to give a "more robust" estimation of the distance matrix and furthermore preserves the original
+    structure as much as possible. Elements departing early from the tree can be interpreted as "different" from the overall dataset.
+    In terms of application, the single-link clustering algorithm is very useful to gain insights in the correlation structure
+    between assets and separates assets that were very different from the rest. If this separation is preferred and high weights
+    should be put on "outliers" the single link certainly is a good choice.
+
+    **2. Complete-Linkage**
+
+    The complete-linkage algorithm tries to avoid those large groups by considering the largest distances between elements.
+    It is thus called the farthest neighbour clustering.
+
+    The complete-link algorithm has a different idea: elements should be grouped together in a way that they are not too
+    different from each other when merged in a cluster. It thus has a much stronger definition of "similar pair of clusters".
+    The complete-link algorithm therefore seems suitable for investors interested in grouping stocks that are similar in one cluster.
+
+    **3. Average-Linkage**
+
+    The average-linkage algorithm is a compromise between the single-linkage and complete-linkage algorithm.
+
 
 The Critical Line Algorithm (CLA)
 =================================
@@ -61,10 +137,28 @@ Implementation
 
         .. automethod:: __init__
 
+
+
+
 Mean-Variance Optimisation
 ==========================
 
 This class contains some classic Mean-Variance optimisation techniques based on Harry Markowitz's methods. We use `cvxopt <https://cvxopt.org/>`_ as our quadratic optimiser instead of the more frequently used `scipy.optimize <https://docs.scipy.org/doc/scipy/reference/optimize.html>`_. This was a design choice for two reasons: (a) the documentation of cvxopt is better than that of scipy and (b) cvxopt's code is much more readable and easier to understand.
+
+Currently, the following solution strings are supported by MVO class:
+
+1. ``inverse_variance`` : Calculates the weights according to simple inverse-variance allocation.
+2. ``max_sharpe`` : Calculates the weights relating to the maximum Sharpe Ratio portfolio. Users can specify the risk free return value through the :py:mod:`risk_free_rate` parameter.
+3. ``min_volatility`` : Calculates the weights relating to Minimum Variance portfolio.
+4. ``efficient_risk`` : Calculates an efficient risk portfolio for a specified target return. Users can specify their target return value through the :py:mod:`target_return` parameter.
+
+.. tip::
+
+    Note that users can also specify upper and lower bounds for asset weights:
+
+    - Either a single upper and lower bound value can be applied for to all the asset weights in which case a single tuple needs to be passed: (:math:`low`, :math:`high`). By default a bound of (0, 1) is applied.
+
+    - If individual bounds are required, then a dictionary needs to be passed with the key being the asset index and the value being the tuple of lower and higher bound values. Something like this: :math:`{ asset\_index : (low_i, high_i) }`
 
 Implementation
 ~~~~~~~~~~~~~~
@@ -76,21 +170,64 @@ Implementation
 
         .. automethod:: __init__
 
-Currently, the following solution strings are supported by MVO class:
 
-1. ``inverse_variance`` : Calculates the weights according to simple inverse-variance allocation.
-2. ``max_sharpe`` : Calculates the weights relating to the maximum Sharpe Ratio portfolio.
-3. ``min_volatility`` : Calculates the weights relating to Minimum Variance portfolio.
-4. ``efficient_risk`` : Calculates an efficient risk portfolio for a specified target return
+
+
+Risk Metrics
+============
+
+The RiskMetrics class contains functions for calculation of common risk metrics used by investment professionals. With time, we
+will keep adding new metrics. For now, it supports the following risk calculations:
+
+1. ``Variance``
+2. ``Value at Risk (VaR)``
+3. ``Expected Shortfall (CVaR)``
+4. ``Conditional Drawdown at Risk (CDaR)``
+
+Implementation
+~~~~~~~~~~~~~~
+
+.. automodule:: mlfinlab.portfolio_optimization.risk_metrics
+
+    .. autoclass:: RiskMetrics
+        :members:
+
+        .. automethod:: __init__
+
+
+
+
+Estimation of Returns
+=====================
+
+Accurate estimation of historical asset returns is one of the most important aspects of portfolio optimisation. At the same, it is
+also one of the most difficult to calculate since most of the times, estimated returns do not correctly reflect the true underlying
+returns of a portfolio/asset. Given this, there is still significant research work being published dealing with novel methods to
+estimate returns and we wanted to share some of these methods with the users of mlfinlab.
+
+This class provides functions to estimate mean asset returns. Currently, it is still in active development and we
+will keep adding new methods to it.
+
+Implementation
+~~~~~~~~~~~~~~
+
+.. automodule:: mlfinlab.portfolio_optimization.returns_estimators
+
+    .. autoclass:: ReturnsEstimation
+        :members:
+
+        .. automethod:: __init__
+
+
 
 
 Examples
-=======
+========
 
 In this section, we provide some code snippets for new users to get started with the portfolio optimisation module.
 
 Importing the Classes
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -101,7 +238,7 @@ Importing the Classes
 	import pandas as pd
 
 Reading Data
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 It is fairly straightforward to read the data using pandas and pass it to the public methods. Here, we read a csv file of historical stock prices.
 ::
@@ -115,7 +252,7 @@ It is fairly straightforward to read the data using pandas and pass it to the pu
 
 
 Allocating the Weights
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
