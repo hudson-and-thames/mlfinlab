@@ -1,5 +1,4 @@
 # pylint: disable=missing-module-docstring
-
 import numpy as np
 import scipy.stats as ss
 from scipy import linalg
@@ -63,26 +62,32 @@ class CampbellBacktesting:
         # correlation among returns
         # The first row of the correlation matrix: [1, rho, rho, .., rho]
         correlation_vector = np.insert(rho * np.ones((1, n_trails - 1)), 0, 1)
+
         # Correlation matrix created from the vector by expanding it
         correlation_matrix = linalg.toeplitz(correlation_vector)
+
         # Vector with mean of simulated returns - zeros
         mean = np.zeros(n_trails)
 
         # Creating a sample from a multivariate normal distribution as returns simulations
         # Covariance matrix - Created from correlation matrix multiplied by monthly volatility and adjusted
         covariance_matrix = correlation_matrix * (monthly_volatility ** 2 / n_obs)
+
         # Result - n_simulations rows with n_trails inside
         shock_mat = np.random.multivariate_normal(mean, covariance_matrix, n_simulations)
 
         # Sample of uniform distribution with the same dimensions as shock_mat
         prob_vec = np.random.uniform(0, 1, (n_simulations, n_trails))
+
         # Sample of exponential distribution with same dimensions ad shock_mat
         mean_vec = np.random.exponential(lambd, (n_simulations, n_trails))
 
         # Taking the factors that have non-zero mean
         nonzero_mean = prob_vec > prob_zero_mean
+
         # Generating the null hypothesis - either zero mean or from an exponential distribution
         mu_null = np.multiply(nonzero_mean, mean_vec)
+
         # Matrix of p-value distributions
         tstat_matrix = abs(mu_null + shock_mat) / (monthly_volatility / n_obs ** (1 / 2))
 
@@ -100,6 +105,7 @@ class CampbellBacktesting:
         :param rho: (float) Average correlation coefficient between strategy returns
         :return: (np.array) Array of parameters
         """
+
         # Levels of parameters based on rho. [rho, n_simulations, prob_zero_mean, lambd]
         parameter_levels = np.array([[0, 1295, 3.9660 * 0.1, 5.4995 * 0.001],
                                      [0.2, 1377, 4.4589 * 0.1, 5.5508 * 0.001],
@@ -184,6 +190,7 @@ class CampbellBacktesting:
                                    ['D','W','M','Q','A'] = [Daily, Weekly, Monthly, Quarterly, Annual]
         :return: (np.float64) Number of monthly observations
         """
+
         # N - Number of monthly observations
         if sampling_frequency == 'D':
             monthly_obs = np.floor(num_obs * 12 / 360)
@@ -210,16 +217,20 @@ class CampbellBacktesting:
         :param p_val: (float) Significance level p-value
         :return: (np.float64) P-value adjusted at a significant level
         """
+
         # Array for final p-values of the Holm method
         p_holm_values = np.array([])
+
         # Iterating through multiple tests
         for i in range(1, (num_mult_test + 2)):
             # Creating array for Holm adjusted p-values (M-j+1)*p(j) in the paper
             p_adjusted_holm = np.array([])
+
             # Iterating through the available subsets of Holm adjusted p-values
             for j in range(1, i + 1):
                 # Holm adjusted p-values
                 p_adjusted_holm = np.append(p_adjusted_holm, (num_mult_test + 1 - j + 1) * all_p_values[j - 1])
+
             # Calculating the final p-values of the Holm method and adding to an array
             p_holm_values = np.append(p_holm_values, min(max(p_adjusted_holm), 1))
 
@@ -240,6 +251,7 @@ class CampbellBacktesting:
         :param c_constant: (float) Constant used in BHY method
         :return: (np.float64) P-value adjusted at a significant level
         """
+
         # Array for final p-values of the BHY method
         p_bhy_values = np.array([])
 
@@ -252,9 +264,11 @@ class CampbellBacktesting:
             if i == (num_mult_test + 1):  # If it's the last observation
                 # The p-value stays the same
                 p_adjusted_holm = all_p_values[-1]
+
             else:  # If it's the previous observations
                 # The p-value is adjusted according to the BHY method
                 p_adjusted_holm = min(((num_mult_test + 1) * c_constant / i) * all_p_values[i - 1], p_previous)
+
             # Adding the final BHY method p-values to an array
             p_bhy_values = np.append(p_adjusted_holm, p_bhy_values)
             p_previous = p_adjusted_holm
@@ -275,6 +289,7 @@ class CampbellBacktesting:
         :param sr_annual: (float) Annualized Sharpe ratio to compare to
         :return: (np.array) Elements (Adjusted annual Sharpe ratio, Haircut percentage)
         """
+
         # Inverting to get z-score of the method
         z_score = ss.t.ppf(1 - p_val / 2, monthly_obs - 1)
 
@@ -296,6 +311,7 @@ class CampbellBacktesting:
         :param alpha_sig: (float) Significance level (e.g., 5%)
         :return: (np.float64) P-value adjusted at a significant level
         """
+
         # Array for adjusted significance levels
         sign_levels = np.zeros(num_mult_test)
 
@@ -305,6 +321,7 @@ class CampbellBacktesting:
 
         # Where the simulations have higher p-values
         exceeding_pval = (p_values_simulation > sign_levels)
+
         # Used to find the first exceeding p-value
         exceeding_cumsum = np.cumsum(exceeding_pval)
 
@@ -313,6 +330,7 @@ class CampbellBacktesting:
         else:
             # Getting the first exceeding p-value
             p_val = p_values_simulation[exceeding_cumsum == 1]
+
             # And the corresponding t-statistic
             tstat_h = ss.norm.ppf((1 - p_val / 2), 0, 1)
 
@@ -328,6 +346,7 @@ class CampbellBacktesting:
         :param alpha_sig: (float) Significance level (e.g., 5%)
         :return: (np.float64) P-value adjusted at a significant level
         """
+
         if num_mult_test <= 1:  # If only one multiple test
             tstat_b = 1.96
         else:
@@ -360,6 +379,7 @@ class CampbellBacktesting:
                     p_chosen = p_val[0]
                 else:  # If not first
                     p_chosen = p_desc[p_val_pos - 1]
+
                 # And the corresponding t-statistic from p-value
                 tstat_b = ss.norm.ppf((1 - (p_val[0] + p_chosen) / 4), 0, 1)
 
@@ -390,6 +410,7 @@ class CampbellBacktesting:
         :return: (np.ndarray) Array with adjuted p-value, adjusted Sharpe ratio, and haircut as rows
                               for Bonferroni, Holm, BHY and average adjustment as columns
         """
+
         # Calculating the annual Sharpe ratio adjusted for the autocorrelation of returns
         sr_annual = self._annualized_sharpe_ratio(sharpe_ratio, sampling_frequency, rho_a, annualized,
                                                   autocorr_adjusted)
@@ -403,14 +424,17 @@ class CampbellBacktesting:
 
         # Needed number of trails inside a simulation with the check of (num_simulations >= num_mul_tests)
         num_trails = int((np.floor(num_mult_test / parameters[1]) + 1) * np.floor(parameters[1] + 1))
+
         # Generating a panel of t-ratios (of size self.simulations * num_simulations)
         t_sample = self._sample_random_multest(parameters[0], num_trails, parameters[2], parameters[3],
                                                self.simulations)
 
         # Annual Sharpe ratio, adjusted to monthly
         sr_monthly = sr_annual / 12 ** (1 / 2)
+
         # Calculating t-ratio based on the Sharpe ratio and the number of observations
         t_ratio = sr_monthly * monthly_obs ** (1 / 2)
+
         # Calculating adjusted p-value from the given t-ratio
         p_val = 2 * (1 - ss.t.cdf(t_ratio, monthly_obs - 1))
 
@@ -423,12 +447,14 @@ class CampbellBacktesting:
 
             # Get one sample of previously generated simulation of t-values
             t_values_simulation = t_sample[simulation_number - 1, 1:(num_mult_test + 1)]
+
             # Calculating adjusted p-values from the simulated t-ratios
             p_values_simulation = 2 * (1 - ss.norm.cdf(t_values_simulation, 0, 1))
 
             # To the N (num_mult_test) other strategies tried (from the simulation),
             # we add the adjusted p_value of the real strategy.
             all_p_values = np.append(p_values_simulation, p_val)
+
             # Ordering p-values
             all_p_values = np.sort(all_p_values)
 
@@ -447,6 +473,7 @@ class CampbellBacktesting:
         # Arrays with adjusted Sharpe ratios and haircuts
         sr_adj = np.zeros(4)
         haircut = np.zeros(4)
+
         # Adjusted Sharpe ratios and haircut percentages
         sr_adj[0], haircut[0] = self._sharpe_ratio_haircut(p_val_adj[0], monthly_obs, sr_annual)
         sr_adj[1], haircut[1] = self._sharpe_ratio_haircut(p_val_adj[1], monthly_obs, sr_annual)
@@ -478,6 +505,7 @@ class CampbellBacktesting:
         :return: (np.ndarray) Minimum Average Monthly Returns for
                               [Independent tests, Bonferroni, Holm, BHY and Average for Multiple tests]
         """
+
         # Independent test t-statistic
         tstat_independent = ss.norm.ppf((1 - alpha_sig / 2), 0, 1)
 
@@ -491,20 +519,23 @@ class CampbellBacktesting:
 
         # Needed number of trails inside a simulation with the check of (num_simulations >= num_mul_tests)
         num_trails = int((np.floor(num_mult_test / parameters[1]) + 1) * np.floor(parameters[1] + 1))
+
         # Generating a panel of t-ratios (of size self.simulations * num_simulations)
         t_sample = self._sample_random_multest(parameters[0], num_trails, parameters[2], parameters[3],
                                                self.simulations)
 
-        # Holm method
 
-        # Array for final t-statistics for every simulation
+        # Arrays for final t-statistics for every simulation for Holm and BHY methods
         tstats_holm = np.array([])
+        tstats_bhy = np.array([])
 
         # Iterating through the simulations
         for simulation_number in range(1, self.simulations + 1):
+            # Holm method
 
             # Get one sample of previously generated simulation of t-values
             t_values_simulation = t_sample[simulation_number - 1, 1:(num_mult_test + 1)]
+
             # Calculating p-values from the simulated t-ratios
             p_values_simulation = 2 * (1 - ss.norm.cdf(t_values_simulation))
             p_values_simulation = np.sort(p_values_simulation)
@@ -515,16 +546,11 @@ class CampbellBacktesting:
             # Adding to array of t-statistics
             tstats_holm = np.append(tstats_holm, tstat_h)
 
-        # BHY method
-
-        # Array for final t-statistics for every simulation
-        tstats_bhy = np.array([])
-
-        # Iterating through the simulations
-        for simulation_number in range(1, self.simulations + 1):
+            # BHY method
 
             # Get one sample of previously generated simulation of t-values
             t_values_simulation = t_sample[simulation_number - 1, 1:(num_mult_test + 1)]
+
             # Calculating p-values from the simulated t-ratios
             p_values_simulation = 2 * (1 - ss.norm.cdf(t_values_simulation))
 

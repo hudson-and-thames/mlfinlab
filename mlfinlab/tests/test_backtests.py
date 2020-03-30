@@ -1,7 +1,6 @@
 """
 Tests the backtests of Campbell research - Haircut Sharpe ratio and Profit Hurdle algorithms.
 """
-
 import unittest
 from mlfinlab.backtest_statistics.backtests import CampbellBacktesting
 
@@ -16,6 +15,7 @@ class TestCampbellBacktesting(unittest.TestCase):
         """
         Test the calculation of haircuts with simple inputs
         """
+
         sample_frequency = 'M'
         num_observations = 120
         sharpe_ratio = 1
@@ -40,6 +40,7 @@ class TestCampbellBacktesting(unittest.TestCase):
         """
         Test the calculation of haircuts with simple inputs
         """
+
         num_mult_test = 300
         num_obs = 240
         alpha_sig = 0.05
@@ -62,6 +63,7 @@ class TestCampbellBacktesting(unittest.TestCase):
         Test the special inputs to Holm method on required monthly returns.
         Particularly, when there are no exceeding p-values in the simulations
         """
+
         p_values_simulation = [0.001, 0.0011, 0.0012, 0.0013]
         num_mult_test = 4
         alpha_sig = 0.05
@@ -102,6 +104,7 @@ class TestCampbellBacktesting(unittest.TestCase):
         """
         Test the calculation of parameters of HLZ model by correlation
         """
+
         backtesting = CampbellBacktesting(200)
         rho = [-0.1, 0.1, 0.3, 0.5, 0.7, 0.9, 1.1]
         expected_result = [0.2, 0.1, 0.3, 0.5, 0.7, 0.9, 0.2]
@@ -114,6 +117,7 @@ class TestCampbellBacktesting(unittest.TestCase):
         """
         Test the conversion of Sharpe ratio to annualized and adjusted to autocorrelation of returns
         """
+
         backtesting = CampbellBacktesting(200)
         sampling_frequency = ['D', 'W', 'M', 'Q', 'A', 'N']
         expected_result_autocorr = [0.905, 0.906, 0.912, 0.928, 1.0, 1.0]
@@ -139,6 +143,7 @@ class TestCampbellBacktesting(unittest.TestCase):
         """
         Test the calculation of monthly observations in a sample
         """
+
         backtesting = CampbellBacktesting(200)
         sampling_frequency = ['D', 'W', 'M', 'Q', 'A', 'N']
         expected_observations = [0.0, 2.0, 10.0, 30.0, 120., 10.0]
