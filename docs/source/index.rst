@@ -121,6 +121,7 @@ Implementations
    implementations/filters
    implementations/frac_diff
    implementations/tb_meta_labeling
+   implementations/labeling_trend_scanning
    implementations/labeling_tail_sets
    implementations/microstructural_features
    implementations/clustering
@@ -139,6 +140,7 @@ Implementations
 * :doc:`implementations/filters`
 * :doc:`implementations/frac_diff`
 * :doc:`implementations/tb_meta_labeling`
+* :doc:`implementations/labeling_trend_scanning`
 * :doc:`implementations/labeling_tail_sets`
 * :doc:`implementations/microstructural_features`
 * :doc:`implementations/clustering`

@@ -8,13 +8,15 @@ import numpy as np
 from mlfinlab.structural_breaks.sadf import _get_betas
 
 
-def get_trend_scanning_labels(price_series: pd.Series, t_events: list, look_forward_window: int) -> pd.DataFrame:
+def trend_scanning_labels(price_series: pd.Series, t_events: list, look_forward_window: int,
+                          min_sample_length: int = 5) -> pd.DataFrame:
     """
     Get Trend-Scanning labels (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3257419)
 
     :param price_series: (pd.Series) close prices used to label the data set
     :param t_events: (list) of filtered events, array of pd.Timestamps
     :param look_forward_window: (int) maximum look forward window used to get the trend value
+    :param min_sample_length: (int) minimum sample length used to fit regression
     :return: (pd.DataFrame) of t1, ret, bin (label information). t1 - label endtime, ret - price change %,
                             bin - label value based on price change sign
     """
@@ -32,7 +34,7 @@ def get_trend_scanning_labels(price_series: pd.Series, t_events: list, look_forw
             max_t_value_index = None  # Index with maximum t-value
 
             # Get optimal label endtime value based on regression t-statistics
-            for forward_window in np.arange(subset.shape[0]):
+            for forward_window in np.arange(min_sample_length, subset.shape[0]):
                 y_subset = subset.iloc[:forward_window + 1].values.reshape(-1, 1)  # y{t}:y_{t+l}
 
                 # Array of [1, 0], [1, 1], [1, 2], ... [1, l] # b_0, b_1 coefficients
@@ -59,6 +61,7 @@ def get_trend_scanning_labels(price_series: pd.Series, t_events: list, look_forw
         else:
             t1_array.append(None)
             ret_array.append(None)
+            t_values_array.append(None)
 
     labels = pd.DataFrame({'t1': t1_array, 'ret': ret_array, 't_value': t_values_array}, index=t_events)
     labels['bin'] = np.sign(labels.ret)
