@@ -1,5 +1,4 @@
 # pylint: disable=missing-module-docstring
-
 import numpy as np
 import pandas as pd
 from sklearn.covariance import LedoitWolf
@@ -36,9 +35,12 @@ class NCO:
         :param num_obs: (int) Number of observations to draw for every X
         :param lw_shrinkage: (bool) Flag to apply Ledoit-Wolf shrinkage to X
         :return: (np.array, np.array) Empirical means vector, empirical covariance matrix
+
         """
+
         # Generating a matrix of num_obs observations for X distributions
         observations = np.random.multivariate_normal(mu_vector.flatten(), cov_matrix, size=num_obs)
+
         # Empirical means vector calculation
         mu_simulated = observations.mean(axis=0).reshape(-1, 1)
         if lw_shrinkage:  # If applying Ledoit-Wolf shrinkage
@@ -60,6 +62,7 @@ class NCO:
                                        If not provided, the unique values of observations are used
         :return: (pd.Series) Series of log(density) of the eval_points
         """
+
         if len(observations.shape) == 1:  # If the input vector is one-dimensional, reshaping
             observations = observations.reshape(-1, 1)
 
@@ -76,6 +79,7 @@ class NCO:
 
         # Evaluating the log density model on the given values
         log_prob = kde.score_samples(eval_points)
+
         # Preparing the output of log densities
         pdf = pd.Series(np.exp(log_prob), index=eval_points.flatten())
 
@@ -95,6 +99,7 @@ class NCO:
         :param num_points: (int) Number of points to estimate pdf
         :return: (pd.Series) Series of pdf values
         """
+
         # Minimum and maximum expected eigenvalues
         eigen_min = var * (1 - (1 / tn_relation) ** (1 / 2)) ** 2
         eigen_max = var * (1 + (1 / tn_relation) ** (1 / 2)) ** 2
@@ -123,6 +128,7 @@ class NCO:
         :param num_points: (int) Number of points to estimate pdf  (empirical pdf)
         :return: (float) SSE between empirical pdf and theoretical pdf
         """
+
         # Calculating theoretical and empirical pdf
         theoretical_pdf = self.mp_pdf(var, tn_relation, num_points)
         empirical_pdf = self.fit_kde(eigen_observations, kde_bwidth, eval_points=theoretical_pdf.index.values)
@@ -142,6 +148,7 @@ class NCO:
         :param kde_bwidth: (float) The bandwidth of the kernel (empirical pdf)
         :return: (float, float) Maximum random eigenvalue, optimal variation of the Marcenko-Pastur distribution
         """
+
         # Searching for the variation of Marcenko-Pastur distribution for the best fit with empirical distribution
         optimization = minimize(lambda *x: self.pdf_fit(*x), x0=np.array(0.5), args=(eigen_observations, tn_relation, kde_bwidth),
                                 bounds=((1E-5, 1 - 1E-5),))
@@ -165,6 +172,7 @@ class NCO:
         :param std: (np.array) vector of standard deviations
         :return: (np.array) Covariance matrix
         """
+
         cov = corr * np.outer(std, std)
 
         return cov
@@ -177,10 +185,13 @@ class NCO:
         :param cov: (np.array) Covariance matrix
         :return: (np.array) Covariance matrix
         """
+
         # Calculating standard deviations of the elements
         std = np.sqrt(np.diag(cov))
+
         # Transforming to correlation matrix
         corr = cov / np.outer(std, std)
+
         # Making sure correlation coefficients are in (-1, 1) range
         corr[corr < -1], corr[corr > 1] = -1, 1
 
@@ -196,15 +207,20 @@ class NCO:
         :param hermit_matrix: (np.array) Hermitian matrix
         :return: (np.array, np.array) Eigenvalues matrix, eigenvectors array
         """
+
         # Calculating eigenvalues and eigenvectors
         eigenvalues, eigenvectors = np.linalg.eigh(hermit_matrix)
+
         # Index to sort eigenvalues in descending order
         indices = eigenvalues.argsort()[::-1]
+
         # Sorting
         eigenvalues = eigenvalues[indices]
         eigenvectors = eigenvectors[:, indices]
+
         # Outputting eigenvalues on the main diagonal of a matrix
         eigenvalues = np.diagflat(eigenvalues)
+
         return eigenvalues, eigenvectors
 
     def denoised_corr(self, eigenvalues, eigenvectors, num_facts):
@@ -218,14 +234,19 @@ class NCO:
         :param num_facts: (float) Threshold for eigenvalues to be fixed
         :return: (np.array) De-noised correlation matrix
         """
+
         # Vector of eigenvalues from main diagonal of a matrix
         eigenval_vec = np.diag(eigenvalues).copy()
+
         # Replacing eigenvalues after num_facts to their average value
         eigenval_vec[num_facts:] = eigenval_vec[num_facts:].sum() / float(eigenval_vec.shape[0] - num_facts)
+
         # Back to eigenvalues on main diagonal of a matrix
         eigenvalues = np.diag(eigenval_vec)
+
         # De-noised covariance matrix
         cov = np.dot(eigenvectors, eigenvalues).dot(eigenvectors.T)
+
         # Ne-noised correlation matrix
         corr = self.cov_to_corr(cov)
 
@@ -243,17 +264,23 @@ class NCO:
         :param kde_bwidth: (float) The bandwidth of the kernel
         :return: (np.array) Maximum random eigenvalue, optimal variation of the Marcenko-Pastur distribution
         """
+
         # Correlation matrix computation
         corr = self.cov_to_corr(cov)
+
         # Calculating eigenvalues and eigenvectors
         eigenval, eigenvec = self.get_pca(corr)
+
         # Calculating the maximum eigenvalue to fit the theoretical distribution
         maximum_eigen, _ = self.find_max_eval(np.diag(eigenval), tn_relation, kde_bwidth)
+
         # Calculating the threshold of eigenvalues that fit theoretical distribution
         # from our set of eigenvalues
         num_facts = eigenval.shape[0] - np.diag(eigenval)[::-1].searchsorted(maximum_eigen)
+
         # Based on the threshold, de-noising the correlation matrix
         corr = self.denoised_corr(eigenval, eigenvec, num_facts)
+
         # Calculating the covariance matrix
         cov_denoised = self.corr_to_cov(corr, np.diag(cov) ** (1 / 2))
 
@@ -277,6 +304,7 @@ class NCO:
         :return: (np.array, dict, pd.Series) Correlation matrix of clustered elements, dict with clusters,
                                              Silhouette Coefficient series
         """
+
         # Distance matix from correlation matrix
         dist_matrix = ((1 - corr.fillna(0)) / 2) ** (1 / 2)
 
@@ -294,24 +322,32 @@ class NCO:
                 # Computing k-means clustering
                 kmeans = KMeans(n_clusters=i, n_jobs=1, n_init=init)
                 kmeans = kmeans.fit(dist_matrix)
+
                 # Computing a Silhouette Coefficient - cluster fit measure
                 silh_coef = silhouette_samples(dist_matrix, kmeans.labels_)
+
                 # Metrics to compare numbers of clusters
                 stat = (silh_coef.mean() / silh_coef.std(), silh_coef_optimal.mean() / silh_coef_optimal.std())
+
                 # If this is the first metric or better than the previous
                 # we set it as the optimal number of clusters
                 if np.isnan(stat[1]) or stat[0] > stat[1]:
                     silh_coef_optimal = silh_coef
                     kmeans_optimal = kmeans
+
         # Sorting labels of clusters
         new_index = np.argsort(kmeans_optimal.labels_)
+
         # Reordering correlation matrix rows
         corr = corr.iloc[new_index]
+
         # Reordering correlation matrix columns
         corr = corr.iloc[:, new_index]
+
         # Preparing cluster members as dict
         clusters = {i: corr.columns[np.where(kmeans_optimal.labels_ == i)[0]].tolist() for \
                     i in np.unique(kmeans_optimal.labels_)}
+
         # Silhouette Coefficient series
         silh_coef_optimal = pd.Series(silh_coef_optimal, index=dist_matrix.index)
 
@@ -333,6 +369,7 @@ class NCO:
                               None if outputting the minimum variance portfolio.
         :return: (np.array) Optimal allocation
         """
+
         # Calculating the inverse covariance matrix
         inv_cov = np.linalg.inv(cov)
 
@@ -370,9 +407,10 @@ class NCO:
         :param cov: (np.array) Covariance matrix of the variables.
         :param mu_vec: (np.array) Expected value of draws from the variables for maximum Sharpe ratio.
                               None if outputting the minimum variance portfolio.
-        :param maxNumClusters: (int) Allowed maximum number of clusters.
+        :param max_тum_сlusters: (int) Allowed maximum number of clusters.
         :return: (np.array) Optimal allocation using the NCO algorithm.
         """
+
         # Using pd.DataFrame instead of np.array
         cov = pd.DataFrame(cov)
 
