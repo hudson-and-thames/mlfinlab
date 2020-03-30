@@ -186,7 +186,8 @@ class TestFeatureImportance(unittest.TestCase):
                                                           self.y_train_clf, cv_gen=cv_gen,
                                                           sample_weight_train=np.ones((self.X_train.shape[0],)))
         sfi_feat_imp_f1 = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
-                                                    cv_gen=cv_gen, scoring=f1_score)
+                                                    cv_gen=cv_gen, scoring=f1_score,
+                                                    sample_weight_score=np.ones((self.X_train.shape[0],)))
 
         # MDI assertions
         self.assertAlmostEqual(mdi_feat_imp['mean'].sum(), 1, delta=0.001)
