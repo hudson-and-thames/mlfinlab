@@ -449,3 +449,71 @@ class NCO:
         w_nco = w_intra_clusters.mul(w_inter_clusters, axis=1).sum(axis=1).values.reshape(-1, 1)
 
         return w_nco
+
+    def opt_port_mcos(self, mu_vec, cov, num_obs, num_sims, kde_bwidth, min_var_portf, lw_shrinkage):
+        """
+        Estimates the optimal allocation using the Monte Carlo optimization selection (MCOS) algorithm.
+
+        Repeats the CVO and theNCO and algorithms multiple times to get the average result based on
+        a large number of simulated pairs of (vector of means, covariance matrix).
+
+        :param mu_vec: (np.array) The original vector of expected outcomes.
+        :param cov: (np.array )The original covariance matrix of outcomes.
+        :param num_obs: (int) The number of observations T used to compute mu0 and cov0.
+        :param num_sims: (int) The number of simulations run in the Monte Carlo.
+        :param kde_bwidth: (float) The bandwidth of the KDE functions used to de-noise the covariance matrix.
+        :param min_var_portf: (bool) when True, the minimum variance solution is computed. Otherwise, the
+                                     maximum Sharpe ratio solution is computed.
+        :param lw_shrinkage: (bool) when True, the covariance matrix is subjected to the Ledoit-Wolf shrinkage
+                                    procedure
+        :return: (pd.dataframe, pd.dataframe) DataFrames with allocations for CVO and NCO algorithms.
+        """
+
+        # Creating DataFrames for simple CVO results and NCO results
+        w_cvo = pd.DataFrame(columns=range(cov.shape[0]), index=range(num_sims), dtype=float)
+        w_nco = w_cvo.copy(deep=True)
+
+        # Iterating thorough simulations
+        for simulation in range(num_sims):
+            # Deriving empirical vector of means and an empirical covariance matrix
+            mu_simulation, cov_simulation = self.simulate_covariance(mu_vec, cov, num_obs, lw_shrinkage)
+
+            # If goal is minimum variance
+            if min_var_portf:
+                mu_simulation = None
+
+            # De-noising covariance matrix
+            if kde_bwidth > 0:
+                cov_simulation = self.de_noise_cov(cov_simulation, num_obs * 1 / cov_simulation.shape[1], kde_bwidth)
+
+            # Writing the results to corresponding dataframes
+            w_cvo.loc[simulation] = self.opt_port(cov_simulation, mu_simulation).flatten()
+            w_nco.loc[simulation] = self.opt_port_nco(cov_simulation, mu_simulation,
+                                                      int(cov_simulation.shape[0] / 2)).flatten()
+
+        return w_cvo, w_nco
+
+    def estim_errors_mcos(self, w_cvo, w_nco, mu_vec, cov, min_var_portf):
+        """
+        Computes the true optimal allocation w, and compares that result with the estimated ones by MCOS.
+
+        :param w_cvo: (pd.dataframe) DataFrame with weights from the CVO algorithm.
+        :param w_nco: (pd.dataframe) DataFrame with weights from the NCO algorithm.
+        :param mu_vec: (np.array) The original vector of expected outcomes.
+        :param cov: (np.array )The original covariance matrix of outcomes.
+        :param min_var_portf: (bool) when True, the minimum variance solution was computed. Otherwise, the
+                                     maximum Sharpe ratio solution was computed.
+        :return: (float, float) Mean difference in expected outcomes for CVO and NCO algorithms.
+        """
+
+        # Calculating the true optimal weights allocation
+        w_true = self.opt_port(cov, None if min_var_portf else mu_vec)
+        w_true = np.repeat(w_true.T, w_cvo.shape[0], axis=0)
+
+        # Mean difference in expected outcomes fro CVO algorithm
+        err_cvo = (w_cvo - w_true).std(axis=0).mean()
+
+        # Mean difference in expected outcomes fro NCO algorithm
+        err_nco = (w_nco - w_true).std(axis=0).mean()
+
+        return err_cvo, err_nco
