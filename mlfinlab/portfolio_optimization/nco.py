@@ -316,3 +316,98 @@ class NCO:
         silh_coef_optimal = pd.Series(silh_coef_optimal, index=dist_matrix.index)
 
         return corr, clusters, silh_coef_optimal
+
+    @staticmethod
+    def opt_port(cov, mu_vec=None):
+        """
+        Estimates the Convex Optimization Solution (CVO).
+
+        Uses the covariance matrix and the mu - optimal solution.
+        If mu is the vector of expected values from variables, the result will be
+        a vector of weights with maximum Sharpe ratio.
+        If mu is a vector of ones, the result will be a vector of weights with
+        minimum variance.
+
+        :param cov: (np.array) Covariance matrix of the variables.
+        :param mu_vec: (np.array) Expected value of draws from the variables for maximum Sharpe ratio.
+                              None if outputting the minimum variance portfolio.
+        :return: (np.array) Optimal allocation
+        """
+        # Calculating the inverse covariance matrix
+        inv_cov = np.linalg.inv(cov)
+
+        # Generating a vector of size of the inverted covariance matrix
+        ones = np.ones(shape=(inv_cov.shape[0], 1))
+
+        if mu_vec is None:  # To output the minimum variance portfolio
+            mu_vec = ones
+
+        # Calculating the analytical solution - weights
+        w_cvo = np.dot(inv_cov, mu_vec)
+        w_cvo /= np.dot(mu_vec.T, w_cvo)
+
+        return w_cvo
+
+
+    def opt_port_nco(self, cov, mu_vec=None, max_num_clusters=None):
+        """
+        Estimates the optimal allocation using the nested clustered optimization (NCO) algorithm.
+
+        First, it clusters the covariance matrix into subsets of highly correlated variables.
+        Second, it computes the optimal allocation for each of the clusters separately.
+        This allows to collapse the original covariance matrix into a reduced covariance matrix,
+        where each cluster is represented by a single variable.
+        Third, we compute the optimal allocations across the reduced covariance matrix.
+        Fourth, the final allocations are the dot-product of the intra-cluster (step 2) allocations and
+        the inter-cluster (step 3) allocations.
+
+        For the Convex Optimization Solution, a mu - optimal solution parameter is needed.
+        If mu is the vector of expected values from variables, the result will be
+        a vector of weights with maximum Sharpe ratio.
+        If mu is a vector of ones (pass None value), the result will be a vector of weights with
+        minimum variance.
+
+        :param cov: (np.array) Covariance matrix of the variables.
+        :param mu_vec: (np.array) Expected value of draws from the variables for maximum Sharpe ratio.
+                              None if outputting the minimum variance portfolio.
+        :param maxNumClusters: (int) Allowed maximum number of clusters.
+        :return: (np.array) Optimal allocation using the NCO algorithm.
+        """
+        # Using pd.DataFrame instead of np.array
+        cov = pd.DataFrame(cov)
+
+        # Optimal solution for minimum variance
+        if mu_vec is not None:
+            mu_vec = pd.Series(mu_vec[:, 0])
+
+        # Calculating correlation matrix
+        corr = self.cov_to_corr(cov)
+
+        # Optimal partition of clusters (step 1)
+        corr, clusters, _ = self.cluster_kmeans_base(corr, max_num_clusters, n_init=10)
+
+        # Weights inside clusters
+        w_intra_clusters = pd.DataFrame(0, index=cov.index, columns=clusters.keys())
+
+        # Iterating over clusters
+        for i in clusters:
+            # Covariance matrix of elements in cluster
+            cov_cluster = cov.loc[clusters[i], clusters[i]].values
+
+            # Optimal solution vector for the cluster
+            mu_cluster = (None if mu_vec is None else mu_vec.loc[clusters[i]].values.reshape(-1, 1))
+
+            # Estimating the Convex Optimization Solution in a cluster (step 2)
+            w_intra_clusters.loc[clusters[i], i] = self.opt_port(cov_cluster, mu_cluster).flatten()
+
+        # Reducing new covariance matrix to calculate inter-cluster weights
+        cov_inter_cluster = w_intra_clusters.T.dot(np.dot(cov, w_intra_clusters))
+        mu_inter_cluster = (None if mu_vec is None else w_intra_clusters.T.dot(mu_vec))
+
+        # Optimal allocations across the reduced covariance matrix (step 3)
+        w_inter_clusters = pd.Series(self.opt_port(cov_inter_cluster, mu_inter_cluster).flatten(), index=cov_inter_cluster.index)
+
+        # Final allocations - dot-product of the intra-cluster and inter-cluster allocations (step 4)
+        w_nco = w_intra_clusters.mul(w_inter_clusters, axis=1).sum(axis=1).values.reshape(-1, 1)
+
+        return w_nco
