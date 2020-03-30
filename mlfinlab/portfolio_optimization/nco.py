@@ -6,6 +6,7 @@ from sklearn.neighbors import KernelDensity
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_samples
 from scipy.optimize import minimize
+from scipy.linalg import block_diag
 
 
 class NCO:
@@ -517,3 +518,65 @@ class NCO:
         err_nco = (w_nco - w_true).std(axis=0).mean()
 
         return err_cvo, err_nco
+
+    @staticmethod
+    def form_block_matrix(num_blocks, block_size, block_corr):
+        """
+        Create a block correlation matrix with given parameters.
+
+        :param num_blocks: (int) Number of blocks in matrix
+        :param block_size: (int) Size of a single block
+        :param block_corr: (float) Correlation of elements in a block
+        :return: (np.array) Resulting correlation matrix
+        """
+
+        # Creating a single block with all elements as block_corr
+        block = np.ones((block_size, block_size)) * block_corr
+
+        # Setting the main diagonal to ones
+        block[range(block_size), range(block_size)] = 1
+
+        # Create a block diagonal matrix from provided blocks
+        res_matrix = block_diag(*([block] * num_blocks))
+
+        return res_matrix
+
+    def form_true_matrix(self, num_blocks, block_size, block_corr, std=None):
+        """
+        Creates a random vector of means and a random covariance matrix.
+
+        The number of securities in a portfolio, number of blocks and correlations
+        both inside the cluster and between clusters are adjustable.
+
+        :param num_blocks: (int) Number of blocks in matrix
+        :param block_size: (int) Size of a single block
+        :param block_corr: (float) Correlation of elements in a block
+        :param std: (float) Correlation between the clusters
+        :return: (np.array) Resulting vector of means and the covariance matrix
+        """
+
+        # Creating a block correlation matrix
+        corr_matrix = self.form_block_matrix(num_blocks, block_size, block_corr)
+
+        # Transforming to DataFrame
+        corr_matrix = pd.DataFrame(corr_matrix)
+
+        # Getting columns of matrix separately
+        columns = corr_matrix.columns.tolist()
+
+        # Randomizing the order of the columns
+        np.random.shuffle(columns)
+        corr_matrix = corr_matrix[columns].loc[columns].copy(deep=True)
+
+        if std is None:  # Default intra-cluster correlations at 0.5
+            std = np.random.uniform(.05, .2, corr_matrix.shape[0])
+        else:  # Or the ones set by user
+            std = np.array([std] * corr_matrix.shape[1])
+
+        # Calculating covariance matrix from the generated correlation matrix
+        cov_matrix = self.corr_to_cov(corr_matrix, std)
+
+        # Vector of means
+        mu_vec = np.random.normal(std, std, cov_matrix.shape[0]).reshape(-1, 1)
+
+        return mu_vec, cov_matrix
