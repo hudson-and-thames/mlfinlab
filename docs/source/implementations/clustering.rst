@@ -110,7 +110,7 @@ Correlation Matrix show the matrix that are sorted by their relevance. Optimized
     df = pd.DataFrame(data) 
     df
     
-Assuming we have a correlation matrix data as in the above
+Assuming that we have a correlation matrix data as in the above
 
 ::
     
