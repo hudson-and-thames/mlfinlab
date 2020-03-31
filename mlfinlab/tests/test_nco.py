@@ -288,11 +288,14 @@ class TestNCO(unittest.TestCase):
         # Finding the clustered corresponding values
         corr, clusters, silh_coef = nco.cluster_kmeans_base(corr_matrix, max_num_clusters, n_init)
 
+        # When maximum number of clusters is not predefined
+        corr_no_max, _, _ = nco.cluster_kmeans_base(corr_matrix, None, n_init)
+
         # Testing if the values are right
-        print(clusters, expected_clust)
         self.assertTrue(clusters == expected_clust)
         np.testing.assert_almost_equal(np.array(corr), np.array(expected_corr), decimal=4)
         np.testing.assert_almost_equal(np.array(silh_coef), np.array(expected_silh_coef), decimal=4)
+        np.testing.assert_almost_equal(np.array(corr), np.array(corr_no_max), decimal=4)
 
     @staticmethod
     def test_opt_port():
@@ -302,10 +305,12 @@ class TestNCO(unittest.TestCase):
 
         nco = NCO()
 
-        # Covariance matrix
+        # Covariance matrix and the desired mu vector
         cov_matrix = np.array([[0.01, 0.002, -0.001],
                                [0.002, 0.04, -0.006],
                                [-0.001, -0.006, 0.01]])
+
+        mu_vec = np.array([1, 1, 1]).reshape(-1, 1)
 
         # Expected weights for minimum variance allocation
         w_expected = np.array([[0.37686939],
@@ -315,8 +320,12 @@ class TestNCO(unittest.TestCase):
         # Finding the optimal weights
         w_cvo = nco.opt_port(cov_matrix, mu_vec=None)
 
-        # Testing if the optimal allocation is right
+        # Also when manually inputting the vector mu
+        w_cvo_mu = nco.opt_port(cov_matrix, mu_vec=mu_vec)
+
+        # Testing if the optimal allocation is right and if the custom mu works
         np.testing.assert_almost_equal(w_cvo, w_expected, decimal=4)
+        np.testing.assert_almost_equal(w_cvo, w_cvo_mu, decimal=4)
 
     @staticmethod
     def test_opt_port_nco():
@@ -326,11 +335,13 @@ class TestNCO(unittest.TestCase):
 
         nco = NCO()
 
-        # Covariance matrix
+        # Covariance matrix and the custom mu vector
         np.random.seed(0)
         cov_matrix = np.array([[0.01, 0.002, -0.001],
                                [0.002, 0.04, -0.006],
                                [-0.001, -0.006, 0.01]])
+
+        mu_vec = np.array([1, 1, 1]).reshape(-1, 1)
 
         # Expected weights for minimum variance allocation
         w_expected = np.array([[0.43875825],
@@ -341,8 +352,12 @@ class TestNCO(unittest.TestCase):
         # Finding the optimal weights
         w_nco = nco.opt_port_nco(cov_matrix, max_num_clusters=max_num_clusters)
 
-        # Testing if the optimal allocation is right
+        # Finding the optimal weights using the custom mu vector
+        w_nco_mu = nco.opt_port_nco(cov_matrix, mu_vec=mu_vec, max_num_clusters=max_num_clusters)
+
+        # Testing if the optimal allocation is right and if the custom mu works
         np.testing.assert_almost_equal(w_nco, w_expected, decimal=4)
+        np.testing.assert_almost_equal(w_nco, w_nco_mu, decimal=4)
 
     @staticmethod
     def test_opt_port_mcos():
@@ -365,6 +380,10 @@ class TestNCO(unittest.TestCase):
         min_var_portf = True
         lw_shrinkage = False
 
+        # Alternative set of values
+        min_var_portf_alt = False
+        kde_bwidth_alt = 0
+
         # Expected weights for minimum variance allocation
         w_cvo_expected = pd.DataFrame([[0.249287, 0.256002, 0.242593, 0.252118],
                                        [0.257547, 0.265450, 0.242453, 0.234551]])
@@ -372,12 +391,25 @@ class TestNCO(unittest.TestCase):
         w_nco_expected = pd.DataFrame([[0.248396, 0.243172, 0.250751, 0.257680],
                                        [0.257547, 0.265450, 0.242453, 0.234551]])
 
-        # Finding the optimal weights
+        # Expected weights for maximum Sharpe ratio allocation
+        w_cvo_sr_expected = pd.DataFrame([[-1.081719, 1.810936, 1.218067, 3.978880],
+                                          [-2.431651, 0.594868, -0.210175, 5.117628]])
+
+        w_nco_sr_expected = pd.DataFrame([[-1.060835, 1.910503, 1.315026, 3.908128],
+                                          [-0.937168, 1.886158, -0.389275, 4.884809]])
+
+        # Finding the optimal weights for minimum variance
         w_cvo, w_nco = nco.opt_port_mcos(mu_vec, cov_mat, num_obs, num_sims, kde_bwidth, min_var_portf, lw_shrinkage)
+
+        # Finding the optimal weights for maximum Sharpe ratio
+        w_cvo_sr, w_nco_sr = nco.opt_port_mcos(mu_vec, cov_mat, num_obs, num_sims, kde_bwidth_alt, min_var_portf_alt, lw_shrinkage)
 
         # Testing if the optimal allocation simulations are right
         np.testing.assert_almost_equal(np.array(w_cvo), np.array(w_cvo_expected), decimal=4)
         np.testing.assert_almost_equal(np.array(w_nco), np.array(w_nco_expected), decimal=4)
+
+        np.testing.assert_almost_equal(np.array(w_cvo_sr), np.array(w_cvo_sr_expected), decimal=4)
+        np.testing.assert_almost_equal(np.array(w_nco_sr), np.array(w_nco_sr_expected), decimal=4)
 
     @staticmethod
     def test_estim_errors_mcos():
@@ -453,6 +485,9 @@ class TestNCO(unittest.TestCase):
         block_corr = 0.3
         std = 0.3
 
+        # Alternative std parameter
+        std_alt = None
+
         # Expected vector of means and covariance matrix
         mu_expected = np.array([[0.5936214],
                                 [0.97226796],
@@ -464,9 +499,19 @@ class TestNCO(unittest.TestCase):
                                      [0, 0, 0.09, 0.027],
                                      [0, 0, 0.027, 0.09]])
 
+        mu_alt_expected = np.array([[0.34260886],
+                                    [0.12059827],
+                                    [0.24366456],
+                                    [0.17248975]])
+
         # Finding the random vector of means and covariance matrix
         mu_vec, cov_matrix = nco.form_true_matrix(num_blocks, block_size, block_corr, std)
+
+        # Also when the std is default
+        mu_vec_alt, _ = nco.form_true_matrix(num_blocks, block_size, block_corr, std_alt)
 
         # Testing if the results are right
         np.testing.assert_almost_equal(mu_vec, mu_expected, decimal=4)
         np.testing.assert_almost_equal(np.array(cov_matrix), np.array(cov_expected), decimal=4)
+
+        np.testing.assert_almost_equal(mu_vec_alt, mu_alt_expected, decimal=4)

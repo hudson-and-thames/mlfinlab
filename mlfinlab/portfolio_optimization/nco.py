@@ -64,8 +64,8 @@ class NCO:
         :return: (pd.Series) Series of log(density) of the eval_points
         """
 
-        if len(observations.shape) == 1:  # If the input vector is one-dimensional, reshaping
-            observations = observations.reshape(-1, 1)
+        # Reshaping array to a horizontal one
+        observations = observations.reshape(-1, 1)
 
         # Estimating Kernel Density of the empirical distribution of eigenvalues
         kde = KernelDensity(kernel=kde_kernel, bandwidth=kde_bwidth).fit(observations)
@@ -158,10 +158,8 @@ class NCO:
         optimization = minimize(self.pdf_fit, x0=np.array(0.5), args=(eigen_observations, tn_relation, kde_bwidth),
                                 bounds=((1e-5, 1 - 1e-5),))
 
-        if optimization['success']:  # If optimal variation found
-            var = optimization['x'][0]
-        else:  # If not found
-            var = 1
+        # The optimal solution found
+        var = optimization['x'][0]
 
         # Eigenvalue calculated as the maximum expected eigenvalue based on the input
         maximum_eigen = var * (1 + (1 / tn_relation) ** (1 / 2)) ** 2
@@ -318,7 +316,7 @@ class NCO:
 
         # If maximum number of clusters undefined, it's equal to the half of the elements
         if max_num_clusters is None:
-            max_num_clusters = int(corr.shape[0] / 2)
+            max_num_clusters = round(corr.shape[0] / 2)
 
         # Iterating over the allowed iteration times for k-means
         for init in range(1, n_init):
