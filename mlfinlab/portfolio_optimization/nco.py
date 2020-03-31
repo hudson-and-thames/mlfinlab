@@ -303,7 +303,7 @@ class NCO:
         The Silhouette Coefficient is used as a measure of how well samples are clustered
         with samples that are similar to themselves.
 
-        :param corr: (np.array) Correlation matrix
+        :param corr: (pd.DataFrame) DataFrame with correlation matrix
         :param max_num_clusters: (float) Maximum allowed number of clusters
         :param n_init: (float) Number of time the k-means algorithm will be run with different centroid seeds
         :return: (np.array, dict, pd.Series) Correlation matrix of clustered elements, dict with clusters,
@@ -318,10 +318,10 @@ class NCO:
 
         # If maximum number of clusters undefined, it's equal to the half of the elements
         if max_num_clusters is None:
-            max_num_clusters = corr.shape[0] / 2
+            max_num_clusters = int(corr.shape[0] / 2)
 
         # Iterating over the allowed iteration times for k-means
-        for init in range(n_init):
+        for init in range(1, n_init):
             # Iterating through every number of clusters
             for i in range(2, max_num_clusters + 1):
                 # Computing k-means clustering

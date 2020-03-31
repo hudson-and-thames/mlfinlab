@@ -6,7 +6,7 @@ import unittest
 #import os
 
 import numpy as np
-#import pandas as pd
+import pandas as pd
 
 
 from mlfinlab.portfolio_optimization.nco import NCO
@@ -267,4 +267,82 @@ class TestNCO(unittest.TestCase):
         # Testing if the de-noised covariance matrix is right
         np.testing.assert_almost_equal(cov_matrix, expected_cov, decimal=4)
 
-        
+    def test_cluster_kmeans_base(self):
+        """
+        Test the finding of the optimal partition of clusters using K-Means algorithm.
+        """
+
+        nco = NCO()
+
+        # Correlation matrix and parameters used in the K-Means algorithm.
+        np.random.seed(0)
+        corr_matrix = pd.DataFrame([[1, 0.1, -0.1],
+                                    [0.1, 1, -0.3],
+                                    [-0.1, -0.3, 1]])
+
+        max_num_clusters = 2
+        n_init = 10
+
+        # Expected correlation matrix of clustered elements, clusters and, Silhouette Coefficient series
+        expected_corr = pd.DataFrame([[1,  0.1, -0.1],
+                                     [0.1,   1,  -0.3],
+                                     [-0.1,- 0.3,   1]])
+        expected_clust = {0: [0, 1], 1: [2]}
+        expected_silh_coef = pd.Series([0.100834, 0.167626, 0], index=[0, 1, 2])
+
+        # Finding the clustered corresponding values
+        corr, clusters, silh_coef = nco.cluster_kmeans_base(corr_matrix, max_num_clusters, n_init)
+
+        # Testing if the values are right
+        print(clusters, expected_clust)
+        self.assertTrue(clusters == expected_clust)
+        np.testing.assert_almost_equal(np.array(corr), np.array(expected_corr), decimal=4)
+        np.testing.assert_almost_equal(np.array(silh_coef), np.array(expected_silh_coef), decimal=4)
+
+    def test_opt_port(self):
+        """
+        Test the estimates of the Convex Optimization Solution (CVO).
+        """
+
+        nco = NCO()
+
+        # Covariance matrix
+        cov_matrix = np.array([[0.01,   0.002, -0.001],
+                               [0.002,   0.04, -0.006],
+                               [-0.001, -0.006,  0.01]])
+
+        # Expected weights for minimum variance allocation
+        w_expected = np.array([[0.37686939],
+                               [0.14257228],
+                               [0.48055833]])
+
+        # Finding the optimal weights
+        w_cvo = nco.opt_port(cov_matrix, mu_vec=None)
+
+        # Testing if the optimal allocation is right
+        np.testing.assert_almost_equal(w_cvo, w_expected, decimal=4)
+
+    def test_opt_port_nco(self):
+        """
+        Test the estimates the optimal allocation using the (NCO) algorithm
+        """
+
+        nco = NCO()
+
+        # Covariance matrix
+        cov_matrix = np.array([[0.01,   0.002, -0.001],
+                               [0.002,   0.04, -0.006],
+                               [-0.001, -0.006,  0.01]])
+
+        # Expected weights for minimum variance allocation
+        w_expected = np.array([[0.43875825],
+                               [0.09237016],
+                               [0.4688716 ]])
+        max_num_clusters = 2
+
+        # Finding the optimal weights
+        w_nco = nco.opt_port_nco(cov_matrix, max_num_clusters = max_num_clusters)
+
+        # Testing if the optimal allocation is right
+        np.testing.assert_almost_equal(w_nco, w_expected, decimal=4)
+
