@@ -9,7 +9,11 @@ This implementation is based on 'Detection of False Investment Strategies using 
 https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3167017
 
 
+Implementation
+==============
+
 .. py:currentmodule:: mlfinlab.clustering.onc
 .. automodule:: mlfinlab.clustering.onc
    :members: get_onc_clusters
+
 
