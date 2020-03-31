@@ -118,6 +118,8 @@ class TestNCO(unittest.TestCase):
         self.assertAlmostEqual(pdf_kde, 50.51326, delta=1e-5)
 
 
+
+
     def test_find_max_eval(self):
         """
         Test the search for maximum random eigenvalue.
@@ -136,3 +138,133 @@ class TestNCO(unittest.TestCase):
         # Testing the maximum random eigenvalue and the optimal variation
         self.assertAlmostEqual(maximum_eigen, 2.41011, delta=1e-5)
         self.assertAlmostEqual(var, 0.82702, delta=1e-5)
+
+
+    def test_corr_to_cov(self):
+        """
+        Test the recovering of the covariance matrix from the correlation matrix.
+        """
+
+        nco = NCO()
+
+        # Correlation matrix and the vector of standard deviations
+        corr_matrix = np.array([[1, 0.1, -0.1],
+                                [0.1, 1, -0.3],
+                                [-0.1, -0.3, 1]])
+        std_vec = np.array([0.1, 0.2, 0.1])
+
+        # Expected covariance matrix
+        expected_matrix = np.array([[ 0.01 ,  0.002, -0.001],
+                                    [ 0.002,  0.04 , -0.006],
+                                    [-0.001, -0.006,  0.01 ]])
+
+        # Finding the covariance matrix
+        cov_matrix = nco.corr_to_cov(corr_matrix, std_vec)
+
+        # Testing the first row of the matrix
+        np.testing.assert_almost_equal(cov_matrix, expected_matrix, decimal=5)
+
+    def test_cov_to_corr(self):
+        """
+        Test the deriving of the correlation matrix from a covariance matrix.
+        """
+
+        nco = NCO()
+
+        # Covariance matrix
+        cov_matrix = np.array([[0.01, 0.002, -0.001],
+                               [0.002, 0.04, -0.006],
+                               [-0.001, -0.006, 0.01]])
+
+        # Expected correlation matrix
+        expected_matrix = np.array([[1, 0.1, -0.1],
+                                    [0.1, 1, -0.3],
+                                    [-0.1, -0.3, 1]])
+
+
+        # Finding the covariance matrix
+        corr_matrix = nco.cov_to_corr(cov_matrix)
+
+        # Testing the first row of the matrix
+        np.testing.assert_almost_equal(corr_matrix, expected_matrix, decimal=5)
+
+
+    def test_get_pca(self):
+        """
+        Test the calculation of eigenvalues and eigenvectors from a Hermitian matrix.
+        """
+
+        nco = NCO()
+
+        # Correlation matrix as an input
+        corr_matrix = np.array([[1, 0.1, -0.1],
+                                [0.1, 1, -0.3],
+                                [-0.1, -0.3, 1]])
+
+        # Expected correlation matrix
+        expected_eigenvalues = np.array([[1.3562, 0,        0],
+                                         [0,      0.9438,   0],
+                                         [0,      0,      0.7]])
+        first_eigenvector = np.array([-3.69048184e-01, -9.29410263e-01,  1.10397126e-16])
+
+        # Finding the eigenvalues
+        eigenvalues, eigenvectors = nco.get_pca(corr_matrix)
+
+        # Testing eigenvalues and the first eigenvector
+        np.testing.assert_almost_equal(eigenvalues, expected_eigenvalues, decimal=4)
+        np.testing.assert_almost_equal(eigenvectors[0], first_eigenvector, decimal=5)
+
+    def test_denoised_corr(self):
+        """
+        Test the shrinkage the eigenvalues associated with noise.
+        """
+
+        nco = NCO()
+
+        # Eigenvalues and eigenvectors to use
+        eigenvalues = np.array([[1.3562, 0, 0],
+                                [0, 0.9438, 0],
+                                [0, 0, 0.7]])
+        eigenvectors = np.array([[-3.69048184e-01, -9.29410263e-01,  1.10397126e-16],
+                                [-6.57192300e-01,  2.60956474e-01,  7.07106781e-01],
+                                [ 6.57192300e-01, -2.60956474e-01,  7.07106781e-01]])
+
+        # Expected correlation matrix
+        expected_corr = np.array([[1,  0.13353165, -0.13353165],
+                                  [0.13353165,  1, -0.21921986],
+                                  [-0.13353165, -0.21921986,  1]])
+
+
+        # Finding the eigenvalues
+        corr_matrix = nco.denoised_corr(eigenvalues, eigenvectors, 1)
+
+        # Testing if the de-noised correlation matrix is right
+        np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
+
+    def de_noised_cov(self):
+        """
+        Test the shrinkage the eigenvalues associated with noise.
+        """
+
+        nco = NCO()
+
+        # Covariance matrix to de-noise and parameters for the theoretical distribution.
+        cov_matrix = np.array([[0.01, 0.002, -0.001],
+                               [0.002, 0.04, -0.006],
+                               [-0.001, -0.006, 0.01]])
+        tn_relation = 50
+        kde_bwidth = 0.25
+
+        # Expected de-noised covariance matrix
+        expected_cov = np.array([[ 0.01,  0.00267029, -0.00133514],
+                                 [ 0.00267029,  0.04, -0.00438387],
+                                 [-0.00133514, -0.00438387,  0.01]])
+
+
+        # Finding the de-noised covariance matrix
+        cov_matrix = nco.de_noised_cov(cov_matrix, tn_relation, kde_bwidth)
+
+        # Testing if the de-noised covariance matrix is right
+        np.testing.assert_almost_equal(cov_matrix, expected_cov, decimal=4)
+
+        

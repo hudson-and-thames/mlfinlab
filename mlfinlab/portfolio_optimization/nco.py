@@ -257,7 +257,7 @@ class NCO:
 
         return corr
 
-    def de_noise_cov(self, cov, tn_relation, kde_bwidth):
+    def de_noised_cov(self, cov, tn_relation, kde_bwidth):
         """
         Computes a denoised covariation matrix from a given covariation matrix.
 
@@ -489,7 +489,7 @@ class NCO:
 
             # De-noising covariance matrix
             if kde_bwidth > 0:
-                cov_simulation = self.de_noise_cov(cov_simulation, num_obs * 1 / cov_simulation.shape[1], kde_bwidth)
+                cov_simulation = self.de_noised_cov(cov_simulation, num_obs * 1 / cov_simulation.shape[1], kde_bwidth)
 
             # Writing the results to corresponding dataframes
             w_cvo.loc[simulation] = self.opt_port(cov_simulation, mu_simulation).flatten()
