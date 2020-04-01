@@ -134,7 +134,7 @@ class RiskEstimators:
         return maximum_eigen, var
 
     @staticmethod
-    def _corr_to_cov(corr, std):
+    def corr_to_cov(corr, std):
         """
         Recovers the covariance matrix from the de-noise correlation matrix.
 
@@ -148,7 +148,7 @@ class RiskEstimators:
         return cov
 
     @staticmethod
-    def _cov_to_corr(cov):
+    def cov_to_corr(cov):
         """
         Derives the correlation matrix from a covariance matrix.
 
@@ -218,7 +218,7 @@ class RiskEstimators:
         cov = np.dot(eigenvectors, eigenvalues).dot(eigenvectors.T)
 
         # Ne-noised correlation matrix
-        corr = self._cov_to_corr(cov)
+        corr = self.cov_to_corr(cov)
 
         return corr
 
@@ -236,7 +236,7 @@ class RiskEstimators:
         """
 
         # Correlation matrix computation
-        corr = self._cov_to_corr(cov)
+        corr = self.cov_to_corr(cov)
 
         # Calculating eigenvalues and eigenvectors
         eigenval, eigenvec = self._get_pca(corr)
@@ -252,6 +252,6 @@ class RiskEstimators:
         corr = self._denoised_corr(eigenval, eigenvec, num_facts)
 
         # Calculating the covariance matrix
-        cov_denoised = self._corr_to_cov(corr, np.diag(cov) ** (1 / 2))
+        cov_denoised = self.corr_to_cov(corr, np.diag(cov) ** (1 / 2))
 
         return cov_denoised

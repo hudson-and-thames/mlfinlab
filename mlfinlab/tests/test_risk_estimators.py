@@ -123,7 +123,7 @@ class TestRiskEstimators(unittest.TestCase):
                                     [-0.001, -0.006, 0.01]])
 
         # Finding the covariance matrix
-        cov_matrix = risk_estimators._corr_to_cov(corr_matrix, std_vec)
+        cov_matrix = risk_estimators.corr_to_cov(corr_matrix, std_vec)
 
         # Testing the first row of the matrix
         np.testing.assert_almost_equal(cov_matrix, expected_matrix, decimal=5)
@@ -147,7 +147,7 @@ class TestRiskEstimators(unittest.TestCase):
                                     [-0.1, -0.3, 1]])
 
         # Finding the covariance matrix
-        corr_matrix = risk_estimators._cov_to_corr(cov_matrix)
+        corr_matrix = risk_estimators.cov_to_corr(cov_matrix)
 
         # Testing the first row of the matrix
         np.testing.assert_almost_equal(corr_matrix, expected_matrix, decimal=5)
