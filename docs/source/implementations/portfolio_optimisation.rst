@@ -221,6 +221,116 @@ Implementation
 
 
 
+Risk Estimators
+===============
+
+This class includes de-noising algorithms and helping methods. In particular, methods for de-noising the covariance function and transforming covariance matrix to the correlation matrix and the other way around.
+
+The main idea behind de-noising is to separate the noise-related eigenvalues from the signal-related ones. This is achieved through fitting the Marcenko-Pastur distribution of the empirical distribution of eigenvalues using a Kernel Density Estimate (KDE).
+
+Implementation
+~~~~~~~~~~~~~~
+
+.. automodule:: mlfinlab.portfolio_optimization.risk_estimators
+
+    .. autoclass:: RiskEstimators
+        :members:
+
+        .. automethod:: __init__
+
+
+
+
+Nested Clustered Optimization (NCO)
+===================================
+
+The Nested Clustered Optimization algorithm estimates optimal weights allocation to either maximize the Sharpe ratio
+or minimize the variance of a portfolio.
+
+The steps of the NCO algorithm are:
+
+1. Get the covariance matrix of the outcomes as an input (and the vector of means if the target is to maximize the Sharpe ratio).
+
+2. Transform the covariance matrix to the correlation matrix and calculate the distance matrix based on it.
+
+3. Cluster the covariance matrix into subsets of highly-correlated variables.
+
+4. Compute the optimal weights allocation for every cluster.
+
+5. Reduce the original covariance matrix to a reduced one - where each cluster is represented by a single variable.
+
+6. Compute the optimal weights allocation for the reduced covariance matrix.
+
+7. Compute the final allocations as a dot-product of the allocations between the clusters and inside the clusters.
+
+
+This algorithm is described in more detail in the work **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3469961>`_.
+
+Implementation
+~~~~~~~~~~~~~~
+
+.. automodule:: mlfinlab.portfolio_optimization.nco
+
+    .. autoclass:: NCO
+        :members: __init__, opt_port_nco
+
+
+
+
+Monte Carlo Optimization Selection (MCOS)
+=========================================
+
+The Monte Carlo Optimization Selection algorithm calculates the NCO allocations and a simple optimal allocation for multiple simulated pairs of mean vector and the covariance matrix to determine the most robust method for weights allocations for a given pair of means vector and a covariance vector.
+
+The steps of the MCOS algorithm are:
+
+1. Get the covariance matrix and the means vector of the outcomes as an input (along with the simulation parameters to use).
+
+2. Drawing the empirical covariance matrix and the empirical means vector based on the true ones.
+
+3. If the kde_bwidth parameter is given, the empirical covariance matrix is de-noised.
+
+4. Based on the min_var_portf parameter, either the minimum variance or the maximum Sharpe ratio is targeted in weights allocation.
+
+5. Simple optimal allocation is applied to the empirical data to obtain the weights allocation.
+
+6. NCO is applied to the empirical data to obtain the weights allocation.
+
+7. Based on the original covariance matrix and the means vector a true optimal allocation is calculated.
+
+8. For each weights estimation in a method, a standard deviation between the true weights and the obtained weights is calculated.
+
+9. The error associated with each method is calculated as the mean of the standard deviation across all estimations for the method.
+
+This algorithm is described in more detail in the work **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3469961>`_.
+
+Implementation
+~~~~~~~~~~~~~~
+
+.. automodule:: mlfinlab.portfolio_optimization.nco
+
+    .. autoclass:: NCO
+        :members: __init__, opt_port_mcos, estim_errors_mcos
+
+
+
+
+Sample Data Generating
+======================
+
+This method allows creating a random vector of means and a random covariance matrix that has the characteristics of securities inside being grouped in clusters that pose a high correlation and also different correlations between clusters in order to test the NCO and the MCOS algorithms.
+
+Implementation
+~~~~~~~~~~~~~~
+
+.. automodule:: mlfinlab.portfolio_optimization.nco
+
+    .. autoclass:: NCO
+        :members: __init__, form_true_matrix
+
+
+
+
 Examples
 ========
 
@@ -353,6 +463,11 @@ The following research notebooks can be used to better understand how the algori
 * `Chapter 16 Exercise Notebook`_
 
 .. _Chapter 16 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Chapter16/Chapter16.ipynb
+
+* `NCO Notebook`_
+
+.. _NCO Notebook: https://github.com/hudson-and-thames/research/blob/master/NCO/NCO.ipynb
+
 
 
 
