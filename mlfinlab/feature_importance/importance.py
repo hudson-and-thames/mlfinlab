@@ -60,7 +60,7 @@ def mean_decrease_impurity(model, feature_names):
     return importance
 
 
-def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight=None, scoring=log_loss):
+def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight_train=None, sample_weight_score=None, scoring=log_loss):
     """
     Snippet 8.3, page 116-117. MDA Feature Importance
 
@@ -87,27 +87,31 @@ def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight=None, scoring=log_
     :param X: (pd.DataFrame): Train set features.
     :param y: (pd.DataFrame, np.array): Train set labels.
     :param cv_gen: (cross_validation.PurgedKFold): Cross-validation object.
-    :param sample_weight: (np.array): Sample weights, if None equal to ones.
+    :param sample_weight_train: A numpy array of sample weights used to train the model for each record in the dataset.
+    :param sample_weight_score: A numpy array of sample weights used to evaluate the model quality.
     :param scoring: (function): Scoring function used to determine importance.
     :return: (pd.DataFrame): Mean and standard deviation of feature importance.
     """
 
-    if sample_weight is None:
-        sample_weight = np.ones((X.shape[0],))
+    if sample_weight_train is None:
+        sample_weight_train = np.ones((X.shape[0],))
+
+    if sample_weight_score is None:
+        sample_weight_score = np.ones((X.shape[0],))
 
     fold_metrics_values, features_metrics_values = pd.Series(), pd.DataFrame(columns=X.columns)
 
     for i, (train, test) in enumerate(cv_gen.split(X=X)):
-        fit = model.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight[train])
+        fit = model.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight_train[train])
         pred = fit.predict(X.iloc[test, :])
 
         # Get overall metrics value on out-of-sample fold
         if scoring == log_loss:
             prob = fit.predict_proba(X.iloc[test, :])
-            fold_metrics_values.loc[i] = -scoring(y.iloc[test], prob, sample_weight=sample_weight[test],
+            fold_metrics_values.loc[i] = -scoring(y.iloc[test], prob, sample_weight=sample_weight_score[test],
                                                   labels=model.classes_)
         else:
-            fold_metrics_values.loc[i] = scoring(y.iloc[test], pred, sample_weight=sample_weight[test])
+            fold_metrics_values.loc[i] = scoring(y.iloc[test], pred, sample_weight=sample_weight_score[test])
 
         # Get feature specific metric on out-of-sample fold
         for j in X.columns:
@@ -115,12 +119,13 @@ def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight=None, scoring=log_
             np.random.shuffle(X1_[j].values)  # Permutation of a single column
             if scoring == log_loss:
                 prob = fit.predict_proba(X1_)
-                features_metrics_values.loc[i, j] = -scoring(y.iloc[test], prob, sample_weight=sample_weight[test],
+                features_metrics_values.loc[i, j] = -scoring(y.iloc[test], prob,
+                                                             sample_weight=sample_weight_score[test],
                                                              labels=model.classes_)
             else:
                 pred = fit.predict(X1_)
                 features_metrics_values.loc[i, j] = scoring(y.iloc[test], pred,
-                                                            sample_weight=sample_weight[test])
+                                                            sample_weight=sample_weight_score[test])
 
     importance = (-features_metrics_values).add(fold_metrics_values, axis=0)
     if scoring == log_loss:
@@ -133,7 +138,7 @@ def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight=None, scoring=log_
     return importance
 
 
-def single_feature_importance(clf, X, y, cv_gen, sample_weight=None, scoring=log_loss):
+def single_feature_importance(clf, X, y, cv_gen, sample_weight_train=None, sample_weight_score=None, scoring=log_loss):
     """
     Snippet 8.4, page 118. Implementation of SFI
 
@@ -161,17 +166,22 @@ def single_feature_importance(clf, X, y, cv_gen, sample_weight=None, scoring=log
     :param X: (pd.DataFrame): Train set features.
     :param y: (pd.DataFrame, np.array): Train set labels.
     :param cv_gen: (cross_validation.PurgedKFold): Cross-validation object.
-    :param sample_weight: (np.array): Sample weights, if None equal to ones.
+    :param sample_weight_train: A numpy array of sample weights used to train the model for each record in the dataset.
+    :param sample_weight_score: A numpy array of sample weights used to evaluate the model quality.
     :param scoring: (function): Scoring function used to determine importance.
     :return: (pd.DataFrame): Mean and standard deviation of feature importance.
     """
     feature_names = X.columns
-    if sample_weight is None:
-        sample_weight = np.ones((X.shape[0],))
+    if sample_weight_train is None:
+        sample_weight_train = np.ones((X.shape[0],))
+
+    if sample_weight_score is None:
+        sample_weight_score = np.ones((X.shape[0],))
 
     imp = pd.DataFrame(columns=['mean', 'std'])
     for feat in feature_names:
-        feat_cross_val_scores = ml_cross_val_score(clf, X=X[[feat]], y=y, sample_weight=sample_weight,
+        feat_cross_val_scores = ml_cross_val_score(clf, X=X[[feat]], y=y, sample_weight_train=sample_weight_train,
+                                                   sample_weight_score=sample_weight_score,
                                                    scoring=scoring, cv_gen=cv_gen)
         imp.loc[feat, 'mean'] = feat_cross_val_scores.mean()
         # pylint: disable=unsubscriptable-object
