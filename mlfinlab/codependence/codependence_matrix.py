@@ -4,10 +4,9 @@ various methods of Information Codependence  described in Cornell lecture notes:
 Codependence: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes
 """
 #Imports
-import numpy as np
 import pandas as pd
-from mlfinlab.codependence.information import variation_of_information_score, get_mutual_info,\
-                                              distance_correlation
+from mlfinlab.codependence.information import variation_of_information_score, get_mutual_info
+from mlfinlab.codependence.correlation import distance_correlation
 
 def get_dependence_matrix(df: pd.DataFrame, dependence_method: str):
     """
@@ -33,7 +32,7 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str):
         dependence_matrix = [[dep_function(df[x].values, df[y].values, normalize=True) for x in features_cols] for y in features_cols]
     else:
         dependence_matrix = [[dep_function(df[x].values, df[y].values) for x in features_cols] for y in features_cols]
-    dependence_df = pd.DataFrame(data=dependence_matrix, index=features_cols,columns=features_cols) # dependence_matrix converted into a DataFrame
+    dependence_df = pd.DataFrame(data=dependence_matrix, index=features_cols, columns=features_cols) # dependence_matrix converted into a DataFrame
     if dependence_method == 'information_variation':
         return 1 - dependence_df  # IV is reverse, 1 - independent, 0 - similar
     else:
