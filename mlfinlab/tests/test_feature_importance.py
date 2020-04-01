@@ -182,15 +182,14 @@ class TestFeatureImportance(unittest.TestCase):
         # SFI feature importance
         # Take only 5 features for faster test run
         sfi_feat_imp_log_loss = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]],
-                                                          self.y_train_clf, cv_gen=cv_gen,
-                                                          sample_weight=np.ones((self.X_train.shape[0],)))
+                                                          self.y_train_clf, cv_gen=cv_gen, sample_weight=np.ones((self.X_train.shape[0],)))
         sfi_feat_imp_f1 = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
                                                     cv_gen=cv_gen, scoring=f1_score)
         #CFI feature importance
         #Auto number of clusters selection
-        clustered_subsets = get_feature_clusters(self.X_train, dependence_metric = 'information_variation',
-                                                 distance_metric = 'angular', linkage_method = 'single', n_clusters = None)
-        cfi_feat_imp = clustered_feature_importance(sb_clf,  self.X_train, self.y_train_clf, cv_gen,
+        clustered_subsets = get_feature_clusters(self.X_train, dependence_metric ='information_variation',
+                                                 distance_metric ='angular', linkage_method ='single', n_clusters = None)
+        cfi_feat_imp = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
                                                     clustered_subsets=clustered_subsets)
 
         # MDI assertions
