@@ -28,7 +28,7 @@ The ONC algorithm workflow
 3. Calculating the proper distance matrix:
    
    
-.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/formula_images/proper_distance_matrix_formula.PNG
+.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/clustering_images/proper_distance_matrix_formula.PNG
    :scale: 100 %
    :align: center 
 
@@ -36,7 +36,7 @@ The ONC algorithm workflow
 4. Calculating the Euclidean distance matrix of the proper distance matrix:
 
 
-.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/formula_images/Euclidean_distance_formula.PNG
+.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/clustering_images/Euclidean_distance_formula.PNG
    :scale: 100 %
    :align: center 
  
@@ -48,7 +48,7 @@ The ONC algorithm workflow
 7. the formula to find the Silhouette scores is as follows:
 	
 	
-.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/formula_images/silhouette_score_formula.PNG
+.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/clustering_images/silhouette_score_formula.PNG
    :scale: 100 %
    :align: center 
  
@@ -56,7 +56,7 @@ The ONC algorithm workflow
 8. Then the measure of quality q for each clustering is calculated as follows:
 
 
-.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/formula_images/quality_distance_formula.PNG
+.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/clustering_images/quality_distance_formula.PNG
    :scale: 100 %
    :align: center 
  
