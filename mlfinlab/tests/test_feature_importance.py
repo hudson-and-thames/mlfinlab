@@ -190,10 +190,25 @@ class TestFeatureImportance(unittest.TestCase):
                                                     sample_weight_score=np.ones((self.X_train.shape[0],)))
         #CFI feature importance
         #Auto number of clusters selection
-        clustered_subsets = get_feature_clusters(self.X_train, dependence_metric='information_variation',
-                                                 distance_metric='angular', linkage_method='single', n_clusters=None)
+        clustered_subsets_linear_angular = get_feature_clusters(self.X_train, dependence_metric='linear',
+                                                                distance_metric='angular', linkage_method='single',
+                                                                n_clusters=None)
+        clustered_subsets_distance_abs_angular = get_feature_clusters(self.X_train, dependence_metric='distance_correlation',
+                                                                      distance_metric='abs_angular', linkage_method='single',
+                                                                      n_clusters=None)
+        clustered_subsets_vi_squared_angular = get_feature_clusters(self.X_train, dependence_metric='information_variation',
+                                                                    distance_metric='squared_angular', linkage_method='single',
+                                                                    n_clusters=None)
+        clustered_subsets_mi_angular = get_feature_clusters(self.X_train, dependence_metric='mutual_information',
+                                                            distance_metric='angular', linkage_method='single',
+                                                            n_clusters=None)
+        # To raise the error message
+        clustered_subsets_raise_error = get_feature_clusters(self.X_train, dependence_metric='information',
+                                                             distance_metric='serial', linkage_method='single',
+                                                             n_clusters=int(len(self.X_train)))
         cfi_feat_imp = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
-                                                    clustered_subsets=clustered_subsets)
+                                                    clustered_subsets=clustered_subsets_linear_angular)
+
 
         # MDI assertions
         self.assertAlmostEqual(mdi_feat_imp['mean'].sum(), 1, delta=0.001)
