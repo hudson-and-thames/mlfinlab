@@ -327,3 +327,8 @@ class TestChapter3(unittest.TestCase):
                                              [(0.04837, 1), (0.03763, 1), (0.05866, 1), (0.05309, 1), (-0.0812, -1)]):
             self.assertAlmostEqual(tr_scan_labels.iloc[int_index]['ret'], ret_v, delta=1e-4)
             self.assertEqual(tr_scan_labels.iloc[int_index]['bin'], bin_v)
+
+        tr_scan_labels_none = trend_scanning_labels(self.eem_close, t_events=None, look_forward_window=20)
+        tr_scan_labels_none.dropna(inplace=True)
+
+        self.assertTrue((tr_scan_labels == tr_scan_labels_none).all().all())

@@ -8,7 +8,7 @@ import numpy as np
 from mlfinlab.structural_breaks.sadf import _get_betas
 
 
-def trend_scanning_labels(price_series: pd.Series, t_events: list, look_forward_window: int,
+def trend_scanning_labels(price_series: pd.Series, t_events: list = None, look_forward_window: int = 20,
                           min_sample_length: int = 5) -> pd.DataFrame:
     """
     Get Trend-Scanning labels (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3257419)
@@ -21,6 +21,9 @@ def trend_scanning_labels(price_series: pd.Series, t_events: list, look_forward_
                             bin - label value based on price change sign
     """
     # pylint: disable=invalid-name
+
+    if t_events is None:
+        t_events = price_series.index
 
     t1_array = []  # Array of label end times
     ret_array = []  # Array of returns
