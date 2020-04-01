@@ -8,6 +8,8 @@ import pandas as pd
 from mlfinlab.codependence.information import variation_of_information_score, get_mutual_info
 from mlfinlab.codependence.correlation import distance_correlation
 
+# pylint: disable=invalid-name
+
 def get_dependence_matrix(df: pd.DataFrame, dependence_method: str):
     """
     This function returns a dependence matrix for the given method of dependence method.
