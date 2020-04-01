@@ -1,3 +1,4 @@
+# pylint: disable=protected-access
 """
 Tests the Nested Clustered Optimization (NCO) algorithm.
 """
@@ -35,14 +36,14 @@ class TestNCO(unittest.TestCase):
         num_obs = 100000
 
         # Using the function
-        mu_empir, cov_empir = nco.simulate_covariance(mu_vec, cov_mat, num_obs, False)
+        mu_empir, cov_empir = nco._simulate_covariance(mu_vec, cov_mat, num_obs, False)
 
         # Testing that with a high number of observations empirical values are close to real ones
         np.testing.assert_almost_equal(mu_empir.flatten(), mu_vec.flatten(), decimal=2)
         np.testing.assert_almost_equal(cov_mat, cov_empir, decimal=2)
 
         # Also testing the Ledoit-Wolf shrinkage
-        mu_empir_shr, cov_empir_shr = nco.simulate_covariance(mu_vec, cov_mat, num_obs, True)
+        mu_empir_shr, cov_empir_shr = nco._simulate_covariance(mu_vec, cov_mat, num_obs, True)
         np.testing.assert_almost_equal(mu_empir_shr.flatten(), mu_vec.flatten(), decimal=2)
         np.testing.assert_almost_equal(cov_mat, cov_empir_shr, decimal=2)
 
@@ -70,10 +71,10 @@ class TestNCO(unittest.TestCase):
         expected_silh_coef = pd.Series([0.100834, 0.167626, 0], index=[0, 1, 2])
 
         # Finding the clustered corresponding values
-        corr, clusters, silh_coef = nco.cluster_kmeans_base(corr_matrix, max_num_clusters, n_init)
+        corr, clusters, silh_coef = nco._cluster_kmeans_base(corr_matrix, max_num_clusters, n_init)
 
         # When maximum number of clusters is not predefined
-        corr_no_max, _, _ = nco.cluster_kmeans_base(corr_matrix, None, n_init)
+        corr_no_max, _, _ = nco._cluster_kmeans_base(corr_matrix, None, n_init)
 
         # Testing if the values are right
         self.assertTrue(clusters == expected_clust)
@@ -249,7 +250,7 @@ class TestNCO(unittest.TestCase):
                                   [0, 0, 0.3, 1]])
 
         # Finding the errors in estimations
-        corr_matrix = nco.form_block_matrix(num_blocks, block_size, block_corr)
+        corr_matrix = nco._form_block_matrix(num_blocks, block_size, block_corr)
 
         # Testing if the error computation is right
         np.testing.assert_almost_equal(corr_matrix, corr_expected, decimal=4)

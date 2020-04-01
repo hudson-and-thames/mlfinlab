@@ -21,7 +21,7 @@ class NCO:
         """
 
     @staticmethod
-    def simulate_covariance(mu_vector, cov_matrix, num_obs, lw_shrinkage=False):
+    def _simulate_covariance(mu_vector, cov_matrix, num_obs, lw_shrinkage=False):
         """
         Derives an empirical vector of means and an empirical covariance matrix.
 
@@ -51,7 +51,7 @@ class NCO:
         return mu_simulated, cov_simulated
 
     @staticmethod
-    def cluster_kmeans_base(corr, max_num_clusters=None, n_init=10):
+    def _cluster_kmeans_base(corr, max_num_clusters=None, n_init=10):
         """
         Finding the optimal partition of clusters using K-Means algorithm.
 
@@ -189,7 +189,7 @@ class NCO:
         corr = risk_estimators.cov_to_corr(cov)
 
         # Optimal partition of clusters (step 1)
-        corr, clusters, _ = self.cluster_kmeans_base(corr, max_num_clusters, n_init=10)
+        corr, clusters, _ = self._cluster_kmeans_base(corr, max_num_clusters, n_init=10)
 
         # Weights inside clusters
         w_intra_clusters = pd.DataFrame(0, index=cov.index, columns=clusters.keys())
@@ -243,7 +243,7 @@ class NCO:
         # Iterating thorough simulations
         for simulation in range(num_sims):
             # Deriving empirical vector of means and an empirical covariance matrix
-            mu_simulation, cov_simulation = self.simulate_covariance(mu_vec, cov, num_obs, lw_shrinkage)
+            mu_simulation, cov_simulation = self._simulate_covariance(mu_vec, cov, num_obs, lw_shrinkage)
 
             # If goal is minimum variance
             if min_var_portf:
@@ -289,7 +289,7 @@ class NCO:
         return err_cvo, err_nco
 
     @staticmethod
-    def form_block_matrix(num_blocks, block_size, block_corr):
+    def _form_block_matrix(num_blocks, block_size, block_corr):
         """
         Create a block correlation matrix with given parameters.
 
@@ -325,7 +325,7 @@ class NCO:
         """
 
         # Creating a block correlation matrix
-        corr_matrix = self.form_block_matrix(num_blocks, block_size, block_corr)
+        corr_matrix = self._form_block_matrix(num_blocks, block_size, block_corr)
 
         # Transforming to DataFrame
         corr_matrix = pd.DataFrame(corr_matrix)
