@@ -35,8 +35,7 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str):
     dependence_df = pd.DataFrame(data=dependence_matrix, index=features_cols, columns=features_cols) # dependence_matrix converted into a DataFrame
     if dependence_method == 'information_variation':
         return 1 - dependence_df  # IV is reverse, 1 - independent, 0 - similar
-    else:
-        return dependence_df
+    return dependence_df
 
 def get_distance_matrix(X: pd.DataFrame, distance_metric: str = 'angular'):
     """
