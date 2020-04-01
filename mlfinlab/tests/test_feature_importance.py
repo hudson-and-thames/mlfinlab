@@ -204,7 +204,7 @@ class TestFeatureImportance(unittest.TestCase):
                                                     n_clusters=None)
         # To raise the error message
         cfi_feat_imp_linear = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
-                                                            clustered_subsets=clustered_subsets_linear)
+                                                           clustered_subsets=clustered_subsets_linear)
         cfi_feat_imp_distance = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
                                                              clustered_subsets=clustered_subsets_distance)
         cfi_feat_imp_vi = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
