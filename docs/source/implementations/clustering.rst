@@ -41,7 +41,7 @@ The ONC algorithm workflow
    :align: center 
  
 
-5. The algorithm does the clustering with K-means algorithm
+5. The algorithm does the clustering with K-means algorithm that is modified by involving Silhouette scores and the measure of quality for each clustering
 
 6. Silhouette scores are calculated from the distance numbers
    
