@@ -193,7 +193,7 @@ def clustered_feature_importance(model, X, y, cv_gen, clustered_subsets: list, s
     """
     An Implementation of the Clustered Feature Importance algorithm described by Dr Marcos Lopez de Prado in
     Clustered Feature Importance (Presentation Slides) https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595
-    
+
     Clustered Feature Importance or Clustered MDA is the modified verison of MDA (Mean Decreased Accuracy). It is
     robust to substitution effect that takes place when two or more explanatory variables share a substantial amount of
     information (predictive power).
@@ -230,14 +230,14 @@ def clustered_feature_importance(model, X, y, cv_gen, clustered_subsets: list, s
             X1_ = X.iloc[test, :].copy(deep=True)
             for j_i in j:
                 np.random.shuffle(X1_[j_i].values)  # Permutation of a single column of the whole subsets
-        if scoring == log_loss:
-            prob = fit.predict_proba(X1_)
-            features_metrics_values.loc[i, j] = -scoring(y.iloc[test], prob, sample_weight=sample_weight_score[test],
-                                                         labels=model.classes_)
-        else:
-            pred = fit.predict(X1_)
-            features_metrics_values.loc[i, j] = scoring(y.iloc[test], pred,
-                                                        sample_weight=sample_weight_score[test])
+            if scoring == log_loss:
+                prob = fit.predict_proba(X1_)
+                features_metrics_values.loc[i, j] = -scoring(y.iloc[test], prob, sample_weight=sample_weight_score[test],
+                                                             labels=model.classes_)
+            else:
+                pred = fit.predict(X1_)
+                features_metrics_values.loc[i, j] = scoring(y.iloc[test], pred,
+                                                            sample_weight=sample_weight_score[test])
     importance = (-features_metrics_values).add(fold_metrics_values, axis=0)
     if scoring == log_loss:
         importance = importance / -features_metrics_values
