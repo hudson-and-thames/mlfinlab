@@ -183,12 +183,8 @@ class TestFeatureImportance(unittest.TestCase):
         # SFI feature importance
         # Take only 5 features for faster test run
         sfi_feat_imp_log_loss = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]],
-<<<<<<< HEAD
-                                                          self.y_train_clf, cv_gen=cv_gen, sample_weight=np.ones((self.X_train.shape[0],)))
-=======
                                                           self.y_train_clf, cv_gen=cv_gen,
-                                                          sample_weight_train=np.ones((self.X_train.shape[0],)))
->>>>>>> b5151222b97bb2dd22ef53554cfbd91a85b92322
+                                                          sample_weight=np.ones((self.X_train.shape[0],)))
         sfi_feat_imp_f1 = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
                                                     cv_gen=cv_gen, scoring=f1_score)
         #CFI feature importance
