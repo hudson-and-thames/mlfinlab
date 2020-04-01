@@ -203,13 +203,14 @@ class TestFeatureImportance(unittest.TestCase):
                                                             distance_metric='angular', linkage_method='single',
                                                             n_clusters=None)
         # To raise the error message
-        clustered_subsets_raise_error = get_feature_clusters(self.X_train, dependence_metric='information',
-                                                             distance_metric='serial', linkage_method='single',
-                                                             n_clusters=int(len(self.X_train)))
-        cfi_feat_imp = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
+        cfi_feat_imp_linear = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
                                                     clustered_subsets=clustered_subsets_linear_angular)
-
-
+        cfi_feat_imp_distance = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
+                                                    clustered_subsets=clustered_subsets_linear_angular)
+        cfi_feat_imp_vi = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
+                                                    clustered_subsets=clustered_subsets_linear_angular)
+        cfi_feat_imp_mi = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
+                                                    clustered_subsets=clustered_subsets_linear_angular)
         # MDI assertions
         self.assertAlmostEqual(mdi_feat_imp['mean'].sum(), 1, delta=0.001)
         # The most informative features
@@ -235,9 +236,38 @@ class TestFeatureImportance(unittest.TestCase):
         self.assertAlmostEqual(sfi_feat_imp_f1.loc['label_prob_0.2', 'mean'], 0.74, delta=1)
         self.assertAlmostEqual(sfi_feat_imp_f1.loc['label_prob_0.5_sma_2', 'mean'], 0.224, delta=1)
 
-        #CFI assertions
-        self.assertAlmostEqual(cfi_feat_imp.loc['label_prob_0.1', 'mean'], 0.2, delta=3)
-        self.assertAlmostEqual(cfi_feat_imp.loc['label_prob_0.2', 'mean'], 0.3, delta=3)
+        #CFI(linear) assertions
+        self.assertAlmostEqual(cfi_feat_imp_linear.loc['label_prob_0.1', 'mean'], 0.2, delta=3)
+        self.assertAlmostEqual(cfi_feat_imp_linear.loc['label_prob_0.2', 'mean'], 0.3, delta=3)
+        #CFI(distance) assertions
+        self.assertAlmostEqual(cfi_feat_imp_distance.loc['label_prob_0.1', 'mean'], 0.2, delta=3)
+        self.assertAlmostEqual(cfi_feat_imp_distance.loc['label_prob_0.2', 'mean'], 0.3, delta=3)
+        #CFI(variation_of_information) assertions
+        self.assertAlmostEqual(cfi_feat_imp_vi.loc['label_prob_0.1', 'mean'], 0.2, delta=3)
+        self.assertAlmostEqual(cfi_feat_imp_vi.loc['label_prob_0.2', 'mean'], 0.3, delta=3)
+        #CFI(mutual_information) assertions
+        self.assertAlmostEqual(cfi_feat_imp_mi.loc['label_prob_0.1', 'mean'], 0.2, delta=3)
+        self.assertAlmostEqual(cfi_feat_imp_mi.loc['label_prob_0.2', 'mean'], 0.3, delta=3)
+
+    def test_value_error_raise(self):
+        """
+        Test get_feature_clusters , codependence_matrix and distance_matrix for invalid arguments
+        """
+        #Unkown dependence_metric
+        with self.assertRaises(ValueError):
+            get_feature_clusters(self.X_train, dependence_metric='information',
+                                 distance_metric='angular', linkage_method='single',
+                                 n_clusters=2))
+        #Unkown distance_metric
+        with self.assertRaises(ValueError):
+            get_feature_clusters(self.X_train, dependence_metric='linear',
+                                 distance_metric='serial', linkage_method='single',
+                                 n_clusters=2))
+        #Number of clusters larger than number of features
+        with self.assertRaises(ValueError):
+            get_feature_clusters(self.X_train, dependence_metric='linear',
+                                 distance_metric='angular', linkage_method='single',
+                                 n_clusters=int(len(self.X_train)))
 
     def test_plot_feature_importance(self):
         """
