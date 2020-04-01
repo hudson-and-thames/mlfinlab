@@ -190,27 +190,27 @@ class TestFeatureImportance(unittest.TestCase):
                                                     sample_weight_score=np.ones((self.X_train.shape[0],)))
         #CFI feature importance
         #Auto number of clusters selection
-        clustered_subsets_linear_angular = get_feature_clusters(self.X_train, dependence_metric='linear',
-                                                                distance_metric='angular', linkage_method='single',
-                                                                n_clusters=None)
-        clustered_subsets_distance_abs_angular = get_feature_clusters(self.X_train, dependence_metric='distance_correlation',
-                                                                      distance_metric='abs_angular', linkage_method='single',
-                                                                      n_clusters=None)
-        clustered_subsets_vi_squared_angular = get_feature_clusters(self.X_train, dependence_metric='information_variation',
-                                                                    distance_metric='squared_angular', linkage_method='single',
-                                                                    n_clusters=None)
-        clustered_subsets_mi_angular = get_feature_clusters(self.X_train, dependence_metric='mutual_information',
-                                                            distance_metric='angular', linkage_method='single',
-                                                            n_clusters=None)
+        clustered_subsets_linear = get_feature_clusters(self.X_train, dependence_metric='linear',
+                                                        distance_metric='angular', linkage_method='single',
+                                                        n_clusters=None)
+        clustered_subsets_distance = get_feature_clusters(self.X_train, dependence_metric='distance_correlation',
+                                                          distance_metric='abs_angular', linkage_method='single',
+                                                          n_clusters=None)
+        clustered_subsets_vi = get_feature_clusters(self.X_train, dependence_metric='information_variation',
+                                                    distance_metric='squared_angular', linkage_method='single',
+                                                    n_clusters=None)
+        clustered_subsets_mi = get_feature_clusters(self.X_train, dependence_metric='mutual_information',
+                                                    distance_metric='angular', linkage_method='single',
+                                                    n_clusters=None)
         # To raise the error message
         cfi_feat_imp_linear = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
-                                                    clustered_subsets=clustered_subsets_linear_angular)
+                                                            clustered_subsets=clustered_subsets_linear)
         cfi_feat_imp_distance = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
-                                                    clustered_subsets=clustered_subsets_linear_angular)
+                                                             clustered_subsets=clustered_subsets_distance)
         cfi_feat_imp_vi = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
-                                                    clustered_subsets=clustered_subsets_linear_angular)
+                                                       clustered_subsets=clustered_subsets_vi)
         cfi_feat_imp_mi = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
-                                                    clustered_subsets=clustered_subsets_linear_angular)
+                                                       clustered_subsets=clustered_subsets_mi)
         # MDI assertions
         self.assertAlmostEqual(mdi_feat_imp['mean'].sum(), 1, delta=0.001)
         # The most informative features
