@@ -41,7 +41,7 @@ The ONC algorithm workflow
    :align: center 
  
 
-5. The algorithm then does the clustering of our distance matrix through K-means algorithm
+5. The algorithm does the clustering with K-means algorithm
 
 6. Silhouette scores are calculated from the distance numbers
    
