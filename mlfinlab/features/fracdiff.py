@@ -162,7 +162,7 @@ class FractionalDifferentiation:
         Note 1: thresh determines the cut-off weight for the window
         Note 2: diff_amt can be any positive fractional, not necessarity bounded [0, 1].
 
-        :param series: (pd.Dataframe)
+        :param series: (pd.DataFrame)
         :param diff_amt: (float) differencing amount
         :param thresh: (float) threshold for minimum weight
         :return: (pd.DataFrame) a data frame of differenced series
