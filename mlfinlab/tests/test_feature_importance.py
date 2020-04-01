@@ -257,12 +257,12 @@ class TestFeatureImportance(unittest.TestCase):
         with self.assertRaises(ValueError):
             get_feature_clusters(self.X_train, dependence_metric='information',
                                  distance_metric='angular', linkage_method='single',
-                                 n_clusters=2))
+                                 n_clusters=2)
         #Unkown distance_metric
         with self.assertRaises(ValueError):
             get_feature_clusters(self.X_train, dependence_metric='linear',
                                  distance_metric='serial', linkage_method='single',
-                                 n_clusters=2))
+                                 n_clusters=2)
         #Number of clusters larger than number of features
         with self.assertRaises(ValueError):
             get_feature_clusters(self.X_train, dependence_metric='linear',
