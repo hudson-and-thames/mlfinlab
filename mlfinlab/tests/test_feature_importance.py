@@ -19,7 +19,7 @@ from mlfinlab.sampling.bootstrapping import get_ind_mat_label_uniqueness, get_in
 from mlfinlab.ensemble.sb_bagging import SequentiallyBootstrappedBaggingClassifier
 from mlfinlab.feature_importance.importance import (mean_decrease_impurity,
                                                     mean_decrease_accuracy, single_feature_importance,
-                                                    clustered_feature_importance,plot_feature_importance)
+                                                    clustered_feature_importance, plot_feature_importance)
 from mlfinlab.feature_importance.orthogonal import feature_pca_analysis, get_orthogonal_features
 from mlfinlab.cross_validation.cross_validation import PurgedKFold, ml_cross_val_score
 from mlfinlab.clustering.feature_clusters import get_feature_clusters
@@ -184,13 +184,14 @@ class TestFeatureImportance(unittest.TestCase):
         # Take only 5 features for faster test run
         sfi_feat_imp_log_loss = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]],
                                                           self.y_train_clf, cv_gen=cv_gen,
-                                                          sample_weight=np.ones((self.X_train.shape[0],)))
+                                                          sample_weight_train=np.ones((self.X_train.shape[0],)))
         sfi_feat_imp_f1 = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
-                                                    cv_gen=cv_gen, scoring=f1_score)
+                                                    cv_gen=cv_gen, scoring=f1_score,
+                                                    sample_weight_score=np.ones((self.X_train.shape[0],)))
         #CFI feature importance
         #Auto number of clusters selection
-        clustered_subsets = get_feature_clusters(self.X_train, dependence_metric ='information_variation',
-                                                 distance_metric ='angular', linkage_method ='single', n_clusters = None)
+        clustered_subsets = get_feature_clusters(self.X_train, dependence_metric='information_variation',
+                                                 distance_metric='angular', linkage_method='single', n_clusters=None)
         cfi_feat_imp = clustered_feature_importance(sb_clf, self.X_train, self.y_train_clf, cv_gen,
                                                     clustered_subsets=clustered_subsets)
 
