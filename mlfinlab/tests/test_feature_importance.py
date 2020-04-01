@@ -1,5 +1,5 @@
 """
-Test various functions regarding chapter 8: MDI, MDA, SFI importance.
+Test various functions regarding chapter 8: MDI, MDA, SFI, CFI importance.
 """
 
 import os
@@ -19,10 +19,10 @@ from mlfinlab.sampling.bootstrapping import get_ind_mat_label_uniqueness, get_in
 from mlfinlab.ensemble.sb_bagging import SequentiallyBootstrappedBaggingClassifier
 from mlfinlab.feature_importance.importance import (mean_decrease_impurity,
                                                     mean_decrease_accuracy, single_feature_importance,
-                                                    plot_feature_importance)
+                                                    clustered_feature_importance,plot_feature_importance)
 from mlfinlab.feature_importance.orthogonal import feature_pca_analysis, get_orthogonal_features
 from mlfinlab.cross_validation.cross_validation import PurgedKFold, ml_cross_val_score
-
+from mlfinlab.clustering.feature_clusters import get_feature_clusters
 
 # pylint: disable=invalid-name
 
@@ -186,6 +186,12 @@ class TestFeatureImportance(unittest.TestCase):
                                                           sample_weight=np.ones((self.X_train.shape[0],)))
         sfi_feat_imp_f1 = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
                                                     cv_gen=cv_gen, scoring=f1_score)
+        #CFI feature importance
+        #Auto number of clusters selection
+        clustered_subsets = get_feature_clusters(self.X_train, dependence_metric = 'information_variation',
+                                                 distance_metric = 'angular', linkage_method = 'single', n_clusters = None)
+        cfi_feat_imp = clustered_feature_importance(sb_clf,  self.X_train, self.y_train_clf, cv_gen,
+                                                    clustered_subsets=clustered_subsets)
 
         # MDI assertions
         self.assertAlmostEqual(mdi_feat_imp['mean'].sum(), 1, delta=0.001)
@@ -211,6 +217,10 @@ class TestFeatureImportance(unittest.TestCase):
         self.assertAlmostEqual(sfi_feat_imp_f1.loc['label_prob_0.1', 'mean'], 0.81, delta=1)
         self.assertAlmostEqual(sfi_feat_imp_f1.loc['label_prob_0.2', 'mean'], 0.74, delta=1)
         self.assertAlmostEqual(sfi_feat_imp_f1.loc['label_prob_0.5_sma_2', 'mean'], 0.224, delta=1)
+
+        #CFI assertions
+        self.assertAlmostEqual(cfi_feat_imp.loc['label_prob_0.1', 'mean'], 0.2, delta=3)
+        self.assertAlmostEqual(cfi_feat_imp.loc['label_prob_0.2', 'mean'], 0.3, delta=3)
 
     def test_plot_feature_importance(self):
         """
