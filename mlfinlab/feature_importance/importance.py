@@ -189,7 +189,8 @@ def single_feature_importance(clf, X, y, cv_gen, sample_weight_train=None, sampl
     return imp
 
 
-def clustered_feature_importance(model, X, y, cv_gen, clustered_subsets: list, sample_weight_train: np.array = None, sample_weight_score: np.array = None, scoring=log_loss):
+def clustered_feature_importance(model, X, y, cv_gen, clustered_subsets: list, sample_weight_train: np.array=None,
+                                sample_weight_score: np.array=None, scoring=log_loss):
     """
     An Implementation of the Clustered Feature Importance algorithm described by Dr Marcos Lopez de Prado in
     Clustered Feature Importance (Presentation Slides) https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595
