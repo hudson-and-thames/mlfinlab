@@ -103,7 +103,8 @@ def ml_cross_val_score(
         X: pd.DataFrame,
         y: pd.Series,
         cv_gen: BaseCrossValidator,
-        sample_weight: np.ndarray = None,
+        sample_weight_train: np.ndarray = None,
+        sample_weight_score: np.ndarray = None,
         scoring: Callable[[np.array, np.array], float] = log_loss):
     # pylint: disable=invalid-name
     # pylint: disable=comparison-with-callable
@@ -127,24 +128,28 @@ def ml_cross_val_score(
     :param X: The dataset of records to evaluate.
     :param y: The labels corresponding to the X dataset.
     :param cv_gen: Cross Validation generator object instance.
-    :param sample_weight: A numpy array of weights for each record in the dataset.
+    :param sample_weight_train: A numpy array of sample weights used to train the model for each record in the dataset.
+    :param sample_weight_score: A numpy array of sample weights used to evaluate the model quality.
     :param scoring: A metric scoring, can be custom sklearn metric.
     :return: The computed score as a numpy array.
     """
 
     # If no sample_weight then broadcast a value of 1 to all samples (full weight).
-    if sample_weight is None:
-        sample_weight = np.ones((X.shape[0],))
+    if sample_weight_train is None:
+        sample_weight_train = np.ones((X.shape[0],))
+
+    if sample_weight_score is None:
+        sample_weight_score = np.ones((X.shape[0],))
 
     # Score model on KFolds
     ret_scores = []
     for train, test in cv_gen.split(X=X, y=y):
-        fit = classifier.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight[train])
+        fit = classifier.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight_train[train])
         if scoring == log_loss:
             prob = fit.predict_proba(X.iloc[test, :])
-            score = -1 * scoring(y.iloc[test], prob, sample_weight=sample_weight[test], labels=classifier.classes_)
+            score = -1 * scoring(y.iloc[test], prob, sample_weight=sample_weight_score[test], labels=classifier.classes_)
         else:
             pred = fit.predict(X.iloc[test, :])
-            score = scoring(y.iloc[test], pred, sample_weight=sample_weight[test])
+            score = scoring(y.iloc[test], pred, sample_weight=sample_weight_score[test])
         ret_scores.append(score)
     return np.array(ret_scores)
