@@ -10,6 +10,8 @@ from scipy.cluster.hierarchy import linkage, fcluster
 from mlfinlab.clustering import get_onc_clusters
 from mlfinlab.codependence.codependence_matrix import get_dependence_matrix, get_distance_matrix
 
+# pylint: disable=invalid-name
+
 def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metric: str, linkage_method: str, n_clusters: int = None):
     """
     Get clustered features subsets from the given set of features.
