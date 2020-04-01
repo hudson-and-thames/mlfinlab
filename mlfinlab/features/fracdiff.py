@@ -67,7 +67,7 @@ class FractionalDifferentiation:
         Note 1: For thresh-1, nothing is skipped
         Note 2: diff_amt can be any positive fractional, not necessarility bounded [0, 1]
 
-        :param series: (pd.Series) a time series that needs to be differenced
+        :param series: (pd.DataFrame) a time series that needs to be differenced
         :param diff_amt: (float) Differencing amount
         :param thresh: (float) threshold or epsilon
         :return: (pd.DataFrame) data frame of differenced series
@@ -162,7 +162,7 @@ class FractionalDifferentiation:
         Note 1: thresh determines the cut-off weight for the window
         Note 2: diff_amt can be any positive fractional, not necessarity bounded [0, 1].
 
-        :param series: (pd.Series)
+        :param series: (pd.Dataframe)
         :param diff_amt: (float) differencing amount
         :param thresh: (float) threshold for minimum weight
         :return: (pd.DataFrame) a data frame of differenced series
