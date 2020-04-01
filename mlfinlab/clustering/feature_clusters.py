@@ -33,14 +33,10 @@ def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metri
     # Apply distance operator on the dependence matrix
     dist_matrix = get_distance_matrix(dep_matrix, distance_metric=distance_metric)
     link = linkage(squareform(dist_matrix), method=linkage_method)
-    if n_clusters is not None:
-        if n_clusters >= len(X.columns):
-            raise ValueError('Number of Clusters Must be less than the number of features')
-        clusters = fcluster(link, t=n_clusters, criterion='maxclust')
-        clustered_subsets = [[f for c, f in zip(clusters, X.columns) if c == ci] for ci in range(1, n_clusters + 1)]
-        return clustered_subsets
-    else:
-        n_clusters = len(get_onc_clusters(dep_matrix)[1])
-        clusters = fcluster(link, t=n_clusters, criterion='maxclust')
-        clustered_subsets = [[f for c, f in zip(clusters, X.columns) if c == ci] for ci in range(1, n_clusters + 1)]
-        return clustered_subsets
+    if n_clusters is None:
+        n_clusters = len(get_onc_clusters(dep_matrix.fillna(0))[1]) # Get optimal number of clusters 
+    if n_clusters >= len(X.columns): #Check if number of clusters exceeds number of features
+        raise ValueError('Number of clusters must be less than the number of features')
+    clusters = fcluster(link, t=n_clusters, criterion='maxclust')
+    clustered_subsets = [[f for c, f in zip(clusters, X.columns) if c == ci] for ci in range(1, n_clusters + 1)]
+    return clustered_subsets
