@@ -54,7 +54,7 @@ The ONC algorithm workflow
    :align: center 
 
  
-:math:`Si = (bi-ai)/ max{ai,bi}`
+:math:`Si = \(bi-ai)/ max{ai,bi}`
 
 8. Then the measure of quality q for each clustering is calculated as follows:
 
@@ -63,7 +63,7 @@ The ONC algorithm workflow
    :align: center 
 
  
-:math:`q = E[{Si}]/ sqrt(V[{Si}]`
+:math:`q = \E[{Si}]/ sqrt(V[{Si}]`
 
 9. Second modification on K-mean's that involves double for.. loop is performed
 
