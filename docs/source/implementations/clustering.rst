@@ -41,7 +41,7 @@ The ONC algorithm workflow
    :align: center
 
 
-:math:`D~ i,j = \sqrt(Sigma k(Dik - Djk)^2)`
+:math:`D~ i,j = \sqrt(Sigma k(Dik - Djk)^{2})`
  
 5. The algorithm does the clustering with K-means algorithm that is modified by involving Silhouette scores and the measure of quality for each clustering
 
