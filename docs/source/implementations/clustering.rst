@@ -63,7 +63,7 @@ The ONC algorithm workflow
    :align: center 
 
  
-:math:`q = \E[{Si}]/ sqrt(V[{Si}]`
+:math:`q = \E[{Si}]/ sqrt(V[{Si}])`
 
 9. Second modification on K-mean's that involves double for.. loop is performed
 
