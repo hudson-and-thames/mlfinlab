@@ -7,7 +7,6 @@ Implements statistics related to:
 - various Sharpe ratios
 - minimum track record length
 """
-
 import pandas as pd
 import scipy.stats as ss
 import numpy as np
@@ -25,19 +24,25 @@ def timing_of_flattening_and_flips(target_positions: pd.Series) -> pd.DatetimeIn
     :param target_positions: (pd.Series) target position series with timestamps as indices
     :return: (pd.DatetimeIndex) timestamps of trades flattening, flipping and last bet
     """
+
     empty_positions = target_positions[(target_positions == 0)].index  # Empty positions index
     previous_positions = target_positions.shift(1)  # Timestamps pointing at previous positions
+
     # Index of positions where previous one wasn't empty
     previous_positions = previous_positions[(previous_positions != 0)].index
+
     # FLATTENING - if previous position was open, but current is empty
     flattening = empty_positions.intersection(previous_positions)
+
     # Multiplies current position with value of next one
     multiplied_posions = target_positions.iloc[1:] * target_positions.iloc[:-1].values
+
     # FLIPS - if current position has another direction compared to the next
     flips = multiplied_posions[(multiplied_posions < 0)].index
     flips_and_flattenings = flattening.union(flips).sort_values()
     if target_positions.index[-1] not in flips_and_flattenings:  # Appending with last bet
         flips_and_flattenings = flips_and_flattenings.append(target_positions.index[-1:])
+
     return flips_and_flattenings
 
 
@@ -57,6 +62,7 @@ def average_holding_period(target_positions: pd.Series) -> float:
     :param target_positions: (pd.Series) target position series with timestamps as indices
     :return: (float) estimated average holding period, NaN if zero or unpredicted
     """
+
     holding_period = pd.DataFrame(columns=['holding_time', 'weight'])
     entry_time = 0
     position_difference = target_positions.diff()
@@ -106,11 +112,13 @@ def bets_concentration(returns: pd.Series) -> float:
     :param returns: (pd.Series) returns from bets
     :return: (float) concentration of returns (nan if less than 3 returns)
     """
+
     if returns.size <= 2:
         return float('nan')  # If less than 3 bets
     weights = returns / returns.sum()  # Weights of each bet
     hhi = (weights ** 2).sum()  # Herfindahl-Hirschman Index for weights
     hhi = float((hhi - returns.size ** (-1)) / (1 - returns.size ** (-1)))
+
     return hhi
 
 
@@ -134,12 +142,16 @@ def all_bets_concentration(returns: pd.Series, frequency: str = 'M') -> tuple:
     :return: (tuple of floats) concentration of positive, negative
                             and time grouped concentrations
     """
+
     # Concentration of positive returns per bet
     positive_concentration = bets_concentration(returns[returns >= 0])
+
     # Concentration of negative returns per bet
     negative_concentration = bets_concentration(returns[returns < 0])
+
     # Concentration of bets/time period (month by default)
     time_concentration = bets_concentration(returns.groupby(pd.Grouper(freq=frequency)).count())
+
     return (positive_concentration, negative_concentration, time_concentration)
 
 
@@ -166,13 +178,17 @@ def drawdown_and_time_under_water(returns: pd.Series, dollars: bool = False) -> 
                     If dollars, then drawdowns are in dollars, else as a %.
     :return: (tuple of pd.Series) series of drawdowns and time under water
     """
+
     frame = returns.to_frame('pnl')
     frame['hwm'] = returns.expanding().max()  # Adding high watermarks as column
+
     # Grouped as min returns by high watermarks
     high_watermarks = frame.groupby('hwm').min().reset_index()
     high_watermarks.columns = ['hwm', 'min']
+
     # Time high watermark occurred
     high_watermarks.index = frame['hwm'].drop_duplicates(keep='first').index
+
     # Picking ones that had a drawdown after high watermark
     high_watermarks = high_watermarks[high_watermarks['hwm'] > high_watermarks['min']]
     if dollars:
@@ -187,6 +203,7 @@ def drawdown_and_time_under_water(returns: pd.Series, dollars: bool = False) -> 
                                  (returns.index[-1] - high_watermarks.index[-1]) / np.timedelta64(1, 'Y'))
 
     time_under_water = pd.Series(time_under_water, index=high_watermarks.index)
+
     return drawdown, time_under_water
 
 
@@ -224,6 +241,7 @@ def information_ratio(returns: pd.Series, benchmark: float = 0, entries_per_year
     :param entries_per_year: (int) times returns are recorded per year (daily by default)
     :return: (float) Annualized Information Ratio
     """
+
     excess_returns = returns - benchmark
     information_r = sharpe_ratio(excess_returns, entries_per_year)
 
@@ -285,11 +303,13 @@ def deflated_sharpe_ratio(observed_sr: float, sr_estimates: list, number_of_retu
     :param benchmark_out: (bool) flag to output the calculated benchmark instead of DSR
     :return: (float) Deflated Sharpe Ratio or Benchmark SR (if benchmark_out)
     """
+
     # Calculating benchmark_SR from the parameters of estimates
     if estimates_param:
         benchmark_sr = sr_estimates[0] * \
                        ((1 - np.euler_gamma) * ss.norm.ppf(1 - 1 / sr_estimates[1]) +
                         np.euler_gamma * ss.norm.ppf(1 - 1 / sr_estimates[1] * np.e ** (-1)))
+
     # Calculating benchmark_SR from a list of estimates
     else:
         benchmark_sr = np.array(sr_estimates).std() * \

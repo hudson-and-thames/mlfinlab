@@ -304,7 +304,8 @@ class TestCrossValidation(unittest.TestCase):
             classifier=decision_tree,
             X=records,
             y=labels,
-            sample_weight=sample_weights.values,
+            sample_weight_train=sample_weights.values,
+            sample_weight_score=sample_weights.values,
             scoring=accuracy_score,
             cv_gen=cv_gen,
         )
@@ -326,15 +327,16 @@ class TestCrossValidation(unittest.TestCase):
             classifier=decision_tree,
             X=records,
             y=labels,
-            sample_weight=sample_weights.values,
+            sample_weight_train=sample_weights.values,
+            sample_weight_score=None,
             scoring=log_loss,
             cv_gen=cv_gen,
         )
         self.log(f"scores= {scores}")
 
-        should_be = np.array([-16.623581666339184, -17.694504470879014, -17.386178334890698])
+        should_be = np.array([-17.26939, -17.32125, -17.32125])
         self.assertTrue(
-            np.array_equal(scores, should_be),
+            np.allclose(scores, should_be),
             "score lists don't match"
         )
 
@@ -347,7 +349,8 @@ class TestCrossValidation(unittest.TestCase):
             classifier=decision_tree,
             X=records,
             y=labels,
-            sample_weight=sample_weights.values,
+            sample_weight_train=sample_weights.values,
+            sample_weight_score=sample_weights.values,
             scoring=log_loss,
             cv_gen=TimeSeriesSplit(max_train_size=None, n_splits=3),
         )
@@ -370,7 +373,8 @@ class TestCrossValidation(unittest.TestCase):
             classifier=decision_tree,
             X=records,
             y=labels,
-            sample_weight=None,
+            sample_weight_train=None,
+            sample_weight_score=None,
             scoring=accuracy_score,
             cv_gen=cv_gen,
         )
