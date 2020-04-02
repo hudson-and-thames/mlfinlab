@@ -224,9 +224,11 @@ Implementation
 Risk Estimators
 ===============
 
-This class includes de-noising algorithms and helping methods. In particular, methods for de-noising the covariance function and transforming covariance matrix to the correlation matrix and the other way around.
+This class includes de-noising algorithms and helping methods. In particular, methods for de-noising the covariance matrix and transforming the covariance matrix to the correlation matrix and back to the covariance matrix.
 
 The main idea behind de-noising is to separate the noise-related eigenvalues from the signal-related ones. This is achieved through fitting the Marcenko-Pastur distribution of the empirical distribution of eigenvalues using a Kernel Density Estimate (KDE).
+
+This method is described in more detail in the NCO Notebook.
 
 Implementation
 ~~~~~~~~~~~~~~
@@ -272,7 +274,7 @@ Implementation
 .. automodule:: mlfinlab.portfolio_optimization.nco
 
     .. autoclass:: NCO
-        :members: __init__, opt_port_nco
+        :members: __init__, opt_port_nco, opt_port
 
 
 
@@ -318,7 +320,7 @@ Implementation
 Sample Data Generating
 ======================
 
-This method allows creating a random vector of means and a random covariance matrix that has the characteristics of securities inside being grouped in clusters that pose a high correlation and also different correlations between clusters in order to test the NCO and the MCOS algorithms.
+This method allows creating a random vector of means and a random covariance matrix that has the characteristics of securities. The elements are divided into clusters. The elements in clusters have a given level of correlation. The correlation between the clusters is set at another level. This structure is created in order to test the NCO and MCOS algorithms.
 
 Implementation
 ~~~~~~~~~~~~~~

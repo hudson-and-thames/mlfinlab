@@ -7,7 +7,7 @@ from scipy.optimize import minimize
 
 class RiskEstimators:
     """
-    This class implements the functions related to de-noising of the covariance matrix. It is reproduced with
+    This class implements the functions related to the de-noising of the covariance matrix. It is reproduced with
     modification from the following paper: `Marcos Lopez de Prado “A Robust Estimator of the Efficient Frontier”,
     (2019). <https://papers.ssrn.com/abstract_id=3469961>`_.
     """
@@ -20,17 +20,18 @@ class RiskEstimators:
     @staticmethod
     def _fit_kde(observations, kde_bwidth=0.25, kde_kernel='gaussian', eval_points=None):
         """
-        Fits kernel to a series of observations, and derives the probability of observations.
+        Fits kernel to a series of observations (in out case eigenvalues), and derives the
+        probability density function of observations.
 
-        :param observations: (np.array) Array of eigenvalues to fit kernel to
+        :param observations: (np.array) Array of observations (eigenvalues) eigenvalues to fit kernel to
         :param kde_bwidth: (float) The bandwidth of the kernel
         :param kde_kernel: (str) Kernel to use [‘gaussian’|’tophat’|’epanechnikov’|’exponential’|’linear’|’cosine’]
         :param eval_points: (np.array) Array of values on which the fit of the KDE will be evaluated
                                        If not provided, the unique values of observations are used
-        :return: (pd.Series) Series of log(density) of the eval_points
+        :return: (pd.Series) Series with estimated pdf values in the eval_points
         """
 
-        # Reshaping array to a horizontal one
+        # Reshaping array to a vertical one
         observations = observations.reshape(-1, 1)
 
         # Estimating Kernel Density of the empirical distribution of eigenvalues
@@ -40,14 +41,14 @@ class RiskEstimators:
         if eval_points is None:
             eval_points = np.unique(observations).reshape(-1, 1)
 
-        # If the input vector is one-dimensional, reshaping
+        # If the input vector is one-dimensional, reshaping to a vertical one
         if len(eval_points.shape) == 1:
             eval_points = eval_points.reshape(-1, 1)
 
         # Evaluating the log density model on the given values
         log_prob = kde.score_samples(eval_points)
 
-        # Preparing the output of log densities
+        # Preparing the output of pdf values
         pdf = pd.Series(np.exp(log_prob), index=eval_points.flatten())
 
         return pdf
@@ -59,15 +60,15 @@ class RiskEstimators:
 
         Outputs the pdf for num_points between the minimum and maximum expected eigenvalues.
         Requires the variance of the distribution (var) and the relation of T - the number
-        of observations of each X variable to N - the number of X variables.
+        of observations of each X variable to N - the number of X variables (T/N).
 
-        :param var: (float) Variance of the distribution
-        :param tn_relation: (float) Relation of sample length T to the number of variables N
+        :param var: (float) Variance of the M-P distribution
+        :param tn_relation: (float) Relation of sample length T to the number of variables N (T/N)
         :param num_points: (int) Number of points to estimate pdf
-        :return: (pd.Series) Series of pdf values
+        :return: (pd.Series) Series of M-P pdf values
         """
 
-        # Changing the type as scipy.optimize.minimize outputs np.array
+        # Changing the type as scipy.optimize.minimize outputs np.array with one element to this function
         if not isinstance(var, float):
             var = float(var)
 
@@ -93,11 +94,11 @@ class RiskEstimators:
         SSE is calculated for num_points, equally spread between minimum and maximum
         expected theoretical eigenvalues.
 
-        :param var: (float) Variance of the distribution (theoretical pdf)
-        :param eigen_observations: (np.array) Observed empirical eigenvalues (empirical pdf)
-        :param tn_relation: (float) Relation of sample length T to the number of variables N (theoretical pdf)
-        :param kde_bwidth: (float) The bandwidth of the kernel (empirical pdf)
-        :param num_points: (int) Number of points to estimate pdf  (empirical pdf)
+        :param var: (float) Variance of the M-P distribution (for the theoretical pdf)
+        :param eigen_observations: (np.array) Observed empirical eigenvalues (for the empirical pdf)
+        :param tn_relation: (float) Relation of sample length T to the number of variables N (for the theoretical pdf)
+        :param kde_bwidth: (float) The bandwidth of the kernel (for the empirical pdf)
+        :param num_points: (int) Number of points to estimate pdf  (for the empirical pdf)
         :return: (float) SSE between empirical pdf and theoretical pdf
         """
 
@@ -115,13 +116,13 @@ class RiskEstimators:
         Searching for maximum random eigenvalue by fitting Marcenko-Pastur distribution
         to the empirical one - obtained through kernel density estimation.
 
-        :param eigen_observations: (np.array) Observed empirical eigenvalues (empirical pdf)
-        :param tn_relation: (float) Relation of sample length T to the number of variables N (theoretical pdf)
-        :param kde_bwidth: (float) The bandwidth of the kernel (empirical pdf)
+        :param eigen_observations: (np.array) Observed empirical eigenvalues (for the empirical pdf)
+        :param tn_relation: (float) Relation of sample length T to the number of variables N (for the theoretical pdf)
+        :param kde_bwidth: (float) The bandwidth of the kernel (for the empirical pdf)
         :return: (float, float) Maximum random eigenvalue, optimal variation of the Marcenko-Pastur distribution
         """
 
-        # Searching for the variation of Marcenko-Pastur distribution for the best fit with empirical distribution
+        # Searching for the variation of Marcenko-Pastur distribution for the best fit with the empirical distribution
         optimization = minimize(self._pdf_fit, x0=np.array(0.5), args=(eigen_observations, tn_relation, kde_bwidth),
                                 bounds=((1e-5, 1 - 1e-5),))
 
@@ -139,7 +140,7 @@ class RiskEstimators:
         Recovers the covariance matrix from the de-noise correlation matrix.
 
         :param corr: (np.array) Correlation matrix
-        :param std: (np.array) vector of standard deviations
+        :param std: (np.array) Vector of standard deviations
         :return: (np.array) Covariance matrix
         """
 
@@ -170,7 +171,7 @@ class RiskEstimators:
     @staticmethod
     def _get_pca(hermit_matrix):
         """
-        Calculates eigenvalues and eigenvectors from a Hermitian matrix.
+        Calculates eigenvalues and eigenvectors from a Hermitian matrix. In our case, from the correlation matrix.
 
         Eigenvalues in the output are on the main diagonal of a matrix.
 
@@ -195,9 +196,9 @@ class RiskEstimators:
 
     def _denoised_corr(self, eigenvalues, eigenvectors, num_facts):
         """
-        Shrinks the eigenvalues associated with noise, and returns a de-noised correlation matrix
+        Shrinks the eigenvalues associated with noise, and returns a de-noised correlation matrix.
 
-        Noise is removed from correlation matrix by fixing random eigenvalues.
+        Noise is removed from the correlation matrix by fixing random eigenvalues.
 
         :param eigenvalues: (np.array) Matrix with eigenvalues on the main diagonal
         :param eigenvectors: (float) Eigenvectors array
@@ -205,7 +206,7 @@ class RiskEstimators:
         :return: (np.array) De-noised correlation matrix
         """
 
-        # Vector of eigenvalues from main diagonal of a matrix
+        # Vector of eigenvalues from the main diagonal of a matrix
         eigenval_vec = np.diag(eigenvalues).copy()
 
         # Replacing eigenvalues after num_facts to their average value
@@ -224,15 +225,16 @@ class RiskEstimators:
 
     def de_noised_cov(self, cov, tn_relation, kde_bwidth):
         """
-        Computes a denoised covariation matrix from a given covariation matrix.
+        Computes a de-noised covariance matrix from a given covariance matrix.
 
         As a threshold for the denoising the correlation matrix, the maximum eigenvalue
         that fits the theoretical distribution is used.
 
         :param cov: (np.array) Covariance matrix
-        :param tn_relation: (float) Relation of sample length T to the number of variables N
-        :param kde_bwidth: (float) The bandwidth of the kernel
-        :return: (np.array) Maximum random eigenvalue, optimal variation of the Marcenko-Pastur distribution
+        :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
+                                    covariance matrix.
+        :param kde_bwidth: (float) The bandwidth of the kernel to fit KDE
+        :return: (np.array) De-noised covariance matrix
         """
 
         # Correlation matrix computation
@@ -244,14 +246,14 @@ class RiskEstimators:
         # Calculating the maximum eigenvalue to fit the theoretical distribution
         maximum_eigen, _ = self._find_max_eval(np.diag(eigenval), tn_relation, kde_bwidth)
 
-        # Calculating the threshold of eigenvalues that fit theoretical distribution
+        # Calculating the threshold of eigenvalues that fit the theoretical distribution
         # from our set of eigenvalues
         num_facts = eigenval.shape[0] - np.diag(eigenval)[::-1].searchsorted(maximum_eigen)
 
         # Based on the threshold, de-noising the correlation matrix
         corr = self._denoised_corr(eigenval, eigenvec, num_facts)
 
-        # Calculating the covariance matrix
+        # Calculating the covariance matrix from the de-noised correlation matrix
         cov_denoised = self.corr_to_cov(corr, np.diag(cov) ** (1 / 2))
 
         return cov_denoised

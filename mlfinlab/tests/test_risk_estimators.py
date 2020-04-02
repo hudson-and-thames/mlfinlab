@@ -1,6 +1,6 @@
 # pylint: disable=protected-access
 """
-Tests the Nested Clustered Optimization (RiskEstimators) algorithm.
+Tests the functions from the RiskEstimators class.
 """
 
 import unittest
@@ -47,7 +47,7 @@ class TestRiskEstimators(unittest.TestCase):
 
         risk_estimators = RiskEstimators()
 
-        # Values to fit to and parameters
+        # Values to fit kernel to and evaluation points
         observations = np.array([0.1, 0.2, 0.2, 0.3, 0.3, 0.3, 0.4, 0.4, 0.5])
         eval_points = np.array([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
 
@@ -226,7 +226,7 @@ class TestRiskEstimators(unittest.TestCase):
                                  [-0.00133514, -0.00438387, 0.01]])
 
         # Finding the de-noised covariance matrix
-        cov_matrix = risk_estimators.de_noised_cov(cov_matrix, tn_relation, kde_bwidth)
+        cov_matrix_denoised = risk_estimators.de_noised_cov(cov_matrix, tn_relation, kde_bwidth)
 
         # Testing if the de-noised covariance matrix is right
-        np.testing.assert_almost_equal(cov_matrix, expected_cov, decimal=4)
+        np.testing.assert_almost_equal(cov_matrix_denoised, expected_cov, decimal=4)

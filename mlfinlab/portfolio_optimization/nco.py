@@ -43,8 +43,10 @@ class NCO:
 
         # Empirical means vector calculation
         mu_simulated = observations.mean(axis=0).reshape(-1, 1)
+
         if lw_shrinkage:  # If applying Ledoit-Wolf shrinkage
             cov_simulated = LedoitWolf().fit(observations).covariance_
+
         else:  # Simple empirical covariance matrix
             cov_simulated = np.cov(observations, rowvar=False)
 
@@ -69,22 +71,22 @@ class NCO:
                                              Silhouette Coefficient series
         """
 
-        # Distance matix from correlation matrix
+        # Distance matrix from correlation matrix
         dist_matrix = ((1 - corr.fillna(0)) / 2) ** (1 / 2)
 
         # Series for Silhouette Coefficients - cluster fit measure
         silh_coef_optimal = pd.Series()
 
-        # If maximum number of clusters undefined, it's equal to the half of the elements
+        # If maximum number of clusters undefined, it's equal to half the number of elements
         if max_num_clusters is None:
             max_num_clusters = round(corr.shape[0] / 2)
 
         # Iterating over the allowed iteration times for k-means
         for init in range(1, n_init):
             # Iterating through every number of clusters
-            for i in range(2, max_num_clusters + 1):
+            for num_clusters in range(2, max_num_clusters + 1):
                 # Computing k-means clustering
-                kmeans = KMeans(n_clusters=i, n_jobs=1, n_init=init)
+                kmeans = KMeans(n_clusters=num_clusters, n_jobs=1, n_init=init)
                 kmeans = kmeans.fit(dist_matrix)
 
                 # Computing a Silhouette Coefficient - cluster fit measure
@@ -143,7 +145,7 @@ class NCO:
         if mu_vec is None:  # To output the minimum variance portfolio
             mu_vec = ones
 
-        # Calculating the analytical solution - weights
+        # Calculating the analytical solution using CVO - weights
         w_cvo = np.dot(inv_cov, mu_vec)
         w_cvo /= np.dot(mu_vec.T, w_cvo)
 
@@ -156,13 +158,13 @@ class NCO:
 
         First, it clusters the covariance matrix into subsets of highly correlated variables.
         Second, it computes the optimal allocation for each of the clusters separately.
-        This allows to collapse the original covariance matrix into a reduced covariance matrix,
+        This allows collapsing of the original covariance matrix into a reduced covariance matrix,
         where each cluster is represented by a single variable.
         Third, we compute the optimal allocations across the reduced covariance matrix.
         Fourth, the final allocations are the dot-product of the intra-cluster (step 2) allocations and
         the inter-cluster (step 3) allocations.
 
-        For the Convex Optimization Solution, a mu - optimal solution parameter is needed.
+        For the Convex Optimization Solution (CVO), a mu - optimal solution parameter is needed.
         If mu is the vector of expected values from variables, the result will be
         a vector of weights with maximum Sharpe ratio.
         If mu is a vector of ones (pass None value), the result will be a vector of weights with
@@ -221,22 +223,23 @@ class NCO:
         """
         Estimates the optimal allocation using the Monte Carlo optimization selection (MCOS) algorithm.
 
-        Repeats the CVO and theNCO and algorithms multiple times to get the average result based on
-        a large number of simulated pairs of (vector of means, covariance matrix).
+        Repeats the CVO and the NCO algorithms multiple times on the empirical values to get a dataframe of trials
+        in order to later compare them to a true optimal weights allocation and compare the robustness of the NCO
+        and the CVO methods.
 
         :param mu_vec: (np.array) The original vector of expected outcomes.
         :param cov: (np.array )The original covariance matrix of outcomes.
-        :param num_obs: (int) The number of observations T used to compute mu0 and cov0.
-        :param num_sims: (int) The number of simulations run in the Monte Carlo.
-        :param kde_bwidth: (float) The bandwidth of the KDE functions used to de-noise the covariance matrix.
-        :param min_var_portf: (bool) when True, the minimum variance solution is computed. Otherwise, the
+        :param num_obs: (int) The number of observations T used to compute mu_vec and cov.
+        :param num_sims: (int) The number of Monte Carlo simulations to run.
+        :param kde_bwidth: (float) The bandwidth of the KDE used to de-noise the covariance matrix.
+        :param min_var_portf: (bool) When True, the minimum variance solution is computed. Otherwise, the
                                      maximum Sharpe ratio solution is computed.
-        :param lw_shrinkage: (bool) when True, the covariance matrix is subjected to the Ledoit-Wolf shrinkage
-                                    procedure
+        :param lw_shrinkage: (bool) When True, the covariance matrix is subjected to the Ledoit-Wolf shrinkage
+                                    procedure.
         :return: (pd.dataframe, pd.dataframe) DataFrames with allocations for CVO and NCO algorithms.
         """
 
-        # Creating DataFrames for simple CVO results and NCO results
+        # Creating DataFrames for CVO results and NCO results
         w_cvo = pd.DataFrame(columns=range(cov.shape[0]), index=range(num_sims), dtype=float)
         w_nco = w_cvo.copy(deep=True)
 
@@ -267,23 +270,26 @@ class NCO:
         """
         Computes the true optimal allocation w, and compares that result with the estimated ones by MCOS.
 
+        The result is the mean standard deviation between the true weights and the ones obtained from the simulation
+        for each algorithm - CVO and NCO.
+
         :param w_cvo: (pd.dataframe) DataFrame with weights from the CVO algorithm.
         :param w_nco: (pd.dataframe) DataFrame with weights from the NCO algorithm.
         :param mu_vec: (np.array) The original vector of expected outcomes.
-        :param cov: (np.array )The original covariance matrix of outcomes.
-        :param min_var_portf: (bool) when True, the minimum variance solution was computed. Otherwise, the
+        :param cov: (np.array)The original covariance matrix of outcomes.
+        :param min_var_portf: (bool) When True, the minimum variance solution was computed. Otherwise, the
                                      maximum Sharpe ratio solution was computed.
-        :return: (float, float) Mean difference in expected outcomes for CVO and NCO algorithms.
+        :return: (float, float) Mean standard deviation of weights for CVO and NCO algorithms.
         """
 
         # Calculating the true optimal weights allocation
         w_true = self.opt_port(cov, None if min_var_portf else mu_vec)
         w_true = np.repeat(w_true.T, w_cvo.shape[0], axis=0)
 
-        # Mean difference in expected outcomes fro CVO algorithm
+        # Mean standard deviation between the weights from CVO algorithm and the true weights
         err_cvo = (w_cvo - w_true).std(axis=0).mean()
 
-        # Mean difference in expected outcomes fro NCO algorithm
+        # Mean standard deviation between the weights from NCO algorithm and the true weights
         err_nco = (w_nco - w_true).std(axis=0).mean()
 
         return err_cvo, err_nco
@@ -291,7 +297,7 @@ class NCO:
     @staticmethod
     def _form_block_matrix(num_blocks, block_size, block_corr):
         """
-        Create a block correlation matrix with given parameters.
+        Creates a correlation matrix in a block form with given parameters.
 
         :param num_blocks: (int) Number of blocks in matrix
         :param block_size: (int) Size of a single block
@@ -305,7 +311,7 @@ class NCO:
         # Setting the main diagonal to ones
         block[range(block_size), range(block_size)] = 1
 
-        # Create a block diagonal matrix from provided blocks
+        # Create a block diagonal matrix with a number of equal blocks
         res_matrix = block_diag(*([block] * num_blocks))
 
         return res_matrix
@@ -314,6 +320,8 @@ class NCO:
         """
         Creates a random vector of means and a random covariance matrix.
 
+        Due to the block structure of a matrix, it is a good sample data to use in the NCO and MCOS algorithms.
+
         The number of securities in a portfolio, number of blocks and correlations
         both inside the cluster and between clusters are adjustable.
 
@@ -321,7 +329,7 @@ class NCO:
         :param block_size: (int) Size of a single block
         :param block_corr: (float) Correlation of elements in a block
         :param std: (float) Correlation between the clusters
-        :return: (np.array) Resulting vector of means and the covariance matrix
+        :return: (np.array, pd.dataframe) Resulting vector of means and the dataframe with covariance matrix
         """
 
         # Creating a block correlation matrix
