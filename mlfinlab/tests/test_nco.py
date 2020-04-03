@@ -83,7 +83,7 @@ class TestNCO(unittest.TestCase):
         np.testing.assert_almost_equal(np.array(corr), np.array(corr_no_max), decimal=4)
 
     @staticmethod
-    def test_opt_port():
+    def test_allocate_cvo():
         """
         Test the estimates of the Convex Optimization Solution (CVO).
         """
@@ -103,17 +103,17 @@ class TestNCO(unittest.TestCase):
                                [0.48055833]])
 
         # Finding the optimal weights
-        w_cvo = nco.opt_port(cov_matrix, mu_vec=None)
+        w_cvo = nco.allocate_cvo(cov_matrix, mu_vec=None)
 
         # Also when manually inputting the vector mu
-        w_cvo_mu = nco.opt_port(cov_matrix, mu_vec=mu_vec)
+        w_cvo_mu = nco.allocate_cvo(cov_matrix, mu_vec=mu_vec)
 
         # Testing if the optimal allocation is right and if the custom mu works
         np.testing.assert_almost_equal(w_cvo, w_expected, decimal=4)
         np.testing.assert_almost_equal(w_cvo, w_cvo_mu, decimal=4)
 
     @staticmethod
-    def test_opt_port_nco():
+    def test_allocate_nco():
         """
         Test the estimates the optimal allocation using the (NCO) algorithm
         """
@@ -135,17 +135,17 @@ class TestNCO(unittest.TestCase):
         max_num_clusters = 2
 
         # Finding the optimal weights
-        w_nco = nco.opt_port_nco(cov_matrix, max_num_clusters=max_num_clusters)
+        w_nco = nco.allocate_nco(cov_matrix, max_num_clusters=max_num_clusters)
 
         # Finding the optimal weights using the custom mu vector
-        w_nco_mu = nco.opt_port_nco(cov_matrix, mu_vec=mu_vec, max_num_clusters=max_num_clusters)
+        w_nco_mu = nco.allocate_nco(cov_matrix, mu_vec=mu_vec, max_num_clusters=max_num_clusters)
 
         # Testing if the optimal allocation is right and if the custom mu works
         np.testing.assert_almost_equal(w_nco, w_expected, decimal=4)
         np.testing.assert_almost_equal(w_nco, w_nco_mu, decimal=4)
 
     @staticmethod
-    def test_opt_port_mcos():
+    def test_allocate_mcos():
         """
         Test the estimates of the optimal allocation using the Monte Carlo optimization selection
         """
@@ -184,10 +184,10 @@ class TestNCO(unittest.TestCase):
                                           [-0.937168, 1.886158, -0.389275, 4.884809]])
 
         # Finding the optimal weights for minimum variance
-        w_cvo, w_nco = nco.opt_port_mcos(mu_vec, cov_mat, num_obs, num_sims, kde_bwidth, min_var_portf, lw_shrinkage)
+        w_cvo, w_nco = nco.allocate_mcos(mu_vec, cov_mat, num_obs, num_sims, kde_bwidth, min_var_portf, lw_shrinkage)
 
         # Finding the optimal weights for maximum Sharpe ratio
-        w_cvo_sr, w_nco_sr = nco.opt_port_mcos(mu_vec, cov_mat, num_obs, num_sims, kde_bwidth_alt, min_var_portf_alt, lw_shrinkage)
+        w_cvo_sr, w_nco_sr = nco.allocate_mcos(mu_vec, cov_mat, num_obs, num_sims, kde_bwidth_alt, min_var_portf_alt, lw_shrinkage)
 
         # Testing if the optimal allocation simulations are right
         np.testing.assert_almost_equal(np.array(w_cvo), np.array(w_cvo_expected), decimal=4)

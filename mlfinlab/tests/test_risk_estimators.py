@@ -206,7 +206,7 @@ class TestRiskEstimators(unittest.TestCase):
         np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
 
     @staticmethod
-    def de_noised_cov():
+    def test_denoise_covariance():
         """
         Test the shrinkage the eigenvalues associated with noise.
         """
@@ -226,7 +226,7 @@ class TestRiskEstimators(unittest.TestCase):
                                  [-0.00133514, -0.00438387, 0.01]])
 
         # Finding the de-noised covariance matrix
-        cov_matrix_denoised = risk_estimators.de_noised_cov(cov_matrix, tn_relation, kde_bwidth)
+        cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation, kde_bwidth)
 
         # Testing if the de-noised covariance matrix is right
         np.testing.assert_almost_equal(cov_matrix_denoised, expected_cov, decimal=4)

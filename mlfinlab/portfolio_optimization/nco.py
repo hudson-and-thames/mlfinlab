@@ -20,6 +20,8 @@ class NCO:
         Initialize
         """
 
+        return
+
     @staticmethod
     def _simulate_covariance(mu_vector, cov_matrix, num_obs, lw_shrinkage=False):
         """
@@ -35,7 +37,6 @@ class NCO:
         :param num_obs: (int) Number of observations to draw for every X
         :param lw_shrinkage: (bool) Flag to apply Ledoit-Wolf shrinkage to X
         :return: (np.array, np.array) Empirical means vector, empirical covariance matrix
-
         """
 
         # Generating a matrix of num_obs observations for X distributions
@@ -58,8 +59,8 @@ class NCO:
         Finding the optimal partition of clusters using K-Means algorithm.
 
         For the fit of K-Means algorithm a matrix of distances based on the correlation matrix is used.
-        The algorithm iterates through n_init - time K-Means can run with different seeds and
-        max_num_clusters - maximum number of clusters allowed.
+        The algorithm iterates n_init number of times and initialises K-Means with different seeds
+        and max_number_of_clusters.
 
         The Silhouette Coefficient is used as a measure of how well samples are clustered
         with samples that are similar to themselves.
@@ -120,7 +121,7 @@ class NCO:
         return corr, clusters, silh_coef_optimal
 
     @staticmethod
-    def opt_port(cov, mu_vec=None):
+    def allocate_cvo(cov, mu_vec=None):
         """
         Estimates the Convex Optimization Solution (CVO).
 
@@ -133,7 +134,7 @@ class NCO:
         :param cov: (np.array) Covariance matrix of the variables.
         :param mu_vec: (np.array) Expected value of draws from the variables for maximum Sharpe ratio.
                               None if outputting the minimum variance portfolio.
-        :return: (np.array) Optimal allocation
+        :return: (np.array) Weights for optimal allocation.
         """
 
         # Calculating the inverse covariance matrix
@@ -152,7 +153,7 @@ class NCO:
         return w_cvo
 
 
-    def opt_port_nco(self, cov, mu_vec=None, max_num_clusters=None):
+    def allocate_nco(self, cov, mu_vec=None, max_num_clusters=None):
         """
         Estimates the optimal allocation using the nested clustered optimization (NCO) algorithm.
 
@@ -205,27 +206,27 @@ class NCO:
             mu_cluster = (None if mu_vec is None else mu_vec.loc[clusters[i]].values.reshape(-1, 1))
 
             # Estimating the Convex Optimization Solution in a cluster (step 2)
-            w_intra_clusters.loc[clusters[i], i] = self.opt_port(cov_cluster, mu_cluster).flatten()
+            w_intra_clusters.loc[clusters[i], i] = self.allocate_cvo(cov_cluster, mu_cluster).flatten()
 
         # Reducing new covariance matrix to calculate inter-cluster weights
         cov_inter_cluster = w_intra_clusters.T.dot(np.dot(cov, w_intra_clusters))
         mu_inter_cluster = (None if mu_vec is None else w_intra_clusters.T.dot(mu_vec))
 
         # Optimal allocations across the reduced covariance matrix (step 3)
-        w_inter_clusters = pd.Series(self.opt_port(cov_inter_cluster, mu_inter_cluster).flatten(), index=cov_inter_cluster.index)
+        w_inter_clusters = pd.Series(self.allocate_cvo(cov_inter_cluster, mu_inter_cluster).flatten(), index=cov_inter_cluster.index)
 
         # Final allocations - dot-product of the intra-cluster and inter-cluster allocations (step 4)
         w_nco = w_intra_clusters.mul(w_inter_clusters, axis=1).sum(axis=1).values.reshape(-1, 1)
 
         return w_nco
 
-    def opt_port_mcos(self, mu_vec, cov, num_obs, num_sims, kde_bwidth, min_var_portf, lw_shrinkage):
+    def allocate_mcos(self, mu_vec, cov, num_obs, num_sims, kde_bwidth, min_var_portf, lw_shrinkage):
         """
         Estimates the optimal allocation using the Monte Carlo optimization selection (MCOS) algorithm.
 
         Repeats the CVO and the NCO algorithms multiple times on the empirical values to get a dataframe of trials
         in order to later compare them to a true optimal weights allocation and compare the robustness of the NCO
-        and the CVO methods.
+        and CVO methods.
 
         :param mu_vec: (np.array) The original vector of expected outcomes.
         :param cov: (np.array )The original covariance matrix of outcomes.
@@ -257,11 +258,11 @@ class NCO:
 
             # De-noising covariance matrix
             if kde_bwidth > 0:
-                cov_simulation = risk_estimators.de_noised_cov(cov_simulation, num_obs/cov_simulation.shape[1], kde_bwidth)
+                cov_simulation = risk_estimators.denoise_covariance(cov_simulation, num_obs/cov_simulation.shape[1], kde_bwidth)
 
             # Writing the results to corresponding dataframes
-            w_cvo.loc[simulation] = self.opt_port(cov_simulation, mu_simulation).flatten()
-            w_nco.loc[simulation] = self.opt_port_nco(cov_simulation, mu_simulation,
+            w_cvo.loc[simulation] = self.allocate_cvo(cov_simulation, mu_simulation).flatten()
+            w_nco.loc[simulation] = self.allocate_nco(cov_simulation, mu_simulation,
                                                       int(cov_simulation.shape[0] / 2)).flatten()
 
         return w_cvo, w_nco
@@ -283,7 +284,7 @@ class NCO:
         """
 
         # Calculating the true optimal weights allocation
-        w_true = self.opt_port(cov, None if min_var_portf else mu_vec)
+        w_true = self.allocate_cvo(cov, None if min_var_portf else mu_vec)
         w_true = np.repeat(w_true.T, w_cvo.shape[0], axis=0)
 
         # Mean standard deviation between the weights from CVO algorithm and the true weights
@@ -322,7 +323,7 @@ class NCO:
 
         Due to the block structure of a matrix, it is a good sample data to use in the NCO and MCOS algorithms.
 
-        The number of securities in a portfolio, number of blocks and correlations
+        The number of assets in a portfolio, number of blocks and correlations
         both inside the cluster and between clusters are adjustable.
 
         :param num_blocks: (int) Number of blocks in matrix

@@ -282,7 +282,7 @@ Implementation
 Monte Carlo Optimization Selection (MCOS)
 =========================================
 
-The Monte Carlo Optimization Selection algorithm calculates the NCO allocations and a simple optimal allocation for multiple simulated pairs of mean vector and the covariance matrix to determine the most robust method for weights allocations for a given pair of means vector and a covariance vector.
+The Monte Carlo Optimization Selection algorithm calculates the NCO allocations and a simple optimal allocation for multiple simulated pairs of mean vector and the covariance matrix to determine the most robust method for weight allocations for a given pair of means vector and a covariance vector.
 
 The steps of the MCOS algorithm are:
 

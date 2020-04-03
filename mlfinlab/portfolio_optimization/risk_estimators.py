@@ -17,6 +17,8 @@ class RiskEstimators:
         Initialize
         """
 
+        return
+
     @staticmethod
     def _fit_kde(observations, kde_bwidth=0.25, kde_kernel='gaussian', eval_points=None):
         """
@@ -137,7 +139,7 @@ class RiskEstimators:
     @staticmethod
     def corr_to_cov(corr, std):
         """
-        Recovers the covariance matrix from the de-noise correlation matrix.
+        Recovers the covariance matrix from a correlation matrix.
 
         :param corr: (np.array) Correlation matrix
         :param std: (np.array) Vector of standard deviations
@@ -145,7 +147,6 @@ class RiskEstimators:
         """
 
         cov = corr * np.outer(std, std)
-
         return cov
 
     @staticmethod
@@ -223,7 +224,7 @@ class RiskEstimators:
 
         return corr
 
-    def de_noised_cov(self, cov, tn_relation, kde_bwidth):
+    def denoise_covariance(self, cov, tn_relation, kde_bwidth):
         """
         Computes a de-noised covariance matrix from a given covariance matrix.
 
