@@ -179,7 +179,7 @@ class TestFeatureImportance(unittest.TestCase):
                                                        sample_weight_train=np.ones((self.X_train.shape[0],)),
                                                        sample_weight_score=np.ones((self.X_train.shape[0],)))
         mda_feat_imp_f1 = mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
-                                                 cv_gen, scoring=f1_score)
+                                                 cv_gen, scoring=accuracy_score)
         # SFI feature importance
         # Take only 5 features for faster test run
         sfi_feat_imp_log_loss = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]],
