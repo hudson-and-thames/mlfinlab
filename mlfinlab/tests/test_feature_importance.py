@@ -229,8 +229,8 @@ class TestFeatureImportance(unittest.TestCase):
         self.assertAlmostEqual(cfi_feat_imp_linear.loc['label_prob_0.2', 'mean'], 0.3, delta=3)
 
         #Check if CFI with clustered_subsets is equal to number of features has same result equal to MDA
-        self.assertEqual(mda_feat_imp_f1.loc['label_prob_0.1', 'mean'],cfi_feat_imp.loc['label_prob_0.1', 'mean'])
-        self.assertEqual(mda_feat_imp_f1.loc['label_prob_0.2', 'mean'],cfi_feat_imp.loc['label_prob_0.2', 'mean'])
+        self.assertEqual(mda_feat_imp_f1.loc['label_prob_0.1', 'mean'], cfi_feat_imp_log_loss.loc['label_prob_0.1', 'mean'])
+        self.assertEqual(mda_feat_imp_f1.loc['label_prob_0.2', 'mean'], cfi_feat_imp_log_loss.loc['label_prob_0.2', 'mean'])
 
     def test_value_error_raise(self):
         """
