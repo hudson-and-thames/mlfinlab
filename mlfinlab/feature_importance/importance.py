@@ -110,7 +110,7 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
 
     fold_metrics_values, features_metrics_values = pd.Series(), pd.DataFrame(columns=X.columns)
     # clustered feature subsets will be used for CFI if clustered_subsets exists else will operate on the single column as MDA
-    feature_sets = clustered_subsets if clustered_subsets else [[x] fo x in X.columns]
+    feature_sets = clustered_subsets if clustered_subsets else [[x] for x in X.columns]
     for i, (train, test) in enumerate(cv_gen.split(X=X)):
         fit = model.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight_train[train])
         pred = fit.predict(X.iloc[test, :])
@@ -127,7 +127,7 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
         for j in feature_sets:
             X1_ = X.iloc[test, :].copy(deep=True)
             for j_i in j:
-                np.random.shuffle(X1_[j_i].values)  # Permutation of a single column for MDA or through the whole subset for CFI   
+                np.random.shuffle(X1_[j_i].values)  # Permutation of a single column for MDA or through the whole subset for CFI
             if scoring == log_loss:
                 prob = fit.predict_proba(X1_)
                 features_metrics_values.loc[i, j] = -scoring(y.iloc[test], prob,
