@@ -179,7 +179,7 @@ class TestFeatureImportance(unittest.TestCase):
                                                        sample_weight_train=np.ones((self.X_train.shape[0],)),
                                                        sample_weight_score=np.ones((self.X_train.shape[0],)))
         mda_feat_imp_f1 = mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
-                                                 cv_gen, scoring=accuracy_score)
+                                                 cv_gen, scoring=f1_score)
         # SFI feature importance
         # Take only 5 features for faster test run
         sfi_feat_imp_log_loss = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]],
@@ -195,10 +195,6 @@ class TestFeatureImportance(unittest.TestCase):
                                                         n_clusters=None)
         cfi_feat_imp_linear = mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf, cv_gen,
                                                      clustered_subsets=clustered_subsets_linear)
-        #CFI over individual feature clusters
-        individual_features = [[x] for x in self.X_train.columns]
-        cfi_feat_imp_log_loss = mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf, cv_gen,
-                                                       clustered_subsets=individual_features)
         # MDI assertions
         self.assertAlmostEqual(mdi_feat_imp['mean'].sum(), 1, delta=0.001)
         # The most informative features
@@ -227,10 +223,6 @@ class TestFeatureImportance(unittest.TestCase):
         #CFI(log_loss) assertions
         self.assertAlmostEqual(cfi_feat_imp_linear.loc['label_prob_0.1', 'mean'], 0.2, delta=3)
         self.assertAlmostEqual(cfi_feat_imp_linear.loc['label_prob_0.2', 'mean'], 0.3, delta=3)
-
-        #Check if CFI with clustered_subsets is equal to number of features has same result equal to MDA
-        self.assertEqual(mda_feat_imp_f1.loc['label_prob_0.1', 'mean'], cfi_feat_imp_log_loss.loc['label_prob_0.1', 'mean'])
-        self.assertEqual(mda_feat_imp_f1.loc['label_prob_0.2', 'mean'], cfi_feat_imp_log_loss.loc['label_prob_0.2', 'mean'])
 
     def test_value_error_raise(self):
         """
