@@ -12,6 +12,7 @@ from mlfinlab.cross_validation.cross_validation import ml_cross_val_score
 # pylint: disable=invalid-name
 # pylint: disable=invalid-unary-operand-type
 # pylint: disable=comparison-with-callable
+#pylint: disable=too-many-locals
 
 def mean_decrease_impurity(model, feature_names):
     """
@@ -142,7 +143,7 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
     if scoring == log_loss:
         importance = importance / -features_metrics_values
     else:
-        importance = importance / (1.0 - features_metrics_values)
+        importance = importance / (1.0 - features_metrics_values).replace(0,np.nan)
     importance = pd.concat({'mean': importance.mean(), 'std': importance.std() * importance.shape[0] ** -.5}, axis=1)
     importance.replace([-np.inf, np.nan], 0, inplace=True)  # Replace infinite values
 
