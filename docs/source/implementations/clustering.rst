@@ -32,7 +32,8 @@ The ONC algorithm workflow
    :align: center 
 
 
-:math:`Di,j = \sqrt(1/2*(1 - p))`
+:math:`D_i_,_j = \sqrt\ \frac {1}{2} (1 - \rho_i_,_j)`
+
 
 4. Calculating the Euclidean distance matrix of the proper distance matrix:
 
@@ -41,7 +42,8 @@ The ONC algorithm workflow
    :align: center
 
 
-:math:`D~ i,j = \sqrt(Sigma k(Dik - Djk)^{2})`
+:math:`\tilde{D}_i_,_j = \sqrt \mathlarger{\mathlarger{??\sum\limits_{\substack{k}}(D_i_k - D_j_k)^{2}  `
+
  
 5. The algorithm does the clustering with K-means algorithm that is modified by involving Silhouette scores and the measure of quality for each clustering
 
@@ -54,7 +56,8 @@ The ONC algorithm workflow
    :align: center 
 
  
-:math:`Si = \(bi-ai)/ max{ai,bi}`
+:math:`S_i = \[\frac{b_i - a_i}{max\{a_i,b_i\}}\] '
+
 
 8. Then the measure of quality q for each clustering is calculated as follows:
 
@@ -63,7 +66,8 @@ The ONC algorithm workflow
    :align: center 
 
  
-:math:`q = \E[{Si}]/ sqrt(V[{Si}])`
+:math:` \textit q = \[\frac{E[\{S_i\}]}{\sqrt\ V[\{S_i\}]}\]` 
+
 
 9. Second modification on K-mean's that involves double for.. loop is performed
 
