@@ -27,47 +27,30 @@ The ONC algorithm workflow
     
 3. Calculating the proper distance matrix:
    
-.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/clustering_images/proper_distance_matrix_formula.PNG
-   :scale: 100 %
-   :align: center 
+:math:`D_{i,j}= \sqrt{\frac{1}{2}(1-\rho_{ij})}` 
 
-
-:math:`D_i_,_j = \sqrt\ \frac {1}{2} (1 - \rho_i_,_j)`
 
 
 4. Calculating the Euclidean distance matrix of the proper distance matrix:
 
-.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/clustering_images/Euclidean_distance_formula.PNG
-   :scale: 100 %
-   :align: center
+:math:`\tilde{D}_{i,j}=\sqrt{\sum\limits_{k}(D_{ik}-D_{jk})^2}` 
 
-
-:math:`\tilde{D}_i_,_j = \sqrt \mathlarger{\mathlarger{??\sum\limits_{\substack{k}}(D_i_k - D_j_k)^{2}`
-
- 
+       
 5. The algorithm does the clustering with K-means algorithm that is modified by involving Silhouette scores and the measure of quality for each clustering
 
 6. Silhouette scores are calculated from the distance numbers
    
 7. the formula to find the Silhouette scores is as follows:
 		
-.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/clustering_images/silhouette_score_formula.PNG
-   :scale: 100 %
-   :align: center 
-
  
-:math:`S_i = \[\frac{b_i - a_i}{max\{a_i,b_i\}}\]`
+:math:`S_i=\frac{b_i-a_i}{max\{a_i,b_i\}}`
 
 
 
 8. Then the measure of quality q for each clustering is calculated as follows:
 
-.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/clustering_images/quality_distance_formula.PNG
-   :scale: 100 %
-   :align: center 
-
  
-:math:`\textit q = \[\frac{E[\{S_i\}]}{\sqrt\ V[\{S_i\}]}\]` 
+:math:`\textit q= \frac{E[\{S_i\}]}{\sqrt{V[\{S_i\}]}}` 
 
 
 9. Second modification on K-mean's that involves double for.. loop is performed
