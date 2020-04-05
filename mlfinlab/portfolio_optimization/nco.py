@@ -10,7 +10,8 @@ from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
 
 class NCO:
     """
-    This class implements the Nested Clustered Optimization (NCO) algorithm. It is reproduced with
+    This class implements the Nested Clustered Optimization (NCO) algorithm, the Convex Optimization Solution (CVO),
+    the  Monte Carlo Optimization Selection (MCOS) algorithm and sample data generating function. It is reproduced with
     modification from the following paper: `Marcos Lopez de Prado “A Robust Estimator of the Efficient Frontier”,
     (2019). <https://papers.ssrn.com/abstract_id=3469961>`_.
     """
