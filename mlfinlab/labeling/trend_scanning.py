@@ -48,11 +48,10 @@ def trend_scanning_labels(price_series: pd.Series, t_events: list = None, look_f
                 # Get regression coefficients estimates
                 b_mean_, b_std_ = _get_betas(X_subset, y_subset)
                 # Check if l gives the maximum t-value among all values {0...L}
-                if len(b_mean_) > 1:
-                    t_beta_1 = abs(b_mean_[1] / b_std_[1, 1])[0]
-                    if t_beta_1 > max_t_value:
-                        max_t_value = t_beta_1
-                        max_t_value_index = forward_window
+                t_beta_1 = abs(b_mean_[1] / b_std_[1, 1])[0]
+                if t_beta_1 > max_t_value:
+                    max_t_value = t_beta_1
+                    max_t_value_index = forward_window
 
             # Store label information (t1, return)
             label_endtime_index = subset.index[max_t_value_index]
