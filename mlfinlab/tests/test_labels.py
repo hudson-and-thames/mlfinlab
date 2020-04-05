@@ -29,7 +29,7 @@ class TestChapter3(unittest.TestCase):
         self.data.index = pd.to_datetime(self.data.index)
 
         # Data set used for trend scanning labels
-        self.eem_close = pd.read_csv('./test_data/stock_prices.csv', index_col=0, parse_dates=[0])
+        self.eem_close = pd.read_csv(project_path + '/test_data/stock_prices.csv', index_col=0, parse_dates=[0])
         # In 2008, EEM had some clear trends
         self.eem_close = self.eem_close['EEM'].loc[pd.Timestamp(2008, 4, 1):pd.Timestamp(2008, 10, 1)]
 
