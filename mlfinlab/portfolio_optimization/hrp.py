@@ -32,6 +32,73 @@ class HierarchicalRiskParity:
         self.returns_estimator = ReturnsEstimation()
         self.risk_metrics = RiskMetrics()
 
+    def allocate(self,
+                 asset_names=None,
+                 asset_prices=None,
+                 asset_returns=None,
+                 covariance_matrix=None,
+                 resample_by=None,
+                 use_shrinkage=False):
+        # pylint: disable=invalid-name, too-many-branches
+        """
+        Calculate asset allocations using HRP algorithm.
+
+        :param asset_names: (list) a list of strings containing the asset names
+        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
+                                            indexed by date
+        :param asset_returns: (pd.Dataframe/numpy matrix) user supplied matrix of asset returns
+        :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+                                  None for no resampling
+        :param use_shrinkage: (Boolean) specifies whether to shrink the covariances
+        """
+
+        if asset_prices is None and asset_returns is None and covariance_matrix is None:
+            raise ValueError("You need to supply either raw prices or returns or a covariance matrix of asset returns")
+
+        if asset_prices is not None:
+            if not isinstance(asset_prices, pd.DataFrame):
+                raise ValueError("Asset prices matrix must be a dataframe")
+            if not isinstance(asset_prices.index, pd.DatetimeIndex):
+                raise ValueError("Asset prices dataframe must be indexed by date.")
+
+        if asset_names is None:
+            if asset_prices is not None:
+                asset_names = asset_prices.columns
+            elif asset_returns is not None and isinstance(asset_returns, pd.DataFrame):
+                asset_names = asset_returns.columns
+            else:
+                raise ValueError("Please provide a list of asset names")
+
+        # Calculate the returns if the user does not supply a returns dataframe
+        if asset_returns is None and covariance_matrix is None:
+            asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
+        asset_returns = pd.DataFrame(asset_returns, columns=asset_names)
+
+        # Calculate covariance of returns or use the user specified covariance matrix
+        if covariance_matrix is None:
+            if use_shrinkage:
+                covariance_matrix = self._shrink_covariance(asset_returns=asset_returns)
+            else:
+                covariance_matrix = asset_returns.cov()
+        cov = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
+
+        # Calculate correlation from covariance matrix
+        corr = self._cov2corr(covariance=cov)
+
+        # Step-1: Tree Clustering
+        distances, self.clusters = self._tree_clustering(correlation=corr)
+
+        # Step-2: Quasi Diagnalization
+        num_assets = len(asset_names)
+        self.ordered_indices = self._quasi_diagnalization(num_assets, 2 * num_assets - 2)
+        self.seriated_distances, self.seriated_correlations = self._get_seriated_matrix(assets=asset_names,
+                                                                                        distances=distances,
+                                                                                        correlations=corr)
+
+        # Step-3: Recursive Bisection
+        self._recursive_bisection(covariance=cov, assets=asset_names)
+
     @staticmethod
     def _tree_clustering(correlation, method='single'):
         """
@@ -181,62 +248,3 @@ class HierarchicalRiskParity:
         corr = np.dot(np.dot(d_inv, covariance), d_inv)
         corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
         return corr
-
-    def allocate(self,
-                 asset_names,
-                 asset_prices=None,
-                 asset_returns=None,
-                 covariance_matrix=None,
-                 resample_by=None,
-                 use_shrinkage=False):
-        # pylint: disable=invalid-name, too-many-branches
-        """
-        Calculate asset allocations using HRP algorithm.
-
-        :param asset_names: (list) a list of strings containing the asset names
-        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
-                                            indexed by date
-        :param asset_returns: (pd.Dataframe/numpy matrix) user supplied matrix of asset returns
-        :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns
-        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                  None for no resampling
-        :param use_shrinkage: (Boolean) specifies whether to shrink the covariances
-        """
-
-        if asset_prices is None and asset_returns is None and covariance_matrix is None:
-            raise ValueError("You need to supply either raw prices or returns or a covariance matrix of asset returns")
-
-        if asset_prices is not None:
-            if not isinstance(asset_prices, pd.DataFrame):
-                raise ValueError("Asset prices matrix must be a dataframe")
-            if not isinstance(asset_prices.index, pd.DatetimeIndex):
-                raise ValueError("Asset prices dataframe must be indexed by date.")
-
-        # Calculate the returns if the user does not supply a returns dataframe
-        if asset_returns is None and covariance_matrix is None:
-            asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
-        asset_returns = pd.DataFrame(asset_returns, columns=asset_names)
-
-        # Calculate covariance of returns or use the user specified covariance matrix
-        if covariance_matrix is None:
-            if use_shrinkage:
-                covariance_matrix = self._shrink_covariance(asset_returns=asset_returns)
-            else:
-                covariance_matrix = asset_returns.cov()
-        cov = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
-
-        # Calculate correlation from covariance matrix
-        corr = self._cov2corr(covariance=cov)
-
-        # Step-1: Tree Clustering
-        distances, self.clusters = self._tree_clustering(correlation=corr)
-
-        # Step-2: Quasi Diagnalization
-        num_assets = len(asset_names)
-        self.ordered_indices = self._quasi_diagnalization(num_assets, 2 * num_assets - 2)
-        self.seriated_distances, self.seriated_correlations = self._get_seriated_matrix(assets=asset_names,
-                                                                                        distances=distances,
-                                                                                        correlations=corr)
-
-        # Step-3: Recursive Bisection
-        self._recursive_bisection(covariance=cov, assets=asset_names)
