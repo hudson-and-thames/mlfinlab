@@ -248,4 +248,3 @@ class HierarchicalRiskParity:
         corr = np.dot(np.dot(d_inv, covariance), d_inv)
         corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
         return corr
-

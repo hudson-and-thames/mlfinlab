@@ -440,4 +440,3 @@ class HierarchicalClusteringAssetAllocation:
             raise ValueError("Unknown allocation metric specified. Supported metrics are - minimum_variance, "
                              "minimum_standard_deviation, sharpe_ratio, equal_weighting, expected_shortfall, "
                              "conditional_drawdown_risk")
-
