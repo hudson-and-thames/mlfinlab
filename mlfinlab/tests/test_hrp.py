@@ -18,8 +18,9 @@ class TestHRP(unittest.TestCase):
 
     def setUp(self):
         """
-        Set the file path for the tick data csv
+        Set the file path for the tick data csv.
         """
+
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
@@ -39,7 +40,7 @@ class TestHRP(unittest.TestCase):
 
     def test_hrp_with_shrinkage(self):
         """
-        Test the weights calculated by HRP algorithm with covariance shrinkage
+        Test the weights calculated by HRP algorithm with covariance shrinkage.
         """
 
         hrp = HierarchicalRiskParity()
@@ -51,7 +52,7 @@ class TestHRP(unittest.TestCase):
 
     def test_dendrogram_plot(self):
         """
-        Test if dendrogram plot object is correctly rendered
+        Test if dendrogram plot object is correctly rendered.
         """
 
         hrp = HierarchicalRiskParity()
@@ -65,7 +66,7 @@ class TestHRP(unittest.TestCase):
 
     def test_quasi_diagnalization(self):
         """
-        Test the quasi-diagnalisation step of HRP algorithm
+        Test the quasi-diagnalisation step of HRP algorithm.
         """
 
         hrp = HierarchicalRiskParity()
@@ -75,7 +76,7 @@ class TestHRP(unittest.TestCase):
 
     def test_value_error_for_non_dataframe_input(self):
         """
-        Test ValueError on passing non-dataframe input
+        Test ValueError on passing non-dataframe input.
         """
 
         with self.assertRaises(ValueError):
@@ -84,7 +85,7 @@ class TestHRP(unittest.TestCase):
 
     def test_value_error_for_non_date_index(self):
         """
-        Test ValueError on passing dataframe not indexed by date
+        Test ValueError on passing dataframe not indexed by date.
         """
 
         with self.assertRaises(ValueError):
@@ -94,7 +95,7 @@ class TestHRP(unittest.TestCase):
 
     def test_resampling_asset_prices(self):
         """
-        Test resampling of asset prices
+        Test resampling of asset prices.
         """
 
         hrp = HierarchicalRiskParity()
@@ -106,7 +107,7 @@ class TestHRP(unittest.TestCase):
 
     def test_all_inputs_none(self):
         """
-        Test allocation when all inputs are None
+        Test allocation when all inputs are None.
         """
 
         with self.assertRaises(ValueError):
@@ -115,7 +116,7 @@ class TestHRP(unittest.TestCase):
 
     def test_hrp_with_input_as_returns(self):
         """
-        Test HRP when passing asset returns dataframe as input
+        Test HRP when passing asset returns dataframe as input.
         """
 
         hrp = HierarchicalRiskParity()
@@ -128,7 +129,7 @@ class TestHRP(unittest.TestCase):
 
     def test_hrp_with_input_as_covariance_matrix(self):
         """
-        Test HRP when passing a covariance matrix as input
+        Test HRP when passing a covariance matrix as input.
         """
 
         hrp = HierarchicalRiskParity()
@@ -138,3 +139,38 @@ class TestHRP(unittest.TestCase):
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_no_asset_names(self):
+        """
+        Test HRP when not supplying a list of asset names.
+        """
+
+        hrp = HierarchicalRiskParity()
+        hrp.allocate(asset_prices=self.data)
+        weights = hrp.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_no_asset_names_with_asset_returns(self):
+        """
+        Test HRP when not supplying a list of asset names and when the user passes asset_returns.
+        """
+
+        hrp = HierarchicalRiskParity()
+        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        hrp.allocate(asset_returns=returns)
+        weights = hrp.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_valuerror_with_no_asset_names(self):
+        """
+        Test ValueError when not supplying a list of asset names and no other input.
+        """
+
+        with self.assertRaises(ValueError):
+            hrp = HierarchicalRiskParity()
+            returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+            hrp.allocate(asset_returns=returns.values)
