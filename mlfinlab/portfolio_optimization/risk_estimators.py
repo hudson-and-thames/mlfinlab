@@ -395,3 +395,46 @@ class RiskEstimators:
         semi_covariance = min_returns.size * min_returns.cov()
 
         return semi_covariance
+
+    @staticmethod
+    def exponential_covariance(returns, price_data=False, window_span=60):
+        """
+        Calculates the Exponentially-weighted Covariance matrix for a dataframe of asset prices or returns.
+
+        It calculates the series of covariances between elements and then gets the last value of exponentially
+        weighted moving average series from covariance series as an element in matrix.
+
+        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param price_data: (bool) Flag if prices of assets are used and not returns.
+        :param window_span: (int) Used to specify decay in terms of span for the exponentially-weighted series.
+        :return: (np.array) Exponentially-weighted Covariance matrix.
+        """
+
+        # Calculating the series of returns from series of prices
+        if price_data:
+            # Class with returns calculation function
+            ret_est = ReturnsEstimation()
+
+            # Calculating returns
+            returns = ret_est.calculate_returns(returns)
+
+        # Simple covariance matrix
+        cov_matrix = returns.cov()
+
+        # Iterating to fill elements
+        for row_number in range(cov_matrix.shape[0]):
+            for column_number in range(cov_matrix.shape[1]):
+                # Series of returns for the element from the row and column
+                row_asset = returns.iloc[:, row_number]
+                column_asset = returns.iloc[:, column_number]
+
+                # Series of covariance
+                covariance_series = (row_asset - row_asset.mean()) * (column_asset - column_asset.mean())
+
+                # Exponentially weighted moving average series
+                ew_ma = covariance_series.ewm(span=window_span).mean()
+
+                # Using the most current element as the Exponential Covariance value
+                cov_matrix.iloc[row_number, column_number] = ew_ma[-1]
+
+        return cov_matrix
