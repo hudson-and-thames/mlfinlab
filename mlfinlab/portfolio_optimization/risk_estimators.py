@@ -2,7 +2,9 @@
 import numpy as np
 import pandas as pd
 from sklearn.neighbors import KernelDensity
+from sklearn.covariance import MinCovDet, EmpiricalCovariance, ShrunkCovariance, LedoitWolf, OAS
 from scipy.optimize import minimize
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 
 class RiskEstimators:
@@ -258,3 +260,104 @@ class RiskEstimators:
         cov_denoised = self.corr_to_cov(corr, np.diag(cov) ** (1 / 2))
 
         return cov_denoised
+
+    @staticmethod
+    def minimum_covariance_determinant(returns, price_data=False, assume_centered=False,
+                                       support_fraction=None, random_state=None):
+        """
+        Calculates the Minimum Covariance Determinant for a dataframe of asset prices or returns.
+
+        This function is a wrap of the sklearn's MinCovDet (MCD) class.
+
+        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param price_data: (bool) Flag if prices of assets are used and not returns.
+        :param assume_centered: (bool) Flag for data with mean significantly equal to zero
+                                       (Read the documentation for MinCovDet class).
+        :param support_fraction: (float) Values between 0 and 1. The proportion of points to be included in the support
+                                         of the raw MCD estimate (Read the documentation for MinCovDet class).
+        :param random_state: (int) Seed used by the random number generator.
+        :return: (np.array) Estimated robust covariance matrix.
+        """
+
+        # Calculating the series of returns from series of prices
+        if price_data:
+            # Class with returns calculation function
+            ret_est = ReturnsEstimation()
+
+            # Calculating returns
+            returns = ret_est.calculate_returns(returns)
+
+        # Calculating the covariance matrix
+        cov_matrix = MinCovDet(assume_centered=assume_centered, support_fraction=support_fraction,
+                               random_state=random_state).fit(returns).covariance_
+
+        return cov_matrix
+
+    @staticmethod
+    def empirical_covariance(returns, price_data=False, assume_centered=False):
+        """
+        Calculates the Maximum likelihood covariance estimator for a dataframe of asset prices or returns.
+
+        This function is a wrap of the sklearn's EmpiricalCovariance class.
+
+        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param price_data: (bool) Flag if prices of assets are used and not returns.
+        :param assume_centered: (bool) Flag for data with mean almost, but not exactly zero
+                                       (Read documentation for EmpiricalCovariance class).
+        :return: (np.array) Estimated covariance matrix.
+        """
+
+        # Calculating the series of returns from series of prices
+        if price_data:
+            # Class with returns calculation function
+            ret_est = ReturnsEstimation()
+
+            # Calculating returns
+            returns = ret_est.calculate_returns(returns)
+
+        # Calculating the covariance matrix
+        cov_matrix = EmpiricalCovariance(assume_centered=assume_centered).fit(returns).covariance_
+
+        return cov_matrix
+
+    @staticmethod
+    def shrinked_covariance(returns, price_data=False, shrinkage_type='basic', assume_centered=False,
+                            basic_shrinkage=0.1):
+        """
+        Calculates the Covariance estimator with shrinkage for a dataframe of asset prices or returns.
+
+        This function allows three types of shrinkage - Basic, Ledoit-Wolf and Oracle Approximating Shrinkage.
+        It is a wrap of the sklearn's ShrunkCovariance, LedoitWolf and OAS classes.
+
+        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param price_data: (bool) Flag if prices of assets are used and not returns.
+        :param shrinkage_type: (str) Type of shrinkage to use ('basic','lw','oas','all').
+        :param assume_centered: (bool) Flag for data with mean almost, but not exactly zero
+                                       (Read documentation for chosen shrinkage class).
+        :param basic_shrinkage: (float) Between 0 and 1. Coefficient in the convex combination for basic shrinkage.
+        :return: (np.array) Estimated covariance matrix. Tuple of covariance matrices if shrinkage_type = 'all'.
+        """
+
+        # Calculating the series of returns from series of prices
+        if price_data:
+            # Class with returns calculation function
+            ret_est = ReturnsEstimation()
+
+            # Calculating returns
+            returns = ret_est.calculate_returns(returns)
+
+        # Calculating the covariance matrix for the chosen method
+        if shrinkage_type == 'basic':
+            cov_matrix = ShrunkCovariance(assume_centered=assume_centered, shrinkage=basic_shrinkage).fit(
+                returns).covariance_
+        elif shrinkage_type == 'lw':
+            cov_matrix = LedoitWolf(assume_centered=assume_centered).fit(returns).covariance_
+        elif shrinkage_type == 'oas':
+            cov_matrix = OAS(assume_centered=assume_centered).fit(returns).covariance_
+        else:
+            cov_matrix = (
+                ShrunkCovariance(assume_centered=assume_centered, shrinkage=basic_shrinkage).fit(returns).covariance_,
+                LedoitWolf(assume_centered=assume_centered).fit(returns).covariance_,
+                OAS(assume_centered=assume_centered).fit(returns).covariance_)
+
+        return cov_matrix
