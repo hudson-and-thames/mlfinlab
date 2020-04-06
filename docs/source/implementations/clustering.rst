@@ -20,7 +20,9 @@ Implementation
 The ONC algorithm workflow
 ==========================
 
+
 Initially, the algorithm was developed to clusterize investment strategies backtests, but it can be used to clusterize features also.
+
 
 1. The module initially transforms the correlated numbers of investment strategies into correlated distance numbers
 
@@ -28,13 +30,16 @@ Initially, the algorithm was developed to clusterize investment strategies backt
     
 3. Calculating the distance matrix:
    
+
 :math:`D_{i,j}= \sqrt{\frac{1}{2}(1-\rho_{ij})}` 
 
 
 
 4. Calculating the Euclidean distance matrix of the distance matrix:
 
+
 :math:`\tilde{D}_{i,j}=\sqrt{\sum\limits_{k}(D_{ik}-D_{jk})^2}` 
+
 
        
 5. The algorithm does the clustering with K-means algorithm that is modified by involving Silhouette scores and the measure of quality for each clustering
@@ -114,6 +119,4 @@ Assuming that we have a correlation matrix data as in the above
 ::
     
     get_onc_clusters(df,10)
-    
-
 
