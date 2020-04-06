@@ -361,3 +361,37 @@ class RiskEstimators:
                 OAS(assume_centered=assume_centered).fit(returns).covariance_)
 
         return cov_matrix
+
+    @staticmethod
+    def semi_covariance(returns, price_data=False, threshold_return=0):
+        """
+        Calculates the Semi-Covariance matrix for a dataframe of asset prices or returns.
+
+        Semi-Covariance matrix is used to minimize the portfolio's downside volatility. Usually the
+        threshold return is zero, but can be a positive number when one assumes a required return rate.
+
+        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param price_data: (bool) Flag if prices of assets are used and not returns.
+        :param threshold_return: (float) Required return for each period in the frequency of the input data
+                                         (If the input data is daily, it's a daily threshold return).
+        :return: (np.array) Semi-Covariance matrix.
+        """
+
+        # Calculating the series of returns from series of prices
+        if price_data:
+            # Class with returns calculationf function
+            ret_est = ReturnsEstimation()
+
+            # Calculating returns
+            returns = ret_est.calculate_returns(returns)
+
+        # Returns that are lower than the threshold
+        lower_returns = returns - threshold_return < 0
+
+        # Calculating the minimum of 0 and returns minus threshold
+        min_returns = (returns - threshold_return) * lower_returns
+
+        # Calculating semi-covariance
+        semi_covariance = min_returns.size * min_returns.cov()
+
+        return semi_covariance
