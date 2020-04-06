@@ -4,8 +4,9 @@
 Labeling: Trend Scanning
 ==========================================
 
-Trend scanning is a classification labeling technique introduced by Marcos Lopez de Prado in the following lecture slides: "Advances in Financial Machine Learning: Lecture 3/10"
-'https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3257419'
+Trend scanning is a classification labeling technique introduced by Marcos Lopez de Prado in the following lecture slides: `Advances in Financial Machine Learning, Lecture 3/10`_
+
+.. _Advances in Financial Machine Learning, Lecture 3/10: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3257419
 
 For some trading algorithms the researcher does not want to explicitly set fix profit / stop loss levels, but rather detect overall trend direction and sit in a position until
 the trend changes. For example, market timing strategy which holds ETF except volatile periods. Trend scanning labels are designed to solve this type of problems.
