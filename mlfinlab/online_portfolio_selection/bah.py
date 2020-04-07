@@ -1,9 +1,11 @@
 import numpy as np
 import pandas as pd
+
+from mlfinlab.online_portfolio_selection.OLPS import OLPS
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 
-class BAH:
+class BAH(OLPS):
     """
     This class implements the Buy and Hold strategy. It is reproduced with modification from the following paper:
     Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December YEAR),
@@ -14,19 +16,11 @@ class BAH:
     not rebalance in subsequent periods.
     """
 
-    def __init__(self, calculate_expected_returns='mean'):
+    def __init__(self):
         """
         Constructor.
-        :param calculate_expected_returns: (str) the method to use for calculation of expected returns.
-        Currently supports "mean" and "exponential"
         """
-
-        self.weights = list()
-        self.portfolio_risk = None
-        self.portfolio_return = None
-        self.portfolio_sharpe_ratio = None
-        self.calculate_expected_returns = calculate_expected_returns
-        self.returns_estimator = ReturnsEstimation()
+        super().__init__()
 
     def allocate(self,
                  asset_names,
