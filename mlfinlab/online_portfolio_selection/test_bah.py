@@ -1,5 +1,5 @@
 """
-Tests Online Portfolio Selection(OLPS).
+Tests Buy and Hold Strategy(BAH).
 """
 
 import unittest
@@ -8,10 +8,10 @@ import numpy as np
 import pandas as pd
 
 
-class TestOLPS(unittest.TestCase):
+class TestBAH(unittest.TestCase):
     # pylint: disable=too-many-public-methods
     """
-    Tests different functions of the CLA class.
+    Tests different functions of the BAH class.
     """
 
     def setUp(self):
