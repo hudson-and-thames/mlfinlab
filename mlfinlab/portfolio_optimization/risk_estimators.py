@@ -391,8 +391,24 @@ class RiskEstimators:
         # Calculating the minimum of 0 and returns minus threshold
         min_returns = (returns - threshold_return) * lower_returns
 
-        # Calculating semi-covariance
-        semi_covariance = min_returns.size * min_returns.cov()
+        # Simple covariance matrix
+        semi_covariance = returns.cov()
+
+        # Iterating to fill elements
+        for row_number in range(semi_covariance.shape[0]):
+            for column_number in range(semi_covariance.shape[1]):
+                # Series of returns for the element from the row and column
+                row_asset = min_returns.iloc[:, row_number]
+                column_asset = min_returns.iloc[:, column_number]
+
+                # Series of element-wise products
+                covariance_series = row_asset * column_asset
+
+                # Element of the Semi-Covariance matrix
+                semi_cov_element = covariance_series.sum() / min_returns.size
+
+                # Inserting the element in the Semi-Covariance matrix
+                semi_covariance.iloc[row_number, column_number] = semi_cov_element
 
         return semi_covariance
 

@@ -336,9 +336,9 @@ class TestRiskEstimators(unittest.TestCase):
         prices_dataframe = self.data.iloc[:, :3]
 
         # Expected Semi-Covariance matrix
-        expected_semi_cov = np.array([[1.108913, 0.845251, -0.007809],
-                                      [0.845251, 0.942407, -0.009931],
-                                      [-0.007809, -0.009931, 0.046984]])
+        expected_semi_cov = np.array([[7.302402e-05, 5.855724e-05, 3.075326e-06],
+                                      [5.855724e-05, 6.285548e-05, 2.788988e-06],
+                                      [3.075326e-06, 2.788988e-06, 3.221170e-06]])
 
         # Calculating the Semi-Covariance matrix on price data with zero threshold (volatility of negative returns)
         semi_cov = risk_estimators.semi_covariance(prices_dataframe, price_data=True, threshold_return=0)
