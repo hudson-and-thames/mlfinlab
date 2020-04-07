@@ -2,12 +2,13 @@
 Implements the Combinatorial Purged Cross-Validation class from Chapter 12
 """
 
+from itertools import combinations
+from typing import List
+
 import pandas as pd
 import numpy as np
 
-from itertools import combinations
 from sklearn.model_selection import KFold
-
 from mlfinlab.cross_validation import ml_get_train_times
 
 
@@ -40,6 +41,25 @@ class CombinatorialPurgedKFold(KFold):
         self.backtest_paths = {k: list(range(self.n_splits)) for k in
                                range(self.n_splits - 1)}  # Dictionary of backtest paths, number of paths = n_splits - 1
 
+    def _generate_combinatorial_test_ranges(self, splits_indices: dict) -> List:
+        """
+        Using start and end indices of test splits from KFolds and number of test_splits (self.n_test_splits),
+        generates combinatorial test ranges splits
+
+        :param splits_indices: (dict) of test fold integer index: [start test index, end test index]
+        :return: (list) of combinatorial test splits ([start index, end index])
+        """
+
+        # Possible test splits for each fold
+        combinatorial_splits = list(combinations(list(splits_indices.keys()), self.n_test_splits))
+        combinatorial_test_ranges = []  # List of test indices formed from combinatorial splits
+        for combination in combinatorial_splits:
+            temp_test_indices = []  # Array of test indices for current split combination
+            for int_index in combination:
+                temp_test_indices.append(splits_indices[int_index])
+            combinatorial_test_ranges.append(temp_test_indices)
+        return combinatorial_test_ranges
+
     # noinspection PyPep8Naming
     def split(self,
               X: pd.DataFrame,
@@ -63,14 +83,7 @@ class CombinatorialPurgedKFold(KFold):
         for index, [start_ix, end_ix] in enumerate(test_ranges):
             splits_indices[index] = [start_ix, end_ix]
 
-        # Possible test splits for each fold
-        combinatorial_splits = list(combinations(list(splits_indices.keys()), self.n_test_splits))
-        combinatorial_test_ranges = []  # List of test indices formed from combinatorial splits
-        for combination in combinatorial_splits:
-            temp_test_indices = []  # Array of test indices for current split combination
-            for int_index in combination:
-                temp_test_indices.append(splits_indices[int_index])
-            combinatorial_test_ranges.append(temp_test_indices)
+        combinatorial_test_ranges = self._generate_combinatorial_test_ranges(splits_indices)
 
         embargo: int = int(X.shape[0] * self.pct_embargo)
         for test_splits in combinatorial_test_ranges:
