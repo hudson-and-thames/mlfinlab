@@ -176,16 +176,18 @@ class TestFeatureImportance(unittest.TestCase):
 
         # MDA feature importance
         mda_feat_imp_log_loss = mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf, cv_gen,
-                                                       sample_weight=np.ones((self.X_train.shape[0],)))
+                                                       sample_weight_train=np.ones((self.X_train.shape[0],)),
+                                                       sample_weight_score=np.ones((self.X_train.shape[0],)))
         mda_feat_imp_f1 = mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf,
                                                  cv_gen, scoring=f1_score)
         # SFI feature importance
         # Take only 5 features for faster test run
         sfi_feat_imp_log_loss = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]],
                                                           self.y_train_clf, cv_gen=cv_gen,
-                                                          sample_weight=np.ones((self.X_train.shape[0],)))
+                                                          sample_weight_train=np.ones((self.X_train.shape[0],)))
         sfi_feat_imp_f1 = single_feature_importance(sb_clf, self.X_train[self.X_train.columns[:5]], self.y_train_clf,
-                                                    cv_gen=cv_gen, scoring=f1_score)
+                                                    cv_gen=cv_gen, scoring=f1_score,
+                                                    sample_weight_score=np.ones((self.X_train.shape[0],)))
 
         # MDI assertions
         self.assertAlmostEqual(mdi_feat_imp['mean'].sum(), 1, delta=0.001)
@@ -218,7 +220,7 @@ class TestFeatureImportance(unittest.TestCase):
         """
 
         sb_clf, cv_gen = self._prepare_clf_data_set(oob_score=True)
-        oos_score = ml_cross_val_score(sb_clf, self.X_train, self.y_train_clf, cv_gen=cv_gen, sample_weight=None,
+        oos_score = ml_cross_val_score(sb_clf, self.X_train, self.y_train_clf, cv_gen=cv_gen, sample_weight_score=None,
                                        scoring=accuracy_score).mean()
 
         sb_clf.fit(self.X_train, self.y_train_clf)
