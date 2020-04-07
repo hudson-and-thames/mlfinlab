@@ -249,7 +249,7 @@ Shrinkage methods supported:
 
 - Ledoit-Wolf shrinkage
 
-- Oracle Approximating Shrinkage
+- Oracle Approximating shrinkage
 
 Our method is a wrap of the sklearn's ShrunkCovariance, LedoitWolf, and OAS classes. For more details about the function and its parameters, please visit `sklearn documentation <https://scikit-learn.org/stable/modules/covariance.html#shrunk-covariance>`__.
 
@@ -505,6 +505,10 @@ The following research notebooks can be used to better understand how the algori
 * `NCO Notebook`_
 
 .. _NCO Notebook: https://github.com/hudson-and-thames/research/blob/master/NCO/NCO.ipynb
+
+* `Risk Estimators Notebook`_
+
+.. _Risk Estimators Notebook: https://github.com/hudson-and-thames/research/blob/master/RiskEstimators/RiskEstimators.ipynb
 
 
 
