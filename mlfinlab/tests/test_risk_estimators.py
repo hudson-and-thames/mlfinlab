@@ -8,6 +8,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 
 class TestRiskEstimators(unittest.TestCase):
@@ -24,6 +25,10 @@ class TestRiskEstimators(unittest.TestCase):
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
+
+        # And series of returns
+        ret_est = ReturnsEstimation()
+        self.returns = ret_est.calculate_returns(self.data)
 
     def test_mp_pdf(self):
         """
@@ -247,6 +252,7 @@ class TestRiskEstimators(unittest.TestCase):
 
         # Getting first three columns of data to be able to compare the output
         prices_dataframe = self.data.iloc[:, :3]
+        returns_dataframe = self.returns.iloc[:, :3]
 
         # Expected resulting Minimum Covariance Determinant
         expected_cov = np.array([[1.5110e-04, 1.1322e-04, -5.2053e-06],
@@ -257,8 +263,15 @@ class TestRiskEstimators(unittest.TestCase):
         min_covar_determ = risk_estimators.minimum_covariance_determinant(prices_dataframe, price_data=True,
                                                                           random_state=0)
 
+        # Using the Minimum Covariance Determinant algorithm on return data with random seed 0
+        min_covar_determ_ret = risk_estimators.minimum_covariance_determinant(returns_dataframe, price_data=False,
+                                                                              random_state=0)
+
         # Testing if the resulting covariance matrix is right
         np.testing.assert_almost_equal(min_covar_determ, expected_cov, decimal=4)
+
+        # And if the results for price and returns are the same
+        np.testing.assert_almost_equal(min_covar_determ, min_covar_determ_ret, decimal=4)
 
     def test_empirical_covariance(self):
         """
@@ -269,6 +282,7 @@ class TestRiskEstimators(unittest.TestCase):
 
         # Getting first three columns of data to be able to compare the output
         prices_dataframe = self.data.iloc[:, :3]
+        returns_dataframe = self.returns.iloc[:, :3]
 
         # Expected resulting Maximum likelihood covariance estimator
         expected_cov = np.array([[4.6571e-04, 3.4963e-04, -1.6626e-05],
@@ -278,8 +292,14 @@ class TestRiskEstimators(unittest.TestCase):
         # Using the Maximum likelihood covariance estimator on price data
         empirical_cov = risk_estimators.empirical_covariance(prices_dataframe, price_data=True)
 
+        # Using the Maximum likelihood covariance estimator on returns data
+        empirical_cov_ret = risk_estimators.empirical_covariance(returns_dataframe, price_data=False)
+
         # Testing if the resulting covariance matrix is right
         np.testing.assert_almost_equal(empirical_cov, expected_cov, decimal=6)
+
+        # And if the results for price and returns are the same
+        np.testing.assert_almost_equal(empirical_cov, empirical_cov_ret, decimal=4)
 
     def test_shrinked_covariance(self):
         """
@@ -290,6 +310,7 @@ class TestRiskEstimators(unittest.TestCase):
 
         # Getting first three columns of data to be able to compare the output
         prices_dataframe = self.data.iloc[:, :3]
+        returns_dataframe = self.returns.iloc[:, :3]
 
         # Expected resulting Covariance estimators for each shrinkage type
         expected_cov_basic = np.array([[4.47705356e-04, 3.14668132e-04, -1.49635474e-05],
@@ -315,6 +336,10 @@ class TestRiskEstimators(unittest.TestCase):
         shrinked_cov_all = risk_estimators.shrinked_covariance(prices_dataframe, price_data=True,
                                                                shrinkage_type='all', basic_shrinkage=0.1)
 
+        # Using the Covariance estimator with different types of shrinkage on returns data
+        shrinked_cov_basic_ret = risk_estimators.shrinked_covariance(returns_dataframe, price_data=False,
+                                                                     shrinkage_type='basic', basic_shrinkage=0.1)
+
         # Testing if the resulting shrinked covariance matrix is right for every method is right
         np.testing.assert_almost_equal(shrinked_cov_basic, expected_cov_basic, decimal=7)
         np.testing.assert_almost_equal(shrinked_cov_lw, expected_cov_lw, decimal=7)
@@ -325,6 +350,9 @@ class TestRiskEstimators(unittest.TestCase):
         np.testing.assert_almost_equal(shrinked_cov_all[1], shrinked_cov_lw, decimal=7)
         np.testing.assert_almost_equal(shrinked_cov_all[2], shrinked_cov_oas, decimal=7)
 
+        # And if the results for price and returns are the same
+        np.testing.assert_almost_equal(shrinked_cov_basic, shrinked_cov_basic_ret, decimal=4)
+
     def test_semi_covariance(self):
         """
         Test the calculation of the Semi-Covariance matrix.
@@ -334,6 +362,7 @@ class TestRiskEstimators(unittest.TestCase):
 
         # Getting first three columns of data to be able to compare the output
         prices_dataframe = self.data.iloc[:, :3]
+        returns_dataframe = self.returns.iloc[:, :3]
 
         # Expected Semi-Covariance matrix
         expected_semi_cov = np.array([[7.302402e-05, 5.855724e-05, 3.075326e-06],
@@ -343,8 +372,14 @@ class TestRiskEstimators(unittest.TestCase):
         # Calculating the Semi-Covariance matrix on price data with zero threshold (volatility of negative returns)
         semi_cov = risk_estimators.semi_covariance(prices_dataframe, price_data=True, threshold_return=0)
 
+        # Calculating the Semi-Covariance matrix on returns data with zero threshold (volatility of negative returns)
+        semi_cov_ret = risk_estimators.semi_covariance(returns_dataframe, price_data=False, threshold_return=0)
+
         # Testing if the resulting Semi-Covariance matrix is right
         np.testing.assert_almost_equal(semi_cov, expected_semi_cov, decimal=6)
+
+        # And if the results for price and returns are the same
+        np.testing.assert_almost_equal(np.array(semi_cov), np.array(semi_cov_ret), decimal=4)
 
     def test_exponential_covariance(self):
         """
@@ -355,6 +390,7 @@ class TestRiskEstimators(unittest.TestCase):
 
         # Getting first three columns of data to be able to compare the output
         prices_dataframe = self.data.iloc[:, :3]
+        returns_dataframe = self.returns.iloc[:, :3]
 
         # Expected Exponentially-weighted Covariance matrix
         expected_expon_cov = np.array([[2.824303e-04, 3.215506e-04, -4.171518e-06],
@@ -364,5 +400,11 @@ class TestRiskEstimators(unittest.TestCase):
         # Calculating the Exponentially-weighted Covariance matrix on price data with the span of 60
         expon_cov = risk_estimators.exponential_covariance(prices_dataframe, price_data=True, window_span=60)
 
+        # Calculating the Exponentially-weighted Covariance matrix on price data with the span of 60
+        expon_cov_ret = risk_estimators.exponential_covariance(returns_dataframe, price_data=False, window_span=60)
+
         # Testing if the resulting Semi-Covariance matrix is right
         np.testing.assert_almost_equal(expon_cov, expected_expon_cov, decimal=6)
+
+        # And if the results for price and returns are the same
+        np.testing.assert_almost_equal(np.array(expon_cov), np.array(expon_cov_ret), decimal=4)
