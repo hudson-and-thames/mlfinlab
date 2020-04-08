@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
-
+from mlfinlab.online_portfolio_selection.olps_utils import *
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
+
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 
@@ -24,7 +25,7 @@ class BAH(OLPS):
 
     def allocate(self,
                  asset_names,
-                 asset_prices=None,
+                 asset_prices,
                  covariance_matrix=None,
                  expected_asset_returns=None,
                  risk_free_rate=0.05,
@@ -40,46 +41,29 @@ class BAH(OLPS):
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         """
-
-        if asset_prices is not None:
-            if not isinstance(asset_prices, pd.DataFrame):
-                raise ValueError("Asset prices matrix must be a dataframe")
-            if not isinstance(asset_prices.index, pd.DatetimeIndex):
-                raise ValueError("Asset prices dataframe must be indexed by date.")
+        # initial check
+        initial_check(asset_prices, expected_asset_returns, covariance_matrix)
 
         number_of_assets = len(asset_names)
-
         if weights is None:
             self.weights = np.linspace(0, 1, num=number_of_assets)
         else:
             self.weights = weights
 
         # Calculate covariance of returns or use the user specified covariance matrix
-        if covariance_matrix is None:
-            returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
-            covariance_matrix = returns.cov()
-        cov = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
+        covariance_matrix = calculate_covariance(asset_names, asset_prices, covariance_matrix, resample_by, self.returns_estimator)
 
         # Calculate the expected returns if the user does not supply any returns
-        if expected_asset_returns is None:
-            if self.calculate_expected_returns == "mean":
-                expected_asset_returns = self.returns_estimator.calculate_mean_historical_returns(
-                    asset_prices=asset_prices,
-                    resample_by=resample_by)
-            elif self.calculate_expected_returns == "exponential":
-                expected_asset_returns = self.returns_estimator.calculate_exponential_historical_returns(
-                    asset_prices=asset_prices,
-                    resample_by=resample_by)
-            else:
-                raise ValueError("Unknown returns specified. Supported returns - mean, exponential")
-        expected_asset_returns = np.array(expected_asset_returns).reshape((len(expected_asset_returns), 1))
+        # expected_asset_returns = calculate_expected_asset_returns(asset_prices, expected_asset_returns, resample_by)
 
         # Calculate the portfolio risk and return if it has not been calculated
-        if self.portfolio_risk is None:
-            self.portfolio_risk = np.dot(self.weights, np.dot(cov.values, self.weights.T))
-        if self.portfolio_return is None:
-            self.portfolio_return = np.dot(self.weights, expected_asset_returns)
-        self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))
+        # self.portfolio_risk = calculate_portfolio_risk(self.portfolio_risk, covariance_matrix, self.weights)
+
+        # Calculate the portfolio return
+        # self.portfolio_return = calculate_portfolio_return(self.portfolio_return, self.weights, expected_asset_returns)
+
+        # Calculate Sharpe Ratio
+        # self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))
 
         self.weights = pd.DataFrame(self.weights)
         self.weights.index = asset_names

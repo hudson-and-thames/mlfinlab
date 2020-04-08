@@ -9,7 +9,6 @@ import pandas as pd
 
 
 class TestBAH(unittest.TestCase):
-    # pylint: disable=too-many-public-methods
     """
     Tests different functions of the BAH class.
     """
