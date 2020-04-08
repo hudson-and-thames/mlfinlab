@@ -12,11 +12,11 @@ class OLPS(object):
         """
         self.weights = None
         self.all_weights = None
+        self.portfolio_return = None
 
         # self.asset_prices = None
         # self.covariance_matrix = None
         # self.portfolio_risk = None
-        # self.portfolio_return = None
         # self.portfolio_sharpe_ratio = None
         # self.expected_returns = None
         # self.returns_estimator = ReturnsEstimation()
@@ -53,17 +53,11 @@ class OLPS(object):
 
         # calculate relative price i.e. week 1's price/week 0's price
         # relative_price is a dataframe
+        relative_price = self.relative_price_change(asset_prices)
 
-        # percent change of each row
-        relative_price = asset_prices.pct_change()
-        # first row is blank because no change, so make it 0
-        relative_price = relative_price.fillna(0)
-        # add 1 to all values so that the values can be multiplied easily
-        relative_price += 1
+        # Actual weight calculation
 
-        # actual weight calculation
-
-        # if weights is none, put 1 on random stock
+        # if weights is none, put 1 on a random stock
         if weights is None:
             self.weights = np.zeros(number_of_assets)
             self.weights[np.random.randint(0, number_of_assets - 1)] += 1
@@ -72,14 +66,16 @@ class OLPS(object):
 
         # initialize self.all_weights
         self.all_weights = self.weights
+        self.portfolio_return = np.dot(self.weights, relative_price[0])
 
+        # Run the Algorithm
         for t in range(1, time_period):
             self.run(self.weights)
+            self.portfolio_return = np.vstack((self.portfolio_return, np.dot(self.weights, relative_price[t])))
 
         # convert to dataframe
         self.all_weights = pd.DataFrame(self.all_weights,index=asset_prices.index,columns=asset_prices.columns)
-        print("Here is your final weight")
-        print(self.all_weights)
+        self.portfolio_return = pd.DataFrame(self.portfolio_return,index=asset_prices.index,columns=["Relative Returns"])
 
     # for this one, it doesn't matter but for subsequent complex selection problems, we might have to include a
     # separate run method for each iteration and not clog the allocate method.
@@ -90,6 +86,15 @@ class OLPS(object):
         self.weights = new_weights
         self.all_weights = np.vstack((self.all_weights, self.weights))
         return self.weights
+
+    def relative_price_change(self, asset_prices):
+        # percent change of each row
+        relative_price = asset_prices.pct_change()
+        # first row is blank because no change, so make it 0
+        relative_price = relative_price.fillna(0)
+        # add 1 to all values so that the values can be multiplied easily
+        relative_price = np.array(relative_price + 1)
+        return relative_price
 
     # calculate the returns based on portfolio weights
     def returns(self):
