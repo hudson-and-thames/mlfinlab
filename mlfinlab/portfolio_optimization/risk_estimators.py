@@ -9,9 +9,10 @@ from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 class RiskEstimators:
     """
-    This class implements the functions related to the de-noising of the covariance matrix. It is reproduced with
-    modification from the following paper: `Marcos Lopez de Prado “A Robust Estimator of the Efficient Frontier”,
-    (2019). <https://papers.ssrn.com/abstract_id=3469961>`_.
+    This class contains the implementations for different ways to calculate and adjust Covariance matrices.
+    The functions related to de-noising the Covariance matrix are reproduced with modification from the following paper:
+    `Marcos Lopez de Prado “A Robust Estimator of the Efficient Frontier”, (2019).
+    <https://papers.ssrn.com/abstract_id=3469961>`_.
     """
 
     def __init__(self):
@@ -419,7 +420,7 @@ class RiskEstimators:
 
         # Calculating the series of returns from series of prices
         if price_data:
-            # Class with returns calculationf function
+            # Class with returns calculation function
             ret_est = ReturnsEstimation()
 
             # Calculating returns
