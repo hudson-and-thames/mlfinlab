@@ -1,5 +1,7 @@
 """
 Classes derived from Online Portfolio Selection module
+
+STILL THINKING OF WAYS TO USE THIS
 """
 from . import olps_utils
 from .OLPS import OLPS

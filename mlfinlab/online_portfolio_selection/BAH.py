@@ -42,7 +42,7 @@ class BAH(OLPS):
                                   None for no resampling
         """
         # initial check
-        initial_check(asset_prices, expected_asset_returns, covariance_matrix)
+        # initial_check(asset_prices, expected_asset_returns, covariance_matrix)
 
         number_of_assets = len(asset_names)
         if weights is None:
