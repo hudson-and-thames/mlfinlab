@@ -41,6 +41,10 @@ class BAH(OLPS):
         # calculate number of assets
         number_of_assets = len(asset_names)
 
+        # split index and columns
+        idx = asset_prices.index
+        asset_names = asset_prices.columns
+
         # calculate number of time periods
         time_period = asset_prices.shape[0]
 
@@ -51,16 +55,29 @@ class BAH(OLPS):
         # relative_price is a dataframe
         relative_price = self.relative_price_change(asset_prices)
 
+        # cumulative product matrix
+        cumulative_product = np.array(relative_price).cumprod(axis=0)
+
         # if user does not initiate a particular weight, give equal weights to every assets
         if weights is None:
             self.weights = np.ones(number_of_assets) / number_of_assets
         else:
             self.weights = weights
 
+        # initialize self.all_weights
+        self.all_weights = self.weights
+        self.portfolio_return = np.dot(self.weights, cumulative_product[0])
+
+        # Run the Algorithm
+        for t in range(1, time_period):
+            self.run(self.weights)
+            self.portfolio_return = np.vstack((self.portfolio_return, np.dot(self.weights, cumulative_product[t])))
+
+    def run(self, _weights):
+        # weights never change because you're just holding onto them, so this effectively becomes the same as OLPS run method
+        super(BAH, self).run(_weights)
 
 
-    def run(self):
-        pass
         # Other idea that might be implemented later
 
         # Calculate covariance of returns or use the user specified covariance matrix
@@ -78,17 +95,17 @@ class BAH(OLPS):
         # Calculate Sharpe Ratio
         # self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))
 
-        self.weights = pd.DataFrame(self.weights)
-        self.weights.index = asset_names
-        self.weights = self.weights.T
+        # self.weights = pd.DataFrame(self.weights)
+        # self.weights.index = asset_names
+        # self.weights = self.weights.T
 
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
     names = list(stock_price.columns)
-    initial_portfolio = OLPS()
-    initial_portfolio.allocate(asset_names=names, asset_prices=stock_price)
+    bah = BAH()
+    bah.allocate(asset_names=names, asset_prices=stock_price)
 
 
 if __name__ == "__main__":

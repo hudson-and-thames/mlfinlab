@@ -84,9 +84,9 @@ class OLPS(object):
     # for this one, it doesn't matter but for subsequent complex selection problems, we might have to include a
     # separate run method for each iteration and not clog the allocate method.
     # after calculating the new weight add that to the all weights
-    def run(self, weights):
+    def run(self, _weights):
         # update weights according to a certain algorithm
-        new_weights = weights
+        new_weights = _weights
         self.weights = new_weights
         self.all_weights = np.vstack((self.all_weights, self.weights))
         return self.weights
@@ -103,7 +103,7 @@ class OLPS(object):
     def conversion(self, _all_weights, _portfolio_return, _index, _asset_names):
         self.all_weights = pd.DataFrame(_all_weights, index=_index, columns=_asset_names)
         self.portfolio_return = pd.DataFrame(_portfolio_return, index=_index,columns=["Relative Returns"])
-    
+
     # calculate the returns based on portfolio weights
     def returns(self):
         pass
