@@ -7,7 +7,7 @@ https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595
 import pandas as pd
 from scipy.spatial.distance import squareform
 from scipy.cluster.hierarchy import linkage, fcluster
-from mlfinlab.clustering import get_onc_clusters
+from mlfinlab.clustering.onc import get_onc_clusters
 from mlfinlab.codependence.codependence_matrix import get_dependence_matrix, get_distance_matrix
 
 # pylint: disable=invalid-name
