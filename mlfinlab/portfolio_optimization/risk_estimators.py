@@ -2,7 +2,9 @@
 import numpy as np
 import pandas as pd
 from sklearn.neighbors import KernelDensity
+from sklearn.covariance import MinCovDet, EmpiricalCovariance, ShrunkCovariance, LedoitWolf, OAS
 from scipy.optimize import minimize
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 
 class RiskEstimators:
@@ -258,3 +260,240 @@ class RiskEstimators:
         cov_denoised = self.corr_to_cov(corr, np.diag(cov) ** (1 / 2))
 
         return cov_denoised
+
+    @staticmethod
+    def minimum_covariance_determinant(returns, price_data=False, assume_centered=False,
+                                       support_fraction=None, random_state=None):
+        """
+        Calculates the Minimum Covariance Determinant for a dataframe of asset prices or returns.
+
+        This function is a wrap of the sklearn's MinCovDet (MCD) class. According to the
+        scikit-learn User Guide on Covariance estimation:
+
+        "The idea is to find a given proportion (h) of “good” observations that are not outliers
+        and compute their empirical covariance matrix. This empirical covariance matrix is then
+        rescaled to compensate for the performed selection of observations".
+
+        Link to the documentation:
+        <https://scikit-learn.org/stable/modules/generated/sklearn.covariance.MinCovDet.html>`_
+
+        If a dataframe of prices is given, it is transformed into a dataframe of returns using
+        the calculate_returns method from the ReturnsEstimation class.
+
+        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param price_data: (bool) Flag if prices of assets are used and not returns.
+        :param assume_centered: (bool) Flag for data with mean significantly equal to zero
+                                       (Read the documentation for MinCovDet class).
+        :param support_fraction: (float) Values between 0 and 1. The proportion of points to be included in the support
+                                         of the raw MCD estimate (Read the documentation for MinCovDet class).
+        :param random_state: (int) Seed used by the random number generator.
+        :return: (np.array) Estimated robust covariance matrix.
+        """
+
+        # Calculating the series of returns from series of prices
+        if price_data:
+            # Class with returns calculation function
+            ret_est = ReturnsEstimation()
+
+            # Calculating returns
+            returns = ret_est.calculate_returns(returns)
+
+        # Calculating the covariance matrix
+        cov_matrix = MinCovDet(assume_centered=assume_centered, support_fraction=support_fraction,
+                               random_state=random_state).fit(returns).covariance_
+
+        return cov_matrix
+
+    @staticmethod
+    def empirical_covariance(returns, price_data=False, assume_centered=False):
+        """
+        Calculates the Maximum likelihood covariance estimator for a dataframe of asset prices or returns.
+
+        This function is a wrap of the sklearn's EmpiricalCovariance class. According to the
+        scikit-learn User Guide on Covariance estimation:
+
+        "The covariance matrix of a data set is known to be well approximated by the classical maximum
+        likelihood estimator, provided the number of observations is large enough compared to the number
+        of features (the variables describing the observations). More precisely, the Maximum Likelihood
+        Estimator of a sample is an unbiased estimator of the corresponding population’s covariance matrix".
+
+        Link to the documentation:
+        <https://scikit-learn.org/stable/modules/generated/sklearn.covariance.EmpiricalCovariance.html>`_
+
+        If a dataframe of prices is given, it is transformed into a dataframe of returns using
+        the calculate_returns method from the ReturnsEstimation class.
+
+        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param price_data: (bool) Flag if prices of assets are used and not returns.
+        :param assume_centered: (bool) Flag for data with mean almost, but not exactly zero
+                                       (Read documentation for EmpiricalCovariance class).
+        :return: (np.array) Estimated covariance matrix.
+        """
+
+        # Calculating the series of returns from series of prices
+        if price_data:
+            # Class with returns calculation function
+            ret_est = ReturnsEstimation()
+
+            # Calculating returns
+            returns = ret_est.calculate_returns(returns)
+
+        # Calculating the covariance matrix
+        cov_matrix = EmpiricalCovariance(assume_centered=assume_centered).fit(returns).covariance_
+
+        return cov_matrix
+
+    @staticmethod
+    def shrinked_covariance(returns, price_data=False, shrinkage_type='basic', assume_centered=False,
+                            basic_shrinkage=0.1):
+        """
+        Calculates the Covariance estimator with shrinkage for a dataframe of asset prices or returns.
+
+        This function allows three types of shrinkage - Basic, Ledoit-Wolf and Oracle Approximating Shrinkage.
+        It is a wrap of the sklearn's ShrunkCovariance, LedoitWolf and OAS classes. According to the
+        scikit-learn User Guide on Covariance estimation:
+
+        "Sometimes, it even occurs that the empirical covariance matrix cannot be inverted for numerical
+        reasons. To avoid such an inversion problem, a transformation of the empirical covariance matrix
+        has been introduced: the shrinkage. Mathematically, this shrinkage consists in reducing the ratio
+        between the smallest and the largest eigenvalues of the empirical covariance matrix".
+
+        Link to the documentation:
+        <https://scikit-learn.org/stable/modules/covariance.html>`_
+
+        If a dataframe of prices is given, it is transformed into a dataframe of returns using
+        the calculate_returns method from the ReturnsEstimation class.
+
+        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param price_data: (bool) Flag if prices of assets are used and not returns.
+        :param shrinkage_type: (str) Type of shrinkage to use ('basic','lw','oas','all').
+        :param assume_centered: (bool) Flag for data with mean almost, but not exactly zero
+                                       (Read documentation for chosen shrinkage class).
+        :param basic_shrinkage: (float) Between 0 and 1. Coefficient in the convex combination for basic shrinkage.
+        :return: (np.array) Estimated covariance matrix. Tuple of covariance matrices if shrinkage_type = 'all'.
+        """
+
+        # Calculating the series of returns from series of prices
+        if price_data:
+            # Class with returns calculation function
+            ret_est = ReturnsEstimation()
+
+            # Calculating returns
+            returns = ret_est.calculate_returns(returns)
+
+        # Calculating the covariance matrix for the chosen method
+        if shrinkage_type == 'basic':
+            cov_matrix = ShrunkCovariance(assume_centered=assume_centered, shrinkage=basic_shrinkage).fit(
+                returns).covariance_
+        elif shrinkage_type == 'lw':
+            cov_matrix = LedoitWolf(assume_centered=assume_centered).fit(returns).covariance_
+        elif shrinkage_type == 'oas':
+            cov_matrix = OAS(assume_centered=assume_centered).fit(returns).covariance_
+        else:
+            cov_matrix = (
+                ShrunkCovariance(assume_centered=assume_centered, shrinkage=basic_shrinkage).fit(returns).covariance_,
+                LedoitWolf(assume_centered=assume_centered).fit(returns).covariance_,
+                OAS(assume_centered=assume_centered).fit(returns).covariance_)
+
+        return cov_matrix
+
+    @staticmethod
+    def semi_covariance(returns, price_data=False, threshold_return=0):
+        """
+        Calculates the Semi-Covariance matrix for a dataframe of asset prices or returns.
+
+        Semi-Covariance matrix is used to calculate the portfolio's downside volatility. Usually, the
+        threshold return is zero and the negative volatility is measured. A threshold can be a positive number
+        when one assumes a required return rate. If the threshold is above zero, the output is the volatility
+        measure for returns below this threshold.
+
+        If a dataframe of prices is given, it is transformed into a dataframe of returns using
+        the calculate_returns method from the ReturnsEstimation class.
+
+        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param price_data: (bool) Flag if prices of assets are used and not returns.
+        :param threshold_return: (float) Required return for each period in the frequency of the input data
+                                         (If the input data is daily, it's a daily threshold return).
+        :return: (np.array) Semi-Covariance matrix.
+        """
+
+        # Calculating the series of returns from series of prices
+        if price_data:
+            # Class with returns calculationf function
+            ret_est = ReturnsEstimation()
+
+            # Calculating returns
+            returns = ret_est.calculate_returns(returns)
+
+        # Returns that are lower than the threshold
+        lower_returns = returns - threshold_return < 0
+
+        # Calculating the minimum of 0 and returns minus threshold
+        min_returns = (returns - threshold_return) * lower_returns
+
+        # Simple covariance matrix
+        semi_covariance = returns.cov()
+
+        # Iterating to fill elements
+        for row_number in range(semi_covariance.shape[0]):
+            for column_number in range(semi_covariance.shape[1]):
+                # Series of returns for the element from the row and column
+                row_asset = min_returns.iloc[:, row_number]
+                column_asset = min_returns.iloc[:, column_number]
+
+                # Series of element-wise products
+                covariance_series = row_asset * column_asset
+
+                # Element of the Semi-Covariance matrix
+                semi_cov_element = covariance_series.sum() / min_returns.size
+
+                # Inserting the element in the Semi-Covariance matrix
+                semi_covariance.iloc[row_number, column_number] = semi_cov_element
+
+        return semi_covariance
+
+    @staticmethod
+    def exponential_covariance(returns, price_data=False, window_span=60):
+        """
+        Calculates the Exponentially-weighted Covariance matrix for a dataframe of asset prices or returns.
+
+        It calculates the series of covariances between elements and then gets the last value of exponentially
+        weighted moving average series from covariance series as an element in matrix.
+
+        If a dataframe of prices is given, it is transformed into a dataframe of returns using
+        the calculate_returns method from the ReturnsEstimation class.
+
+        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param price_data: (bool) Flag if prices of assets are used and not returns.
+        :param window_span: (int) Used to specify decay in terms of span for the exponentially-weighted series.
+        :return: (np.array) Exponentially-weighted Covariance matrix.
+        """
+
+        # Calculating the series of returns from series of prices
+        if price_data:
+            # Class with returns calculation function
+            ret_est = ReturnsEstimation()
+
+            # Calculating returns
+            returns = ret_est.calculate_returns(returns)
+
+        # Simple covariance matrix
+        cov_matrix = returns.cov()
+
+        # Iterating to fill elements
+        for row_number in range(cov_matrix.shape[0]):
+            for column_number in range(cov_matrix.shape[1]):
+                # Series of returns for the element from the row and column
+                row_asset = returns.iloc[:, row_number]
+                column_asset = returns.iloc[:, column_number]
+
+                # Series of covariance
+                covariance_series = (row_asset - row_asset.mean()) * (column_asset - column_asset.mean())
+
+                # Exponentially weighted moving average series
+                ew_ma = covariance_series.ewm(span=window_span).mean()
+
+                # Using the most current element as the Exponential Covariance value
+                cov_matrix.iloc[row_number, column_number] = ew_ma[-1]
+
+        return cov_matrix
