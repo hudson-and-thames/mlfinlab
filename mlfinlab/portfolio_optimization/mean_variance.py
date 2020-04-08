@@ -60,14 +60,15 @@ class MeanVarianceOptimisation:
         :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
         :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns (sigma)
         :param solution: (str) the type of solution/algorithm to use to calculate the weights.
-                               Currently supported solution strings - inverse_variance, min_volatility, max_sharpe and
-                               efficient_risk
+                               Currently supported solution strings - inverse_variance, min_volatility, max_sharpe,
+                               efficient_risk, max_return, max_return_min_volatility, max_diversification, efficient_return
+                               and max_decorrelation
         :param risk_free_rate: (float) the rate of return for a risk-free asset.
         :param target_return: (float) target return of the portfolio
         :param weight_bounds: (dict/tuple) can be either a single tuple of upper and lower bounds
-                                          for all portfolio weights or a dictionary mapping of individual asset indices
-                                          to tuples of upper and lower bounds. Those indices which do not have any mapping
-                                          will have a (0, 1) default bound.
+                                          for all portfolio weights or a list of strings with each string representing
+                                          an inequality on the weights. For e.g. to bound the weight of the 3rd asset
+                                          pass the following weight bounds: ['weights[2] <= 0.3', 'weights[2] >= 0.1']
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         """
@@ -160,7 +161,8 @@ class MeanVarianceOptimisation:
                                                                                     num_assets=len(asset_names))
         else:
             raise ValueError("Unknown solution string specified. Supported solutions - "
-                             "inverse_variance, min_volatility, max_sharpe and efficient_risk.")
+                             "inverse_variance, min_volatility, max_sharpe, efficient_risk, max_return, "
+                             "max_return_min_volatility, max_diversification, efficient_return and max_decorrelation")
 
         # Round weights which are very very small negative numbers (e.g. -4.7e-16) to 0
         negative_weight_indices = np.argwhere(self.weights < 0)
@@ -191,8 +193,9 @@ class MeanVarianceOptimisation:
         Compute minimum volatility portfolio allocation.
 
         :param covariance: (pd.Dataframe) covariance dataframe of asset returns
+        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
         :param num_assets: (int) number of assets in the portfolio
-        :return: (np.array, float) portfolio weights and risk value
+        :return: (np.array, float, float) portfolio weights, risk value and return value
         """
 
         weights = cp.Variable(num_assets)
@@ -212,13 +215,17 @@ class MeanVarianceOptimisation:
                     weights <= min(self.weight_bounds[1], 1)
                 ]
             )
-        if isinstance(self.weight_bounds, list):
-            indices_in_list = set()
+        else:
             for inequality in self.weight_bounds:
-                allocation_constraints.extend(
-                    eval(inequality)
-                )
-        print(allocation_constraints)
+                allocation_constraints.append(eval(inequality))
+
+            # Add the hard-boundaries for weights.
+            allocation_constraints.extend(
+                [
+                    weights <= 1,
+                    weights >= 0
+                ]
+            )
 
         # Define and solve the problem
         problem = cp.Problem(
@@ -234,9 +241,10 @@ class MeanVarianceOptimisation:
         """
         Calculate maximum return portfolio allocation.
 
-        :param expected_returns:
-        :param num_assets:
-        :return:
+        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
+        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
+        :param num_assets: (int) number of assets in the portfolio
+        :return: (np.array, float, float) portfolio weights, risk value and return value
         """
 
         weights = cp.Variable(num_assets)
@@ -256,16 +264,17 @@ class MeanVarianceOptimisation:
                     weights <= min(self.weight_bounds[1], 1)
                 ]
             )
-        if isinstance(self.weight_bounds, dict):
-            asset_indices = list(range(num_assets))
-            for asset_index in asset_indices:
-                lower_bound, upper_bound = self.weight_bounds.get(asset_index, (0, 1))
-                allocation_constraints.extend(
-                    [
-                        weights[asset_index] >= lower_bound,
-                        weights[asset_index] <= min(upper_bound, 1)
-                    ]
-                )
+        else:
+            for inequality in self.weight_bounds:
+                allocation_constraints.append(eval(inequality))
+
+            # Add the hard-boundaries for weights.
+            allocation_constraints.extend(
+                [
+                    weights <= 1,
+                    weights >= 0
+                ]
+            )
 
         # Define and solve the problem
         problem = cp.Problem(
@@ -281,10 +290,10 @@ class MeanVarianceOptimisation:
         """
         Calculate maximum return-minimum volatility portfolio allocation.
 
-        :param covariance:
-        :param expected_returns:
-        :param num_assets:
-        :return:
+        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
+        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
+        :param num_assets: (int) number of assets in the portfolio
+        :return: (np.array, float, float) portfolio weights, risk value and return value
         """
 
         weights = cp.Variable(num_assets)
@@ -304,16 +313,17 @@ class MeanVarianceOptimisation:
                     weights <= min(self.weight_bounds[1], 1)
                 ]
             )
-        if isinstance(self.weight_bounds, dict):
-            asset_indices = list(range(num_assets))
-            for asset_index in asset_indices:
-                lower_bound, upper_bound = self.weight_bounds.get(asset_index, (0, 1))
-                allocation_constraints.extend(
-                    [
-                        weights[asset_index] >= lower_bound,
-                        weights[asset_index] <= min(upper_bound, 1)
-                    ]
-                )
+        else:
+            for inequality in self.weight_bounds:
+                allocation_constraints.append(eval(inequality))
+
+            # Add the hard-boundaries for weights.
+            allocation_constraints.extend(
+                [
+                    weights <= 1,
+                    weights >= 0
+                ]
+            )
 
         # Define and solve the problem
         problem = cp.Problem(
@@ -358,16 +368,17 @@ class MeanVarianceOptimisation:
                     y <= kappa * self.weight_bounds[1]
                 ]
             )
-        if isinstance(self.weight_bounds, dict):
-            asset_indices = list(range(num_assets))
-            for asset_index in asset_indices:
-                lower_bound, upper_bound = self.weight_bounds.get(asset_index, (0, 1))
-                allocation_constraints.extend(
-                    [
-                        y[asset_index] >= kappa * lower_bound,
-                        y[asset_index] <= kappa * upper_bound
-                    ]
-                )
+        else:
+            for inequality in self.weight_bounds:
+                allocation_constraints.append(eval(inequality))
+
+            # Add the hard-boundaries for weights.
+            allocation_constraints.extend(
+                [
+                    y <= kappa,
+                    y >= 0
+                ]
+            )
 
         # Define and solve the problem
         problem = cp.Problem(
@@ -408,16 +419,17 @@ class MeanVarianceOptimisation:
                     weights <= min(self.weight_bounds[1], 1)
                 ]
             )
-        if isinstance(self.weight_bounds, dict):
-            asset_indices = list(range(num_assets))
-            for asset_index in asset_indices:
-                lower_bound, upper_bound = self.weight_bounds.get(asset_index, (0, 1))
-                allocation_constraints.extend(
-                    [
-                        weights[asset_index] >= lower_bound,
-                        weights[asset_index] <= min(upper_bound, 1)
-                    ]
-                )
+        else:
+            for inequality in self.weight_bounds:
+                allocation_constraints.append(eval(inequality))
+
+            # Add the hard-boundaries for weights.
+            allocation_constraints.extend(
+                [
+                    weights <= 1,
+                    weights >= 0
+                ]
+            )
 
         # Define and solve the problem
         problem = cp.Problem(
@@ -431,12 +443,13 @@ class MeanVarianceOptimisation:
 
     def _max_return_for_target_risk(self, covariance, expected_returns, target_risk, num_assets):
         """
+        Calculate maximum return for a given target volatility/risk.
 
-        :param covariance:
-        :param expected_returns:
-        :param target_risk:
-        :param num_assets:
-        :return:
+        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
+        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
+        :param target_risk: (float) target risk of the portfolio
+        :param num_assets: (int) number of assets in the portfolio
+        :return: (np.array, float, float) portfolio weights, risk value and return value
         """
 
         weights = cp.Variable(num_assets)
@@ -457,16 +470,17 @@ class MeanVarianceOptimisation:
                     weights <= min(self.weight_bounds[1], 1)
                 ]
             )
-        if isinstance(self.weight_bounds, dict):
-            asset_indices = list(range(num_assets))
-            for asset_index in asset_indices:
-                lower_bound, upper_bound = self.weight_bounds.get(asset_index, (0, 1))
-                allocation_constraints.extend(
-                    [
-                        weights[asset_index] >= lower_bound,
-                        weights[asset_index] <= min(upper_bound, 1)
-                    ]
-                )
+        else:
+            for inequality in self.weight_bounds:
+                allocation_constraints.append(eval(inequality))
+
+            # Add the hard-boundaries for weights.
+            allocation_constraints.extend(
+                [
+                    weights <= 1,
+                    weights >= 0
+                ]
+            )
 
         # Define and solve the problem
         problem = cp.Problem(
@@ -480,11 +494,12 @@ class MeanVarianceOptimisation:
 
     def _max_diversification(self, covariance, expected_returns, num_assets):
         """
+        Calculate the maximum diversified portfolio.
 
-        :param covariance:
-        :param expected_returns:
-        :param num_assets:
-        :return:
+        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
+        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
+        :param num_assets: (int) number of assets in the portfolio
+        :return: (np.array, float, float) portfolio weights, risk value and return value
         """
 
         weights, _, _ = self._max_decorrelation(covariance, expected_returns, num_assets)
@@ -502,11 +517,12 @@ class MeanVarianceOptimisation:
 
     def _max_decorrelation(self, covariance, expected_returns, num_assets):
         """
+        Calculate the maximum decorrelated portfolio.
 
-        :param covariance:
-        :param expected_returns:
-        :param num_assets:
-        :return:
+        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
+        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
+        :param num_assets: (int) number of assets in the portfolio
+        :return: (np.array, float, float) portfolio weights, risk value and return value
         """
 
         weights = cp.Variable(num_assets)
@@ -528,16 +544,17 @@ class MeanVarianceOptimisation:
                     weights <= min(self.weight_bounds[1], 1)
                 ]
             )
-        if isinstance(self.weight_bounds, dict):
-            asset_indices = list(range(num_assets))
-            for asset_index in asset_indices:
-                lower_bound, upper_bound = self.weight_bounds.get(asset_index, (0, 1))
-                allocation_constraints.extend(
-                    [
-                        weights[asset_index] >= lower_bound,
-                        weights[asset_index] <= min(upper_bound, 1)
-                    ]
-                )
+        else:
+            for inequality in self.weight_bounds:
+                allocation_constraints.append(eval(inequality))
+
+            # Add the hard-boundaries for weights.
+            allocation_constraints.extend(
+                [
+                    weights <= 1,
+                    weights >= 0
+                ]
+            )
 
         # Define and solve the problem
         problem = cp.Problem(
