@@ -1,8 +1,6 @@
 from mlfinlab.online_portfolio_selection.olps_utils import *
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
-
 
 class BAH(OLPS):
     """
@@ -24,23 +22,17 @@ class BAH(OLPS):
     def allocate(self,
                  asset_names,
                  asset_prices,
-                 covariance_matrix=None,
-                 expected_asset_returns=None,
-                 risk_free_rate=0.05,
                  weights=None,
                  resample_by=None):
         """
         :param asset_names: (list) a list of strings containing the asset names
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
-        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
-        :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns (sigma)
-        :param risk_free_rate: (float) the rate of return for a risk-free asset.
-        :param weights: (list) a list of weights, if not stated weights are uniform
+        :param weights: any weights
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         """
-        # initial check
-        # initial_check(asset_prices, expected_asset_returns, covariance_matrix)
+
+        # Data Prep
 
         number_of_assets = len(asset_names)
         if weights is None:
@@ -48,8 +40,11 @@ class BAH(OLPS):
         else:
             self.weights = weights
 
+
+        # Other idea that might be implemented later
+
         # Calculate covariance of returns or use the user specified covariance matrix
-        covariance_matrix = calculate_covariance(asset_names, asset_prices, covariance_matrix, resample_by, self.returns_estimator)
+        # covariance_matrix = calculate_covariance(asset_names, asset_prices, covariance_matrix, resample_by, self.returns_estimator)
 
         # Calculate the expected returns if the user does not supply any returns
         # expected_asset_returns = calculate_expected_asset_returns(asset_prices, expected_asset_returns, resample_by)
@@ -66,3 +61,15 @@ class BAH(OLPS):
         self.weights = pd.DataFrame(self.weights)
         self.weights.index = asset_names
         self.weights = self.weights.T
+
+
+def main():
+    stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
+    stock_price = stock_price.dropna(axis=1)
+    names = list(stock_price.columns)
+    initial_portfolio = OLPS()
+    initial_portfolio.allocate(asset_names=names, asset_prices=stock_price)
+
+
+if __name__ == "__main__":
+    main()
