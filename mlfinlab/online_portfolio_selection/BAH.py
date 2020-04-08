@@ -34,13 +34,33 @@ class BAH(OLPS):
 
         # Data Prep
 
+        # same problems from OLPS
+
+        # copy and pasted from OLPS beginning
+
+        # calculate number of assets
         number_of_assets = len(asset_names)
+
+        # calculate number of time periods
+        time_period = asset_prices.shape[0]
+
+        # make asset_prices a numpy array (maybe faster for calculation)
+        np_asset_prices = np.array(asset_prices)
+
+        # calculate relative price i.e. week 1's price/week 0's price
+        # relative_price is a dataframe
+        relative_price = self.relative_price_change(asset_prices)
+
+        # if user does not initiate a particular weight, give equal weights to every assets
         if weights is None:
-            self.weights = np.linspace(0, 1, num=number_of_assets)
+            self.weights = np.ones(number_of_assets) / number_of_assets
         else:
             self.weights = weights
 
 
+
+    def run(self):
+        pass
         # Other idea that might be implemented later
 
         # Calculate covariance of returns or use the user specified covariance matrix

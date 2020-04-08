@@ -45,6 +45,10 @@ class OLPS(object):
         # calculate number of assets
         number_of_assets = len(asset_names)
 
+        # split index and columns
+        idx = asset_prices.index
+        asset_names = asset_prices.columns
+
         # calculate number of time periods
         time_period = asset_prices.shape[0]
 
@@ -73,9 +77,9 @@ class OLPS(object):
             self.run(self.weights)
             self.portfolio_return = np.vstack((self.portfolio_return, np.dot(self.weights, relative_price[t])))
 
+        # convert everything to make presentable
         # convert to dataframe
-        self.all_weights = pd.DataFrame(self.all_weights,index=asset_prices.index,columns=asset_prices.columns)
-        self.portfolio_return = pd.DataFrame(self.portfolio_return,index=asset_prices.index,columns=["Relative Returns"])
+        self.conversion(_all_weights=self.all_weights,_portfolio_return=self.portfolio_return,_index=idx,_asset_names=asset_names)
 
     # for this one, it doesn't matter but for subsequent complex selection problems, we might have to include a
     # separate run method for each iteration and not clog the allocate method.
@@ -96,6 +100,10 @@ class OLPS(object):
         relative_price = np.array(relative_price + 1)
         return relative_price
 
+    def conversion(self, _all_weights, _portfolio_return, _index, _asset_names):
+        self.all_weights = pd.DataFrame(_all_weights, index=_index, columns=_asset_names)
+        self.portfolio_return = pd.DataFrame(_portfolio_return, index=_index,columns=["Relative Returns"])
+    
     # calculate the returns based on portfolio weights
     def returns(self):
         pass
