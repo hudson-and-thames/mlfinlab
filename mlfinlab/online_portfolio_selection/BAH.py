@@ -1,5 +1,3 @@
-import numpy as np
-import pandas as pd
 from mlfinlab.online_portfolio_selection.olps_utils import *
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 

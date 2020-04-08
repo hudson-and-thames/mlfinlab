@@ -91,6 +91,17 @@ class OLPS(object):
         self.all_weights = np.vstack((self.all_weights, self.weights))
         return self.weights
 
+    # calculate the returns based on portfolio weights
+    def returns(self):
+        pass
+
+    # calculate the variance based on the price
+    def volatility(self):
+        pass
+
+    # calculate the sharpe ratio based on the weights and returns
+    def sharpe_ratio(self):
+        pass
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
