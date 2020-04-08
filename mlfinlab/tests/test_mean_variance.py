@@ -39,7 +39,7 @@ class TestMVO(unittest.TestCase):
 
     def test_min_volatility_solution(self):
         """
-        Test the calculation of inverse-variance portfolio weights.
+        Test the calculation of minimum volatility portfolio weights.
         """
 
         mvo = MeanVarianceOptimisation()
@@ -49,22 +49,47 @@ class TestMVO(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
-    def test_max_sharpe_solution(self):
+    def test_max_return_solution(self):
         """
-        Test the calculation of inverse-variance portfolio weights.
+        Test the calculation of maximum expected return portfolio weights.
         """
 
         mvo = MeanVarianceOptimisation()
-        mvo.allocate(asset_prices=self.data, solution='max_sharpe', asset_names=self.data.columns)
+        mvo.allocate(asset_prices=self.data, solution='max_return', asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
-    def test_min_volatility_with_target_return(self):
+    def test_max_return_min_volatility_solution(self):
+        """
+        Test the calculation of maximum expected return and minimum volatility portfolio weights.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data, solution='max_return_min_volatility', asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_max_sharpe_solution(self):
+        """
+        Test the calculation of maximum sharpe portfolio weights.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data, solution='max_sharpe', asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        print(mvo.weights)
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_min_volatility_for_target_return(self):
         # pylint: disable=invalid-name
         """
-        Test the calculation of inverse-variance portfolio weights.
+        Test the calculation of minimum volatility-target return portfolio weights.
         """
 
         mvo = MeanVarianceOptimisation()
@@ -74,10 +99,50 @@ class TestMVO(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
+    def test_max_return_for_target_risk(self):
+        # pylint: disable=invalid-name
+        """
+        Test the calculation of maximum return-target risk portfolio weights.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data, solution='efficient_return', asset_names=self.data.columns, resample_by='W')
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_max_diversification(self):
+        # pylint: disable=invalid-name
+        """
+        Test the calculation of maximum diversification portfolio weights.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data, solution='max_diversification', asset_names=self.data.columns, resample_by='M')
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_max_decorrelation(self):
+        # pylint: disable=invalid-name
+        """
+        Test the calculation of maximum decorrelation portfolio weights.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data, solution='max_decorrelation', asset_names=self.data.columns, resample_by='W')
+        weights = mvo.weights.values[0]
+        print(weights)
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
     def test_plotting_efficient_frontier(self):
         # pylint: disable=invalid-name, bad-continuation, protected-access
         """
-        Test the calculation of inverse-variance portfolio weights.
+        Test the plotting of the efficient frontier.
         """
 
         mvo = MeanVarianceOptimisation()

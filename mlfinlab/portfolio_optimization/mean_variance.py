@@ -4,6 +4,7 @@ import pandas as pd
 import cvxpy as cp
 import matplotlib.pyplot as plt
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
 
 
 class MeanVarianceOptimisation:
@@ -15,6 +16,11 @@ class MeanVarianceOptimisation:
         2. Maximum Sharpe
         3. Minimum Volatility
         4. Efficient Risk
+        5. Maximum Return
+        6. Maximum Return - Minimum Volatility
+        7. Efficient Return
+        8. Maximum Diversification
+        9. Maximum Decorrelation
     """
 
     def __init__(self, calculate_expected_returns='mean'):
@@ -31,6 +37,7 @@ class MeanVarianceOptimisation:
         self.portfolio_sharpe_ratio = None
         self.calculate_expected_returns = calculate_expected_returns
         self.returns_estimator = ReturnsEstimation()
+        self.risk_estimators = RiskEstimators()
         self.weight_bounds = None
 
     def allocate(self,
@@ -41,6 +48,7 @@ class MeanVarianceOptimisation:
                  solution='inverse_variance',
                  risk_free_rate=0.05,
                  target_return=0.2,
+                 target_risk=0.01,
                  weight_bounds=(0, 1),
                  resample_by=None):
         # pylint: disable=invalid-name, too-many-branches, bad-continuation
@@ -105,8 +113,23 @@ class MeanVarianceOptimisation:
 
         if solution == 'inverse_variance':
             self.weights = self._inverse_variance(covariance=cov)
+            self.portfolio_risk = np.dot(self.weights, np.dot(cov.values, self.weights.T))
+            self.portfolio_return = np.dot(self.weights, expected_asset_returns)[0]
         elif solution == 'min_volatility':
-            self.weights, self.portfolio_risk = self._min_volatility(covariance=cov, num_assets=len(asset_names))
+            self.weights, self.portfolio_risk, self.portfolio_return = self._min_volatility(
+                                                                                    covariance=cov,
+                                                                                    expected_returns=expected_asset_returns,
+                                                                                    num_assets=len(asset_names))
+        elif solution == 'max_return':
+            self.weights, self.portfolio_risk, self.portfolio_return = self._max_return(
+                                                                                    covariance=cov,
+                                                                                    expected_returns=expected_asset_returns,
+                                                                                    num_assets=len(asset_names))
+        elif solution == 'max_return_min_volatility':
+            self.weights, self.portfolio_risk, self.portfolio_return = self._max_return_min_volatility(
+                                                                                    covariance=cov,
+                                                                                    expected_returns=expected_asset_returns,
+                                                                                    num_assets=len(asset_names))
         elif solution == 'max_sharpe':
             self.weights, self.portfolio_risk, self.portfolio_return = self._max_sharpe(
                                                                                     covariance=cov,
@@ -119,6 +142,22 @@ class MeanVarianceOptimisation:
                                                                                     expected_returns=expected_asset_returns,
                                                                                     target_return=target_return,
                                                                                     num_assets=len(asset_names))
+        elif solution == 'efficient_return':
+            self.weights, self.portfolio_risk, self.portfolio_return = self._max_return_for_target_risk(
+                                                                                    covariance=cov,
+                                                                                    expected_returns=expected_asset_returns,
+                                                                                    target_risk=target_risk,
+                                                                                    num_assets=len(asset_names))
+        elif solution == 'max_diversification':
+            self.weights, self.portfolio_risk, self.portfolio_return = self._max_diversification(
+                                                                                    covariance=cov,
+                                                                                    expected_returns=expected_asset_returns,
+                                                                                    num_assets=len(asset_names))
+        elif solution == 'max_decorrelation':
+            self.weights, self.portfolio_risk, self.portfolio_return = self._max_decorrelation(
+                                                                                    covariance=cov,
+                                                                                    expected_returns=expected_asset_returns,
+                                                                                    num_assets=len(asset_names))
         else:
             raise ValueError("Unknown solution string specified. Supported solutions - "
                              "inverse_variance, min_volatility, max_sharpe and efficient_risk.")
@@ -127,11 +166,7 @@ class MeanVarianceOptimisation:
         negative_weight_indices = np.argwhere(self.weights < 0)
         self.weights[negative_weight_indices] = np.round(self.weights[negative_weight_indices], 3)
 
-        # Calculate the portfolio risk and return if it has not been calculated
-        if self.portfolio_risk is None:
-            self.portfolio_risk = np.dot(self.weights, np.dot(cov.values, self.weights.T))
-        if self.portfolio_return is None:
-            self.portfolio_return = np.dot(self.weights, expected_asset_returns)
+        # Calculate the portfolio sharpe ratio
         self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))
 
         self.weights = pd.DataFrame(self.weights)
@@ -151,7 +186,7 @@ class MeanVarianceOptimisation:
         ivp /= ivp.sum()
         return ivp
 
-    def _min_volatility(self, covariance, num_assets):
+    def _min_volatility(self, covariance, expected_returns, num_assets):
         """
         Compute minimum volatility portfolio allocation.
 
@@ -163,11 +198,56 @@ class MeanVarianceOptimisation:
         weights = cp.Variable(num_assets)
         weights.value = np.array([1 / num_assets] * num_assets)
         risk = cp.quad_form(weights, covariance)
+        portfolio_return = cp.matmul(weights, expected_returns)
 
         # Optimisation objective and constraints
         allocation_objective = cp.Minimize(risk)
         allocation_constraints = [
             cp.sum(weights) == 1,
+        ]
+        if isinstance(self.weight_bounds, tuple):
+            allocation_constraints.extend(
+                [
+                    weights >= self.weight_bounds[0],
+                    weights <= min(self.weight_bounds[1], 1)
+                ]
+            )
+        if isinstance(self.weight_bounds, list):
+            indices_in_list = set()
+            for inequality in self.weight_bounds:
+                allocation_constraints.extend(
+                    eval(inequality)
+                )
+        print(allocation_constraints)
+
+        # Define and solve the problem
+        problem = cp.Problem(
+            objective=allocation_objective,
+            constraints=allocation_constraints
+        )
+        problem.solve(warm_start=True)
+        if weights.value is None:
+            raise ValueError('No optimal set of weights found.')
+        return weights.value, risk.value, portfolio_return.value[0]
+
+    def _max_return(self, covariance, expected_returns, num_assets):
+        """
+        Calculate maximum return portfolio allocation.
+
+        :param expected_returns:
+        :param num_assets:
+        :return:
+        """
+
+        weights = cp.Variable(num_assets)
+        weights.value = np.array([1 / num_assets] * num_assets)
+        portfolio_return = cp.matmul(weights, expected_returns)
+        risk = cp.quad_form(weights, covariance)
+
+        # Optimisation objective and constraints
+        allocation_objective = cp.Maximize(portfolio_return)
+        allocation_constraints = [
+            cp.sum(weights) == 1
         ]
         if isinstance(self.weight_bounds, tuple):
             allocation_constraints.extend(
@@ -195,7 +275,55 @@ class MeanVarianceOptimisation:
         problem.solve(warm_start=True)
         if weights.value is None:
             raise ValueError('No optimal set of weights found.')
-        return weights.value, risk.value ** 0.5
+        return weights.value, risk.value, portfolio_return.value[0]
+
+    def _max_return_min_volatility(self, covariance, expected_returns, num_assets):
+        """
+        Calculate maximum return-minimum volatility portfolio allocation.
+
+        :param covariance:
+        :param expected_returns:
+        :param num_assets:
+        :return:
+        """
+
+        weights = cp.Variable(num_assets)
+        weights.value = np.array([1 / num_assets] * num_assets)
+        portfolio_return = cp.matmul(weights, expected_returns)
+        risk = cp.quad_form(weights, covariance)
+
+        # Optimisation objective and constraints
+        allocation_objective = cp.Maximize(portfolio_return - risk)
+        allocation_constraints = [
+            cp.sum(weights) == 1
+        ]
+        if isinstance(self.weight_bounds, tuple):
+            allocation_constraints.extend(
+                [
+                    weights >= self.weight_bounds[0],
+                    weights <= min(self.weight_bounds[1], 1)
+                ]
+            )
+        if isinstance(self.weight_bounds, dict):
+            asset_indices = list(range(num_assets))
+            for asset_index in asset_indices:
+                lower_bound, upper_bound = self.weight_bounds.get(asset_index, (0, 1))
+                allocation_constraints.extend(
+                    [
+                        weights[asset_index] >= lower_bound,
+                        weights[asset_index] <= min(upper_bound, 1)
+                    ]
+                )
+
+        # Define and solve the problem
+        problem = cp.Problem(
+            objective=allocation_objective,
+            constraints=allocation_constraints
+        )
+        problem.solve(warm_start=True)
+        if weights.value is None:
+            raise ValueError('No optimal set of weights found.')
+        return weights.value, risk.value, portfolio_return.value[0]
 
     def _max_sharpe(self, covariance, expected_returns, risk_free_rate, num_assets):
         # pylint: disable=invalid-name
@@ -213,6 +341,8 @@ class MeanVarianceOptimisation:
         y.value = np.array([1 / num_assets] * num_assets)
         kappa = cp.Variable(1)
         risk = cp.quad_form(y, covariance)
+        weights = y / kappa
+        portfolio_return = cp.matmul(weights, expected_returns)
 
         # Optimisation objective and constraints
         allocation_objective = cp.Minimize(risk)
@@ -247,9 +377,7 @@ class MeanVarianceOptimisation:
         problem.solve(warm_start=True)
         if y.value is None or kappa.value is None:
             raise ValueError('No optimal set of weights found.')
-        weights = y.value / kappa.value
-        portfolio_return = (expected_returns.T @ weights)[0]
-        return weights, risk.value ** 0.5, portfolio_return
+        return weights.value, risk.value, portfolio_return.value[0]
 
     def _min_volatility_for_target_return(self, covariance, expected_returns, target_return, num_assets):
         """
@@ -263,13 +391,15 @@ class MeanVarianceOptimisation:
         """
 
         weights = cp.Variable(num_assets)
+        weights.value = np.array([1 / num_assets] * num_assets)
         risk = cp.quad_form(weights, covariance)
+        portfolio_return = cp.matmul(weights, expected_returns)
 
         # Optimisation objective and constraints
         allocation_objective = cp.Minimize(risk)
         allocation_constraints = [
             cp.sum(weights) == 1,
-            (expected_returns.T @ weights)[0] == target_return,
+            portfolio_return >= target_return,
         ]
         if isinstance(self.weight_bounds, tuple):
             allocation_constraints.extend(
@@ -297,7 +427,127 @@ class MeanVarianceOptimisation:
         problem.solve()
         if weights.value is None:
             raise ValueError('No optimal set of weights found.')
-        return weights.value, risk.value ** 0.5, target_return
+        return weights.value, risk.value, target_return
+
+    def _max_return_for_target_risk(self, covariance, expected_returns, target_risk, num_assets):
+        """
+
+        :param covariance:
+        :param expected_returns:
+        :param target_risk:
+        :param num_assets:
+        :return:
+        """
+
+        weights = cp.Variable(num_assets)
+        weights.value = np.array([1 / num_assets] * num_assets)
+        portfolio_return = cp.matmul(weights, expected_returns)
+        risk = cp.quad_form(weights, covariance)
+
+        # Optimisation objective and constraints
+        allocation_objective = cp.Maximize(portfolio_return)
+        allocation_constraints = [
+            cp.sum(weights) == 1,
+            risk <= target_risk
+        ]
+        if isinstance(self.weight_bounds, tuple):
+            allocation_constraints.extend(
+                [
+                    weights >= self.weight_bounds[0],
+                    weights <= min(self.weight_bounds[1], 1)
+                ]
+            )
+        if isinstance(self.weight_bounds, dict):
+            asset_indices = list(range(num_assets))
+            for asset_index in asset_indices:
+                lower_bound, upper_bound = self.weight_bounds.get(asset_index, (0, 1))
+                allocation_constraints.extend(
+                    [
+                        weights[asset_index] >= lower_bound,
+                        weights[asset_index] <= min(upper_bound, 1)
+                    ]
+                )
+
+        # Define and solve the problem
+        problem = cp.Problem(
+            objective=allocation_objective,
+            constraints=allocation_constraints
+        )
+        problem.solve()
+        if weights.value is None:
+            raise ValueError('No optimal set of weights found.')
+        return weights.value, target_risk, portfolio_return.value[0]
+
+    def _max_diversification(self, covariance, expected_returns, num_assets):
+        """
+
+        :param covariance:
+        :param expected_returns:
+        :param num_assets:
+        :return:
+        """
+
+        weights, _, _ = self._max_decorrelation(covariance, expected_returns, num_assets)
+
+        # Divide weights by individual asset volatilities
+        weights /= np.diag(covariance)
+
+        # Standardize weights
+        weights /= np.sum(weights)
+
+        portfolio_return = np.dot(expected_returns.T, weights)[0]
+        risk = np.dot(weights, np.dot(covariance, weights.T))
+
+        return weights, risk, portfolio_return
+
+    def _max_decorrelation(self, covariance, expected_returns, num_assets):
+        """
+
+        :param covariance:
+        :param expected_returns:
+        :param num_assets:
+        :return:
+        """
+
+        weights = cp.Variable(num_assets)
+        weights.value = np.array([1 / num_assets] * num_assets)
+        risk = cp.quad_form(weights, covariance)
+        portfolio_return = cp.matmul(weights, expected_returns)
+        corr = self.risk_estimators.cov_to_corr(covariance)
+        portfolio_correlation = cp.quad_form(weights, corr)
+
+        # Optimisation objective and constraints
+        allocation_objective = cp.Minimize(portfolio_correlation)
+        allocation_constraints = [
+            cp.sum(weights) == 1
+        ]
+        if isinstance(self.weight_bounds, tuple):
+            allocation_constraints.extend(
+                [
+                    weights >= self.weight_bounds[0],
+                    weights <= min(self.weight_bounds[1], 1)
+                ]
+            )
+        if isinstance(self.weight_bounds, dict):
+            asset_indices = list(range(num_assets))
+            for asset_index in asset_indices:
+                lower_bound, upper_bound = self.weight_bounds.get(asset_index, (0, 1))
+                allocation_constraints.extend(
+                    [
+                        weights[asset_index] >= lower_bound,
+                        weights[asset_index] <= min(upper_bound, 1)
+                    ]
+                )
+
+        # Define and solve the problem
+        problem = cp.Problem(
+            objective=allocation_objective,
+            constraints=allocation_constraints
+        )
+        problem.solve(warm_start=True)
+        if weights.value is None:
+            raise ValueError('No optimal set of weights found.')
+        return weights.value, risk.value, portfolio_return.value[0]
 
     def plot_efficient_frontier(self,
                                 covariance,
