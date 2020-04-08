@@ -81,7 +81,6 @@ class TestMVO(unittest.TestCase):
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data, solution='max_sharpe', asset_names=self.data.columns)
         weights = mvo.weights.values[0]
-        print(mvo.weights)
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
@@ -134,7 +133,6 @@ class TestMVO(unittest.TestCase):
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data, solution='max_decorrelation', asset_names=self.data.columns, resample_by='W')
         weights = mvo.weights.values[0]
-        print(weights)
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
@@ -182,7 +180,7 @@ class TestMVO(unittest.TestCase):
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data,
                      solution='min_volatility',
-                     weight_bounds={0:(0.3, 1)},
+                     weight_bounds=['weights[0] <= 0.2'],
                      asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
@@ -198,7 +196,7 @@ class TestMVO(unittest.TestCase):
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data,
                      solution='max_sharpe',
-                     weight_bounds={0: (0.3, 1)},
+                     weight_bounds=['y[0] <= kappa * 0.5'],
                      asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
@@ -215,7 +213,92 @@ class TestMVO(unittest.TestCase):
         mvo.allocate(asset_prices=self.data,
                      solution='efficient_risk',
                      target_return=0.01,
-                     weight_bounds={0: (0.3, 1)},
+                     weight_bounds=['weights[0] <= 0.3'],
+                     asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_efficient_return_with_specific_weight_bounds(self):
+        # pylint: disable=invalid-name
+        """
+        Test the calculation of weights when specific bounds are supplied.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data,
+                     solution='efficient_return',
+                     target_return=0.01,
+                     weight_bounds=['weights[0] <= 0.3'],
+                     asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_max_return_with_specific_weight_bounds(self):
+        # pylint: disable=invalid-name
+        """
+        Test the calculation of weights when specific bounds are supplied.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data,
+                     solution='max_return',
+                     target_return=0.01,
+                     weight_bounds=['weights[0] <= 0.3'],
+                     asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_max_decorrelation_with_specific_weight_bounds(self):
+        # pylint: disable=invalid-name
+        """
+        Test the calculation of weights when specific bounds are supplied.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data,
+                     solution='max_decorrelation',
+                     target_return=0.01,
+                     weight_bounds=['weights[0] <= 0.3'],
+                     asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_max_diversification_with_specific_weight_bounds(self):
+        # pylint: disable=invalid-name
+        """
+        Test the calculation of weights when specific bounds are supplied.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data,
+                     solution='max_diversification',
+                     target_return=0.01,
+                     weight_bounds=['weights[0] <= 0.3'],
+                     asset_names=self.data.columns)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_max_return_min_volatility_with_specific_weight_bounds(self):
+        # pylint: disable=invalid-name
+        """
+        Test the calculation of weights when specific bounds are supplied.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data,
+                     solution='max_return_min_volatility',
+                     target_return=0.01,
+                     weight_bounds=['weights[0] <= 0.3'],
                      asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
