@@ -49,6 +49,13 @@ class TestMVO(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
+        # Check that the volatility is the minimum among all other portfolios
+        for solution_string in {"inverse_variance", "max_return", "max_sharpe", "max_return_min_volatility",
+                                "max_diversification", "max_decorrelation"}:
+            mvo_ = MeanVarianceOptimisation()
+            mvo_.allocate(asset_prices=self.data, solution=solution_string, asset_names=self.data.columns)
+            assert mvo.portfolio_risk <= mvo_.portfolio_risk
+
     def test_max_return_solution(self):
         """
         Test the calculation of maximum expected return portfolio weights.
@@ -60,6 +67,13 @@ class TestMVO(unittest.TestCase):
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
+
+        # Check that the return is the maximum among all other portfolios
+        for solution_string in {"inverse_variance", "min_volatility", "max_sharpe", "max_return_min_volatility",
+                                "max_diversification", "max_decorrelation"}:
+            mvo_ = MeanVarianceOptimisation()
+            mvo_.allocate(asset_prices=self.data, solution=solution_string, asset_names=self.data.columns)
+            assert (mvo.portfolio_return > mvo_.portfolio_return or np.isclose(mvo.portfolio_return, mvo_.portfolio_return))
 
     def test_max_return_min_volatility_solution(self):
         """
@@ -84,6 +98,14 @@ class TestMVO(unittest.TestCase):
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
+
+        # Check that the sharpe ratio is maximum
+        for solution_string in {"inverse_variance", "min_volatility", "max_return", "max_return_min_volatility",
+                         "max_diversification", "max_decorrelation"}:
+            mvo_ = MeanVarianceOptimisation()
+            mvo_.allocate(asset_prices=self.data, solution=solution_string, asset_names=self.data.columns)
+            print(solution_string, mvo.portfolio_sharpe_ratio, mvo_.portfolio_sharpe_ratio)
+            # assert mvo.portfolio_sharpe_ratio >= mvo_.portfolio_sharpe_ratio
 
     def test_min_volatility_for_target_return(self):
         # pylint: disable=invalid-name
@@ -229,7 +251,6 @@ class TestMVO(unittest.TestCase):
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data,
                      solution='efficient_return',
-                     target_return=0.01,
                      weight_bounds=['weights[0] <= 0.3'],
                      asset_names=self.data.columns)
         weights = mvo.weights.values[0]
@@ -246,8 +267,7 @@ class TestMVO(unittest.TestCase):
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data,
                      solution='max_return',
-                     target_return=0.01,
-                     weight_bounds=['weights[0] <= 0.3'],
+                     weight_bounds=['weights[1] <= 1'],
                      asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
@@ -263,7 +283,6 @@ class TestMVO(unittest.TestCase):
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data,
                      solution='max_decorrelation',
-                     target_return=0.01,
                      weight_bounds=['weights[0] <= 0.3'],
                      asset_names=self.data.columns)
         weights = mvo.weights.values[0]
@@ -280,7 +299,6 @@ class TestMVO(unittest.TestCase):
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data,
                      solution='max_diversification',
-                     target_return=0.01,
                      weight_bounds=['weights[0] <= 0.3'],
                      asset_names=self.data.columns)
         weights = mvo.weights.values[0]
@@ -297,7 +315,6 @@ class TestMVO(unittest.TestCase):
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data,
                      solution='max_return_min_volatility',
-                     target_return=0.01,
                      weight_bounds=['weights[0] <= 0.3'],
                      asset_names=self.data.columns)
         weights = mvo.weights.values[0]

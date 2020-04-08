@@ -165,8 +165,11 @@ class MeanVarianceOptimisation:
                              "max_return_min_volatility, max_diversification, efficient_return and max_decorrelation")
 
         # Round weights which are very very small negative numbers (e.g. -4.7e-16) to 0
-        negative_weight_indices = np.argwhere(self.weights < 0)
-        self.weights[negative_weight_indices] = np.round(self.weights[negative_weight_indices], 3)
+        self.weights[self.weights < 0] = 0
+        if True in set(np.isclose(self.weights, 1)):
+            almost_one_index = np.isclose(self.weights, 1)
+            self.weights[almost_one_index] = 1
+            self.weights[np.logical_not(almost_one_index)] = 0
 
         # Calculate the portfolio sharpe ratio
         self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))
@@ -302,7 +305,7 @@ class MeanVarianceOptimisation:
         risk = cp.quad_form(weights, covariance)
 
         # Optimisation objective and constraints
-        allocation_objective = cp.Maximize(portfolio_return - risk)
+        allocation_objective = cp.Maximize(portfolio_return - 0.5 * risk)
         allocation_constraints = [
             cp.sum(weights) == 1
         ]
