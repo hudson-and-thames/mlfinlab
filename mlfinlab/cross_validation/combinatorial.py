@@ -14,7 +14,7 @@ from .cross_validation import ml_get_train_times
 
 class CombinatorialPurgedKFold(KFold):
     """
-    Extend KFold class to work with labels that span intervals
+    Implements Combinatial Purged Cross Validation (CPCV) from Chapter 12
     The train is purged of observations overlapping test-label intervals
     Test set is assumed contiguous (shuffle=False), w/o training samples in between
 
