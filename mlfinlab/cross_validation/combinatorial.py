@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 
 from sklearn.model_selection import KFold
-from mlfinlab.cross_validation import ml_get_train_times
+from .cross_validation import ml_get_train_times
 
 
 class CombinatorialPurgedKFold(KFold):

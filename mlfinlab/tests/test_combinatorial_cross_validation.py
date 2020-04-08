@@ -3,7 +3,6 @@ Tests the cross validation technique described in Ch.7 of the book.
 """
 import unittest
 import pandas as pd
-import numpy as np
 from mlfinlab.cross_validation import CombinatorialPurgedKFold
 
 
@@ -52,7 +51,8 @@ class TestCombinatorialPurgedCV(unittest.TestCase):
         Test that purging and embargo works correctly
         """
 
-        cv_gen = CombinatorialPurgedKFold(n_splits=6, n_test_splits=2, samples_info_sets=self.info_sets, pct_embargo=0.05)
+        cv_gen = CombinatorialPurgedKFold(n_splits=6, n_test_splits=2, samples_info_sets=self.info_sets,
+                                          pct_embargo=0.05)
         train_splits = []
         test_splits = []
 
@@ -60,7 +60,30 @@ class TestCombinatorialPurgedCV(unittest.TestCase):
             train_splits.append(train)
             test_splits.append(test)
 
+        cv_gen_no_embargo = CombinatorialPurgedKFold(n_splits=6, n_test_splits=2, samples_info_sets=self.info_sets,
+                                                     pct_embargo=0.0)
+        train_splits_no = []
+        test_splits_no = []
 
+        for train, test in cv_gen_no_embargo.split(self.info_sets):
+            train_splits_no.append(train)
+            test_splits_no.append(test)
 
+        self.assertEqual(len(train_splits_no[0]) - len(train_splits[0]), 5)  # Embargo of 1 train set
+        self.assertEqual(len(train_splits_no[1]) - len(train_splits[1]), 10)  # Embargo of 2 train set
+        self.assertEqual(len(train_splits_no[-1]) - len(train_splits[-1]), 0)  # Latest set is not embargo-ed
 
+    def test_errors_raise(self):
+        """
+        Test if ValueErrors are raised
+        """
 
+        with self.assertRaises(ValueError):
+            CombinatorialPurgedKFold(n_splits=6, n_test_splits=3, samples_info_sets=[1, 2, 3, 4])
+
+        cv_gen = CombinatorialPurgedKFold(n_splits=6, n_test_splits=2, samples_info_sets=self.info_sets,
+                                          pct_embargo=0.05)
+
+        with self.assertRaises(ValueError):
+            for _, _ in cv_gen.split(self.info_sets.iloc[2:]):
+                pass
