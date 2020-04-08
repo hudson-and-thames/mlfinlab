@@ -267,7 +267,18 @@ class RiskEstimators:
         """
         Calculates the Minimum Covariance Determinant for a dataframe of asset prices or returns.
 
-        This function is a wrap of the sklearn's MinCovDet (MCD) class.
+        This function is a wrap of the sklearn's MinCovDet (MCD) class. According to the
+        scikit-learn User Guide on Covariance estimation:
+
+        "The idea is to find a given proportion (h) of “good” observations that are not outliers
+        and compute their empirical covariance matrix. This empirical covariance matrix is then
+        rescaled to compensate for the performed selection of observations".
+
+        Link to the documentation:
+        <https://scikit-learn.org/stable/modules/generated/sklearn.covariance.MinCovDet.html>`_
+
+        If a dataframe of prices is given, it is transformed into a dataframe of returns using
+        the calculate_returns method from the ReturnsEstimation class.
 
         :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
@@ -298,7 +309,19 @@ class RiskEstimators:
         """
         Calculates the Maximum likelihood covariance estimator for a dataframe of asset prices or returns.
 
-        This function is a wrap of the sklearn's EmpiricalCovariance class.
+        This function is a wrap of the sklearn's EmpiricalCovariance class. According to the
+        scikit-learn User Guide on Covariance estimation:
+
+        "The covariance matrix of a data set is known to be well approximated by the classical maximum
+        likelihood estimator, provided the number of observations is large enough compared to the number
+        of features (the variables describing the observations). More precisely, the Maximum Likelihood
+        Estimator of a sample is an unbiased estimator of the corresponding population’s covariance matrix".
+
+        Link to the documentation:
+        <https://scikit-learn.org/stable/modules/generated/sklearn.covariance.EmpiricalCovariance.html>`_
+
+        If a dataframe of prices is given, it is transformed into a dataframe of returns using
+        the calculate_returns method from the ReturnsEstimation class.
 
         :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
@@ -327,7 +350,19 @@ class RiskEstimators:
         Calculates the Covariance estimator with shrinkage for a dataframe of asset prices or returns.
 
         This function allows three types of shrinkage - Basic, Ledoit-Wolf and Oracle Approximating Shrinkage.
-        It is a wrap of the sklearn's ShrunkCovariance, LedoitWolf and OAS classes.
+        It is a wrap of the sklearn's ShrunkCovariance, LedoitWolf and OAS classes. According to the
+        scikit-learn User Guide on Covariance estimation:
+
+        "Sometimes, it even occurs that the empirical covariance matrix cannot be inverted for numerical
+        reasons. To avoid such an inversion problem, a transformation of the empirical covariance matrix
+        has been introduced: the shrinkage. Mathematically, this shrinkage consists in reducing the ratio
+        between the smallest and the largest eigenvalues of the empirical covariance matrix".
+
+        Link to the documentation:
+        <https://scikit-learn.org/stable/modules/covariance.html>`_
+
+        If a dataframe of prices is given, it is transformed into a dataframe of returns using
+        the calculate_returns method from the ReturnsEstimation class.
 
         :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
@@ -367,8 +402,13 @@ class RiskEstimators:
         """
         Calculates the Semi-Covariance matrix for a dataframe of asset prices or returns.
 
-        Semi-Covariance matrix is used to minimize the portfolio's downside volatility. Usually the
-        threshold return is zero, but can be a positive number when one assumes a required return rate.
+        Semi-Covariance matrix is used to calculate the portfolio's downside volatility. Usually, the
+        threshold return is zero and the negative volatility is measured. A threshold can be a positive number
+        when one assumes a required return rate. If the threshold is above zero, the output is the volatility
+        measure for returns below this threshold.
+
+        If a dataframe of prices is given, it is transformed into a dataframe of returns using
+        the calculate_returns method from the ReturnsEstimation class.
 
         :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
@@ -419,6 +459,9 @@ class RiskEstimators:
 
         It calculates the series of covariances between elements and then gets the last value of exponentially
         weighted moving average series from covariance series as an element in matrix.
+
+        If a dataframe of prices is given, it is transformed into a dataframe of returns using
+        the calculate_returns method from the ReturnsEstimation class.
 
         :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
