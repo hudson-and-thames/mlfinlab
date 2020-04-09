@@ -66,48 +66,28 @@ class BAH(OLPS):
 
         # initialize self.all_weights
         self.all_weights = self.weights
+        self.portfolio_return = np.array([np.dot(self.weights, relative_price[0])])
 
         # sum of cumulative weights
         sum_cumulative_product = np.sum(cumulative_product, axis=1)
 
         # Run the Algorithm
         for t in range(1, time_period):
-            self.run(cumulative_product[t], sum_cumulative_product[t])
+            self.run(self.weights, relative_price[t-1])
+            self.returns(self.weights, relative_price[t], self.portfolio_return[self.portfolio_return.size - 1])
 
-        self.portfolio_return = np.dot(cumulative_product, self.all_weights[0])
-
+        self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
+                        _asset_names=asset_names)
     # update weights
     # although we're not rebalancing the portfolio, the weights themselves change because of the underlying price changes
     # we only need the cumulative product matrix to calculate the weights since we're just tracking the change
     # unnecessary run function but I kept it here so that it matches the other algorithms
-    def run(self, _cumulative_product, _sum_cumulative_product):
-        new_weights = _cumulative_product / _sum_cumulative_product
-        self.weights = new_weights
-        self.all_weights = np.vstack((self.all_weights, self.weights))
-        return self.weights
 
+    def run(self, _weights, _relative_price):
+        # redundant because BAH doesn't rebalance based on previous data
+        new_weights = _weights
 
-        # Other idea that might be implemented later
-
-        # Calculate covariance of returns or use the user specified covariance matrix
-        # covariance_matrix = calculate_covariance(asset_names, asset_prices, covariance_matrix, resample_by, self.returns_estimator)
-
-        # Calculate the expected returns if the user does not supply any returns
-        # expected_asset_returns = calculate_expected_asset_returns(asset_prices, expected_asset_returns, resample_by)
-
-        # Calculate the portfolio risk and return if it has not been calculated
-        # self.portfolio_risk = calculate_portfolio_risk(self.portfolio_risk, covariance_matrix, self.weights)
-
-        # Calculate the portfolio return
-        # self.portfolio_return = calculate_portfolio_return(self.portfolio_return, self.weights, expected_asset_returns)
-
-        # Calculate Sharpe Ratio
-        # self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))
-
-        # self.weights = pd.DataFrame(self.weights)
-        # self.weights.index = asset_names
-        # self.weights = self.weights.T
-
+        self.normalize_and_add(new_weights, _relative_price)
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')

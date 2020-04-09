@@ -64,12 +64,9 @@ class OLPS(object):
 
         # Actual weight calculation
 
-        # if weights is none, put 1 on a random stock
-        if weights is None:
-            self.weights = np.zeros(number_of_assets)
-            self.weights[np.random.randint(0, number_of_assets - 1)] += 1
-        else:
-            self.weights = weights
+        # Buy one asset and never change
+        self.weights = np.zeros(number_of_assets)
+        self.weights[np.random.randint(0, number_of_assets - 1)] += 1
 
         # initialize self.all_weights
         self.all_weights = self.weights
@@ -77,8 +74,8 @@ class OLPS(object):
 
         # Run the Algorithm
         for t in range(1, time_period):
-            # update new weights
-            self.run(self.weights)
+            # update weights
+            self.run(self.weights, relative_price[t-1])
             # update portfolio_return
             self.returns(self.weights, relative_price[t], self.portfolio_return[self.portfolio_return.size - 1])
 
@@ -90,16 +87,25 @@ class OLPS(object):
     # for this one, it doesn't matter, but for subsequent complex selection problems, we might have to include a
     # separate run method for each iteration and not clog the allocate method.
     # after calculating the new weight add that to the all weights
-    def run(self, _weights):
+    def run(self, _weights, _relative_price):
         # update weights according to a certain algorithm
         new_weights = _weights
-        self.weights = new_weights
-        self.all_weights = np.vstack((self.all_weights, self.weights))
+
+        self.normalize_and_add(new_weights, _relative_price)
 
     # calculate the returns based on portfolio weights
     def returns(self, _weights, _relative_price, _portfolio_return):
         new_returns = _portfolio_return * np.dot(_weights, _relative_price)
         self.portfolio_return = np.vstack((self.portfolio_return, new_returns))
+
+    def normalize_and_add(self, _weights, _relative_price):
+        # normalization factor
+        total_weights = np.dot(_weights, _relative_price)
+        # calculate the change divided by the normalization factor
+        _weights = np.multiply(_weights, _relative_price) / total_weights
+
+        self.weights = _weights
+        self.all_weights = np.vstack((self.all_weights, self.weights))
 
     def relative_price_change(self, asset_prices):
         # percent change of each row
@@ -122,6 +128,22 @@ class OLPS(object):
     def sharpe_ratio(self):
         pass
 
+    # Other idea that might be implemented later
+
+    # Calculate covariance of returns or use the user specified covariance matrix
+    # covariance_matrix = calculate_covariance(asset_names, asset_prices, covariance_matrix, resample_by, self.returns_estimator)
+
+    # Calculate the expected returns if the user does not supply any returns
+    # expected_asset_returns = calculate_expected_asset_returns(asset_prices, expected_asset_returns, resample_by)
+
+    # Calculate the portfolio risk and return if it has not been calculated
+    # self.portfolio_risk = calculate_portfolio_risk(self.portfolio_risk, covariance_matrix, self.weights)
+
+    # Calculate the portfolio return
+    # self.portfolio_return = calculate_portfolio_return(self.portfolio_return, self.weights, expected_asset_returns)
+
+    # Calculate Sharpe Ratio
+    # self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
