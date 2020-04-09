@@ -107,6 +107,8 @@ def main():
     names = list(stock_price.columns)
     bcrp = BCRP()
     bcrp.allocate(asset_names=names, asset_prices=stock_price)
+    print(bcrp.all_weights)
+    print(bcrp.portfolio_return)
 
 
 if __name__ == "__main__":
