@@ -1,8 +1,8 @@
+from mlfinlab.online_portfolio_selection import CRP
 from mlfinlab.online_portfolio_selection.olps_utils import *
-from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
 
-class CRP(OLPS):
+class BCRP(CRP):
     """
     This class implements the Constant Rebalanced Portfolio strategy.
     """
