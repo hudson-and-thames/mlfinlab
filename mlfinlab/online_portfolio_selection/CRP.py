@@ -52,22 +52,22 @@ class CRP(OLPS):
         # cumulative product matrix
         cumulative_product = np.array(relative_price).cumprod(axis=0)
 
-        # if user does not initiate a particular weight, give equal weights to every assets
-        if weights is None:
-            self.weights = np.ones(number_of_assets) / number_of_assets
-        else:
-            self.weights = weights
+        # index of stock that increased the most
+        best_idx = np.argmax(cumulative_product[-1])
+        self.weights = np.zeros(number_of_assets)
+        self.weights[best_idx] = 1
 
         # initialize self.all_weights
         self.all_weights = self.weights
+        self.portfolio_return = np.array([np.dot(self.weights, relative_price[0])])
 
         # Run the Algorithm
         for t in range(1, time_period):
-            self.run(self.weights)
-            new_portfolio_return = self.portfolio_return[-1] * np.dot(self.weights, relative_price[t])
-            self.portfolio_return = np.vstack((self.portfolio_return, ))
+            self.run(self.weights, relative_price[t-1])
+            self.returns(self.weights, relative_price[t], self.portfolio_return[self.portfolio_return.size - 1])
 
-        self.portfolio_return = np.dot(cumulative_product, self.all_weights[0])
+        self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
+                        _asset_names=asset_names)
 
     # update weights
     # just copy and pasting the weights
@@ -78,9 +78,6 @@ class CRP(OLPS):
         self.weights = new_weights
         self.all_weights = np.vstack((self.all_weights, self.weights))
         return self.weights
-
-    def returns(self):
-
 
 
         # Other idea that might be implemented later

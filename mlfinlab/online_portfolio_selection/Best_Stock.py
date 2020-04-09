@@ -52,23 +52,26 @@ class Best_Stock(OLPS):
         # cumulative product matrix
         cumulative_product = np.array(relative_price).cumprod(axis=0)
 
-        # index of stock that incresed the most
+        # index of stock that increased the most
         best_idx = np.argmax(cumulative_product[-1])
         self.weights = np.zeros(number_of_assets)
         self.weights[best_idx] = 1
 
         # initialize self.all_weights
         self.all_weights = self.weights
-        self.portfolio_return = np.dot(self.weights, cumulative_product[0])
+        self.portfolio_return = np.array([np.dot(self.weights, relative_price[0])])
 
         # Run the Algorithm
         for t in range(1, time_period):
             self.run(self.weights)
-            self.portfolio_return = np.vstack((self.portfolio_return, np.dot(self.weights, cumulative_product[t])))
+            self.returns(self.weights, relative_price[t], self.portfolio_return[self.portfolio_return.size - 1])
 
-    def run(self, _weights):
-        # weights never change because you're just holding onto them, so this effectively becomes the same as OLPS run method
-        super(Best_Stock, self).run(_weights)
+        self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
+                        _asset_names=asset_names)
+
+    # weight doesn't change because we chose the best stock
+    def run(self, _weights, _relative_price):
+        super(Best_Stock, self).run(_weights, _relative_price)
 
 
 def main():
