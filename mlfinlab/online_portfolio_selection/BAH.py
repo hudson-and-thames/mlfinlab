@@ -95,6 +95,8 @@ def main():
     names = list(stock_price.columns)
     bah = BAH()
     bah.allocate(asset_names=names, asset_prices=stock_price)
+    print(bah.all_weights)
+    print(bah.portfolio_return)
 
 
 if __name__ == "__main__":
