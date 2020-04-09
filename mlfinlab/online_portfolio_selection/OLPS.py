@@ -87,31 +87,31 @@ class OLPS(object):
     # for this one, it doesn't matter, but for subsequent complex selection problems, we might have to include a
     # separate run method for each iteration and not clog the allocate method.
     # after calculating the new weight add that to the all weights
-    def run(self, _weights, _relative_price):
+    def run(self, _past_weights, _past_relative_price):
         # update weights according to a certain algorithm
-        new_weights = _weights
+        new_weights = _past_weights
 
-        self.normalize_and_add(new_weights, _relative_price)
+        self.normalize_and_add(new_weights, _past_relative_price)
 
     # calculate the returns based on portfolio weights
-    def returns(self, _weights, _relative_price, _portfolio_return):
-        # we subtract np.ones because we added 1 to all the values in order to calculate other variables easily
-        # the original relative pct_change returned the editted value
-        new_returns = _portfolio_return * (1 + np.dot(_weights, _relative_price - np.ones(len(_weights))))
+    def returns(self, _current_weights, _current_relative_price, _previous_portfolio_return):
+        new_returns = _previous_portfolio_return * np.dot(_current_weights, _current_relative_price)
         self.portfolio_return = np.vstack((self.portfolio_return, new_returns))
 
-    def normalize_and_add(self, _weights, _relative_price):
+    # normalize and update weights, all_weights
+    def normalize_and_add(self, _new_weights, _past_relative_price):
         # normalization factor
-        total_weights = np.dot(_weights, _relative_price)
+        total_weights = np.dot(_new_weights, _past_relative_price)
         # element-wise multiply weights and relative price then divide by the normalization factor
-        _weights = np.multiply(_weights, _relative_price) / total_weights
+        _weights = np.multiply(_new_weights, _past_relative_price) / total_weights
 
         self.weights = _weights
         self.all_weights = np.vstack((self.all_weights, self.weights))
 
-    def relative_price_change(self, asset_prices):
+    # calculate percent change relative to the original price
+    def relative_price_change(self, _asset_prices):
         # percent change of each row
-        relative_price = asset_prices.pct_change()
+        relative_price = _asset_prices.pct_change()
         # first row is blank because no change, so make it 0
         relative_price = relative_price.fillna(0)
         # add 1 to all values so that the values can be multiplied easily
@@ -129,6 +129,10 @@ class OLPS(object):
     # calculate the sharpe ratio based on the weights and returns
     def sharpe_ratio(self):
         pass
+
+    # return maximum drawdown
+    def maximum_drawdown(self):
+        return min(self.portfolio_return)
 
     # Other idea that might be implemented later
 
@@ -153,6 +157,8 @@ def main():
     names = list(stock_price.columns)
     initial_portfolio = OLPS()
     initial_portfolio.allocate(asset_names=names, asset_prices=stock_price)
+    print(initial_portfolio.all_weights)
+    print(initial_portfolio.portfolio_return)
 
 
 if __name__ == "__main__":
