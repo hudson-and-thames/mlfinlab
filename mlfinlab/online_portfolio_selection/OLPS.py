@@ -59,6 +59,9 @@ class OLPS(object):
         # relative_price is a dataframe
         relative_price = self.relative_price_change(asset_prices)
 
+        # cumulative product matrix
+        cumulative_product = np.array(relative_price).cumprod(axis=0)
+
         # Actual weight calculation
 
         # if weights is none, put 1 on a random stock
@@ -70,18 +73,21 @@ class OLPS(object):
 
         # initialize self.all_weights
         self.all_weights = self.weights
-        self.portfolio_return = np.dot(self.weights, relative_price[0])
+        self.portfolio_return = np.array([np.dot(self.weights, relative_price[0])])
 
         # Run the Algorithm
         for t in range(1, time_period):
+            # update new weights
             self.run(self.weights)
-            self.portfolio_return = np.vstack((self.portfolio_return, np.dot(self.weights, relative_price[t])))
+            # update portfolio_return
+            self.returns(self.weights, relative_price[t], self.portfolio_return[self.portfolio_return.size - 1])
 
         # convert everything to make presentable
         # convert to dataframe
-        self.conversion(_all_weights=self.all_weights,_portfolio_return=self.portfolio_return,_index=idx,_asset_names=asset_names)
+        self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
+                        _asset_names=asset_names)
 
-    # for this one, it doesn't matter but for subsequent complex selection problems, we might have to include a
+    # for this one, it doesn't matter, but for subsequent complex selection problems, we might have to include a
     # separate run method for each iteration and not clog the allocate method.
     # after calculating the new weight add that to the all weights
     def run(self, _weights):
@@ -89,7 +95,11 @@ class OLPS(object):
         new_weights = _weights
         self.weights = new_weights
         self.all_weights = np.vstack((self.all_weights, self.weights))
-        return self.weights
+
+    # calculate the returns based on portfolio weights
+    def returns(self, _weights, _relative_price, _portfolio_return):
+        new_returns = _portfolio_return * np.dot(_weights, _relative_price)
+        self.portfolio_return = np.vstack((self.portfolio_return, new_returns))
 
     def relative_price_change(self, asset_prices):
         # percent change of each row
@@ -102,11 +112,7 @@ class OLPS(object):
 
     def conversion(self, _all_weights, _portfolio_return, _index, _asset_names):
         self.all_weights = pd.DataFrame(_all_weights, index=_index, columns=_asset_names)
-        self.portfolio_return = pd.DataFrame(_portfolio_return, index=_index,columns=["Relative Returns"])
-
-    # calculate the returns based on portfolio weights
-    def returns(self):
-        pass
+        self.portfolio_return = pd.DataFrame(_portfolio_return, index=_index, columns=["Relative Returns"])
 
     # calculate the variance based on the price
     def volatility(self):
@@ -115,6 +121,7 @@ class OLPS(object):
     # calculate the sharpe ratio based on the weights and returns
     def sharpe_ratio(self):
         pass
+
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
