@@ -7,9 +7,10 @@ Parent Class: OLPS
 Child Class:
 
     Benchmarks:
-        - Buy and Hold: buy_and_hold
-        - Best Stock: best_stock
-        - Constant Rebalanced Portfolio: constant_rebalanced_portfolio
+        - Buy and Hold: BAH
+        - Best Stock: Best_Stock
+        - Constant Rebalanced Portfolio: CRP
+        - Best Constant Rebalanced Portfolio: BCRP
 
     Follow-the-Winner: (Momentum)
         - Universal Portfolio
@@ -47,6 +48,14 @@ Child Class:
         - RACORN-K
         - SCORN-K
         - FCORN-K
+
+Method:
+
+    allocate
+
+    run
+
+    returns
 
 
 
