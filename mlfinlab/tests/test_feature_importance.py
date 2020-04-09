@@ -195,6 +195,12 @@ class TestFeatureImportance(unittest.TestCase):
                                                         n_clusters=None)
         cfi_feat_imp_linear = mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf, cv_gen,
                                                      clustered_subsets=clustered_subsets_linear)
+        #CFI with number clusters equal to number of features
+        #This is done verify the theory that if number clusters is equal to number of features then the result will be same as MDA
+        feature_subset_single = [[x] for x in self.X_train.columns]
+        cfi_feat_imp_single = mean_decrease_accuracy(sb_clf, self.X_train, self.y_train_clf, cv_gen,
+                                                     clustered_subsets=feature_subset_single)
+
         # MDI assertions
         self.assertAlmostEqual(mdi_feat_imp['mean'].sum(), 1, delta=0.001)
         # The most informative features
@@ -224,43 +230,9 @@ class TestFeatureImportance(unittest.TestCase):
         self.assertAlmostEqual(cfi_feat_imp_linear.loc['label_prob_0.1', 'mean'], 0.2, delta=3)
         self.assertAlmostEqual(cfi_feat_imp_linear.loc['label_prob_0.2', 'mean'], 0.3, delta=3)
 
-    def test_value_error_raise(self):
-        """
-        Test get_feature_clusters , codependence_matrix and distance_matrix for invalid arguments
-        """
-        #Unkown dependence_metric
-        with self.assertRaises(ValueError):
-            get_feature_clusters(self.X_train, dependence_metric='information',
-                                 distance_metric='angular', linkage_method='single',
-                                 n_clusters=2)
-        #Unkown distance_metric
-        with self.assertRaises(ValueError):
-            get_feature_clusters(self.X_train, dependence_metric='linear',
-                                 distance_metric='serial', linkage_method='single',
-                                 n_clusters=2)
-        #Number of clusters larger than number of features
-        with self.assertRaises(ValueError):
-            get_feature_clusters(self.X_train, dependence_metric='linear',
-                                 distance_metric='angular', linkage_method='single',
-                                 n_clusters=int(len(self.X_train)))
-
-    def test_get_feature_clusters(self):
-        """
-        Test get_feature_clusters arguments
-        """
-        clustered_subsets_distance = get_feature_clusters(self.X_train, dependence_metric='distance_correlation',
-                                                          distance_metric='abs_angular', linkage_method='single',
-                                                          n_clusters=2)
-        clustered_subsets_vi = get_feature_clusters(self.X_train, dependence_metric='information_variation',
-                                                    distance_metric='squared_angular', linkage_method='single',
-                                                    n_clusters=2)
-        clustered_subsets_mi = get_feature_clusters(self.X_train, dependence_metric='mutual_information',
-                                                    distance_metric='angular', linkage_method='single',
-                                                    n_clusters=2)
-        #output clusters must be 2
-        self.assertAlmostEqual(len(clustered_subsets_distance), 2, delta=0.001)
-        self.assertAlmostEqual(len(clustered_subsets_vi), 2, delta=0.001)
-        self.assertAlmostEqual(len(clustered_subsets_mi), 2, delta=0.001)
+        #Test if CFI with number of clusters same to number features is equal to MDA results
+        self.assertEqual(mda_feat_imp_log_loss.loc['label_prob_0.1', 'mean'],cfi_feat_imp_single.loc['label_prob_0.1', 'mean'])
+        self.assertEqual(mda_feat_imp_log_loss.loc['label_prob_0.2', 'mean'],cfi_feat_imp_single.loc['label_prob_0.2', 'mean'])
 
     def test_plot_feature_importance(self):
         """
