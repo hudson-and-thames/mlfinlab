@@ -61,7 +61,7 @@ def mean_decrease_impurity(model, feature_names):
     return importance
 
 
-def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_weight_train=None, sample_weight_score=None, scoring=log_loss):
+def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_weight_train=None, sample_weight_score=None, scoring=log_loss, random_state=42):
     """
     Snippet 8.3, page 116-117. MDA Feature Importance
 
@@ -100,6 +100,7 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
     :param sample_weight_train: A numpy array of sample weights used to train the model for each record in the dataset.
     :param sample_weight_score: A numpy array of sample weights used to evaluate the model quality.
     :param scoring: (function): Scoring function used to determine importance.
+    :param random_state: (int) random seed for shuffling the features.
     :return: (pd.DataFrame): Mean and standard deviation of feature importance.
     """
 
@@ -110,6 +111,8 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
         sample_weight_score = np.ones((X.shape[0],))
 
     fold_metrics_values, features_metrics_values = pd.Series(), pd.DataFrame(columns=X.columns)
+    #generating a numpy random state object for the given random_state
+    rs_obj = np.random.RandomState(seed=random_state)
     # clustered feature subsets will be used for CFI if clustered_subsets exists else will operate on the single column as MDA
     feature_sets = clustered_subsets if clustered_subsets else [[x] for x in X.columns]
     for i, (train, test) in enumerate(cv_gen.split(X=X)):
@@ -128,7 +131,7 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
         for j in feature_sets:
             X1_ = X.iloc[test, :].copy(deep=True)
             for j_i in j:
-                np.random.shuffle(X1_[j_i].values)  # Permutation of a single column for MDA or through the whole subset for CFI
+                rs_obj.shuffle(X1_[j_i].values)  # Permutation of a single column for MDA or through the whole subset for CFI
             if scoring == log_loss:
                 prob = fit.predict_proba(X1_)
                 features_metrics_values.loc[i, j] = -scoring(y.iloc[test], prob,
