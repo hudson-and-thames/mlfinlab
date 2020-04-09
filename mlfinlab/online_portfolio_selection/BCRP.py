@@ -1,5 +1,6 @@
 from mlfinlab.online_portfolio_selection import CRP
 from mlfinlab.online_portfolio_selection.olps_utils import *
+import cvxpy as cp
 
 
 class BCRP(CRP):
@@ -52,11 +53,10 @@ class BCRP(CRP):
         # cumulative product matrix
         cumulative_product = np.array(relative_price).cumprod(axis=0)
 
-        # if user does not initiate a particular weight, give equal weights to every assets
-        if weights is None:
-            self.weights = np.ones(number_of_assets) / number_of_assets
-        else:
-            self.weights = weights
+        # find the best weights
+        optimize_array = relative_price - 1
+        optimize_array = optimize_array[1:]
+        self.optimize(optimize_array)
 
         # initialize self.all_weights
         self.all_weights = self.weights
@@ -73,15 +73,40 @@ class BCRP(CRP):
     # update weights
     # just copy and pasting the weights
     def run(self, _weights, _relative_price):
-        super(CRP, self).run(_weights, _relative_price)
+        super(BCRP, self).run(_weights, _relative_price)
+
+    def optimize(self, _optimize_array):
+        length_of_time = _optimize_array.shape[0]
+        number_of_assets = _optimize_array.shape[1]
+        # initialize weights
+        weights = cp.Variable(number_of_assets)
+
+        # used cp.log and cp.sum to make the cost function a convex function
+        # multiplying continuous returns equates to summing over the log returns
+        portfolio_return = cp.sum(cp.log(_optimize_array * weights + np.ones(length_of_time)))
+
+        # Optimization objective and constraints
+        allocation_objective = cp.Maximize(portfolio_return)
+        allocation_constraints = [
+                cp.sum(weights) == 1,
+                weights <= 1,
+                weights >= 0
+        ]
+        # Define and solve the problem
+        problem = cp.Problem(
+                objective=allocation_objective,
+                constraints=allocation_constraints
+        )
+        problem.solve()
+        self.weights = weights.value
 
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
     names = list(stock_price.columns)
-    bah = BAH()
-    bah.allocate(asset_names=names, asset_prices=stock_price)
+    bcrp = BCRP()
+    bcrp.allocate(asset_names=names, asset_prices=stock_price)
 
 
 if __name__ == "__main__":

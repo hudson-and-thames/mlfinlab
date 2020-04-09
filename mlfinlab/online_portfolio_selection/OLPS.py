@@ -95,13 +95,15 @@ class OLPS(object):
 
     # calculate the returns based on portfolio weights
     def returns(self, _weights, _relative_price, _portfolio_return):
+        # we subtract np.ones because we added 1 to all the values in order to calculate other variables easily
+        # the original relative pct_change returned the editted value
         new_returns = _portfolio_return * (1 + np.dot(_weights, _relative_price - np.ones(len(_weights))))
         self.portfolio_return = np.vstack((self.portfolio_return, new_returns))
 
     def normalize_and_add(self, _weights, _relative_price):
         # normalization factor
         total_weights = np.dot(_weights, _relative_price)
-        # calculate the change divided by the normalization factor
+        # element-wise multiply weights and relative price then divide by the normalization factor
         _weights = np.multiply(_weights, _relative_price) / total_weights
 
         self.weights = _weights

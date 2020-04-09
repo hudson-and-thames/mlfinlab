@@ -73,15 +73,16 @@ class CRP(OLPS):
     # update weights
     # just copy and pasting the weights
     def run(self, _weights, _relative_price):
-        super(CRP, self).run(_weights, _relative_price)
+        self.weights = _weights
+        self.all_weights = np.vstack((self.all_weights, self.weights))
 
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
     names = list(stock_price.columns)
-    bah = BAH()
-    bah.allocate(asset_names=names, asset_prices=stock_price)
+    crp = CRP()
+    crp.allocate(asset_names=names, asset_prices=stock_price)
 
 
 if __name__ == "__main__":
