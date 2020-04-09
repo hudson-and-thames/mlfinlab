@@ -178,7 +178,6 @@ class TestChapter3(unittest.TestCase):
         triple_labels = get_bins(triple_barrier_events, self.data['close'])
         self.assertTrue(np.all(triple_labels[np.abs(triple_labels['ret']) < triple_labels['trgt']]['bin'] == 0))
 
-        # ----------------------
         # Assert meta labeling works
         self.data['side'] = 1
         triple_barrier_events = get_events(close=self.data['close'],

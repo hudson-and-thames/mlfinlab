@@ -112,6 +112,7 @@ Implementations
    :caption: Implementations
    :hidden:
 
+   implementations/backtesting
    implementations/backtest_statistics
    implementations/bet_sizing
    implementations/codependence
@@ -121,6 +122,7 @@ Implementations
    implementations/filters
    implementations/frac_diff
    implementations/tb_meta_labeling
+   implementations/labeling_trend_scanning
    implementations/labeling_tail_sets
    implementations/microstructural_features
    implementations/clustering
@@ -130,6 +132,7 @@ Implementations
    implementations/structural_breaks
 
 
+* :doc:`implementations/backtesting`
 * :doc:`implementations/backtest_statistics`
 * :doc:`implementations/bet_sizing`
 * :doc:`implementations/codependence`
@@ -139,6 +142,7 @@ Implementations
 * :doc:`implementations/filters`
 * :doc:`implementations/frac_diff`
 * :doc:`implementations/tb_meta_labeling`
+* :doc:`implementations/labeling_trend_scanning`
 * :doc:`implementations/labeling_tail_sets`
 * :doc:`implementations/microstructural_features`
 * :doc:`implementations/clustering`
