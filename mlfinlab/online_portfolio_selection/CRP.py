@@ -83,6 +83,8 @@ def main():
     names = list(stock_price.columns)
     crp = CRP()
     crp.allocate(asset_names=names, asset_prices=stock_price)
+    print(crp.all_weights)
+    print(crp.portfolio_return)
 
 
 if __name__ == "__main__":
