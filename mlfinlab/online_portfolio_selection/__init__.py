@@ -7,3 +7,4 @@ from . import olps_utils
 from .OLPS import OLPS
 from .BAH import BAH
 from .Best_Stock import Best_Stock
+from .CRP import CRP

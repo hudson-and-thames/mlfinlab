@@ -58,6 +58,9 @@ class BAH(OLPS):
         # cumulative product matrix
         cumulative_product = np.array(relative_price).cumprod(axis=0)
 
+        # sum of cumulative weights
+        sum_cumulative_product = np.sum(cumulative_product, axis=1)
+
         # if user does not initiate a particular weight, give equal weights to every assets
         if weights is None:
             self.weights = np.ones(number_of_assets) / number_of_assets
@@ -67,9 +70,6 @@ class BAH(OLPS):
         # initialize self.all_weights
         self.all_weights = self.weights
         self.portfolio_return = np.array([np.dot(self.weights, relative_price[0])])
-
-        # sum of cumulative weights
-        sum_cumulative_product = np.sum(cumulative_product, axis=1)
 
         # Run the Algorithm
         for t in range(1, time_period):
