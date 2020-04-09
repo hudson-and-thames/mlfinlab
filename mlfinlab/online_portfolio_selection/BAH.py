@@ -66,16 +66,25 @@ class BAH(OLPS):
 
         # initialize self.all_weights
         self.all_weights = self.weights
-        self.portfolio_return = np.dot(self.weights, cumulative_product[0])
+
+        # sum of cumulative weights
+        sum_cumulative_product = np.sum(cumulative_product, axis=1)
 
         # Run the Algorithm
         for t in range(1, time_period):
-            self.run(self.weights)
-            self.portfolio_return = np.vstack((self.portfolio_return, np.dot(self.weights, cumulative_product[t])))
+            self.run(cumulative_product[t], sum_cumulative_product[t])
 
-    def run(self, _weights):
-        # weights never change because you're just holding onto them, so this effectively becomes the same as OLPS run method
-        super(BAH, self).run(_weights)
+        self.portfolio_return = np.dot(cumulative_product, self.all_weights[0])
+
+    # update weights
+    # although we're not rebalancing the portfolio, the weights themselves change because of the underlying price changes
+    # we only need the cumulative product matrix to calculate the weights since we're just tracking the change
+    # unnecessary run function but I kept it here so that it matches the other algorithms
+    def run(self, _cumulative_product, _sum_cumulative_product):
+        new_weights = _cumulative_product / _sum_cumulative_product
+        self.weights = new_weights
+        self.all_weights = np.vstack((self.all_weights, self.weights))
+        return self.weights
 
 
         # Other idea that might be implemented later
