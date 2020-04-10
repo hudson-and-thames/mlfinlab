@@ -58,13 +58,17 @@ class FTL(BCRP):
         # optimize_array = optimize_array[1:]
         # self.optimize(optimize_array)
 
+        # initialize self.weights
+        self.initialize_weight(number_of_assets)
+
         # initialize self.all_weights
         self.all_weights = self.weights
-        self.portfolio_return = np.array([np.dot(self.weights, relative_price[0])])
+        # next time will be equal weight
+        self.all_weights = np.vstack((self.all_weights, self.weights))
 
-        # Run the Algorithm
-        for t in range(1, time_period):
-            self.run(self.weights, self.weights)
+        # Run the Algorithm starting from the third time because relative price is not just all 1's
+        for t in range(2, time_period):
+            self.run(relative_price[:t])
 
         self.portfolio_return = self.calculate_portfolio_returns(self.all_weights, relative_price)
 
@@ -73,34 +77,9 @@ class FTL(BCRP):
 
     # update weights
     # just copy and pasting the weights
-    def run(self, _weights, _relative_price):
-        super(BCRP, self).run(_weights, _relative_price)
-
-    def optimize(self, _optimize_array):
-        length_of_time = _optimize_array.shape[0]
-        number_of_assets = _optimize_array.shape[1]
-        # initialize weights
-        weights = cp.Variable(number_of_assets)
-
-        # used cp.log and cp.sum to make the cost function a convex function
-        # multiplying continuous returns equates to summing over the log returns
-        portfolio_return = cp.sum(cp.log(_optimize_array * weights + np.ones(length_of_time)))
-
-        # Optimization objective and constraints
-        allocation_objective = cp.Maximize(portfolio_return)
-        allocation_constraints = [
-                cp.sum(weights) == 1,
-                weights <= 1,
-                weights >= 0
-        ]
-        # Define and solve the problem
-        problem = cp.Problem(
-                objective=allocation_objective,
-                constraints=allocation_constraints
-        )
-        problem.solve()
-        self.weights = weights.value
-
+    def run(self, _relative_price):
+        self.optimize(_relative_price)
+        self.all_weights = np.vstack((self.all_weights, self.weights))
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')

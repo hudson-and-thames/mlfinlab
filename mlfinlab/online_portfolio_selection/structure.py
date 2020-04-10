@@ -7,17 +7,17 @@ Parent Class: OLPS
 Child Class:
 
     Benchmarks:
-        - Buy and Hold: BAH
-        - Best Stock: Best_Stock
-        - Constant Rebalanced Portfolio: CRP
-        - Best Constant Rebalanced Portfolio: BCRP
+        # Buy and Hold: BAH
+        # Best Stock: Best_Stock
+        # Constant Rebalanced Portfolio: CRP
+        # Best Constant Rebalanced Portfolio: BCRP
 
     Follow-the-Winner: (Momentum)
-        - Universal Portfolio
-        - Exponential Gradient
-        - Follow the Leader
-        - Follow the Reguliarized Leader
-        - Aggregating-type Algorithms
+        # Universal Portfolio
+        # Exponential Gradient
+        # Follow the Leader
+        - Follow the Reguliarized Leader --- skip over for now
+        - Aggregating-type Algorithms --- skip over for now
 
     Follow-the-Loser: (Mean-Reversion)
         - Anti Correlation

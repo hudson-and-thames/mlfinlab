@@ -11,3 +11,4 @@ from .CRP import CRP
 from .BCRP import BCRP
 from .UP import UP
 from .EG import EG
+from .FTL import FTL
