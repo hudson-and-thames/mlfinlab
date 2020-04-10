@@ -98,7 +98,7 @@ Implementation
 
         .. automethod:: __init__
 
-Examples
+Example
 ########
 Below is an example on how to create the positive, negative, and full matrix Tail Sets.
 

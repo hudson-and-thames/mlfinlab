@@ -7,12 +7,12 @@ import os
 import numpy as np
 import pandas as pd
 
-from mlfinlab.structural_breaks import get_chow_type_stat, get_sadf, get_chu_stinchcombe_white_statistics
+from mlfinlab.structural_breaks import (get_chow_type_stat, get_sadf, get_chu_stinchcombe_white_statistics)
 
 
 # pylint: disable=unsubscriptable-object
 from mlfinlab.structural_breaks.cusum import _get_values_diff
-from mlfinlab.structural_breaks.sadf import _get_betas
+from mlfinlab.structural_breaks.sadf import get_betas
 
 
 class TesStructuralBreaks(unittest.TestCase):
@@ -145,6 +145,6 @@ class TesStructuralBreaks(unittest.TestCase):
 
         # Assert that nans are parsed if singular matrix
         singular_matrix = np.array([[1, 0, 0], [-1, 3, 3], [1, 2, 2]])
-        b_mean, b_var = _get_betas(singular_matrix, singular_matrix)
+        b_mean, b_var = get_betas(singular_matrix, singular_matrix)
         self.assertTrue(b_mean, [np.nan])
         self.assertTrue(b_var, [[np.nan, np.nan]])
