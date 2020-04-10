@@ -66,7 +66,7 @@ class CRP(OLPS):
         for t in range(1, time_period):
             self.run(self.weights, self.weights)
 
-        self.portfolio_return = self.calculate_portfolio_returns(self.all_weights, relative_price)
+        self.calculate_portfolio_returns(self.all_weights, relative_price)
 
         self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
                         _asset_names=asset_names)
@@ -86,6 +86,7 @@ def main():
     crp.allocate(asset_names=names, asset_prices=stock_price)
     print(crp.all_weights)
     print(crp.portfolio_return)
+    crp.portfolio_return.plot()
 
 
 if __name__ == "__main__":

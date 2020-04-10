@@ -76,7 +76,7 @@ class OLPS(object):
             # update weights
             self.run(self.weights, relative_price[t-1])
         
-        self.portfolio_return = self.calculate_portfolio_returns(self.all_weights, relative_price)
+        self.calculate_portfolio_returns(self.all_weights, relative_price)
 
         # convert everything to make presentable
         # convert to dataframe
@@ -98,7 +98,7 @@ class OLPS(object):
 
     # calculate portfolio returns
     def calculate_portfolio_returns(self, _all_weights, _relative_price):
-        return np.diagonal(np.dot(_relative_price, _all_weights.T)).cumprod()
+        self.portfolio_return = np.diagonal(np.dot(_relative_price, _all_weights.T)).cumprod()
 
     # calculate the returns based on portfolio weights
     def returns(self, _current_weights, _current_relative_price, _previous_portfolio_return):
@@ -135,6 +135,10 @@ class OLPS(object):
     def maximum_drawdown(self):
         return min(self.portfolio_return)
 
+    # return summary of the portfolio
+    def summary(self):
+        pass
+
     # Other idea that might be implemented later
 
     # Calculate covariance of returns or use the user specified covariance matrix
@@ -160,6 +164,7 @@ def main():
     initial_portfolio.allocate(asset_names=names, asset_prices=stock_price)
     print(initial_portfolio.all_weights)
     print(initial_portfolio.portfolio_return)
+    initial_portfolio.portfolio_return.plot()
 
 
 if __name__ == "__main__":

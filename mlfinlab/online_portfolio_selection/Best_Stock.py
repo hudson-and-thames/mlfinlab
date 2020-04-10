@@ -65,7 +65,7 @@ class Best_Stock(OLPS):
         for t in range(1, time_period):
             self.run(self.weights, relative_price[t-1])
 
-        self.portfolio_return = self.calculate_portfolio_returns(self.all_weights, relative_price)
+        self.calculate_portfolio_returns(self.all_weights, relative_price)
 
         self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
                         _asset_names=asset_names)
@@ -83,6 +83,7 @@ def main():
     best_stock.allocate(asset_names=names, asset_prices=stock_price)
     print(best_stock.all_weights)
     print(best_stock.portfolio_return)
+    best_stock.portfolio_return.plot()
 
 
 if __name__ == "__main__":

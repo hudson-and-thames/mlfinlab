@@ -65,7 +65,7 @@ class EG(OLPS):
         for t in range(1, time_period):
             self.run(self.weights, relative_price[t - 1])
 
-        self.portfolio_return = self.calculate_portfolio_returns(self.all_weights, relative_price)
+        self.calculate_portfolio_returns(self.all_weights, relative_price)
 
         self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
                         _asset_names=asset_names)
@@ -87,10 +87,27 @@ def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
     names = list(stock_price.columns)
-    eg = EG(update_rule='EM')
+
+    print("This is for EG")
+    eg = EG(update_rule='EG')
     eg.allocate(asset_names=names, asset_prices=stock_price)
     print(eg.all_weights)
     print(eg.portfolio_return)
+    eg.portfolio_return.plot()
+
+    print("This is for GP")
+    gp = EG(update_rule='GP')
+    gp.allocate(asset_names=names, asset_prices=stock_price)
+    print(gp.all_weights)
+    print(gp.portfolio_return)
+    gp.portfolio_return.plot()
+
+    print("This is for EM")
+    em = EG(update_rule='EM')
+    em.allocate(asset_names=names, asset_prices=stock_price)
+    print(em.all_weights)
+    print(em.portfolio_return)
+    em.portfolio_return.plot()
 
 
 if __name__ == "__main__":

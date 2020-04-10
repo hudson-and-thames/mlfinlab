@@ -70,7 +70,7 @@ class FTL(BCRP):
         for t in range(2, time_period):
             self.run(relative_price[:t])
 
-        self.portfolio_return = self.calculate_portfolio_returns(self.all_weights, relative_price)
+        self.calculate_portfolio_returns(self.all_weights, relative_price)
 
         self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
                         _asset_names=asset_names)
@@ -89,6 +89,7 @@ def main():
     ftl.allocate(asset_names=names, asset_prices=stock_price)
     print(ftl.all_weights)
     print(ftl.portfolio_return)
+    ftl.portfolio_return.plot()
 
 
 if __name__ == "__main__":
