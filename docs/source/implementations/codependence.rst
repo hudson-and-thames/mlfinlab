@@ -111,3 +111,22 @@ Let's see how various metrics work for different variable dependencies:
         plt.savefig('{}.png'.format(dependency))
 
 ::
+
+
+Codependence Matrix
+===================
+
+.. py:currentmodule:: mlfinlab.codependence.codependence_matrix
+.. automodule:: mlfinlab.codependence.codependence_matrix
+   :members:
+
+::
+    import pandas as pd
+    from mlfinlab.codependence.codependence_matrix import get_dependence_matrix, get_distance_matrix
+
+    X = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+
+    dep_matrix = get_dependence_matrix(X, dependence_method='distance_correlation')
+    dist_matrix = get_distance_matrix(dep_matrix, distance_metric='angular')
+
+ ::
