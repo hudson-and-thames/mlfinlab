@@ -8,11 +8,12 @@ class UP(CRP):
     This class implements the Constant Rebalanced Portfolio strategy.
     """
 
-    def __init__(self):
+    def __init__(self, _number_of_iterations):
         """
         Constructor.
         """
         super(UP, self).__init__()
+        self.number_of_iterations = _number_of_iterations
 
     # if there is user input, set it as that, if not we will return a uniform CRP
     def allocate(self,
@@ -56,7 +57,7 @@ class UP(CRP):
         important part
         """
         # how many portfolios
-        number_of_portfolios = 100
+        number_of_portfolios = self.number_of_iterations
 
         # distribute wealth vector
         distribute_wealth = np.ones((number_of_portfolios, 1)) / number_of_portfolios
@@ -64,60 +65,31 @@ class UP(CRP):
         # generate matrix of random weights
         random_weights = np.random.rand(number_of_assets, number_of_portfolios)
 
-        # temporary check to compare to normal UCRP
-        # random_weights = np.ones((number_of_portfolios, number_of_portfolios)) / number_of_portfolios
-
         # normalize each column by dividing by the sum to make the total sum of each column equal 1
         random_weights = np.apply_along_axis(lambda x: x / np.sum(x), 0, random_weights)
 
         # calculate the returns for all weights
         all_returns = np.dot(relative_price, random_weights)
-        print(pd.DataFrame(all_returns))
-        # calculate the portfolio returns
-        portfolio_r = np.dot(all_returns, distribute_wealth)
-        print(pd.DataFrame(portfolio_r))
-        # calculate the final return value
-        self.portfolio_return = portfolio_r.cumprod()
-        print(self.portfolio_return)
 
+        # calculate cumulative portfolio return
+        all_returns = np.apply_along_axis(lambda x: x.cumprod(), 0, all_returns)
 
-        # for row in weight_options:
-        #     self.portfolio_return += self.direct_returns(row, optimize_relative_price)
-        # print(self.portfolio_return)
-        # # if user does not initiate a particular weight, give equal weights to every assets
-        # if weights is None:
-        #     self.weights = np.ones(number_of_assets) / number_of_assets
-        # else:
-        #     self.weights = weights
-        #
-        # # initialize self.all_weights
-        # self.all_weights = self.weights
-        # self.portfolio_return = np.array([np.dot(self.weights, relative_price[0])])
-        #
-        # # Run the Algorithm
-        # for t in range(1, time_period):
-        #     self.run(self.weights, self.weights)
-        #     self.returns(self.weights, relative_price[t], self.portfolio_return[self.portfolio_return.size - 1])
-        #
-        # self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
-        #                 _asset_names=asset_names)
+        # calculate all_weights for return purposes
+        self.all_weights = np.apply_along_axis(lambda x: x / np.sum(x), 0, np.dot(random_weights, all_returns.T))
+        # add first averaged weight to the beginning and pop the last
+        self.all_weights = np.hstack((self.all_weights[:, [0]], self.all_weights)).T[:-1]
 
-    # update weights
-    # just copy and pasting the weights
-    def run(self, _weights, _relative_price):
-        self.weights = _weights
-        self.all_weights = np.vstack((self.all_weights, self.weights))
+        # calculate portfolio return by time
+        self.portfolio_return = np.dot(all_returns, distribute_wealth)
 
-    # directly calculate the final portfolio returns to optimize for computation
-    def direct_returns(self, _weights, _relative_price):
-        return np.prod(np.diagonal(np.dot(_relative_price, _weights)))
-
+        self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
+                        _asset_names=asset_names)
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
     names = list(stock_price.columns)
-    up = UP()
+    up = UP(10)
     up.allocate(asset_names=names, asset_prices=stock_price)
     print(up.all_weights)
     print(up.portfolio_return)
