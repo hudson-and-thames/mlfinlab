@@ -109,6 +109,11 @@ class OLPS(object):
     def normalize(self, _weights):
         return _weights/np.sum(_weights)
 
+    # method to get a diagonal multiplication of two arrays
+    # equivalent to np.diag(np.dot(A, B))
+    def diag_mul(self, A, B):
+        return (A * B.T).sum(-1)
+
     # calculate percent change relative to the original price
     def relative_price_change(self, _asset_prices):
         # percent change of each row
