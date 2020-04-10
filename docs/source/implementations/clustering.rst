@@ -91,7 +91,7 @@ Initially, the algorithm was developed to clusterize investment strategies backt
 The ONC algorithm diagram
 ==========================
 
-.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/clustering_images/ONC_diagram.PNG
+.. image:: clustering_images/ONC_diagram.png
    :scale: 100 %
    :align: center 
 
