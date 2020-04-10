@@ -54,8 +54,7 @@ class BCRP(CRP):
         cumulative_product = np.array(relative_price).cumprod(axis=0)
 
         # find the best weights
-        optimize_array = relative_price - 1
-        optimize_array = optimize_array[1:]
+        optimize_array = relative_price[1:]
         self.optimize(optimize_array)
 
         # initialize self.all_weights
@@ -84,7 +83,7 @@ class BCRP(CRP):
 
         # used cp.log and cp.sum to make the cost function a convex function
         # multiplying continuous returns equates to summing over the log returns
-        portfolio_return = cp.sum(cp.log(_optimize_array * weights + np.ones(length_of_time)))
+        portfolio_return = cp.sum(cp.log(_optimize_array * weights))
 
         # Optimization objective and constraints
         allocation_objective = cp.Maximize(portfolio_return)
