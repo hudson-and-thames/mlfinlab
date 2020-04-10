@@ -93,6 +93,9 @@ class OLPS(object):
         self.weights = self.normalize(new_weight)
         self.all_weights = np.vstack((self.all_weights, self.weights))
 
+    def initialize_weight(self, _number_of_assets):
+        self.weights = np.ones(_number_of_assets) / _number_of_assets
+
     # calculate portfolio returns
     def calculate_portfolio_returns(self, _all_weights, _relative_price):
         return np.diagonal(np.dot(_relative_price, _all_weights.T)).cumprod()

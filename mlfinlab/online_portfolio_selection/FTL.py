@@ -54,9 +54,9 @@ class FTL(BCRP):
         cumulative_product = np.array(relative_price).cumprod(axis=0)
 
         # find the best weights
-        optimize_array = relative_price - 1
-        optimize_array = optimize_array[1:]
-        self.optimize(optimize_array)
+        # optimize_array = relative_price - 1
+        # optimize_array = optimize_array[1:]
+        # self.optimize(optimize_array)
 
         # initialize self.all_weights
         self.all_weights = self.weights
