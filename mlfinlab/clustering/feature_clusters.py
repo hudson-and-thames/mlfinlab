@@ -1,5 +1,5 @@
 """
-This implementation creates clustered subsets of features described in the paper
+This module creates clustered subsets of features described in the paper
 Clustered Feature Importance (Presentation Slides) by Dr Marcos Lopez de Prado
 https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595
 """
