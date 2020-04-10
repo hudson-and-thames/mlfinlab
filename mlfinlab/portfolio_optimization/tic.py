@@ -170,7 +170,7 @@ class TIC:
     @staticmethod
     def update_dist(dist0, lnk0, lnk_, items0, criterion=None):
         """
-        Updates the general distance matrix to take the new cluster in to account
+        Updates the general distance matrix to take the new cluster into account
 
         Expands dist0 to incorporate newly created clusters
 

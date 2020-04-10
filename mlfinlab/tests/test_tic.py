@@ -45,7 +45,7 @@ class TestNCO(unittest.TestCase):
         dend_expected = np.array([(1, 4, 0.10526126, 2), (5, 3, 0.23105119, 3),
                                   (0, 6, 0.40104189, 4), (7, 2, 0.59567056, 5)])
 
-        # Calculationg simple correlation matrix for the TIC algorithm input
+        # Calculating simple correlation matrix for the TIC algorithm input
         etf_corr = etf_prices.corr()
 
         # Using the function
@@ -55,3 +55,177 @@ class TestNCO(unittest.TestCase):
         # Transforming to DataFrames to get same types
         np.testing.assert_almost_equal(np.array(pd.DataFrame(dendrogram)), np.array(pd.DataFrame(dend_expected)),
                                        decimal=2)
+
+    @staticmethod
+    def test_link_clusters():
+        """
+        Test the creation of a new link array.
+        """
+
+        tic = TIC()
+
+        # Creating a sample input
+        lnk0 = np.array([])
+        lnk1 = np.array([[1, 3, 0.10526126, 2],
+                         [4, 2, 0.23105119, 3],
+                         [0, 5, 0.40104189, 4]])
+        items0 = [1010, 1020, 2030, 1040, 1030]
+        items1 = [1010, 1020, 1040, 1030]
+
+        # Expected link array
+        link_expected = np.array([[1, 4, 0.10526126, 2],
+                                  [5, 3, 0.23105119, 3],
+                                  [0, 6, 0.40104189, 4]])
+
+        # Calculating new link array
+        link_new = tic.link_clusters(lnk0, lnk1, items0, items1)
+
+        # Testing that the obtained new link is right
+        np.testing.assert_almost_equal(link_new, link_expected, decimal=2)
+
+    @staticmethod
+    def test_update_dist():
+        """
+        Test the update of the general distance matrix to take the new cluster into account
+        """
+
+        tic = TIC()
+
+        # Creating a sample input
+        dist0 = pd.DataFrame([[0.0, 0.595671], [0.595671, 0.0]], columns=[20, 10], index=[20, 10])
+        lnk0 = np.array([[1, 4, 0.10526126, 2],
+                         [5, 3, 0.23105119, 3],
+                         [0, 6, 0.40104189, 4],
+                         [7, 2, 0.59567056, 5]])
+        lnk_ = np.array([[7, 2, 0.59567056, 5]])
+        items0 = [1010, 1020, 20, 1040, 1030, 5, 6, 10, 8]
+
+        # Alternative criterion - simple average
+        alt_criterion = pd.DataFrame.mean
+
+        # Expected distance matrix
+        dist_expected = pd.DataFrame([0], columns=[8], index=[8])
+
+        # Calculating distance matrix
+        dist_new = tic.update_dist(dist0, lnk0, lnk_, items0, criterion=None)
+
+        # Calculating distance matrix with alternative criterion
+        dist_new_alt = tic.update_dist(dist0, lnk0, lnk_, items0, criterion=alt_criterion)
+
+        # Testing that the obtained distance matrix is right
+        np.testing.assert_almost_equal(np.array(dist_new), np.array(dist_expected), decimal=2)
+
+        # Testing that the obtained distance matrix is right
+        np.testing.assert_almost_equal(np.array(dist_new_alt), np.array(dist_expected), decimal=2)
+
+    @staticmethod
+    def test_get_atoms():
+        """
+        Test the process of getting all atoms included in an item
+        """
+
+        tic = TIC()
+
+        # Creating a sample input
+        lnk = np.array([(1, 4, 0.10526126, 2), (5, 3, 0.23105119, 3),
+                        (0, 6, 0.40104189, 4), (7, 2, 0.59567056, 5)],
+                       dtype=[('i0', int), ('i1', int), ('dist', float), ('num', int)])
+        item = 5
+
+        # Expected list of atoms
+        atoms_expected = [1, 4]
+
+        # Getting the atoms list
+        atoms = tic.get_atoms(lnk, item)
+
+        # Testing that the obtained atoms are right
+        np.testing.assert_almost_equal(atoms, atoms_expected, decimal=2)
+
+    def test_link2corr(self):
+        """
+        Test the process of deriving a correlation matrix from the linkage object
+        """
+
+        tic = TIC()
+
+        # Creating a sample input
+        etf_prices = self.price_data.iloc[:, :5]
+        etf_corr = etf_prices.corr()
+
+        lnk = np.array([(1, 4, 0.10526126, 2), (5, 3, 0.23105119, 3),
+                        (0, 6, 0.40104189, 4), (7, 2, 0.59567056, 5)],
+                       dtype=[('i0', int), ('i1', int), ('dist', float), ('num', int)])
+        lbls = etf_corr.index
+
+        # Expected correlation matrix
+        corr_expected = pd.DataFrame([[1, 0.678331, 0.290353, 0.678331, 0.678331],
+                                      [0.678331, 1, 0.290353, 0.893231, 0.977840],
+                                      [0.290353, 0.290353, 1, 0.290353, 0.290353],
+                                      [0.678331, 0.893231, 0.290353, 1, 0.893231],
+                                      [0.678331, 0.977840, 0.290353, 0.893231, 1]],
+                                     index=lbls, columns=lbls)
+
+        # Getting the correlation matrix
+        corr = tic.link2corr(lnk, lbls)
+
+        # Testing that the correlation matrix is right
+        np.testing.assert_almost_equal(np.array(corr), np.array(corr_expected), decimal=2)
+
+    def test_tic_correlation(self):
+        """
+        Test the calculation the Theory-Implies Correlation (TIC) matrix.
+        """
+
+        tic = TIC()
+
+        # Taking the first 5 ETFs for test purposes
+        etf_prices = self.price_data.iloc[:, :5]
+        etf_classification_tree = self.classification_tree.iloc[:5]
+
+        # Calculating simple correlation matrix for the TIC algorithm input
+        etf_corr = etf_prices.corr()
+
+        # Calculating the relation of number of observations to the number of elements
+        tn_relation = etf_prices.shape[0] / etf_prices.shape[1]
+        print(tn_relation)
+
+        # Expected correlation matrix
+        corr_expected = pd.DataFrame([[1, 0.65494846, 0.43127882, 0.6499022, 0.65494846],
+                                      [0.65494846, 1, 0.4574763, 0.68937968, 0.69473247],
+                                      [0.43127882, 0.4574763, 1, 0.45395153, 0.4574763],
+                                      [0.6499022, 0.68937968, 0.45395153, 1, 0.68937968],
+                                      [0.65494846, 0.69473247, 0.4574763, 0.68937968, 1]],
+                                     index=etf_corr.index, columns=etf_corr.index)
+
+        # Getting the correlation matrix
+        corr = tic.tic_correlation(etf_classification_tree, etf_corr, tn_relation=tn_relation, kde_bwidth=0.25)
+
+        # Testing that the correlation matrix is right
+        np.testing.assert_almost_equal(np.array(corr), np.array(corr_expected), decimal=2)
+
+    def test_corr_dist(self):
+        """
+        Test the calculation of the correlation matrix distance
+        """
+
+        tic = TIC()
+
+        # Taking the original correlation matrix and the TIC matrix
+        etf_prices = self.price_data.iloc[:, :5]
+        etf_corr = etf_prices.corr()
+
+        tic_corr = pd.DataFrame([[1, 0.65494846, 0.43127882, 0.6499022, 0.65494846],
+                                 [0.65494846, 1, 0.4574763, 0.68937968, 0.69473247],
+                                 [0.43127882, 0.4574763, 1, 0.45395153, 0.4574763],
+                                 [0.6499022, 0.68937968, 0.45395153, 1, 0.68937968],
+                                 [0.65494846, 0.69473247, 0.4574763, 0.68937968, 1]],
+                                index=etf_corr.index, columns=etf_corr.index)
+
+        # Expected distance between the matrices
+        dist_ecpected = 0.03076883
+
+        # Calculating the distance between the correlation matrices
+        distance = tic.corr_dist(etf_corr, tic_corr)
+
+        # Testing that the calculated distance is right
+        np.testing.assert_almost_equal(distance, dist_ecpected, decimal=2)
