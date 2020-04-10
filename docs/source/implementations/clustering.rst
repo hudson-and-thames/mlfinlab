@@ -1,6 +1,8 @@
 .. _implementations-clustering:
+==========
+Clustering
+==========
 
-================================
 Optimal Number of Clusters (ONC)
 ================================
 
@@ -13,3 +15,21 @@ https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3167017
 .. automodule:: mlfinlab.clustering.onc
    :members: get_onc_clusters
 
+
+Feature Clusters
+================
+
+.. py:currentmodule:: mlfinlab.clustering.feature_clusters
+.. automodule:: mlfinlab.clustering.feature_clusters
+   :members: get_feature_clusters
+
+::
+
+    import pandas as pd
+    from mlfinlab.clustering.feature_clusters import get_feature_clusters
+
+    X = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+
+    feat_subs = get_feature_clusters(X, dependence_metric='information_variation', distance_metric='angular',
+                                          linkage_method='singular', n_clusters=4)
+::
