@@ -1,7 +1,5 @@
-.. py:currentmodule:: mlfinlab.labeling.labeling
-
 =================================
-Triple-Barrier and Meta Labelling
+Triple-Barrier and Meta-Labelling
 =================================
 
 The primary labeling method used in financial academia is the fixed-time horizon method. While ubiquitous, this method
@@ -111,124 +109,18 @@ a 3, else not 3.
 
 Implementation
 ##############
+.. py:currentmodule:: mlfinlab.labeling.labeling
 
 The following functions are used for the triple-barrier method which works in tandem with meta-labeling.
 
+.. autofunction:: add_vertical_barrier
 
+.. autofunction:: get_events
 
+.. autofunction:: get_bins
 
+.. autofunction:: drop_labels
 
-
-.. autofunction:: get_daily_vol
-
-
-----
-
-.. function:: get_daily_vol(close, lookback=100)
-
-    Snippet 3.1 computes the daily volatility
-    at intraday estimation points, applying a span of lookback days to an exponentially weighted moving
-    standard deviation.
-
-    See the pandas documentation for details on the pandas.Series.ewm function.
-
-    Note: This function is used to compute dynamic thresholds for profit taking and stop loss limits.
-
-    :param close: Closing prices
-    :param lookback: lookback period to compute volatility
-    :return: series of daily volatility value
-
-
-.. function:: add_vertical_barrier(t_events, close, num_days=0, num_hours=0, num_minutes=0, num_seconds=0)
-
-    Snippet 3.4 page 49, Adding a Vertical Barrier
-
-    For each index in t_events, it finds the timestamp of the next price bar at or immediately after
-    a number of days num_days. This vertical barrier can be passed as an optional argument t1 in get_events.
-
-    This function creates a series that has all the timestamps of when the vertical barrier would be reached.
-
-    :param t_events: (series) series of events (symmetric CUSUM filter)
-    :param close: (series) close prices
-    :param num_days: (int) number of days to add for vertical barrier
-    :param num_hours: (int) number of hours to add for vertical barrier
-    :param num_minutes: (int) number of minutes to add for vertical barrier
-    :param num_seconds: (int) number of seconds to add for vertical barrier
-    :return: (series) timestamps of vertical barriers
-
-
-.. function:: get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_barrier_times=False, side_prediction=None)
-
-    Snippet 3.6 page 50, Getting the Time of the First Touch, with Meta Labels
-
-    This function is orchestrator to meta-label the data, in conjunction with the Triple Barrier Method.
-
-    :param close: (series) Close prices
-
-    :param t_events: (series) of t_events. These are timestamps that will seed every triple barrier. 
-    	These are the timestamps selected by the sampling procedures discussed in Chapter 2, Section 2.5. Eg: CUSUM Filter
-
-    :param pt_sl: (2 element array) element 0, indicates the profit taking level; element 1 is stop loss level. A non-negative float that sets the width of the two barriers. 
-    	A 0 value means that the respective horizontal barrier (profit taking and/or stop loss) will be disabled.
-
-    :param target: (series) of values that are used (in conjunction with pt_sl) to determine the width of the barrier. In this program this is daily volatility series.
-
-    :param min_ret: (float) The minimum target return required for running a triple barrier search.
-
-    :param num_threads: (int) The number of threads concurrently used by the function.
-
-    :param vertical_barrier_times: (series) A pandas series with the timestamps of the vertical barriers. We pass a False when we want to disable vertical barriers.
-
-    :param side_prediction: (series) Side of the bet (long/short) as decided by the primary model
-
-
-    :return: (data frame) of events
-            events.index is event's starttime
-
-            events['t1'] is event's endtime
-
-            events['trgt'] is event's target
-
-            events['side'] (optional) implies the algo's position side
-
-
-.. function:: get_bins(triple_barrier_events, close)
-
-    Snippet 3.7, page 51, Labeling for Side & Size with Meta Labels
-
-    Compute event's outcome (including side information, if provided).
-    events is a DataFrame where:
-
-    Now the possible values for labels in out['bin'] are {0,1}, as opposed to whether to take the bet or pass,
-    a purely binary prediction. When the predicted label the previous feasible values {−1,0,1}.
-    The ML algorithm will be trained to decide is 1, we can use the probability of this secondary prediction
-    to derive the size of the bet, where the side (sign) of the position has been set by the primary model.
-
-    :param triple_barrier_events: (data frame)
-
-        events.index is event's starttime
-
-	events['t1'] is event's endtime
-
-	events['trgt'] is event's target
-
-	events['side'] (optional) implies the algo's position side
-
-	Case 1: ('side' not in events): bin in (-1,1) <-label by price action
-
-	Case 2: ('side' in events): bin in (0,1) <-label by pnl (meta-labeling)
-
-    :param close: (series) close prices
-    :return: (data frame) of meta-labeled events
-
-.. function:: drop_labels(events, min_pct=.05)
-
-    Snippet 3.8 page 54
-    This function recursively eliminates rare observations.
-
-    :param events: (data frame) events
-    :param min_pct: (float) a fraction used to decide if the observation occurs less than that fraction
-    :return: (data frame) of event
 
 Example
 #######
