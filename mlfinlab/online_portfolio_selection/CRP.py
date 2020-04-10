@@ -65,7 +65,8 @@ class CRP(OLPS):
         # Run the Algorithm
         for t in range(1, time_period):
             self.run(self.weights, self.weights)
-            self.returns(self.weights, relative_price[t], self.portfolio_return[self.portfolio_return.size - 1])
+
+        self.portfolio_return = self.calculate_portfolio_returns(self.all_weights, relative_price)
 
         self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
                         _asset_names=asset_names)

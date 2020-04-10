@@ -70,14 +70,13 @@ class OLPS(object):
 
         # initialize self.all_weights
         self.all_weights = self.weights
-        self.portfolio_return = np.array([np.dot(self.weights, relative_price[0])])
 
         # Run the Algorithm
         for t in range(1, time_period):
             # update weights
             self.run(self.weights, relative_price[t-1])
-            # update portfolio_return
-            self.returns(self.weights, relative_price[t], self.portfolio_return[self.portfolio_return.size - 1])
+        
+        self.portfolio_return = self.calculate_portfolio_returns(self.all_weights, relative_price)
 
         # convert everything to make presentable
         # convert to dataframe
@@ -88,25 +87,24 @@ class OLPS(object):
     # separate run method for each iteration and not clog the allocate method.
     # after calculating the new weight add that to the all weights
     def run(self, _past_weights, _past_relative_price):
-        # update weights according to a certain algorithm
-        new_weights = _past_weights
+        # no transactions, just moving weights around to reflect price difference
+        new_weight = np.multiply(_past_weights, _past_relative_price)
 
-        self.normalize_and_add(new_weights, _past_relative_price)
+        self.weights = self.normalize(new_weight)
+        self.all_weights = np.vstack((self.all_weights, self.weights))
+
+    # calculate portfolio returns
+    def calculate_portfolio_returns(self, _all_weights, _relative_price):
+        return np.diagonal(np.dot(_relative_price, _all_weights.T)).cumprod()
 
     # calculate the returns based on portfolio weights
     def returns(self, _current_weights, _current_relative_price, _previous_portfolio_return):
         new_returns = _previous_portfolio_return * np.dot(_current_weights, _current_relative_price)
         self.portfolio_return = np.vstack((self.portfolio_return, new_returns))
 
-    # normalize and update weights, all_weights
-    def normalize_and_add(self, _new_weights, _past_relative_price):
-        # normalization factor
-        total_weights = np.dot(_new_weights, _past_relative_price)
-        # element-wise multiply weights and relative price then divide by the normalization factor
-        _weights = np.multiply(_new_weights, _past_relative_price) / total_weights
-
-        self.weights = _weights
-        self.all_weights = np.vstack((self.all_weights, self.weights))
+    # method to normalize sum of weights to 1
+    def normalize(self, _weights):
+        return _weights/np.sum(_weights)
 
     # calculate percent change relative to the original price
     def relative_price_change(self, _asset_prices):

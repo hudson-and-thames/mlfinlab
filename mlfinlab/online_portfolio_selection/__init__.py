@@ -10,3 +10,4 @@ from .Best_Stock import Best_Stock
 from .CRP import CRP
 from .BCRP import BCRP
 from .UP import UP
+from .EG import EG

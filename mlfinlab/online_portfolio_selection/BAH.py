@@ -69,25 +69,15 @@ class BAH(OLPS):
 
         # initialize self.all_weights
         self.all_weights = self.weights
-        self.portfolio_return = np.array([np.dot(self.weights, relative_price[0])])
 
         # Run the Algorithm
         for t in range(1, time_period):
             self.run(self.weights, relative_price[t-1])
-            self.returns(self.weights, relative_price[t], self.portfolio_return[self.portfolio_return.size - 1])
+
+        self.portfolio_return = self.calculate_portfolio_returns(self.all_weights, relative_price)
 
         self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
                         _asset_names=asset_names)
-    # update weights
-    # although we're not rebalancing the portfolio, the weights themselves change because of the underlying price changes
-    # we only need the cumulative product matrix to calculate the weights since we're just tracking the change
-    # unnecessary run function but I kept it here so that it matches the other algorithms
-
-    def run(self, _weights, _relative_price):
-        # redundant because BAH doesn't rebalance based on previous data
-        new_weights = _weights
-
-        self.normalize_and_add(new_weights, _relative_price)
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
