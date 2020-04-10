@@ -105,7 +105,6 @@ Built With
 
     getting_started/installation
     getting_started/barriers_to_entry
-    getting_started/requirements
 
 .. toctree::
     :maxdepth: 2
