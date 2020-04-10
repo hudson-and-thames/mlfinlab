@@ -4,15 +4,18 @@ Barriers to Entry
 =================
 
 As most of you know, getting through the first 3 chapters of the book is challenging as it relies on HFT data to 
-create the new financial data structures. Sourcing the HFT data is very difficult and thus we have resorted to purchasing the full history of S&P500 Emini futures tick data from `TickData LLC`_.
+create the new financial data structures. Sourcing the HFT data is very difficult and thus we have resorted to purchasing
+the full history of S&P500 Emini futures tick data from `TickData LLC`_.
 
-We are not affiliated with TickData in any way but would like to recommend others to make use of their service. The full history cost us about $750 and is worth every penny. They have really done a great job at cleaning the data and providing it in a user friendly manner. 
+We are not affiliated with TickData in any way but would like to recommend others to make use of their service. The full
+history cost us about $750 and is worth every penny. They have really done a great job at cleaning the data and providing
+it in a user friendly manner.
 
 .. _TickData LLC: https://www.tickdata.com/
 
 
 Sample Data
-===========
+###########
 
 TickData does offer about 20 days worth of raw tick data which can be sourced from their website `link`_.
 
@@ -25,7 +28,7 @@ You should be able to work on a few implementations of the code with this set.
 
 
 Additional Sources
-==================
+##################
 
 Searching for free tick data can be a challenging task. The following three sources may help:
 

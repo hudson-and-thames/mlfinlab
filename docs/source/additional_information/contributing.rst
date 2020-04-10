@@ -5,7 +5,7 @@ Contributing
 ============
 
 Areas of Contribution
-=====================
+#####################
 
 Currently we have a `live project board`_ that follows the principles of Agile Project Management. This board is available to the public and lets everyone know what the maintainers are currently working on. The board has an ice bucket filled with new features and documentation that have priority.
 
@@ -20,7 +20,7 @@ The typical contributions are:
 .. _Research repo: https://github.com/hudson-and-thames/research
 
 Templates
-=========
+#########
 
 We have created `templates`_ to help aid in creating issues and PRs:
 
