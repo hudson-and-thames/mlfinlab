@@ -83,7 +83,7 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
       OOS performance.
     * The CV must be purged and embargoed.
 
-    Clustered Feature Importance(CFI) or Clustered MDA is the modified verison of MDA (Mean Decreased Accuracy). It is
+    Clustered Feature Importance(CFI) or Clustered MDA is the modified version of MDA (Mean Decreased Accuracy). It is
     robust to substitution effect that takes place when two or more explanatory variables share a substantial amount of
     information (predictive power).CFI algorithm described by Dr Marcos Lopez de Prado  in Clustered Feature  Importance
     (Presentation Slides) https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595. Instead of shuffling (permutating)
