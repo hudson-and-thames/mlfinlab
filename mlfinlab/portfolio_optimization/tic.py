@@ -108,8 +108,8 @@ class TIC:
                 dist0.columns = dist0.columns[:-1].tolist() + [cat]
                 dist0.index = dist0.columns
 
-            # Changing from link arrays to link tuples
-            lnk0 = np.array(map(tuple, lnk0), dtype=[('i0', int), ('i1', int), ('dist', float), ('num', int)])
+        # Changing from link arrays to link tuples
+        lnk0 = np.array([*map(tuple, lnk0)], dtype=[('i0', int), ('i1', int), ('dist', float), ('num', int)])
 
         return lnk0
 
