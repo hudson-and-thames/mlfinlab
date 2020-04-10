@@ -27,73 +27,81 @@ Initially, the algorithm was developed to clusterize investment strategies backt
 1. The module initially transforms the correlated numbers of investment strategies into correlated distance numbers
 
 2. The process takes two steps of creating distance numbers
-    
-3. Calculating the distance matrix:
-   
 
-:math:`D_{i,j}= \sqrt{\frac{1}{2}(1-\rho_{ij})}` 
+3. Calculating the distance matrix:
+
+:math:`D_{i,j}= \sqrt{\frac{1}{2}(1-\rho_{ij})}`
 
 
 
 4. Calculating the Euclidean distance matrix of the distance matrix:
 
 
-:math:`\tilde{D}_{i,j}=\sqrt{\sum\limits_{k}(D_{ik}-D_{jk})^2}` 
+:math:`\tilde{D}_{i,j}=\sqrt{\sum\limits_{k}(D_{ik}-D_{jk})^2}`
 
 
-       
 5. The algorithm does the clustering with K-means algorithm that is modified by involving Silhouette scores and the measure of quality for each clustering
 
 6. Silhouette scores are calculated from the distance numbers
-   
+
 7. the formula to find the Silhouette scores is as follows:
-		
- 
+
+
 :math:`S_i=\frac{b_i-a_i}{max\{a_i,b_i\}}`
 
 
 
 8. Then the measure of quality q for each clustering is calculated as follows:
 
- 
-:math:`\textit q= \frac{E[\{S_i\}]}{\sqrt{V[\{S_i\}]}}` 
+
+:math:`\textit q= \frac{E[\{S_i\}]}{\sqrt{V[\{S_i\}]}}`
 
 
-9. Second modification on K-mean's that involves double for.. loop is performed
+9. Second modification on K-mean's initialization problem that involves double for.. loop is performed
 
-10. In the first loop, we cluster each different k=2,...,N-1 via K-means for one given initialization and evaluate the quality q of each clustering
+10. Initially,at the base level,  we are given an evaluated N x N correlation matrix that from which the distance matrix and euclidean distance matrix were evaluated
 
-11. The second loop repeats the first loop multiple times that results in different initializations
+11. In the first loop, we cluster the matrix with each different k=2,...,N-1 via K-means for one given initialization and evaluate the quality q of each clustering
 
-12. Then the module chooses the clustering with the highest quality measure
+12. The second loop repeats the first loop several times that obtains different initializations
 
-13. The third modification to K-means deals with clusters of inconsistent quality, each cluster's quality or qk (k=1,...,K) is evaluated 
+13. Then the module chooses the clustering with the highest quality measure
 
-14. We then take the average quality value and find the set of clusters with below average quality
+14. The next modification to K-means deals with clusters that have inconsistent quality, each cluster's quality or qk (k=1,...,K) is evaluated with the given clustering and silhouette scores that are taken from the base clustering algorithm
 
-15. The number of clusters in the set,K1 < K,  then are tested by the conditions of:
+15. We then take the average quality value and we find the set of clusters with below average quality
+
+16. We then test The number of clusters in the set,K1 < K, under the conditions of:
 
     - If the number of clusters to rerun is K1 <= 2, then we return the clustering that is given by the base algorithm
 
-    - If K1 > 2 then we rerun the clustering of the items in those K1 clusters, while the rest are considered as acceptably clustered
+    - If K1 > 2 then we rerun the clustering of the K1 clusters' entities, while the rest are accepted clusters
 
-16. We rerun the K1 clusters in a recursive manner, rerunning the clustering on the matrix, restricted to the nodes in the K1 clusters
+17. We rerun the K1 clusters with a recursive way, rerunning the clustering on the matrix, limited to the nodes in the K1 clusters
 
-17. The process possibly returns a new optimal clustering for the nodes
+18. The process possibly returns a new optimal clustering for the nodes
 
-18. To check its efficacy, we compare the average quality of the clusters to redo given the previous clustering to the average quality of the clusters given the new clustering
+19. Then we check its efficacy, by comparing the average quality of the clusters to redo given the previous clustering to the average quality of the clusters given the new clustering
 
-19. If the average quality improves for these clusters, we return the accepted clustering from the base clustering concatenated with the new clustering for the nodes redone
+20. If the clusters have improved average quality then we return the accepted clustering from the base clustering with the concatenated new clustering for the nodes redone
 
-20. Otherwise we return the clustering formed by the base algorithm
+21. If not so, we return the clustering formed by the base algorithm
 
+
+The ONC algorithm diagram
+==========================
+
+.. image:: https://raw.githubusercontent.com/leren123/mlfinlab/onc_docs/docs/source/implementations/clustering_images/ONC_diagram.PNG
+   :scale: 100 %
+   :align: center 
+
+Figure 4.2.  López de Prado and Lewis. `\textit Structure of ONC’s higher-level stage`. 2018. MACHINE LEARNING FOR ASSET MANAGERS. `\textit Marcos M. López de Prado` . Cornell University, New York.April 2020. Page 60. Digital Book.   
+ 
 
 Example
 =======
 
 Optimal Number of Clusters (ONC)
-
-ONC is an algorithm that will partition N series of correlations into an optimal number of clusters.
 
 The result of this algorithm is a tupple that contains:
 
@@ -101,7 +109,7 @@ The result of this algorithm is a tupple that contains:
 2. Optimized Clusters
 3. Silhouette Scores
 
-Correlation Matrix show the matrix that are sorted by their relevance. Optimized Clusters show the optimal number of clusters and each of the clusters' contents.
+Correlation Matrix shows the matrix that is sorted under the optimization clustering. Optimized Clusters show the optimal number of clusters and each of the clusters' contents. Silhouette Scores show Silhouette quality of each node in the clusters.
 
 ::
 
