@@ -3,6 +3,7 @@ import numbers
 from math import log, ceil
 import numpy as np
 import pandas as pd
+
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 
@@ -15,11 +16,13 @@ class CLA:
 
     The Critical Line Algorithm is a famous portfolio optimisation algorithm used for calculating the optimal allocation weights
     for a given portfolio. It solves the optimisation problem with optimisation constraints on each weight - lower and upper
-    bounds on the weight value. This class can compute multiple types of solutions -
-            1. CLA Turning Points
-            2. Minimum Variance
-            3. Maximum Sharpe
-            4. Efficient Frontier Allocations
+    bounds on the weight value. This class can compute multiple types of solutions:
+
+    1. CLA Turning Points
+    2. Minimum Variance
+    3. Maximum Sharpe
+    4. Efficient Frontier Allocations
+
     """
 
     def __init__(self, weight_bounds=(0, 1), calculate_expected_returns="mean"):
@@ -46,6 +49,100 @@ class CLA:
         self.efficient_frontier_means = None
         self.efficient_frontier_sigma = None
         self.returns_estimator = ReturnsEstimation()
+
+    def allocate(self,
+                 asset_names=None,
+                 asset_prices=None,
+                 expected_asset_returns=None,
+                 covariance_matrix=None,
+                 solution="cla_turning_points",
+                 resample_by=None):
+        # pylint: disable=consider-using-enumerate,too-many-locals,too-many-branches,too-many-statements,bad-continuation
+        """
+        Calculate the portfolio asset allocations using the method specified.
+
+        :param asset_names: (list) a list of strings containing the asset names
+        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (adj closed)
+        :param expected_asset_returns: (list) a list of mean stock returns (mu)
+        :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns
+        :param solution: (str) specify the type of solution to compute. Supported strings: "cla_turning_points", "max_sharpe",
+                               "min_volatility", "efficient_frontier"
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+                                  None for no resampling
+        """
+
+        # Initial checks
+        if asset_prices is None and (expected_asset_returns is None or covariance_matrix is None):
+            raise ValueError("You need to supply either raw prices or expected returns "
+                             "and a covariance matrix of asset returns")
+
+        if asset_prices is not None:
+            if not isinstance(asset_prices, pd.DataFrame):
+                raise ValueError("Asset prices matrix must be a dataframe")
+            if not isinstance(asset_prices.index, pd.DatetimeIndex):
+                raise ValueError("Asset prices dataframe must be indexed by date.")
+
+        if asset_names is None:
+            if asset_prices is not None:
+                asset_names = asset_prices.columns
+            else:
+                raise ValueError("Please provide a list of asset names")
+
+        # Some initial steps before the algorithm runs
+        self._initialise(asset_prices=asset_prices,
+                         resample_by=resample_by,
+                         expected_asset_returns=expected_asset_returns,
+                         covariance_matrix=covariance_matrix)
+
+        # Compute the turning points, free sets and weights
+        free_weights, weights = self._init_algo()
+        self.weights.append(np.copy(weights))  # store solution
+        self.lambdas.append(None)
+        self.gammas.append(None)
+        self.free_weights.append(free_weights[:])
+        while True:
+
+            # 1) Bound one free weight
+            lambda_in, i_in, bi_in = self._bound_free_weight(free_weights)
+
+            # 2) Free one bounded weight
+            lambda_out, i_out = self._free_bound_weight(free_weights)
+
+            # 3) Compute minimum variance solution
+            if (lambda_in is None or lambda_in < 0) and (lambda_out is None or lambda_out < 0):
+                self.lambdas.append(0)
+                covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights)
+                covar_f_inv = np.linalg.inv(covar_f)
+                mean_f = np.zeros(mean_f.shape)
+
+            # 4) Decide whether to free a bounded weight or bound a free weight
+            else:
+                if self._infnone(lambda_in) > self._infnone(lambda_out):
+                    self.lambdas.append(lambda_in)
+                    free_weights.remove(i_in)
+                    weights[i_in] = bi_in  # set value at the correct boundary
+                else:
+                    self.lambdas.append(lambda_out)
+                    free_weights.append(i_out)
+                covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights)
+                covar_f_inv = np.linalg.inv(covar_f)
+
+            # 5) Compute solution vector
+            w_f, gamma = self._compute_w(covar_f_inv, covar_fb, mean_f, w_b)
+            for i in range(len(free_weights)):
+                weights[free_weights[i]] = w_f[i]
+            self.weights.append(np.copy(weights))  # store solution
+            self.gammas.append(gamma)
+            self.free_weights.append(free_weights[:])
+            if self.lambdas[-1] == 0:
+                break
+
+        # 6) Purge turning points
+        self._purge_num_err(10e-10)
+        self._purge_excess()
+
+        # Compute the specified solution
+        self._compute_solution(assets=asset_names, solution=solution)
 
     @staticmethod
     def _infnone(number):
@@ -441,93 +538,6 @@ class CLA:
         self.lambdas = []
         self.gammas = []
         self.free_weights = []
-
-    def allocate(self,
-                 asset_names,
-                 asset_prices=None,
-                 expected_asset_returns=None,
-                 covariance_matrix=None,
-                 solution="cla_turning_points",
-                 resample_by=None):
-        # pylint: disable=consider-using-enumerate,too-many-locals,too-many-branches,too-many-statements,bad-continuation
-        """
-        Calculate the portfolio asset allocations using the method specified.
-
-        :param asset_names: (list) a list of strings containing the asset names
-        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (adj closed)
-        :param expected_asset_returns: (list) a list of mean stock returns (mu)
-        :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns
-        :param solution: (str) specify the type of solution to compute. Supported strings: "cla_turning_points", "max_sharpe",
-                               "min_volatility", "efficient_frontier"
-        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                  None for no resampling
-        """
-
-        # Initial checks
-        if asset_prices is None and (expected_asset_returns is None or covariance_matrix is None):
-            raise ValueError("Either supply your own asset returns matrix or pass the asset prices as input")
-
-        if asset_prices is not None:
-            if not isinstance(asset_prices, pd.DataFrame):
-                raise ValueError("Asset prices matrix must be a dataframe")
-            if not isinstance(asset_prices.index, pd.DatetimeIndex):
-                raise ValueError("Asset prices dataframe must be indexed by date.")
-
-        # Some initial steps before the algorithm runs
-        self._initialise(asset_prices=asset_prices,
-                         resample_by=resample_by,
-                         expected_asset_returns=expected_asset_returns,
-                         covariance_matrix=covariance_matrix)
-
-        # Compute the turning points, free sets and weights
-        free_weights, weights = self._init_algo()
-        self.weights.append(np.copy(weights))  # store solution
-        self.lambdas.append(None)
-        self.gammas.append(None)
-        self.free_weights.append(free_weights[:])
-        while True:
-
-            # 1) Bound one free weight
-            lambda_in, i_in, bi_in = self._bound_free_weight(free_weights)
-
-            # 2) Free one bounded weight
-            lambda_out, i_out = self._free_bound_weight(free_weights)
-
-            # 3) Compute minimum variance solution
-            if (lambda_in is None or lambda_in < 0) and (lambda_out is None or lambda_out < 0):
-                self.lambdas.append(0)
-                covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights)
-                covar_f_inv = np.linalg.inv(covar_f)
-                mean_f = np.zeros(mean_f.shape)
-
-            # 4) Decide whether to free a bounded weight or bound a free weight
-            else:
-                if self._infnone(lambda_in) > self._infnone(lambda_out):
-                    self.lambdas.append(lambda_in)
-                    free_weights.remove(i_in)
-                    weights[i_in] = bi_in  # set value at the correct boundary
-                else:
-                    self.lambdas.append(lambda_out)
-                    free_weights.append(i_out)
-                covar_f, covar_fb, mean_f, w_b = self._get_matrices(free_weights)
-                covar_f_inv = np.linalg.inv(covar_f)
-
-            # 5) Compute solution vector
-            w_f, gamma = self._compute_w(covar_f_inv, covar_fb, mean_f, w_b)
-            for i in range(len(free_weights)):
-                weights[free_weights[i]] = w_f[i]
-            self.weights.append(np.copy(weights))  # store solution
-            self.gammas.append(gamma)
-            self.free_weights.append(free_weights[:])
-            if self.lambdas[-1] == 0:
-                break
-
-        # 6) Purge turning points
-        self._purge_num_err(10e-10)
-        self._purge_excess()
-
-        # Compute the specified solution
-        self._compute_solution(assets=asset_names, solution=solution)
 
     def _compute_solution(self, assets, solution):
         """

@@ -4,29 +4,29 @@
 License
 =======
 
-BSD 3-Clause License
-
-Copyright (c) 2019, Hudson and Thames Quantitative Research
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+Copyright (c) 2019, Hudson and Thames Quantitative Research
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+This codebase is open-source* only in the sense that the code is free to use
+as-is, and the source code is publicly available, however, all other rights
+are reserved under the Hudson and Thames Quantitative Research brand.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+Our intention is to make some of the techniques developed publicly available
+and to promote research in quantitative finance and machine learning.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
+1. Users may use the code as-is.
+2. All modifications made, must be added to the respective repositories
+   and all contribution's copyright falls under the Hudson and Thames brand.
+3. Rights to reproduce, distribute, or create derivative works must be
+   granted in writing. Requests for permissions must be directed to
+   research@hudsonthames.org
+4. Neither the name of the copyright holder nor the names of its contributors
+   may be used to endorse or promote products.
+5. No user may use our code or any part thereof to sell, market, or distribute
+   for any reason whatsoever, especially to make a profit of any kind whatsoever.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
 FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
