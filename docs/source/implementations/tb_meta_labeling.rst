@@ -196,8 +196,7 @@ We also implement a Trend Following and Mean-reverting Bollinger band based trad
 fact that a combination of event-based sampling, triple-barrier method and meta labeling improves the performance of the
 strategies.
 
-* `WorldQuant University Final Project`_
-.. _WorldQuant University Final Project: https://hudsonthames.org/does-meta-labeling-add-to-signal-efficacy-triple-barrier-method/
+* `WorldQuant University Final Project <https://hudsonthames.org/does-meta-labeling-add-to-signal-efficacy-triple-barrier-method>`_
 
 Meta Labeling (A Toy Example)
 *****************************
@@ -209,8 +208,8 @@ Prado and promises to improve model and strategy performance metrics by helping 
 We make use of a computer vision problem known as the MNIST handwritten digit classification. By using of a non-financial
 timeseries data set we can illustrate the components that make up meta labeling more clearly. Lets begin!
 
-* `A Toy Example`_
-.. _A Toy Example: https://hudsonthames.org/meta-labeling-a-toy-example/
+* `A Toy Example <https://hudsonthames.org/meta-labeling-a-toy-example>`_
+
 
 Research Notebooks
 ##################

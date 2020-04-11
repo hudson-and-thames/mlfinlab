@@ -52,11 +52,10 @@ ordered by adjustment methods in the following way [Bonferroni, Holm, BHY, Avera
 
 Implementation
 **************
+.. py:currentmodule:: mlfinlab.backtest_statistics.backtests
 
-.. automodule:: mlfinlab.backtest_statistics.backtests
-
-    .. autoclass:: CampbellBacktesting
-        :members: __init__, haircut_sharpe_ratios
+.. autoclass:: CampbellBacktesting
+   :members: __init__, haircut_sharpe_ratios
 
 Example
 *******
@@ -111,12 +110,11 @@ Adjustment methods include:
 Implementation
 **************
 
-The method returns np.array of minimum average monthly returns by the method as elements. The order of the elements by method is [Bonferroni, Holm, BHY, Average].
+The method returns np.array of minimum average monthly returns by the method as elements. The order of the elements by
+method is [Bonferroni, Holm, BHY, Average].
 
-.. automodule:: mlfinlab.backtest_statistics.backtests
-
-    .. autoclass:: CampbellBacktesting
-        :members: __init__, profit_hurdle
+.. autoclass:: CampbellBacktesting
+   :members: __init__, profit_hurdle
 
 Example
 *******
@@ -148,6 +146,4 @@ Research Notebooks
 The following research notebooks can be used to better understand how the algorithms within this module work and how
 they can be used on real data.
 
-* `Backtesting Notebook`_
-
-.. _Backtesting: https://github.com/hudson-and-thames/research/blob/master/Backtesting/Backtesting.ipynb
+* `Backtesting Notebook <https://github.com/hudson-and-thames/research/blob/master/Backtesting/Backtesting.ipynb>`_

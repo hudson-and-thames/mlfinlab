@@ -36,14 +36,12 @@ get_av_uniqueness_from_triple_barrier function from the mlfinlab package.
 
 This function is the orchestrator to derive average sample uniqueness from a dateset labeled by the triple barrier method.
 
-.. function:: get_av_uniqueness_from_triple_barrier(triple_barrier_events, close_series, num_threads)
+.. py:currentmodule:: mlfinlab.sampling.concurrent
 
-    :param triple_barrier_events: (data frame) of events from labeling.get_events()
-    :param close_series: (pd.Series) close prices.
-    :param num_threads: (int) The number of threads concurrently used by the function.
-    :return: (pd.Series) average uniqueness over event's lifespan for each index in triple_barrier_events
+.. autofunction:: get_av_uniqueness_from_triple_barrier
 
-An example of calculating average uniqueness given that we have already found our barrier events can be seen below:
+
+An example of calculating average uniqueness given that we have already have our barrier events can be seen below:
 
 .. code-block::
 
@@ -173,6 +171,7 @@ On the first step all labels will have equal probalities as average uniqueness o
 **2nd Iteration**
 
 .. code-block::
+
     phi = [1] # Sample chosen from the 2st step
     uniqueness_array = np.array([None, None, None])
     for i in range(0, 3):
@@ -258,6 +257,7 @@ sequential bootstrapping and 3 samples using standard random choise, repeat the 
 corresponding label uniqueness in each experiment
 
 .. code-block::
+
     standard_unq_array = np.zeros(10000) * np.nan # Array of random sampling uniqueness
     seq_unq_array = np.zeros(10000) * np.nan # Array of Sequential Bootstapping uniqueness
     for i in range(0, 10000):
