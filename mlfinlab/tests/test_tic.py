@@ -48,12 +48,23 @@ class TestNCO(unittest.TestCase):
         # Calculating simple correlation matrix for the TIC algorithm input
         etf_corr = etf_prices.corr()
 
+        # Also testing on tree that has single element on the top level
+        etf_classification_tree_alt = etf_classification_tree.copy()
+        etf_classification_tree_alt['All'] = 0
+
         # Using the function
         dendrogram = tic.get_linkage_corr(etf_classification_tree, etf_corr)
+
+        # Using the function on a tree with extra level
+        dendrogram_alt = tic.get_linkage_corr(etf_classification_tree_alt, etf_corr)
 
         # Testing that the obtained dendrogram is right
         # Transforming to DataFrames to get same types
         np.testing.assert_almost_equal(np.array(pd.DataFrame(dendrogram)), np.array(pd.DataFrame(dend_expected)),
+                                       decimal=2)
+
+        # Checking that the tree with an extra level returned the same result
+        np.testing.assert_almost_equal(np.array(pd.DataFrame(dendrogram)), np.array(pd.DataFrame(dendrogram_alt)),
                                        decimal=2)
 
     @staticmethod
@@ -187,7 +198,6 @@ class TestNCO(unittest.TestCase):
 
         # Calculating the relation of number of observations to the number of elements
         tn_relation = etf_prices.shape[0] / etf_prices.shape[1]
-        print(tn_relation)
 
         # Expected correlation matrix
         corr_expected = pd.DataFrame([[1, 0.65494846, 0.43127882, 0.6499022, 0.65494846],
