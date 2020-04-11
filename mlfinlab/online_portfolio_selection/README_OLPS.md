@@ -1,10 +1,16 @@
 # Online Portfolio Selection
+
+
+
 ## Benchmarks:
 ### Buy and Hold: BAH
+Never rebalances after initial purchase
 ### Best Stock: Best_Stock
+Tracks the best performing stock in hindsight
 ### Constant Rebalanced Portfolio: CRP
+Rebalances weight each day to a predetermined weight
 ### Best Constant Rebalanced Portfolio: BCRP
-
+Tracks the best constant rebalanced portfolio in hindsight
 ## Follow-the-Winner: (Momentum)
 ### Universal Portfolio: UP
 ### Exponential Gradient: EG
@@ -42,10 +48,11 @@
 ### SCORN-K
 ### FCORN-K
 
-Method:
-
-    allocate
-
-    run
-
-    returns
+## Method
+### Public
+#### allocate
+- sets all weights
+#### clean_data
+- clean given data to the right format
+#### summary
+- returns metrics
