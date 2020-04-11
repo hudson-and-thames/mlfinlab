@@ -143,13 +143,13 @@ Assuming that we have a correlation matrix data as in the above
 Tips
 =======
 
-.. tip.1 :
+.. tip.1:
    * Did you know that you can also apply ONC algorithm on any kind of matrix apart from correlation matrix?
 
-.. tip.2 :
+.. tip.2:
    * ONC will work directly with any matrix data, so, feel free to put in your matrix directly to the function.
 
-.. tip.3 :
+.. tip.3:
    * You do not have to assume or decide any number of initial clusters with this algorithm, so sit back, relax, and enjoy the clustering!
 
     
