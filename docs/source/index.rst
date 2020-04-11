@@ -140,6 +140,7 @@ Built With
     implementations/sb_bagging
     implementations/feature_importance
     implementations/cross_validation
+    implementations/EF3M
     implementations/bet_sizing
 
 .. toctree::
