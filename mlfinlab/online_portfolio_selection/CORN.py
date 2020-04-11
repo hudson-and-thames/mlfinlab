@@ -1,4 +1,5 @@
 from mlfinlab.online_portfolio_selection.olps_utils import *
+import cvxpy as cp
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
 
@@ -51,9 +52,6 @@ class CORN(OLPS):
         # calculate relative price i.e. week 1's price/week 0's price
         relative_price = self.relative_price_change(asset_prices)
 
-        # cumulative product matrix
-        cumulative_product = np.array(relative_price).cumprod(axis=0)
-
         # if user does not initiate a particular weight, give equal weights to every assets
         if weights is None:
             self.weights = np.ones(number_of_assets) / number_of_assets
@@ -64,9 +62,32 @@ class CORN(OLPS):
         self.all_weights = self.weights
         self.portfolio_return = np.array([np.dot(self.weights, relative_price[0])])
 
+        # Calculate rolling market window relatives
+        rolling_relative = np.exp(np.log(pd.DataFrame(relative_price)).rolling(self.window).sum())
+
+        # Calculate correlation coefficient between market windows
+        corr_coef = np.corrcoef(rolling_relative)
+        print(pd.DataFrame(corr_coef))
+        # Probably can find a faster way to use this and compute algorithm
+        # true_false = corr_coef > self.window
+
         # Run the Algorithm
         for t in range(1, time_period):
-            self.run(self.weights, self.weights)
+            similar_set = []
+            weights = np.ones(number_of_assets) / number_of_assets
+            if t <= self.window:
+                self.weights = weights
+            else:
+                for i in range(self.window + 1, t + 1):
+                    if corr_coef[i - 1][t] > self.rho:
+                        similar_set.append(i)
+                if similar_set:
+                    similar_sequences = relative_price[similar_set]
+                    self.optimize(similar_sequences)
+                else:
+                    self.weights = weights
+            self.all_weights = np.vstack((self.all_weights, self.weights))
+            print(t)
 
         self.calculate_portfolio_returns(self.all_weights, relative_price)
 
@@ -75,6 +96,32 @@ class CORN(OLPS):
 
     # update weights
     # just copy and pasting the weights
+
+    def optimize(self, _optimize_array):
+        length_of_time = _optimize_array.shape[0]
+        number_of_assets = _optimize_array.shape[1]
+        # initialize weights
+        weights = cp.Variable(number_of_assets)
+
+        # used cp.log and cp.sum to make the cost function a convex function
+        # multiplying continuous returns equates to summing over the log returns
+        portfolio_return = cp.sum(cp.log(_optimize_array * weights))
+
+        # Optimization objective and constraints
+        allocation_objective = cp.Maximize(portfolio_return)
+        allocation_constraints = [
+                cp.sum(weights) == 1,
+                weights <= 1,
+                weights >= 0
+        ]
+        # Define and solve the problem
+        problem = cp.Problem(
+                objective=allocation_objective,
+                constraints=allocation_constraints
+        )
+        problem.solve(solver=cp.SCS)
+        self.weights = weights.value
+
     def run(self, _weights, _relative_price):
         self.weights = _weights
         self.all_weights = np.vstack((self.all_weights, self.weights))
@@ -83,11 +130,13 @@ class CORN(OLPS):
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
+    stock_price = stock_price.resample('w').last()
     names = list(stock_price.columns)
-    corn = CORN()
+    corn = CORN(window=30)
     corn.allocate(asset_names=names, asset_prices=stock_price)
     print(corn.all_weights)
     print(corn.portfolio_return)
+    print(type(corn.portfolio_return))
     corn.portfolio_return.plot()
 
 
