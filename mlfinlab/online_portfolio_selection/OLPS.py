@@ -21,12 +21,12 @@ class OLPS(object):
         # asset time
         self.time = None
         self.number_of_time = None
-        # return asset time
-        self.return_time = None
-        self.return_number_of_time = None
-        # relative return
+        # final asset time
+        self.final_time = None
+        self.final_number_of_time = None
+        # relative return and final relative return
         self.relative_return = None
-        self.return_relative_return = None
+        self.final_relative_return = None
         # portfolio return
         self.portfolio_return = None
 
@@ -91,7 +91,8 @@ class OLPS(object):
 
     def __initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
         # resample asset
-        _asset_prices = _asset_prices.resample(_resample_by).last()
+        if _resample_by is not None:
+            _asset_prices = _asset_prices.resample(_resample_by).last()
 
         # set portfolio start
         self.portfolio_start = _portfolio_start
@@ -99,30 +100,37 @@ class OLPS(object):
         # set asset names
         self.asset_name = _asset_prices.columns
 
-        # set time and returns time
+        # set time
         self.time = _asset_prices.index
-        self.return_time = self.time[self.portfolio_start:]
 
         # calculate number of assets
         self.number_of_assets = self.asset_name.size
 
-        # calculate number of time and number of time for returns
+        # calculate number of time
         self.number_of_time = self.time.size
-        self.return_number_of_time = self.return_time.size
 
-        # calculate relative returns
+        # calculate relative returns and final relative returns
         self.relative_return = self.__relative_return(_asset_prices)
 
+        # set portfolio start
+        self.portfolio_start = _portfolio_start
+
+        # set final returns
+        self.final_time = self.time[self.portfolio_start:]
+        self.final_number_of_time = self.final_time.size
+        self.final_relative_return = self.relative_return[self.portfolio_start:]
+
+        # set initial weights
         if _weights is None:
             self.weights = self.__uniform_weight(self.number_of_assets)
         else:
             self.weights = _weights
 
-        # set return_weights
-        self.return_weights = np.zeros((self.return_time, self.number_of_assets))
+        # set final_weights
+        self.all_weights = np.zeros((self.final_number_of_time, self.number_of_assets))
 
         # set portfolio_return
-        self.portfolio_return = np.zeros((self.return_time, self.number_of_assets))
+        self.portfolio_return = np.zeros((self.final_number_of_time, self.number_of_assets))
 
     # calculate relative returns
     def __relative_return(self, _asset_prices):
@@ -197,11 +205,9 @@ class OLPS(object):
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    names = list(stock_price.columns)
     initial_portfolio = OLPS()
-    initial_portfolio.allocate(asset_names=names, asset_prices=stock_price)
+    initial_portfolio.allocate(stock_price)
     print(initial_portfolio.all_weights)
-    print(initial_portfolio.portfolio_return)
     initial_portfolio.portfolio_return.plot()
 
 
