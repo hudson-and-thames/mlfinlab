@@ -41,7 +41,7 @@ Implementation
 
 
 Combinatorial Purged CV (CPCV)
-==============================
+##############################
 
 This implementation is based on Chapter 12 of the book.
 
@@ -82,4 +82,3 @@ Research Notebooks
 ##################
 
 * `Answering Chapter 7: Cross-Validation Questions <https://github.com/hudson-and-thames/research/blob/master/Chapter7_CrossValidation/Chapter7_Exercises_CrossValidation.ipynb>`_
-
