@@ -1,40 +1,43 @@
 .. image:: logo/ht_logo.png
-   :scale: 20 %
+   :scale: 15 %
    :align: center
-
 
 |
 
-************************************************
+================================================
 Machine Learning Financial Laboratory (mlfinlab)
-************************************************
+================================================
+
+    |Build Status| |codecov| |pylint Score| |License: BSD3|
+
+    .. |Build Status| image:: https://travis-ci.com/hudson-and-thames/mlfinlab.svg?branch=master
+        :target: https://travis-ci.com/hudson-and-thames/mlfinlab
+
+    .. |codecov| image:: https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg
+        :target: https://codecov.io/gh/hudson-and-thames/mlfinlab
+
+    .. |pylint Score| image:: https://mperlet.github.io/pybadge/badges/10.svg
+
+    .. |License: BSD3| image:: https://img.shields.io/github/license/hudson-and-thames/mlfinlab.svg
+        :target: https://opensource.org/licenses/BSD-3-Clause
+
+    |PyPi| |Downloads| |Python|
+
+    .. |PyPi| image:: https://img.shields.io/pypi/v/mlfinlab.svg
+        :target: https://pypi.org/project/mlfinlab/
+
+    .. |Downloads| image:: https://img.shields.io/pypi/dm/mlfinlab.svg
+        :target: https://pypi.org/project/mlfinlab/
+
+    .. |Python| image:: https://img.shields.io/pypi/pyversions/mlfinlab.svg
+        :target: https://pypi.org/project/mlfinlab/
 
 
-	|Build Status| |codecov| |pylint Score| |License: BSD3|
-
-	.. |Build Status| image:: https://travis-ci.com/hudson-and-thames/mlfinlab.svg?branch=master
-		:target: https://travis-ci.com/hudson-and-thames/mlfinlab
-
-	.. |codecov| image:: https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg
-		:target: https://codecov.io/gh/hudson-and-thames/mlfinlab
-
-	.. |pylint Score| image:: https://mperlet.github.io/pybadge/badges/10.svg
-
-	.. |License: BSD3| image:: https://img.shields.io/github/license/hudson-and-thames/mlfinlab.svg
-		:target: https://opensource.org/licenses/BSD-3-Clause
-
-	|PyPi| |Downloads| |Python|
-
-	.. |PyPi| image:: https://img.shields.io/pypi/v/mlfinlab.svg
-		:target: https://pypi.org/project/mlfinlab/
-
-	.. |Downloads| image:: https://img.shields.io/pypi/dm/mlfinlab.svg
-		:target: https://pypi.org/project/mlfinlab/
-
-	.. |Python| image:: https://img.shields.io/pypi/pyversions/mlfinlab.svg
-		:target: https://pypi.org/project/mlfinlab/
-
-MLFinLab is an open source package based on the research of Dr Marcos Lopez de Prado (`QuantResearch.org`_) in his new book Advances in Financial Machine Learning as well as various implementations from the `Journal of Financial Data Science`_. This implementation started out as a spring board for a research project in the Masters in Financial Engineering programme at `WorldQuant University`_ and has grown into a mini research group called `Hudson and Thames Quantitative Research`_ (not affiliated with the university).
+MLFinLab is an open-source package based on the research of Dr Marcos Lopez de Prado (`QuantResearch.org`_) in his
+new book Advances in Financial Machine Learning as well as various implementations from the
+`Journal of Financial Data Science`_. This implementation started out as a spring board for a research project in the
+Masters in Financial Engineering programme at `WorldQuant University`_ and has grown into a mini research group called
+`Hudson and Thames Quantitative Research`_ (not affiliated with the university).
 
 .. _Hudson and Thames Quantitative Research: https://hudsonthames.org/
 .. _WorldQuant University: https://wqu.org/
@@ -42,34 +45,40 @@ MLFinLab is an open source package based on the research of Dr Marcos Lopez de P
 .. _QuantResearch.org: http://www.quantresearch.org/
 .. _Masters in Financial Engineering programme at WorldQuant University: https://wqu.org/
 
+#####################
 Sponsors and Donating
 #####################
 .. image:: logo/support.png
    :scale: 100 %
    :align: center
 
-A special thank you to our sponsors! It is because of your contributions that we are able to continue the development of academic research for open source. If you would like to become a sponsor and help support our research, please sign up on `Patreon`_.
+A special thank you to our sponsors! It is because of your contributions that we are able to continue the development of
+academic research for open source. If you would like to become a sponsor and help support our research, please sign up
+on `Patreon`_.
 
 .. _Patreon: https://www.patreon.com/HudsonThames
 
+*****************
 Platinum Sponsor:
 *****************
 * `Machine Factor Technologies`_
 
+**************
 Gold Sponsors:
 **************
 * `E.P. Chan & Associates`_
 * `Markov Capital`_
 
+*******************
 Supporter Sponsors:
 *******************
-* `John B. Keown`_
-* `Roberto Spadim`_
-* `Zack Gow`_
-* `Jack Yu`_
-* Егор Тарасенок
-* Joseph Matthew
-* Justin Gerard
++--------------------+--------------------+--------------------+
+| `John B. Keown`_   | `Roberto Spadim`_  | `Zack Gow`_        |
++--------------------+--------------------+--------------------+
+| `Jack Yu`_         |  Егор Тарасенок    | Joseph Matthew     |
++--------------------+--------------------+--------------------+
+| Justin Gerard      |  Jason             | Shaun McDonogh     |
++--------------------+--------------------+--------------------+
 
 .. _`Machine Factor Technologies`: https://machinefactor.tech/
 .. _`E.P. Chan & Associates`: https://www.epchan.com/
@@ -79,6 +88,7 @@ Supporter Sponsors:
 .. _`Zack Gow`: https://www.linkedin.com/in/zackgow/
 .. _`Jack Yu`: https://www.linkedin.com/in/jihao-yu/
 
+##########
 Built With
 ##########
 
@@ -88,75 +98,85 @@ Built With
 .. _Github: https://github.com/hudson-and-thames/mlfinlab
 .. _Travis CI: https://www.travis-ci.com
 
-Getting Started
-###############
 
 .. toctree::
-   :caption: Getting Started
-   :hidden:
+    :maxdepth: 2
+    :caption: Getting Started
+    :hidden:
 
-   getting_started/installation
-   getting_started/barriers_to_entry
-   getting_started/requirements
-
-* :doc:`getting_started/installation`
-
-* :doc:`getting_started/barriers_to_entry`
-
-* :doc:`getting_started/requirements`
-
-Implementations
-###############
+    getting_started/installation
+    additional_information/contact
+    getting_started/barriers_to_entry
+    getting_started/researcher
 
 .. toctree::
-   :caption: Implementations
-   :hidden:
+    :maxdepth: 2
+    :caption: Feature Engineering
+    :hidden:
 
-   implementations/backtest_statistics
-   implementations/bet_sizing
-   implementations/codependence
-   implementations/cross_validation
-   implementations/data_structures
-   implementations/feature_importance
-   implementations/filters
-   implementations/frac_diff
-   implementations/tb_meta_labeling
-   implementations/labeling_tail_sets
-   implementations/microstructural_features
-   implementations/clustering
-   implementations/portfolio_optimisation
-   implementations/sampling
-   implementations/sb_bagging
-   implementations/structural_breaks
+    implementations/data_structures
+    implementations/filters
+    implementations/codependence
+    implementations/frac_diff
+    implementations/structural_breaks
+    implementations/microstructural_features
 
 
-* :doc:`implementations/backtest_statistics`
-* :doc:`implementations/bet_sizing`
-* :doc:`implementations/codependence`
-* :doc:`implementations/cross_validation`
-* :doc:`implementations/data_structures`
-* :doc:`implementations/feature_importance`
-* :doc:`implementations/filters`
-* :doc:`implementations/frac_diff`
-* :doc:`implementations/tb_meta_labeling`
-* :doc:`implementations/labeling_tail_sets`
-* :doc:`implementations/microstructural_features`
-* :doc:`implementations/clustering`
-* :doc:`implementations/portfolio_optimisation`
-* :doc:`implementations/sampling`
-* :doc:`implementations/sb_bagging`
-* :doc:`implementations/structural_breaks`
-
-Additional Information
-######################
 .. toctree::
-   :caption: Additional Information
-   :hidden:
+    :maxdepth: 2
+    :caption: Labelling
+    :hidden:
 
-   additional_information/contact
-   additional_information/contributing
-   additional_information/license
+    implementations/tb_meta_labeling
+    implementations/labeling_trend_scanning
+    implementations/labeling_tail_sets
 
-* :doc:`additional_information/contact`
-* :doc:`additional_information/contributing`
-* :doc:`additional_information/license`
+.. toctree::
+    :maxdepth: 2
+    :caption: Modelling
+    :hidden:
+
+    implementations/sampling
+    implementations/sb_bagging
+    implementations/feature_importance
+    implementations/cross_validation
+    implementations/EF3M
+    implementations/bet_sizing
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Clustering
+    :hidden:
+
+    implementations/onc
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Backtest Overfitting
+    :hidden:
+
+    implementations/backtesting
+    implementations/backtest_statistics
+
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Portfolio Optimization
+    :hidden:
+
+    portfolio_optimisation/risk_metrics
+    portfolio_optimisation/returns_estimation
+    portfolio_optimisation/risk_estimators
+    portfolio_optimisation/mean_variance
+    portfolio_optimisation/critical_line_algorithm
+    portfolio_optimisation/hierarchical_risk_parity
+    portfolio_optimisation/hierarchical_clustering_asset_allocation
+    portfolio_optimisation/nested_clustered_optimisation
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Additional Information
+    :hidden:
+
+    additional_information/contributing
+    additional_information/license

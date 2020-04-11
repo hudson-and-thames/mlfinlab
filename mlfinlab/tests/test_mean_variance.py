@@ -18,15 +18,16 @@ class TestMVO(unittest.TestCase):
 
     def setUp(self):
         """
-        Set the file path for the tick data csv
+        Set the file path for the tick data csv.
         """
+
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
     def test_inverse_variance_solution(self):
         """
-        Test the calculation of inverse-variance portfolio weights
+        Test the calculation of inverse-variance portfolio weights.
         """
 
         mvo = MeanVarianceOptimisation()
@@ -38,7 +39,7 @@ class TestMVO(unittest.TestCase):
 
     def test_min_volatility_solution(self):
         """
-        Test the calculation of inverse-variance portfolio weights
+        Test the calculation of inverse-variance portfolio weights.
         """
 
         mvo = MeanVarianceOptimisation()
@@ -50,7 +51,7 @@ class TestMVO(unittest.TestCase):
 
     def test_max_sharpe_solution(self):
         """
-        Test the calculation of inverse-variance portfolio weights
+        Test the calculation of inverse-variance portfolio weights.
         """
 
         mvo = MeanVarianceOptimisation()
@@ -63,7 +64,7 @@ class TestMVO(unittest.TestCase):
     def test_min_volatility_with_target_return(self):
         # pylint: disable=invalid-name
         """
-        Test the calculation of inverse-variance portfolio weights
+        Test the calculation of inverse-variance portfolio weights.
         """
 
         mvo = MeanVarianceOptimisation()
@@ -76,7 +77,7 @@ class TestMVO(unittest.TestCase):
     def test_plotting_efficient_frontier(self):
         # pylint: disable=invalid-name, bad-continuation, protected-access
         """
-        Test the calculation of inverse-variance portfolio weights
+        Test the calculation of inverse-variance portfolio weights.
         """
 
         mvo = MeanVarianceOptimisation()
@@ -93,7 +94,7 @@ class TestMVO(unittest.TestCase):
     def test_mvo_with_input_as_returns_and_covariance(self):
         # pylint: disable=invalid-name, bad-continuation
         """
-        Test MVO when we pass expected returns and covariance matrix as input
+        Test MVO when we pass expected returns and covariance matrix as input.
         """
 
         mvo = MeanVarianceOptimisation()
@@ -110,7 +111,7 @@ class TestMVO(unittest.TestCase):
     def test_min_volatility_with_specific_weight_bounds(self):
         # pylint: disable=invalid-name
         """
-        Test the calculation of weights when specific bounds are supplied
+        Test the calculation of weights when specific bounds are supplied.
         """
 
         mvo = MeanVarianceOptimisation()
@@ -126,7 +127,7 @@ class TestMVO(unittest.TestCase):
     def test_max_sharpe_with_specific_weight_bounds(self):
         # pylint: disable=invalid-name
         """
-        Test the calculation of weights when specific bounds are supplied
+        Test the calculation of weights when specific bounds are supplied.
         """
 
         mvo = MeanVarianceOptimisation()
@@ -142,7 +143,7 @@ class TestMVO(unittest.TestCase):
     def test_efficient_risk_with_specific_weight_bounds(self):
         # pylint: disable=invalid-name
         """
-        Test the calculation of weights when specific bounds are supplied
+        Test the calculation of weights when specific bounds are supplied.
         """
 
         mvo = MeanVarianceOptimisation()
@@ -159,7 +160,7 @@ class TestMVO(unittest.TestCase):
     def test_mvo_with_exponential_returns(self):
         # pylint: disable=invalid-name
         """
-        Test the calculation of inverse-variance portfolio weights
+        Test the calculation of inverse-variance portfolio weights.
         """
 
         mvo = MeanVarianceOptimisation(calculate_expected_returns='exponential')
@@ -172,7 +173,7 @@ class TestMVO(unittest.TestCase):
     def test_unknown_returns_calculation(self):
         # pylint: disable=invalid-name
         """
-        Test ValueError on passing unknown returns calculation string
+        Test ValueError on passing unknown returns calculation string.
         """
 
         with self.assertRaises(ValueError):
@@ -182,7 +183,7 @@ class TestMVO(unittest.TestCase):
     def test_value_error_for_unknown_solution(self):
         # pylint: disable=invalid-name
         """
-        Test ValueError on passing unknown solution string
+        Test ValueError on passing unknown solution string.
         """
 
         with self.assertRaises(ValueError):
@@ -192,7 +193,7 @@ class TestMVO(unittest.TestCase):
     def test_value_error_for_non_dataframe_input(self):
         # pylint: disable=invalid-name
         """
-        Test ValueError on passing non-dataframe input
+        Test ValueError on passing non-dataframe input.
         """
 
         with self.assertRaises(ValueError):
@@ -202,7 +203,7 @@ class TestMVO(unittest.TestCase):
     def test_value_error_for_no_min_volatility_optimal_weights(self):
         # pylint: disable=invalid-name
         """
-        Test ValueError when no optimal weights are found for minimum volatility solution
+        Test ValueError when no optimal weights are found for minimum volatility solution.
         """
 
         with self.assertRaises(ValueError):
@@ -215,7 +216,7 @@ class TestMVO(unittest.TestCase):
     def test_value_error_for_no_max_sharpe_optimal_weights(self):
         # pylint: disable=invalid-name
         """
-        Test ValueError when no optimal weights are found for maximum Sharpe solution
+        Test ValueError when no optimal weights are found for maximum Sharpe solution.
         """
 
         with self.assertRaises(ValueError):
@@ -228,7 +229,7 @@ class TestMVO(unittest.TestCase):
     def test_value_error_for_no_efficient_risk_optimal_weights(self):
         # pylint: disable=invalid-name
         """
-        Test ValueError when no optimal weights are found for efficient risk solution
+        Test ValueError when no optimal weights are found for efficient risk solution.
         """
 
         with self.assertRaises(ValueError):
@@ -240,7 +241,7 @@ class TestMVO(unittest.TestCase):
 
     def test_value_error_for_non_date_index(self):
         """
-        Test ValueError on passing dataframe not indexed by date
+        Test ValueError on passing dataframe not indexed by date.
         """
 
         with self.assertRaises(ValueError):
@@ -250,7 +251,7 @@ class TestMVO(unittest.TestCase):
 
     def test_resampling_asset_prices(self):
         """
-        Test resampling of asset prices
+        Test resampling of asset prices.
         """
 
         mvo = MeanVarianceOptimisation()
@@ -262,9 +263,33 @@ class TestMVO(unittest.TestCase):
 
     def test_all_inputs_none(self):
         """
-        Test allocation when all inputs are None
+        Test allocation when all inputs are None.
         """
 
         with self.assertRaises(ValueError):
             mvo = MeanVarianceOptimisation()
             mvo.allocate(asset_names=self.data.columns)
+
+    def test_no_asset_names(self):
+        """
+        Test MVO when not supplying a list of asset names.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_valuerror_with_no_asset_names(self):
+        """
+        Test ValueError when not supplying a list of asset names and no other input
+        """
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation()
+            expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+                                                                                     resample_by='W')
+            covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
+            mvo.allocate(expected_asset_returns=expected_returns, covariance_matrix=covariance)

@@ -262,10 +262,9 @@ def drop_labels(events, min_pct=.05):
 
     This function recursively eliminates rare observations.
 
-    :param events: (data frame) events
-    :param min_pct: (float) a fraction used to decide if the observation occurs less than
-    that fraction
-    :return: (data frame) of events
+    :param events: (data frame) events.
+    :param min_pct: (float) a fraction used to decide if the observation occurs less than that fraction.
+    :return: (data frame) of events.
     """
     # Apply weights, drop labels with insufficient examples
     while True:
