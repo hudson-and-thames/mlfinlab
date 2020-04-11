@@ -39,8 +39,8 @@ class TestTrendScanningLabels(unittest.TestCase):
         self.assertTrue(
             set(tr_scan_labels.loc[pd.Timestamp(2008, 1, 1):pd.Timestamp(2008, 5, 9)].bin) == set([1]))
 
-        self.assertEqual(tr_scan_labels.bin.value_counts()[-1], 76)  # Number of -1 labels check
-        self.assertEqual(tr_scan_labels.bin.value_counts()[1], 34)
+        self.assertEqual(tr_scan_labels.bin.value_counts()[-1], 70)  # Number of -1 labels check
+        self.assertEqual(tr_scan_labels.bin.value_counts()[1], 40)
 
         # Approx. 20 latest labels are nan because we don't have data for look-forward period (20)
         self.assertEqual(tr_scan_labels.shape[0] - tr_scan_labels.dropna().shape[0], 19)
@@ -51,7 +51,7 @@ class TestTrendScanningLabels(unittest.TestCase):
         self.assertTrue((tr_scan_labels.t1 > tr_scan_labels.index).all())
 
         for int_index, (ret_v, bin_v) in zip([0, 2, 10, 20, 50],
-                                             [(0.04837, 1), (0.03763, 1), (0.05866, 1), (0.05309, 1), (-0.0812, -1)]):
+                                             [(0.05037, 1), (0.0350, 1), (0.07508, 1), (0.05219, 1), (0.02447, 1)]):
             self.assertAlmostEqual(tr_scan_labels.iloc[int_index]['ret'], ret_v, delta=1e-4)
             self.assertEqual(tr_scan_labels.iloc[int_index]['bin'], bin_v)
 

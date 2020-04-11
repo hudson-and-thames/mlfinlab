@@ -11,10 +11,12 @@ class MeanVarianceOptimisation:
     This class implements some classic mean-variance optimisation techniques for calculating the efficient frontier solutions.
     With the help of quadratic optimisers, users can generate optimal portfolios for different objective functions. Currently
     solutions to the following portfolios can be generated:
-        1. Inverse Variance
-        2. Maximum Sharpe
-        3. Minimum Volatility
-        4. Efficient Risk
+
+    1. Inverse Variance
+    2. Maximum Sharpe
+    3. Minimum Volatility
+    4. Efficient Risk
+
     """
 
     def __init__(self, calculate_expected_returns='mean'):
@@ -22,7 +24,7 @@ class MeanVarianceOptimisation:
         Constructor.
 
         :param calculate_expected_returns: (str) the method to use for calculation of expected returns.
-        Currently supports "mean" and "exponential"
+                                           Currently supports "mean" and "exponential"
         """
 
         self.weights = list()
