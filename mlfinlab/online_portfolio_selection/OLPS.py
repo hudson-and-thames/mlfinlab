@@ -62,26 +62,26 @@ class OLPS(object):
             # weights add up to 1
             # resample function
         # not implemented yet
-        self.__check_asset(asset_prices, weights, portfolio_start, resample_by)
+        self.check_asset(asset_prices, weights, portfolio_start, resample_by)
 
         # Data Prep
-        self.__initialize(asset_prices, weights, portfolio_start, resample_by)
+        self.initialize(asset_prices, weights, portfolio_start, resample_by)
 
         # Actual weight calculation
         # For future portfolios only change __run() if we want to change it to batch style
         # or change __update_weight to change stepwise function
         # or change __first_weight if we delay our portfolio return start date
-        self.__run(weights)
+        self.run(weights, self.final_relative_return)
 
         # Calculate Portfolio Returns
-        self.__calculate_returns(self.all_weights, self.final_relative_return)
+        self.calculate_portfolio_returns(self.all_weights, self.final_relative_return)
 
         # convert everything to make presentable
-        self.__conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return)
+        self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return)
 
     # check for valid dataset
     # raise ValueError
-    def __check_asset(self, _asset_prices, _weights, _portfolio_start, _resample_by):
+    def check_asset(self, _asset_prices, _weights, _portfolio_start, _resample_by):
         # is the dataset actually valid
         pass
         # check _asset_prices is dataframe
@@ -89,7 +89,7 @@ class OLPS(object):
         # _resample_by actually works
         # _portfolio_start is a valid number
 
-    def __initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
+    def initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
         # resample asset
         if _resample_by is not None:
             _asset_prices = _asset_prices.resample(_resample_by).last()
@@ -110,7 +110,7 @@ class OLPS(object):
         self.number_of_time = self.time.size
 
         # calculate relative returns and final relative returns
-        self.relative_return = self.__relative_return(_asset_prices)
+        self.relative_return = self.calculate_relative_return(_asset_prices)
 
         # set portfolio start
         self.portfolio_start = _portfolio_start
@@ -127,7 +127,7 @@ class OLPS(object):
         self.portfolio_return = np.zeros((self.final_number_of_time, self.number_of_assets))
 
     # calculate relative returns
-    def __relative_return(self, _asset_prices):
+    def calculate_relative_return(self, _asset_prices):
         # percent change of each row
         # first row is blank because no change, so make it 0
         # add 1 to all values so that the values can be multiplied easily
@@ -138,48 +138,48 @@ class OLPS(object):
     # for this one, it doesn't matter, but for subsequent complex selection problems, we might have to include a
     # separate run method for each iteration and not clog the allocate method.
     # after calculating the new weight add that to the all weights
-    def __run(self, _weights):
+    def run(self, _weights, _relative_return):
         # set initial weights
-        self.weights= self.__first_weight(_weights)
+        self.weights = self.first_weight(_weights)
         self.all_weights[0] = self.weights
 
         # Run the Algorithm for the rest of data
         for t in range(1, self.final_number_of_time):
             # update weights
-            new_weight = self.__update_weight(self.weights)
+            new_weight = self.update_weight(self.weights, _relative_return[t-1])
             self.all_weights[t] = new_weight
 
     # initialize first weight
     # might change depending on algorithm
-    def __first_weight(self, _weights):
+    def first_weight(self, _weights):
         if _weights is None:
-            return self.__uniform_weight(self.number_of_assets)
+            return self.uniform_weight(self.number_of_assets)
         else:
             return _weights
 
     # return uniform weights numpy array (1/n, 1/n, 1/n ...)
-    def __uniform_weight(self, n):
+    def uniform_weight(self, n):
         return np.ones(n) / n
 
     # for the first one, just return the same weight
     # only have to change this for future iteration
-    def __update_weight(self, _weights):
+    def update_weight(self, _weights, _relative_return):
         return _weights
 
     # calculate portfolio returns
-    def __calculate_returns(self, _all_weights, _relative_return):
+    def calculate_portfolio_returns(self, _all_weights, _relative_return):
         self.portfolio_return = np.diagonal(np.dot(_relative_return, _all_weights.T)).cumprod()
 
     # method to normalize sum of weights to 1
-    def __normalize(self, _weights):
+    def normalize(self, _weights):
         return _weights / np.sum(_weights)
 
     # method to get a diagonal multiplication of two arrays
     # equivalent to np.diag(np.dot(A, B))
-    def __diag_mul(self, A, B):
+    def diag_mul(self, A, B):
         return (A * B.T).sum(-1)
 
-    def __conversion(self, _all_weights, _portfolio_return):
+    def conversion(self, _all_weights, _portfolio_return):
         self.all_weights = pd.DataFrame(_all_weights, index=self.final_time, columns=self.asset_name)
         self.portfolio_return = pd.DataFrame(_portfolio_return, index=self.final_time, columns=["Returns"])
 
