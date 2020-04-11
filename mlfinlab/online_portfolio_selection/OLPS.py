@@ -13,20 +13,22 @@ class OLPS(object):
         # weights
         self.weights = None
         self.all_weights = None
+        # delayed portfolio
+        self.portfolio_start = None
         # asset names
         self.asset_name = None
         self.number_of_assets = None
         # asset time
         self.time = None
         self.number_of_time = None
+        # return asset time
         self.return_time = None
         self.return_number_of_time = None
-        # portfolio return
-        self.portfolio_return = None
         # relative return
         self.relative_return = None
-        # delayed portfolio
-        self.portfolio_start = None
+        self.return_relative_return = None
+        # portfolio return
+        self.portfolio_return = None
 
         # self.asset_prices = None
         # self.covariance_matrix = None
@@ -66,23 +68,16 @@ class OLPS(object):
         self.__initialize(asset_prices, weights, portfolio_start, resample_by)
 
         # Actual weight calculation
+        # For future portfolios only change __run() to update the algorithms
         self.__run()
 
-        # Buy one asset and never change
-        self.weights = np.zeros(number_of_assets)
-        self.weights[np.random.randint(0, number_of_assets - 1)] += 1
-
-        # Run the Algorithm
-        for t in range(1, time_period):
-            # update weights
-            self.run(self.weights, relative_price[t - 1])
-
-        self.calculate_portfolio_returns(self.all_weights, relative_price)
+        # # Calculate Metrics
+        # self.calculate_portfolio_returns(self.all_weights, self.relative_return)
 
         # convert everything to make presentable
         # convert to dataframe
-        self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
-                        _asset_names=asset_names)
+        # self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
+        #                 _asset_names=asset_names)
 
     # check for valid dataset
     # raise ValueError
@@ -95,20 +90,25 @@ class OLPS(object):
         # _portfolio_start is a valid number
 
     def __initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
-        # set asset names
-        self.asset_name = _asset_prices.columns
-
-        # set asset time
-        self.asset_time = _asset_prices.index
+        # resample asset
+        _asset_prices = _asset_prices.resample(_resample_by).last()
 
         # set portfolio start
         self.portfolio_start = _portfolio_start
 
+        # set asset names
+        self.asset_name = _asset_prices.columns
+
+        # set time and returns time
+        self.time = _asset_prices.index
+        self.return_time = self.time[self.portfolio_start:]
+
         # calculate number of assets
         self.number_of_assets = self.asset_name.size
 
-        # calculate number of time periods
-        self.number_of_time = self.asset_time.size
+        # calculate number of time and number of time for returns
+        self.number_of_time = self.time.size
+        self.return_number_of_time = self.return_time.size
 
         # calculate relative returns
         self.relative_return = self.__relative_return(_asset_prices)
@@ -118,15 +118,11 @@ class OLPS(object):
         else:
             self.weights = _weights
 
-        # delayed portfolio
-        delay_asset_time = self.asset_time[self.portfolio_start:]
-        delay_number_of_time = self.number_of_time - self.portfolio_start
-
-        # set all_weights
-        self.all_weights = np.zeros((delay_number_of_time, self.number_of_assets))
+        # set return_weights
+        self.return_weights = np.zeros((self.return_time, self.number_of_assets))
 
         # set portfolio_return
-        self.portfolio_return = np.zeros((delay_number_of_time, self.number_of_assets))
+        self.portfolio_return = np.zeros((self.return_time, self.number_of_assets))
 
     # calculate relative returns
     def __relative_return(self, _asset_prices):
@@ -144,6 +140,13 @@ class OLPS(object):
     # for this one, it doesn't matter, but for subsequent complex selection problems, we might have to include a
     # separate run method for each iteration and not clog the allocate method.
     # after calculating the new weight add that to the all weights
+    def __run(self, _weights, _relative_return):
+        # Run the Algorithm
+        for t in range(1, time_period):
+            # update weights
+            self.run(self.weights, relative_price[t - 1])
+
+
     def run(self, _past_weights, _past_relative_price):
         # no transactions, just moving weights around to reflect price difference
         new_weight = np.multiply(_past_weights, _past_relative_price)
