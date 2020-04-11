@@ -52,12 +52,11 @@ def average_holding_period(target_positions: pd.Series) -> float:
     given a pandas series of target positions using average entry time pairing algorithm.
 
     Idea of an algorithm:
-    - entry_time = (previous_time * weight_of_previous_position +
-                    time_since_beginning_of_trade * increase_in_position ) /
-                    weight_of_current_position
-    - holding_period ['holding_time' = time a position was held,
-                      'weight' = weight of position closed]
-    - res = weighted average time a trade was held
+
+    * entry_time = (previous_time * weight_of_previous_position + time_since_beginning_of_trade * increase_in_position )
+      / weight_of_current_position
+    * holding_period ['holding_time' = time a position was held, 'weight' = weight of position closed]
+    * res = weighted average time a trade was held
 
     :param target_positions: (pd.Series) target position series with timestamps as indices
     :return: (float) estimated average holding period, NaN if zero or unpredicted
@@ -124,23 +123,21 @@ def bets_concentration(returns: pd.Series) -> float:
 
 def all_bets_concentration(returns: pd.Series, frequency: str = 'M') -> tuple:
     """
-    Snippet 14.3, page 201, Given a pd.Series of returns, derives concentration of
-    positive returns, negative returns and concentration of bets grouped by
-    time intervals (daily, monthly etc.). If after time grouping less than
+    Snippet 14.3, page 201, Given a pd.Series of returns, derives concentration of positive returns, negative returns
+    and concentration of bets grouped by time intervals (daily, monthly etc.). If after time grouping less than
     3 observations, returns nan.
 
     Properties or results:
-    - low positive_concentration -> no right fat-tail of returns (desirable)
-    - low negative_concentration -> no left fat-tail of returns (desirable)
-    - low time_concentration -> bets are not concentrated in time, or
-                                are evenly concentrated (desirable)
-    - positive_concentration == 0 ⇔ returns are uniform
-    - positive_concentration == 1 ⇔ only one non-zero return exists
+
+    * low positive_concentration -> no right fat-tail of returns (desirable)
+    * low negative_concentration -> no left fat-tail of returns (desirable)
+    * low time_concentration -> bets are not concentrated in time, or are evenly concentrated (desirable)
+    * positive_concentration == 0 ⇔ returns are uniform
+    * positive_concentration == 1 ⇔ only one non-zero return exists
 
     :param returns: (pd.Series) returns from bets
     :param frequency: (str) desired time grouping frequency from pd.Grouper
-    :return: (tuple of floats) concentration of positive, negative
-                            and time grouped concentrations
+    :return: (tuple of floats) concentration of positive, negative and time grouped concentrations
     """
 
     # Concentration of positive returns per bet
@@ -157,19 +154,19 @@ def all_bets_concentration(returns: pd.Series, frequency: str = 'M') -> tuple:
 
 def drawdown_and_time_under_water(returns: pd.Series, dollars: bool = False) -> tuple:
     """
-    Snippet 14.4, page 201, Calculates drawdowns and time under water for pd.Series
-    of either relative price of a portfolio or dollar price of a protfolio.
+    Snippet 14.4, page 201, Calculates drawdowns and time under water for pd.Series of either relative price of a
+    portfolio or dollar price of a portfolio.
 
-    Intuitively, a drawdown is the maximum loss suffered by an investment between
-    two consecutive high-watermarks. The time under water is the time
-    elapsed between an high watermark and the moment the PnL (profit and loss)
-    exceeds the previous maximum PnL. We also append the Time under water series
-    with period from the last high-watermark to the last return observed.
+    Intuitively, a drawdown is the maximum loss suffered by an investment between two consecutive high-watermarks.
+    The time under water is the time elapsed between an high watermark and the moment the PnL (profit and loss)
+    exceeds the previous maximum PnL. We also append the Time under water series with period from the last
+    high-watermark to the last return observed.
 
     Return details:
-    - Drawdown series index is the time of a high watermark and the value of a
+
+    * Drawdown series index is the time of a high watermark and the value of a
       drawdown after it.
-    - Time under water index is the time of a high watermark and how much time
+    * Time under water index is the time of a high watermark and how much time
       passed till the next high watermark in years. Also includes time between
       the last high watermark and last observation in returns as the last element.
 
