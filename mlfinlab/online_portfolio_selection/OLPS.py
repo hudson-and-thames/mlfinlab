@@ -64,13 +64,13 @@ class OLPS(object):
         # not implemented yet
         self.__check_asset(asset_prices, weights, portfolio_start, resample_by)
 
-        # Data prep
+        # Data Prep
         self.__initialize(asset_prices, weights, portfolio_start, resample_by)
 
         # Actual weight calculation
         # For future portfolios only change __run() to update the algorithms
-        self.__run()
-
+        self.__run(self.weights, self.relative_return)
+        print(pd.DataFrame(self.all_weights))
         # # Calculate Metrics
         # self.calculate_portfolio_returns(self.all_weights, self.relative_return)
 
@@ -120,12 +120,6 @@ class OLPS(object):
         self.final_number_of_time = self.final_time.size
         self.final_relative_return = self.relative_return[self.portfolio_start:]
 
-        # set initial weights
-        if _weights is None:
-            self.weights = self.__uniform_weight(self.number_of_assets)
-        else:
-            self.weights = _weights
-
         # set final_weights
         self.all_weights = np.zeros((self.final_number_of_time, self.number_of_assets))
 
@@ -149,18 +143,27 @@ class OLPS(object):
     # separate run method for each iteration and not clog the allocate method.
     # after calculating the new weight add that to the all weights
     def __run(self, _weights, _relative_return):
-        # Run the Algorithm
-        for t in range(1, time_period):
+        # set initial weights
+        self.all_weights[0] = self.__first_weight(_weights)
+
+        # Run the Algorithm for the rest of data
+        for t in range(1, self.final_number_of_time):
             # update weights
-            self.run(self.weights, relative_price[t - 1])
+            new_weight = self.__update_weight(self.weights)
+            self.all_weights[t] = new_weight
 
+    # initiliaze first weight
+    # might change depending on algorithm
+    def __first_weight(self, _weights):
+        if _weights is None:
+            return self.__uniform_weight(self.number_of_assets)
+        else:
+            return _weights
 
-    def run(self, _past_weights, _past_relative_price):
-        # no transactions, just moving weights around to reflect price difference
-        new_weight = np.multiply(_past_weights, _past_relative_price)
-
-        self.weights = self.normalize(new_weight)
-        self.all_weights = np.vstack((self.all_weights, self.weights))
+    # for the first one, just return the same weight
+    # only have to change this for future iteration
+    def __update_weight(self, _weights):
+        return _weights
 
     # calculate portfolio returns
     def calculate_portfolio_returns(self, _all_weights, _relative_price):
