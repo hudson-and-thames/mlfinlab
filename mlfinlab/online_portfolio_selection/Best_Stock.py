@@ -13,6 +13,7 @@ class Best_Stock(OLPS):
         """
         super().__init__()
 
+    # Buy the asset that increased the most for the given period
     def first_weight(self, _weights):
         # index of stock that increased the most
         best_idx = np.argmax(self.final_relative_return[-1])
