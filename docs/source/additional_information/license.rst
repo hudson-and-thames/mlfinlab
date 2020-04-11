@@ -9,10 +9,10 @@ All rights reserved.
 Copyright (c) 2019, Hudson and Thames Quantitative Research
 
 This codebase is open-source* only in the sense that the code is free to use
-as-is, and the source code is publically available, however, all other rights
+as-is, and the source code is publicly available, however, all other rights
 are reserved under the Hudson and Thames Quantitative Research brand.
 
-Our intention is to make some of the techniques developed publically available
+Our intention is to make some of the techniques developed publicly available
 and to promote research in quantitative finance and machine learning.
 
 1. Users may use the code as-is.
@@ -23,6 +23,8 @@ and to promote research in quantitative finance and machine learning.
    research@hudsonthames.org
 4. Neither the name of the copyright holder nor the names of its contributors
    may be used to endorse or promote products.
+5. No user may use our code or any part thereof to sell, market, or distribute
+   for any reason whatsoever, especially to make a profit of any kind whatsoever.
 
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
 FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
