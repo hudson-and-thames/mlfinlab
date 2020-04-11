@@ -92,7 +92,7 @@ Initially, the algorithm was developed to clusterize investment strategies backt
 The ONC algorithm diagram
 ==========================
 
-Structure of ONC's base clustering stage.
+**Structure of ONC's base clustering stage.**
 
 .. image:: clustering_images/ONC_diagram_base.png
    :scale: 100 %
@@ -100,7 +100,7 @@ Structure of ONC's base clustering stage.
 
 Figure 4.1.  Marcos M. Lopez de Prado. *Structure of ONC's base clustering stage*. 2020. MACHINE LEARNING FOR ASSET MANAGERS. Marcos M. Lopez de Prado. Cornell University, New York. April 2020. Page 57. Digital Book.
 
-Structure of ONC's higher-level stage.
+**Structure of ONC's higher-level stage.**
 
 .. image:: clustering_images/ONC_diagram.png
    :scale: 100 %
