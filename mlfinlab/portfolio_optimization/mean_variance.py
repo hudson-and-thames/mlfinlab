@@ -11,10 +11,12 @@ class MeanVarianceOptimisation:
     This class implements some classic mean-variance optimisation techniques for calculating the efficient frontier solutions.
     With the help of quadratic optimisers, users can generate optimal portfolios for different objective functions. Currently
     solutions to the following portfolios can be generated:
-        1. Inverse Variance
-        2. Maximum Sharpe
-        3. Minimum Volatility
-        4. Efficient Risk
+
+    1. Inverse Variance
+    2. Maximum Sharpe
+    3. Minimum Volatility
+    4. Efficient Risk
+
     """
 
     def __init__(self, calculate_expected_returns='mean'):
@@ -22,7 +24,7 @@ class MeanVarianceOptimisation:
         Constructor.
 
         :param calculate_expected_returns: (str) the method to use for calculation of expected returns.
-        Currently supports "mean" and "exponential"
+                                           Currently supports "mean" and "exponential"
         """
 
         self.weights = list()
@@ -34,7 +36,7 @@ class MeanVarianceOptimisation:
         self.weight_bounds = None
 
     def allocate(self,
-                 asset_names,
+                 asset_names=None,
                  asset_prices=None,
                  expected_asset_returns=None,
                  covariance_matrix=None,
@@ -64,7 +66,7 @@ class MeanVarianceOptimisation:
                                   None for no resampling
         """
 
-        if asset_prices is None and expected_asset_returns is None and covariance_matrix is None:
+        if asset_prices is None and (expected_asset_returns is None or covariance_matrix is None):
             raise ValueError("You need to supply either raw prices or expected returns "
                              "and a covariance matrix of asset returns")
 
@@ -73,6 +75,12 @@ class MeanVarianceOptimisation:
                 raise ValueError("Asset prices matrix must be a dataframe")
             if not isinstance(asset_prices.index, pd.DatetimeIndex):
                 raise ValueError("Asset prices dataframe must be indexed by date.")
+
+        if asset_names is None:
+            if asset_prices is not None:
+                asset_names = asset_prices.columns
+            else:
+                raise ValueError("Please provide a list of asset names")
 
         # Weight bounds
         self.weight_bounds = weight_bounds
