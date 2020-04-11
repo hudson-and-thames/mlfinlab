@@ -18,12 +18,15 @@ series bereft of any memory and thereby reducing or eliminating its predictive c
 Fractionally differentiated features tackle this problem by deriving features through fractionally differentiating a time
 series to the point where the series is stationary, but not over differencing such that we lose all predictive power.
 
-The following graph shows a fractionally differenced series plotted over the original closing price series
-`(Lopez de Prado 2018) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3447398>`_:
+The following graph shows a fractionally differenced series plotted over the original closing price series:
 
-.. image:: frac_diff_graph.png
+.. figure:: frac_diff_graph.png
    :scale: 80 %
    :align: center
+   :figclass: align-center
+   :alt: Fractionally Differentiated Series
+
+   Fractionally Differentiated Series `(Lopez de Prado 2018) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3447398>`_
 
 |
 

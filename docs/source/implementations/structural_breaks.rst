@@ -17,7 +17,7 @@ classified in two general categories:
    :scale: 70 %
    :align: center
    :figclass: align-center
-   :alt: purging image
+   :alt: structural breaks
 
    Image showing SADF test statistic with 5 lags and linear model.
 
