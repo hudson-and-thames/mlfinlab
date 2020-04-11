@@ -22,7 +22,7 @@ class MeanVarianceOptimisation:
         8. Maximum Decorrelation
     """
 
-    def __init__(self, calculate_expected_returns='mean'):
+    def __init__(self, calculate_expected_returns='mean', risk_free_rate=0.03):
         """
         Constructor.
 
@@ -38,6 +38,7 @@ class MeanVarianceOptimisation:
         self.returns_estimator = ReturnsEstimation()
         self.risk_estimators = RiskEstimators()
         self.weight_bounds = (0, 1)
+        self.risk_free_rate = risk_free_rate
 
     def allocate(self,
                  asset_names=None,
@@ -45,7 +46,6 @@ class MeanVarianceOptimisation:
                  expected_asset_returns=None,
                  covariance_matrix=None,
                  solution='inverse_variance',
-                 risk_free_rate=0.03,
                  target_return=0.2,
                  target_risk=0.01,
                  risk_aversion=10,
@@ -121,60 +121,114 @@ class MeanVarianceOptimisation:
             self.portfolio_risk = np.dot(self.weights, np.dot(cov.values, self.weights.T))
             self.portfolio_return = np.dot(self.weights, expected_asset_returns)[0]
         elif solution == 'min_volatility':
-            self.weights, self.portfolio_risk, self.portfolio_return = self._min_volatility(
-                                                                                    covariance=cov,
-                                                                                    expected_returns=expected_asset_returns,
-                                                                                    num_assets=len(asset_names))
+            self._min_volatility(covariance=cov,
+                                 expected_returns=expected_asset_returns,
+                                 num_assets=len(asset_names))
         elif solution == 'max_return_min_volatility':
-            self.weights, self.portfolio_risk, self.portfolio_return = self._max_return_min_volatility(
-                                                                                    covariance=cov,
-                                                                                    expected_returns=expected_asset_returns,
-                                                                                    mu=risk_aversion,
-                                                                                    num_assets=len(asset_names))
+            self._max_return_min_volatility(covariance=cov,
+                                            expected_returns=expected_asset_returns,
+                                            mu=risk_aversion,
+                                            num_assets=len(asset_names))
         elif solution == 'max_sharpe':
-            self.weights, self.portfolio_risk, self.portfolio_return = self._max_sharpe(
-                                                                                    covariance=cov,
-                                                                                    expected_returns=expected_asset_returns,
-                                                                                    risk_free_rate=risk_free_rate,
-                                                                                    num_assets=len(asset_names))
+            self._max_sharpe(covariance=cov,
+                             expected_returns=expected_asset_returns,
+                             num_assets=len(asset_names))
         elif solution == 'efficient_risk':
-            self.weights, self.portfolio_risk, self.portfolio_return = self._min_volatility_for_target_return(
-                                                                                    covariance=cov,
-                                                                                    expected_returns=expected_asset_returns,
-                                                                                    target_return=target_return,
-                                                                                    num_assets=len(asset_names))
+            self._min_volatility_for_target_return(covariance=cov,
+                                                   expected_returns=expected_asset_returns,
+                                                   target_return=target_return,
+                                                   num_assets=len(asset_names))
         elif solution == 'efficient_return':
-            self.weights, self.portfolio_risk, self.portfolio_return = self._max_return_for_target_risk(
-                                                                                    covariance=cov,
-                                                                                    expected_returns=expected_asset_returns,
-                                                                                    target_risk=target_risk,
-                                                                                    num_assets=len(asset_names))
+            self._max_return_for_target_risk(covariance=cov,
+                                             expected_returns=expected_asset_returns,
+                                             target_risk=target_risk,
+                                             num_assets=len(asset_names))
         elif solution == 'max_diversification':
-            self.weights, self.portfolio_risk, self.portfolio_return = self._max_diversification(
-                                                                                    covariance=cov,
-                                                                                    expected_returns=expected_asset_returns,
-                                                                                    num_assets=len(asset_names))
+            self._max_diversification(covariance=cov,
+                                      expected_returns=expected_asset_returns,
+                                      num_assets=len(asset_names))
         elif solution == 'max_decorrelation':
-            self.weights, self.portfolio_risk, self.portfolio_return = self._max_decorrelation(
-                                                                                    covariance=cov,
-                                                                                    expected_returns=expected_asset_returns,
-                                                                                    num_assets=len(asset_names))
+            self._max_decorrelation(covariance=cov,
+                                    expected_returns=expected_asset_returns,
+                                    num_assets=len(asset_names))
         else:
             raise ValueError("Unknown solution string specified. Supported solutions - "
                              "inverse_variance, min_volatility, max_sharpe, efficient_risk"
                              "max_return_min_volatility, max_diversification, efficient_return and max_decorrelation")
 
         # Do some post-processing of the weights
-        self._check_weights()
+        self._post_process_weights()
 
         # Calculate the portfolio sharpe ratio
-        self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))
+        self.portfolio_sharpe_ratio = ((self.portfolio_return - self.risk_free_rate) / (self.portfolio_risk ** 0.5))
 
         self.weights = pd.DataFrame(self.weights)
         self.weights.index = asset_names
         self.weights = self.weights.T
 
-    def _check_weights(self):
+    def custom_objective(self, **kwargs):
+        """
+
+        :param kwargs:
+        :return:
+        """
+
+        return
+
+    def plot_efficient_frontier(self,
+                                covariance,
+                                expected_asset_returns,
+                                num_assets,
+                                min_return=0,
+                                max_return=0.4,
+                                risk_free_rate=0.05):
+        # pylint: disable=bad-continuation, broad-except
+        """
+        Plot the Markowitz efficient frontier.
+
+        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
+        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
+        :param num_assets: (int) number of assets in the portfolio
+        :param min_return: (float) minimum target return
+        :param max_return: (float) maximum target return
+        :param risk_free_rate: (float) the rate of return for a risk-free asset.
+        """
+
+        expected_returns = np.array(expected_asset_returns).reshape((len(expected_asset_returns), 1))
+        volatilities = []
+        returns = []
+        sharpe_ratios = []
+        for portfolio_return in np.linspace(min_return, max_return, 100):
+            _, risk, _ = self._min_volatility_for_target_return(
+                                                    covariance=covariance,
+                                                    expected_returns=expected_returns,
+                                                    target_return=portfolio_return,
+                                                    num_assets=num_assets)
+            volatilities.append(risk)
+            returns.append(portfolio_return)
+            sharpe_ratios.append((portfolio_return - risk_free_rate) / (risk ** 0.5 + 1e-16))
+        max_sharpe_ratio_index = sharpe_ratios.index(max(sharpe_ratios))
+        min_volatility_index = volatilities.index(min(volatilities))
+        figure = plt.scatter(volatilities, returns, c=sharpe_ratios, cmap='viridis')
+        plt.colorbar(label='Sharpe Ratio')
+        plt.scatter(volatilities[max_sharpe_ratio_index],
+                    returns[max_sharpe_ratio_index],
+                    marker='*',
+                    color='g',
+                    s=400,
+                    label='Maximum Sharpe Ratio')
+        plt.scatter(volatilities[min_volatility_index],
+                    returns[min_volatility_index],
+                    marker='*',
+                    color='r',
+                    s=400,
+                    label='Minimum Volatility')
+        plt.xlabel('Volatility')
+        plt.ylabel('Return')
+        plt.legend(loc='upper left')
+        return figure
+
+    def _post_process_weights(self):
         """
         Check weights for very small numbers and numbers close to 1. A final post-processing of weights produced by the
         optimisation procedures.
@@ -250,7 +304,10 @@ class MeanVarianceOptimisation:
         problem.solve(warm_start=True)
         if weights.value is None:
             raise ValueError('No optimal set of weights found.')
-        return weights.value, risk.value, portfolio_return.value[0]
+
+        self.weights = weights.value
+        self.portfolio_risk = risk.value
+        self.portfolio_return = portfolio_return.value[0]
 
     def _max_return_min_volatility(self, covariance, expected_returns, mu, num_assets):
         """
@@ -301,16 +358,18 @@ class MeanVarianceOptimisation:
         problem.solve(warm_start=True)
         if weights.value is None:
             raise ValueError('No optimal set of weights found.')
-        return weights.value, risk.value, portfolio_return.value[0]
 
-    def _max_sharpe(self, covariance, expected_returns, risk_free_rate, num_assets):
+        self.weights = weights.value
+        self.portfolio_risk = risk.value
+        self.portfolio_return = portfolio_return.value[0]
+
+    def _max_sharpe(self, covariance, expected_returns, num_assets):
         # pylint: disable=invalid-name
         """
         Compute maximum Sharpe portfolio allocation.
 
         :param covariance: (pd.Dataframe) covariance dataframe of asset returns
         :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
-        :param risk_free_rate: (float) the rate of return for a risk-free asset.
         :param num_assets: (int) number of assets in the portfolio
         :return: (np.array, float, float) portfolio weights, risk value and return value
         """
@@ -325,7 +384,7 @@ class MeanVarianceOptimisation:
         # Optimisation objective and constraints
         allocation_objective = cp.Minimize(risk)
         allocation_constraints = [
-            cp.sum((expected_returns - risk_free_rate).T @ y) == 1,
+            cp.sum((expected_returns - self.risk_free_rate).T @ y) == 1,
             cp.sum(y) == kappa,
             kappa >= 0
         ]
@@ -356,7 +415,10 @@ class MeanVarianceOptimisation:
         problem.solve(warm_start=True)
         if y.value is None or kappa.value is None:
             raise ValueError('No optimal set of weights found.')
-        return weights.value, risk.value, portfolio_return.value[0]
+
+        self.weights = weights.value
+        self.portfolio_risk = risk.value
+        self.portfolio_return = portfolio_return.value[0]
 
     def _min_volatility_for_target_return(self, covariance, expected_returns, target_return, num_assets):
         """
@@ -407,7 +469,10 @@ class MeanVarianceOptimisation:
         problem.solve()
         if weights.value is None:
             raise ValueError('No optimal set of weights found.')
-        return weights.value, risk.value, target_return
+
+        self.weights = weights.value
+        self.portfolio_risk = risk.value
+        self.portfolio_return = target_return
 
     def _max_return_for_target_risk(self, covariance, expected_returns, target_risk, num_assets):
         """
@@ -458,7 +523,10 @@ class MeanVarianceOptimisation:
         problem.solve()
         if weights.value is None:
             raise ValueError('No optimal set of weights found.')
-        return weights.value, target_risk, portfolio_return.value[0]
+
+        self.weights = weights.value
+        self.portfolio_risk = target_risk
+        self.portfolio_return = portfolio_return.value[0]
 
     def _max_diversification(self, covariance, expected_returns, num_assets):
         """
@@ -481,7 +549,9 @@ class MeanVarianceOptimisation:
         portfolio_return = np.dot(expected_returns.T, weights)[0]
         risk = np.dot(weights, np.dot(covariance, weights.T))
 
-        return weights, risk, portfolio_return
+        self.weights = weights
+        self.portfolio_risk = risk
+        self.portfolio_return = portfolio_return
 
     def _max_decorrelation(self, covariance, expected_returns, num_assets):
         """
@@ -532,47 +602,8 @@ class MeanVarianceOptimisation:
         problem.solve(warm_start=True)
         if weights.value is None:
             raise ValueError('No optimal set of weights found.')
-        return weights.value, risk.value, portfolio_return.value[0]
 
-    def plot_efficient_frontier(self,
-                                covariance,
-                                expected_asset_returns,
-                                num_assets,
-                                min_return=0,
-                                max_return=0.4,
-                                risk_free_rate=0.05):
-        # pylint: disable=bad-continuation, broad-except
-        """
-        Plot the Markowitz efficient frontier.
+        self.weights = weights.value
+        self.portfolio_risk = risk.value
+        self.portfolio_return = portfolio_return.value[0]
 
-        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
-        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
-        :param num_assets: (int) number of assets in the portfolio
-        :param min_return: (float) minimum target return
-        :param max_return: (float) maximum target return
-        :param risk_free_rate: (float) the rate of return for a risk-free asset.
-        """
-
-        expected_returns = np.array(expected_asset_returns).reshape((len(expected_asset_returns), 1))
-        volatilities = []
-        returns = []
-        sharpe_ratios = []
-        for portfolio_return in np.linspace(min_return, max_return, 100):
-            _, risk, _ = self._min_volatility_for_target_return(
-                                                    covariance=covariance,
-                                                    expected_returns=expected_returns,
-                                                    target_return=portfolio_return,
-                                                    num_assets=num_assets)
-            volatilities.append(risk)
-            returns.append(portfolio_return)
-            sharpe_ratios.append((portfolio_return - risk_free_rate) / (risk ** 0.5 + 1e-16))
-        max_sharpe_ratio_index = sharpe_ratios.index(max(sharpe_ratios))
-        min_volatility_index = volatilities.index(min(volatilities))
-        figure = plt.scatter(volatilities, returns, c=sharpe_ratios, cmap='viridis')
-        plt.colorbar(label='Sharpe Ratio')
-        plt.scatter(volatilities[max_sharpe_ratio_index], returns[max_sharpe_ratio_index], marker='*', color='g', s=400, label='Maximum Sharpe Ratio')
-        plt.scatter(volatilities[min_volatility_index], returns[min_volatility_index], marker='*', color='r', s=400, label='Minimum Volatility')
-        plt.xlabel('Volatility')
-        plt.ylabel('Return')
-        plt.legend(loc='upper left')
-        return figure
