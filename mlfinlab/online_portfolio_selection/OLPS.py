@@ -118,7 +118,9 @@ class OLPS(object):
         # set final returns
         self.final_time = self.time[self.portfolio_start:]
         self.final_number_of_time = self.final_time.size
-        self.final_relative_return = self.relative_return[self.portfolio_start:]
+
+        # calcualte final relative return
+        self.final_relative_return = self.calculate_relative_return(_asset_prices[self.portfolio_start:])
 
         # set final_weights
         self.all_weights = np.zeros((self.final_number_of_time, self.number_of_assets))
@@ -146,8 +148,8 @@ class OLPS(object):
         # Run the Algorithm for the rest of data
         for t in range(1, self.final_number_of_time):
             # update weights
-            new_weight = self.update_weight(self.weights, _relative_return[t-1])
-            self.all_weights[t] = new_weight
+            self.weights = self.update_weight(self.weights, _relative_return[t-1])
+            self.all_weights[t] = self.weights
 
     # initialize first weight
     # might change depending on algorithm

@@ -28,12 +28,8 @@ class BAH(OLPS):
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    names = list(stock_price.columns)
-    w = np.zeros(23)/23
-    w[0] = 0.5
-    w[1] = 0.5
     bah = BAH()
-    bah.allocate(stock_price, weights=w)
+    bah.allocate(stock_price)
     print(bah.all_weights)
     print(bah.portfolio_return)
     bah.portfolio_return.plot()
