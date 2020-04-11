@@ -98,7 +98,7 @@ Structure of ONC's base clustering stage.
    :scale: 100 %
    :align: center 
 
-{\tiny Figure 4.1.  Marcos M. Lopez de Prado. *Structure of ONC's base clustering stage*. 2020. MACHINE LEARNING FOR ASSET MANAGERS. Marcos M. Lopez de Prado. Cornell University, New York. April 2020. Page 57. Digital Book.}  
+Figure 4.1.  Marcos M. Lopez de Prado. *Structure of ONC's base clustering stage*. 2020. MACHINE LEARNING FOR ASSET MANAGERS. Marcos M. Lopez de Prado. Cornell University, New York. April 2020. Page 57. Digital Book.
 
 Structure of ONC's higher-level stage.
 
@@ -106,7 +106,7 @@ Structure of ONC's higher-level stage.
    :scale: 100 %
    :align: center 
 
-{\tiny Figure 4.2.  Lopez de Prado and Lewis. *Structure of ONC's higher-level stage*. 2020. MACHINE LEARNING FOR ASSET MANAGERS. Marcos M. Lopez de Prado. Cornell University, New York. April 2020. Page 60. Digital Book.}  
+Figure 4.2.  Lopez de Prado and Lewis. *Structure of ONC's higher-level stage*. 2020. MACHINE LEARNING FOR ASSET MANAGERS. Marcos M. Lopez de Prado. Cornell University, New York. April 2020. Page 60. Digital Book. 
  
 
 Example
@@ -157,6 +157,6 @@ Tips
    You do not have to assume or decide any number of initial clusters with this algorithm, so sit back, relax, and enjoy the clustering!
 
 
-:widths: test
+
 
     
