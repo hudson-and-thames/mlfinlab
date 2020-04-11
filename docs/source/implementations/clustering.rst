@@ -88,24 +88,25 @@ Initially, the algorithm was developed to clusterize investment strategies backt
 21. If not so, we return the clustering formed by the base algorithm
 
 
+
 The ONC algorithm diagram
 ==========================
 
-Structure of ONC’s base clustering stage.
+Structure of ONC's base clustering stage.
 
 .. image:: clustering_images/ONC_diagram_base.png
    :scale: 100 %
    :align: center 
 
-Figure 4.1.  Marcos M. López de Prado. :math:`\textit Structure of ONC’s base clustering stage`. 2020. MACHINE LEARNING FOR ASSET MANAGERS. :math:`\textit Marcos M. López de Prado` . Cornell University, New York. April 2020. Page 57. Digital Book.   
+Figure 4.1.  Marcos M. Lopez de Prado. *Structure of ONC's base clustering stage*. 2020. MACHINE LEARNING FOR ASSET MANAGERS. Marcos M. Lopez de Prado. Cornell University, New York. April 2020. Page 57. Digital Book.   
 
-Structure of ONC’s higher-level stage.
+Structure of ONC's higher-level stage.
 
 .. image:: clustering_images/ONC_diagram.png
    :scale: 100 %
    :align: center 
 
-Figure 4.2.  López de Prado and Lewis. :math:`\textit Structure of ONC’s higher-level stage`. 2020. MACHINE LEARNING FOR ASSET MANAGERS. :math:`\textit Marcos M. López de Prado` . Cornell University, New York. April 2020. Page 60. Digital Book.   
+Figure 4.2.  Lopez de Prado and Lewis. *Structure of ONC's higher-level stage*. 2020. MACHINE LEARNING FOR ASSET MANAGERS. Marcos M. Lopez de Prado. Cornell University, New York. April 2020. Page 60. Digital Book.   
  
 
 Example
@@ -125,7 +126,7 @@ Correlation Matrix shows the matrix that is sorted under the optimization cluste
 
     import numpy as np
     import pandas as pd
-    from mlfinlab.clustering.onc import get_onc_clusters # import the ONC function	
+    from mlfinlab.clustering.onc import get_onc_clusters # import the ONC function
 ::
     
     data = [[1,0.5,-0.2,0.7,0], [0.5,1,-1,0,-0.5], [-0.2,-1,1,0.1,0.8], [0.7,0,0.1,1,-0.5], [0,-0.5,0.8,-0.5,1]] 
@@ -143,13 +144,19 @@ Assuming that we have a correlation matrix data as in the above
 Tips
 =======
 
-.. tip.1::
-   * Did you know that you can also apply ONC algorithm on any kind of matrix apart from correlation matrix?
+.. tip::
 
-.. tip.2::
-   * ONC will work directly with any matrix data, so, feel free to put in your matrix directly to the function.
+   Did you know that you can also apply ONC algorithm on any kind of matrix apart from correlation matrix?
 
-.. tip.3::
-   * You do not have to assume or decide any number of initial clusters with this algorithm, so sit back, relax, and enjoy the clustering!
+.. tip::
+   
+   ONC will work directly with any matrix data, so, feel free to put in your matrix directly to the function.
+
+.. tip::
+   
+   You do not have to assume or decide any number of initial clusters with this algorithm, so sit back, relax, and enjoy the clustering!
+
+
+
 
     
