@@ -68,16 +68,16 @@ class OLPS(object):
         self.__initialize(asset_prices, weights, portfolio_start, resample_by)
 
         # Actual weight calculation
-        # For future portfolios only change __run() to update the algorithms
-        self.__run(self.weights, self.relative_return)
-        print(pd.DataFrame(self.all_weights))
-        # # Calculate Metrics
-        # self.calculate_portfolio_returns(self.all_weights, self.relative_return)
+        # For future portfolios only change __run() if we want to change it to batch style
+        # or change __update_weight to change stepwise function
+        # or change __first_weight if we delay our portfolio return start date
+        self.__run(weights)
+
+        # Calculate Portfolio Returns
+        self.__calculate_returns(self.all_weights, self.final_relative_return)
 
         # convert everything to make presentable
-        # convert to dataframe
-        # self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
-        #                 _asset_names=asset_names)
+        self.__conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return)
 
     # check for valid dataset
     # raise ValueError
@@ -135,16 +135,13 @@ class OLPS(object):
         relative_return = np.array(_asset_prices.pct_change().fillna(0) + 1)
         return relative_return
 
-    # return uniform weights numpy array (1/n, 1/n, 1/n ...)
-    def __uniform_weight(self, n):
-        return np.ones(n) / n
-
     # for this one, it doesn't matter, but for subsequent complex selection problems, we might have to include a
     # separate run method for each iteration and not clog the allocate method.
     # after calculating the new weight add that to the all weights
-    def __run(self, _weights, _relative_return):
+    def __run(self, _weights):
         # set initial weights
-        self.all_weights[0] = self.__first_weight(_weights)
+        self.weights= self.__first_weight(_weights)
+        self.all_weights[0] = self.weights
 
         # Run the Algorithm for the rest of data
         for t in range(1, self.final_number_of_time):
@@ -152,7 +149,7 @@ class OLPS(object):
             new_weight = self.__update_weight(self.weights)
             self.all_weights[t] = new_weight
 
-    # initiliaze first weight
+    # initialize first weight
     # might change depending on algorithm
     def __first_weight(self, _weights):
         if _weights is None:
@@ -160,32 +157,31 @@ class OLPS(object):
         else:
             return _weights
 
+    # return uniform weights numpy array (1/n, 1/n, 1/n ...)
+    def __uniform_weight(self, n):
+        return np.ones(n) / n
+
     # for the first one, just return the same weight
     # only have to change this for future iteration
     def __update_weight(self, _weights):
         return _weights
 
     # calculate portfolio returns
-    def calculate_portfolio_returns(self, _all_weights, _relative_price):
-        self.portfolio_return = np.diagonal(np.dot(_relative_price, _all_weights.T)).cumprod()
-
-    # calculate the returns based on portfolio weights
-    def returns(self, _current_weights, _current_relative_price, _previous_portfolio_return):
-        new_returns = _previous_portfolio_return * np.dot(_current_weights, _current_relative_price)
-        self.portfolio_return = np.vstack((self.portfolio_return, new_returns))
+    def __calculate_returns(self, _all_weights, _relative_return):
+        self.portfolio_return = np.diagonal(np.dot(_relative_return, _all_weights.T)).cumprod()
 
     # method to normalize sum of weights to 1
-    def normalize(self, _weights):
+    def __normalize(self, _weights):
         return _weights / np.sum(_weights)
 
     # method to get a diagonal multiplication of two arrays
     # equivalent to np.diag(np.dot(A, B))
-    def diag_mul(self, A, B):
+    def __diag_mul(self, A, B):
         return (A * B.T).sum(-1)
 
-    def conversion(self, _all_weights, _portfolio_return, _index, _asset_names):
-        self.all_weights = pd.DataFrame(_all_weights, index=_index, columns=_asset_names)
-        self.portfolio_return = pd.DataFrame(_portfolio_return, index=_index, columns=["Relative Returns"])
+    def __conversion(self, _all_weights, _portfolio_return):
+        self.all_weights = pd.DataFrame(_all_weights, index=self.final_time, columns=self.asset_name)
+        self.portfolio_return = pd.DataFrame(_portfolio_return, index=self.final_time, columns=["Returns"])
 
     # calculate the variance based on the price
     def volatility(self):
@@ -211,6 +207,7 @@ def main():
     initial_portfolio = OLPS()
     initial_portfolio.allocate(stock_price)
     print(initial_portfolio.all_weights)
+    print(initial_portfolio.portfolio_return)
     initial_portfolio.portfolio_return.plot()
 
 
