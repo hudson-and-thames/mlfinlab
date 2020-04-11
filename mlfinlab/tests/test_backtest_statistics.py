@@ -1,7 +1,6 @@
 """
 Test various functions related to Backtest Statistics
 """
-
 import os
 import unittest
 
@@ -35,6 +34,7 @@ class TestBacktestStatistics(unittest.TestCase):
         """
         Set the data for tests.
         """
+
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/dollar_bar_sample.csv'
         self.logret = pd.read_csv(data_path, index_col='date_time')
@@ -64,6 +64,7 @@ class TestBacktestStatistics(unittest.TestCase):
         Check that moments of flips and flattenings are picked correctly and
         that last is added
         """
+
         flattenings_and_flips = timing_of_flattening_and_flips(self.flip_flattening_positions)
         test_flat_flip = self.flips.append(self.flattenings)
 
@@ -79,6 +80,7 @@ class TestBacktestStatistics(unittest.TestCase):
         """
         Check average holding period calculation
         """
+
         average_holding = average_holding_period(self.hold_positions)
         nan_average_holding = average_holding_period(self.no_closed_positions)
 
@@ -90,6 +92,7 @@ class TestBacktestStatistics(unittest.TestCase):
         """
         Check if concentration is balanced and correctly calculated
         """
+
         positive_concentration = bets_concentration(self.logret)
         #Testing for symmetry in concentration
         flipped_logret = -1 * self.logret
@@ -104,14 +107,16 @@ class TestBacktestStatistics(unittest.TestCase):
         Check if concentration is nan when not enough observations, also values
         testing
         """
+
         # Only one negative return in this dataset
         positive_returns_concentration = all_bets_concentration(self.normal_returns)
+
         # A longer dataset with all concentrations
-        all_returns_concentration = all_bets_concentration(self.logret, frequency='D')
         all_returns_concentration = all_bets_concentration(self.logret, frequency='D')
 
         # Not enough negative observations in dataset
         self.assertTrue(np.isnan(positive_returns_concentration[1]))
+
         # Not enough observations to group by month
         self.assertTrue(np.isnan(positive_returns_concentration[2]))
         self.assertAlmostEqual(all_returns_concentration[0], 0.0014938,
@@ -126,6 +131,7 @@ class TestBacktestStatistics(unittest.TestCase):
         Check if drawdowns and time under water calculated correctly for
         dollar and non-dollar test sets.
         """
+
         drawdown_dol, time_under_water_dol = drawdown_and_time_under_water(self.dollar_returns,
                                                                            dollars=True)
         _, time_under_water = drawdown_and_time_under_water(self.dollar_returns / 100,
@@ -142,6 +148,7 @@ class TestBacktestStatistics(unittest.TestCase):
         """
         Check if Sharpe ratio is calculated right
         """
+
         sharpe = sharpe_ratio(self.normal_returns, entries_per_year=12,
                               risk_free_rate=0.005)
 
@@ -151,6 +158,7 @@ class TestBacktestStatistics(unittest.TestCase):
         """
         Check if Information ratio is calculated right
         """
+
         information_r = information_ratio(self.normal_returns, benchmark=0.006,
                                           entries_per_year=12)
 
@@ -160,6 +168,7 @@ class TestBacktestStatistics(unittest.TestCase):
         """
         Check probabilistic Sharpe ratio using numerical example
         """
+
         observed_sr = 1.14
         benchmark_sr = 1
         number_of_returns = 250
@@ -177,8 +186,10 @@ class TestBacktestStatistics(unittest.TestCase):
         """
         Check deflated Sharpe ratio using numerical example
         """
+
         observed_sr = 1.14
         sr_estimates = [3.5, 1.01, 1.02]
+
         # Parameters of SR estimates - standard deviation and number of observations
         estim_param = [0.4, 100]
         number_of_returns = 250
@@ -212,6 +223,7 @@ class TestBacktestStatistics(unittest.TestCase):
         """
         Check deflated Sharpe ratio using numerical example
         """
+
         observed_sr = 1.14
         benchmark_sr = 1
         skewness = 0

@@ -221,6 +221,154 @@ Implementation
 
 
 
+Risk Estimators
+===============
+
+This class includes functions for calculating different types of covariance matrices, for de-noising a covariance matrix and other helping methods.
+
+**Minimum Covariance Determinant**
+
+Minimum Covariance Determinant (MCD) is a robust robust estimator of covariance.
+
+Our method is a wrap of the sklearn's MinCovDet class. For more details about the function and its parameters, please visit `sklearn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.covariance.MinCovDet.html>`__.
+
+**Maximum likelihood covariance estimator (Empirical covariance)**
+
+Maximum Likelihood Estimator of a sample is an unbiased estimator of the corresponding population’s covariance matrix.
+
+Our method is a wrap of the sklearn's EmpiricalCovariance class. For more details about the function and its parameters, please visit `sklearn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.covariance.EmpiricalCovariance.html>`__.
+
+
+**Covariance estimator with shrinkage**
+
+Shrinkage allows to avoid a problem of inability to invert the covariance matrix due to numerical reasons. Shrinkage consists in reducing the ratio between the smallest and the largest eigenvalues of the empirical covariance matrix.
+
+Shrinkage methods supported:
+
+- Basic shrinkage
+
+- Ledoit-Wolf shrinkage
+
+- Oracle Approximating shrinkage
+
+Our method is a wrap of the sklearn's ShrunkCovariance, LedoitWolf, and OAS classes. For more details about the function and its parameters, please visit `sklearn documentation <https://scikit-learn.org/stable/modules/covariance.html#shrunk-covariance>`__.
+
+**Semi-Covariance matrix**
+
+Semi-Covariance matrix is used to measure the downside volatility of portfolio and can be used as a measure to minimize it. This metric also allows to measure the volatility of returns below a specific threshold. An example of Semi-Covaraicne usage can be found `here <https://www.solactive.com/wp-content/uploads/2018/04/Solactive_Minimum-Downside-Volatility-Indices.pdf>`__.
+
+**Exponentially-weighted Covariance matrix**
+
+Each element in the Exponentially-weighted Covariance matrix is the last element from exponentially weighted moving average series based on series of covariances between returns of the corresponding assets. It's used to give greater weight to most relevant observations in computing the covariance.
+
+*This and above methods are described in more detail in the Risk Estimators Notebook.*
+
+**De-noising covariance matrix**
+
+The main idea behind de-noising is to separate the noise-related eigenvalues from the signal-related ones. This is achieved through fitting the Marcenko-Pastur distribution of the empirical distribution of eigenvalues using a Kernel Density Estimate (KDE).
+
+*This method is described in more detail in the NCO Notebook.*
+
+**Transforming covariance matrix to correlation matrix and back**
+
+Helping methods for transforming the covariance matrix to the correlation matrix and back to the covariance matrix.
+
+Implementation
+~~~~~~~~~~~~~~
+
+.. automodule:: mlfinlab.portfolio_optimization.risk_estimators
+
+    .. autoclass:: RiskEstimators
+        :members:
+
+        .. automethod:: __init__
+
+
+
+
+Nested Clustered Optimization (NCO)
+===================================
+
+The NCO class includes functions related to:
+
+- Weight allocation using the Nested Clustered Optimization (NCO) algorithm.
+
+- Weight allocation using the Convex Optimization Solution (CVO).
+
+- Multiple simulations for the NCO and CVO algorithms using Monte Carlo Optimization Selection (MCOS) algorithm.
+
+- Sample data generation to use in the above functions.
+
+**Nested Clustered Optimization (NCO)**
+
+The Nested Clustered Optimization algorithm estimates optimal weights allocation to either maximize the Sharpe ratio
+or minimize the variance of a portfolio.
+
+The steps of the NCO algorithm are:
+
+1. Get the covariance matrix of the outcomes as an input (and the vector of means if the target is to maximize the Sharpe ratio).
+
+2. Transform the covariance matrix to the correlation matrix and calculate the distance matrix based on it.
+
+3. Cluster the covariance matrix into subsets of highly-correlated variables.
+
+4. Compute the optimal weights allocation (Convex Optimization Solution) for every cluster.
+
+5. Reduce the original covariance matrix to a reduced one - where each cluster is represented by a single variable.
+
+6. Compute the optimal weights allocation (Convex Optimization Solution) for the reduced covariance matrix.
+
+7. Compute the final allocations as a dot-product of the allocations between the clusters and inside the clusters.
+
+**Convex Optimization Solution (CVO)**
+
+The Convex Optimization Solution is the result of convex optimization for a problem of calculating the optimal weight allocation using the true covariance matrix and the true vector of means for a set of assets with a goal of maximum Sharpe ratio or minimum variance of a portfolio.
+
+**Monte Carlo Optimization Selection (MCOS)**
+
+The Monte Carlo Optimization Selection algorithm calculates the NCO allocations and a simple optimal allocation for multiple simulated pairs of mean vector and the covariance matrix to determine the most robust method for weight allocations for a given pair of means vector and a covariance vector.
+
+The steps of the MCOS algorithm are:
+
+1. Get the covariance matrix and the means vector of the outcomes as an input (along with the simulation parameters to use).
+
+2. Drawing the empirical covariance matrix and the empirical means vector based on the true ones.
+
+3. If the kde_bwidth parameter is given, the empirical covariance matrix is de-noised.
+
+4. Based on the min_var_portf parameter, either the minimum variance or the maximum Sharpe ratio is targeted in weights allocation.
+
+5. CVO is applied to the empirical data to obtain the weights allocation.
+
+6. NCO is applied to the empirical data to obtain the weights allocation.
+
+7. Based on the original covariance matrix and the means vector a true optimal allocation is calculated.
+
+8. For each weights estimation in a method, a standard deviation between the true weights and the obtained weights is calculated.
+
+9. The error associated with each method is calculated as the mean of the standard deviation across all estimations for the method.
+
+**Sample Data Generating**
+
+This method allows creating a random vector of means and a random covariance matrix that has the characteristics of securities. The elements are divided into clusters. The elements in clusters have a given level of correlation. The correlation between the clusters is set at another level. This structure is created in order to test the NCO and MCOS algorithms.
+
+These algorithms are described in more detail in the work **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3469961>`_.
+
+*Examples of using these functions are available in the NCO Notebook (link in the end of the page).*
+
+Implementation
+~~~~~~~~~~~~~~
+
+.. automodule:: mlfinlab.portfolio_optimization.nco
+
+    .. autoclass:: NCO
+        :members:
+
+        .. automethod:: __init__
+
+
+
+
 Examples
 ========
 
@@ -353,6 +501,15 @@ The following research notebooks can be used to better understand how the algori
 * `Chapter 16 Exercise Notebook`_
 
 .. _Chapter 16 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Chapter16/Chapter16.ipynb
+
+* `NCO Notebook`_
+
+.. _NCO Notebook: https://github.com/hudson-and-thames/research/blob/master/NCO/NCO.ipynb
+
+* `Risk Estimators Notebook`_
+
+.. _Risk Estimators Notebook: https://github.com/hudson-and-thames/research/blob/master/RiskEstimators/RiskEstimators.ipynb
+
 
 
 
