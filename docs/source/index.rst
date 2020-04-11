@@ -167,7 +167,6 @@ Built With
     portfolio_optimisation/risk_metrics
     portfolio_optimisation/returns_estimation
     portfolio_optimisation/risk_estimators
-    portfolio_optimisation/portfolio_optimisation
     portfolio_optimisation/mean_variance
     portfolio_optimisation/critical_line_algorithm
     portfolio_optimisation/hierarchical_risk_parity
