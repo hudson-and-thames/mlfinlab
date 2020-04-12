@@ -21,8 +21,8 @@ class BAH(OLPS):
 
     # adjust for previous returns
     # even if we don't rebalance, weights change because of the underlying price changes
-    def update_weight(self, _weights, _past_relative_return):
-        new_weight = _weights * _past_relative_return
+    def update_weight(self, _weights, _relative_return, _time):
+        new_weight = _weights * _relative_return[_time - 1]
         return self.normalize(new_weight)
 
 def main():
