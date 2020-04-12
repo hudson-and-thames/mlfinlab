@@ -8,77 +8,38 @@ class CWMR(OLPS):
     This class implements the Constant Weighted Mean Reversion strategy.
     """
 
-    def __init__(self):
+    def __init__(self, confidence=0.5, epsilon=0.5):
         """
         Constructor.
         """
-        # check that sensitivity is within [0,1]
-        self.sensitivity = None
-        self.aggressiveness = None
-        self.optimization_method = None
+        self.confidence = confidence
+        self.epsilon = epsilon
         super().__init__()
 
-    # update sensitivity, aggressiveness, optimization method
-    def allocate(self,
-                 asset_prices,
-                 weights=None,
-                 portfolio_start=0,
-                 sensitivity=0.5,
-                 aggressiveness=1,
-                 optimization_method=0,
-                 resample_by=None):
-        self.sensitivity = sensitivity
-        self.aggressiveness = aggressiveness
-        self.optimization_method = optimization_method
-        super(PAMR, self).allocate(asset_prices, weights, portfolio_start, resample_by)
+    # will update later
 
-    def update_weight(self, _weights, _relative_return, _time):
-        # calculation prep
-        _past_relative_return = _relative_return[_time - 1]
-        loss = max(0, np.dot(_weights, _past_relative_return))
-        adjusted_market_change = _past_relative_return - self.uniform_weight(self.number_of_assets) * np.mean(
-            _past_relative_return)
-        diff_norm = np.linalg.norm(adjusted_market_change)
-
-        # different optimization methods
-        if self.optimization_method == 0:
-            tau = loss / (diff_norm ** 2)
-        elif self.optimization_method == 1:
-            tau = min(self.aggressiveness, loss / (diff_norm ** 2))
-        elif self.optimization_method == 2:
-            tau = loss / (diff_norm ** 2 + 1 / (2 * self.aggressiveness))
-
-        new_weights = _weights - tau * adjusted_market_change
-        # if not in simplex domain
-        if ((new_weights > 1) | (new_weights < 0)).any():
-            return self.optimize(new_weights)
-        else:
-            return new_weights
-
-    # optimize the weight that minimizes the l2 norm
-    def optimize(self, _optimize_weight):
-        # initialize weights
-        weights = cp.Variable(self.number_of_assets)
-
-        # used cp.log and cp.sum to make the cost function a convex function
-        # multiplying continuous returns equates to summing over the log returns
-        l2_norm = cp.norm(weights - _optimize_weight)
-
-        # Optimization objective and constraints
-        allocation_objective = cp.Minimize(l2_norm)
-        allocation_constraints = [
-                cp.sum(weights) == 1,
-                weights <= 1,
-                weights >= 0
-        ]
-        # Define and solve the problem
-        problem = cp.Problem(
-                objective=allocation_objective,
-                constraints=allocation_constraints
-        )
-        problem.solve(solver=cp.SCS)
-        return weights.value
-
+    # def update_weight(self, _weights, _relative_return, _time):
+    #     # calculation prep
+    #     _past_relative_return = _relative_return[_time - 1]
+    #     loss = max(0, np.dot(_weights, _past_relative_return))
+    #     adjusted_market_change = _past_relative_return - self.uniform_weight(self.number_of_assets) * np.mean(
+    #         _past_relative_return)
+    #     diff_norm = np.linalg.norm(adjusted_market_change)
+    #
+    #     # different optimization methods
+    #     if self.optimization_method == 0:
+    #         tau = loss / (diff_norm ** 2)
+    #     elif self.optimization_method == 1:
+    #         tau = min(self.aggressiveness, loss / (diff_norm ** 2))
+    #     elif self.optimization_method == 2:
+    #         tau = loss / (diff_norm ** 2 + 1 / (2 * self.aggressiveness))
+    #
+    #     new_weights = _weights - tau * adjusted_market_change
+    #     # if not in simplex domain
+    #     if ((new_weights > 1) | (new_weights < 0)).any():
+    #         return self.optimize(new_weights)
+    #     else:
+    #         return new_weights
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')

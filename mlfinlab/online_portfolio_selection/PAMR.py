@@ -8,29 +8,16 @@ class PAMR(OLPS):
     This class implements the Passive Aggresive Mean Reversion strategy.
     """
 
-    def __init__(self):
+    def __init__(self, sensitivity=0.5, aggressiveness=1, optimization_method=0):
         """
         Constructor.
         """
         # check that sensitivity is within [0,1]
-        self.sensitivity = None
-        self.aggressiveness = None
-        self.optimization_method = None
-        super().__init__()
-
-    # update sensitivity, aggressiveness, optimization method
-    def allocate(self,
-                 asset_prices,
-                 weights=None,
-                 portfolio_start=0,
-                 sensitivity=0.5,
-                 aggressiveness=1,
-                 optimization_method=0,
-                 resample_by=None):
         self.sensitivity = sensitivity
         self.aggressiveness = aggressiveness
         self.optimization_method = optimization_method
-        super(PAMR, self).allocate(asset_prices, weights, portfolio_start, resample_by)
+        super().__init__()
+
 
     def update_weight(self, _weights, _relative_return, _time):
         # calculation prep

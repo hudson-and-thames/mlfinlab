@@ -8,26 +8,16 @@ class CORN(OLPS):
     This class implements the Correlation Driven Nonparametric Learning strategy.
     """
 
-    def __init__(self):
+    def __init__(self, window=20, rho=0.6):
         """
         Constructor.
         """
-        self.window = None
-        self.rho = None
-        self.corr_coef = None
-        super().__init__()
-    
-    def allocate(self,
-                 asset_prices,
-                 weights=None,
-                 window=20,
-                 rho=.6,
-                 portfolio_start=0,
-                 resample_by=None):
         self.window = window
         self.rho = rho
-        super(CORN, self).allocate(asset_prices, weights, portfolio_start, resample_by)
+        self.corr_coef = None
+        super().__init__()
 
+    # calculate corr_coef ahead of updating to speed up calculations
     def initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
         super(CORN, self).initialize(_asset_prices, _weights, _portfolio_start, _resample_by)
         self.corr_coef = self.calculate_rolling_correlation_coefficient(self.final_relative_return)
