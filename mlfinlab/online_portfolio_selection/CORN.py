@@ -8,13 +8,14 @@ class CORN(OLPS):
     This class implements the Correlation Driven Nonparametric Learning strategy.
     """
 
-    def __init__(self, window=30, rho=.5):
+    def __init__(self, window=20, rho=.6):
         """
         Constructor.
         """
         super().__init__()
         self.window = window
         self.rho = rho
+        self.corr_coef = None
 
     def run(self, _weights, _relative_return):
         # set initial weights
@@ -22,34 +23,30 @@ class CORN(OLPS):
         self.all_weights[0] = self.weights
 
         # rolling correlation coefficient
-        corr_coef = self.calculate_rolling_correlation_coefficient(_relative_return)
+        self.corr_coef = self.calculate_rolling_correlation_coefficient(_relative_return)
 
         # Probably can find a faster way to use this and compute algorithm
         # true_false = corr_coef > self.window
 
         # Run the Algorithm for the rest of data
         for t in range(1, self.final_number_of_time):
-            similar_set = []
-            new_weights = self.uniform_weight(self.number_of_assets)
-
-            if t <= self.window:
-                self.weights = new_weights
-            else:
-                for i in range(self.window + 1, t):
-                    if corr_coef[i - 1][t - 1] > self.rho:
-                        similar_set.append(i)
-                if similar_set:
-                    similar_sequences = _relative_return[similar_set]
-                    self.weights = self.optimize(similar_sequences)
-                else:
-                    self.weights = new_weights
-
             # update weights
             self.weights = self.update_weight(self.weights, _relative_return, t)
             self.all_weights[t] = self.weights
 
     def update_weight(self, _weights, _relative_return, _time):
-        return _weights
+        similar_set = []
+        new_weights = self.uniform_weight(self.number_of_assets)
+
+        if _time - 1 > self.window:
+            for i in range(self.window + 1, _time - 1):
+                if self.corr_coef[i - 1][_time - 1] > self.rho:
+                    similar_set.append(i)
+            if similar_set:
+                print(similar_set)
+                similar_sequences = _relative_return[similar_set]
+                new_weights = self.optimize(similar_sequences)
+        return new_weights
 
     # optimize the weight that maximizes the returns
     def optimize(self, _optimize_array):

@@ -74,6 +74,9 @@ class OLPS(object):
         # or change __first_weight if we delay our portfolio return start date
         self.run(weights, self.final_relative_return)
 
+        # round weights
+        self.all_weights = self.round_weights(self.all_weights)
+
         # Calculate Portfolio Returns
         self.calculate_portfolio_returns(self.all_weights, self.final_relative_return)
 
@@ -159,7 +162,8 @@ class OLPS(object):
 
     # calculate rolling correlation coefficient
     def calculate_rolling_correlation_coefficient(self, _relative_return):
-        return np.corrcoef(np.exp(np.log(pd.DataFrame(_relative_return)).rolling(self.window).sum()))
+        rolling_corr_coef = np.corrcoef(np.exp(np.log(pd.DataFrame(_relative_return)).rolling(self.window).sum()))
+        return rolling_corr_coef
 
     # initialize first weight
     # might change depending on algorithm
@@ -206,6 +210,11 @@ class OLPS(object):
     # return summary of the portfolio
     def summary(self):
         pass
+
+    # drop weights below a certain threshold
+    def round_weights(self, _all_weights, threshold=1e-6):
+        new_all_weights = np.where(_all_weights < threshold, 0, _all_weights)
+        return np.apply_along_axis(lambda x: x/np.sum(x), 1, new_all_weights)
 
     # optimize the weight that maximizes the returns
     def optimize(self, _optimize_array):
