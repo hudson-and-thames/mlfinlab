@@ -149,7 +149,7 @@ class OLPS(object):
         # Run the Algorithm for the rest of data
         for t in range(1, self.final_number_of_time):
             # update weights
-            self.weights = self.update_weight(self.weights, _relative_return[t-1])
+            self.weights = self.update_weight(self.weights, _relative_return, t)
             self.all_weights[t] = self.weights
 
     # initialize first weight
@@ -166,7 +166,7 @@ class OLPS(object):
 
     # for the first one, just return the same weight
     # only have to change this for future iteration
-    def update_weight(self, _weights, _relative_return):
+    def update_weight(self, _weights, _relative_return, _time):
         return _weights
 
     # calculate portfolio returns
