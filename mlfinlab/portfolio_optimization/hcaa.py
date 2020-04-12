@@ -21,7 +21,7 @@ class HierarchicalClusteringAssetAllocation:
 
     def __init__(self, calculate_expected_returns='mean'):
         """
-        Constructor.
+        Initialise.
 
         :param calculate_expected_returns: (str) the method to use for calculation of expected returns.
                                         Currently supports "mean" and "exponential"
@@ -33,6 +33,100 @@ class HierarchicalClusteringAssetAllocation:
         self.returns_estimator = ReturnsEstimation()
         self.risk_metrics = RiskMetrics()
         self.calculate_expected_returns = calculate_expected_returns
+
+    def allocate(self,
+                 asset_names=None,
+                 asset_prices=None,
+                 asset_returns=None,
+                 covariance_matrix=None,
+                 expected_asset_returns=None,
+                 allocation_metric='equal_weighting',
+                 linkage='average',
+                 confidence_level=0.05,
+                 optimal_num_clusters=None,
+                 resample_by=None):
+        # pylint: disable=too-many-arguments
+        """
+        Calculate asset allocations using the HCAA algorithm.
+
+        :param asset_names: (list) a list of strings containing the asset names
+        :param asset_prices: (pd.DataFrame) a dataframe of historical asset prices (daily close)
+                                            indexed by date
+        :param asset_returns: (pd.DataFrame/numpy matrix) user supplied matrix of asset returns
+        :param covariance_matrix: (pd.DataFrame/numpy matrix) user supplied covariance matrix of asset returns
+        :param expected_asset_returns: (list) a list of mean asset returns (mu)
+        :param allocation_metric: (str) the metric used for calculating weight allocations. Supported strings - "equal_weighting",
+                                        "minimum_variance", "minimum_standard_deviation", "sharpe_ratio", "expected_shortfall",
+                                        "conditional_drawdown_risk"
+        :param linkage: (str) the type of linkage method to use for clustering. Supported strings - "single", "average", "complete"
+        :param confidence_level: (float) the confidence level (alpha) used for calculating expected shortfall and conditional
+                                         drawdown at risk
+        :param optimal_num_clusters: (int) optimal number of clusters for hierarchical clustering
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+                                  None for no resampling
+        """
+
+        # Perform initial checks
+        self._perform_checks(asset_prices, asset_returns, covariance_matrix, allocation_metric)
+
+        # Calculate the expected returns if the user does not supply any returns
+        if allocation_metric == 'sharpe_ratio' and expected_asset_returns is None:
+            if asset_prices is None:
+                raise ValueError(
+                    "Either provide pre-calculated expected returns or give raw asset prices for inbuilt returns calculation")
+
+            if self.calculate_expected_returns == "mean":
+                expected_asset_returns = self.returns_estimator.calculate_mean_historical_returns(
+                    asset_prices=asset_prices,
+                    resample_by=resample_by)
+            elif self.calculate_expected_returns == "exponential":
+                expected_asset_returns = self.returns_estimator.calculate_exponential_historical_returns(
+                    asset_prices=asset_prices,
+                    resample_by=resample_by)
+            else:
+                raise ValueError("Unknown returns specified. Supported returns - mean, exponential")
+
+        if asset_names is None:
+            if asset_prices is not None:
+                asset_names = asset_prices.columns
+            elif asset_returns is not None and isinstance(asset_returns, pd.DataFrame):
+                asset_names = asset_returns.columns
+            else:
+                raise ValueError("Please provide a list of asset names")
+
+        # Calculate the returns if the user does not supply a returns dataframe
+        if asset_returns is None:
+            asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
+        asset_returns = pd.DataFrame(asset_returns, columns=asset_names)
+
+        # Calculate covariance of returns or use the user specified covariance matrix
+        if covariance_matrix is None:
+            covariance_matrix = asset_returns.cov()
+        cov = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
+
+        # Calculate correlation from covariance matrix
+        corr = self._cov2corr(covariance=cov)
+
+        # Calculate the optimal number of clusters using the Gap statistic
+        if not optimal_num_clusters:
+            optimal_num_clusters = self._get_optimal_number_of_clusters(correlation=corr,
+                                                                        linkage=linkage,
+                                                                        asset_returns=asset_returns)
+
+        # Tree Clustering
+        self.clusters = self._tree_clustering(correlation=corr, num_clusters=optimal_num_clusters, linkage=linkage)
+
+        # Quasi Diagnalization
+        num_assets = len(asset_names)
+        self.ordered_indices = self._quasi_diagnalization(num_assets, 2 * num_assets - 2)
+
+        # Recursive Bisection
+        self._recursive_bisection(expected_asset_returns=expected_asset_returns,
+                                  asset_returns=asset_returns,
+                                  covariance_matrix=cov,
+                                  assets=asset_names,
+                                  allocation_metric=allocation_metric,
+                                  confidence_level=confidence_level)
 
     @staticmethod
     def _compute_cluster_inertia(labels, asset_returns):
@@ -53,8 +147,7 @@ class HierarchicalClusteringAssetAllocation:
                                         correlation,
                                         asset_returns,
                                         linkage,
-                                        num_reference_datasets=5,
-                                        max_number_of_clusters=10):
+                                        num_reference_datasets=5):
         """
         Find the optimal number of clusters for hierarchical clustering using the Gap statistic.
 
@@ -62,10 +155,10 @@ class HierarchicalClusteringAssetAllocation:
         :param asset_returns: (pd.DataFrame) historical asset returns
         :param linkage: (str) the type of linkage method to use for clustering
         :param num_reference_datasets: (int) the number of reference datasets to generate for calculating expected inertia
-        :param max_number_of_clusters: (int) the maximum number of clusters to check for finding the optimal value
         :return: (int) the optimal number of clusters
         """
 
+        max_number_of_clusters = min(10, asset_returns.shape[1])
         cluster_func = AgglomerativeClustering(affinity='precomputed', linkage=linkage)
         original_distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
         gap_values = []
@@ -94,7 +187,7 @@ class HierarchicalClusteringAssetAllocation:
             gap = expected_inertia - inertia
             gap_values.append(gap)
 
-        return np.argmax(gap_values)
+        return 1 + np.argmax(gap_values)
 
     @staticmethod
     def _tree_clustering(correlation, num_clusters, linkage):
@@ -347,89 +440,3 @@ class HierarchicalClusteringAssetAllocation:
             raise ValueError("Unknown allocation metric specified. Supported metrics are - minimum_variance, "
                              "minimum_standard_deviation, sharpe_ratio, equal_weighting, expected_shortfall, "
                              "conditional_drawdown_risk")
-
-    def allocate(self,
-                 asset_names,
-                 asset_prices=None,
-                 asset_returns=None,
-                 covariance_matrix=None,
-                 expected_asset_returns=None,
-                 allocation_metric='equal_weighting',
-                 linkage='average',
-                 confidence_level=0.05,
-                 optimal_num_clusters=None,
-                 resample_by=None):
-        # pylint: disable=too-many-arguments
-        """
-        Calculate asset allocations using the HCAA algorithm.
-
-        :param asset_names: (list) a list of strings containing the asset names
-        :param asset_prices: (pd.DataFrame) a dataframe of historical asset prices (daily close)
-                                            indexed by date
-        :param asset_returns: (pd.DataFrame/numpy matrix) user supplied matrix of asset returns
-        :param covariance_matrix: (pd.DataFrame/numpy matrix) user supplied covariance matrix of asset returns
-        :param expected_asset_returns: (list) a list of mean asset returns (mu)
-        :param allocation_metric: (str) the metric used for calculating weight allocations. Supported strings - "equal_weighting",
-                                        "minimum_variance", "minimum_standard_deviation", "sharpe_ratio", "expected_shortfall",
-                                        "conditional_drawdown_risk"
-        :param linkage: (str) the type of linkage method to use for clustering. Supported strings - "single", "average", "complete"
-        :param confidence_level: (float) the confidence level (alpha) used for calculating expected shortfall and conditional
-                                         drawdown at risk
-        :param optimal_num_clusters: (int) optimal number of clusters for hierarchical clustering
-        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                  None for no resampling
-        """
-
-        # Perform initial checks
-        self._perform_checks(asset_prices, asset_returns, covariance_matrix, allocation_metric)
-
-        # Calculate the expected returns if the user does not supply any returns
-        if allocation_metric == 'sharpe_ratio' and expected_asset_returns is None:
-            if asset_prices is None:
-                raise ValueError(
-                    "Either provide pre-calculated expected returns or give raw asset prices for inbuilt returns calculation")
-
-            if self.calculate_expected_returns == "mean":
-                expected_asset_returns = self.returns_estimator.calculate_mean_historical_returns(
-                    asset_prices=asset_prices,
-                    resample_by=resample_by)
-            elif self.calculate_expected_returns == "exponential":
-                expected_asset_returns = self.returns_estimator.calculate_exponential_historical_returns(
-                    asset_prices=asset_prices,
-                    resample_by=resample_by)
-            else:
-                raise ValueError("Unknown returns specified. Supported returns - mean, exponential")
-
-        # Calculate the returns if the user does not supply a returns dataframe
-        if asset_returns is None:
-            asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
-        asset_returns = pd.DataFrame(asset_returns, columns=asset_names)
-
-        # Calculate covariance of returns or use the user specified covariance matrix
-        if covariance_matrix is None:
-            covariance_matrix = asset_returns.cov()
-        cov = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
-
-        # Calculate correlation from covariance matrix
-        corr = self._cov2corr(covariance=cov)
-
-        # Calculate the optimal number of clusters using the Gap statistic
-        if not optimal_num_clusters:
-            optimal_num_clusters = self._get_optimal_number_of_clusters(correlation=corr,
-                                                                        linkage=linkage,
-                                                                        asset_returns=asset_returns)
-
-        # Tree Clustering
-        self.clusters = self._tree_clustering(correlation=corr, num_clusters=optimal_num_clusters, linkage=linkage)
-
-        # Quasi Diagnalization
-        num_assets = len(asset_names)
-        self.ordered_indices = self._quasi_diagnalization(num_assets, 2 * num_assets - 2)
-
-        # Recursive Bisection
-        self._recursive_bisection(expected_asset_returns=expected_asset_returns,
-                                  asset_returns=asset_returns,
-                                  covariance_matrix=cov,
-                                  assets=asset_names,
-                                  allocation_metric=allocation_metric,
-                                  confidence_level=confidence_level)
