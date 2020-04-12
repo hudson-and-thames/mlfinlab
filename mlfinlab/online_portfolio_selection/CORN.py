@@ -43,7 +43,6 @@ class CORN(OLPS):
                 if self.corr_coef[i - 1][_time - 1] > self.rho:
                     similar_set.append(i)
             if similar_set:
-                print(similar_set)
                 similar_sequences = _relative_return[similar_set]
                 new_weights = self.optimize(similar_sequences)
         return new_weights
