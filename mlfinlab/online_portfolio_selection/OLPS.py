@@ -1,4 +1,5 @@
 from mlfinlab.online_portfolio_selection.olps_utils import *
+import cvxpy as cp
 
 
 # General OLPS class
@@ -201,6 +202,32 @@ class OLPS(object):
     # return summary of the portfolio
     def summary(self):
         pass
+
+    # optimize the weight that maximizes the returns
+    def optimize(self, _optimize_array):
+        length_of_time = _optimize_array.shape[0]
+        number_of_assets = _optimize_array.shape[1]
+        # initialize weights
+        weights = cp.Variable(number_of_assets)
+
+        # used cp.log and cp.sum to make the cost function a convex function
+        # multiplying continuous returns equates to summing over the log returns
+        portfolio_return = cp.sum(cp.log(_optimize_array * weights))
+
+        # Optimization objective and constraints
+        allocation_objective = cp.Maximize(portfolio_return)
+        allocation_constraints = [
+                cp.sum(weights) == 1,
+                weights <= 1,
+                weights >= 0
+        ]
+        # Define and solve the problem
+        problem = cp.Problem(
+                objective=allocation_objective,
+                constraints=allocation_constraints
+        )
+        problem.solve()
+        self.weights = weights.value
 
 
 def main():
