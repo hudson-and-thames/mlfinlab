@@ -17,6 +17,10 @@ class CORN(OLPS):
         self.rho = rho
         self.corr_coef = None
 
+
+    # I didn't really need to rewrite this method but I did it anyways
+    # because I thought self.corr_coef might take a long time
+    # will look for a coding style that might not require that
     def run(self, _weights, _relative_return):
         # set initial weights
         self.weights = self.first_weight(_weights)
@@ -24,9 +28,6 @@ class CORN(OLPS):
 
         # rolling correlation coefficient
         self.corr_coef = self.calculate_rolling_correlation_coefficient(_relative_return)
-
-        # Probably can find a faster way to use this and compute algorithm
-        # true_false = corr_coef > self.window
 
         # Run the Algorithm for the rest of data
         for t in range(1, self.final_number_of_time):

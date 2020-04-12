@@ -31,7 +31,7 @@ Child Class:
         - Nonparametric Histogram Log-optimal Strategy
         - Nonparametric Kernel-based Log-optimal Strategy
         - Nonparametric Nearest Neighbor Log-optimal Strategy
-        - Correlation-driven Nonparametric Learning Strategy
+        # Correlation-driven Nonparametric Learning Strategy
         - Nonparametric Kernel-based Semi-log-optimal Strategy
         - Nonparametric Kernel-based Markowitz-type Strategy
         - Nonparametric Kernel-based GV-type Strategy

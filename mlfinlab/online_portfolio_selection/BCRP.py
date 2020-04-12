@@ -21,7 +21,7 @@ def main():
     stock_price = stock_price.dropna(axis=1)
     bcrp = BCRP()
     bcrp.allocate(stock_price)
-    print(bcrp.all_weights.iloc)
+    print(bcrp.all_weights)
     print(bcrp.portfolio_return)
     bcrp.portfolio_return.plot()
 

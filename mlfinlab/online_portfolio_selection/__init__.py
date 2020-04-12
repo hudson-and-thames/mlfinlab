@@ -13,3 +13,4 @@ from .UP import UP
 from .EG import EG
 from .FTL import FTL
 from .CORN import CORN
+from .PAMR import PAMR
