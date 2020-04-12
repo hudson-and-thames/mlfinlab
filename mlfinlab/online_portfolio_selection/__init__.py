@@ -14,3 +14,5 @@ from .EG import EG
 from .FTL import FTL
 from .CORN import CORN
 from .PAMR import PAMR
+from .CWMR import CWMR
+from .OLMAR import OLMAR

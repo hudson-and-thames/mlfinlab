@@ -56,12 +56,12 @@ class OLPS(object):
                                   None for no resampling
         """
         # Data Check
-            # Some sort of initial check to make sure data fits the standards
-            # asset name in right format
-            # asset price in right format
-            # resample_by in right format
-            # weights add up to 1
-            # resample function
+        # Some sort of initial check to make sure data fits the standards
+        # asset name in right format
+        # asset price in right format
+        # resample_by in right format
+        # weights add up to 1
+        # resample function
         # not implemented yet
         self.check_asset(asset_prices, weights, portfolio_start, resample_by)
 
@@ -165,6 +165,13 @@ class OLPS(object):
         rolling_corr_coef = np.corrcoef(np.exp(np.log(pd.DataFrame(_relative_return)).rolling(self.window).sum()))
         return rolling_corr_coef
 
+    # calculate rolling moving average for OLMAR
+    def calculate_rolling_moving_average(self, _asset_prices, _window, _reversion_method, _alpha):
+        if _reversion_method == 1:
+            return np.array(_asset_prices.rolling(_window).apply(lambda x: np.sum(x) / x[0] / _window))
+        elif _reversion_method == 2:
+            return np.array(_asset_prices.ewm(alpha=_alpha, adjust=False).mean() / _asset_prices)
+
     # initialize first weight
     # might change depending on algorithm
     def first_weight(self, _weights):
@@ -214,7 +221,7 @@ class OLPS(object):
     # drop weights below a certain threshold
     def round_weights(self, _all_weights, threshold=1e-6):
         new_all_weights = np.where(_all_weights < threshold, 0, _all_weights)
-        return np.apply_along_axis(lambda x: x/np.sum(x), 1, new_all_weights)
+        return np.apply_along_axis(lambda x: x / np.sum(x), 1, new_all_weights)
 
     # optimize the weight that maximizes the returns
     def optimize(self, _optimize_array):
