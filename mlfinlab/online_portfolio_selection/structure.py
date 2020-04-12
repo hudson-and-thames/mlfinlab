@@ -22,7 +22,7 @@ Child Class:
     Follow-the-Loser: (Mean-Reversion)
         - Anti Correlation
         # Passive Aggressive Mean Reversion
-        - Confidence Weighted Mean Reversion
+        ? Confidence Weighted Mean Reversion
         - Online Moving Average Reversion
         - Robust Median Reversion
 
