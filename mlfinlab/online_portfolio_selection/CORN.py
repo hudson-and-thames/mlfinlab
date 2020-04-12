@@ -8,37 +8,33 @@ class CORN(OLPS):
     This class implements the Correlation Driven Nonparametric Learning strategy.
     """
 
-    def __init__(self, window=20, rho=.6):
+    def __init__(self):
         """
         Constructor.
         """
+        self.window = None
+        self.rho = None
+        self.corr_coef = None
         super().__init__()
+    
+    def allocate(self,
+                 asset_prices,
+                 weights=None,
+                 window=20,
+                 rho=.6,
+                 portfolio_start=0,
+                 resample_by=None):
         self.window = window
         self.rho = rho
-        self.corr_coef = None
+        super(CORN, self).allocate(asset_prices, weights, portfolio_start, resample_by)
 
-
-    # I didn't really need to rewrite this method but I did it anyways
-    # because I thought self.corr_coef might take a long time
-    # will look for a coding style that might not require that
-    def run(self, _weights, _relative_return):
-        # set initial weights
-        self.weights = self.first_weight(_weights)
-        self.all_weights[0] = self.weights
-
-        # rolling correlation coefficient
-        self.corr_coef = self.calculate_rolling_correlation_coefficient(_relative_return)
-
-        # Run the Algorithm for the rest of data
-        for t in range(1, self.final_number_of_time):
-            # update weights
-            self.weights = self.update_weight(self.weights, _relative_return, t)
-            self.all_weights[t] = self.weights
+    def initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
+        super(CORN, self).initialize(_asset_prices, _weights, _portfolio_start, _resample_by)
+        self.corr_coef = self.calculate_rolling_correlation_coefficient(self.final_relative_return)
 
     def update_weight(self, _weights, _relative_return, _time):
         similar_set = []
         new_weights = self.uniform_weight(self.number_of_assets)
-
         if _time - 1 > self.window:
             for i in range(self.window + 1, _time - 1):
                 if self.corr_coef[i - 1][_time - 1] > self.rho:
