@@ -129,15 +129,6 @@ class OLPS(object):
         # set portfolio_return
         self.portfolio_return = np.zeros((self.final_number_of_time, self.number_of_assets))
 
-    # calculate relative returns
-    def calculate_relative_return(self, _asset_prices):
-        # percent change of each row
-        # first row is blank because no change, so make it 0
-        # add 1 to all values so that the values can be multiplied easily
-        # change to numpy array
-        relative_return = np.array(_asset_prices.pct_change().fillna(0) + 1)
-        return relative_return
-
     # for this one, it doesn't matter, but for subsequent complex selection problems, we might have to include a
     # separate run method for each iteration and not clog the allocate method.
     # after calculating the new weight add that to the all weights
@@ -152,6 +143,24 @@ class OLPS(object):
             self.weights = self.update_weight(self.weights, _relative_return, t)
             self.all_weights[t] = self.weights
 
+    # for the first one, just return the same weight
+    # only have to change this for future iteration
+    def update_weight(self, _weights, _relative_return, _time):
+        return _weights
+
+    # calculate relative returns
+    def calculate_relative_return(self, _asset_prices):
+        # percent change of each row
+        # first row is blank because no change, so make it 0
+        # add 1 to all values so that the values can be multiplied easily
+        # change to numpy array
+        relative_return = np.array(_asset_prices.pct_change().fillna(0) + 1)
+        return relative_return
+
+    # calculate rolling correlation coefficient
+    def calculate_rolling_correlation_coefficient(self, _relative_return):
+        return np.corrcoef(np.exp(np.log(pd.DataFrame(_relative_return)).rolling(self.window).sum()))
+
     # initialize first weight
     # might change depending on algorithm
     def first_weight(self, _weights):
@@ -163,11 +172,6 @@ class OLPS(object):
     # return uniform weights numpy array (1/n, 1/n, 1/n ...)
     def uniform_weight(self, n):
         return np.ones(n) / n
-
-    # for the first one, just return the same weight
-    # only have to change this for future iteration
-    def update_weight(self, _weights, _relative_return, _time):
-        return _weights
 
     # calculate portfolio returns
     def calculate_portfolio_returns(self, _all_weights, _relative_return):

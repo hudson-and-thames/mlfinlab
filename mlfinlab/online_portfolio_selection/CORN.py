@@ -16,92 +16,53 @@ class CORN(OLPS):
         self.window = window
         self.rho = rho
 
-    # if there is user input, set it as that, if not we will return a uniform CRP
-    def allocate(self,
-                 asset_names,
-                 asset_prices,
-                 weights=None,
-                 resample_by=None):
-        """
-        :param asset_names: (list) a list of strings containing the asset names
-        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
-        :param weights: any weights
-        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                  None for no resampling
-        """
+    def run(self, _weights, _relative_return):
+        # set initial weights
+        self.weights = self.first_weight(_weights)
+        self.all_weights[0] = self.weights
 
-        # Data Prep
+        # rolling correlation coefficient
+        corr_coef = self.calculate_rolling_correlation_coefficient(_relative_return)
 
-        # same problems from OLPS
-
-        # copy and pasted from OLPS beginning
-
-        # calculate number of assets
-        number_of_assets = len(asset_names)
-
-        # split index and columns
-        idx = asset_prices.index
-        asset_names = asset_prices.columns
-
-        # calculate number of time periods
-        time_period = asset_prices.shape[0]
-
-        # make asset_prices a numpy array (maybe faster for calculation)
-        np_asset_prices = np.array(asset_prices)
-
-        # calculate relative price i.e. week 1's price/week 0's price
-        relative_price = self.relative_price_change(asset_prices)
-
-        # if user does not initiate a particular weight, give equal weights to every assets
-        if weights is None:
-            self.weights = np.ones(number_of_assets) / number_of_assets
-        else:
-            self.weights = weights
-
-        # initialize self.all_weights
-        self.all_weights = self.weights
-        self.portfolio_return = np.array([np.dot(self.weights, relative_price[0])])
-
-        # Calculate rolling market window relatives
-        rolling_relative = np.exp(np.log(pd.DataFrame(relative_price)).rolling(self.window).sum())
-
-        # Calculate correlation coefficient between market windows
-        corr_coef = np.corrcoef(rolling_relative)
-        print(pd.DataFrame(corr_coef))
         # Probably can find a faster way to use this and compute algorithm
         # true_false = corr_coef > self.window
 
-        # Run the Algorithm
-        for t in range(1, time_period):
+        # Run the Algorithm for the rest of data
+        for t in range(1, self.final_number_of_time):
             similar_set = []
-            weights = np.ones(number_of_assets) / number_of_assets
+            new_weights = self.uniform_weight(self.number_of_assets)
+
             if t <= self.window:
-                self.weights = weights
+                self.weights = new_weights
             else:
-                for i in range(self.window + 1, t + 1):
-                    if corr_coef[i - 1][t] > self.rho:
+                for i in range(self.window + 1, t):
+                    if corr_coef[i - 1][t - 1] > self.rho:
                         similar_set.append(i)
                 if similar_set:
-                    similar_sequences = relative_price[similar_set]
-                    self.optimize(similar_sequences)
+                    similar_sequences = _relative_return[similar_set]
+                    self.weights = self.optimize(similar_sequences)
                 else:
-                    self.weights = weights
-            self.all_weights = np.vstack((self.all_weights, self.weights))
-            print(t)
+                    self.weights = new_weights
 
-        self.calculate_portfolio_returns(self.all_weights, relative_price)
+            # update weights
+            self.weights = self.update_weight(self.weights, _relative_return, t)
+            self.all_weights[t] = self.weights
 
-        self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return, _index=idx,
-                        _asset_names=asset_names)
+    def update_weight(self, _weights, _relative_return, _time):
+        return _weights
 
-    # update weights
-    # just copy and pasting the weights
-
+    # optimize the weight that maximizes the returns
     def optimize(self, _optimize_array):
         length_of_time = _optimize_array.shape[0]
         number_of_assets = _optimize_array.shape[1]
+        if length_of_time == 1:
+            best_idx = np.argmax(_optimize_array)
+            weight = np.zeros(number_of_assets)
+            weight[best_idx] = 1
+            return weight
+
         # initialize weights
-        weights = cp.Variable(number_of_assets)
+        weights = cp.Variable(self.number_of_assets)
 
         # used cp.log and cp.sum to make the cost function a convex function
         # multiplying continuous returns equates to summing over the log returns
@@ -120,23 +81,16 @@ class CORN(OLPS):
                 constraints=allocation_constraints
         )
         problem.solve(solver=cp.SCS)
-        self.weights = weights.value
-
-    def run(self, _weights, _relative_price):
-        self.weights = _weights
-        self.all_weights = np.vstack((self.all_weights, self.weights))
+        return weights.value
 
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    stock_price = stock_price.resample('w').last()
-    names = list(stock_price.columns)
-    corn = CORN(window=30)
-    corn.allocate(asset_names=names, asset_prices=stock_price)
+    corn = CORN()
+    corn.allocate(stock_price, resample_by='w')
     print(corn.all_weights)
     print(corn.portfolio_return)
-    print(type(corn.portfolio_return))
     corn.portfolio_return.plot()
 
 

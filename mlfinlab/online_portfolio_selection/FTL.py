@@ -14,10 +14,8 @@ class FTL(BCRP):
         """
         super().__init__()
 
-
     def update_weight(self, _weights, _relative_return, _time):
         return self.optimize(_relative_return[:_time])
-    
 
 
 def main():
