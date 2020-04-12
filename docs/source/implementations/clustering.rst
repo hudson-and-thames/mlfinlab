@@ -57,7 +57,6 @@ The distance matrix formula is as follow:
 :math:`D_{i,j}= \sqrt{\frac{1}{2}(1-\rho_{ij})}`
 
 
-
 The ONC Mechanism
 =================
 
