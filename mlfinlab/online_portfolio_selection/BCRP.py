@@ -13,6 +13,8 @@ class BCRP(OLPS):
         """
         super().__init__()
 
+    def first_weight(self, _weights):
+        return self.optimize(self.final_relative_return)
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')

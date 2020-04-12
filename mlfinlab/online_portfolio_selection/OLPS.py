@@ -207,8 +207,14 @@ class OLPS(object):
     def optimize(self, _optimize_array):
         length_of_time = _optimize_array.shape[0]
         number_of_assets = _optimize_array.shape[1]
+        if length_of_time == 1:
+            best_idx = np.argmax(_optimize_array)
+            weight = np.zeros(number_of_assets)
+            weight[best_idx] = 1
+            return weight
+
         # initialize weights
-        weights = cp.Variable(number_of_assets)
+        weights = cp.Variable(self.number_of_assets)
 
         # used cp.log and cp.sum to make the cost function a convex function
         # multiplying continuous returns equates to summing over the log returns
@@ -227,7 +233,7 @@ class OLPS(object):
                 constraints=allocation_constraints
         )
         problem.solve()
-        self.weights = weights.value
+        return weights.value
 
 
 def main():
