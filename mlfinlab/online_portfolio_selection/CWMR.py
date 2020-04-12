@@ -3,9 +3,9 @@ import cvxpy as cp
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
 
-class PAMR(OLPS):
+class CWMR(OLPS):
     """
-    This class implements the Passive Aggresive Mean Reversion strategy.
+    This class implements the Constant Weighted Mean Reversion strategy.
     """
 
     def __init__(self):
@@ -83,11 +83,11 @@ class PAMR(OLPS):
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    pamr = PAMR()
-    pamr.allocate(stock_price, resample_by='M')
-    print(pamr.all_weights)
-    print(pamr.portfolio_return)
-    pamr.portfolio_return.plot()
+    cwmr = CWMR()
+    cwmr.allocate(stock_price, resample_by='M')
+    print(cwmr.all_weights)
+    print(cwmr.portfolio_return)
+    cwmr.portfolio_return.plot()
 
 
 if __name__ == "__main__":
