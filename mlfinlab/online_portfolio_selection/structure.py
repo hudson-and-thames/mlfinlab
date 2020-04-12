@@ -23,7 +23,7 @@ Child Class:
         - Anti Correlation
         # Passive Aggressive Mean Reversion
         ? Confidence Weighted Mean Reversion
-        - Online Moving Average Reversion
+        # Online Moving Average Reversion
         - Robust Median Reversion
 
     Pattern-Matching:
