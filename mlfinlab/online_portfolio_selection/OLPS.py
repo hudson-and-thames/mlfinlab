@@ -256,6 +256,35 @@ class OLPS(object):
         problem.solve()
         return weights.value
 
+        # optimize the weight that minimizes the l2 norm
+    def simplex_projection(self, _optimize_weight):
+        """
+
+        :param _optimize_weight:
+        :return:
+        """
+        # initialize weights
+        weights = cp.Variable(self.number_of_assets)
+
+        # used cp.log and cp.sum to make the cost function a convex function
+        # multiplying continuous returns equates to summing over the log returns
+        l2_norm = cp.norm(weights - _optimize_weight)
+
+        # Optimization objective and constraints
+        allocation_objective = cp.Minimize(l2_norm)
+        allocation_constraints = [
+                cp.sum(weights) == 1,
+                weights <= 1,
+                weights >= 0
+        ]
+        # Define and solve the problem
+        problem = cp.Problem(
+                objective=allocation_objective,
+                constraints=allocation_constraints
+        )
+        problem.solve(solver=cp.SCS)
+        return weights.value
+
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')

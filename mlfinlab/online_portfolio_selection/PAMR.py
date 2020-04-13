@@ -1,5 +1,6 @@
-from mlfinlab.online_portfolio_selection.olps_utils import *
-import cvxpy as cp
+# pylint: disable=missing-module-docstring
+import pandas as pd
+import numpy as np
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
 
@@ -20,6 +21,13 @@ class PAMR(OLPS):
 
 
     def update_weight(self, _weights, _relative_return, _time):
+        """
+
+        :param _weights:
+        :param _relative_return:
+        :param _time:
+        :return:
+        """
         # calculation prep
         _past_relative_return = _relative_return[_time - 1]
         loss = max(0, np.dot(_weights, _past_relative_return))
@@ -37,37 +45,14 @@ class PAMR(OLPS):
 
         new_weights = _weights - tau * adjusted_market_change
         # if not in simplex domain
-        if ((new_weights > 1) | (new_weights < 0)).any():
-            return self.optimize(new_weights)
-        else:
-            return new_weights
-
-    # optimize the weight that minimizes the l2 norm
-    def optimize(self, _optimize_weight):
-        # initialize weights
-        weights = cp.Variable(self.number_of_assets)
-
-        # used cp.log and cp.sum to make the cost function a convex function
-        # multiplying continuous returns equates to summing over the log returns
-        l2_norm = cp.norm(weights - _optimize_weight)
-
-        # Optimization objective and constraints
-        allocation_objective = cp.Minimize(l2_norm)
-        allocation_constraints = [
-                cp.sum(weights) == 1,
-                weights <= 1,
-                weights >= 0
-        ]
-        # Define and solve the problem
-        problem = cp.Problem(
-                objective=allocation_objective,
-                constraints=allocation_constraints
-        )
-        problem.solve(solver=cp.SCS)
-        return weights.value
+        return self.simplex_projection(new_weights)
 
 
 def main():
+    """
+
+    :return:
+    """
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
     pamr = PAMR()

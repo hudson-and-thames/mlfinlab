@@ -1,7 +1,6 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import pandas as pd
-import cvxpy as cp
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
 
@@ -82,35 +81,6 @@ class OLMAR(OLPS):
         # if not in simplex domain
 
         return self.simplex_projection(new_weights)
-
-    # optimize the weight that minimizes the l2 norm
-    def simplex_projection(self, _optimize_weight):
-        """
-
-        :param _optimize_weight:
-        :return:
-        """
-        # initialize weights
-        weights = cp.Variable(self.number_of_assets)
-
-        # used cp.log and cp.sum to make the cost function a convex function
-        # multiplying continuous returns equates to summing over the log returns
-        l2_norm = cp.norm(weights - _optimize_weight)
-
-        # Optimization objective and constraints
-        allocation_objective = cp.Minimize(l2_norm)
-        allocation_constraints = [
-            cp.sum(weights) == 1,
-            weights <= 1,
-            weights >= 0
-        ]
-        # Define and solve the problem
-        problem = cp.Problem(
-            objective=allocation_objective,
-            constraints=allocation_constraints
-        )
-        problem.solve(solver=cp.SCS)
-        return weights.value
 
 
 def main():
