@@ -32,6 +32,8 @@ class OLPS(object):
         self.final_relative_return = None
         # portfolio return
         self.portfolio_return = None
+        # pass dataframe on
+        self.asset_prices = None
 
         # self.asset_prices = None
         # self.covariance_matrix = None
@@ -132,7 +134,10 @@ class OLPS(object):
         self.all_weights = np.zeros((self.final_number_of_time, self.number_of_assets))
 
         # set portfolio_return
-        self.portfolio_return = np.zeros((self.final_number_of_time, self.number_of_assets))
+        self.portfolio_return = np.zeros((self.final_number_of_time, 1))
+
+        # pass dataframe on
+        self.asset_prices = _asset_prices
 
     # for this one, it doesn't matter, but for subsequent complex selection problems, we might have to include a
     # separate run method for each iteration and not clog the allocate method.

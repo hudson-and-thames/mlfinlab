@@ -65,8 +65,8 @@ def main():
     """
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    corn = CORN()
-    corn.allocate(stock_price, resample_by='m')
+    corn = CORN(window=2, rho=0.5)
+    corn.allocate(stock_price, resample_by='y')
     print(corn.all_weights)
     print(corn.portfolio_return)
     corn.portfolio_return.plot()
