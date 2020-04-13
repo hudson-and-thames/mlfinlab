@@ -24,21 +24,3 @@ class BAH(OLPS):
         """
         new_weight = _weights * _relative_return[_time - 1]
         return self.normalize(new_weight)
-
-
-def main():
-    """
-    test run
-    test doesn't work for some reason
-    """
-    stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
-    stock_price = stock_price.dropna(axis=1)
-    bah = BAH()
-    bah.allocate(stock_price)
-    print(bah.all_weights)
-    print(bah.portfolio_return)
-    bah.portfolio_return.plot()
-
-
-if __name__ == "__main__":
-    main()
