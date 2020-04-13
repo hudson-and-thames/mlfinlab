@@ -285,6 +285,18 @@ class OLPS(object):
         problem.solve(solver=cp.SCS)
         return weights.value
 
+    # https://cs.stackexchange.com/questions/3227/uniform-sampling-from-a-simplex
+    def generate_simplex(self, _number_of_portfolio, _number_of_assets):
+        """
+
+        :param _number_of_portfolio:
+        :param _number_of_assets:
+        :return:
+        """
+        simplex = np.sort(np.random.random((_number_of_portfolio, _number_of_assets - 1)))
+        simplex = np.diff(np.hstack([np.zeros((_number_of_portfolio, 1)), simplex, np.ones((_number_of_portfolio, 1))]))
+        return simplex.T
+
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')

@@ -1,4 +1,6 @@
-from mlfinlab.online_portfolio_selection.olps_utils import *
+# pylint: disable=missing-module-docstring
+import pandas as pd
+import numpy as np
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
 
@@ -15,6 +17,12 @@ class UP(OLPS):
         self.number_of_iterations = _number_of_iterations
 
     def run(self, _weights, _relative_return):
+        """
+
+        :param _weights:
+        :param _relative_return:
+        :return:
+        """
         random_portfolio = self.generate_simplex(self.number_of_iterations, self.number_of_assets)
 
         # calculate the returns for all weights
@@ -31,31 +39,42 @@ class UP(OLPS):
         self.all_weights[0] = self.weights
 
         # Run the Algorithm for the rest of data
-        for t in range(1, self.final_number_of_time):
+        for time in range(1, self.final_number_of_time):
             # update weights
-            self.weights = self.update_weight(random_portfolio, cumulative_returns, t)
-            self.all_weights[t] = self.weights
+            self.weights = self.update_weight(random_portfolio, cumulative_returns, time)
+            self.all_weights[time] = self.weights
 
     def first_weight(self, _weights):
+        """
+
+        :param _weights:
+        :return:
+        """
         return np.mean(_weights, axis=1)
 
     def update_weight(self, _random_portfolio, _cumulative_returns, _time):
+        """
+
+        :param _random_portfolio:
+        :param _cumulative_returns:
+        :param _time:
+        :return:
+        """
         return np.dot(_cumulative_returns[_time], _random_portfolio.T)
 
-    # https://cs.stackexchange.com/questions/3227/uniform-sampling-from-a-simplex
-    def generate_simplex(self, _number_of_portfolio, _number_of_assets):
-        simplex = np.sort(np.random.random((_number_of_portfolio, _number_of_assets - 1)))
-        simplex = np.diff(np.hstack([np.zeros((_number_of_portfolio,1)), simplex, np.ones((_number_of_portfolio,1))]))
-        return simplex.T
 
 def main():
+    """
+
+    :return:
+    """
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    up = UP(10000)
-    up.allocate(stock_price)
-    print(up.all_weights)
-    print(up.portfolio_return)
-    up.portfolio_return.plot()
+    universal_portfolio = UP(10000)
+    universal_portfolio.allocate(stock_price)
+    print(universal_portfolio.all_weights)
+    print(universal_portfolio.portfolio_return)
+    universal_portfolio.portfolio_return.plot()
 
 
 if __name__ == "__main__":
