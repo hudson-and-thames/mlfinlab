@@ -16,7 +16,7 @@ Child Class:
         # Universal Portfolio
         # Exponential Gradient
         # Follow the Leader
-        - Follow the Reguliarized Leader --- skip over for now (just need to add a regularization factor)
+        # Follow the Reguliarized Leader --- skip over for now (just need to add a regularization factor)
         - Aggregating-type Algorithms --- skip over for now
 
     Follow-the-Loser: (Mean-Reversion)
