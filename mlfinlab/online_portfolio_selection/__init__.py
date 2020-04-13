@@ -5,11 +5,10 @@ STILL THINKING OF WAYS TO USE THIS
 """
 from . import olps_utils
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
-from mlfinlab.online_portfolio_selection.BAH import BAH
-# from .BAH import BAH
-from mlfinlab.online_portfolio_selection.BESTSTOCK import BESTSTOCK
-from mlfinlab.online_portfolio_selection.CRP import CRP
-from mlfinlab.online_portfolio_selection.BCRP import BCRP
+from mlfinlab.online_portfolio_selection.benchmarks.BAH import BAH
+from mlfinlab.online_portfolio_selection.benchmarks.BESTSTOCK import BESTSTOCK
+from mlfinlab.online_portfolio_selection.benchmarks.CRP import CRP
+from mlfinlab.online_portfolio_selection.benchmarks.BCRP import BCRP
 from mlfinlab.online_portfolio_selection.UP import UP
 from mlfinlab.online_portfolio_selection.EG import EG
 from mlfinlab.online_portfolio_selection.FTL import FTL
