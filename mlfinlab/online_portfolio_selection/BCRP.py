@@ -1,5 +1,6 @@
+# pylint: disable=missing-module-docstring
 from mlfinlab.online_portfolio_selection import OLPS
-from mlfinlab.online_portfolio_selection.olps_utils import *
+import pandas as pd
 
 
 class BCRP(OLPS):
@@ -7,16 +8,18 @@ class BCRP(OLPS):
     This class implements the Constant Rebalanced Portfolio strategy.
     """
 
-    def __init__(self):
-        """
-        Constructor.
-        """
-        super().__init__()
-
     def first_weight(self, _weights):
+        """
+        :param _weights: optimized first weight
+        :return:
+        """
         return self.optimize(self.final_relative_return)
 
 def main():
+    """
+    test run
+    :return:
+    """
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
     bcrp = BCRP()
