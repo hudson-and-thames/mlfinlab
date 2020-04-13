@@ -5,7 +5,7 @@
 Clustering
 ================================
 
-Clustering is a task of grouping a set of data points into several groups such that data points in the same group are more similar to each other than to those in other groups. K-means algorithm is a popular method for this purpose. However, the K-means algorithm requires the user to set the number of clusters in advance. Besides that, the initialization of the clusters is random. As the consequence, often that the solution is not optimal in some sense, and the effectiveness of the algorithm can be random. 
+Clustering is a task of grouping a set of data points into several groups such that data points in the same group are more similar to each other than to those in other groups. K-means algorithm is a popular method for this purpose. However, the K-means algorithm requires the user to set the number of clusters in advance. Besides that, the initialization of the clusters is random. As a consequence, often that the solution is not optimal in some sense, and the effectiveness of the algorithm can be random. 
 
 ================================
 Optimal Number of Clusters (ONC)
