@@ -1,5 +1,6 @@
 # pylint: disable=missing-module-docstring
 import pandas as pd
+import numpy as np
 import cvxpy as cp
 
 
@@ -225,7 +226,7 @@ class OLPS(object):
         return np.apply_along_axis(lambda x: x / np.sum(x), 1, new_all_weights)
 
     # optimize the weight that maximizes the returns
-    def optimize(self, _optimize_array):
+    def optimize(self, _optimize_array, _solver=None):
         length_of_time = _optimize_array.shape[0]
         number_of_assets = _optimize_array.shape[1]
         if length_of_time == 1:
@@ -244,16 +245,19 @@ class OLPS(object):
         # Optimization objective and constraints
         allocation_objective = cp.Maximize(portfolio_return)
         allocation_constraints = [
-                cp.sum(weights) == 1,
-                weights <= 1,
-                weights >= 0
+            cp.sum(weights) == 1,
+            weights <= 1,
+            weights >= 0
         ]
         # Define and solve the problem
         problem = cp.Problem(
-                objective=allocation_objective,
-                constraints=allocation_constraints
+            objective=allocation_objective,
+            constraints=allocation_constraints
         )
-        problem.solve()
+        if _solver:
+            problem.solve(solver=_solver)
+        else:
+            problem.solve()
         return weights.value
 
         # optimize the weight that minimizes the l2 norm

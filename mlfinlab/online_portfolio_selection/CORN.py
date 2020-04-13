@@ -9,7 +9,8 @@ class CORN(OLPS):
     """
     This class implements the Correlation Driven Nonparametric Learning strategy.
     """
-
+    # check -1 <= rho <= 1
+    # check window >= 1
     def __init__(self, window=20, rho=0.6):
         """
         Constructor.
@@ -22,7 +23,6 @@ class CORN(OLPS):
     # calculate corr_coef ahead of updating to speed up calculations
     def initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
         """
-
         :param _asset_prices:
         :param _weights:
         :param _portfolio_start:
@@ -34,7 +34,6 @@ class CORN(OLPS):
 
     def update_weight(self, _weights, _relative_return, _time):
         """
-
         :param _weights:
         :param _relative_return:
         :param _time:
@@ -48,45 +47,15 @@ class CORN(OLPS):
                     similar_set.append(i)
             if similar_set:
                 similar_sequences = _relative_return[similar_set]
-                new_weights = self.optimize(similar_sequences)
+                new_weights = self.optimize(similar_sequences, cp.SCS)
         return new_weights
 
-    # optimize the weight that maximizes the returns
-    def optimize(self, _optimize_array):
+    def generate_random_window_rho(self, _length_of_window, _number_of_rho):
         """
-
-        :param _optimize_array:
+        :param _length_of_window:
+        :param _number_of_rho:
         :return:
         """
-        length_of_time = _optimize_array.shape[0]
-        number_of_assets = _optimize_array.shape[1]
-        if length_of_time == 1:
-            best_idx = np.argmax(_optimize_array)
-            weight = np.zeros(number_of_assets)
-            weight[best_idx] = 1
-            return weight
-
-        # initialize weights
-        weights = cp.Variable(self.number_of_assets)
-
-        # used cp.log and cp.sum to make the cost function a convex function
-        # multiplying continuous returns equates to summing over the log returns
-        portfolio_return = cp.sum(cp.log(_optimize_array * weights))
-
-        # Optimization objective and constraints
-        allocation_objective = cp.Maximize(portfolio_return)
-        allocation_constraints = [
-            cp.sum(weights) == 1,
-            weights <= 1,
-            weights >= 0
-        ]
-        # Define and solve the problem
-        problem = cp.Problem(
-            objective=allocation_objective,
-            constraints=allocation_constraints
-        )
-        problem.solve(solver=cp.SCS)
-        return weights.value
 
 
 def main():
@@ -97,7 +66,7 @@ def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
     corn = CORN()
-    corn.allocate(stock_price, resample_by='w')
+    corn.allocate(stock_price, resample_by='m')
     print(corn.all_weights)
     print(corn.portfolio_return)
     corn.portfolio_return.plot()
