@@ -53,10 +53,10 @@ class TestNCO(unittest.TestCase):
         etf_classification_tree_alt['All'] = 0
 
         # Using the function
-        dendrogram = tic.get_linkage_corr(etf_classification_tree, etf_corr)
+        dendrogram = tic._get_linkage_corr(etf_classification_tree, etf_corr)
 
         # Using the function on a tree with extra level
-        dendrogram_alt = tic.get_linkage_corr(etf_classification_tree_alt, etf_corr)
+        dendrogram_alt = tic._get_linkage_corr(etf_classification_tree_alt, etf_corr)
 
         # Testing that the obtained dendrogram is right
         # Transforming to DataFrames to get same types
@@ -89,7 +89,7 @@ class TestNCO(unittest.TestCase):
                                   [0, 6, 0.40104189, 4]])
 
         # Calculating new link array
-        link_new = tic.link_clusters(lnk0, lnk1, items0, items1)
+        link_new = tic._link_clusters(lnk0, lnk1, items0, items1)
 
         # Testing that the obtained new link is right
         np.testing.assert_almost_equal(link_new, link_expected, decimal=2)
@@ -118,10 +118,10 @@ class TestNCO(unittest.TestCase):
         dist_expected = pd.DataFrame([0], columns=[8], index=[8])
 
         # Calculating distance matrix
-        dist_new = tic.update_dist(dist0, lnk0, lnk_, items0, criterion=None)
+        dist_new = tic._update_dist(dist0, lnk0, lnk_, items0, criterion=None)
 
         # Calculating distance matrix with alternative criterion
-        dist_new_alt = tic.update_dist(dist0, lnk0, lnk_, items0, criterion=alt_criterion)
+        dist_new_alt = tic._update_dist(dist0, lnk0, lnk_, items0, criterion=alt_criterion)
 
         # Testing that the obtained distance matrix is right
         np.testing.assert_almost_equal(np.array(dist_new), np.array(dist_expected), decimal=2)
@@ -147,7 +147,7 @@ class TestNCO(unittest.TestCase):
         atoms_expected = [1, 4]
 
         # Getting the atoms list
-        atoms = tic.get_atoms(lnk, item)
+        atoms = tic._get_atoms(lnk, item)
 
         # Testing that the obtained atoms are right
         np.testing.assert_almost_equal(atoms, atoms_expected, decimal=2)
@@ -177,7 +177,7 @@ class TestNCO(unittest.TestCase):
                                      index=lbls, columns=lbls)
 
         # Getting the correlation matrix
-        corr = tic.link2corr(lnk, lbls)
+        corr = tic._link2corr(lnk, lbls)
 
         # Testing that the correlation matrix is right
         np.testing.assert_almost_equal(np.array(corr), np.array(corr_expected), decimal=2)
