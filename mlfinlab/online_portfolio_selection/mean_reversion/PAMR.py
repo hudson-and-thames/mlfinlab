@@ -46,21 +46,3 @@ class PAMR(OLPS):
         new_weights = _weights - tau * adjusted_market_change
         # if not in simplex domain
         return self.simplex_projection(new_weights)
-
-
-def main():
-    """
-
-    :return:
-    """
-    stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
-    stock_price = stock_price.dropna(axis=1)
-    pamr = PAMR()
-    pamr.allocate(stock_price, resample_by='M')
-    print(pamr.all_weights)
-    print(pamr.portfolio_return)
-    pamr.portfolio_return.plot()
-
-
-if __name__ == "__main__":
-    main()
