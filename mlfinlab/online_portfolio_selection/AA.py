@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
-# class to aggregate algorithms
+# parent class to aggregate algorithms
 # for example 1000 strategies involving CORN or 1000 different weights for BCRP
 class AA(object):
     # what strategy to implement
@@ -12,7 +12,9 @@ class AA(object):
         self.strategy = None
         self.number_of_experts = None
 
-
+    # check if the parameters are correct
+    # initialize n number of experts and store them in a list
+    # only interested in the portfolio returns and weights
     def allocate(self, strategy, number_of_experts):
         pass
 
