@@ -30,7 +30,7 @@ Implementation
 Formulas
 ========
 
-The ONC algorithm accommodates two distinct features, and that sets the algorithm apart from the K-means clustering. 
+The ONC algorithm accommodates two distinct features, and that set the algorithm apart from the K-means clustering. 
 
 These features are Silhouette Scores and The measure of clustering quality or *q*.
 
