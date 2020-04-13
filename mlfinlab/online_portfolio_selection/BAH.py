@@ -1,5 +1,7 @@
-from mlfinlab.online_portfolio_selection.olps_utils import *
+# pylint: disable=missing-module-docstring
+
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
+import pandas as pd
 
 
 class BAH(OLPS):
@@ -12,20 +14,20 @@ class BAH(OLPS):
     the portfolio till the end. The manager only buys the assets at the beginning of the first period and does
     not rebalance in subsequent periods.
     """
-
-    def __init__(self):
-        """
-        Constructor.
-        """
-        super().__init__()
-
     # adjust for previous returns
     # even if we don't rebalance, weights change because of the underlying price changes
     def update_weight(self, _weights, _relative_return, _time):
+        """
+        :param _weights
+        """
         new_weight = _weights * _relative_return[_time - 1]
         return self.normalize(new_weight)
 
+
 def main():
+    """
+    test run
+    """
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
     bah = BAH()
