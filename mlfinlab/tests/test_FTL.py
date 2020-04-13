@@ -26,7 +26,7 @@ class TestFTL(TestCase):
 
     def test_ftl_solution(self):
         """
-        Test the calculation of buy and hold weights.
+        Test the calculation of follow the leader weights
         """
 
         ftl = FTL()
