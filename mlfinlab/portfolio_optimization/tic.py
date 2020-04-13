@@ -338,11 +338,11 @@ class TIC:
 
         return corr_matrix
 
-    def tic_correlation(self, tree_struct, corr_matrix, tn_relation, kde_bwidth):
+    def tic_correlation(self, tree_struct, corr_matrix, tn_relation, kde_bwidth=0.01):
         """
         Calculates the Theory-Implied Correlation (TIC) matrix.
 
-        Includes two steps.
+        Includes three steps.
 
         On the first step, the theoretical tree graph structure of the assets is fit on the evidence
         presented by the empirical correlation matrix.
@@ -356,6 +356,12 @@ class TIC:
         Each cluster in the global linkage object is decomposed to two elements,
         which can be either atoms or other clusters. Then the off -diagonal correlation between two
         elements are calculated based on the distances between them.
+
+        On the third step, the correlation matrix is de-noised.
+
+        This is done by fitting the Marcenko-Pastur distribution to the eigenvalues of the matrix, calculating the
+        maximum theoretical eigenvalue as a threshold and eliminating the eigenvalues higher than a set threshold.
+        This algorithm is implemented in the RiskEstimators class.
 
         :param tree_struct: (pd.dataframe) The tree graph that represents the structure of the assets
         :param corr_matrix: (pd.dataframe) The empirical correlation matrix of the assets
