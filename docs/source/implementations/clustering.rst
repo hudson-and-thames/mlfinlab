@@ -162,7 +162,7 @@ The purpose of the Base Clustering is to find the optimal clustering. The detail
         corr1=corr1.iloc[:,newIdx] # reorder columns 
 
 
-8.) Make a dict that consists of clusters, their labels, and variables based on the k-mean clustering 
+8.) Make a dict that consists of clusters, their labels (keys), and variables (values) based on the k-mean clustering 
 
 ::
 
