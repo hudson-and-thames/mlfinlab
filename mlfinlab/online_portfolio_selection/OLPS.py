@@ -283,7 +283,6 @@ class OLPS(object):
         allocation_objective = cp.Minimize(l2_norm)
         allocation_constraints = [
                 cp.sum(weights) == 1,
-                weights <= 1,
                 weights >= 0
         ]
         # Define and solve the problem
@@ -291,7 +290,7 @@ class OLPS(object):
                 objective=allocation_objective,
                 constraints=allocation_constraints
         )
-        problem.solve(solver=cp.SCS)
+        problem.solve()
         return weights.value
 
     # https://cs.stackexchange.com/questions/3227/uniform-sampling-from-a-simplex

@@ -79,30 +79,4 @@ class OLMAR(OLPS):
         if np.isnan(new_weights).any():
             raise ValueError()
         # if not in simplex domain
-
         return self.simplex_projection(new_weights)
-
-
-def main():
-    """
-
-    :return:
-    """
-    stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
-    stock_price = stock_price.dropna(axis=1)
-
-    olmar1 = OLMAR(epsilon=2, window=7, reversion_method=1)
-    olmar1.allocate(stock_price, resample_by='M')
-    print(olmar1.all_weights)
-    print(olmar1.portfolio_return)
-    olmar1.portfolio_return.plot()
-
-    olmar2 = OLMAR(epsilon=2, alpha=.9, reversion_method=2)
-    olmar2.allocate(stock_price, resample_by='M')
-    print(olmar2.all_weights)
-    print(olmar2.portfolio_return)
-    olmar2.portfolio_return.plot()
-
-
-if __name__ == "__main__":
-    main()
