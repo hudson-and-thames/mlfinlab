@@ -1,4 +1,5 @@
-from mlfinlab.online_portfolio_selection.olps_utils import *
+# pylint: disable=missing-module-docstring
+import pandas as pd
 import cvxpy as cp
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 

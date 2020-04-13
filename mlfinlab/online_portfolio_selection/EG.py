@@ -1,10 +1,12 @@
-from mlfinlab.online_portfolio_selection.olps_utils import *
+# pylint: disable=missing-module-docstring
+import pandas as pd
+import numpy as np
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
 
 class EG(OLPS):
     """
-
+    Exponential Gradient
     """
 
     def __init__(self, eta=0.05, update_rule='EG'):
@@ -16,6 +18,13 @@ class EG(OLPS):
         self.update_rule = update_rule
 
     def update_weight(self, _weights, _relative_return, _time):
+        """
+
+        :param _weights:
+        :param _relative_return:
+        :param _time:
+        :return:
+        """
         past_relative_return = _relative_return[_time - 1]
         dot_product = np.dot(_weights, past_relative_return)
 
@@ -30,28 +39,32 @@ class EG(OLPS):
 
 
 def main():
+    """
+
+    :return:
+    """
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
     print("This is for EG")
-    eg = EG()
-    eg.allocate(stock_price)
-    print(eg.all_weights)
-    print(eg.portfolio_return)
-    eg.portfolio_return.plot()
+    exponential_gradient = EG()
+    exponential_gradient.allocate(stock_price)
+    print(exponential_gradient.all_weights)
+    print(exponential_gradient.portfolio_return)
+    exponential_gradient.portfolio_return.plot()
 
     print("This is for GP")
-    gp = EG(update_rule='GP')
-    gp.allocate(stock_price)
-    print(gp.all_weights)
-    print(gp.portfolio_return)
-    gp.portfolio_return.plot()
+    gradient_projection = EG(update_rule='GP')
+    gradient_projection.allocate(stock_price)
+    print(gradient_projection.all_weights)
+    print(gradient_projection.portfolio_return)
+    gradient_projection.portfolio_return.plot()
 
     print("This is for EG")
-    em = EG(update_rule='EM')
-    em.allocate(stock_price)
-    print(em.all_weights)
-    print(em.portfolio_return)
-    em.portfolio_return.plot()
+    expectation_maximization = EG(update_rule='EM')
+    expectation_maximization.allocate(stock_price)
+    print(expectation_maximization.all_weights)
+    print(expectation_maximization.portfolio_return)
+    expectation_maximization.portfolio_return.plot()
 
 
 if __name__ == "__main__":
