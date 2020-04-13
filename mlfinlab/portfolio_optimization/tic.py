@@ -128,7 +128,7 @@ class TIC:
     @staticmethod
     def link_clusters(lnk0, lnk1, items0, items1):
         """
-        Transforming linkage object from local link1 (based on dist1) into global link0 (based on dist0)
+        Transforms linkage object from local link1 (based on dist1) into global link0 (based on dist0)
 
         Consists of changes of names for the elements in clusters and change of the number of
         basic elements (atoms) contained inside a cluster. This is done to take into account the
@@ -148,36 +148,41 @@ class TIC:
         # Making a copy of a local linkage object
         lnk_ = lnk1.copy()
 
-        # Iterating through elements in the partial link
+        # Iterating through links in the local linkage object
         for i in range(lnk_.shape[0]):
-            # Setting the number of the atom elements in the cluster
+            # Counting the number of atoms in the cluster (represented by this link)
             el_i3 = 0
 
-            # Iterating through the second index of elements
+            # Iterating through the two elements contained in a cluster (represented by this link)
             for j in range(2):
-                if lnk_[i, j] < len(items1):  # If the element is smaller than the num of items in the category
-                    # Then replacing it with name from all elements
+                # Changing the names in links to global ones
+
+                if lnk_[i, j] < len(items1):  # If it's the element from the grouped ones
+                    # Then replacing its local name with the actual name from the list of all elements' names
                     lnk_[i, j] = items0.index(items1[int(lnk_[i, j])])
-                else:
-                    # Otherwise it's global element number minus the local element number
+
+                else:  # Otherwise it's a new cluster
+                    # Then giving it a new name, taking into account the previously named clusters
+                    # The names of the clusters are sequential numbers
                     lnk_[i, j] += -len(items1) + len(items0)
 
-                # Update number of items
+                # Updating the number of atoms in a cluster (represented by this link)
 
-                # If the added element is an atom
-                if lnk_[i, j] < num_atoms:
-                    # Then add one to the counter
+                if lnk_[i, j] < num_atoms:  # If the added element is an atom
+                    # Then add one to the counter of atoms inside
                     el_i3 += 1
+
                 else:  # If the element added is a cluster
-                    # If the added element is in the list of added clusters previously
+                    # If the added element is a previously created cluster
                     if lnk_[i, j] - num_atoms < lnk0.shape[0]:
-                        # Adding to counter the number of atoms from the global link matrix
+                        # Adding to counter the number of atoms from the global linkage object
                         el_i3 += lnk0[int(lnk_[i, j]) - num_atoms, 3]
-                    else:  # If the added element is the newly added cluster
-                        # Adding to the counter the number of atims from the local link matrix
+
+                    else:  # If the added element is a newly created cluster
+                        # Adding to the counter the number of atoms from the local linkage object
                         el_i3 += lnk_[int(lnk_[i, j]) - len(items0), 3]
 
-            # Setting the number of atoms in the cluster to the according value.
+            # Setting the number of atoms in the cluster to the calculated counter
             lnk_[i, 3] = el_i3
 
         return lnk_
@@ -185,15 +190,17 @@ class TIC:
     @staticmethod
     def update_dist(dist0, lnk0, lnk_, items0, criterion=None):
         """
-        Updates the general distance matrix to take the new cluster into account
+        Updates the general distance matrix to take the new clusters into account
 
-        Expands dist0 to incorporate newly created clusters
+        Replaces the elements added to the new clusters with these clusters as elements.
+        Requires the recalculation of the distance matrix to determine the distance from
+        new clusters to other elements.
 
-        :param dist0: Distance matrix with all elements
-        :param lnk0: Matrix of links
-        :param lnk_: New link array
-        :param items0: List of all element names
-        :param criterion: function of linkage criterion
+        :param dist0: Previous distance matrix
+        :param lnk0: Global linkage object that includes new clusters
+        :param lnk_: Local linkage object updated to global names of elements and number of contained atoms
+        :param items0: Global list with names of all elements
+        :param criterion: Function to apply to a dataframe of distances to adjust them
         :return: Updated distance matrix
         """
 
@@ -203,49 +210,50 @@ class TIC:
         # Getting the list with names of new items
         new_items = items0[-lnk_.shape[0]:]
 
-        # Iterating through elements in the partial link
+        # Iterating through elements in the local linkage object
         for i in range(lnk_.shape[0]):
-            # Ids of two items clustered together
+            # Getting the names of two elements clustered together
             el_i0, el_i1 = items0[int(lnk_[i, 0])], items0[int(lnk_[i, 1])]
 
-            # If no criterion function given
+            # If no criterion function given to determine new distances then the weighted average
+            # based on the number of atoms in each of the two elements is used
             if criterion is None:
 
-                # If the first element is an atom
-                if lnk_[i, 0] < num_atoms:
-                    # Weight is set to 1
-                    el_w0 = 1.
+                if lnk_[i, 0] < num_atoms:  # If the first element is an atom
+                    # Weight of the element is 1
+                    el_w0 = 1
+
                 else:  # If the first element is a cluster
-                    # Weight is set as number of elements in a cluster
+                    # Weight is set to the number of atoms in a cluster
                     el_w0 = lnk0[int(lnk_[i, 0]) - num_atoms, 3]
 
-                # If the second element is an atom
-                if lnk_[i, 1] < num_atoms:
-                    # Weight is set to 1
-                    el_w1 = 1.
+                if lnk_[i, 1] < num_atoms:  # If the second element is an atom
+                    # Weight of the element is 1
+                    el_w1 = 1
+
                 else:  # If the second element is a cluster
-                    # Weight is set as number of elements in a cluster
+                    # Weight is set to the number of atoms in a cluster
                     el_w1 = lnk0[int(lnk_[i, 1]) - num_atoms, 3]
 
-                # Calculating new distance as the average weighted distances
-                # where the weight is number of atoms in an element
+                # Calculating new distance as the average weighted distance
+                # where the weight is the number of atoms in an element
                 dist1 = (dist0[el_i0] * el_w0 + dist0[el_i1] * el_w1) / (el_w0 + el_w1)
 
-            # If criterion function is given, the new distance is calculated using it.
+            # If criterion function is given, the new distance is calculated using it
             else:
                 # New distance
                 dist1 = criterion(dist0[[el_i0, el_i1]], axis=1)
 
-            # Adding column with new element
+            # Adding column with new cluster to the distance matrix
             dist0[new_items[i]] = dist1
 
-            # Adding row with new element
+            # Adding row with new cluster to the distance matrix
             dist0.loc[new_items[i]] = dist1
 
-            # Setting the main diagonal value for the new element to 0
+            # Setting the main diagonal value for the new cluster to 0 (distance of the element to itself is zero)
             dist0.loc[new_items[i], new_items[i]] = 0
 
-            # And deleting the two elements that were combined in the new element
+            # And deleting the two elements that were combined in the new cluster
             dist0 = dist0.drop([el_i0, el_i1], axis=0)
             dist0 = dist0.drop([el_i0, el_i1], axis=1)
 
