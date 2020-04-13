@@ -17,3 +17,6 @@ from .CORN import CORN
 from .PAMR import PAMR
 from .CWMR import CWMR
 from .OLMAR import OLMAR
+from .CORN import CORN
+from .CORN_U import CORN_U
+from .CORN_K import CORN_K
