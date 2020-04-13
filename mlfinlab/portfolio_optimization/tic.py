@@ -24,8 +24,8 @@ class TIC:
         Fits the theoretical tree graph structure of the assets in a portfolio on the evidence
         presented by the empirical correlation matrix.
 
-        The result is a binary tree (dendrogram) that sequentially clusters two items
-        together, while measuring how closely together the two items are, until all items are
+        The result is a binary tree (dendrogram) that sequentially clusters two elements
+        together, while measuring how closely together the two elements are, until all elements are
         subsumed within the same cluster.
 
         This is the first step of the TIC algorithm.
@@ -41,8 +41,8 @@ class TIC:
 
         # Creating a linkage object (matrix with link elements).
         # Each row represents a cluster and consists of the following columns:
-        # (1) and (2) - number ids of two items clustered together
-        # (3) - distance between those items
+        # (1) and (2) - number ids of two elements clustered together
+        # (3) - distance between those elements
         # (4) - number of original variables in this cluster
         # Items in a cluster can be single elements or other clusters
         lnk0 = np.empty(shape=(0, 4))
@@ -262,20 +262,22 @@ class TIC:
     @staticmethod
     def get_atoms(lnk, item):
         """
-        Getting all atoms included in an item
+        Getting the atoms included in an element from a linkage object
 
-        :param lnk: Matrix of links
-        :param item: Item to get atoms from
+        Atoms are the basic assets in a portfolio and not clusters.
+
+        :param lnk: Global linkage object
+        :param item: Element to get atoms from
         :return: Set of atoms
         """
 
-        # A list of items to unpack
-        # Now includes only one item
+        # A list of elements to unpack
+        # Now includes only one given element, but will be appended with the unpacked elements
         anc = [item]
 
-        # Iterating
+        # Iterating (until there are elements to unpack)
         while True:
-            # The maximum item from the list
+            # The maximum item from the list (as the clusters have higher numbers in comparison to atoms)
             item_ = max(anc)
 
             # If it's a cluster and not an atom
@@ -283,37 +285,40 @@ class TIC:
                 # Delete this cluster
                 anc.remove(item_)
 
-                # Adding the elements of the cluster to list of items to unpack
+                # Unpack the elements in a cluster and add them to a list of elements to unpack
                 anc.append(lnk['i0'][item_ - lnk.shape[0] - 1])
                 anc.append(lnk['i1'][item_ - lnk.shape[0] - 1])
 
-            else:  # If all the items left in the list are atoms, we're done
+            else:  # If all the elements left in the list are atoms, we're done
                 break
 
+        # The resulting list contains only atoms
         return anc
 
     def link2corr(self, lnk, lbls):
         """
-        Derives a correlation matrix from the linkage object. Each cluster
-        is decomposed to two elements, which can be either atoms or other
-        clusters.
+        Derives a correlation matrix from the linkage object.
 
-        The second step of the TIC algorithm.
+        Each cluster in the global linkage object is decomposed to two elements,
+        which can be either atoms or other clusters. Then the off -diagonal correlation between two
+        elements are calculated based on the distances between them.
 
-        :param lnk: Matrix of links
-        :param lbls: Labels
-        :return: Correlation matrix associated with linkage matrix
+        This is the second step of the TIC algorithm.
+
+        :param lnk: Global linkage object
+        :param lbls: Names of elements used to calculate the linkage object
+        :return: Correlation matrix associated with linkage object
         """
 
-        # Creating a base for correlation matrix with ones on the main diagonal
+        # Creating a base for new correlation matrix with ones on the main diagonal
         corr = pd.DataFrame(np.eye(lnk.shape[0]+1), index=lbls, columns=lbls, dtype=float)
 
-        # Iterating through links
+        # Iterating through links in the linkage object
         for i in range(lnk.shape[0]):
-            # Getting the first element in a link
+            # Getting the atoms contained in the first element from the link
             el_x = self.get_atoms(lnk, lnk['i0'][i])
 
-            # Getting the second element in a link
+            # Getting the atoms contained in the second element from the link
             el_y = self.get_atoms(lnk, lnk['i1'][i])
 
             # Calculating the odd-diagonal values of the correlation matrix
@@ -326,14 +331,29 @@ class TIC:
 
     def tic_correlation(self, tree, corr, tn_relation, kde_bwidth):
         """
-        Calculating the Theory-Implies Correlation (TIC) matrix.
+        Calculates the Theory-Implied Correlation (TIC) matrix.
 
-        :param tree: (list) The tree graph that represents the economic theory
-        :param corr: (list) The empirical correlation matrix
+        Includes two steps.
+
+        On the first step, the theoretical tree graph structure of the assets is fit on the evidence
+        presented by the empirical correlation matrix.
+
+        The result of the first step is a binary tree (dendrogram) that sequentially clusters two elements
+        together, while measuring how closely together the two elements are, until all elements are
+        subsumed within the same cluster.
+
+        On the second step, a correlation matrix is derived from the linkage object.
+
+        Each cluster in the global linkage object is decomposed to two elements,
+        which can be either atoms or other clusters. Then the off -diagonal correlation between two
+        elements are calculated based on the distances between them.
+
+        :param tree: (list) The tree graph that represents the structure of the assets
+        :param corr: (list) The empirical correlation matrix of the assets
         :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
-                                    correlation matrix.
-        :param kde_bwidth: (float) The bandwidth of the kernel to fit KDE
-        :return: (list) TIC matrix
+                                    correlation matrix
+        :param kde_bwidth: (float) The bandwidth of the kernel to fit KDE for de-noising the correlation matrix
+        :return: (list) Theory-Implies Correlation matrix
         """
 
         # Getting the linkage object that characterizes the dendrogram
@@ -342,10 +362,10 @@ class TIC:
         # Calculating the correlation matrix from the dendrogram
         corr0 = self.link2corr(lnk0, corr.index)
 
-        # Class with function for de-noising correlation matrix
+        # Class with function for de-noising the correlation matrix
         risk_estim = RiskEstimators()
 
-        # De-noising the obtained correlation matrix
+        # De-noising the obtained Theory-Implies Correlation matrix
         corr1 = risk_estim.denoise_covariance(corr0, tn_relation=tn_relation, kde_bwidth=kde_bwidth)
 
         return corr1
@@ -354,6 +374,15 @@ class TIC:
     def corr_dist(corr0, corr1):
         """
         Calculates correlation matrix distance proposed by Herdin and Bonek.
+
+        The distance obtained measures the orthogonality between the considered
+        correlation matrices. If the matrices are equal up to a scaling factor,
+        the distance becomes zero and one if they are different to a maximum
+        extent.
+
+        This can be used to measure to which extent the TIC matrix has blended
+        theory-implied views (tree structure of the elements) with empirical
+        evidence (correlation matrix).
 
         :param corr0: First correlation matrix
         :param corr1: Second correlation matrix
