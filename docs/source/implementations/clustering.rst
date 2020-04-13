@@ -254,14 +254,14 @@ The first part - makeNewOutputs function.
         def makeNewOutputs(corr0,clstrs,clstrs2): 
             clstrsNew={} 
 
-3.) Make a dict from the first cluster        
+3.) Make a dict from the first clusters        
 
 ::
 
         for i in clstrs.keys(): 
           clstrsNew[len(clstrsNew.keys())]=list(clstrs[i])
 
-4.) Add the second cluster to the dict 
+4.) Add the second clusters to the dict 
 
 ::
 
