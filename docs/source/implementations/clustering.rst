@@ -131,7 +131,7 @@ The purpose of the Base Clustering is to find the optimal clustering. The detail
 
         for init in range(n_init): 
 
-4a.)In the first loop, we cluster the matrix with the k-means algorithm for every number of k, where k is the number of clusters and k = 2,.., N, and N is the maximum number of clusters set for this algorithm for one given initialization
+4a.) In the first loop, we cluster the matrix with the k-means algorithm for every number of k, where k is the number of clusters and k = 2,.., N, and N is the maximum number of clusters set for this algorithm for one given initialization
 
 ::
 
