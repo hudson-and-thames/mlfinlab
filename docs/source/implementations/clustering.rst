@@ -40,15 +40,15 @@ These features are Silhouette Scores and The measure of clustering quality or *q
 
 :math:`a_i` = the average distance between i and all other elements in the same cluster
 
-:math:`b_i` = the average distance between i and all the elements in the nearest cluster of which i is not a member
+:math:`b_i` = the average distance between i and all the elements in the nearest cluster where i is not a member
 
 2.)The measure of clustering quality or *q*:
 
 :math:`\textit q= \frac{E[\{S_i\}]}{\sqrt{V[\{S_i\}]}}`
 
-:math:`E[\{S_i\}]` = the mean of the silhouette coefficients 
+:math:`E[\{S_i\}]` = the mean of the Silhouette coefficients 
 
-:math:`V[\{S_i\}]` = the variance of the silhouette coefficients
+:math:`V[\{S_i\}]` = the variance of the Silhouette coefficients
 
 The algorithm also uses distance matrix as a part of its assessment in finding optimal clustering.
 
@@ -60,22 +60,17 @@ The distance matrix formula is as follow:
 The ONC Mechanism
 =================
 
-.. image:: clustering_images/ONC_diagram.png
-   :scale: 100 %
-   :align: center 
 
-Figure 4.2.  Lopez de Prado and Lewis. *Structure of ONC's higher-level stage*. 2020. MACHINE LEARNING FOR ASSET MANAGERS. Marcos M. Lopez de Prado. Cornell University, New York. April 2020. Page 60. Digital Book. 
+Initially, an observation matrix is fed into the algorithm. Next, the algorithm evaluates the observation matrix. Then the Base Clustering performs a double for..loop. The first loop clusters the matrix for different k values from 2 to N via k-means for one given initialization while assesses the quality *q* for each clustering. The second loop repeats the first loop as many as the number of initializations. Lastly, the system chooses the clustering with the highest quality or *q*.  
 
-Initially, a correlation matrix is fed into the algorithm. Next, the algorithm evaluates the observation matrix. Then the Base Clustering performs a double for..loop. The first loop clusters the matrix for different k values of 2 to N via k-means for one given initialization while assesses the quality *q* of each clustering. The second loop repeats the first loop as many as the number of initializations. Lastly, the system chooses the clustering with the highest quality or *q*.  
-
-The second algorithm, the Top- Level of Clustering, evaluates the quality of each cluster of the optimum clustering from the first algorithm. The algorithm then take the average quality of the clusters and find the set of clusters with below-average quality. We name the number of sub-par quality clusters K1 where K1<K (number of clusters). The next step is to rerun the clustering of the items in those K1 clusters if K1>1 or to return the clustering given by the base algorithm if K1<2. The rerun of the Base Clustering algorithm is done on the matrix that is composed of the elements of K1 clusters. We then check the efficacy of the new clustering by comparing the average cluster quality before and after reclustering of the elements in K1.  If the average cluster quality does not improve, we return the clustering formed by the base algorithm. If we see an improvement in the average cluster quality, we return the accepted clustering from the base clustering concatenated with the new redone clustering. 
+The second algorithm, the Top- Level of Clustering, evaluates the quality of each cluster of the optimum clustering from the first algorithm. The algorithm then takes the average quality of the clusters and find the set of clusters with below-average quality. We name the number of sub-par quality clusters K1 where K1<K (number of clusters). The next step is to rerun the clustering of the items in the K1 clusters if :math:`K_1` >=2 or to return the clustering given by the base algorithm if :math:`K_1` <=1. The rerun of the Base Clustering algorithm is done on the matrix that is composed of the elements of K1 clusters. This process may return a new clustering for these elements in :math:`K_1`. We then check the efficacy of the new clustering by comparing the average cluster quality before and after reclustering the elements in :math:`K_1`.  If the average cluster quality does not improve, we return the clustering created by the base algorithm. If we see an improvement in the average cluster quality, we return the accepted clustering from the base clustering concatenated with the newly redone clustering. 
 
 
 
 The ONC Algorithm Workflow
 ==========================
 
-The ONC algorithm consists of two main parts. They are the Base Clustering and the Top- Level Clustering. The Base Clustering produces optimum clustering while the Top- Level Clustering reassesses the clusters, optimizes the inconsistent clusters, and updates the clustering accordingly. We will dissect the codes, organize their parts accordingly, and put some explanations of the parts based on the organization in order for us to understand the workflow of this ONC algorithm. We first assume that we have an NxN correlation matrix  :math:`\rho` , where  :math:`\rho_{ij}` is the correlation between entities *i* and *j*.
+The ONC algorithm is divided into two main parts. They are the Base Clustering and the Top- Level Clustering. The Base Clustering produces optimum clustering while the Top- Level Clustering reassesses the clustering, optimizes the inconsistent clustering, and updates the clustering accordingly. We will dissect the codes, organize their parts accordingly, and put some explanations of the parts based on the organization in order for us to understand the workflow of this ONC algorithm. We first assume that we have an NxN correlation matrix  :math:`\rho` , where  :math:`\rho_{ij}` is the correlation between entities *i* and *j*.
 
 **The Base Clustering**
 
@@ -116,7 +111,7 @@ The purpose of the Base Clustering is to find the optimal clustering. The detail
         from sklearn.cluster import KMeans from sklearn.metrics 
         import silhouette_samples 
 
-2.) We define the Base Clustering algorithm with corr0 as the correlation matrix or :math:`\rho`,  maxNumClusters as the allowed maximum number of clusters, and n_init as the number of initiations       
+2.) We define the Base Clustering algorithm with corr0 as the correlation matrix ( :math:`\rho` ),  maxNumClusters as the allowed maximum number of clusters, and n_init as the number of initiations       
 
 ::
 
@@ -144,7 +139,7 @@ The purpose of the Base Clustering is to find the optimal clustering. The detail
             kmeans_=KMeans(n_clusters=i,n_jobs=1,n_init=1) 
             kmeans_=kmeans_.fit(x) 
 
-5.) We then evaluate the quality q for each clustering in this loop
+5.) We then evaluate the quality *q* for each clustering in this loop
 
 ::
 
@@ -202,7 +197,7 @@ The Base Clustering algorithm may result in optimum clustering, but the new clus
                 clstrsNew[len(clstrsNew.keys())]=list(clstrs2[i]) 
             newIdx=[j for i in clstrsNew for j in clstrsNew[i]] 
             corrNew=corr0.loc[newIdx,newIdx] 
-            x=((1-corr0.?llna(0))/2.)**.5 
+            x=((1-corr0.fillna(0))/2.)**.5 
             kmeans_labels=np.zeros(len(x.columns)) 
             for i in clstrsNew.keys(): 
                 idxs=[x.index.get_loc(k) for k in clstrsNew[i]] 
@@ -242,7 +237,7 @@ The Base Clustering algorithm may result in optimum clustering, but the new clus
 
 The Top-Level of Clustering codes are taken from Machine Learning for Asset Managers, Chapter 4, page 58 and 59, SNIPPET 4.2 - TOP-LEVEL OF CLUSTERING.
 
-The details and explanations of Top-Level of Clustering function are provided below:
+The details and explanations of the Top-Level of Clustering function are provided below:
 
 The first part - makeNewOutputs function.
 
@@ -279,7 +274,7 @@ The first part - makeNewOutputs function.
 
         newIdx=[j for i in clstrsNew for j in clstrsNew[i]] 
 
-6.) Make a new correlation matrix with the new list
+6.) Make a new correlation matrix from the new list
 
 ::
 
@@ -297,7 +292,7 @@ The first part - makeNewOutputs function.
 
         kmeans_labels=np.zeros(len(x.columns)) 
 
-9.) Fill in the array with the index labels of the distance matrix that are arranged by the values of the dict of the new clusters from step 3 and 4 
+9.) Fill in the array with the index labels of the distance matrix that are sorted according to the values of the dict of the new clusters from step 3 and 4 
 
 ::
 
@@ -305,7 +300,7 @@ The first part - makeNewOutputs function.
           idxs=[x.index.get_loc(k) for k in clstrsNew[i]] 
           kmeans_labels[idxs]=i 
 
-10.) Make a series of Silhouette Scores of the correlations distance matrix that is arranged by the new index labels
+10.) Make a series of Silhouette Scores of the correlations distance matrix that is sorted by the new index labels
 
 ::
 
@@ -384,13 +379,13 @@ The second part- clusterKMeansTop function.
 
         corrTmp=corr0.loc[keysRedo,keysRedo] 
 
-11.) Find the mean of the means of the sub-par clusters
+11.) Calculate the mean of the means of the sub-par clusters
 
 ::
 
         tStatMean=np.mean([clusterTstats[i] for i in redoClusters]) 
 
-12.)  Apply the clusterKMeansTop function to the new matrix of sub-par values. The maximum number of clusters that is set in this function is the minimum value between the initial function and the new matrix's N-1. A new set of optimum clustering is the result.
+12.) Apply the clusterKMeansTop function to the new matrix of sub-par values. The maximum number of clusters that is set in this function is the minimum value between the initial function and the new matrix's N-1. A new set of optimum clustering is the result.
 
 ::
 
@@ -428,20 +423,39 @@ The second part- clusterKMeansTop function.
         else: 
             return corrNew,clstrsNew,silhNew
         
+The ONC Algorithm Diagram
+==========================
+
+**Structure of ONC's Base Clustering Stage.**
+
+.. image:: clustering_images/ONC_diagram_base.png
+   :scale: 100 %
+   :align: center 
+
+Figure 4.1.  Marcos M. Lopez de Prado. *Structure of ONC's base clustering stage*. 2020. MACHINE LEARNING FOR ASSET MANAGERS. Marcos M. Lopez de Prado. Cornell University, New York. April 2020. Page 57. Digital Book.
+
+**Structure of ONC's Top-Level Stage.**
+
+.. image:: clustering_images/ONC_diagram.png
+   :scale: 100 %
+   :align: center 
+
+Figure 4.2.  Lopez de Prado and Lewis. *Structure of ONC's higher-level stage*. 2020. MACHINE LEARNING FOR ASSET MANAGERS. Marcos M. Lopez de Prado. Cornell University, New York. April 2020. Page 60. Digital Book. 
+ 
                 
         
 Example
 =======
 
-Optimal Number of Clusters (ONC)
+Optimal Number of Clusters (ONC).
 
-The result of this algorithm is a dict that contains:
+The result of this algorithm is a tuple that contains:
 
 1. Correlation Matrix
 2. Optimized Clusters
 3. Silhouette Scores
 
-Correlation Matrix shows the matrix that is sorted under the optimization clustering. Optimized Clusters show the optimal number of clusters and each of the clusters' contents. Silhouette Scores show Silhouette quality of each node in the clusters.
+Correlation Matrix shows the matrix that is sorted under the optimization clustering. Optimized Clusters show the optimal number of clusters and each of the clusters' contents. Silhouette Scores show the Silhouette quality of each node in the clusters.
 
 ::
 
@@ -455,7 +469,7 @@ Correlation Matrix shows the matrix that is sorted under the optimization cluste
     df = pd.DataFrame(data) 
     df
     
-Assuming that we have a correlation matrix data as in the above
+Assuming that we have a correlation matrix data as in the above.
 
 ::
     
