@@ -125,7 +125,7 @@ The purpose of the Base Clustering is to find the optimal clustering. The detail
 
 4.) We implement a double for .. loop
 
-4b.)In the second loop, we repeat the first loop multiple times until the number of loops satisfies the n_init criteria
+4b.) In the second loop, we repeat the first loop multiple times until the number of loops satisfies the n_init criteria
 
 ::
 
