@@ -50,9 +50,9 @@ These features are Silhouette Scores and The measure of clustering quality or *q
 
 :math:`V[\{S_i\}]` = the variance of the Silhouette coefficients
 
-The algorithm also uses distance matrix as a part of its assessment in finding optimal clustering.
+The algorithm also utilizes a distance matrix as a part of its assessment in finding optimal clustering.
 
-The distance matrix formula is as follow:
+The distance matrix formula:
 
 :math:`D_{i,j}= \sqrt{\frac{1}{2}(1-\rho_{ij})}`
 
