@@ -43,7 +43,7 @@ class CWMR(OLPS):
     #         return new_weights
 
 def main():
-    stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
+    stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
     cwmr = CWMR()
     cwmr.allocate(stock_price, resample_by='M')

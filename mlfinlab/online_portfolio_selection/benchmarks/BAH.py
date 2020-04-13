@@ -18,6 +18,8 @@ class BAH(OLPS):
     # even if we don't rebalance, weights change because of the underlying price changes
     def update_weight(self, _weights, _relative_return, _time):
         """
+        :param _time:
+        :param _relative_return:
         :param _weights
         """
         new_weight = _weights * _relative_return[_time - 1]
@@ -27,6 +29,7 @@ class BAH(OLPS):
 def main():
     """
     test run
+    test doesn't work for some reason
     """
     stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)

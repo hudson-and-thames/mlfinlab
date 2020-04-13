@@ -15,14 +15,14 @@ Tracks the best constant rebalanced portfolio in hindsight
 ### Universal Portfolio: UP
 ### Exponential Gradient: EG
 ### Follow the Leader: FTL
-### Follow the Reguliarized Leader --- skip over for now (just need to add a regularization factor)
+### Follow the Reguliarized Leader: FTRL
 ### Aggregating-type Algorithms --- skip over for now
 
 ## Follow-the-Loser: (Mean-Reversion)
 ### Anti Correlation
-### Passive Aggressive Mean Reversion
-### Confidence Weighted Mean Reversion
-### Online Moving Average Reversion
+### Passive Aggressive Mean Reversion: PAMR
+### Confidence Weighted Mean Reversion: CWMR
+### Online Moving Average Reversion: OLMAR
 ### Robust Median Reversion
 
 ## Pattern-Matching:
@@ -43,7 +43,7 @@ Tracks the best constant rebalanced portfolio in hindsight
 ### Follow the Leading History
 
 ## Most importantly:
-### CORN-K
+### CORN-K: CORN
 ### RACORN-K
 ### SCORN-K
 ### FCORN-K

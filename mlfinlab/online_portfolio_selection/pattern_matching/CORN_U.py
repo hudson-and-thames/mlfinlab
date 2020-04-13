@@ -3,11 +3,10 @@ import cvxpy as cp
 import numpy as np
 import pandas as pd
 
-from mlfinlab.online_portfolio_selection import CORN
-from mlfinlab.online_portfolio_selection.CORN_U import CORN_U
+from mlfinlab.online_portfolio_selection.pattern_matching import CORN
 
 
-class CORN_K(CORN_U):
+class CORN_U(CORN):
     """
     This class implements the Correlation Driven Nonparametric Learning - Uniform strategy.
     """
@@ -125,13 +124,13 @@ def main():
     """
     :return:
     """
-    stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
+    stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    corn_k = CORN_K(number_of_window=20, number_of_rho=10)
-    corn_k.allocate(stock_price, resample_by='m')
-    print(corn_k.all_weights)
-    print(corn_k.portfolio_return)
-    corn_k.portfolio_return.plot()
+    corn_u = CORN_U(number_of_window=20, number_of_rho=10)
+    corn_u.allocate(stock_price, resample_by='m')
+    print(corn_u.all_weights)
+    print(corn_u.portfolio_return)
+    corn_u.portfolio_return.plot()
 
 
 if __name__ == "__main__":
