@@ -426,7 +426,7 @@ The second part- clusterKMeansTop function.
 The ONC Algorithm Diagram
 ==========================
 
-**Structure of ONC's Base Clustering Stage.**
+**Structure of the ONC's Base Clustering Stage.**
 
 .. image:: clustering_images/ONC_diagram_base.png
    :scale: 100 %
@@ -434,7 +434,7 @@ The ONC Algorithm Diagram
 
 Figure 4.1.  Marcos M. Lopez de Prado. *Structure of ONC's base clustering stage*. 2020. MACHINE LEARNING FOR ASSET MANAGERS. Marcos M. Lopez de Prado. Cornell University, New York. April 2020. Page 57. Digital Book.
 
-**Structure of ONC's Top-Level Stage.**
+**Structure of the ONC's Top-Level Stage.**
 
 .. image:: clustering_images/ONC_diagram.png
    :scale: 100 %
