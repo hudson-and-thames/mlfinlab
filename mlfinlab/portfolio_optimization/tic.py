@@ -30,9 +30,9 @@ class TIC:
 
         This is the first step of the TIC algorithm.
 
-        :param tree: (list) The tree graph that represents the structure of the assets
-        :param corr: (list) The empirical correlation matrix of the assets
-        :return: (list) Linkage object that characterizes the dendrogram
+        :param tree: (pd.dataframe) The tree graph that represents the structure of the assets
+        :param corr: (pd.dataframe) The empirical correlation matrix of the assets
+        :return: (np.array) Linkage object that characterizes the dendrogram
         """
 
         # If the top level of the tree contains multiple elements, creating a level with just one element (tree root)
@@ -134,11 +134,11 @@ class TIC:
         basic elements (atoms) contained inside a cluster. This is done to take into account the
         already existing links.
 
-        :param lnk0: Global linkage object (previous links)
-        :param lnk1: Local linkage object (containing grouped elements and not global ones)
-        :param items0: List of names for all elements (global)
-        :param items1: List of grouped elements (local)
-        :return: Local linkage object changed to global one
+        :param lnk0: (np.array) Global linkage object (previous links)
+        :param lnk1: (np.array) Local linkage object (containing grouped elements and not global ones)
+        :param items0: (list) List of names for all elements (global)
+        :param items1: (list) List of grouped elements (local)
+        :return: (np.array) Local linkage object changed to global one
         """
 
         # Counting the number of atoms - basic elements and not clusters
@@ -196,12 +196,16 @@ class TIC:
         Requires the recalculation of the distance matrix to determine the distance from
         new clusters to other elements.
 
-        :param dist0: Previous distance matrix
-        :param lnk0: Global linkage object that includes new clusters
-        :param lnk_: Local linkage object updated to global names of elements and number of contained atoms
-        :param items0: Global list with names of all elements
-        :param criterion: Function to apply to a dataframe of distances to adjust them
-        :return: Updated distance matrix
+        A criterion function may be given for calculation of the new distances from a new cluster to other
+        elements based on the distances of elements included in a cluster. The default method is the weighted
+        average of distances based on the number of atoms in each of the two elements.
+
+        :param dist0: (pd.dataframe) Previous distance matrix
+        :param lnk0: (np.array) Global linkage object that includes new clusters
+        :param lnk_: (np.array) Local linkage object updated to global names of elements and number of contained atoms
+        :param items0: (list) Global list with names of all elements
+        :param criterion: (function) Function to apply to a dataframe of distances to adjust them
+        :return: (np.array) Updated distance matrix
         """
 
         # Counting the number of atoms - basic elements  and not clusters
@@ -266,9 +270,9 @@ class TIC:
 
         Atoms are the basic assets in a portfolio and not clusters.
 
-        :param lnk: Global linkage object
-        :param item: Element to get atoms from
-        :return: Set of atoms
+        :param lnk: (np.array) Global linkage object
+        :param item: (int) Element id to get atoms from
+        :return: (list) Set of atoms
         """
 
         # A list of elements to unpack
@@ -305,9 +309,9 @@ class TIC:
 
         This is the second step of the TIC algorithm.
 
-        :param lnk: Global linkage object
-        :param lbls: Names of elements used to calculate the linkage object
-        :return: Correlation matrix associated with linkage object
+        :param lnk: (np.array) Global linkage object
+        :param lbls: (pd.index) Names of elements used to calculate the linkage object
+        :return: (pd.dataframe) Correlation matrix associated with linkage object
         """
 
         # Creating a base for new correlation matrix with ones on the main diagonal
@@ -348,12 +352,12 @@ class TIC:
         which can be either atoms or other clusters. Then the off -diagonal correlation between two
         elements are calculated based on the distances between them.
 
-        :param tree: (list) The tree graph that represents the structure of the assets
-        :param corr: (list) The empirical correlation matrix of the assets
+        :param tree: (pd.dataframe) The tree graph that represents the structure of the assets
+        :param corr: (pd.dataframe) The empirical correlation matrix of the assets
         :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
                                     correlation matrix
         :param kde_bwidth: (float) The bandwidth of the kernel to fit KDE for de-noising the correlation matrix
-        :return: (list) Theory-Implies Correlation matrix
+        :return: (pd.dataframe) Theory-Implies Correlation matrix
         """
 
         # Getting the linkage object that characterizes the dendrogram
@@ -384,9 +388,9 @@ class TIC:
         theory-implied views (tree structure of the elements) with empirical
         evidence (correlation matrix).
 
-        :param corr0: First correlation matrix
-        :param corr1: Second correlation matrix
-        :return: Correlation matrix distance
+        :param corr0: (pd.dataframe) First correlation matrix
+        :param corr1: (pd.dataframe) Second correlation matrix
+        :return: (float) Correlation matrix distance
         """
 
         # Trace of the product of correlation matrices
