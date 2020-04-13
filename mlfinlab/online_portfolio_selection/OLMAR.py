@@ -1,4 +1,6 @@
-from mlfinlab.online_portfolio_selection.olps_utils import *
+# pylint: disable=missing-module-docstring
+import numpy as np
+import pandas as pd
 import cvxpy as cp
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
@@ -26,23 +28,44 @@ class OLMAR(OLPS):
 
     # intialize moving average reversion
     def initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
+        """
+
+        :param _asset_prices:
+        :param _weights:
+        :param _portfolio_start:
+        :param _resample_by:
+        :return:
+        """
         self.moving_average_reversion = self.calculate_rolling_moving_average(_asset_prices, self.window,
                                                                               self.reversion_method, self.alpha)
         super(OLMAR, self).initialize(_asset_prices, _weights, _portfolio_start, _resample_by)
 
     # change based on method
     def run(self, _weights, _relative_return):
+        """
+
+        :param _weights:
+        :param _relative_return:
+        :return:
+        """
         # set initial weights
         self.weights = self.first_weight(_weights)
         self.all_weights[0] = self.weights
 
         # Run the Algorithm for the rest of data
-        for t in range(1, self.final_number_of_time):
+        for time in range(1, self.final_number_of_time):
             # update weights
-            self.weights = self.update_weight(self.weights, _relative_return, t)
-            self.all_weights[t] = self.weights
+            self.weights = self.update_weight(self.weights, _relative_return, time)
+            self.all_weights[time] = self.weights
 
     def update_weight(self, _weights, _relative_return, _time):
+        """
+
+        :param _weights:
+        :param _relative_return:
+        :param _time:
+        :return:
+        """
         if self.reversion_method == 1 and _time < self.window:
             return self.weights
         # calculate price relative
@@ -51,19 +74,22 @@ class OLMAR(OLPS):
         mean_relative = np.mean(predicted_change)
         mean_change = np.ones(self.number_of_assets) * mean_relative
         lambd = max(0, (self.epsilon - np.dot(_weights, predicted_change)) / (
-                    np.linalg.norm(predicted_change - mean_change) ** 2))
+            np.linalg.norm(predicted_change - mean_change) ** 2))
 
         new_weights = _weights + lambd * (predicted_change - mean_change)
         if np.isnan(new_weights).any():
             raise ValueError()
         # if not in simplex domain
-        if ((new_weights > 1) | (new_weights < 0)).any():
-            return self.optimize(new_weights)
-        else:
-            return new_weights
+
+        return self.simplex_projection(new_weights)
 
     # optimize the weight that minimizes the l2 norm
-    def optimize(self, _optimize_weight):
+    def simplex_projection(self, _optimize_weight):
+        """
+
+        :param _optimize_weight:
+        :return:
+        """
         # initialize weights
         weights = cp.Variable(self.number_of_assets)
 
@@ -74,20 +100,24 @@ class OLMAR(OLPS):
         # Optimization objective and constraints
         allocation_objective = cp.Minimize(l2_norm)
         allocation_constraints = [
-                cp.sum(weights) == 1,
-                weights <= 1,
-                weights >= 0
+            cp.sum(weights) == 1,
+            weights <= 1,
+            weights >= 0
         ]
         # Define and solve the problem
         problem = cp.Problem(
-                objective=allocation_objective,
-                constraints=allocation_constraints
+            objective=allocation_objective,
+            constraints=allocation_constraints
         )
         problem.solve(solver=cp.SCS)
         return weights.value
 
 
 def main():
+    """
+
+    :return:
+    """
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
 
