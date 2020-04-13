@@ -286,7 +286,7 @@ The first part - makeNewOutputs function.
 
         x=((1-corr0.fillna(0))/2.)**.5 
 
-8.) Make an array of x amount of 0 where x is the length of the distance matrix's column
+8.) Make an array of x amount of 0 where x is the length of the distance matrix's columns
 
 ::
 
