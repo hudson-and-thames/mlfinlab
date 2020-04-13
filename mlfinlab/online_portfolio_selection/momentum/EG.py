@@ -36,36 +36,3 @@ class EG(OLPS):
             new_weight = _weights * (1 + self.eta * (past_relative_return/dot_product - 1))
 
         return self.normalize(new_weight)
-
-
-def main():
-    """
-
-    :return:
-    """
-    stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
-    stock_price = stock_price.dropna(axis=1)
-    print("This is for EG")
-    exponential_gradient = EG()
-    exponential_gradient.allocate(stock_price)
-    print(exponential_gradient.all_weights)
-    print(exponential_gradient.portfolio_return)
-    exponential_gradient.portfolio_return.plot()
-
-    print("This is for GP")
-    gradient_projection = EG(update_rule='GP')
-    gradient_projection.allocate(stock_price)
-    print(gradient_projection.all_weights)
-    print(gradient_projection.portfolio_return)
-    gradient_projection.portfolio_return.plot()
-
-    print("This is for EG")
-    expectation_maximization = EG(update_rule='EM')
-    expectation_maximization.allocate(stock_price)
-    print(expectation_maximization.all_weights)
-    print(expectation_maximization.portfolio_return)
-    expectation_maximization.portfolio_return.plot()
-
-
-if __name__ == "__main__":
-    main()
