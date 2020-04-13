@@ -4,19 +4,20 @@ Classes derived from Online Portfolio Selection module
 STILL THINKING OF WAYS TO USE THIS
 """
 from . import olps_utils
-from .OLPS import OLPS
-from .BAH import BAH
-from .BESTSTOCK import BESTSTOCK
-from .CRP import CRP
-from .BCRP import BCRP
-from .UP import UP
-from .EG import EG
-from .FTL import FTL
-from .FTRL import FTRL
-from .CORN import CORN
-from .PAMR import PAMR
-from .CWMR import CWMR
-from .OLMAR import OLMAR
-from .CORN import CORN
-from .CORN_U import CORN_U
-from .CORN_K import CORN_K
+from mlfinlab.online_portfolio_selection.OLPS import OLPS
+from mlfinlab.online_portfolio_selection.BAH import BAH
+# from .BAH import BAH
+from mlfinlab.online_portfolio_selection.BESTSTOCK import BESTSTOCK
+from mlfinlab.online_portfolio_selection.CRP import CRP
+from mlfinlab.online_portfolio_selection.BCRP import BCRP
+from mlfinlab.online_portfolio_selection.UP import UP
+from mlfinlab.online_portfolio_selection.EG import EG
+from mlfinlab.online_portfolio_selection.FTL import FTL
+from mlfinlab.online_portfolio_selection.FTRL import FTRL
+from mlfinlab.online_portfolio_selection.CORN import CORN
+from mlfinlab.online_portfolio_selection.PAMR import PAMR
+from mlfinlab.online_portfolio_selection.CWMR import CWMR
+from mlfinlab.online_portfolio_selection.OLMAR import OLMAR
+from mlfinlab.online_portfolio_selection.CORN import CORN
+from mlfinlab.online_portfolio_selection.CORN_U import CORN_U
+from mlfinlab.online_portfolio_selection.CORN_K import CORN_K
