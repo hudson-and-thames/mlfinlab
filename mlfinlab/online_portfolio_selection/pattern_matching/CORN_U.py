@@ -3,7 +3,7 @@ import cvxpy as cp
 import numpy as np
 import pandas as pd
 
-from mlfinlab.online_portfolio_selection.pattern_matching import CORN
+from mlfinlab.online_portfolio_selection.pattern_matching.CORN import CORN
 
 
 class CORN_U(CORN):
@@ -12,7 +12,7 @@ class CORN_U(CORN):
     """
     # check -1 <= rho <= 1
     # check window >= 1
-    def __init__(self, number_of_window=5, number_of_rho=5):
+    def __init__(self, number_of_window=3, number_of_rho=3):
         """
         Constructor.
         """
