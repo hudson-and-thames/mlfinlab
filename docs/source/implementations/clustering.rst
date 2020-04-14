@@ -447,7 +447,8 @@ Assuming that we want to find the optimum clustering of a matrix by using the ON
 
 .. code-block:: python
     
-    data = [[1,0.5,-0.2,0.7,0], [0.5,1,-1,0,-0.5], [-0.2,-1,1,0.1,0.8], [0.7,0,0.1,1,-0.5], [0,-0.5,0.8,-0.5,1]] 
+    data = [[1,0.5,-0.2,0.7,0], [0.5,1,-1,0,-0.5], [-0.2,-1,1,0.1,0.8],\
+            [0.7,0,0.1,1,-0.5], [0,-0.5,0.8,-0.5,1]] 
     df = pd.DataFrame(data) 
     df
 
