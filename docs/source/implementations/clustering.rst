@@ -80,7 +80,7 @@ The ONC algorithm is divided into two main parts. They are the Base Clustering a
 
 **The Base Clustering**
 
-.. code-block::
+.. code-block:: python
 
         import numpy as np,pandas as pd 
         from sklearn.cluster import KMeans from sklearn.metrics 
@@ -111,7 +111,7 @@ The details and the explanations of the Base Clustering are provided below.
 
 1.) We import the necessary packages for the algorithm
 
-.. code-block::
+.. code-block:: python
 
         import numpy as np,pandas as pd 
         from sklearn.cluster import KMeans from sklearn.metrics 
@@ -119,13 +119,13 @@ The details and the explanations of the Base Clustering are provided below.
 
 2.) We define the Base Clustering algorithm with corr0 as the correlation matrix ( :math:`\rho` ),  maxNumClusters as the allowed maximum number of clusters, and n_init as the number of initiations      
 
-.. code-block::
+.. code-block:: python
 
         def clusterKMeansBase(corr0,maxNumClusters=10,n_init=10):
 
 3.) We calculate the distance matrix D and set an empty series as the initial Silhouette Scores
 
-.. code-block::
+.. code-block:: python
 
         x,silh=((1-corr0.fillna(0))/2.)**.5,pd.Series()# observations matrix 
 
@@ -133,13 +133,13 @@ The details and the explanations of the Base Clustering are provided below.
 
 4b.) In the second loop, we repeat the first loop multiple times until the number of loops satisfies the n_init criteria
 
-.. code-block::
+.. code-block:: python
 
          for init in range(n_init): 
 
 4a.) In the first loop, we cluster the matrix with the k-means algorithm for every number of k, where k is the number of clusters and k = 2,.., N, and N is the maximum number of clusters set for this algorithm for one given initi             alization
 
-.. code-block::
+.. code-block:: python
 
         for i in xrange(2,maxNumClusters+1): 
             kmeans_=KMeans(n_clusters=i,n_jobs=1,n_init=1) 
@@ -147,21 +147,21 @@ The details and the explanations of the Base Clustering are provided below.
 
 5.) We then evaluate the quality *q* for each clustering in this loop
 
-.. code-block::
+.. code-block:: python
 
         silh_=silhouette_samples(x,kmeans_.labels_) 
         stat=(silh_.mean()/silh_.std(),silh.mean()/silh.std()) 
 
 6.) We also update the Silhouette Scores and the k-mean if the clustering quality is greater than that of the previous loop
 
-.. code-block::
+.. code-block:: python
 
         if np.isnan(stat[1]) or stat[0]>stat[1]: 
            silh,kmeans=silh_,kmeans_
 
 7.) Rearrange the correlation matrix based on the k-mean clustering
 
-.. code-block::
+.. code-block:: python
 
         newIdx=np.argsort(kmeans.labels_) 
         corr1=corr0.iloc[newIdx] # reorder rows
@@ -170,20 +170,20 @@ The details and the explanations of the Base Clustering are provided below.
 
 8.) Make a dict that consists of clusters, their labels (keys), and variables (values) based on the k-mean clustering
 
-.. code-block::
+.. code-block:: python
 
         clstrs={i:corr0.columns[np.where(kmeans.labels_==i)[0]].tolist() \ 
                 for i in np.unique(kmeans.labels_) } # cluster members 
 
 9.) Make a series of Silhouette Scores
 
-.. code-block::
+.. code-block:: python
 
         silh=pd.Series(silh,index=x.index) 
 
 10.) Return the optimized matrix, the clusters and their labels, and the Silhouette Scores
 
-.. code-block::
+.. code-block:: python
 
         return corr1, clstrs, silh
 
@@ -191,7 +191,7 @@ The Base Clustering algorithm may result in optimum clustering, but the new clus
 
 **The Top-Level Clustering**
 
-.. code-block::
+.. code-block:: python
 
         from sklearn.metrics import silhouette_samples 
         #--------------------------------------------------
@@ -249,58 +249,58 @@ The details and explanations of the Top-Level of Clustering are provided below:
 
 1.) Import the necessary package
 
-.. code-block::
+.. code-block:: python
 
         from sklearn.metrics import silhouette_samples     
 
 2.) Define the function with a correlation matrix and two clusters as the input
 
-.. code-block::
+.. code-block:: python
 
         def makeNewOutputs(corr0,clstrs,clstrs2): 
             clstrsNew={} 
 
 3.) Make a dict from the first clusters       
 
-.. code-block::
+.. code-block:: python
 
         for i in clstrs.keys(): 
           clstrsNew[len(clstrsNew.keys())]=list(clstrs[i])
 
 4.) Add the second clusters to the dict
 
-.. code-block::
+.. code-block:: python
 
         for i in clstrs2.keys(): 
           clstrsNew[len(clstrsNew.keys())]=list(clstrs2[i]) 
 
 5.) Make a new list of the values of the dict
 
-.. code-block::
+.. code-block:: python
 
         newIdx=[j for i in clstrsNew for j in clstrsNew[i]] 
 
 6.) Rearrange the correlation matrix based on the new list with its values as the index and column labels
 
-.. code-block::
+.. code-block:: python
 
         corrNew=corr0.loc[newIdx,newIdx] 
 
 7.) We create a new distance matrix from the input matrix
 
-.. code-block::
+.. code-block:: python
 
         x=((1-corr0.fillna(0))/2.)**.5 
 
 8.) Make an array of x amount of 0 where x is the length of the distance matrix's columns and name it accordingly
 
-.. code-block::
+.. code-block:: python
 
         kmeans_labels=np.zeros(len(x.columns)) 
 
 9.) Fill in the array with the index labels of the distance matrix that are sorted according to the values of the dict of the new clusters from step 3 and 4
 
-.. code-block::
+.. code-block:: python
 
         for i in clstrsNew.keys(): 
           idxs=[x.index.get_loc(k) for k in clstrsNew[i]] 
@@ -308,14 +308,14 @@ The details and explanations of the Top-Level of Clustering are provided below:
 
 10.) Make a series of Silhouette Scores of the correlations distance matrix that is sorted by the new index labels
 
-.. code-block::
+.. code-block:: python
 
         silhNew=pd.Series(silhouette_samples(x,kmeans_labels), 
                 index=x.index) 
 
 11.) Return the new correlation matrix, clustering, and Silhouette Scores
 
-.. code-block::
+.. code-block:: python
 
         return corrNew,clstrsNew,silhNew 
         
@@ -323,77 +323,77 @@ The details and explanations of the Top-Level of Clustering are provided below:
 
 1.) We define the function with corr0 as the correlation matrix input or :math:`\rho`, maxNumClusters as the allowed maximum number of clusters, and n_init as the number of initiations
 
-.. code-block::
+.. code-block:: python
 
         def clusterKMeansTop(corr0,maxNumClusters=None,n_init=10): 
 
 2.) If the maximum number of clusters is not defined, then the system will choose N-1 as the value
 
-.. code-block::
+.. code-block:: python
 
         if maxNumClusters==None:maxNumClusters=corr0.shape[1]-1 
 
 3.) We extract the values of the optimum correlation matrix, the clustering, and the clustering's Silhouette Scores by applying the Base Clustering algorithm on the correlation matrix
 
-.. code-block::
+.. code-block:: python
 
         corr1,clstrs,silh=clusterKMeansBase(corr0,maxNumClusters= \ 
          min(maxNumClusters,corr0.shape[1]-1),n_init=n_init) 
         
 4.) Evaluate the quality of each cluster and assign the values to a dict
 
-.. code-block::
+.. code-block:: python
 
         clusterTstats={i:np.mean(silh[clstrs[i]])/ \ 
          np.std(silh[clstrs[i]]) for i in clstrs.keys()} 
 
 5.) Find the mean of all quality measures of the clusters and assign the value to a variable
 
-.. code-block::
+.. code-block:: python
 
         tStatMean=sum(clusterTstats.values())/len(clusterTstats) 
 
 6.) Find the keys of clusters that have smaller quality values than the mean of all quality values in the optimized set of clusters and assign the result to a list
 
-.. code-block::
+.. code-block:: python
 
         redoClusters=[i for i in clusterTstats.keys() if \ 
          clusterTstats[i]<tStatMean] 
 
 7.) If the number of sub-par clusters is less or equal than one, then return the values that result from the Base Clustering
 
-.. code-block::
+.. code-block:: python
 
         if len(redoClusters)<=1: 
          return corr1,clstrs,silh 
 
 8.) If the number of sub-par clusters is more than one, then we move to the next steps
 
-.. code-block::
+.. code-block:: python
 
         else: 
 
 9.) Make a list of keys of the sub-par clusters
 
-.. code-block::
+.. code-block:: python
 
         keysRedo=[j for i in redoClusters for j in clstrs[i]] 
 
 10.) Make a new matrix that consists of values in the sub-par clusters
 
-.. code-block::
+.. code-block:: python
 
         corrTmp=corr0.loc[keysRedo,keysRedo] 
 
 11.) Calculate the mean of the means of the sub-par clusters
 
-.. code-block::
+.. code-block:: python
 
         tStatMean=np.mean([clusterTstats[i] for i in redoClusters]) 
 
 12.) Apply the clusterKMeansTop function to the new matrix of sub-par values. The maximum number of clusters that is set in this function is the minimum value between the initial function and the new matrix's N-1. A new set of optimum clustering is the result.
 
-.. code-block::
+.. code-block:: python
 
         corr2,clstrs2,silh2=clusterKMeansTop(corrTmp, \ 
           maxNumClusters=min(maxNumClusters, \ 
@@ -401,7 +401,7 @@ The details and explanations of the Top-Level of Clustering are provided below:
 
 13.) Assign new values of the correlation matrix, clustering, and Silhouette Scores. These values are obtained by applying the makeNewOutputs function to the original correlation matrix, clusters that have keys that are not in redoClusters, and the sub-par clusters that have gone through the filtering process in the search for sub-par clusters within.
 
-.. code-block::
+.. code-block:: python
 
         # Make new outputs, if necessary 
         corrNew,clstrsNew,silhNew=makeNewOutputs(corr0, \ 
@@ -410,21 +410,21 @@ The details and explanations of the Top-Level of Clustering are provided below:
 
 14.) Find the mean of the means of the quality values of all of the new clusters
 
-.. code-block::
+.. code-block:: python
 
         newTstatMean=np.mean([np.mean(silhNew[clstrsNew[i]])/ \ 
           np.std(silhNew[clstrsNew[i]]) for i in clstrsNew.keys()]) 
 
 15.) If the mean of the means of the new quality values is less or equal to the mean of the means of the initial quality values, then return the initial optimum set of clustering
 
-.. code-block::
+.. code-block:: python
 
         if newTstatMean<=tStatMean: 
             return corr1,clstrs,silh 
 
 16.) If the above condition is not satisfied, then return the new optimum set of clustering
 
-.. code-block::
+.. code-block:: python
 
         else: 
             return corrNew,clstrsNew,silhNew
@@ -445,7 +445,7 @@ Example
 
 Assuming that we want to find the optimum clustering of a matrix by using the ONC algorithm. Let's create the necessary correlation matrix.
 
-.. code-block::
+.. code-block:: python
     
     data = [[1,0.5,-0.2,0.7,0], [0.5,1,-1,0,-0.5], [-0.2,-1,1,0.1,0.8], [0.7,0,0.1,1,-0.5], [0,-0.5,0.8,-0.5,1]] 
     df = pd.DataFrame(data) 
@@ -453,7 +453,7 @@ Assuming that we want to find the optimum clustering of a matrix by using the ON
 
 Import the necessary packages.
 
-.. code-block::
+.. code-block:: python
 
     import numpy as np
     import pandas as pd
@@ -461,7 +461,7 @@ Import the necessary packages.
 
 Apply ONC algorithm on the matrix.
 
-.. code-block::
+.. code-block:: python
     
     get_onc_clusters(df,10)
 
