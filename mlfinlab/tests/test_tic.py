@@ -210,7 +210,7 @@ class TestNCO(unittest.TestCase):
                                       [-0.30629381, -0.30729469, 1, -0.30419096, -0.30729469],
                                       [0.7144813, 0.716816, -0.30419096, 1, 0.716816],
                                       [0.72177129, 0.72412981, -0.30729469, 0.716816, 1]],
-                                      index=etf_corr.index, columns=etf_corr.index)
+                                     index=etf_corr.index, columns=etf_corr.index)
 
         # Getting the correlation matrix
         corr = tic.tic_correlation(etf_classification_tree, etf_corr, tn_relation=tn_relation, kde_bwidth=0.25)
@@ -234,7 +234,7 @@ class TestNCO(unittest.TestCase):
                                  [-0.30629381, -0.30729469, 1, -0.30419096, -0.30729469],
                                  [0.7144813, 0.716816, -0.30419096, 1, 0.716816],
                                  [0.72177129, 0.72412981, -0.30729469, 0.716816, 1]],
-                                 index=etf_corr.index, columns=etf_corr.index)
+                                index=etf_corr.index, columns=etf_corr.index)
 
         # Expected distance between the matrices
         dist_ecpected = 0.0130404424083
