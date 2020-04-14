@@ -465,7 +465,7 @@ Apply ONC algorithm on the matrix.
     
     get_onc_clusters(df,10)
 
-The algorithm results in a tuple that contains an optimized correlation matrix, the optimized clusters, and the Silhouette Score of each node in the clusters. The result can be seen below.
+The algorithm results in a tuple that contains an optimized correlation matrix, the optimized clusters, and the Silhouette Scores of each node in the clusters. The result can be seen below.
 
 ::
 
