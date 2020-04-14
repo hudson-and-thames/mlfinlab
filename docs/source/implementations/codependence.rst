@@ -30,7 +30,45 @@ the limitations of correlations."
 Correlation-Based Metrics
 #########################
 
+Angular Distance
+*****************
+
 **Angular Distance** is a slight modification of correlation coefficient which satisfies all metric conditions.
+This measure is known as the angular distance because when we use *covariance* as *inner product*, we can interpret correlation as :math:`cos\theta`.
+It is a metric, because it is a linear multiple of the Euclidean distance between the vectors :math:`X, Y` (after standardization) from
+`Cornell lecture slides, p.10 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_
+
+.. math::
+    d_\rho[X, Y] = \sqrt{\frac{1}{2}(1-\rho[X,Y])}
+.. math::
+    d_\rho \in [0, 1]
+
+.. image:: codependence_images/angular_distance.png
+   :scale: 70 %
+   :align: center
+
+
+There are alternative correlation based distance metrics. We can use those distance depend on applications
+
+.. math::
+    d_{|\rho|}[X, Y] = \sqrt{1-|\rho[X,Y]|}
+.. math::
+    d_{\rho^2}[X, Y] = \sqrt{1-{\rho[X,Y]}^2}
+
+
+
+Marcos Lopez de Prado's slides
+
+    | In some financial applications, it makes more sense to apply a modified definition of angular distance, such that the sign of
+    | the correlation is ignored --- Marcos Lopez de Prado, `Cornell lecture slides, p.11 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_
+
+.. image:: codependence_images/modified_angular_distance.png
+   :scale: 70 %
+   :align: center
+
+
+Distance Correlation
+*********************
 
 **Distance Correlation** was introduced in 2005 by Gábor J. Székely to capture non-linear variable dependencies.
 
