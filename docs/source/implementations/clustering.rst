@@ -152,14 +152,14 @@ The details and the explanations of the Base Clustering are provided below.
         silh_=silhouette_samples(x,kmeans_.labels_) 
         stat=(silh_.mean()/silh_.std(),silh.mean()/silh.std()) 
 
-6.) We also update the Silhouette Scores and the k-mean if the clustering quality is greater than that of the previous loop
+6.) We also update the Silhouette Scores and the k-means if the clustering quality is greater than that of the previous loop
 
 .. code-block:: python
 
         if np.isnan(stat[1]) or stat[0]>stat[1]: 
            silh,kmeans=silh_,kmeans_
 
-7.) Rearrange the correlation matrix based on the k-mean clustering
+7.) Rearrange the correlation matrix based on the k-means clustering
 
 .. code-block:: python
 
@@ -168,7 +168,7 @@ The details and the explanations of the Base Clustering are provided below.
         corr1=corr1.iloc[:,newIdx] # reorder columns 
 
 
-8.) Make a dict that consists of clusters, their labels (keys), and variables (values) based on the k-mean clustering
+8.) Make a dict that consists of clusters, their labels (keys), and variables (values) based on the k-means clustering
 
 .. code-block:: python
 
