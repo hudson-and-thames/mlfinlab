@@ -149,7 +149,7 @@ Built With
     :hidden:
 
     implementations/onc
-
+    implementations/feature_clusters
 .. toctree::
     :maxdepth: 2
     :caption: Backtest Overfitting
