@@ -446,19 +446,16 @@ Example
 Assuming that we want to find the optimum clustering of a matrix by using the ONC algorithm. Let's create the necessary correlation matrix.
 
 .. code-block:: python
+
+    import numpy as np
+    import pandas as pd
+    from mlfinlab.clustering.onc import get_onc_clusters # import the ONC function
     
     data = [[1,0.5,-0.2,0.7,0], [0.5,1,-1,0,-0.5], [-0.2,-1,1,0.1,0.8],\
             [0.7,0,0.1,1,-0.5], [0,-0.5,0.8,-0.5,1]] 
     df = pd.DataFrame(data) 
     df
 
-Import the necessary packages.
-
-.. code-block:: python
-
-    import numpy as np
-    import pandas as pd
-    from mlfinlab.clustering.onc import get_onc_clusters # import the ONC function
 
 Apply ONC algorithm on the matrix.
 
