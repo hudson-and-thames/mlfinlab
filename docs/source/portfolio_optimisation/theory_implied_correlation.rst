@@ -93,12 +93,27 @@ The TIC algorithm consists of three steps:
 
 .. tip::
 
-    The algorithm for de-noising the correlation and the covariance matrix is implemented in the RiskEstimators class of the mlfinlab package. It is described in more detail `here <https://mlfinlab.readthedocs.io/en/latest/portfolio_optimisation/risk_estimators.html>`_.
+    The algorithm for de-noising the correlation and the covariance matrix is implemented in the RiskEstimators class of the mlfinlab package. It is described in more detail `here <https://github.com/hudson-and-thames/research/blob/master/RiskEstimators/RiskEstimators.ipynb>`_.
 
 
 .. tip::
 
     This algorithm is described in more detail in the work **Estimation of Theory-Implied Correlation Matrices** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3484152>`_.
+
+Correlation matrix distance
+###########################
+
+The similarity of the Empirical correlation matrix and the Theory-implied correlation matrix can be measured using the correlation matrix distance introduced by Herdin and Bonek `in this paper <https://publik.tuwien.ac.at/files/pub-et_8791.pdf>`_.
+
+The distance is calculated as:
+
+.. math::
+   d[\sum_{1},\sum_{2}] = 1 - \frac{tr(\sum_{1}\sum_{2})}{||\sum_{1}||_f||\sum_{2}||_f}
+
+Where :math:`\sum_{1},\sum_{2}` are the two correlation matrices and the :math:`||.||_f` is the Frobenius norm.
+
+From the work **Estimation of Theory-Implied Correlation Matrices**:
+"The distance :math:`\sum_{1},\sum_{2}` measures the orthogonality between the considered correlation matrices. It becomes zero if the correlation matrices are equal up to a scaling factor, and one if they differ to a maximum extent".
 
 Implementation
 ##############
@@ -120,14 +135,14 @@ Example Code
 
     # Reading data
     tree_classification = pd.read_csv('TREE_FILE_PATH')
-    stock_prices = pd.read_csv('DATA_FILE_PATH', parse_dates=True, index_col='Date')
+    stock_returns = pd.read_csv('DATA_FILE_PATH', parse_dates=True, index_col='Date')
 
     # Calculating the empirical correlation matrix
-    corr_matrix = stock_prices.corr()
+    corr_matrix = stock_returns.corr()
 
     # Calculating the relation of sample length T to the number of variables N
     # It's used for de-noising the TIC matrix
-    tn_relation = stock_prices.shape[0] / stock_prices.shape[1]
+    tn_relation = stock_returns.shape[0] / stock_returns.shape[1]
 
     # The class that contains the TIC algorithm
     tic = TIC()

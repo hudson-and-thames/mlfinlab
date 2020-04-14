@@ -368,7 +368,7 @@ class TIC:
         :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
                                     correlation matrix
         :param kde_bwidth: (float) The bandwidth of the kernel to fit KDE for de-noising the correlation matrix
-        :return: (pd.dataframe) Theory-Implied Correlation matrix
+        :return: (np.array) Theory-Implied Correlation matrix
         """
 
         # Getting the linkage object that characterizes the dendrogram
