@@ -7,9 +7,10 @@ from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
 
 class TIC:
     """
-    This class implements the Theory-Implied Correlation (TIC) algorithm. It is reproduced with
-    modification from the following paper: `Marcos Lopez de Prado “Estimation of Theory-Implied Correlation Matrices”,
-    (2019). <https://papers.ssrn.com/abstract_id=3484152>`_.
+    This class implements the Theory-Implied Correlation (TIC) algorithm and the correlation matrix distance
+    introduced by Herdin and Bonek. It is reproduced with modification from the following paper:
+    `Marcos Lopez de Prado “Estimation of Theory-Implied Correlation Matrices”, (2019).
+    <https://papers.ssrn.com/abstract_id=3484152>`_.
     """
 
     def __init__(self):
@@ -42,7 +43,7 @@ class TIC:
         # Creating a linkage object (matrix with link elements).
         # Each row represents a cluster and consists of the following columns:
         # (1) and (2) - number ids of two elements clustered together
-        # (3) - distance between those elements
+        # (3) - the distance between those elements
         # (4) - number of original variables in this cluster
         # Items in a cluster can be single elements or other clusters
         global_linkage = np.empty(shape=(0, 4))
@@ -50,7 +51,7 @@ class TIC:
         # List with elements containing two consecutive tree levels
         tree_levels = [[tree_struct.columns[i-1], tree_struct.columns[i]] for i in range(1, tree_struct.shape[1])]
 
-        # Calculating distance matrix from the empirical correlation matrix
+        # Calculating the distance matrix from the empirical correlation matrix
         distance_matrix = ((1 - corr_matrix) / 2)**(1/2)
 
         # Getting a list of names of elements
@@ -61,21 +62,21 @@ class TIC:
 
             # Taking two consecutive levels of the tree
             # Removing duplicates from the lower level of the tree
-            # Setting the obtained unique elements from the lower level as index
+            # Setting the obtained unique elements from the lower level as an index
             # Grouping by elements in the higher level
             grouped_level = tree_struct[level].drop_duplicates(level[0]).set_index(level[0]).groupby(level[1])
 
             # Iterating through the obtained two levels of a tree
             for high_element, grouped_elements in grouped_level:
                 # high_element contains the higher element
-                # grouped_elements contain the elements from lower level, grouped under the higher level element
+                # grouped_elements contain the elements from the lower level, grouped under the higher-level element
 
                 # Getting the names of the grouped elements
                 grouped_elements = grouped_elements.index.tolist()
 
                 # If only one element grouped by the element from the higher level
                 if len(grouped_elements) == 1:
-                    # Changing the name of this element to the name of element from the higher level
+                    # Changing the name of this element to the name of the element from the higher level
                     # As this element is now representing the higher level
 
                     # Changing the name in the list of names
@@ -123,7 +124,7 @@ class TIC:
                 distance_matrix.columns = distance_matrix.columns[:-1].tolist() + [high_element]
                 distance_matrix.index = distance_matrix.columns
 
-        # Changing the linkage object from array of arrays to array of tuples with named fields
+        # Changing the linkage object from an array of arrays to array of tuples with named fields
         global_linkage = np.array([*map(tuple, global_linkage)],
                                   dtype=[('i0', int), ('i1', int), ('dist', float), ('num', int)])
 
@@ -248,18 +249,18 @@ class TIC:
                 dist_vector = (distance_matrix[elem_1] * elem_1_weight + distance_matrix[elem_2] * elem_2_weight) / \
                               (elem_1_weight + elem_2_weight)
 
-            # If criterion function is given, the new distance is calculated using it
+            # If a criterion function is given, the new distance is calculated using it
             else:
                 # New distance
                 dist_vector = criterion(distance_matrix[[elem_1, elem_2]], axis=1)
 
-            # Adding column with new cluster to the distance matrix
+            # Adding a column with th new cluster to the distance matrix
             distance_matrix[new_items[i]] = dist_vector
 
-            # Adding row with new cluster to the distance matrix
+            # Adding row with the new cluster to the distance matrix
             distance_matrix.loc[new_items[i]] = dist_vector
 
-            # Setting the main diagonal value for the new cluster to 0 (distance of the element to itself is zero)
+            # Setting the main diagonal value for the new cluster to 0 (the distance of the element to itself is zero)
             distance_matrix.loc[new_items[i], new_items[i]] = 0
 
             # And deleting the two elements that were combined in the new cluster
@@ -281,7 +282,7 @@ class TIC:
         """
 
         # A list of elements to unpack
-        # Now includes only one given element, but will be appended with the unpacked elements
+        # Now includes only one given element but will be appended with the unpacked elements
         element_list = [element]
 
         # Iterating (until there are elements to unpack)
@@ -308,8 +309,8 @@ class TIC:
         """
         Derives a correlation matrix from the linkage object.
 
-        Each cluster in the global linkage object is decomposed to two elements,
-        which can be either atoms or other clusters. Then the off -diagonal correlation between two
+        Each cluster in the global linkage object is decomposed into two elements,
+        which can be either atoms or other clusters. Then the off-diagonal correlation between two
         elements are calculated based on the distances between them.
 
         This is the second step of the TIC algorithm.
@@ -344,20 +345,20 @@ class TIC:
 
         Includes three steps.
 
-        On the first step, the theoretical tree graph structure of the assets is fit on the evidence
+        In the first step, the theoretical tree graph structure of the assets is fit on the evidence
         presented by the empirical correlation matrix.
 
         The result of the first step is a binary tree (dendrogram) that sequentially clusters two elements
         together, while measuring how closely together the two elements are, until all elements are
         subsumed within the same cluster.
 
-        On the second step, a correlation matrix is derived from the linkage object.
+        In the second step, a correlation matrix is derived from the linkage object.
 
-        Each cluster in the global linkage object is decomposed to two elements,
-        which can be either atoms or other clusters. Then the off -diagonal correlation between two
-        elements are calculated based on the distances between them.
+        Each cluster in the global linkage object is decomposed into two elements,
+        which can be either atoms or other clusters. Then the off-diagonal correlation between two
+        elements is calculated based on the distances between them.
 
-        On the third step, the correlation matrix is de-noised.
+        In the third step, the correlation matrix is de-noised.
 
         This is done by fitting the Marcenko-Pastur distribution to the eigenvalues of the matrix, calculating the
         maximum theoretical eigenvalue as a threshold and shrinking the eigenvalues higher than a set threshold.
@@ -389,7 +390,7 @@ class TIC:
     @staticmethod
     def corr_dist(corr0, corr1):
         """
-        Calculates correlation matrix distance proposed by Herdin and Bonek.
+        Calculates the correlation matrix distance proposed by Herdin and Bonek.
 
         The distance obtained measures the orthogonality between the considered
         correlation matrices. If the matrices are equal up to a scaling factor,
@@ -409,12 +410,12 @@ class TIC:
         prod_trace = np.trace(np.dot(corr0, corr1))
 
         # Frobenius norm of the first correlation matrix
-        den = np.linalg.norm(corr0, ord='fro')
+        frob_product = np.linalg.norm(corr0, ord='fro')
 
         # Frobenius norm of the second correlation matrix
-        den *= np.linalg.norm(corr1, ord='fro')
+        frob_product *= np.linalg.norm(corr1, ord='fro')
 
         # Distance calculation
-        distance = 1 - prod_trace / den
+        distance = 1 - prod_trace / frob_product
 
         return distance
