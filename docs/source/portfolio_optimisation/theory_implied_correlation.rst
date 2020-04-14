@@ -40,11 +40,61 @@ Steps of the Algorithm
 
 The TIC algorithm consists of three steps:
 
-1. On the first step, the theoretical tree graph structure of the assets is fit on the evidence presented by the empirical correlation matrix. The result of the first step is a binary tree (dendrogram) that sequentially clusters two elements together, while measuring how closely together the two elements are, until all elements are subsumed within the same cluster.
+1. On the first step, the theoretical tree graph structure of the assets is fit on the evidence presented by the empirical correlation matrix.
 
-2. On the second step, a correlation matrix is derived from the linkage object. Each cluster in the global linkage object is decomposed to two elements, which can be either atoms or other clusters. Then the off -diagonal correlation between two elements are calculated based on the distances between them.
+ - If there is no top level of the tree (tree root), this level is added so that all variables are included in one general cluster.
 
-3. On the third step, the correlation matrix is de-noised. This is done by fitting the Marcenko-Pastur distribution to the eigenvalues of the matrix, calculating the maximum theoretical eigenvalue as a threshold and eliminating the eigenvalues higher than a set threshold. This algorithm is implemented in the RiskEstimators class.
+ - The empirical correlation matrix is transformed into a matrix of distances using the above formula:
+
+ .. math::
+    d_{i,j} = \sqrt{\frac{1}{2}(1 - \rho_{i,j})}
+
+ - For each level of the tree, the elements are grouped by elements from the higher level. The algorithm iterates from the lowest to the highest level of the tree.
+
+ - A linkage object is created for these grouped elements based on their distance matrix using the `SciPy linkage function <https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html>`_. Each link in the linkage object is an array representing a cluster of two elements and has the following data as elements:
+
+  - ID of the first element in a cluster
+
+  - ID of the second element in a cluster
+
+  - Distance between the elements
+
+  - Number of atoms (simple elements from portfolio and not clusters) inside
+
+ - A linkage object is transformed to reflect the previously created clusters.
+
+ - A transformed local linkage object is added to the global linkage object
+
+ - Distance matrix is adjusted to the newly created clusters - elements that are now in the new clusters are replaced by the clusters in the distance matrix. The distance from the new clusters to the rest of elements in the distance matrix is calculated as weighted average of distances of two elements in a cluster to the other elements. The weight is the number of atoms in an element. So, the formula is:
+
+ .. math::
+    DistanceCluster = \frac{Distance_1 * NumAtoms_1 + Distance_2 * NumAtoms_2}{NumAtoms_1 + NumAtoms_2}
+
+ - The linkage object, representing a dendrogram of all elements in a portfolio is the result of the first step of the algorithm. It sequentially clusters two elements together, while measuring how closely together the two elements are, until all elements are subsumed within the same cluster.
+
+2. On the second step, a correlation matrix is derived from the linkage object.
+
+ - One by one clusters (each represented by a link in the linkage object) are decomposed to lists of atoms contained in each of the two elements of the cluster.
+
+ - The elements on the main diagonal of the resulting correlation matrix are set to 1s. The off-diagonal correlations between the variables are computed as:
+
+ .. math::
+    \rho_{i,j} = 1 - 2 * d_{i,j}^{2}
+
+3. On the third step, the correlation matrix is de-noised.
+
+ - The eigenvalues and eigenvectors of the correlation matrix are calculated.
+
+ - Marcenko-Pastur distribution is fit to the eigenvalues of the correlation matrix and the maximum theoretical eigenvalue is calculated.
+
+ - This maximum theoretical eigenvalue is set as a threshold and all the eigenvalues above the threshold are shrinked.
+
+ - The de-noised correlation matrix is calculated back from the eigenvectors and the new eigenvalues.
+
+.. tip::
+
+    The algorithm for de-noising the correlation and the covariance matrix is implemented in the RiskEstimators class of the mlfinlab package. It is described in more detail `here <https://mlfinlab.readthedocs.io/en/latest/portfolio_optimisation/risk_estimators.html>`_.
+
 
 .. tip::
 

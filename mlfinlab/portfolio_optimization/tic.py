@@ -360,7 +360,7 @@ class TIC:
         On the third step, the correlation matrix is de-noised.
 
         This is done by fitting the Marcenko-Pastur distribution to the eigenvalues of the matrix, calculating the
-        maximum theoretical eigenvalue as a threshold and eliminating the eigenvalues higher than a set threshold.
+        maximum theoretical eigenvalue as a threshold and shrinking the eigenvalues higher than a set threshold.
         This algorithm is implemented in the RiskEstimators class.
 
         :param tree_struct: (pd.dataframe) The tree graph that represents the structure of the assets
