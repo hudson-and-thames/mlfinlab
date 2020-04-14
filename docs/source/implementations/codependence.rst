@@ -119,6 +119,7 @@ The following example highlights how the various metrics behave under various va
     :scale: 70 %
     :align: center
 
+
 Codependence Matrix
 ###################
 
@@ -143,3 +144,4 @@ Example
 
    dep_matrix = get_dependence_matrix(X, dependence_method='distance_correlation')
    dist_matrix = get_distance_matrix(dep_matrix, distance_metric='angular')
+   

@@ -3,7 +3,7 @@ Explosiveness tests: Chow-Type Dickey-Fuller Test
 """
 
 import pandas as pd
-from mlfinlab.structural_breaks.sadf import _get_betas
+from mlfinlab.structural_breaks.sadf import get_betas
 from mlfinlab.util import mp_pandas_obj
 
 
@@ -27,9 +27,10 @@ def _get_dfc_for_t(series: pd.Series, molecule: list) -> pd.Series:
 
         y = series_diff.loc[series_lag.index].values
         x = series_lag.values
-        coefs, coef_vars = _get_betas(x.reshape(-1, 1), y)
+        coefs, coef_vars = get_betas(x.reshape(-1, 1), y)
         b_estimate, b_var = coefs[0], coef_vars[0][0]
         dfc_series[index] = b_estimate / (b_var ** 0.5)
+
     return dfc_series
 
 
