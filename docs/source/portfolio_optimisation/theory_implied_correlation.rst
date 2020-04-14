@@ -4,7 +4,7 @@
 ================================
 Theory-Implied Correlation (TIC)
 ================================
-This TIC class includes algorithm to calculate the Theory-Implied Correlation and a method to calculate the correlation matrix distance proposed by Herdin and Bonek. This distance may be used to measure to which extent the TIC matrix has blended theory-implied views (tree structure of the elements) with empirical evidence (correlation matrix).
+This TIC class includes an algorithm to calculate the Theory-Implied Correlation and a method to calculate the correlation matrix distance proposed by Herdin and Bonek. This distance may be used to measure to which extent the TIC matrix has blended theory-implied views (tree structure of the elements) with empirical evidence (correlation matrix).
 
 About the Algorithm
 ###################
@@ -13,13 +13,13 @@ The TIC algorithm is aiming to estimate a forward-looking correlation matrix bas
 
 According to Lopez de Prado, author of the algorithm: "A problem of empirical correlation matrices is that they are purely observation driven, and do not impose a structural view of the investment universe, supported by economic theory."
 
-Using the TIC approach allows to include forward-looking views to the world, instead of only backward-looking views in empirical correlations matrix.
+Using the TIC approach allows us to include forward-looking views to the world, instead of only backward-looking views in empirical correlations matrix.
 
-The economic theory in the algorithm is represented in terms of a tree graph. The tree can include any number of levels needed, each branch should have one or more leaves, some branches may include more levels than other.
+The economic theory in the algorithm is represented in terms of a tree graph. The tree can include any number of levels needed, each branch should have one or more leaves, some branches may include more levels than others.
 
 An example of how the theoretical structure can be used is the MSCI's Global Industry Classification Standard (GICS) for investments. Using this structure, each stock can be classified using four levels of depth.
 
-To use a tree as the input to the algorithm, it should have the bottom-up order of the columns, where the leftmost column is corresponding to terminal leaves and the rifhtmost colums corresponding to the tree's root. An  example of a tree graph according to the GICS:
+To use a tree as the input to the algorithm, it should have the bottom-up order of the columns, where the leftmost column is corresponding to terminal leaves and the rightmost columns corresponding to the tree's root. An  example of a tree graph according to the GICS:
 
 +---------------+----------------+-----------+-----------------+---------+
 | Ticker        | Sub-Industry   | Industry  | Industry Group  | Sector  |
@@ -40,7 +40,7 @@ Steps of the Algorithm
 
 The TIC algorithm consists of three steps:
 
-1. On the first step, the theoretical tree graph structure of the assets is fit on the evidence presented by the empirical correlation matrix.
+1. In the first step, the theoretical tree graph structure of the assets is fit on the evidence presented by the empirical correlation matrix.
 
  - If there is no top level of the tree (tree root), this level is added so that all variables are included in one general cluster.
 
@@ -59,29 +59,29 @@ The TIC algorithm consists of three steps:
 
   - Distance between the elements
 
-  - Number of atoms (simple elements from portfolio and not clusters) inside
+  - Number of atoms (simple elements from the portfolio and not clusters) inside
 
  - A linkage object is transformed to reflect the previously created clusters.
 
  - A transformed local linkage object is added to the global linkage object
 
- - Distance matrix is adjusted to the newly created clusters - elements that are now in the new clusters are replaced by the clusters in the distance matrix. The distance from the new clusters to the rest of elements in the distance matrix is calculated as weighted average of distances of two elements in a cluster to the other elements. The weight is the number of atoms in an element. So, the formula is:
+ - The distance matrix is adjusted to the newly created clusters - elements that are now in the new clusters are replaced by the clusters in the distance matrix. The distance from the new clusters to the rest of the elements in the distance matrix is calculated as weighted a average of distances of two elements in a cluster to the other elements. The weight is the number of atoms in an element. So, the formula is:
 
  .. math::
     DistanceCluster = \frac{Distance_1 * NumAtoms_1 + Distance_2 * NumAtoms_2}{NumAtoms_1 + NumAtoms_2}
 
  - The linkage object, representing a dendrogram of all elements in a portfolio is the result of the first step of the algorithm. It sequentially clusters two elements together, while measuring how closely together the two elements are, until all elements are subsumed within the same cluster.
 
-2. On the second step, a correlation matrix is derived from the linkage object.
+2. In the second step, a correlation matrix is derived from the linkage object.
 
- - One by one clusters (each represented by a link in the linkage object) are decomposed to lists of atoms contained in each of the two elements of the cluster.
+ - One by one, the clusters (each represented by a link in the linkage object) are decomposed to lists of atoms contained in each of the two elements of the cluster.
 
  - The elements on the main diagonal of the resulting correlation matrix are set to 1s. The off-diagonal correlations between the variables are computed as:
 
  .. math::
     \rho_{i,j} = 1 - 2 * d_{i,j}^{2}
 
-3. On the third step, the correlation matrix is de-noised.
+3. In the third step, the correlation matrix is de-noised.
 
  - The eigenvalues and eigenvectors of the correlation matrix are calculated.
 
