@@ -5,7 +5,7 @@
 Clustering
 ==========
 
-Clustering is a task of grouping a set of data points into several groups such that data points in the same group are more similar to each other than to those in other groups. There are different types of clustering algorithms that are known. Some of the well-known ones are the distribution-based method, centroid based method, connectivity-based method, density model, and subspace clustering. One of the most popular clusterings is the K-means algorithm that falls under the category of the centroid based method. However, the K-means algorithm requires the user to set the number of clusters in advance. Besides that, the initialization of the clusters is random. As the consequence, often that the solution is not optimal in some sense, and the effectiveness of the algorithm can be random. 
+Clustering is a task of grouping a set of data points into several groups such that data points in the same group are more similar to each other than to those in other groups. There are different types of clustering algorithms that are known. Some of the well-known ones are the distribution-based method, centroid based method, connectivity-based method, density model, and subspace clustering. One of the most popular clusterings is the K-means algorithm that falls under the category of the centroid based method. However, the K-means algorithm requires the user to set the number of clusters in advance. Besides that, the initialization of the clusters is random. Consequently, often that the solution is not optimal in some sense, and the effectiveness of the algorithm can be random. 
 
 
 Optimal Number of Clusters (ONC)
