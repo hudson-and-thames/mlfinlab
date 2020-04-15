@@ -6,12 +6,21 @@ Theory-Implied Correlation (TIC)
 ================================
 This TIC class includes an algorithm to calculate the Theory-Implied Correlation and a method to calculate the correlation matrix distance proposed by Herdin and Bonek. This distance may be used to measure to which extent the TIC matrix has blended theory-implied views (tree structure of the elements) with empirical evidence (correlation matrix).
 
+.. tip::
+   **Underlying Literature**
+
+   The following sources elaborate extensively on the topic:
+
+   - **Estimation of Theory-Implied Correlation Matrices** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3484152>`_. *Describes the TIC algorithm*
+   - **AMIMO Correlation Matrix based Metric for Characterizing Non-Stationarity** *by* Markus Herdin *and* Ernst Bonek `available here <https://publik.tuwien.ac.at/files/pub-et_8791.pdf>`_. *Describes the Correlation Matrix Distance metric*
+
 About the Algorithm
 ###################
 
 The TIC algorithm is aiming to estimate a forward-looking correlation matrix based on economic theory. The method is using a theoretical classification of assets (hierarchical structure) and fits the empirical correlation matrix to the theoretical structure.
 
-According to Lopez de Prado, author of the algorithm: "A problem of empirical correlation matrices is that they are purely observation driven, and do not impose a structural view of the investment universe, supported by economic theory."
+From the work **Estimation of Theory-Implied Correlation Matrices**:
+"A problem of empirical correlation matrices is that they are purely observation driven, and do not impose a structural view of the investment universe, supported by economic theory."
 
 Using the TIC approach allows us to include forward-looking views to the world, instead of only backward-looking views in empirical correlations matrix.
 
@@ -100,10 +109,10 @@ The TIC algorithm consists of three steps:
 
     This algorithm is described in more detail in the work **Estimation of Theory-Implied Correlation Matrices** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3484152>`_.
 
-Correlation matrix distance
+Correlation Matrix Distance
 ###########################
 
-The similarity of the Empirical correlation matrix and the Theory-implied correlation matrix can be measured using the correlation matrix distance introduced by Herdin and Bonek `in this paper <https://publik.tuwien.ac.at/files/pub-et_8791.pdf>`_.
+The similarity of the Empirical correlation matrix and the Theory-implied correlation matrix can be measured using the correlation matrix distance introduced by Herdin and Bonek.
 
 The distance is calculated as:
 
@@ -114,6 +123,10 @@ Where :math:`\sum_{1},\sum_{2}` are the two correlation matrices and the :math:`
 
 From the work **Estimation of Theory-Implied Correlation Matrices**:
 "The distance :math:`\sum_{1},\sum_{2}` measures the orthogonality between the considered correlation matrices. It becomes zero if the correlation matrices are equal up to a scaling factor, and one if they differ to a maximum extent".
+
+.. tip::
+
+    The Correlation Matrix Distance metric is described in more detail in the work **AMIMO Correlation Matrix based Metric for Characterizing Non-Stationarity** *by* Markus Herdin *and* Ernst Bonek `available here <https://publik.tuwien.ac.at/files/pub-et_8791.pdf>`_.
 
 Implementation
 ##############
@@ -154,7 +167,7 @@ Example Code
     matrix_distance = tic.corr_dist(corr_matrix, tic_matrix)
 
 Research Notebooks
-==================
+##################
 
 The following research notebook can be used to better understand how the algorithms within this module can be used on real data.
 

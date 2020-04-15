@@ -11,7 +11,7 @@ from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 from mlfinlab.portfolio_optimization.tic import TIC
 
 
-class TestNCO(unittest.TestCase):
+class TestTIC(unittest.TestCase):
     """
     Tests different functions of the TIC algorithm class.
     """
