@@ -14,7 +14,7 @@ Optimal Number of Clusters algorithm detects the optimal number of K-Means clust
 
 The same subject and information can also be found in 'Machine Learning for Asset Managers', Marcos M. Lopez de Prado, Cornell University, New York, April 2020, Chapter 4, Page 52-64.
 
-This algorithm results in a tuple that contains an optimized correlation matrix, optimized clusters, and the Silhouette Score of each node in the clusters.
+This algorithm results in a tuple that contains an optimized correlation matrix, optimized clusters, and the Silhouette Scores of each node in the clusters.
 
 
 Formulas
