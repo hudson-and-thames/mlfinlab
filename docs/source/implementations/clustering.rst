@@ -401,7 +401,7 @@ The details and explanations of the Top-Level of Clustering are provided below:
           maxNumClusters=min(maxNumClusters, \ 
           corrTmp.shape[1]-1),n_init=n_init)
 
-13.) Assign new values of the correlation matrix, clustering, and Silhouette Scores. These values are obtained by applying the makeNewOutputs function to the original correlation matrix, clusters that have keys that are not in redoClusters, and the sub-par clusters that have gone through the filtering process in the search for sub-par clusters within.
+13.) Assign new values of the correlation matrix, clustering, and Silhouette Scores. These values are obtained by applying the makeNewOutputs function to the original correlation matrix, clusters with keys that are not in redoClusters, and the sub-par clusters that have gone through the filtering process in the search for sub-par clusters within.
 
 .. code-block:: python
 
