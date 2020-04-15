@@ -56,7 +56,8 @@ We rerun the Base Clustering algorithm on the matrix that is composed of the ele
 The ONC Algorithm Diagram
 *************************
 
-The ONC algorithm is a composition of two main algorithms, the Base Clustering, and the Top-Level Clustering. Below are the diagrams for the two algorithms. 
+The ONC algorithm is a composition of two main algorithms, the Base Clustering, and the Top-Level Clustering. Below are the diagrams for the two algorithms.
+
 **Structure of the ONC's Base Clustering Stage.**
 
 .. image:: clustering_images/ONC_diagram_base.png
