@@ -78,7 +78,7 @@ Figure 4.2. Marcos M. Lopez de Prado and Lewis (2018). *Structure of ONC's highe
 The ONC Algorithm Code and The Workflow
 ***************************************
 
-The ONC algorithm is divided into two main parts, the Base Clustering, and the Top- Level Clustering. The Base Clustering produces optimum clustering while the Top- Level Clustering reassesses the clustering, optimizes the inconsistent clustering, and updates the clustering accordingly. We dissect the code, organize the parts, and put some explanations for us to understand the structure and mechanism of the ONC algorithm. We first assume that we have an NxN correlation matrix  :math:`\rho` , where  :math:`\rho_{ij}` is the correlation between entities *i* and *j*.
+We divide the ONC algorithm into two main parts, the Base Clustering, and the Top- Level Clustering. The Base Clustering produces optimum clustering while the Top- Level Clustering reassesses the clustering, optimizes the inconsistent clustering, and updates the clustering accordingly. We dissect the code, organize the parts, and put some explanations for us to understand the structure and mechanism of the ONC algorithm. We first assume that we have an NxN correlation matrix  :math:`\rho` , where  :math:`\rho_{ij}` is the correlation between entities *i* and *j*.
 
 **The Base Clustering**
 
