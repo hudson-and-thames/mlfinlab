@@ -16,6 +16,7 @@ The same subject and information can also be found in 'Machine Learning for Asse
 
 This algorithm results in a tuple that contains an optimized correlation matrix, optimized clusters, and the Silhouette Score of each node in the clusters.
 
+
 Formulas
 ********
 
@@ -55,8 +56,7 @@ We rerun the Base Clustering algorithm on the matrix that is composed of the ele
 The ONC Algorithm Diagram
 *************************
 
-The ONC algorithm is a composition of two main algorithms where each algorithm supports the main objective of the ONC algorithm. The two main parts of the ONC are the Base Clustering and the Top-Level Clustering. Below are the diagrams for the said parts.
-
+The ONC algorithm is a composition of two main algorithms, the Base Clustering, and the Top-Level Clustering. Below are the diagrams for the two algorithms. 
 **Structure of the ONC's Base Clustering Stage.**
 
 .. image:: clustering_images/ONC_diagram_base.png
@@ -429,7 +429,7 @@ The details and explanations of the Top-Level of Clustering are provided below:
 
         else: 
             return corrNew,clstrsNew,silhNew
-        
+   
 
 Implementation
 ##############
@@ -439,8 +439,8 @@ Implementation
 
 .. automodule:: mlfinlab.clustering.onc
    :members: get_onc_clusters
-                
-        
+           
+  
 Example
 #######
 
