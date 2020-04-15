@@ -308,7 +308,7 @@ The details and explanations of the Top-Level of Clustering are provided below:
           idxs=[x.index.get_loc(k) for k in clstrsNew[i]] 
           kmeans_labels[idxs]=i 
 
-10.) Make a series of Silhouette Scores of the correlations distance matrix that is sorted by the new index labels
+10.) Make a series of Silhouette Scores of the correlations distance matrix that is sorted based on the new index labels
 
 .. code-block:: python
 
