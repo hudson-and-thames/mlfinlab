@@ -9,9 +9,7 @@ class OLPS(object):
     # Initialize
     def __init__(self):
         """
-        :param weights: (pd.DataFrame) final weight of portfolio
-        :param all_weights: (pd.DataFrame) all weights of portfolio
-        :param portfolio_return: (pd.DataFrame) all returns of portfolio
+        Initiating variables
         """
         # weights
         self.weights = None
@@ -303,6 +301,10 @@ class OLPS(object):
         simplex = np.sort(np.random.random((_number_of_portfolio, _number_of_assets - 1)))
         simplex = np.diff(np.hstack([np.zeros((_number_of_portfolio, 1)), simplex, np.ones((_number_of_portfolio, 1))]))
         return simplex.T
+
+    # generating sigmoid function
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
 
 
 def main():

@@ -12,8 +12,10 @@ class FCORN(SCORN):
     """
 
 
-    def __init__(self, lamb=0.3):
+    def __init__(self, lamb=0.3, window=10, rho=0.8):
         self.lamb = 0.3
+        self.window = window
+        self.rho = rho
         super(FCORN, self).__init__()
 
     def update_weight(self, _weights, _relative_return, _time):
@@ -29,30 +31,13 @@ class FCORN(SCORN):
         if _time - 1 > self.window:
             activation_fn = np.zeros(self.final_number_of_time)
             for i in range(self.window + 1, _time - 1):
-                if self.corr_coef[i - 1][_time - 1] > self.rho:
-                    similar_set.append(i)
-                elif self.corr_coef[i - 1][_time - 1] < -self.rho:
-                    opposite_set.append(i)
-            if similar_set:
-                # put 1 for the values in the set
-                activation_fn[similar_set] = 1
-            if opposite_set:
-                activation_fn[opposite_set] = -1
+                c = self.corr_coef[i - 1][_time - 1]
+                if c >= 0:
+                    activation_fn[i] = self.sigmoid(-self.lamb * (c - self.rho))
+                else:
+                    activation_fn[i] = self.sigmoid(-self.lamb * (c + self.rho))
             new_weights = self.optimize(_relative_return, activation_fn)
         return new_weights
-
-    def optimize(self, _optimize_array, _activation_fn):
-        # initial guess
-        weights = self.uniform_weight(self.number_of_assets)
-        def objective(_weights):
-            return -np.dot(_activation_fn, np.log(np.dot(_optimize_array, _weights)))
-        # weight bounds
-        bounds = tuple((0.0, 1.0) for asset in range(self.number_of_assets))
-        # sum of weights = 1
-        const = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
-
-        problem = opt.minimize(objective, weights, method='SLSQP', bounds=bounds, constraints=const)
-        return problem.x
 
 def main():
     """
