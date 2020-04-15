@@ -369,7 +369,7 @@ The details and explanations of the Top-Level of Clustering are provided below:
         if len(redoClusters)<=1: 
          return corr1,clstrs,silh 
 
-8.) If the number of sub-par clusters is more than one, then we move to the next steps
+8.) If the number of sub-par clusters is more than one, then we move to the next step
 
 .. code-block:: python
 
