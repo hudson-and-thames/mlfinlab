@@ -25,3 +25,4 @@ from mlfinlab.online_portfolio_selection.pattern_matching.CORN import CORN
 from mlfinlab.online_portfolio_selection.pattern_matching.CORN_U import CORN_U
 from mlfinlab.online_portfolio_selection.pattern_matching.CORN_K import CORN_K
 from mlfinlab.online_portfolio_selection.pattern_matching.SCORN import SCORN
+from mlfinlab.online_portfolio_selection.pattern_matching.FCORN import FCORN
