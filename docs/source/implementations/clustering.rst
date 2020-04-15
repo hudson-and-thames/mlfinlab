@@ -362,7 +362,7 @@ The details and explanations of the Top-Level of Clustering are provided below:
         redoClusters=[i for i in clusterTstats.keys() if \ 
          clusterTstats[i]<tStatMean] 
 
-7.) If the number of sub-par clusters is less or equal than one, then return the values that result from the Base Clustering
+7.) If the number of sub-par clusters is less or equal than one, then return the values from the Base Clustering
 
 .. code-block:: python
 
