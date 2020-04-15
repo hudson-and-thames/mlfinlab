@@ -22,13 +22,13 @@ The TIC algorithm is aiming to estimate a forward-looking correlation matrix bas
 From the work **Estimation of Theory-Implied Correlation Matrices**:
 "A problem of empirical correlation matrices is that they are purely observation driven, and do not impose a structural view of the investment universe, supported by economic theory."
 
-Using the TIC approach allows us to include forward-looking views to the world, instead of only backward-looking views in empirical correlations matrix.
+Using the TIC approach allows us to include forward-looking views to the world, instead of only backward-looking views from the empirical correlations matrix.
 
-The economic theory in the algorithm is represented in terms of a tree graph. The tree can include any number of levels needed, each branch should have one or more leaves, some branches may include more levels than others.
+The economic theory in the algorithm is represented in terms of a tree graph. "The tree can include any number of levels needed, each branch should have one or more leaves, some branches may include more levels than others".
 
-An example of how the theoretical structure can be used is the MSCI's Global Industry Classification Standard (GICS) for investments. Using this structure, each stock can be classified using four levels of depth.
+An example of how the theoretical structure can be used is the `MSCI's Global Industry Classification Standard (GICS) <https://www.msci.com/gics>`_ for investments. Using this structure, each stock can be classified using four levels of depth.
 
-To use a tree as the input to the algorithm, it should have the bottom-up order of the columns, where the leftmost column is corresponding to terminal leaves and the rightmost columns corresponding to the tree's root. An  example of a tree graph according to the GICS:
+To use a tree as the input to the algorithm, it should have the "bottom-up order of the columns, where the leftmost column is corresponding to terminal leaves and the rightmost columns corresponding to the tree's root". An  example of a tree graph according to the GICS:
 
 +---------------+----------------+-----------+-----------------+---------+
 | Ticker        | Sub-Industry   | Industry  | Industry Group  | Sector  |
@@ -42,7 +42,7 @@ To use a tree as the input to the algorithm, it should have the bottom-up order 
 | AAPL UW Equity| 45202030       | 452020    | 4520            | 45      |
 +---------------+----------------+-----------+-----------------+---------+
 
-The empirical correlation matrix used in the TIC algorithm is estimated on historical observations. It should be symmetric and have a main diagonal of 1s. But it doesn't need to be invertible, positive-definite or non-singular.
+The empirical correlation matrix used in the TIC algorithm is estimated on historical observations. "It should be symmetric and have a main diagonal of 1s. But it doesn't need to be invertible, positive-definite or non-singular".
 
 Steps of the Algorithm
 ######################
@@ -74,7 +74,7 @@ The TIC algorithm consists of three steps:
 
  - A transformed local linkage object is added to the global linkage object
 
- - The distance matrix is adjusted to the newly created clusters - elements that are now in the new clusters are replaced by the clusters in the distance matrix. The distance from the new clusters to the rest of the elements in the distance matrix is calculated as weighted a average of distances of two elements in a cluster to the other elements. The weight is the number of atoms in an element. So, the formula is:
+ - The distance matrix is adjusted to the newly created clusters - elements that are now in the new clusters are replaced by the clusters in the distance matrix. The distance from the new clusters to the rest of the elements in the distance matrix is calculated as a weighted average of distances of two elements in a cluster to the other elements. The weight is the number of atoms in an element. So, the formula is:
 
  .. math::
     DistanceCluster = \frac{Distance_1 * NumAtoms_1 + Distance_2 * NumAtoms_2}{NumAtoms_1 + NumAtoms_2}
