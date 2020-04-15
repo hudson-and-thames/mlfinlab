@@ -1,11 +1,11 @@
 # pylint: disable=missing-module-docstring
-import pandas as pd
-from mlfinlab.online_portfolio_selection import BCRP
+import cvxpy as cp
+from mlfinlab.online_portfolio_selection import OLPS
 
 
-class FTL(BCRP):
+class FTL(OLPS):
     """
-    This class implements the Constant Rebalanced Portfolio strategy.
+    This class implements Follow the Leader strategy.
     """
 
     def update_weight(self, _weights, _relative_return, _time):
@@ -16,4 +16,4 @@ class FTL(BCRP):
         :param _time:
         :return:
         """
-        return self.optimize(_relative_return[:_time])
+        return self.optimize(_relative_return[:_time], _solver=cp.SCS)

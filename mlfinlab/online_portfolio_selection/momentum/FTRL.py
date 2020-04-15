@@ -1,5 +1,4 @@
 # pylint: disable=missing-module-docstring
-import pandas as pd
 import numpy as np
 import cvxpy as cp
 from mlfinlab.online_portfolio_selection import FTL
@@ -21,10 +20,10 @@ class FTRL(FTL):
         :param _time:
         :return:
         """
-        return self.optimize(_relative_return[:_time])
+        return self.optimize(_relative_return[:_time], _solver=cp.SCS)
 
     # optimize the weight that maximizes the returns
-    def optimize(self, _optimize_array):
+    def optimize(self, _optimize_array, _solver=None):
         length_of_time = _optimize_array.shape[0]
         number_of_assets = _optimize_array.shape[1]
         if length_of_time == 1:
@@ -43,14 +42,16 @@ class FTRL(FTL):
         # Optimization objective and constraints
         allocation_objective = cp.Maximize(portfolio_return)
         allocation_constraints = [
-            cp.sum(weights) == 1,
-            weights <= 1,
-            weights >= 0
+                cp.sum(weights) == 1,
+                cp.min(weights) >= 0
         ]
         # Define and solve the problem
         problem = cp.Problem(
-            objective=allocation_objective,
-            constraints=allocation_constraints
+                objective=allocation_objective,
+                constraints=allocation_constraints
         )
-        problem.solve()
+        if _solver:
+            problem.solve(solver=_solver)
+        else:
+            problem.solve()
         return weights.value
