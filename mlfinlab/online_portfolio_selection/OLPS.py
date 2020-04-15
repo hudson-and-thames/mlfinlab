@@ -251,8 +251,7 @@ class OLPS(object):
         allocation_objective = cp.Maximize(portfolio_return)
         allocation_constraints = [
             cp.sum(weights) == 1,
-            weights <= 1,
-            weights >= 0
+            cp.min(weights) >= 0
         ]
         # Define and solve the problem
         problem = cp.Problem(
