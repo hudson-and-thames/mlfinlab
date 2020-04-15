@@ -183,7 +183,7 @@ The details and the explanations of the Base Clustering are provided below.
 
         silh=pd.Series(silh,index=x.index) 
 
-10.) Return the optimized matrix, the clusters and their labels, and the Silhouette Scores
+10.) Return the optimized matrix, the clusters, their labels, and the Silhouette Scores
 
 .. code-block:: python
 
