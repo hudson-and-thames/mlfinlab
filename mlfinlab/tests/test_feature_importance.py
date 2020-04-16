@@ -15,7 +15,7 @@ from mlfinlab.feature_importance.importance import (mean_decrease_impurity,
                                                     mean_decrease_accuracy, single_feature_importance,
                                                     plot_feature_importance)
 from mlfinlab.feature_importance.orthogonal import feature_pca_analysis, get_orthogonal_features
-
+from mlfinlab.clustering.feature_clusters import get_feature_clusters
 
 # pylint: disable=invalid-name
 class TestFeatureImportance(unittest.TestCase):
@@ -94,6 +94,20 @@ class TestFeatureImportance(unittest.TestCase):
                                                     sample_weight_score=np.ones((self.X.shape[0],)),
                                                     scoring=f1_score)
 
+        #CFI feature importance
+        #Auto number of clusters selection
+        clustered_subsets_linear = get_feature_clusters(self.X, dependence_metric='linear',
+                                                        distance_metric='angular', linkage_method='single',
+                                                        n_clusters=None)
+        cfi_feat_imp_linear = mean_decrease_accuracy(self.bag_clf, self.X, self.y, self.cv_gen,
+                                                     clustered_subsets=clustered_subsets_linear)
+        #CFI with number clusters equal to number of features
+        #This is done verify the theory that if number clusters is equal to number of features then the
+        #result will be same as MDA
+        feature_subset_single = [[x] for x in self.X.columns]
+        cfi_feat_imp_single = mean_decrease_accuracy(self.bag_clf, self.X, self.y, self.cv_gen,
+                                                     clustered_subsets=feature_subset_single)
+
         # MDI assertions
         self.assertAlmostEqual(mdi_feat_imp['mean'].sum(), 1, delta=0.001)
         # The most informative features
@@ -119,6 +133,14 @@ class TestFeatureImportance(unittest.TestCase):
         # SFI(accuracy) assertions
         self.assertAlmostEqual(sfi_feat_imp_f1.loc['I_0', 'mean'], 0.48530, delta=0.1)
         self.assertAlmostEqual(sfi_feat_imp_f1.loc['I_1', 'mean'], 0.78778, delta=0.1)
+
+        #CFI(log_loss) assertions
+        self.assertAlmostEqual(cfi_feat_imp_linear.loc['I_1', 'mean'], 0.2, delta=3)
+        self.assertAlmostEqual(cfi_feat_imp_linear.loc['R_0', 'mean'], 0.3, delta=3)
+
+        #Test if CFI with number of clusters same to number features is equal to MDA results
+        self.assertEqual(mda_feat_imp_log_loss.loc['I_1', 'mean'], cfi_feat_imp_single.loc['I_1', 'mean'])
+        self.assertEqual(mda_feat_imp_log_loss.loc['R_0', 'mean'], cfi_feat_imp_single.loc['R_0', 'mean'])
 
     def test_plot_feature_importance(self):
         """
