@@ -19,7 +19,6 @@ class PAMR(OLPS):
         self.optimization_method = optimization_method
         super().__init__()
 
-
     def update_weight(self, _weights, _relative_return, _time):
         """
 
@@ -32,7 +31,7 @@ class PAMR(OLPS):
         _past_relative_return = _relative_return[_time - 1]
         loss = max(0, np.dot(_weights, _past_relative_return))
         adjusted_market_change = _past_relative_return - self.uniform_weight(self.number_of_assets) * np.mean(
-            _past_relative_return)
+                _past_relative_return)
         diff_norm = np.linalg.norm(adjusted_market_change)
 
         # different optimization methods

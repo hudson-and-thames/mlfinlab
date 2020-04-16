@@ -39,24 +39,6 @@ class OLMAR(OLPS):
                                                                               self.reversion_method, self.alpha)
         super(OLMAR, self).initialize(_asset_prices, _weights, _portfolio_start, _resample_by)
 
-    # change based on method
-    def run(self, _weights, _relative_return):
-        """
-
-        :param _weights:
-        :param _relative_return:
-        :return:
-        """
-        # set initial weights
-        self.weights = self.first_weight(_weights)
-        self.all_weights[0] = self.weights
-
-        # Run the Algorithm for the rest of data
-        for time in range(1, self.final_number_of_time):
-            # update weights
-            self.weights = self.update_weight(self.weights, _relative_return, time)
-            self.all_weights[time] = self.weights
-
     def update_weight(self, _weights, _relative_return, _time):
         """
 

@@ -3,7 +3,7 @@ Classes derived from Online Portfolio Selection module
 
 STILL THINKING OF WAYS TO USE THIS
 """
-from . import olps_utils
+# Parent Method
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 # Benchmarks
 from mlfinlab.online_portfolio_selection.benchmarks.BAH import BAH

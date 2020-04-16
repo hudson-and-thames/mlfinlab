@@ -3,42 +3,42 @@ import pandas as pd
 import numpy as np
 import cvxpy as cp
 
-
 # General OLPS class
 class OLPS(object):
-    # Initialize
+    """
+    Parent Class for all Online Portfolio Selection Algorithms
+    This class broadly defines all variables and allocates a set of weights given a certain strategy
+    """
     def __init__(self):
         """
         Initiating variables
         """
-        # weights
+        # weights of the most recent time
         self.weights = None
+        # all weights of the given time period
         self.all_weights = None
-        # delayed portfolio
+        # delayed portfolio in case we want only a later timeframe
         self.portfolio_start = None
-        # asset names
+        # asset names of the given data
         self.asset_name = None
+        # number of assets in the given data
         self.number_of_assets = None
-        # asset time
+        # asset time index
         self.time = None
+        # number of time periods over the given data
         self.number_of_time = None
-        # final asset time
+        # final asset time index
         self.final_time = None
+        # final number of time periods
         self.final_number_of_time = None
-        # relative return and final relative return
+        # relative return data
         self.relative_return = None
+        # final relative return data
         self.final_relative_return = None
         # portfolio return
         self.portfolio_return = None
         # pass dataframe on
         self.asset_prices = None
-
-        # self.asset_prices = None
-        # self.covariance_matrix = None
-        # self.portfolio_risk = None
-        # self.portfolio_sharpe_ratio = None
-        # self.expected_returns = None
-        # self.returns_estimator = ReturnsEstimation()
 
     # public method idea
     # OLPS.allocate(some_data)
@@ -51,14 +51,15 @@ class OLPS(object):
                  portfolio_start=0,
                  resample_by=None):
         """
+        All OLPS algorithms can have their weight allocated using this method
+
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
-        :param weights: any weights
+        :param weights: (list/np.array/pd.Dataframe) any initial weights that the user wants to use
         :param portfolio_start: (int) delay the portfolio by n number of time
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         """
-        # Data Check
-        # Some sort of initial check to make sure data fits the standards
+        # Data Check method to make sure that the data fits the standards
         # asset name in right format
         # asset price in right format
         # resample_by in right format
@@ -67,40 +68,62 @@ class OLPS(object):
         # not implemented yet
         self.check_asset(asset_prices, weights, portfolio_start, resample_by)
 
-        # Data Prep
+        # Data Prep to initialize all variables
         self.initialize(asset_prices, weights, portfolio_start, resample_by)
 
         # Actual weight calculation
         # For future portfolios only change __run() if we want to change it to batch style
-        # or change __update_weight to change stepwise function
-        # or change __first_weight if we delay our portfolio return start date
+        # or change update_weight to change stepwise function
+        # or change first_weight if we delay our portfolio return start date
         self.run(weights, self.final_relative_return)
 
-        # round weights
-        self.all_weights = self.round_weights(self.all_weights)
+        # round weights and drop values that are less than the given threshold
+        self.all_weights = self.round_weights(self.all_weights, threshold=1e-6)
 
-        # Calculate Portfolio Returns
+        # Calculate Portfolio Returns based on all the weights calculated from the run method
         self.calculate_portfolio_returns(self.all_weights, self.final_relative_return)
 
-        # convert everything to make presentable
+        # convert everything to pd.Dataframe to make the information presentable
         self.conversion(_all_weights=self.all_weights, _portfolio_return=self.portfolio_return)
 
     # check for valid dataset
     # raise ValueError
     def check_asset(self, _asset_prices, _weights, _portfolio_start, _resample_by):
+        """
+        Checks if the given input value is valid
+
+        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
+        :param weights: (list/np.array/pd.Dataframe) any initial weights that the user wants to use
+        :param portfolio_start: (int) delay the portfolio by n number of time
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+                                  None for no resampling
+        :return: (None) raises ValueError if there are incorrect inputs
+        """
         # is the dataset actually valid
         pass
         # check _asset_prices is dataframe
         # check weights size is _asset_prices column size
-        # _resample_by actually works
-        # _portfolio_start is a valid number
+        # check that the weights sum to 1
+        # _resample_by actually works - right parameter
+        # _portfolio_start is a valid number and nonnegative
 
     def initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
-        # resample asset
+        """
+        Initializes the important variables for the object
+
+        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
+        :param weights: (list/np.array/pd.Dataframe) any initial weights that the user wants to use
+        :param portfolio_start: (int) delay the portfolio by n number of time
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+                                  None for no resampling
+        :return: (None) Sets all the important information regarding the portfolio
+        """
+        # resample asset to either make the calculations shorter or to look at a longer time period
         if _resample_by is not None:
             _asset_prices = _asset_prices.resample(_resample_by).last()
 
         # set portfolio start
+        # this information will be implemented later with more data on portfolio usage
         self.portfolio_start = _portfolio_start
 
         # set asset names
@@ -125,7 +148,7 @@ class OLPS(object):
         self.final_time = self.time[self.portfolio_start:]
         self.final_number_of_time = self.final_time.size
 
-        # calcualte final relative return
+        # calculate final relative return
         self.final_relative_return = self.calculate_relative_return(_asset_prices[self.portfolio_start:])
 
         # set final_weights
@@ -134,48 +157,95 @@ class OLPS(object):
         # set portfolio_return
         self.portfolio_return = np.zeros((self.final_number_of_time, 1))
 
-        # pass dataframe on
+        # pass dataframe on in order to speed up process
         self.asset_prices = _asset_prices
 
     # for this one, it doesn't matter, but for subsequent complex selection problems, we might have to include a
     # separate run method for each iteration and not clog the allocate method.
     # after calculating the new weight add that to the all weights
     def run(self, _weights, _relative_return):
+        """
+        Runs the algorithm in a step by step fashion
+
+        :param _weights: (list/np.array/pd.Dataframe) any initial weights that the user wants to use
+        :param _relative_return: (np.array) the relative returns of the given price data
+        :return: (None) Calculates all the weights given the range of time
+        """
         # set initial weights
         self.weights = self.first_weight(_weights)
+        # set initial all weights to be the first given weight
         self.all_weights[0] = self.weights
 
-        # Run the Algorithm for the rest of data
+        # run the algorithm for the rest of data from time 1 to the end
         for t in range(1, self.final_number_of_time):
             # update weights
             self.weights = self.update_weight(self.weights, _relative_return, t)
+            # set the next all_weights to be the changed weight
             self.all_weights[t] = self.weights
 
-    # for the first one, just return the same weight
-    # only have to change this for future iteration
+    # for this specific class, the weight doesn't change so just return the same weight
+    # for other portfolios, most of the itmes we only have to change this for future iteration
     def update_weight(self, _weights, _relative_return, _time):
+        """
+        Updates portfolio weights for a given time, previous weight, and given relative return array
+
+        :param _weights: (np.array) weight for the previous time period
+        :param _relative_return:  (np.array) relative returns of a certain time period specified by the strategy
+        :param _time: (int) time for the portfolio calculation
+        :return _weights: (np.array) same weight as the input weight
+        """
+        # weight does not change
         return _weights
 
     # calculate relative returns
     def calculate_relative_return(self, _asset_prices):
-        # percent change of each row
-        # first row is blank because no change, so make it 0
-        # add 1 to all values so that the values can be multiplied easily
-        # change to numpy array
+        """
+        Calculates the relative return of a given price data
+
+        :param _asset_prices: (pd.Dataframe/np.array) historical price of the given assets
+        :return relative_return: (np.array) relative returns of a certain time period specified by the strategy
+        """
+        # first calculate the percent change of each time period
+        # first row is nan because there is no initial change, so we replce that value with 0
+        # add 1 to all values to replicate relative returns for each week
+        # change type to np.array
         relative_return = np.array(_asset_prices.pct_change().fillna(0) + 1)
         return relative_return
 
     # calculate rolling correlation coefficient
     def calculate_rolling_correlation_coefficient(self, _relative_return):
+        """
+        Calculates the rolling correlation coefficient for a given relative return and window
+
+        :param _relative_return: relative returns of a certain time period specified by the strategy
+        :return rolling_corr_coef: (np.array) rolling correlation coefficient over a given window
+        """
+        # take the log of the relative return
+        # first calculate the rolling window the relative return
+        # sum the data which returns the log of the window's return
+        # take the exp to revert back to the original window's returns
+        # calculate the correlation coefficient for the different window's overall returns
         rolling_corr_coef = np.corrcoef(np.exp(np.log(pd.DataFrame(_relative_return)).rolling(self.window).sum()))
         return rolling_corr_coef
 
     # calculate rolling moving average for OLMAR
     def calculate_rolling_moving_average(self, _asset_prices, _window, _reversion_method, _alpha):
+        """
+        Calculates the rolling moving average for Online Moving Average Reversion
+
+        :param _asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
+        :param _window: (int) number of market windows
+        :param _reversion_method: (int) number that represents the reversion method
+        :param _alpha: (int) exponential weight for the second reversion method
+        :return rolling_ma: (np.array) rolling moving average for the given reversion method
+        """
+        # MAR-1 reversion method: Simple Moving Average
         if _reversion_method == 1:
-            return np.array(_asset_prices.rolling(_window).apply(lambda x: np.sum(x) / x[0] / _window))
+            rolling_ma = np.array(_asset_prices.rolling(_window).apply(lambda x: np.sum(x) / x[0] / _window))
+        # Mar-2 reversion method: Exponential Moving Average
         elif _reversion_method == 2:
-            return np.array(_asset_prices.ewm(alpha=_alpha, adjust=False).mean() / _asset_prices)
+            rolling_ma = np.array(_asset_prices.ewm(alpha=_alpha, adjust=False).mean() / _asset_prices)
+        return rolling_ma
 
     # initialize first weight
     # might change depending on algorithm
