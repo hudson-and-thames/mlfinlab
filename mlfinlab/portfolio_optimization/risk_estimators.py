@@ -216,12 +216,12 @@ class RiskEstimators:
         """
         De-noises the correlation matrix using the Constant Residual Eigenvalue method.
 
-        The input is the eigenvalues and the eigenvectors of the covariance matrix and the number
-        of the first eigenvalue that is above the maximum theoretical eigenvalue.
+        The input is the eigenvalues and the eigenvectors of the correlation matrix and the number
+        of the first eigenvalue that is below the maximum theoretical eigenvalue.
 
         De-noising is done by shrinking the eigenvalues associated with noise (the eigenvalues lower than
         the maximum theoretical eigenvalue are set to a constant eigenvalue, preserving the trace of the correlation
-        matrix). The de-noised covariance matrix is then calculated back from new eigenvalues and eigenvectors.
+        matrix).
 
         The result is the de-noised correlation calculated from the de-noised covariance matrix.
 
@@ -248,18 +248,23 @@ class RiskEstimators:
 
         return corr
 
-    def _denoise_corr2(self, eigenvalues, eigenvectors, num_facts, alpha=0):
+    def _denoised_corr2(self, eigenvalues, eigenvectors, num_facts, alpha=0):
         """
         De-noises the correlation matrix using the Targeted Shrinkage method.
 
-        The input is the eigenvalues and the eigenvectors of the covariance matrix and the number
-        of the first eigenvalue that is above the maximum theoretical eigenvalue.
+        The input is the eigenvalues and the eigenvectors of the correlation matrix and the number
+        of the first eigenvalue that is below the maximum theoretical eigenvalue and the shrinkage
+        coefficient for the eigenvectors and eigenvalues associated with noise.
+
+        Shrinks strictly the random eigenvalues - eigenvalues below the maximum theoretical eigenvalue.
 
         The result is the de-noised correlation calculated from the de-noised covariance matrix.
 
         :param eigenvalues: (np.array) Matrix with eigenvalues on the main diagonal
         :param eigenvectors: (float) Eigenvectors array
         :param num_facts: (float) Threshold for eigenvalues to be fixed
+        :param alpha: (float) In range (0 to 1) - shrinkage among the eigenvectors
+                              and eigenvalues associated with noise
         :return: (np.array) De-noised correlation matrix
         """
 
@@ -285,16 +290,18 @@ class RiskEstimators:
 
         return corr
 
-    def _detone_corr(self, eigenvalues, eigenvectors, num_facts, alpha=0, market_component=1):
+    def _detone_corr(self, eigenvalues, eigenvectors, num_facts, market_component=1):
         """
         De-tones the correlation matrix by removing the market component.
 
-        The input is the eigenvalues and the eigenvectors of the covariance matrix and the number
-        of the first eigenvalue that is above the maximum theoretical eigenvalue.
+        The input is the eigenvalues and the eigenvectors of the correlation matrix and the number
+        of the first eigenvalue that is above the maximum theoretical eigenvalue and the number of
+        eigenvectors related to a market component.
 
         :param eigenvalues: (np.array) Matrix with eigenvalues on the main diagonal
         :param eigenvectors: (float) Eigenvectors array
         :param num_facts: (float) Threshold for eigenvalues to be fixed
+        :param market_component: (int) Number of fist eigevectors related to a market component
         :return: (np.array)
         """
 
@@ -311,14 +318,8 @@ class RiskEstimators:
         # Removing the market component from the de-noised correlation matrix
         corr = corr - corr_mark
 
-        # Eigenvalues on main diagonal of a matrix
-        eigenvalues = np.diag(corr)
-
-        # De-toned covariance matrix
-        cov = np.dot(eigenvectors, eigenvalues).dot(eigenvectors.T)
-
         # De-toned correlation matrix
-        corr = self.cov_to_corr(cov)
+        corr = self.cov_to_corr(corr)
 
         return corr
 
