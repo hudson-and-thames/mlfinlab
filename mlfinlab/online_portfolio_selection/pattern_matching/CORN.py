@@ -50,7 +50,6 @@ class CORN(OLPS):
                 # put 1 for the values in the set
                 activation_fn[similar_set] = 1
                 new_weights = self.optimize(_relative_return, activation_fn, cp.SCS)
-            print(activation_fn)
         return new_weights
 
     # optimize the weight that maximizes the returns
@@ -81,20 +80,11 @@ class CORN(OLPS):
                 objective=allocation_objective,
                 constraints=allocation_constraints
         )
-        print(problem.is_dcp())
-        print(problem.is_dqcp())
         if _solver:
             problem.solve(qcp=True, solver=_solver)
         else:
             problem.solve()
         return weights.value
-
-    def generate_random_window_rho(self, _length_of_window, _number_of_rho):
-        """
-        :param _length_of_window:
-        :param _number_of_rho:
-        :return:
-        """
 
 
 def main():
