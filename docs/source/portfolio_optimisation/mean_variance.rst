@@ -12,9 +12,9 @@ Mean-Variance Optimisation
 ==========================
 
 This class contains some classic Mean-Variance optimisation techniques based on Harry Markowitz's methods. We use
-`cvxopt <https://cvxopt.org/>`_ as our quadratic optimiser instead of the more frequently used
+`cvxpy <https://www.cvxpy.org/index.html>`_ as our quadratic optimiser instead of the more frequently used
 `scipy.optimize <https://docs.scipy.org/doc/scipy/reference/optimize.html>`_. This was a design choice for two reasons:
-(a) the documentation of cvxopt is better than that of scipy and (b) cvxopt's code is much more readable and easier to understand.
+(a) the documentation of cvxpy is better than that of scipy and (b) cvxpy's code is much more readable and easier to understand.
 
 Currently, the following solution strings are supported by MVO class:
 
