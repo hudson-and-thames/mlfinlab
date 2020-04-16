@@ -10,3 +10,23 @@ class CRP(OLPS):
 
     Constant Rebalanced Portfolio rebalances to a given weight for each time period.
     """
+    def __init__(self, weights):
+        super(CRP, self).__init__()
+        self.weights = weights
+
+    def first_weight(self, _weights):
+        """
+        Returns the first weight of the given portfolio
+
+        :param _weights: (list/np.array/pd.Dataframe) weights given by the user, none if not initialized
+        :return _weights: (np.array) returns a uniform weight if not given a specific weight for the initial portfolio
+        """
+        # initialize with the given weights
+        if self.weights is not None:
+            return self.weights
+        # if no initializing or no weights for allocate method, return uniform weight
+        elif _weights is None:
+            return self.uniform_weight(self.number_of_assets)
+        # return given weight
+        else:
+            return _weights

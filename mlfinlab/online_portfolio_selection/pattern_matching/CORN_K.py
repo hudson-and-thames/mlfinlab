@@ -2,36 +2,49 @@
 import numpy as np
 import pandas as pd
 from mlfinlab.online_portfolio_selection.pattern_matching.CORN import CORN
-from mlfinlab.online_portfolio_selection.pattern_matching.CORN_U import CORN_U
+from mlfinlab.online_portfolio_selection.UP import UP
 
 
-class CORN_K(CORN_U):
+class CORN_K(UP):
     """
     This class implements the Correlation Driven Nonparametric Learning - Uniform strategy.
     """
     # check -1 <= rho <= 1
     # check window >= 1
-    def __init__(self, k=5, window=10,rho=10):
+    def __init__(self, k=5, number_of_window=10, number_of_rho=10):
         """
         Constructor.
         """
         self.k = k
-        self.window = window
-        self.rho = rho
-        super().__init__()
+        self.number_of_window = number_of_window
+        self.number_of_rho = number_of_rho
+        self.number_of_experts = self.number_of_window * self.number_of_rho
+        super().__init__(number_of_experts=self.number_of_experts)
 
-    # run by iterating through the experts
-    # could optimize for efficiency later on
-    def run(self, _weights, _relative_return):
-        # run allocate on all the experts
+    def generate_experts(self):
+        """
+        Generates n experts for CORN-K strategy
+
+        :return:
+        """
+        self.expert_params = np.zeros((self.number_of_experts, 2))
+        pointer = 0
+        for _window in range(1, self.number_of_window + 1):
+            for _rho in range(1, self.number_of_rho + 1):
+                self.expert_params[pointer] = [_window, _rho / self.number_of_rho]
+                pointer += 1
+
         for exp in range(self.number_of_experts):
-            print(self.experts[exp].window, self.experts[exp].rho)
-            # allocate to each experts
-            self.experts[exp].allocate(self.asset_prices)
-            # stack the weights
-            self.expert_all_weights[exp] = self.experts[exp].all_weights
-            # stack the portfolio returns
-            self.expert_portfolio_returns[:, [exp]] = self.experts[exp].portfolio_return
+            param = self.expert_params[exp]
+            self.experts.append(CORN(int(param[0]), param[1]))
+
+    def calculate_weights_on_experts(self):
+        """
+        Calculates the weight allocation on each experts
+        Weights rebalanced to give equal allocation to all managers
+
+        :return: (None) set weights_on_experts
+        """
 
         # wealth is not uniformaly distributed only the top k experts get 1/k of the wealth
         # https://stackoverflow.com/questions/6910641/how-do-i-get-indices-of-n-maximum-values-in-a-numpy-array
@@ -47,12 +60,9 @@ class CORN_K(CORN_U):
         # new array where each row represents that week's allocation to the k experts
         for time in range(1, top_k.shape[0] + 1):
             top_k_distribution[time][top_k[time - 1]] = 1/self.k
-        # calculate the product of the distribution matrix with the 3d expers x all weights matrix
-        # https://stackoverflow.com/questions/58588378/how-to-matrix-multiply-a-2d-numpy-array-with-a-3d-array-to-give-a-3d-array
-        d_shape = top_k_distribution.shape[:1] + self.expert_all_weights.shape[1:]
-        weight_change = (top_k_distribution @ self.expert_all_weights.reshape(self.expert_all_weights.shape[0], -1)).reshape(d_shape)
-        # we are looking at the diagonal cross section of the multiplication
-        self.all_weights = np.diagonal(weight_change, axis1=0, axis2=1).T
+
+        self.weights_on_experts = top_k_distribution
+
 
 
 def main():
@@ -61,7 +71,7 @@ def main():
     """
     stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    corn_k = CORN_K(k=5)
+    corn_k = CORN_K(k=3, number_of_window=3, number_of_rho=3)
     corn_k.allocate(stock_price, resample_by='m')
     print(corn_k.all_weights)
     print(corn_k.portfolio_return)

@@ -23,6 +23,8 @@ class UP(OLPS):
         self.expert_portfolio_returns = None
         # 3d np.array of each expert's weights over time
         self.expert_all_weights = None
+        # wealth weights on each expert
+        self.weights_on_experts = None
         super(UP, self).__init__()
 
     def initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
@@ -47,14 +49,15 @@ class UP(OLPS):
         # run allocate on all the experts
         for exp in range(self.number_of_experts):
             # allocate to each experts
-            self.experts[exp].allocate(self.asset_prices, weights=self.expert_params[exp])
+            self.experts[exp].allocate(self.asset_prices)
             # stack the weights
             self.expert_all_weights[exp] = self.experts[exp].all_weights
             # stack the portfolio returns
             self.expert_portfolio_returns[:, [exp]] = self.experts[exp].portfolio_return
 
+        self.calculate_weights_on_experts()
         # uniform weight distribution for wealth between managers
-        self.calculate_all_weights(self.expert_all_weights, self.expert_portfolio_returns)
+        self.calculate_all_weights()
 
     def generate_experts(self):
         """
@@ -66,7 +69,7 @@ class UP(OLPS):
         """
         self.generate_simplex(self.number_of_experts, self.number_of_assets)
         for exp in range(self.number_of_experts):
-            self.experts.append(CRP())
+            self.experts.append(CRP(weights=self.expert_params[exp]))
 
     def generate_simplex(self, _number_of_experts, _number_of_assets):
         """
@@ -86,22 +89,30 @@ class UP(OLPS):
         simplex = np.diff(np.hstack([np.zeros((_number_of_experts, 1)), simplex, np.ones((_number_of_experts, 1))]))
         self.expert_params = simplex
 
-    def calculate_all_weights(self, expert_all_weights, expert_portfolio_returns):
+    def calculate_weights_on_experts(self):
+        """
+        Calculates the weight allocation on each experts
+        The initial weights don't change, but total weights do change as underlying asset price fluctuates
+
+        :return: (None) set weights_on_experts
+        """
+        # calculate each expert's cumulative return ratio for each time period
+        expert_returns_ratio = np.apply_along_axis(lambda x: x/np.sum(x), 1, self.expert_portfolio_returns[:-1])
+        # initial weights is evenly distributed among all experts
+        expert_returns_ratio = np.vstack((self.uniform_weight(self.number_of_experts), expert_returns_ratio))
+        self.weights_on_experts = expert_returns_ratio
+
+    def calculate_all_weights(self):
         """
         UP allocates the same weight to all experts
         The weights will be adjusted each week due to market fluctuations
 
-        :param expert_all_weights: (np.array) 3d array
-        :param expert_portfolio_returns (np.array) 2d array
         :return average_weights: (np.array) 2d array
         """
-        # calculate each expert's cumulative return ratio for each time period
-        expert_returns_ratio = np.apply_along_axis(lambda x: x/np.sum(x), 1, expert_portfolio_returns[:-1])
-        expert_returns_ratio = np.vstack((self.uniform_weight(self.number_of_experts), expert_returns_ratio))
 
         # calculate the product of the distribution matrix with the 3d experts x all weights matrix
         # https://stackoverflow.com/questions/58588378/how-to-matrix-multiply-a-2d-numpy-array-with-a-3d-array-to-give-a-3d-array
-        d_shape = expert_returns_ratio.shape[:1] + expert_all_weights.shape[1:]
-        weight_change = (expert_returns_ratio @ expert_all_weights.reshape(expert_all_weights.shape[0], -1)).reshape(d_shape)
+        d_shape = self.weights_on_experts.shape[:1] + self.expert_all_weights.shape[1:]
+        weight_change = (self.weights_on_experts @ self.expert_all_weights.reshape(self.expert_all_weights.shape[0], -1)).reshape(d_shape)
         # we are looking at the diagonal cross section of the multiplication
         self.all_weights = np.diagonal(weight_change, axis1=0, axis2=1).T

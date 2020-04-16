@@ -22,8 +22,8 @@ class CORN_U(UP):
 
     def generate_experts(self):
         """
-        :param _length_of_window:
-        :param _number_of_rho:
+        Generates n experts for CORN-U strategy
+
         :return:
         """
         self.expert_params = np.zeros((self.number_of_experts, 2))
@@ -37,44 +37,17 @@ class CORN_U(UP):
             param = self.expert_params[exp]
             self.experts.append(CORN(int(param[0]), param[1]))
 
-    def run(self, _weights, _relative_return):
+    def calculate_weights_on_experts(self):
         """
-        Runs all experts by iterating through the initiated array
+        Calculates the weight allocation on each experts
+        Weights rebalanced to give equal allocation to all managers
 
-        :param _weights:
-        :param _relative_return:
-        :return:
+        :return: (None) set weights_on_experts
         """
-        # run allocate on all the experts
-        for exp in range(self.number_of_experts):
-            # allocate to each experts
-            self.experts[exp].allocate(self.asset_prices)
-            # stack the weights
-            self.expert_all_weights[exp] = self.experts[exp].all_weights
-            # stack the portfolio returns
-            self.expert_portfolio_returns[:, [exp]] = self.experts[exp].portfolio_return
 
-        # uniform weight distribution for wealth between managers
-        self.calculate_all_weights(self.expert_all_weights, self.expert_portfolio_returns)
-
-    def calculate_all_weights(self, expert_all_weights, expert_portfolio_returns):
-        """
-        CORN-U allocates the same weight to all experts in every time period
-
-        :param expert_all_weights: (np.array) 3d array
-        :param expert_portfolio_returns (np.array) 2d array
-        :return average_weights: (np.array) 2d array
-        """
         # weight allocated is 1/n for all experts
-        expert_returns_ratio = np.ones(expert_portfolio_returns.shape) / self.number_of_experts
-
-        # calculate the product of the distribution matrix with the 3d experts x all weights matrix
-        # https://stackoverflow.com/questions/58588378/how-to-matrix-multiply-a-2d-numpy-array-with-a-3d-array-to-give-a-3d-array
-        d_shape = expert_returns_ratio.shape[:1] + expert_all_weights.shape[1:]
-        weight_change = (expert_returns_ratio @ expert_all_weights.reshape(expert_all_weights.shape[0], -1)).reshape(d_shape)
-        # we are looking at the diagonal cross section of the multiplication
-        self.all_weights = np.diagonal(weight_change, axis1=0, axis2=1).T
-
+        expert_returns_ratio = np.ones(self.expert_portfolio_returns.shape) / self.number_of_experts
+        self.weights_on_experts = expert_returns_ratio
 
 
 def main():
@@ -83,7 +56,7 @@ def main():
     """
     stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    corn_u = CORN_U(number_of_window=20, number_of_rho=20)
+    corn_u = CORN_U(number_of_window=3, number_of_rho=3)
     corn_u.allocate(stock_price, resample_by='m')
     print(corn_u.all_weights)
     print(corn_u.portfolio_return)
