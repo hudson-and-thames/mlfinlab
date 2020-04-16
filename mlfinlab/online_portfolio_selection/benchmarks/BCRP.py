@@ -5,12 +5,20 @@ import cvxpy as cp
 
 class BCRP(OLPS):
     """
-    This class implements the Constant Rebalanced Portfolio strategy.
+    This class implements the Best Constant Rebalanced Portfolio strategy. It is reproduced with modification from the following paper:
+    Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December YEAR),
+    33 pages. DOI:http://dx.doi.org/10.1145/0000000.0000000.
+
+    Best Constant Rebalanced Portfolio rebalances to a set weight that maximizes returns over a given time period.
+
+    This strategy is implemented in hindsight and is not predictive
     """
 
     def first_weight(self, _weights):
         """
-        :param _weights: optimized first weight
-        :return:
+        :param _weights: (np.array) given weights that do not affect the new weights
+        :return new_weights: (np.array) weights that maximize the returns
         """
-        return self.optimize(self.final_relative_return, _solver=cp.SCS)
+        # used cp.SCS solver to speed up calculations
+        new_weights = self.optimize(self.final_relative_return, _solver=cp.SCS)
+        return new_weights
