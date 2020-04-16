@@ -1,7 +1,6 @@
 # pylint: disable=missing-module-docstring
 
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
-import pandas as pd
 
 
 class BAH(OLPS):
@@ -14,13 +13,18 @@ class BAH(OLPS):
     the portfolio till the end. The manager only buys the assets at the beginning of the first period and does
     not rebalance in subsequent periods.
     """
+
     # adjust for previous returns
     # even if we don't rebalance, weights change because of the underlying price changes
     def update_weight(self, _weights, _relative_return, _time):
         """
-        :param _time:
-        :param _relative_return:
-        :param _weights
+        Changes step-by-step update method to adjsut for underlying asset price changes
+
+        :param _relative_return: (np.array) previous time period's relative return
+        :param _weights: (np.array) new weights that are adjusted for price change
+        :param _time: (int) time for current weights
+        :return
         """
-        new_weight = _weights * _relative_return[_time - 1]
-        return self.normalize(new_weight)
+        # calculate adjusted weights and then normalize
+        new_weight = self.normalize(_weights * _relative_return[_time - 1])
+        return new_weight
