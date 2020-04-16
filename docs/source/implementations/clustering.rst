@@ -42,7 +42,9 @@ The ONC algorithm accommodates three distinct features that set the algorithm ap
 
         :math:`D_{i,j}= \sqrt{\frac{1}{2}(1-\rho_{ij})}`
 
+        :math:`\rho_{ij}` = the correlation between entities *i* and *j*
 
+        
 The ONC Mechanism
 *****************
 
