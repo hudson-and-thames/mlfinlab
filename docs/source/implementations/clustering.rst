@@ -20,7 +20,7 @@ This algorithm results in a tuple that contains an optimized correlation matrix,
 Formulas
 ********
 
-The ONC algorithm accommodates three distinct features that set the algorithm apart from the K-means clustering. These features are Silhouette Scores, the measure of clustering quality or *q*, and the distance matrix. The formulas of the said features are available below.
+The ONC algorithm accommodates three distinct features that set the algorithm apart from the traditional K-means clustering. These features are Silhouette Scores, the measure of clustering quality or *q*, and the distance matrix. The formulas of the said features are available below.
 
 * Silhouette Scores:
 
