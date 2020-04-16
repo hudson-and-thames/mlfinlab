@@ -248,14 +248,14 @@ class RiskEstimators:
 
         return corr
 
-    def _detoned_corr(self, eigenvalues, eigenvectors, num_facts, alpha=0):
+    def _denoise_corr2(self, eigenvalues, eigenvectors, num_facts, alpha=0):
         """
-        De-tones the correlation matrix using the Targeted Shrinkage method.
+        De-noises the correlation matrix using the Targeted Shrinkage method.
 
         The input is the eigenvalues and the eigenvectors of the covariance matrix and the number
         of the first eigenvalue that is above the maximum theoretical eigenvalue.
 
-        The result is the de-toned correlation calculated from the de-toned covariance matrix.
+        The result is the de-noised correlation calculated from the de-noised covariance matrix.
 
         :param eigenvalues: (np.array) Matrix with eigenvalues on the main diagonal
         :param eigenvectors: (float) Eigenvectors array
@@ -277,10 +277,47 @@ class RiskEstimators:
         # Calculating the covariance matrix from eigenvalues associated with noise
         cov_noise = np.dot(eigenvectors_noise, eigenvalues_noise).dot(eigenvectors_noise.T)
 
-        # Calculating the De-toned correlation matrix
+        # Calculating the De-noised correlation matrix
         cov = cov_signal + alpha * cov_noise + (1 - alpha) * np.diag(np.diag(cov_noise))
 
-        # Ne-noised correlation matrix
+        # De-noised correlation matrix
+        corr = self.cov_to_corr(cov)
+
+        return corr
+
+    def _detone_corr(self, eigenvalues, eigenvectors, num_facts, alpha=0, market_component=1):
+        """
+        De-tones the correlation matrix by removing the market component.
+
+        The input is the eigenvalues and the eigenvectors of the covariance matrix and the number
+        of the first eigenvalue that is above the maximum theoretical eigenvalue.
+
+        :param eigenvalues: (np.array) Matrix with eigenvalues on the main diagonal
+        :param eigenvectors: (float) Eigenvectors array
+        :param num_facts: (float) Threshold for eigenvalues to be fixed
+        :return: (np.array)
+        """
+
+        # Getting the de-noised correlation matrix
+        corr = self._denoised_corr(eigenvalues, eigenvectors, num_facts)
+
+        # Getting the eigenvalues and eigenvectors related to market component
+        eigenvalues_mark = eigenvalues[:market_component, :market_component]
+        eigenvectors_mark = eigenvectors[:, :market_component]
+
+        # Calculating the market component covariance
+        corr_mark = np.dot(eigenvectors_mark, eigenvalues_mark).dot(eigenvectors_mark.T)
+
+        # Removing the market component from the de-noised correlation matrix
+        corr = corr - corr_mark
+
+        # Eigenvalues on main diagonal of a matrix
+        eigenvalues = np.diag(corr)
+
+        # De-toned covariance matrix
+        cov = np.dot(eigenvectors, eigenvalues).dot(eigenvectors.T)
+
+        # De-toned correlation matrix
         corr = self.cov_to_corr(cov)
 
         return corr
