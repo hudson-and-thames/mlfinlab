@@ -64,7 +64,6 @@ class UP(OLPS):
         Generate the experts with the specified parameter
         Can easily swap out for different generations for different UP algorithms
 
-        :param _number_of_experts: (int) number of experts generated for universal portfolio
         :return: (None) Initialize each strategies
         """
         self.generate_simplex(self.number_of_experts, self.number_of_assets)

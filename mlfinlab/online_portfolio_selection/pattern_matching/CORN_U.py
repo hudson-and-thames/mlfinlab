@@ -9,15 +9,16 @@ class CORN_U(UP):
     """
     This class implements the Correlation Driven Nonparametric Learning - Uniform strategy.
     """
+
     # check -1 <= rho <= 1
     # check window >= 1
-    def __init__(self, number_of_window=3, number_of_rho=3):
+    def __init__(self, window_values, rho_values):
         """
         Constructor.
         """
-        self.number_of_window = number_of_window
-        self.number_of_rho = number_of_rho
-        self.number_of_experts = number_of_window * number_of_rho
+        self.window_values = window_values
+        self.rho_values = rho_values
+        self.number_of_experts = len(self.window_values) * len(self.rho_values)
         super().__init__(number_of_experts=self.number_of_experts)
 
     def generate_experts(self):
@@ -28,9 +29,9 @@ class CORN_U(UP):
         """
         self.expert_params = np.zeros((self.number_of_experts, 2))
         pointer = 0
-        for _window in range(1, self.number_of_window + 1):
-            for _rho in range(1, self.number_of_rho + 1):
-                self.expert_params[pointer] = [_window, _rho / self.number_of_rho]
+        for _window in self.window_values:
+            for _rho in self.rho_values:
+                self.expert_params[pointer] = [_window, _rho]
                 pointer += 1
 
         for exp in range(self.number_of_experts):
@@ -56,7 +57,7 @@ def main():
     """
     stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    corn_u = CORN_U(number_of_window=3, number_of_rho=3)
+    corn_u = CORN_U(window_values=[2, 3, 4], rho_values=[0.4, 0.6, 0.8])
     corn_u.allocate(stock_price, resample_by='m')
     print(corn_u.all_weights)
     print(corn_u.portfolio_return)

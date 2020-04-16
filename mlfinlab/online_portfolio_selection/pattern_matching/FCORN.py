@@ -1,8 +1,6 @@
 # pylint: disable=missing-module-docstring
-import cvxpy as cp
 import numpy as np
 import pandas as pd
-import scipy.optimize as opt
 from mlfinlab.online_portfolio_selection.pattern_matching.SCORN import SCORN
 
 
@@ -11,11 +9,10 @@ class FCORN(SCORN):
     This class implements the Functional Correlation Driven Nonparametric Learning strategy.
     """
 
-
-    def __init__(self, lamb=0.3, window=10, rho=0.8):
-        self.lamb = 0.3
+    def __init__(self, window, rho, lamb):
         self.window = window
         self.rho = rho
+        self.lamb = lamb
         super(FCORN, self).__init__()
 
     def update_weight(self, _weights, _relative_return, _time):
@@ -39,6 +36,7 @@ class FCORN(SCORN):
             new_weights = self.optimize(_relative_return, activation_fn)
         return new_weights
 
+
 def main():
     """
 
@@ -46,8 +44,8 @@ def main():
     """
     stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    fcorn = FCORN(window=10, rho=0.8)
-    fcorn.allocate(stock_price, resample_by='w')
+    fcorn = FCORN(window=3, rho=0.8, lamb=500)
+    fcorn.allocate(stock_price, resample_by='m')
     print(fcorn.all_weights)
     print(fcorn.portfolio_return)
     fcorn.portfolio_return.plot()
