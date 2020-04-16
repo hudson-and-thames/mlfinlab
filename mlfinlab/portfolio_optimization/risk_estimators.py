@@ -253,7 +253,8 @@ class RiskEstimators:
         De-noises the covariance matrix or the correlation matrix.
 
         The de-noising algorithm works as follows:
-        First, a correlation is calculated from the covariance matrix (if the input is the covariance matrix)
+
+        First, a correlation is calculated from the covariance matrix (if the input is the covariance matrix).
 
         Second, eigenvalues and eigenvectors of the correlation matrix are calculated using the linalg.eigh
         function from numpy package.
