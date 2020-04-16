@@ -217,7 +217,7 @@ class OLPS(object):
         """
         Calculates the rolling correlation coefficient for a given relative return and window
 
-        :param _relative_return: relative returns of a certain time period specified by the strategy
+        :param _relative_return: (np.array) relative returns of a certain time period specified by the strategy
         :return rolling_corr_coef: (np.array) rolling correlation coefficient over a given window
         """
         # take the log of the relative return
@@ -250,65 +250,114 @@ class OLPS(object):
     # initialize first weight
     # might change depending on algorithm
     def first_weight(self, _weights):
+        """
+        Returns the first weight of the given portfolio
+
+        :param _weights: (list/np.array/pd.Dataframe) weights given by the user, none if not initialized
+        :return _weights: (np.array) returns a uniform weight if not given a specific weight for the initial portfolio
+        """
+        # no weights given so return uniform weight
         if _weights is None:
             return self.uniform_weight(self.number_of_assets)
+        # return given weight
         else:
             return _weights
 
-    # return uniform weights numpy array (1/n, 1/n, 1/n ...)
     def uniform_weight(self, n):
-        return np.ones(n) / n
+        """
+        Returns a uniform weight given n number assets
 
-    # calculate portfolio returns
+        :param n: (int) number of assets
+        :return uni_weight: (np.array) uniform weights (1/n, 1/n, 1/n ...)
+        """
+        # divide by n after creating numpy arrays of one
+        uni_weight = np.ones(n) / n
+        return uni_weight
+
     def calculate_portfolio_returns(self, _all_weights, _relative_return):
+        """
+        Calculates portfolio returns
+
+        :param _all_weights: (np.array) all weights of the given portfolio
+        :param _relative_return: (np.array) relative returns of a certain time period specified by the strategy
+        :return: (None) set current portfolio_return with the given value
+        """
+        # take the dot product of the relative returns and transpose of all_weights
+        # diagonal of the resulting matrix will be the returns for each week
+        # take the cumulative product of the returns to calculate returns over time
         self.portfolio_return = np.diagonal(np.dot(_relative_return, _all_weights.T)).cumprod()
 
-    # method to normalize sum of weights to 1
     def normalize(self, _weights):
-        return _weights / np.sum(_weights)
+        """
+        Normalize sum of weights to one
 
-    # method to get a diagonal multiplication of two arrays
-    # equivalent to np.diag(np.dot(A, B))
+        :param _weights: (np.array) value of portfolio weights that has not been processed yet
+        :return norm_weights: (np.array) divide by the total sum to create an array that sums to one
+        """
+        norm_weights = _weights / np.sum(_weights)
+        return norm_weights
+
     def diag_mul(self, A, B):
-        return (A * B.T).sum(-1)
+        """
+        Method to get a diagonal multiplication of two arrays
+        --- Still in progress
+        --- equivalent to np.diag(np.dot(A, B))
+
+        :param A: (np.array)
+        :param B: (np.array)
+        :return diag_m: (np.array) diagonal of the dot product of two matrix
+        """
+        diag_m = (A * B.T).sum(-1)
+        return diag_m
 
     def conversion(self, _all_weights, _portfolio_return):
+        """
+        Method to convert the given np.array to pd.Dataframe for visibility issues
+
+        :param _all_weights: (np.array) portfolio weights calculated for all periods
+        :param _portfolio_return: (np.array) cumulative portfolio returns for all periods
+        :return: (None) set all_weights and portfolio_return to pd.Dataframe with corresponding index and column
+        """
         self.all_weights = pd.DataFrame(_all_weights, index=self.final_time, columns=self.asset_name)
         self.portfolio_return = pd.DataFrame(_portfolio_return, index=self.final_time, columns=["Returns"])
 
-    # calculate the variance based on the price
-    def volatility(self):
-        pass
-
-    # Calculate Sharpe Ratio
-    def sharpe_ratio(self):
-        # self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))
-        pass
-
-    # return maximum drawdown
-    def maximum_drawdown(self):
-        return min(self.portfolio_return)
-
-    # return summary of the portfolio
-    def summary(self):
-        pass
-
-    # drop weights below a certain threshold
     def round_weights(self, _all_weights, threshold=1e-6):
-        new_all_weights = np.where(_all_weights < threshold, 0, _all_weights)
-        return np.apply_along_axis(lambda x: x / np.sum(x), 1, new_all_weights)
+        """
+        Method to drop weights below a certain threshold
 
-    # optimize the weight that maximizes the returns
+        :param _all_weights: (np.array) portfolio weights calculated for all periods
+        :param threshold: (float) drop all values below this threshold
+        :return new_all_weights: (np.array) portfolio weights that dropped all values below threshold
+        """
+        # set all values below the threshold to 0
+        new_all_weights = np.where(_all_weights < threshold, 0, _all_weights)
+        # normalize the weights to sum of 1 in case the weights don't add up to 1
+        new_all_weights = np.apply_along_axis(lambda x: x / np.sum(x), 1, new_all_weights)
+        return new_all_weights
+
     def optimize(self, _optimize_array, _solver=None):
+        """
+        Method to return weights that maximize returns over a given _optimize_array
+
+        :param _optimize_array: (np.array) relative returns for a given time period
+        :param _solver: (cp.SOLVER) set the solver to be a particular cvxpy solver
+        :return weights.value: (np.array) weights that maximize the returns for the given optimize_array
+        """
+        # calcualte length of time
         length_of_time = _optimize_array.shape[0]
+        # calculate number of assets
         number_of_assets = _optimize_array.shape[1]
+        # edge case to speed up calculation
         if length_of_time == 1:
+            # in case that the optimize array is only one row, weights will be 1 for the highest relative return asset
             best_idx = np.argmax(_optimize_array)
+            # initialize np.array of zeros
             weight = np.zeros(number_of_assets)
+            # add 1 to the best performing stock
             weight[best_idx] = 1
             return weight
 
-        # initialize weights
+        # initialize weights for optimization problem
         weights = cp.Variable(self.number_of_assets)
 
         # used cp.log and cp.sum to make the cost function a convex function
@@ -326,8 +375,10 @@ class OLPS(object):
             objective=allocation_objective,
             constraints=allocation_constraints
         )
+        # if there is a specified solver use it
         if _solver:
             problem.solve(solver=_solver)
+        # if none specified, use default solver
         else:
             problem.solve()
         return weights.value
@@ -335,15 +386,15 @@ class OLPS(object):
         # optimize the weight that minimizes the l2 norm
     def simplex_projection(self, _optimize_weight):
         """
+        Method to calculate the simplex projection of the calculated weights
 
-        :param _optimize_weight:
-        :return:
+        :param _optimize_weight: (np.array) a weight that will be projected onto the simplex domain
+        :return weights.value: (np.array) simplex projection of the original weight
         """
-        # initialize weights
+        # initialize weights for simplex projection
         weights = cp.Variable(self.number_of_assets)
 
-        # used cp.log and cp.sum to make the cost function a convex function
-        # multiplying continuous returns equates to summing over the log returns
+        # taking the minimizing weights of l2 norm of the difference equates to simplex projection
         l2_norm = cp.norm(weights - _optimize_weight)
 
         # Optimization objective and constraints
@@ -360,22 +411,51 @@ class OLPS(object):
         problem.solve()
         return weights.value
 
-    # https://cs.stackexchange.com/questions/3227/uniform-sampling-from-a-simplex
     def generate_simplex(self, _number_of_portfolio, _number_of_assets):
         """
+        Method to generate uniform points on a simplex domain
+        https://cs.stackexchange.com/questions/3227/uniform-sampling-from-a-simplex
 
-        :param _number_of_portfolio:
-        :param _number_of_assets:
-        :return:
+        :param _number_of_portfolio: (int) number of portfolios that the universal portfolio wants to create
+        :param _number_of_assets: (int) number of assets
+        :return simplex.T: (np.array) random simplex points
         """
+        # first create a randomized array with number of portfolios and number of assets minus one
         simplex = np.sort(np.random.random((_number_of_portfolio, _number_of_assets - 1)))
+        # stack a column of zeros on the left
+        # stack a column of ones on the right
+        # take the difference of each interval which equates to a uniform sampling of the simplex domain
         simplex = np.diff(np.hstack([np.zeros((_number_of_portfolio, 1)), simplex, np.ones((_number_of_portfolio, 1))]))
         return simplex.T
 
-    # generating sigmoid function
     def sigmoid(self, x):
-        return 1 / (1 + np.exp(-x))
+        """
+        Generates the resulting sigmoid function
 
+        :param x: (float) input for the sigmoid function
+        :return sig: (float) sigmoid(x)
+        """
+        sig = 1 / (1 + np.exp(-x))
+        return sig
+
+    # Method to implement later for portfolio visualization
+
+    # calculate the variance based on the price
+    def volatility(self):
+        pass
+
+    # Calculate Sharpe Ratio
+    def sharpe_ratio(self):
+        # self.portfolio_sharpe_ratio = ((self.portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5))
+        pass
+
+    # return maximum drawdown
+    def maximum_drawdown(self):
+        return min(self.portfolio_return)
+
+    # return summary of the portfolio
+    def summary(self):
+        pass
 
 def main():
     stock_price = pd.read_csv("../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
