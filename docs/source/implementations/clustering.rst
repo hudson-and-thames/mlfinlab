@@ -119,7 +119,7 @@ The details and the explanations of the Base Clustering are provided below.
         from sklearn.cluster import KMeans from sklearn.metrics 
         import silhouette_samples 
 
-2.) We define the Base Clustering algorithm with corr0 as the correlation matrix ( :math:`\rho` ),  maxNumClusters as the allowed maximum number of clusters, and n_init as the number of initiations      
+2.) We define the Base Clustering algorithm with corr0 as the correlation matrix ( :math:`\rho` ),  maxNumClusters as the allowed maximum number of clusters, and n_init as the number of initializations      
 
 .. code-block:: python
 
