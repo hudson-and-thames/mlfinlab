@@ -4,21 +4,7 @@
 Codependence
 ============
 
-This module implements various dependence measures described in Dr. Marcos Lopez de Prado's slides `Codependence`_ from
-Cornell University.
-
-**Abstract**:
-
-"Two random variables are codependent when knowing the value of one helps us determine the value of the other. This should
-not be confounded with the notion of causality.
-
-Correlation is perhaps the best known measure of codependence in econometric studies. Despite its popularity among economists,
-correlation has many known limitations in the contexts of financial studies.
-
-In these slides we will explore more modern measures of codependence, based on information theory, which overcome some of
-the limitations of correlations."
-
-.. _`Codependence`: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994
+Pearson correlation numbers are the most famous and widely used to measure Codependence, but there are some drawbacks below.
 
 .. warning::
 
@@ -26,6 +12,13 @@ the limitations of correlations."
 
     1) It captures linear effects, but if two variables have strong non-linear dependency (squared or abs for example) Pearson correlation won't find any pattern between them.
     2) Correlation is not a metric: it does not satisfy non-negativity and and subadditivity conditions.
+
+However, The Pearson correlation is not the only way of measuring codependence.
+There are modern measures of codependence, using Euclidean distances or based on information theory,
+which overcome some of the limitations of correlations.
+You can find more details from `Codependence (Presentation Slides)`_ by Marcos Lopez de Prado
+
+.. _`Codependence (Presentation Slides)`: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994
 
 
 Distance Correlation
@@ -132,11 +125,96 @@ It is a metric, because it is a linear multiple of the Euclidean distance betwee
 Information Theory Metrics
 ##########################
 
-**Mutual Information** is defined as the decrease in uncertainty (or informational gain) in X that results from knowing the value of Y. Mutual information is not
-a metric and needs to be normalized.
+we can gauge the codependence from the information theory perspective.
+In information theory, (Shannon’s) entropy is a measure of information(uncertainty).
+
+.. math::
+    H[X] = -\sum\limits_{x \in S_{X}}p[x]log[p[x]]
+
+In short, we can say that entropy is the expectation of the amount of information when we sampling from a certain probability distribution or the number of bits to transmit the target.
+So, If there is correspondence between random variables, the correspondence will be reflected in entropy. For example, if two random variables are associated,
+the amount of information of joint probability distribution of two random variables will be less than the sum of the information in each random variable.
+This is because knowing a correspondence means knowing one random variable can reduce uncertainty about the other random variable.
+
+.. math::
+    H[X+Y]=H[X]+H[Y],  X \bot Y
+
+
+Here, we have two wayw of measuring correspondence
+
+- Mutual Information
+- Variation of Information
+
+
+we can check th relationships of various information measures associated with correlated variables
+:math:`X` and :math:`Y` through below figure.[`Cornell lecture slides, p.24 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_]
+
+.. image:: codependence_images/entropy_relation_diagram.png
+   :scale: 70 %
+   :align: center
+
+----
+
+Mutual Information
+******************
+
+**Mutual Information** is defined as the decrease in uncertainty (or informational gain) in X that results from knowing the value of Y.
+Mutual information is not a metric and needs to be normalized. [`Cornell lecture slides, p.18 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_]
+
+- :py:func:`mlfinlab.codependence.information.get_mutual_info`
+
+.. math::
+    \begin{align*}
+    I[X, Y]=& H[X] - H[X|Y]\\
+           =& H[X]+H[Y]-H[X,Y]\\
+           =& \sum\limits_{x \in S_{X}} \sum\limits_{y \in S_{Y}}p[x,y]log[\frac{p[x,y]}{p[x]p[y]}]\\
+    \end{align*}
+
+
+----
+
+Variation of Information
+************************
 
 **Variation of Information** can be interpreted as the uncertainty we expect in one variable if we are told the value of another. Variation of information is a
 metric because it satisfies non-negativity, symmetry and triangle inequality axioms.
+
+- :py:func:`mlfinlab.codependence.information.get_optimal_number_of_bins`
+
+.. math::
+    \begin{align*}
+    VI[X,Y]=& H[X|Y] + H[Y|X]\\
+           =& H[X] + H[Y]-2I[X,Y]\\
+           =& 2H[X,Y]-H[X]-H[Y]\\
+    \end{align*}
+
+----
+
+Discretization
+**************
+
+Throughout above section, we have assumed that random variables were discrete.
+For continuous case, we can quantize the values and estimate :math:`H[X]`, and apply the same concepts on the binned observations.
+[`Cornell lecture slides, p.26 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_]
+
+.. math::
+    \begin{align*}
+    H[X] =& \int_{\infty}^{\infty}f_{X}[x_{i}]logf_{X}[x]dx\\
+    \:    &\approx-\sum\limits_{i=1}^{B_{X}}f_{X}[x_{i}]logf_{X}[x_{i}]\\
+    \end{align*}
+
+.. math::
+    \hat{H}[X]=-\sum\limits_{i=1}^{B_{X}}\frac{N_{i}}{N}log[\frac{N_{i}}{N}]log[\Delta_{x}]
+
+As you can see from these equations, we need to choose the binning carefully because results may be biased.
+There are optimal binning  depends on entropy case(marginal, joint).
+You can optimal number of bins for discretization through below method.
+This function is need for using methods for getting information based codependence.
+
+- :py:func:`mlfinlab.codependence.information.variation_of_information_score`
+
+
+----
 
 .. py:currentmodule:: mlfinlab.codependence.information
 .. automodule:: mlfinlab.codependence.information
