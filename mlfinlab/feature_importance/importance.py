@@ -12,6 +12,7 @@ from mlfinlab.cross_validation.cross_validation import ml_cross_val_score
 # pylint: disable=invalid-name
 # pylint: disable=invalid-unary-operand-type
 # pylint: disable=comparison-with-callable
+#pylint: disable=too-many-locals
 
 def mean_decrease_impurity(model, feature_names):
     """
@@ -60,7 +61,7 @@ def mean_decrease_impurity(model, feature_names):
     return importance
 
 
-def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight_train=None, sample_weight_score=None, scoring=log_loss):
+def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_weight_train=None, sample_weight_score=None, scoring=log_loss, random_state=42):
     """
     Snippet 8.3, page 116-117. MDA Feature Importance
 
@@ -82,14 +83,24 @@ def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight_train=None, sample
       OOS performance.
     * The CV must be purged and embargoed.
 
+    Clustered Feature Importance(CFI) or Clustered MDA is the modified version of MDA (Mean Decreased Accuracy). It is
+    robust to substitution effect that takes place when two or more explanatory variables share a substantial amount of
+    information (predictive power).CFI algorithm described by Dr Marcos Lopez de Prado  in Clustered Feature  Importance
+    (Presentation Slides) https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595. Instead of shuffling (permutating)
+    all variables individually (like in MDA), we shuffle all variables in cluster together. Next, we follow all the  rest
+    of the steps as in MDA. It can used by simply specifying the clustered_subsets argument.
 
     :param model: (sklearn.Classifier): Any sklearn classifier.
     :param X: (pd.DataFrame): Train set features.
     :param y: (pd.DataFrame, np.array): Train set labels.
     :param cv_gen: (cross_validation.PurgedKFold): Cross-validation object.
+    :param clustered_subsets: (list) of feature clusters for Clustered Feature Importance (CFI). Default None will not apply CFI.
+                              Structure of the input must be a list of list/s i.e. a list containing the clusters/subsets of feature
+                              name/s in list.
     :param sample_weight_train: A numpy array of sample weights used to train the model for each record in the dataset.
     :param sample_weight_score: A numpy array of sample weights used to evaluate the model quality.
     :param scoring: (function): Scoring function used to determine importance.
+    :param random_state: (int) random seed for shuffling the features.
     :return: (pd.DataFrame): Mean and standard deviation of feature importance.
     """
 
@@ -100,7 +111,10 @@ def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight_train=None, sample
         sample_weight_score = np.ones((X.shape[0],))
 
     fold_metrics_values, features_metrics_values = pd.Series(), pd.DataFrame(columns=X.columns)
-
+    #generating a numpy random state object for the given random_state
+    rs_obj = np.random.RandomState(seed=random_state)
+    # clustered feature subsets will be used for CFI if clustered_subsets exists else will operate on the single column as MDA
+    feature_sets = clustered_subsets if clustered_subsets else [[x] for x in X.columns]
     for i, (train, test) in enumerate(cv_gen.split(X=X)):
         fit = model.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight_train[train])
         pred = fit.predict(X.iloc[test, :])
@@ -114,9 +128,10 @@ def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight_train=None, sample
             fold_metrics_values.loc[i] = scoring(y.iloc[test], pred, sample_weight=sample_weight_score[test])
 
         # Get feature specific metric on out-of-sample fold
-        for j in X.columns:
+        for j in feature_sets:
             X1_ = X.iloc[test, :].copy(deep=True)
-            np.random.shuffle(X1_[j].values)  # Permutation of a single column
+            for j_i in j:
+                rs_obj.shuffle(X1_[j_i].values)  # Permutation of a single column for MDA or through the whole subset for CFI
             if scoring == log_loss:
                 prob = fit.predict_proba(X1_)
                 features_metrics_values.loc[i, j] = -scoring(y.iloc[test], prob,
@@ -131,7 +146,7 @@ def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight_train=None, sample
     if scoring == log_loss:
         importance = importance / -features_metrics_values
     else:
-        importance = importance / (1.0 - features_metrics_values)
+        importance = importance / (1.0 - features_metrics_values).replace(0, np.nan)
     importance = pd.concat({'mean': importance.mean(), 'std': importance.std() * importance.shape[0] ** -.5}, axis=1)
     importance.replace([-np.inf, np.nan], 0, inplace=True)  # Replace infinite values
 
