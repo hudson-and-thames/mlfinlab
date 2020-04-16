@@ -214,14 +214,14 @@ class RiskEstimators:
 
     def _denoised_corr(self, eigenvalues, eigenvectors, num_facts):
         """
-        De-noises the correlation matrix.
+        De-noises the correlation matrix using the Constant Residual Eigenvalue method.
 
         The input is the eigenvalues and the eigenvectors of the covariance matrix and the number
         of the first eigenvalue that is above the maximum theoretical eigenvalue.
 
-        De-noising is done by shrinking the eigenvalues associated with noise (the eigenvalues higher than
-        the maximum theoretical eigenvalue are set to their average value). The de-noised covariance matrix
-        is then calculated back from new eigenvalues and eigenvectors.
+        De-noising is done by shrinking the eigenvalues associated with noise (the eigenvalues lower than
+        the maximum theoretical eigenvalue are set to a constant eigenvalue, preserving the trace of the correlation
+        matrix). The de-noised covariance matrix is then calculated back from new eigenvalues and eigenvectors.
 
         The result is the de-noised correlation calculated from the de-noised covariance matrix.
 
@@ -242,6 +242,43 @@ class RiskEstimators:
 
         # De-noised covariance matrix
         cov = np.dot(eigenvectors, eigenvalues).dot(eigenvectors.T)
+
+        # De-noised correlation matrix
+        corr = self.cov_to_corr(cov)
+
+        return corr
+
+    def _detoned_corr(self, eigenvalues, eigenvectors, num_facts, alpha=0):
+        """
+        De-tones the correlation matrix using the Targeted Shrinkage method.
+
+        The input is the eigenvalues and the eigenvectors of the covariance matrix and the number
+        of the first eigenvalue that is above the maximum theoretical eigenvalue.
+
+        The result is the de-toned correlation calculated from the de-toned covariance matrix.
+
+        :param eigenvalues: (np.array) Matrix with eigenvalues on the main diagonal
+        :param eigenvectors: (float) Eigenvectors array
+        :param num_facts: (float) Threshold for eigenvalues to be fixed
+        :return: (np.array) De-noised correlation matrix
+        """
+
+        # Getting the eigenvalues and eigenvectors related to signal
+        eigenvalues_signal = eigenvalues[:num_facts, :num_facts]
+        eigenvectors_signal = eigenvectors[:, :num_facts]
+
+        # Getting the eigenvalues and eigenvectors related to noise
+        eigenvalues_noise = eigenvalues[num_facts:, num_facts:]
+        eigenvectors_noise = eigenvectors[:, num_facts:]
+
+        # Calculating the covariance matrix from eigenvalues associated with signal
+        cov_signal = np.dot(eigenvectors_signal, eigenvalues_signal).dot(eigenvectors_signal.T)
+
+        # Calculating the covariance matrix from eigenvalues associated with noise
+        cov_noise = np.dot(eigenvectors_noise, eigenvalues_noise).dot(eigenvectors_noise.T)
+
+        # Calculating the De-toned correlation matrix
+        cov = cov_signal + alpha * cov_noise + (1 - alpha) * np.diag(np.diag(cov_noise))
 
         # Ne-noised correlation matrix
         corr = self.cov_to_corr(cov)

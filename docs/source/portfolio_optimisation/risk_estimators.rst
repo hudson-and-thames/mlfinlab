@@ -13,6 +13,7 @@ covariance and the correlation matrices, and other helpful methods.
    The following sources elaborate extensively on the topic:
 
    - **Scikit-learn User Guide on Covariance estimation** `available here <https://scikit-learn.org/stable/modules/covariance.html>`__. *Describes covariance estimators in this class*
+   - **Machine Learning for Asset Managers** *by* Marcos Lopez de Prado `available here <https://www.cambridge.org/core/books/machine-learning-for-asset-managers/6D9211305EA2E425D33A9F38D0AE3545>`__. *Chapter 2 describes the motivation and the algorithm of de-noising and de-toning the covariance matrix*
    - **Financial applications of random matrix theory: Old laces and new pieces** *by* Potter M.,  J.P. Bouchaud *and* L. Laloux `available here <https://arxiv.org/abs/physics/0507111>`__. *Describes the process of de-noising the covariance matrix*
 
 Minimum Covariance Determinant
