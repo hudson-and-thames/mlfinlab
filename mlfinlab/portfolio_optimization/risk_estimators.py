@@ -28,6 +28,9 @@ class RiskEstimators:
         Fits kernel to a series of observations (in out case eigenvalues), and derives the
         probability density function of observations.
 
+        The function used to fit kernel is KernelDensity from sklearn.neighbors. Fit of the KDE
+        can be evaluated on a given set of points, passed as eval_points variable.
+
         :param observations: (np.array) Array of observations (eigenvalues) eigenvalues to fit kernel to
         :param kde_bwidth: (float) The bandwidth of the kernel
         :param kde_kernel: (str) Kernel to use [‘gaussian’|’tophat’|’epanechnikov’|’exponential’|’linear’|’cosine’]
@@ -119,7 +122,9 @@ class RiskEstimators:
     def _find_max_eval(self, eigen_observations, tn_relation, kde_bwidth):
         """
         Searching for maximum random eigenvalue by fitting Marcenko-Pastur distribution
-        to the empirical one - obtained through kernel density estimation.
+        to the empirical one - obtained through kernel density estimation. The fit is done by
+        minimizing the Sum of Squared estimate of Errors between the theoretical pdf and the
+        kernel fit. The minimization is done by adjusting the variation of the M-P distribution.
 
         :param eigen_observations: (np.array) Observed empirical eigenvalues (for the empirical pdf)
         :param tn_relation: (float) Relation of sample length T to the number of variables N (for the theoretical pdf)
@@ -144,6 +149,11 @@ class RiskEstimators:
         """
         Recovers the covariance matrix from a correlation matrix.
 
+        Requires a vector of standard deviations of variables - square root
+        of elements on the main diagonal fo the covariance matrix.
+
+        Formula used: Cov = Corr * OuterProduct(std, std)
+
         :param corr: (np.array) Correlation matrix
         :param std: (np.array) Vector of standard deviations
         :return: (np.array) Covariance matrix
@@ -156,6 +166,8 @@ class RiskEstimators:
     def cov_to_corr(cov):
         """
         Derives the correlation matrix from a covariance matrix.
+
+        Formula used: Corr = Cov / OuterProduct(std, std)
 
         :param cov: (np.array) Covariance matrix
         :return: (np.array) Covariance matrix
@@ -177,7 +189,9 @@ class RiskEstimators:
         """
         Calculates eigenvalues and eigenvectors from a Hermitian matrix. In our case, from the correlation matrix.
 
-        Eigenvalues in the output are on the main diagonal of a matrix.
+        Function used to calculate the eigenvalues and eigenvectors is linalg.eigh from numpy package.
+
+        Eigenvalues in the output are placed on the main diagonal of a matrix.
 
         :param hermit_matrix: (np.array) Hermitian matrix
         :return: (np.array, np.array) Eigenvalues matrix, eigenvectors array
@@ -200,9 +214,16 @@ class RiskEstimators:
 
     def _denoised_corr(self, eigenvalues, eigenvectors, num_facts):
         """
-        Shrinks the eigenvalues associated with noise, and returns a de-noised correlation matrix.
+        De-noises the correlation matrix.
 
-        Noise is removed from the correlation matrix by fixing random eigenvalues.
+        The input is the eigenvalues and the eigenvectors of the covariance matrix and the number
+        of the first eigenvalue that is above the maximum theoretical eigenvalue.
+
+        De-noising is done by shrinking the eigenvalues associated with noise (the eigenvalues higher than
+        the maximum theoretical eigenvalue are set to their average value). The de-noised covariance matrix
+        is then calculated back from new eigenvalues and eigenvectors.
+
+        The result is the de-noised correlation calculated from the de-noised covariance matrix.
 
         :param eigenvalues: (np.array) Matrix with eigenvalues on the main diagonal
         :param eigenvectors: (float) Eigenvectors array
@@ -227,18 +248,33 @@ class RiskEstimators:
 
         return corr
 
-    def denoise_covariance(self, cov, tn_relation, kde_bwidth):
+    def denoise_covariance(self, cov, tn_relation, kde_bwidth=0.01):
         """
-        Computes a de-noised covariance matrix from a given covariance matrix.
+        De-noises the covariance matrix or the correlation matrix.
 
-        As a threshold for the denoising the correlation matrix, the maximum eigenvalue
-        that fits the theoretical distribution is used.
+        The de-noising algorithm works as follows:
+        First, a correlation is calculated from the covariance matrix (if the input is the covariance matrix)
 
-        :param cov: (np.array) Covariance matrix
+        Second, eigenvalues and eigenvectors of the correlation matrix are calculated using the linalg.eigh
+        function from numpy package.
+
+        Third, a maximum theoretical eigenvalue is found by fitting Marcenko-Pastur distribution
+        to the empirical distribution of the correlation matrix eigenvalues. The empirical distribution
+        is obtained through kernel density estimation using the KernelDensity class from sklearn.
+        The fit of the M-P distribution is done by minimizing the Sum of Squared estimate of Errors
+        between the theoretical pdf and the kernel. The minimization is done by adjusting the variation
+        of the M-P distribution.
+
+        Fourth, the eigenvalues of the correlation matrix are sorted and the eigenvalues higher than
+        the maximum theoretical eigenvalue are set to their average value. This is how the eigenvalues
+        associated with noise are shrinked. The de-noised covariance matrix is then calculated back
+        from new eigenvalues and eigenvectors.
+
+        :param cov: (np.array) Covariance matrix or correlation matrix
         :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
                                     covariance matrix.
         :param kde_bwidth: (float) The bandwidth of the kernel to fit KDE
-        :return: (np.array) De-noised covariance matrix
+        :return: (np.array) De-noised covariance matrix or correlation matrix
         """
 
         # Correlation matrix computation
