@@ -329,13 +329,13 @@ The details and explanations of the Top-Level of Clustering are provided below:
 
         def clusterKMeansTop(corr0,maxNumClusters=None,n_init=10): 
 
-2.) If the maximum number of clusters is not defined, then the system will choose N-1 as the value
+2.) If the maximum number of clusters is not defined, then the algorithm will choose N-1 as the value
 
 .. code-block:: python
 
         if maxNumClusters==None:maxNumClusters=corr0.shape[1]-1 
 
-3.) We extract the values of the optimum correlation matrix, the clustering, and the clustering's Silhouette Scores by applying the Base Clustering algorithm on the correlation matrix
+3.) We extract the values of the optimum correlation matrix, the clustering, and its Silhouette Scores by applying the Base Clustering algorithm on the correlation matrix
 
 .. code-block:: python
 
