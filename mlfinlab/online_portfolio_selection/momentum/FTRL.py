@@ -6,18 +6,28 @@ from mlfinlab.online_portfolio_selection import FTL
 
 class FTRL(FTL):
     """
-    This class implements the Follow the Regularized Leader
+    This class implements the Follow the Regularized Leader strategy. It is reproduced with modification from the following paper:
+    Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December YEAR),
+    33 pages. DOI:http://dx.doi.org/10.1145/0000000.0000000.
+
+    Follow the Regularized Leader strategy directly tracks the BCRP until the previous period with an additional regularization term
     """
     def __init__(self, beta=0.1):
+        """
+        Set beta, a regularization term
+
+        :param beta: (float) constant multiplied to regularization term
+        """
         self.beta = beta
         super(FTRL, self).__init__()
 
     def update_weight(self, _weights, _relative_return, _time):
         """
+        Updates weight to find the BCRP and regularization adjusted weights until the last time period
 
-        :param _weights:
-        :param _relative_return:
-        :param _time:
+        :param _weights: (np.array) portfolio weights of the previous period
+        :param _relative_return: (np.array) relative returns of all period
+        :param _time: (int) current time period
         :return:
         """
         return self.optimize(_relative_return[:_time], _solver=cp.SCS)
@@ -32,11 +42,8 @@ class FTRL(FTL):
             weight[best_idx] = 1
             return weight
 
-        # initialize weights
         weights = cp.Variable(self.number_of_assets)
-
-        # used cp.log and cp.sum to make the cost function a convex function
-        # multiplying continuous returns equates to summing over the log returns
+        # added additiona l2 regularization term for the weights for calculation
         portfolio_return = cp.sum(cp.log(_optimize_array * weights)) - self.beta * cp.norm(weights) / 2
 
         # Optimization objective and constraints
