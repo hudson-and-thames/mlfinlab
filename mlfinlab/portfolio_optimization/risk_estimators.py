@@ -290,7 +290,7 @@ class RiskEstimators:
 
         return corr
 
-    def _detone_corr(self, eigenvalues, eigenvectors, num_facts, market_component=1):
+    def _detoned_corr(self, eigenvalues, eigenvectors, num_facts, market_component=1):
         """
         De-tones the correlation matrix by removing the market component.
 
