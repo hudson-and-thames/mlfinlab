@@ -197,7 +197,6 @@ class OLPS(object):
         # weight does not change
         return _weights
 
-    # calculate relative returns
     def calculate_relative_return(self, _asset_prices):
         """
         Calculates the relative return of a given price data
@@ -212,7 +211,6 @@ class OLPS(object):
         relative_return = np.array(_asset_prices.pct_change().fillna(0) + 1)
         return relative_return
 
-    # calculate rolling correlation coefficient
     def calculate_rolling_correlation_coefficient(self, _relative_return):
         """
         Calculates the rolling correlation coefficient for a given relative return and window
@@ -228,7 +226,6 @@ class OLPS(object):
         rolling_corr_coef = np.corrcoef(np.exp(np.log(pd.DataFrame(_relative_return)).rolling(self.window).sum()))
         return rolling_corr_coef
 
-    # calculate rolling moving average for OLMAR
     def calculate_rolling_moving_average(self, _asset_prices, _window, _reversion_method, _alpha):
         """
         Calculates the rolling moving average for Online Moving Average Reversion
@@ -411,23 +408,6 @@ class OLPS(object):
         problem.solve()
         return weights.value
 
-    def generate_simplex(self, _number_of_portfolio, _number_of_assets):
-        """
-        Method to generate uniform points on a simplex domain
-        https://cs.stackexchange.com/questions/3227/uniform-sampling-from-a-simplex
-
-        :param _number_of_portfolio: (int) number of portfolios that the universal portfolio wants to create
-        :param _number_of_assets: (int) number of assets
-        :return simplex.T: (np.array) random simplex points
-        """
-        # first create a randomized array with number of portfolios and number of assets minus one
-        simplex = np.sort(np.random.random((_number_of_portfolio, _number_of_assets - 1)))
-        # stack a column of zeros on the left
-        # stack a column of ones on the right
-        # take the difference of each interval which equates to a uniform sampling of the simplex domain
-        simplex = np.diff(np.hstack([np.zeros((_number_of_portfolio, 1)), simplex, np.ones((_number_of_portfolio, 1))]))
-        return simplex.T
-
     def sigmoid(self, x):
         """
         Generates the resulting sigmoid function
@@ -451,7 +431,7 @@ class OLPS(object):
 
     # return maximum drawdown
     def maximum_drawdown(self):
-        return min(self.portfolio_return)
+        return 1 - min(self.portfolio_return)
 
     # return summary of the portfolio
     def summary(self):
