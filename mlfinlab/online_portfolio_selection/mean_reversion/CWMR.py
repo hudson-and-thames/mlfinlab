@@ -6,6 +6,7 @@ from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
 class CWMR(OLPS):
     """
+    NOT IMPLEMENTED YET
     This class implements the Constant Weighted Mean Reversion strategy.
     """
 

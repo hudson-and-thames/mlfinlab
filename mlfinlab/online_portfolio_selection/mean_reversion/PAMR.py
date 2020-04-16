@@ -1,17 +1,23 @@
 # pylint: disable=missing-module-docstring
-import pandas as pd
 import numpy as np
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
 
 class PAMR(OLPS):
     """
-    This class implements the Passive Aggresive Mean Reversion strategy.
+    This class implements the Passive Aggressive Mean Reversion strategy. It is reproduced with modification from the following paper:
+    Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December YEAR),
+    33 pages. DOI:http://dx.doi.org/10.1145/0000000.0000000.
+
+    Passive Aggressive Mean Reversion strategy
     """
 
     def __init__(self, sensitivity=0.5, aggressiveness=1, optimization_method=0):
         """
-        Constructor.
+
+        :param sensitivity: (float)
+        :param aggressiveness:
+        :param optimization_method:
         """
         # check that sensitivity is within [0,1]
         self.sensitivity = sensitivity
