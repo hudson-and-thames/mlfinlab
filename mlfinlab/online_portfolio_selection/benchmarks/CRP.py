@@ -10,7 +10,7 @@ class CRP(OLPS):
 
     Constant Rebalanced Portfolio rebalances to a given weight for each time period.
     """
-    def __init__(self, weights):
+    def __init__(self, weights=None):
         super(CRP, self).__init__()
         self.weights = weights
 

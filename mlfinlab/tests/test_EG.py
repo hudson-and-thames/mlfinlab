@@ -24,14 +24,14 @@ class TestEG(TestCase):
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
         self.data = self.data.dropna(axis=1)
 
-    def test_eg_solution(self):
+    def test_mu_solution(self):
         """
-        Test the calculation of exponential gradient weights.
+        Test the calculation of exponential gradient weights with multiplicative update rule.
         """
 
-        exponential_gradient = EG()
-        exponential_gradient.allocate(self.data)
-        all_weights = np.array(exponential_gradient.all_weights)
+        multiplicative_update = EG(update_rule='MU')
+        multiplicative_update.allocate(self.data)
+        all_weights = np.array(multiplicative_update.all_weights)
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]
             assert (weights >= 0).all()
