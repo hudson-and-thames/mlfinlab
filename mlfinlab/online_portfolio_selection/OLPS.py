@@ -392,7 +392,7 @@ class OLPS(object):
         weights = cp.Variable(self.number_of_assets)
 
         # taking the minimizing weights of l2 norm of the difference equates to simplex projection
-        l2_norm = cp.norm(weights - _optimize_weight)
+        l2_norm = cp.norm(weights - _optimize_weight) ** 2
 
         # Optimization objective and constraints
         allocation_objective = cp.Minimize(l2_norm)

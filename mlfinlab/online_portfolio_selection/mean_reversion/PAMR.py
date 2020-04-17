@@ -12,16 +12,16 @@ class PAMR(OLPS):
     Passive Aggressive Mean Reversion strategy
     """
 
-    def __init__(self, sensitivity=0.5, aggressiveness=1, optimization_method=0):
+    def __init__(self, epsilon=0.5, c=1, optimization_method=0):
         """
 
-        :param sensitivity: (float)
-        :param aggressiveness:
+        :param epsilon: (float) measure of sensitivity to the market
+        :param aggressiveness: (float) measure of aggressiveness to the market
         :param optimization_method:
         """
         # check that sensitivity is within [0,1]
-        self.sensitivity = sensitivity
-        self.aggressiveness = aggressiveness
+        self.epsilon = epsilon
+        self.c = c
         self.optimization_method = optimization_method
         super().__init__()
 
@@ -35,7 +35,7 @@ class PAMR(OLPS):
         """
         # calculation prep
         _past_relative_return = _relative_return[_time - 1]
-        loss = max(0, np.dot(_weights, _past_relative_return))
+        loss = max(0, np.dot(_weights, _past_relative_return) - self.epsilon)
         adjusted_market_change = _past_relative_return - self.uniform_weight(self.number_of_assets) * np.mean(
                 _past_relative_return)
         diff_norm = np.linalg.norm(adjusted_market_change)
@@ -44,9 +44,9 @@ class PAMR(OLPS):
         if self.optimization_method == 0:
             tau = loss / (diff_norm ** 2)
         elif self.optimization_method == 1:
-            tau = min(self.aggressiveness, loss / (diff_norm ** 2))
+            tau = min(self.c, loss / (diff_norm ** 2))
         elif self.optimization_method == 2:
-            tau = loss / (diff_norm ** 2 + 1 / (2 * self.aggressiveness))
+            tau = loss / (diff_norm ** 2 + 1 / (2 * self.c))
 
         new_weights = _weights - tau * adjusted_market_change
         # if not in simplex domain

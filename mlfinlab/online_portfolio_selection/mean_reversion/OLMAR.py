@@ -35,9 +35,9 @@ class OLMAR(OLPS):
         :param _resample_by:
         :return:
         """
-        self.moving_average_reversion = self.calculate_rolling_moving_average(_asset_prices, self.window,
-                                                                              self.reversion_method, self.alpha)
         super(OLMAR, self).initialize(_asset_prices, _weights, _portfolio_start, _resample_by)
+        self.moving_average_reversion = self.calculate_rolling_moving_average(self.asset_prices, self.window,
+                                                                              self.reversion_method, self.alpha)
 
     def update_weight(self, _weights, _relative_return, _time):
         """
