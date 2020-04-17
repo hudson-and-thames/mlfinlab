@@ -9,7 +9,7 @@ class OLMAR(OLPS):
     This class implements the Online Moving Average Reversion Strategy.
     """
 
-    def __init__(self, epsilon=2, window=2, alpha=.9, reversion_method=1):
+    def __init__(self, epsilon, window, alpha, reversion_method):
         """
         Constructor.
         """

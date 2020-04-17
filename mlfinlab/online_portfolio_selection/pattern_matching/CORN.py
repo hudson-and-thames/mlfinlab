@@ -11,7 +11,7 @@ class CORN(OLPS):
     """
     # check -1 <= rho <= 1
     # check window >= 1
-    def __init__(self, window=20, rho=0.6):
+    def __init__(self, window, rho):
         """
         Constructor.
         """

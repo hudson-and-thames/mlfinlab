@@ -10,10 +10,8 @@ class FCORN(SCORN):
     """
 
     def __init__(self, window, rho, lamb):
-        self.window = window
-        self.rho = rho
         self.lamb = lamb
-        super(FCORN, self).__init__()
+        super().__init__(window=window, rho=rho)
 
     def update_weight(self, _weights, _relative_return, _time):
         """

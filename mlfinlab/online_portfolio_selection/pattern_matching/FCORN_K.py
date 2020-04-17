@@ -37,7 +37,7 @@ class FCORN_K(UP):
 
         for exp in range(self.number_of_experts):
             param = self.expert_params[exp]
-            self.experts.append(FCORN(int(param[0]), param[1], param[2]))
+            self.experts.append(FCORN(window=int(param[0]), rho=param[1], lamb=param[2]))
 
 
 def main():

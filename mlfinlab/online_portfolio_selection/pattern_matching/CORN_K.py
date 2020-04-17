@@ -11,7 +11,7 @@ class CORN_K(UP):
     """
     # check -1 <= rho <= 1
     # check window >= 1
-    def __init__(self, k=5, window_values=10, rho_values=10):
+    def __init__(self, k, window_values, rho_values):
         """
         Constructor.
         """
