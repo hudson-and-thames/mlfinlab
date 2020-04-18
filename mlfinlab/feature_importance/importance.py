@@ -1,5 +1,6 @@
 """
-Module which implements feature importance algorithms as described in Chapter 8 of Advances in Financial Machine Learning.
+Module which implements feature importance algorithms as described in Chapter 8 of Advances in Financial Machine Learning and
+Clustered Feature Importance algorithms as described in Chapter 6 Section 6.5.2 of Machine Learning for Asset Manager.
 """
 
 import pandas as pd
@@ -14,7 +15,7 @@ from mlfinlab.cross_validation.cross_validation import ml_cross_val_score
 # pylint: disable=comparison-with-callable
 #pylint: disable=too-many-locals
 
-def mean_decrease_impurity(model, feature_names):
+def mean_decrease_impurity(model, feature_names, clustered_subsets=None):
     """
     Snippet 8.2, page 115. MDI Feature importance
 
@@ -41,8 +42,17 @@ def mean_decrease_impurity(model, feature_names):
     * Sklearn’s RandomForest class implements MDI as the default feature importance score. This choice is likely
       motivated by the ability to compute MDI on the fly, with minimum computational cost.
 
+    Clustered Feature Importance(CFI) : Clustered MDI is the  modified version of MDI (Mean Decreased Impurity). It  is
+    robust to substitution effect that takes place when two or more explanatory variables share a substantial amount of
+    information (predictive power).CFI algorithm described by Dr Marcos Lopez de Prado  in Clustered Feature  Importance
+    section of book Machine Learning  for Asset Manager. Here  instead of  taking the importance  of  every feature, we
+    consider the importance of every feature subsets, thus every feature receive the importance of subset it belongs to.
+
     :param model: (model object): Trained tree based classifier.
     :param feature_names: (list): Array of feature names.
+    :param clustered_subsets: (list) of feature clusters for Clustered Feature Importance (CFI). Default None will not apply CFI.
+                              Structure of the input must be a list of list/s i.e. a list containing the clusters/subsets of feature
+                              name/s inside a list. E.g- [['I_0','I_1','R_0','R_1'],['N_1','N_2'],['R_3']]
     :return: (pd.DataFrame): Mean and standard deviation feature importance.
     """
     # Feature importance based on in-sample (IS) mean impurity reduction
@@ -54,9 +64,19 @@ def mean_decrease_impurity(model, feature_names):
     # was not randomly chosen. Replace those values with np.nan
     feature_imp_df = feature_imp_df.replace(0, np.nan)  # Because max_features = 1
 
-    importance = pd.concat({'mean': feature_imp_df.mean(),
-                            'std': feature_imp_df.std() * feature_imp_df.shape[0] ** -0.5},
-                           axis=1)
+    if clustered_subsets is not None:
+        #getting subset wise importance
+        importance = pd.DataFrame(index=feature_names,columns=['mean','std'])
+        for subset in clustered_subsets: #iterating over each cluster
+            subset_feat_imp = feature_imp_df[subset].sum(axis=1)
+            #importance of each feature within a subsets is equal to the importance of that subset
+            importance[subset,'mean'] = subset_feat_imp.mean()
+            importance[subset,'std'] = subset_feat_imp.std()*subset_feat_imp.shape[0]**-.5
+    else:
+        importance = pd.concat({'mean': feature_imp_df.mean(),
+                                'std': feature_imp_df.std() * feature_imp_df.shape[0] ** -0.5},
+                               axis=1)
+
     importance /= importance['mean'].sum()
     return importance
 
@@ -83,7 +103,7 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
       OOS performance.
     * The CV must be purged and embargoed.
 
-    Clustered Feature Importance(CFI) or Clustered MDA is the modified version of MDA (Mean Decreased Accuracy). It is
+    Clustered Feature Importance(CFI) : Clustered MDA is the modified version of MDA (Mean Decreased Accuracy). It is
     robust to substitution effect that takes place when two or more explanatory variables share a substantial amount of
     information (predictive power).CFI algorithm described by Dr Marcos Lopez de Prado  in Clustered Feature  Importance
     (Presentation Slides) https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595. Instead of shuffling (permutating)
@@ -96,7 +116,7 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
     :param cv_gen: (cross_validation.PurgedKFold): Cross-validation object.
     :param clustered_subsets: (list) of feature clusters for Clustered Feature Importance (CFI). Default None will not apply CFI.
                               Structure of the input must be a list of list/s i.e. a list containing the clusters/subsets of feature
-                              name/s in list.
+                              name/s inside a list. E.g- [['I_0','I_1','R_0','R_1'],['N_1','N_2'],['R_3']]
     :param sample_weight_train: A numpy array of sample weights used to train the model for each record in the dataset.
     :param sample_weight_score: A numpy array of sample weights used to evaluate the model quality.
     :param scoring: (function): Scoring function used to determine importance.
