@@ -5,6 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from mlfinlab.online_portfolio_selection import OLMAR
 
 
@@ -29,7 +30,7 @@ class TestOLMAR(TestCase):
         Test the calculation of online moving average reversion with the original reversion method
         """
 
-        olmar = OLMAR(reversion_method=1, epsilon=0.3,window=2)
+        olmar = OLMAR(reversion_method=1, epsilon=1, window=10)
         olmar.allocate(self.data)
         all_weights = np.array(olmar.all_weights)
         for i in range(all_weights.shape[0]):
@@ -43,7 +44,7 @@ class TestOLMAR(TestCase):
         Test the calculation of online moving average reversion with the second reversion method
         """
 
-        olmar = OLMAR(reversion_method=2, epsilon=0.3, alpha=0.5)
+        olmar = OLMAR(reversion_method=2, epsilon=10, alpha=0.5)
         olmar.allocate(self.data)
         all_weights = np.array(olmar.all_weights)
         for i in range(all_weights.shape[0]):

@@ -53,8 +53,18 @@ class OLMAR(OLPS):
         # different OLMAR methods
         mean_relative = np.mean(predicted_change)
         mean_change = np.ones(self.number_of_assets) * mean_relative
-        lambd = max(0, (self.epsilon - np.dot(_weights, predicted_change)) / (
-            np.linalg.norm(predicted_change - mean_change) ** 2))
+        try:
+            loss_fn = max(0, (self.epsilon - np.dot(_weights, predicted_change)))
+        except:
+            print(self.epsilon)
+            print(_weights)
+            print(predicted_change)
+            raise ValueError()
+
+        if loss_fn == 0:
+            lambd = 0
+        else:
+            lambd = loss_fn / (np.linalg.norm(predicted_change - mean_change) ** 2)
 
         new_weights = _weights + lambd * (predicted_change - mean_change)
         if np.isnan(new_weights).any():

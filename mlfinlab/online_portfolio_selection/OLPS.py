@@ -380,33 +380,43 @@ class OLPS(object):
             problem.solve()
         return weights.value
 
-        # optimize the weight that minimizes the l2 norm
     def simplex_projection(self, _optimize_weight):
         """
         Method to calculate the simplex projection of the calculated weights
+        https://stanford.edu/~jduchi/projects/DuchiShSiCh08.pdf
 
         :param _optimize_weight: (np.array) a weight that will be projected onto the simplex domain
         :return weights.value: (np.array) simplex projection of the original weight
         """
-        # initialize weights for simplex projection
-        weights = cp.Variable(self.number_of_assets)
 
-        # taking the minimizing weights of l2 norm of the difference equates to simplex projection
-        l2_norm = cp.norm(weights - _optimize_weight) ** 2
+        # return itself if already a simplex projection
+        len_weight = len(_optimize_weight)
+        if np.sum(_optimize_weight) == 1 and np.all(_optimize_weight >= 0):
+            return _optimize_weight
 
-        # Optimization objective and constraints
-        allocation_objective = cp.Minimize(l2_norm)
-        allocation_constraints = [
-                cp.sum(weights) == 1,
-                weights >= 0
-        ]
-        # Define and solve the problem
-        problem = cp.Problem(
-                objective=allocation_objective,
-                constraints=allocation_constraints
-        )
-        problem.solve()
-        return weights.value
+        # sort descending
+        mu = np.sort(_optimize_weight)[::-1]
+
+        # adjusted sum
+        adjusted_sum = np.cumsum(mu) - 1
+
+        # number
+        j = np.arange(len(_optimize_weight)) + 1
+
+        # condition
+        cond = mu - adjusted_sum / j > 0
+
+        # define max rho
+        rho = float(j[cond][-1])
+
+        # define theta
+        theta = adjusted_sum[cond][-1] / rho
+
+        # calculate new weight
+        new_weight = np.maximum(_optimize_weight - theta, 0)
+        return new_weight
+
+
 
     def sigmoid(self, x):
         """
