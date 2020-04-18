@@ -14,9 +14,15 @@ MDI, MDA, and SFI Feature Importance
 
 The book describes three methods to get importance scores:
 
-1) **Mean Decrease Impurity (MDI)**: This score can be obtained from tree-based classifiers and corresponds to sklearn's feature_importances attribute. MDI uses in-sample (IS) performance to estimate feature importance.
-2) **Mean Decrease Accuracy (MDA)**: This method can be applied to any classifier, not only tree based. MDA uses out-of-sample (OOS) performance in order to estimate feature importance. As an extension to tackle multicollinearity and (linear or non-linear) substitution effect a list of feature subsets can be used as clustered_subsets argument to implement Clustered Feature Importance algorithm by `Marcos Lopez de Prado <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595>`.
-3) **Single Feature Importance (SFI)**: MDA and MDI feature suffer from substitution effects. If two features are highly correlated, one of them will be considered as important while the other one will be redundant. SFI is a OOS feature importance estimator which doesn't suffer from substitution effects because it estimates each feature importance separately.
+1) **Mean Decrease Impurity (MDI)**: This score can be obtained from tree-based classifiers and corresponds to sklearn's
+   feature_importances attribute. MDI uses in-sample (IS) performance to estimate feature importance.
+2) **Mean Decrease Accuracy (MDA)**: This method can be applied to any classifier, not only tree based. MDA uses
+   out-of-sample (OOS) performance in order to estimate feature importance. As an extension to tackle multi-collinearity
+   and (linear or non-linear) substitution effect a list of feature subsets can be used as clustered_subsets argument to
+   implement Clustered Feature Importance algorithm by `Marcos Lopez de Prado <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595>`_.
+3) **Single Feature Importance (SFI)**: MDA and MDI feature suffer from substitution effects. If two features are highly
+   correlated, one of them will be considered as important while the other one will be redundant. SFI is a OOS feature
+   importance estimator which doesn't suffer from substitution effects because it estimates each feature importance separately.
 
 Implementation
 **************
@@ -35,10 +41,10 @@ An example showing how to use various feature importance functions:
   import pandas as pd
   from sklearn.ensemble import RandomForestClassifier
   from sklearn.metrics import accuracy_score, log_loss
+
   from mlfinlab.ensemble import SequentiallyBootstrappedBaggingClassifier
   from mlfinlab.feature_importance import (mean_decrease_impurity, mean_decrease_accuracy, single_feature_importance, plot_feature_importance)
   from mlfinlab.cross_validation import PurgedKFold, ml_cross_val_score
-  from mlfinlab.ensemble import SequentiallyBootstrappedBaggingClassifier
   from mlfinlab.clustering.feature_clusters import get_feature_clusters
 
   X_train = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])

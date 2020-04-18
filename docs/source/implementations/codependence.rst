@@ -313,22 +313,31 @@ The following example highlights how the various metrics behave under various va
 Codependence Matrix
 ###################
 
-This module consists two functions that generates -
-**Dependence Matrix** to compute dependence of a given matrix using various codependence method like Mutual Information, Variation of Information and Distance Correlation.
-**Distance Matrix** can used to compute distance of a given matrix using various metrics like angular, squared angular and absolute angular. This is useful while apply algorithm for clustering.
+This module consists two functions that generate the following:
+
+1. **Dependence Matrix** to compute dependence of a given matrix using various codependence method like Mutual Information,
+   Variation of Information and Distance Correlation.
+2. **Distance Matrix** can used to compute distance of a given matrix using various metrics like angular, squared
+   angular and absolute angular.
 
 Implementation
 **************
+
 .. py:currentmodule:: mlfinlab.codependence.codependence_matrix
-.. automodule:: mlfinlab.codependence.codependence_matrix
-   :members:
+
+.. autofunction:: get_dependence_matrix
+
+.. autofunction:: get_distance_matrix
+
 
 Example
 *******
 
 .. code-block::
+
    import pandas as pd
-   from mlfinlab.codependence.codependence_matrix import get_dependence_matrix, get_distance_matrix
+   from mlfinlab.codependence.codependence_matrix import (get_dependence_matrix,
+                                                          get_distance_matrix)
 
    X = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
 
