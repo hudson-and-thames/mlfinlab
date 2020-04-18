@@ -114,7 +114,7 @@ Supporter Sponsors:
 .. _`Ming Wu`: https://www.linkedin.com/in/ming-yue-wu/
 .. _`Richard Scheiwe`: https://www.linkedin.com/in/richardscheiwe/
 .. _`Shaun McDonogh`: https://www.linkedin.com/in/shaunmcdonogh/
-.. _`Tianfang Wu`: linkedin.com/in/tianfangwu
+.. _`Tianfang Wu`: https://www.linkedin.com/in/tianfangwu/
 
 
 .. toctree::

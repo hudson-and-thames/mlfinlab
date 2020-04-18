@@ -49,15 +49,13 @@ A special thank you to our sponsors! If you would like to become a sponsor and h
 * [Eugene Tartakovsky](https://www.linkedin.com/in/etartakovsky/)
 * [Ming Wu](https://www.linkedin.com/in/ming-yue-wu/)
 * [Richard Scheiwe](https://www.linkedin.com/in/richardscheiwe/)
-* [Tianfang Wu](file:///home/jackal08/Git/mlfinlab/docs/build/html/linkedin.com/in/tianfangwu)
+* [Tianfang Wu](https://www.linkedin.com/in/tianfangwu/)
 
 ---
 
 ## Getting Started
 
 Please find all of the supporting documentation needed here: [ReadTheDocs](https://mlfinlab.readthedocs.io/en/latest/)
-
----
 
 ## Contact us
 We have recently opened access to our [Slack channel](https://join.slack.com/t/mlfinlab/shared_invite/enQtOTUzNjAyNDI1NTc1LTU0NTczNWRlM2U5ZDZiZTUxNTgzNzBlNDU3YmY5MThkODdiMTgwNzI5NDQ2NWI0YTYyMmI3MjBkMzY2YjVkNzc) to help form a community and encourage contributions.
