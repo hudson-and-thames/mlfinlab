@@ -1,6 +1,5 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
-import pandas as pd
 from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
 
@@ -9,7 +8,7 @@ class OLMAR(OLPS):
     This class implements the Online Moving Average Reversion Strategy.
     """
 
-    def __init__(self, epsilon, window, alpha, reversion_method):
+    def __init__(self, reversion_method, epsilon, window=None, alpha=None):
         """
         Constructor.
         """

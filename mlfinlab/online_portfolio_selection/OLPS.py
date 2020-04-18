@@ -374,7 +374,7 @@ class OLPS(object):
         )
         # if there is a specified solver use it
         if _solver:
-            problem.solve(solver=_solver)
+            problem.solve(warm_start=True, solver=_solver)
         # if none specified, use default solver
         else:
             problem.solve()

@@ -63,7 +63,7 @@ class CORN(OLPS):
             return weight
 
         # initialize weights
-        weights = cp.Variable(self.number_of_assets, nonneg=True)
+        weights = cp.Variable(self.number_of_assets)
 
         # used cp.log and cp.sum to make the cost function a convex function
         # multiplying continuous returns equates to summing over the log returns
@@ -80,10 +80,8 @@ class CORN(OLPS):
                 objective=allocation_objective,
                 constraints=allocation_constraints
         )
-        if _solver:
-            problem.solve(qcp=True, solver=_solver)
-        else:
-            problem.solve()
+
+        problem.solve(warm_start=True, solver=_solver)
         return weights.value
 
 
@@ -94,8 +92,8 @@ def main():
     """
     stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    corn = CORN(window=2, rho=0.5)
-    corn.allocate(stock_price, resample_by='m')
+    corn = CORN(window=2, rho=0.1)
+    corn.allocate(stock_price, resample_by='w')
     print(corn.all_weights)
     print(corn.portfolio_return)
     corn.portfolio_return.plot()

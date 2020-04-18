@@ -58,8 +58,8 @@ def main():
     """
     stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    scorn = SCORN(window=10, rho=0.8)
-    scorn.allocate(stock_price, resample_by='w')
+    scorn = SCORN(window=5, rho=0.2)
+    scorn.allocate(stock_price)
     print(scorn.all_weights)
     print(scorn.portfolio_return)
     scorn.portfolio_return.plot()

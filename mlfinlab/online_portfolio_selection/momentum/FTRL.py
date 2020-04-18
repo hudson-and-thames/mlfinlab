@@ -58,7 +58,7 @@ class FTRL(FTL):
                 constraints=allocation_constraints
         )
         if _solver:
-            problem.solve(solver=_solver)
+            problem.solve(warm_start=True, solver=_solver)
         else:
             problem.solve()
         return weights.value
