@@ -129,6 +129,12 @@ Supporter Sponsors:
 
 .. toctree::
     :maxdepth: 2
+    :caption: Recipes
+
+    recipes/Financial Data Structure
+
+.. toctree::
+    :maxdepth: 2
     :caption: Feature Engineering
     :hidden:
 
@@ -192,14 +198,6 @@ Supporter Sponsors:
     portfolio_optimisation/nested_clustered_optimisation
     portfolio_optimisation/theory_implied_correlation
 
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Recipes
-
-    recipes/Financial Data Structure
-
-* :doc:'recipes/Financial Data Structure'
 
 .. toctree::
     :maxdepth: 2
