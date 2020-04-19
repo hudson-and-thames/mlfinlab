@@ -3,6 +3,7 @@ import numbers
 from math import log, ceil
 import numpy as np
 import pandas as pd
+
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 
 
@@ -15,11 +16,13 @@ class CLA:
 
     The Critical Line Algorithm is a famous portfolio optimisation algorithm used for calculating the optimal allocation weights
     for a given portfolio. It solves the optimisation problem with optimisation constraints on each weight - lower and upper
-    bounds on the weight value. This class can compute multiple types of solutions -
-            1. CLA Turning Points
-            2. Minimum Variance
-            3. Maximum Sharpe
-            4. Efficient Frontier Allocations
+    bounds on the weight value. This class can compute multiple types of solutions:
+
+    1. CLA Turning Points
+    2. Minimum Variance
+    3. Maximum Sharpe
+    4. Efficient Frontier Allocations
+
     """
 
     def __init__(self, weight_bounds=(0, 1), calculate_expected_returns="mean"):

@@ -150,11 +150,13 @@ class FractionalDifferentiation:
         Source: Chapter 5, AFML (section 5.5, page 83);
 
         References:
-        https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086
-        https://wwwf.imperial.ac.uk/~ejm/M3S8/Problems/hosking81.pdf
-        https://en.wikipedia.org/wiki/Fractional_calculus
+
+        * https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086
+        * https://wwwf.imperial.ac.uk/~ejm/M3S8/Problems/hosking81.pdf
+        * https://en.wikipedia.org/wiki/Fractional_calculus
 
         The steps are as follows:
+
         - Compute weights (this is a one-time exercise)
         - Iteratively apply the weights to the price series and generate output points
 
@@ -211,5 +213,27 @@ def get_weights_ffd(diff_amt, thresh, lim):
 
 
 def frac_diff_ffd(series, diff_amt, thresh=1e-5):
-    """ This is a pass-through function """
+    """
+    Source: Chapter 5, AFML (section 5.5, page 83);
+
+    References:
+
+    * https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086
+    * https://wwwf.imperial.ac.uk/~ejm/M3S8/Problems/hosking81.pdf
+    * https://en.wikipedia.org/wiki/Fractional_calculus
+
+    The steps are as follows:
+
+    - Compute weights (this is a one-time exercise)
+    - Iteratively apply the weights to the price series and generate output points
+
+    Constant width window (new solution)
+    Note 1: thresh determines the cut-off weight for the window
+    Note 2: diff_amt can be any positive fractional, not necessarity bounded [0, 1].
+
+    :param series: (pd.Series)
+    :param diff_amt: (float) differencing amount
+    :param thresh: (float) threshold for minimum weight
+    :return: (pd.DataFrame) a data frame of differenced series
+    """
     return FractionalDifferentiation.frac_diff_ffd(series, diff_amt, thresh)

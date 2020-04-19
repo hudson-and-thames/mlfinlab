@@ -22,7 +22,7 @@ def _get_sadf_at_t(X: pd.DataFrame, y: pd.DataFrame, min_length: int) -> float:
     start_points, bsadf = range(0, y.shape[0] - min_length + 1), -np.inf
     for start in start_points:
         y_, X_ = y[start:], X[start:]
-        b_mean_, b_std_ = _get_betas(X_, y_)
+        b_mean_, b_std_ = get_betas(X_, y_)
         if not np.isnan(b_mean_[0]):
             b_mean_, b_std_ = b_mean_[0, 0], b_std_[0, 0] ** 0.5
             all_adf = b_mean_ / b_std_
@@ -110,7 +110,7 @@ def _lag_df(df: pd.DataFrame, lags: Union[int, list]) -> pd.DataFrame:
     return df_lagged
 
 
-def _get_betas(X: pd.DataFrame, y: pd.DataFrame) -> Tuple[np.array, np.array]:
+def get_betas(X: pd.DataFrame, y: pd.DataFrame) -> Tuple[np.array, np.array]:
     """
     Snippet 17.4, page 259. Fitting The ADF Specification (get beta estimate and estimate variance)
 
@@ -120,13 +120,16 @@ def _get_betas(X: pd.DataFrame, y: pd.DataFrame) -> Tuple[np.array, np.array]:
     """
     xy = np.dot(X.T, y)
     xx = np.dot(X.T, X)
+
     try:
         xx_inv = np.linalg.inv(xx)
     except np.linalg.LinAlgError:
         return [np.nan], [[np.nan, np.nan]]
+
     b_mean = np.dot(xx_inv, xy)
     err = y - np.dot(X, b_mean)
     b_var = np.dot(err.T, err) / (X.shape[0] - X.shape[1]) * xx_inv
+
     return b_mean, b_var
 
 
