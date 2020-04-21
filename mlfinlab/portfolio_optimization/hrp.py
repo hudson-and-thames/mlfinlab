@@ -38,7 +38,7 @@ class HierarchicalRiskParity:
                  covariance_matrix=None,
                  distance_matrix=None,
                  side_weights=None,
-                 linkage='single',
+                 linkage_method='single',
                  resample_by=None,
                  use_shrinkage=False):
         # pylint: disable=invalid-name, too-many-branches
@@ -97,7 +97,7 @@ class HierarchicalRiskParity:
         distance_matrix = pd.DataFrame(distance_matrix, index=asset_names, columns=asset_names)
 
         # Step-1: Tree Clustering
-        self.clusters = self._tree_clustering(distance=distance_matrix, method=linkage)
+        self.clusters = self._tree_clustering(distance=distance_matrix, method=linkage_method)
 
         # Step-2: Quasi Diagnalization
         num_assets = len(asset_names)
