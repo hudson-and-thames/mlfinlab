@@ -214,6 +214,7 @@ class HierarchicalRiskParity:
         self.weights.index = assets[self.ordered_indices]
         self.weights = pd.DataFrame(self.weights)
 
+        # Build Long/Short portfolio if needed
         short_ptf = side_weights[side_weights == -1].index
         buy_ptf = side_weights[side_weights == 1].index
         if not short_ptf.empty:
