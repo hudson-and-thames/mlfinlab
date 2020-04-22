@@ -23,7 +23,7 @@ def get_classification_data(n_features=100, n_informative=25, n_redundant=25, n_
     '''
     np.random.seed(random_state)
     X, y = make_classification(n_samples=n_samples, n_features=n_features-n_redundant, n_informative=n_informative,
-                            n_redundant=0, shuffle=False, random_state=random_state)
+                               n_redundant=0, shuffle=False, random_state=random_state)
     cols = ['I_'+str(i) for i in range(n_informative)]
     cols += ['N_'+str(i) for i in range(n_features-n_informative-n_redundant)]
     X, y = pd.DataFrame(X, columns=cols), pd.Series(y)
