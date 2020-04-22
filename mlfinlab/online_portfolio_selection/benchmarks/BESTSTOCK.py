@@ -1,6 +1,6 @@
 # pylint: disable=missing-module-docstring
-from mlfinlab.online_portfolio_selection.OLPS import OLPS
 import numpy as np
+from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
 
 class BESTSTOCK(OLPS):

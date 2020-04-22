@@ -150,7 +150,7 @@ class OLPS:
         """
         # if no weights are given, return uniform weight
         if _weights is None:
-            _weights = uniform_weight(self.number_of_assets)
+            _weights = self.uniform_weight()
         # return given weight
         return _weights
 
