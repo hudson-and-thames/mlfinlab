@@ -5,7 +5,6 @@ import os
 import unittest
 
 import numpy as np
-import pandas as pd
 
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.model_selection import cross_val_score, KFold
@@ -28,7 +27,7 @@ class TestFeatureImportance(unittest.TestCase):
         Generate X, y datasets and fit a RF
         """
         #Generate datasets
-        self.X, self.y = get_classification_data(40,5,30,10000,sigmaStd=.125)
+        self.X, self.y = get_classification_data(40, 5, 30, 10000, sigmaStd=.125)
         # Fit a RF
         self.clf_base = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
                                                class_weight='balanced_subsample')
@@ -130,13 +129,13 @@ class TestFeatureImportance(unittest.TestCase):
         self.assertAlmostEqual(sfi_feat_imp_f1.loc['I_0', 'mean'], 0.48530, delta=0.1)
         self.assertAlmostEqual(sfi_feat_imp_f1.loc['I_1', 'mean'], 0.78778, delta=0.1)
 
-        #MDI CFI assertions
-        self.assertAlmostEqual(mdi_cfi_linear.loc['I_1', 'mean'], 0.5, delta=3)
-        self.assertAlmostEqual(mdi_cfi_linear.loc['I_0', 'mean'], 0.1, delta=3)
+        #Cluster MDI  assertions
+        self.assertAlmostEqual(clustered_mdi.loc['I_1', 'mean'], 0.5, delta=3)
+        self.assertAlmostEqual(clustered_mdi.loc['I_0', 'mean'], 0.1, delta=3)
 
         #MDA CFI(log_loss) assertions
-        self.assertAlmostEqual(mda_cfi_linear.loc['I_1', 'mean'], 0.2, delta=3)
-        self.assertAlmostEqual(mda_cfi_linear.loc['R_0', 'mean'], 0.3, delta=3)
+        self.assertAlmostEqual(clustered_mda.loc['I_1', 'mean'], 0.2, delta=3)
+        self.assertAlmostEqual(clustered_mda.loc['R_0', 'mean'], 0.3, delta=3)
 
         #Test if CFI with number of clusters same to number features is equal to MDA results
         self.assertEqual(mda_feat_imp_log_loss.loc['I_1', 'mean'], mda_cfi_single.loc['I_1', 'mean'])
