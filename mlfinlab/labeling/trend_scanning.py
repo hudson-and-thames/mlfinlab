@@ -6,7 +6,7 @@ Implementation of Trend-Scanning labels described in `Advances in Financial Mach
 import pandas as pd
 import numpy as np
 from numba import njit
-print('bla')
+
 
 @njit
 def calculate_t_values(subset):
