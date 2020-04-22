@@ -30,7 +30,7 @@ class TestCRP(TestCase):
         """
 
         crp = CRP()
-        crp.allocate(self.data)
+        crp.allocate(self.data, resample_by='M')
         all_weights = np.array(crp.all_weights)
         one_weight = all_weights[0]
         for i in range(all_weights.shape[0]):
@@ -39,4 +39,5 @@ class TestCRP(TestCase):
             assert len(weights) == self.data.shape[1]
             assert (weights == one_weight).all()
             np.testing.assert_almost_equal(np.sum(weights), 1)
+        print(crp.all_weights)
 

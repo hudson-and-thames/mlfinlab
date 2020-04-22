@@ -4,11 +4,13 @@ from mlfinlab.online_portfolio_selection.OLPS import OLPS
 
 class CRP(OLPS):
     """
-    This class implements the Constant Rebalanced Portfolio strategy. It is reproduced with modification from the following paper:
+    This class implements the Buy and Hold strategy. It is reproduced with modification from the following paper:
     Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December YEAR),
-    33 pages. DOI:http://dx.doi.org/10.1145/0000000.0000000.
+    33 pages. DOI:http://dx.doi.org/10.1145/2512962.
 
     Constant Rebalanced Portfolio rebalances to a given weight for each time period.
+
+    :ivar weights: (np.array) any initial weights that the user wants to use
     """
     def __init__(self, weights=None):
         super(CRP, self).__init__()
@@ -25,8 +27,7 @@ class CRP(OLPS):
         if self.weights is not None:
             return self.weights
         # if no initializing or no weights for allocate method, return uniform weight
-        elif _weights is None:
-            return self.uniform_weight(self.number_of_assets)
+        if _weights is None:
+            return self.uniform_weight()
         # return given weight
-        else:
-            return _weights
+        return _weights

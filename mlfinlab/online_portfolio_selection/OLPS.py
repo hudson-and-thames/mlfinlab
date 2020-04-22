@@ -126,7 +126,7 @@ class OLPS:
         :return: (None) sets all_weights for the given data
         """
         # set initial weights
-        self.first_weight(_weights)
+        self.weights = self.first_weight(_weights)
         # set initial all weights to be the first given weight
         self.all_weights[0] = self.weights
 
@@ -146,13 +146,13 @@ class OLPS:
         Initializes to uniform weight if not given a certain weight
 
         :param _weights: (list/np.array/pd.Dataframe) weights given by the user, or none if not initialized
-        :return (None): (np.array) sets self.weights
+        :return (_weights): (np.array) first portfolio weights
         """
         # if no weights are given, return uniform weight
         if _weights is None:
             _weights = uniform_weight(self.number_of_assets)
         # return given weight
-        self.weights = _weights
+        return _weights
 
     def update_weight(self,
                       _time):
@@ -258,6 +258,16 @@ class OLPS:
         norm_weights = _weights / np.sum(_weights)
         self.weights = norm_weights
 
+    def uniform_weight(self):
+        """
+        Returns a uniform weight of assets
+
+        :return uni_weight: (np.array) uniform weights (1/n, 1/n, 1/n ...)
+        """
+        # divide by n after creating numpy arrays of one
+        uni_weight = np.ones(self.number_of_assets) / self.number_of_assets
+        return uni_weight
+
 
 def calculate_relative_return(_asset_prices):
     """
@@ -319,18 +329,6 @@ def simplex_projection(_optimize_weight):
     # calculate new weight
     new_weight = np.maximum(_optimize_weight - theta, 0)
     return new_weight
-
-
-def uniform_weight(number_of_asset):
-    """
-    Returns a uniform weight given n number assets
-
-    :param number_of_asset: (int) number of assets
-    :return uni_weight: (np.array) uniform weights (1/n, 1/n, 1/n ...)
-    """
-    # divide by n after creating numpy arrays of one
-    uni_weight = np.ones(number_of_asset) / number_of_asset
-    return uni_weight
 
 
 def check_asset(_asset_prices,
