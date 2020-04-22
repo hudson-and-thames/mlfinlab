@@ -2,7 +2,6 @@
 Test various methods of generating feature clusters
 """
 import unittest
-import pandas as pd
 
 from mlfinlab.util.generate_dataset import get_classification_data
 from mlfinlab.clustering.feature_clusters import get_feature_clusters
@@ -38,7 +37,7 @@ class TestFeatureClusters(unittest.TestCase):
         #the threshold higher (0.1) than that. Also we need a feature to trigger the low degree of freedom
         #condition so, we create a series of zero in the datasets
         self.X['R_5c'] = self.X['R_5'] #this feature is add to introduce low DF in the regressor.
-        clustered_subsets_distance = get_feature_clusters(X_data, dependence_metric='distance_correlation',
+        clustered_subsets_distance = get_feature_clusters(self.X, dependence_metric='distance_correlation',
                                                           distance_metric='abs_angular', linkage_method='single',
                                                           n_clusters=None, critical_threshold=0.1)
         #output clusters must be 2
