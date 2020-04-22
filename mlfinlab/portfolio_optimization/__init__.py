@@ -10,3 +10,4 @@ from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 from mlfinlab.portfolio_optimization.nco import NCO
 from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
+from mlfinlab.portfolio_optimization.tic import TIC
