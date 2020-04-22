@@ -9,32 +9,29 @@ from numba import njit
 
 
 @njit
-def calculate_t_values(subset):
+def calculate_t_values(subset, min_sample_length, step):
     """
-    Fuor loop for calculating linear regression every n steps.
+    For loop for calculating linear regression every n steps.
     
     :param subset: (np.array) subset of indecies for which we want to calculate t values
     :return: (float) maximum t value and index of maximum t value
     """
-    
-    
     max_abs_t_value = -np.inf  # Maximum abs t-value of b_1 coefficient among l values
     max_t_value_index = None  # Index with maximum t-value
-    min_sample_length = 20
     
     for forward_window in np.arange(min_sample_length, subset.shape[0], step):
 
-        y = subset[:forward_window].reshape(-1, 1)  # y{t}:y_{t+l}
+        y_subset = subset[:forward_window].reshape(-1, 1)  # y{t}:y_{t+l}
 
         # Array of [1, 0], [1, 1], [1, 2], ... [1, l] # b_0, b_1 coefficients
-        X = np.ones((y.shape[0], 2))
-        X[:, 1] = np.arange(y.shape[0])
+        X_subset = np.ones((y_subset.shape[0], 2))
+        X_subset[:, 1] = np.arange(y_subset.shape[0])
 
         # Get regression coefficients estimates
-        xy = X.transpose() @ y
+        xy = X.transpose() @ y_subset
         xx = X.transpose() @ X
 
-        # calculate to check for singularity
+        #   check for singularity
         det = np.linalg.det(xx)
         
         # get coefficient and std from linear regression
@@ -44,8 +41,8 @@ def calculate_t_values(subset):
         else:
             xx_inv = np.linalg.inv(xx)
             b_mean = xx_inv @ xy
-            err = y - (X @ b_mean)
-            b_std = np.dot(np.transpose(err), err) / (X.shape[0] - X.shape[1]) * xx_inv
+            err = y_subset - (X_subset @ b_mean)
+            b_std = np.dot(np.transpose(err), err) / (X_subset.shape[0] - X_subset.shape[1]) * xx_inv
         
         # Check if l gives the maximum t-value among all values {0...L}
             t_beta_1 = (b_mean[1] / np.sqrt(b_std[1, 1]))[0]
@@ -96,7 +93,9 @@ def trend_scanning_labels(price_series: pd.Series, t_events: list = None, look_f
         if subset.shape[0] >= look_forward_window:
 
             # linear regressoin for every index
-            max_t_value_index, max_t_value = calculate_t_values(subset.values)
+            max_t_value_index, max_t_value = calculate_t_values(subset.values,
+                                                                min_sample_length,
+                                                                step)
 
             # Store label information (t1, return)
             label_endtime_index = subset.index[max_t_value_index - 1]
