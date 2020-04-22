@@ -50,6 +50,18 @@ class TestHRP(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 0)
 
+    def test_hrp_with_nb_clusters(self):
+        """
+        Test the weights calculated by the HRP algorithm - if all the weights are positive and
+        their sum is equal to 1 by specifying a giver number of clusters
+        """
+        hrp = HierarchicalRiskParity()
+        hrp.allocate(asset_prices=self.data, asset_names=self.data.columns, nb_clusters=7)
+        weights = hrp.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
     def test_hrp_with_shrinkage(self):
         """
         Test the weights calculated by HRP algorithm with covariance shrinkage.
@@ -69,7 +81,7 @@ class TestHRP(unittest.TestCase):
 
         hrp = HierarchicalRiskParity()
         hrp.allocate(asset_prices=self.data, use_shrinkage=True, asset_names=self.data.columns)
-        dendrogram = hrp.plot_clusters(assets=self.data.columns)
+        dendrogram = hrp.plot_clusters(max_nb_clusters=7)
         assert dendrogram.get('icoord')
         assert dendrogram.get('dcoord')
         assert dendrogram.get('ivl')
@@ -104,6 +116,15 @@ class TestHRP(unittest.TestCase):
             hrp = HierarchicalRiskParity()
             data = self.data.reset_index()
             hrp.allocate(asset_prices=data, asset_names=self.data.columns)
+
+    def test_value_error_for_non_int_nb_clusters(self):
+        """
+        Test ValueError on passing dataframe not indexed by date.
+        """
+
+        with self.assertRaises(ValueError):
+            hrp = HierarchicalRiskParity()
+            hrp.allocate(asset_prices=self.data, asset_names=self.data.columns,nb_clusters='7')
 
     def test_resampling_asset_prices(self):
         """
