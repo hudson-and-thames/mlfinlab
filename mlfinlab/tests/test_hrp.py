@@ -43,7 +43,7 @@ class TestHRP(unittest.TestCase):
         Test the Long Short Portfolio via side_weights Serries 1 for Long, -1 for Short (index=asset names)
         """
         hrp = HierarchicalRiskParity()
-        side_weights = pd.Series([1]*self.data.shape[1], index=self.data.columns)
+        side_weights = pd.Series([1] * self.data.shape[1], index=self.data.columns)
         side_weights.loc[self.data.columns[:4]] = -1
         hrp.allocate(asset_prices=self.data, asset_names=self.data.columns, side_weights=side_weights)
         weights = hrp.weights.values[0]
@@ -124,7 +124,7 @@ class TestHRP(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             hrp = HierarchicalRiskParity()
-            hrp.allocate(asset_prices=self.data, asset_names=self.data.columns,nb_clusters='7')
+            hrp.allocate(asset_prices=self.data, asset_names=self.data.columns, nb_clusters='7')
 
     def test_resampling_asset_prices(self):
         """
