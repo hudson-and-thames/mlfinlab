@@ -306,6 +306,11 @@ class HierarchicalRiskParity:
 
     @staticmethod
     def _fancy_dendrogram(*args, **kwargs):
+        '''
+        :param *args: Variable length argument list.
+        :param **kwargs: Arbitrary keyword arguments.
+        :return: dendogram object
+        '''
         max_d = kwargs.pop('max_d', None)
         if max_d and 'color_threshold' not in kwargs:
             kwargs['color_threshold'] = max_d
@@ -318,11 +323,11 @@ class HierarchicalRiskParity:
             plt.xlabel('sample index or (cluster size)')
             plt.ylabel('distance')
             for i_coord, d_coord, c_color in zip(ddata['icoord'], ddata['dcoord'], ddata['color_list']):
-                x = 0.5 * sum(i_coord[1:3])
-                y = d_coord[1]
-                if y > annotate_above:
-                    plt.plot(x, y, 'o', c=c_color)
-                    plt.annotate("%.3g" % y, (x, y), xytext=(0, -5),
+                x_coord = 0.5 * sum(i_coord[1:3])
+                y_coord = d_coord[1]
+                if y_coord > annotate_above:
+                    plt.plot(x_coord, y_coord, 'o', c=c_color)
+                    plt.annotate("%.3g" % y_coord, (x_coord, y_coord), xytext=(0, -5),
                                  textcoords='offset points',
                                  va='top', ha='center')
             if max_d:
