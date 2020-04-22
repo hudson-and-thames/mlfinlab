@@ -3,24 +3,11 @@ Test various methods of generating feature clusters
 """
 import unittest
 import pandas as pd
-from sklearn.datasets import make_classification
 
+from mlfinlab.util.generate_dataset import get_classification_data
 from mlfinlab.clustering.feature_clusters import get_feature_clusters
 
-def getTestData(n_features=100,n_informative=25,n_redundant=25,n_samples=10000,random_state=0,sigmaStd=.0):
-    '''
-    A funtion to generate synthetic data
-    '''
-    np.random.seed(random_state)
-    X,y=make_classification(n_samples=n_samples,n_features=n_features-n_redundant, n_informative=n_informative,
-                            n_redundant=0,shuffle=False,random_state=random_state)
-    cols=['I_'+str(i) for i in range(n_informative)]
-    cols+=['N_'+str(i) for i in range(n_features-n_informative-n_redundant)]
-    X,y=pd.DataFrame(X,columns=cols),pd.Series(y)
-    i=np.random.choice(range(n_informative),size=n_redundant)
-    for k,j in enumerate(i):
-        X['R_'+str(k)]=X['I_'+str(j)]+np.random.normal(size=X.shape[0])*sigmaStd
-    return X,y
+
 
 class TestFeatureClusters(unittest.TestCase):
     """
@@ -31,7 +18,7 @@ class TestFeatureClusters(unittest.TestCase):
         """
         Create X, y datasets
         """
-        self.X, self.y = getTestData(40,5,30,10000,sigmaStd=.125)
+        self.X, self.y = get_classification_data(40,5,30,1000,sigmaStd=2)
 
     def test_get_feature_clusters(self):
         """
@@ -48,20 +35,17 @@ class TestFeatureClusters(unittest.TestCase):
         #test for optimal number of clusters and  _check_for_low_silhouette_scores
         #since this is done on test dataset so there will be no features with low silhouette score
         #so we will make a feature with some what lower silhouette score (near to zero) and set
-        #the threshold higher (0.55) than that. Also we need a feature to trigger the low degree of freedom
+        #the threshold higher (0.1) than that. Also we need a feature to trigger the low degree of freedom
         #condition so, we create a series of zero in the datasets
         X_data = self.X
-        X_data['low_df'] = 0
+        X_data['R_5c'] = X['R_5'] #this feature is add to introduce low DF in the regressor.
         clustered_subsets_distance = get_feature_clusters(X_data, dependence_metric='distance_correlation',
                                                           distance_metric='abs_angular', linkage_method='single',
-                                                          n_clusters=None, critical_threshold=0.55)
+                                                          n_clusters=None, critical_threshold=0.1)
         #output clusters must be 2
         self.assertAlmostEqual(len(clustered_subsets_distance), 5, delta=0.001)
         self.assertAlmostEqual(len(clustered_subsets_vi), 2, delta=0.001)
         self.assertAlmostEqual(len(clustered_subsets_mi), 2, delta=0.001)
-
-
-
 
 
     def test_value_error_raise(self):
