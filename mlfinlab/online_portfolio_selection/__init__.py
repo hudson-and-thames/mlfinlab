@@ -7,9 +7,9 @@ from mlfinlab.online_portfolio_selection.OLPS import OLPS
 # from mlfinlab.online_portfolio_selection.UP import UP
 # Benchmarks
 from mlfinlab.online_portfolio_selection.benchmarks.BAH import BAH
-# from mlfinlab.online_portfolio_selection.benchmarks.BESTSTOCK import BESTSTOCK
-# from mlfinlab.online_portfolio_selection.benchmarks.CRP import CRP
-# from mlfinlab.online_portfolio_selection.benchmarks.BCRP import BCRP
+from mlfinlab.online_portfolio_selection.benchmarks.BESTSTOCK import BESTSTOCK
+from mlfinlab.online_portfolio_selection.benchmarks.CRP import CRP
+from mlfinlab.online_portfolio_selection.benchmarks.BCRP import BCRP
 # Momentum
 # from mlfinlab.online_portfolio_selection.momentum.EG import EG
 # from mlfinlab.online_portfolio_selection.momentum.FTL import FTL

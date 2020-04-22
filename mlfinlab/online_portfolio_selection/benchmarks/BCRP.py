@@ -1,6 +1,6 @@
 # pylint: disable=missing-module-docstring
-from mlfinlab.online_portfolio_selection import OLPS
 import cvxpy as cp
+from mlfinlab.online_portfolio_selection import OLPS
 
 
 class BCRP(OLPS):
