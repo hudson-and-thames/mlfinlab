@@ -38,7 +38,7 @@ class TestTrendScanningLabels(unittest.TestCase):
 
         # Before 2008/5/12 we had a strong positive trend
         self.assertTrue(
-            set(tr_scan_labels.reindex(pd.date_range(pd.Timestamp(2008, 4, 1), pd.Timestamp(2008, 10, 1))).dropna().bin) == set([1]))
+            set(tr_scan_labels.reindex(pd.date_range(pd.Timestamp(2008, 1, 1), pd.Timestamp(2008, 5, 9))).dropna().bin) == set([1]))
 
         self.assertEqual(tr_scan_labels.bin.value_counts()[-1], 70)  # Number of -1 labels check
         self.assertEqual(tr_scan_labels.bin.value_counts()[1], 40)
