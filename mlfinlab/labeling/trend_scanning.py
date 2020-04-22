@@ -5,8 +5,56 @@ Implementation of Trend-Scanning labels described in `Advances in Financial Mach
 
 import pandas as pd
 import numpy as np
+from numba import njit
 
-from mlfinlab.structural_breaks.sadf import get_betas
+
+@njit
+def calculate_t_values(subset):
+    """
+    Fuor loop for calculating linear regression every n steps.
+    
+    :param subset: (np.array) subset of indecies for which we want to calculate t values
+    :return: (float) maximum t value and index of maximum t value
+    """
+    
+    
+    max_abs_t_value = -np.inf  # Maximum abs t-value of b_1 coefficient among l values
+    max_t_value_index = None  # Index with maximum t-value
+    min_sample_length = 20
+    
+    for forward_window in np.arange(min_sample_length, subset.shape[0], step):
+
+        y = subset[:forward_window].reshape(-1, 1)  # y{t}:y_{t+l}
+
+        # Array of [1, 0], [1, 1], [1, 2], ... [1, l] # b_0, b_1 coefficients
+        X = np.ones((y.shape[0], 2))
+        X[:, 1] = np.arange(y.shape[0])
+
+        # Get regression coefficients estimates
+        xy = X.transpose() @ y
+        xx = X.transpose() @ X
+
+        # calculate to check for singularity
+        det = np.linalg.det(xx)
+        
+        # get coefficient and std from linear regression
+        if det == 0:
+            b_mean = [np.nan]
+            b_std = [[np.nan, np.nan]]
+        else:
+            xx_inv = np.linalg.inv(xx)
+            b_mean = xx_inv @ xy
+            err = y - (X @ b_mean)
+            b_std = np.dot(np.transpose(err), err) / (X.shape[0] - X.shape[1]) * xx_inv
+        
+        # Check if l gives the maximum t-value among all values {0...L}
+            t_beta_1 = (b_mean[1] / np.sqrt(b_std[1, 1]))[0]
+            if abs(t_beta_1) > max_abs_t_value:
+                max_abs_t_value = abs(t_beta_1)
+                max_t_value = t_beta_1
+                max_t_value_index = forward_window
+                
+    return max_t_value_index, max_t_value
 
 
 def trend_scanning_labels(price_series: pd.Series, t_events: list = None, look_forward_window: int = 20,
@@ -46,27 +94,9 @@ def trend_scanning_labels(price_series: pd.Series, t_events: list = None, look_f
     for index in t_events:
         subset = price_series.loc[index:].iloc[:look_forward_window]  # Take t:t+L window
         if subset.shape[0] >= look_forward_window:
-            # Loop over possible look-ahead windows to get the one which yields maximum t values for b_1 regression coef
-            max_abs_t_value = -np.inf  # Maximum abs t-value of b_1 coefficient among l values
-            max_t_value_index = None  # Index with maximum t-value
-            max_t_value = None  # Maximum t-value signed
 
-            # Get optimal label end time value based on regression t-statistics
-            for forward_window in np.arange(min_sample_length, subset.shape[0], step):
-                y_subset = subset.iloc[:forward_window].values.reshape(-1, 1)  # y{t}:y_{t+l}
-
-                # Array of [1, 0], [1, 1], [1, 2], ... [1, l] # b_0, b_1 coefficients
-                X_subset = np.ones((y_subset.shape[0], 2))
-                X_subset[:, 1] = np.arange(y_subset.shape[0])
-
-                # Get regression coefficients estimates
-                b_mean_, b_std_ = get_betas(X_subset, y_subset)
-                # Check if l gives the maximum t-value among all values {0...L}
-                t_beta_1 = (b_mean_[1] / np.sqrt(b_std_[1, 1]))[0]
-                if abs(t_beta_1) > max_abs_t_value:
-                    max_abs_t_value = abs(t_beta_1)
-                    max_t_value = t_beta_1
-                    max_t_value_index = forward_window
+            # linear regressoin for every index
+            max_t_value_index, max_t_value = calculate_t_values(subset.values)
 
             # Store label information (t1, return)
             label_endtime_index = subset.index[max_t_value_index - 1]
@@ -78,7 +108,7 @@ def trend_scanning_labels(price_series: pd.Series, t_events: list = None, look_f
             t_values_array.append(None)
 
     labels = pd.DataFrame({'t1': t1_array, 't_value': t_values_array}, index=t_events)
-    labels.loc[:, 'ret'] = price_series.loc[labels.t1].values / price_series.loc[labels.index].values - 1
+    labels.loc[:, 'ret'] = price_series.reindex(labels.t1).values / price_series.reindex(labels.index).values - 1
     labels['bin'] = np.sign(labels.t_value)
 
     return labels
