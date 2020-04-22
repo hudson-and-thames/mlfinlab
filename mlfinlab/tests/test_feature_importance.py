@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
-from sklearn.datasets import make_classification
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn.metrics import f1_score, log_loss
 from mlfinlab.feature_importance.importance import (mean_decrease_impurity,
@@ -16,6 +15,7 @@ from mlfinlab.feature_importance.importance import (mean_decrease_impurity,
                                                     plot_feature_importance)
 from mlfinlab.feature_importance.orthogonal import feature_pca_analysis, get_orthogonal_features
 from mlfinlab.clustering.feature_clusters import get_feature_clusters
+from mlfinlab.util.generate_dataset import get_classification_data
 
 # pylint: disable=invalid-name
 class TestFeatureImportance(unittest.TestCase):
@@ -25,18 +25,10 @@ class TestFeatureImportance(unittest.TestCase):
 
     def setUp(self):
         """
-        Create X, y datasets and fit a RF
+        Generate X, y datasets and fit a RF
         """
-        # Create X, y datasets
-        self.X, self.y = make_classification(n_samples=1000, n_features=10, n_informative=5, n_redundant=2,
-                                             random_state=0,
-                                             shuffle=False)
-        date_index = pd.DatetimeIndex(periods=1000, freq=pd.tseries.offsets.BDay(), end=pd.datetime.today())
-        self.X, self.y = pd.DataFrame(self.X, index=date_index), pd.Series(self.y, index=date_index).to_frame('y')
-        cols_names = ['I_' + str(i) for i in range(5)] + ['R_' + str(i) for i in range(2)]
-        cols_names += ['N_' + str(i) for i in range(10 - len(cols_names))]
-        self.X.columns = cols_names
-
+        #Generate datasets
+        self.X, self.y = get_classification_data(40,5,30,10000,sigmaStd=.125)
         # Fit a RF
         self.clf_base = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
                                                class_weight='balanced_subsample')
@@ -82,6 +74,7 @@ class TestFeatureImportance(unittest.TestCase):
                                                        sample_weight_train=np.ones((self.X.shape[0],)),
                                                        sample_weight_score=np.ones((self.X.shape[0],)),
                                                        scoring=log_loss)
+
         mda_feat_imp_f1 = mean_decrease_accuracy(self.bag_clf, self.X, self.y,
                                                  self.cv_gen, scoring=f1_score)
         # SFI feature importance
@@ -94,21 +87,22 @@ class TestFeatureImportance(unittest.TestCase):
                                                     sample_weight_score=np.ones((self.X.shape[0],)),
                                                     scoring=f1_score)
 
-        #CFI feature importance
+        #Clustered feature importance
         #Auto number of clusters selection
         clustered_subsets_linear = get_feature_clusters(self.X, dependence_metric='linear',
                                                         distance_metric='angular', linkage_method='single',
                                                         n_clusters=None)
-        mdi_cfi_linear = mean_decrease_impurity(self.fit_clf, self.X.columns,
-                                                clustered_subsets=clustered_subsets_linear)
-        mda_cfi_linear = mean_decrease_accuracy(self.bag_clf, self.X, self.y, self.cv_gen,
-                                                clustered_subsets=clustered_subsets_linear)
+
+        clustered_mdi = mean_decrease_impurity(self.fit_clf, self.X.columns,
+                                               clustered_subsets=clustered_subsets_linear)
+        clustered_mda = mean_decrease_accuracy(self.bag_clf, self.X, self.y, self.cv_gen,
+                                               clustered_subsets=clustered_subsets_linear)
         #CFI with number clusters equal to number of features
         #This is done verify the theory that if number clusters is equal to number of features then the
         #result will be same as MDA
         feature_subset_single = [[x] for x in self.X.columns]
         mda_cfi_single = mean_decrease_accuracy(self.bag_clf, self.X, self.y, self.cv_gen,
-                                                     clustered_subsets=feature_subset_single)
+                                                clustered_subsets=feature_subset_single)
 
         # MDI assertions
         self.assertAlmostEqual(mdi_feat_imp['mean'].sum(), 1, delta=0.001)
