@@ -52,8 +52,8 @@ class TestTrendScanningLabels(unittest.TestCase):
 
         for int_index, (ret_v, bin_v) in zip([0, 2, 10, 20, 50],
                                              [(0.05037, 1), (0.0350, 1), (0.07508, 1), (0.05219, 1), (0.02447, 1)]):
-            self.assertAlmostEqual(tr_scan_labels.iloc[int_index]['ret'], ret_v, delta=1e-4)
-            self.assertEqual(tr_scan_labels.iloc[int_index]['bin'], bin_v)
+            self.assertAlmostEqual(tr_scan_labels.reindex(int_index)['ret'], ret_v, delta=1e-4)
+            self.assertEqual(tr_scan_labels.reindex(int_index)['bin'], bin_v)
 
         tr_scan_labels_none = trend_scanning_labels(self.eem_close, t_events=None, look_forward_window=20)
         tr_scan_labels_none.dropna(inplace=True)
