@@ -1,16 +1,16 @@
 """
-Tests Buy and Hold (BAH).
+Tests Online Portfolio Selection (OLPS).
 """
 from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection import BAH
+from mlfinlab.online_portfolio_selection import OLPS
 
 
-class TestBAH(TestCase):
+class TestOLPS(TestCase):
     """
-    Tests different functions of the BAH class.
+    Tests different functions of the OLPS class.
     """
 
     def setUp(self):
@@ -23,14 +23,14 @@ class TestBAH(TestCase):
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
         self.data = self.data.dropna(axis=1)
 
-    def test_bah_solution(self):
+    def test_olps_solution(self):
         """
-        Test the calculation of buy and hold weights.
+        Test the calculation of OLPS weights.
         """
 
-        bah = BAH()
-        bah.allocate(self.data)
-        all_weights = np.array(bah.all_weights)
+        olps = OLPS()
+        olps.allocate(self.data)
+        all_weights = np.array(olps.all_weights)
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]
             assert (weights >= 0).all()

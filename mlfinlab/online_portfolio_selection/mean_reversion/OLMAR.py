@@ -71,3 +71,21 @@ class OLMAR(OLPS):
             raise ValueError()
         # if not in simplex domain
         return self.simplex_projection(new_weights)
+
+    def calculate_rolling_moving_average(self, _asset_prices, _window, _reversion_method, _alpha):
+        """
+        Calculates the rolling moving average for Online Moving Average Reversion
+
+        :param _asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
+        :param _window: (int) number of market windows
+        :param _reversion_method: (int) number that represents the reversion method
+        :param _alpha: (int) exponential weight for the second reversion method
+        :return rolling_ma: (np.array) rolling moving average for the given reversion method
+        """
+        # MAR-1 reversion method: Simple Moving Average
+        if _reversion_method == 1:
+            rolling_ma = np.array(_asset_prices.rolling(_window).apply(lambda x: np.sum(x) / x[0] / _window))
+        # Mar-2 reversion method: Exponential Moving Average
+        elif _reversion_method == 2:
+            rolling_ma = np.array(_asset_prices.ewm(alpha=_alpha, adjust=False).mean() / _asset_prices)
+        return rolling_ma

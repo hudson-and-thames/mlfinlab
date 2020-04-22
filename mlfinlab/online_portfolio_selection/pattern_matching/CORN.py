@@ -84,6 +84,20 @@ class CORN(OLPS):
         problem.solve(warm_start=True, solver=_solver)
         return weights.value
 
+    def calculate_rolling_correlation_coefficient(self, _relative_return):
+        """
+        Calculates the rolling correlation coefficient for a given relative return and window
+
+        :param _relative_return: (np.array) relative returns of a certain time period specified by the strategy
+        :return rolling_corr_coef: (np.array) rolling correlation coefficient over a given window
+        """
+        # take the log of the relative return
+        # first calculate the rolling window the relative return
+        # sum the data which returns the log of the window's return
+        # take the exp to revert back to the original window's returns
+        # calculate the correlation coefficient for the different window's overall returns
+        rolling_corr_coef = np.corrcoef(np.exp(np.log(pd.DataFrame(_relative_return)).rolling(self.window).sum()))
+        return rolling_corr_coef
 
 def main():
     """
