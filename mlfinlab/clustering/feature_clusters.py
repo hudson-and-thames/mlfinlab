@@ -5,6 +5,7 @@ in the book Machine Learning for Asset Managers Snippet 6.5.2 page 84.
 """
 
 #Imports
+import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from scipy.spatial.distance import squareform
@@ -30,7 +31,7 @@ def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metri
     :param distance_metric: (str) the distance operator to be used for generating the distance matrix. The methods that
        can be applied are: 'angular', 'squared_angular', 'absolute_angular'.
     :param linkage_method: (str) method of linkage to be used for clustering. Methods include: 'single' , 'ward' ,
-       'complete' , 'average' , 'weighted' and 'centroid'.
+       'complete' , 'average' , 'weighted' and 'centroid'. 
     :param n_clusters: (int) number of clusters to form. Must be less the total number of features. If None then it
        returns optimal number of clusters decided by the ONC Algorithm.
     :return: (array) of feature subsets.
@@ -45,7 +46,6 @@ def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metri
 
     # Apply distance operator on the dependence matrix
     dist_matrix = get_distance_matrix(dep_matrix, distance_metric=distance_metric)
-    link = linkage(squareform(dist_matrix), method=linkage_method)
 
     if n_clusters is None:
         return list(get_onc_clusters(dep_matrix.fillna(0))[1].values())  # Get optimal number of clusters
@@ -53,6 +53,7 @@ def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metri
     if n_clusters >= len(X.columns):  # Check if number of clusters exceeds number of features
         raise ValueError('Number of clusters must be less than the number of features')
 
+    link = linkage(squareform(dist_matrix), method=linkage_method)
     clusters = fcluster(link, t=n_clusters, criterion='maxclust')
     clustered_subsets = [[f for c, f in zip(clusters, X.columns) if c == ci] for ci in range(1, n_clusters + 1)]
 
@@ -72,22 +73,22 @@ def _cluster_transformation(X: pd.DataFrame, clusters: dict, feats_to_transform:
     :return: (pd.DataFrame) of transformed features.
     '''
     for feat in feats_to_transform:
-        for i,j in clusters.items():
+        for i, j in clusters.items():
             if feat in j: #Selecting the cluster that contains the feature
-                exog = sm.add_constant(X.drop(j,axis=1)).values
+                exog = sm.add_constant(X.drop(j, axis=1)).values
                 endog = X[feat].values
-                ols = OLS(endog,exog).fit()
+                ols = OLS(endog, exog).fit()
                 if ols.df_model < (exog.shape[1]-1):
                     #degree of freedom is low
-                    new_exog = _combine_features(X,clusters,i)
+                    new_exog = _combine_features(X, clusters, i)
                     #run the regression again on the new exog
-                    ols = OLS(endog,new_exog.reshape(exog.shape[0],-1)).fit()
+                    ols = OLS(endog,new_exog.reshape(exog.shape[0], -1)).fit()
                     X[feat] = ols.resid
                 else:
                     X[feat] = ols.resid
     return X
 
-def _combine_features(X,clusters,exclude_key):
+def _combine_features(X, clusters, exclude_key):
     '''
     This function combines features of each cluster linearly by following
     a minimum variance weighting scheme. The Minimum Variance weights are
@@ -99,13 +100,13 @@ def _combine_features(X,clusters,exclude_key):
     :return: (np.array)  of the combined features for each cluster
     '''
     new_exog = []
-    for i,cluster in clusters.items():
+    for i, cluster in clusters.items():
         if i != exclude_key and len(cluster) > 1:
             subset = X[cluster]
             cov_matx = subset.cov() #covariance matrix of the cluster
-            eye_vec = np.array(cov_matx.shape[1]*[1],float)
+            eye_vec = np.array(cov_matx.shape[1]*[1], float)
             try:
-                numerator = np.dot(np.linalg.inv(cov_matx),eye_vec)
+                numerator = np.dot(np.linalg.inv(cov_matx), eye_vec)
                 denominator = np.dot(eye_vec,numerator)
                 #minimum variance weighting
                 wghts = numerator/denominator
@@ -130,12 +131,11 @@ def _check_for_low_silhouette_scores(X: pd.DataFrame, critical_threshold: int = 
     :param critical_threshold: (int) threshold for determining low silhouette score
     :return: (pd.DataFrame) of features.
     '''
-    corr,clstrs,silh = get_onc_clusters(X.corr())
+    _, clstrs, silh = get_onc_clusters(X.corr())
     low_silh_feat = silh[silh < critical_threshold].index
-    if len(low_silh_feat) == 0:
-        print('There is no feature/s found with low silhouette score. All features belongs to its respective clusters')
-        return X
-    else:
+    if len(low_silh_feat) > 0:
         print(f'{len(low_silh_feat)} feature/s found with low silhouette score {low_silh_feat}. Returning the transformed dataset')
         #returning the transformed dataset
-        return cluster_transformation(X,clstrs,low_silh_feat)
+        return _cluster_transformation(X, clstrs, low_silh_feat)
+    print('There is no feature/s found with low silhouette score. All features belongs to its respective clusters')
+    return X
