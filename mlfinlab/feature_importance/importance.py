@@ -42,11 +42,12 @@ def mean_decrease_impurity(model, feature_names, clustered_subsets=None):
     * Sklearn’s RandomForest class implements MDI as the default feature importance score. This choice is likely
       motivated by the ability to compute MDI on the fly, with minimum computational cost.
 
-    Clustered Feature Importance(CFI) : Clustered MDI is the  modified version of MDI (Mean Decreased Impurity). It  is
-    robust to substitution effect that takes place when two or more explanatory variables share a substantial amount of
-    information (predictive power).CFI algorithm described by Dr Marcos Lopez de Prado  in Clustered Feature  Importance
-    section of book Machine Learning  for Asset Manager. Here  instead of  taking the importance  of  every feature, we
-    consider the importance of every feature subsets, thus every feature receive the importance of subset it belongs to.
+    Clustered Feature Importance( Machine Learning for Asset Manager snippet 6.4 page 86) :
+    Clustered MDI  is the  modified version of MDI (Mean Decreased Impurity). It  is robust to substitution effect that
+    takes place when two or more explanatory variables share a substantial amount of information (predictive power).CFI
+    algorithm described by Dr Marcos Lopez de Prado  in Clustered Feature  Importance section of book Machine Learning
+    for Asset Manager. Here  instead of  taking the importance  of  every feature, we consider the importance of every
+    feature subsets, thus every feature receive the importance of subset it belongs to.
 
     :param model: (model object): Trained tree based classifier.
     :param feature_names: (list): Array of feature names.
@@ -66,12 +67,12 @@ def mean_decrease_impurity(model, feature_names, clustered_subsets=None):
 
     if clustered_subsets is not None:
         #getting subset wise importance
-        importance = pd.DataFrame(index=feature_names,columns=['mean','std'])
+        importance = pd.DataFrame(index=feature_names, columns=['mean', 'std'])
         for subset in clustered_subsets: #iterating over each cluster
             subset_feat_imp = feature_imp_df[subset].sum(axis=1)
             #importance of each feature within a subsets is equal to the importance of that subset
-            importance[subset,'mean'] = subset_feat_imp.mean()
-            importance[subset,'std'] = subset_feat_imp.std()*subset_feat_imp.shape[0]**-.5
+            importance[subset, 'mean'] = subset_feat_imp.mean()
+            importance[subset, 'std'] = subset_feat_imp.std()*subset_feat_imp.shape[0]**-.5
     else:
         importance = pd.concat({'mean': feature_imp_df.mean(),
                                 'std': feature_imp_df.std() * feature_imp_df.shape[0] ** -0.5},
@@ -103,12 +104,13 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
       OOS performance.
     * The CV must be purged and embargoed.
 
-    Clustered Feature Importance(CFI) : Clustered MDA is the modified version of MDA (Mean Decreased Accuracy). It is
-    robust to substitution effect that takes place when two or more explanatory variables share a substantial amount of
-    information (predictive power).CFI algorithm described by Dr Marcos Lopez de Prado  in Clustered Feature  Importance
-    (Presentation Slides) https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595. Instead of shuffling (permutating)
-    all variables individually (like in MDA), we shuffle all variables in cluster together. Next, we follow all the  rest
-    of the steps as in MDA. It can used by simply specifying the clustered_subsets argument.
+    Clustered Feature Importance( Machine Learning for Asset Manager snippet 6.5 page 87) :
+    Clustered MDA is the modified version of MDA (Mean Decreased Accuracy). It is robust to substitution effect that takes
+    place when two or more explanatory variables share a substantial amount of information (predictive power).CFI algorithm
+    described by Dr Marcos Lopez de Prado  in Clustered Feature  Importance (Presentation Slides)
+    https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595. Instead of shuffling (permutating) all variables
+    individually (like in MDA), we shuffle all variables in cluster together. Next, we follow all the  rest of the
+    steps as in MDA. It can used by simply specifying the clustered_subsets argument.
 
     :param model: (sklearn.Classifier): Any sklearn classifier.
     :param X: (pd.DataFrame): Train set features.
