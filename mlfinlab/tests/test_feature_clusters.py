@@ -34,12 +34,12 @@ class TestFeatureClusters(unittest.TestCase):
         #test for optimal number of clusters and  _check_for_low_silhouette_scores
         #since this is done on test dataset so there will be no features with low silhouette score
         #so we will make a feature with some what lower silhouette score (near to zero) and set
-        #the threshold higher (0.1) than that. Also we need a feature to trigger the low degree of freedom
+        #the threshold higher (0.2) than that. Also we need a feature to trigger the low degree of freedom
         #condition so, we create a series of zero in the datasets
         self.X['R_5c'] = self.X['R_5'] #this feature is add to introduce low DF in the regressor.
         clustered_subsets_distance = get_feature_clusters(self.X, dependence_metric='distance_correlation',
                                                           distance_metric='abs_angular', linkage_method='single',
-                                                          n_clusters=None, critical_threshold=0.1)
+                                                          n_clusters=None, critical_threshold=0.2)
         #output clusters must be 2
         self.assertAlmostEqual(len(clustered_subsets_distance), 5, delta=0.001)
         self.assertAlmostEqual(len(clustered_subsets_vi), 2, delta=0.001)
