@@ -21,4 +21,8 @@ class BAH(OLPS):
         :param _time: (int) current time period
         :return (None) adjusts weights for previous time's price changes
         """
-        return self.normalize(self.weights * self.relative_return[_time - 1])
+        # return same weights because price has not changed
+        if _time == 0:
+            return self.weights
+        # adjust it for price differences
+        return self.weights * self.relative_return[_time - 1]
