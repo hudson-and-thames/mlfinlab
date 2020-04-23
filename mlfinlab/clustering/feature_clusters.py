@@ -17,7 +17,7 @@ from mlfinlab.codependence.codependence_matrix import get_dependence_matrix, get
 
 
 # pylint: disable=invalid-name
-def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metric: str, linkage_method: str,
+def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metric: str = None, linkage_method: str = None,
                          n_clusters: int = None, critical_threshold: float = 0.0):
     """
     Machine Learning for Asset Managers
@@ -29,9 +29,11 @@ def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metri
     :param dependence_metric: (str) method to be use for generating dependence_matrix, either 'linear' or
                               'information_variation' or 'mutual_information' or 'distance_correlation'.
     :param distance_metric: (str) the distance operator to be used for generating the distance matrix. The methods that
-                            can be applied are: 'angular', 'squared_angular', 'absolute_angular'.
+                            can be applied are: 'angular', 'squared_angular', 'absolute_angular'. Set it to None if the
+                            feature are to be generated as it is by the ONC algorithm.
     :param linkage_method: (str) method of linkage to be used for clustering. Methods include: 'single' , 'ward' ,
-                           'complete' , 'average' , 'weighted' and 'centroid'.
+                           'complete' , 'average' , 'weighted' and 'centroid'. Set it to None if the feature are to
+                            be generated as it is by the ONC algorithm.
     :param n_clusters: (int) number of clusters to form. Must be less the total number of features. If None then it
                        returns optimal number of clusters decided by the ONC Algorithm.
     :return: (array) of feature subsets.
@@ -44,15 +46,16 @@ def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metri
     else:
         dep_matrix = X.corr()
 
-    # Apply distance operator on the dependence matrix
-    dist_matrix = get_distance_matrix(dep_matrix, distance_metric=distance_metric)
-
-    if n_clusters is None:
+    if n_clusters == None and (distance_metric == None or linkage_method == None):
         return list(get_onc_clusters(dep_matrix.fillna(0))[1].values())  # Get optimal number of clusters
-
+    if distance_metric != None and (linkage_method != None and n_clusters==None):
+        n_clusters = len(get_onc_clusters(dep_matrix.fillna(0))[1])
     if n_clusters >= len(X.columns):  # Check if number of clusters exceeds number of features
         raise ValueError('Number of clusters must be less than the number of features')
 
+    # Apply distance operator on the dependence matrix
+    dist_matrix = get_distance_matrix(dep_matrix, distance_metric=distance_metric)
+    #get the linkage
     link = linkage(squareform(dist_matrix), method=linkage_method)
     clusters = fcluster(link, t=n_clusters, criterion='maxclust')
     clustered_subsets = [[f for c, f in zip(clusters, X.columns) if c == ci] for ci in range(1, n_clusters + 1)]
