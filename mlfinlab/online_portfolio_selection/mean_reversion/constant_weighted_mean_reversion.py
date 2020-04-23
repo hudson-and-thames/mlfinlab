@@ -4,7 +4,7 @@ import cvxpy as cp
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class CWMR(OLPS):
+class ConstantWeightedMeanReversion(OLPS):
     """
     NOT IMPLEMENTED YET
     This class implements the Constant Weighted Mean Reversion strategy.
@@ -46,7 +46,7 @@ class CWMR(OLPS):
 def main():
     stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    cwmr = CWMR()
+    cwmr = ConstantWeightedMeanReversion()
     cwmr.allocate(stock_price, resample_by='M')
     print(cwmr.all_weights)
     print(cwmr.portfolio_return)

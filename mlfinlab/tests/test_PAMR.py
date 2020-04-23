@@ -1,17 +1,17 @@
 """
-Tests Passive Aggressive Mean Reversion (PAMR)
+Tests Passive Aggressive Mean Reversion (PassiveAggressiveMeanReversion)
 """
 from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection import PAMR
+from mlfinlab.online_portfolio_selection import PassiveAggressiveMeanReversion
 
 
 class TestPAMR(TestCase):
     # pylint: disable=too-many-public-methods
     """
-    Tests different functions of the PAMR class.
+    Tests different functions of the PassiveAggressiveMeanReversion class.
     """
 
     def setUp(self):
@@ -29,7 +29,7 @@ class TestPAMR(TestCase):
         Test the calculation of passive aggressive mean reversion with the original optimization method
         """
 
-        pamr = PAMR(optimization_method=0)
+        pamr = PassiveAggressiveMeanReversion(optimization_method=0)
         pamr.allocate(self.data)
         all_weights = np.array(pamr.all_weights)
         for i in range(all_weights.shape[0]):
@@ -40,10 +40,10 @@ class TestPAMR(TestCase):
 
     def test_pamr1_solution(self):
         """
-        Test the calculation of passive aggressive mean reversion with the PAMR-1 optimization method
+        Test the calculation of passive aggressive mean reversion with the PassiveAggressiveMeanReversion-1 optimization method
         """
 
-        pamr = PAMR(optimization_method=1)
+        pamr = PassiveAggressiveMeanReversion(optimization_method=1)
         pamr.allocate(self.data)
         all_weights = np.array(pamr.all_weights)
         for i in range(all_weights.shape[0]):
@@ -54,10 +54,10 @@ class TestPAMR(TestCase):
 
     def test_pamr2_solution(self):
         """
-        Test the calculation of passive aggressive mean reversion with the PAMR-2 optimization method
+        Test the calculation of passive aggressive mean reversion with the PassiveAggressiveMeanReversion-2 optimization method
         """
 
-        pamr = PAMR(optimization_method=2)
+        pamr = PassiveAggressiveMeanReversion(optimization_method=2)
         pamr.allocate(self.data)
         all_weights = np.array(pamr.all_weights)
         for i in range(all_weights.shape[0]):

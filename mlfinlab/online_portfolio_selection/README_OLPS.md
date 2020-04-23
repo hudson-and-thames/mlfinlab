@@ -20,9 +20,9 @@ Tracks the best constant rebalanced portfolio in hindsight
 
 ## Follow-the-Loser: (Mean-Reversion)
 ### Anti Correlation
-### Passive Aggressive Mean Reversion: PAMR
-### Confidence Weighted Mean Reversion: CWMR
-### Online Moving Average Reversion: OLMAR
+### Passive Aggressive Mean Reversion: PassiveAggressiveMeanReversion
+### Confidence Weighted Mean Reversion: ConstantWeightedMeanReversion
+### Online Moving Average Reversion: OnlineMovingAverageReversion
 ### Robust Median Reversion
 
 ## Pattern-Matching:
