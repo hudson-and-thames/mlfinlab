@@ -18,7 +18,7 @@ class TestFeatureClusters(unittest.TestCase):
         Create X, y datasets
         """
         self.X, self.y = get_classification_data(40, 5, 30, 1000, sigmaStd=2)
-
+        self.X_matrix, _ = get_classification_data(6, 2, 2, 1000, sigmaStd=0)
     def test_get_feature_clusters(self):
         """
         Test get_feature_clusters arguments
@@ -37,7 +37,6 @@ class TestFeatureClusters(unittest.TestCase):
         #so we will make a feature with some what lower silhouette score (near to zero) and set
         #the threshold higher (0.2) than that. Also we need a feature to trigger the low degree of freedom
         #condition so, we create a series of zero in the datasets
-        print('Feature Cluster Testing started')
         self.X['R_5c'] = self.X['R_5'] #this feature is add to introduce low DF in the regressor.
         clustered_subsets_distance = get_feature_clusters(self.X, dependence_metric='linear',
                                                           distance_metric=None, linkage_method=None,
@@ -49,7 +48,7 @@ class TestFeatureClusters(unittest.TestCase):
         #The ONC should detect somwhere around 5 clusters
         self.assertAlmostEqual(len(clustered_subsets_ha), 5, delta=1)
         self.assertAlmostEqual(len(clustered_subsets_distance), 5, delta=1)
-        print('Feature Cluster Testing finished')
+
 
     def test_value_error_raise(self):
         """
@@ -57,6 +56,6 @@ class TestFeatureClusters(unittest.TestCase):
         """
         #Number of clusters larger than number of features
         with self.assertRaises(ValueError):
-            get_feature_clusters(self.X, dependence_metric='linear',
+            get_feature_clusters(self.X_matrix, dependence_metric='linear',
                                  distance_metric='angular', linkage_method='single',
                                  n_clusters=int(len(self.data)))
