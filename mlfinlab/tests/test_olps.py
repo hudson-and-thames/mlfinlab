@@ -113,16 +113,26 @@ class TestOLPS(TestCase):
         """
         Test that uniform weights return equal allocation of weights.
         """
+        # initialize OLPS
         olps6 = OLPS()
+        # allocate data
         olps6.allocate(self.data)
+        # calculate uniform weight
         olps6_uni_weight = olps6.uniform_weight()
+        # two weights should be equal
         np.testing.assert_almost_equal(olps6_uni_weight, np.array(olps6.all_weights)[0])
 
     def test_normalize(self):
         """
         Test that weights sum to 1.
         """
+        # initialize OLPS
         olps7 = OLPS()
+        # allocate data
+        OLPS.allocate(self.data)
+        # test normalization on random weight
         random_weight = np.ones(3)
+        # use class method to normalize it
         normalized_weight = olps7.normalize(random_weight)
+        # compare normalized value and manual calculation
         np.testing.assert_almost_equal(normalized_weight, random_weight / 3)
