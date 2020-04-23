@@ -87,9 +87,9 @@ class TestFeatureImportance(unittest.TestCase):
                                                     scoring=f1_score)
 
         #Clustered feature importance
-        #Auto number of clusters selection
+        #Auto number of clusters selection using ONC algorithm
         clustered_subsets_linear = get_feature_clusters(self.X, dependence_metric='linear',
-                                                        distance_metric='angular', linkage_method='single',
+                                                        distance_metric=None, linkage_method=None,
                                                         n_clusters=None)
 
         clustered_mdi = mean_decrease_impurity(self.fit_clf, self.X.columns,
@@ -130,12 +130,12 @@ class TestFeatureImportance(unittest.TestCase):
         self.assertAlmostEqual(sfi_feat_imp_f1.loc['I_1', 'mean'], 0.78778, delta=0.1)
 
         #Cluster MDI  assertions
-        self.assertAlmostEqual(clustered_mdi.loc['I_1', 'mean'], 0.5, delta=3)
-        self.assertAlmostEqual(clustered_mdi.loc['I_0', 'mean'], 0.1, delta=3)
+        self.assertAlmostEqual(clustered_mdi.loc['R_0', 'mean'], 0.0218752, delta=0.1)
+        self.assertAlmostEqual(clustered_mdi.loc['I_0', 'mean'], 0.028433, delta=0.1)
 
-        #MDA CFI(log_loss) assertions
-        self.assertAlmostEqual(clustered_mda.loc['I_1', 'mean'], 0.2, delta=3)
-        self.assertAlmostEqual(clustered_mda.loc['R_0', 'mean'], 0.3, delta=3)
+        #Clustered MDA (log_loss) assertions
+        self.assertAlmostEqual(clustered_mda.loc['I_0', 'mean'], 0.169471, delta=0.1)
+        self.assertAlmostEqual(clustered_mda.loc['R_0', 'mean'], 0.136713, delta=0.1)
 
         #Test if CFI with number of clusters same to number features is equal to MDA results
         self.assertEqual(mda_feat_imp_log_loss.loc['I_1', 'mean'], mda_cfi_single.loc['I_1', 'mean'])
