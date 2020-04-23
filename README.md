@@ -58,8 +58,18 @@ A special thank you to our sponsors! If you would like to become a sponsor and h
 Please find all of the supporting documentation needed here: [ReadTheDocs](https://mlfinlab.readthedocs.io/en/latest/)
 
 ## Contact us
-We have recently opened access to our [Slack channel](https://join.slack.com/t/mlfinlab/shared_invite/enQtOTUzNjAyNDI1NTc1LTU0NTczNWRlM2U5ZDZiZTUxNTgzNzBlNDU3YmY5MThkODdiMTgwNzI5NDQ2NWI0YTYyMmI3MjBkMzY2YjVkNzc) to help form a community and encourage contributions.
 
+We host a booming community of like minded data scientists and quants, join the 
+[Slack Channel](https://www.patreon.com/HudsonThames) now! Open to sponsors of our package. 
+
+The channel has the following benefits: 
+
+* Community of like minded individuals.
+* Ask questions about the package implementations and get community feedback.
+* Occasional presentations on topics within financial machine learning.
+* A papers channel where we share the papers which are freely available.
+* Access to members of our research group.
+ 
 Looking forward to hearing from you!
 
 ## License
