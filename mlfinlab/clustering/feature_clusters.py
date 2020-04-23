@@ -46,9 +46,9 @@ def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metri
     else:
         dep_matrix = X.corr()
 
-    if n_clusters == None and (distance_metric == None or linkage_method == None):
+    if n_clusters is None and (distance_metric is None or linkage_method is None):
         return list(get_onc_clusters(dep_matrix.fillna(0))[1].values())  # Get optimal number of clusters
-    if distance_metric != None and (linkage_method != None and n_clusters==None):
+    if distance_metric is not None and (linkage_method is not None and n_clusters is None):
         n_clusters = len(get_onc_clusters(dep_matrix.fillna(0))[1])
     if n_clusters >= len(X.columns):  # Check if number of clusters exceeds number of features
         raise ValueError('Number of clusters must be less than the number of features')
