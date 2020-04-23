@@ -54,12 +54,15 @@ class TestBestStock(TestCase):
         # allocates self.data to BestStock
         beststock1.allocate(self.data)
         # best performing asset calculated by dividing the last row by the first row
-        price_diff = self.data.iloc[-1] / self.data.iloc[0]
-        calc_weight = np.array(price_diff)
+        price_diff = np.array(self.data.iloc[-1] / self.data.iloc[0])
+        # index of best stock through manual calculation
+        idx_price_diff = np.argmax(price_diff)
         # weight returned by beststock
         beststock_weight = np.array(beststock1.all_weights)[0]
+        # index of best stock through BestStock
+        idx_best_stock = np.argmax(beststock_weight)
         # compare the two weights
-        np.testing.assert_equal(calc_weight, price_diff)
+        np.testing.assert_equal(idx_best_stock, idx_price_diff)
 
     def test_number_of_nonzero(self):
         """
