@@ -37,10 +37,12 @@ class TestFeatureClusters(unittest.TestCase):
         #so we will make a feature with some what lower silhouette score (near to zero) and set
         #the threshold higher (0.2) than that. Also we need a feature to trigger the low degree of freedom
         #condition so, we create a series of zero in the datasets
+        print('Feature Cluster Testing started')
         self.X['R_5c'] = self.X['R_5'] #this feature is add to introduce low DF in the regressor.
         clustered_subsets_distance = get_feature_clusters(self.X, dependence_metric='linear',
                                                           distance_metric=None, linkage_method=None,
                                                           n_clusters=None, critical_threshold=0.2)
+        print('Feature Cluster Testing finished')
         #assertions
         #output clusters must be 2
         self.assertEqual(len(clustered_subsets), 2)
