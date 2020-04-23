@@ -126,6 +126,7 @@ Supporter Sponsors:
     additional_information/contact
     getting_started/barriers_to_entry
     getting_started/researcher
+    getting_started/datasets
 
 .. toctree::
     :maxdepth: 2
