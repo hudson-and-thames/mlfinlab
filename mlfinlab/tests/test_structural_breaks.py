@@ -148,3 +148,4 @@ class TesStructuralBreaks(unittest.TestCase):
         b_mean, b_var = get_betas(singular_matrix, singular_matrix)
         self.assertTrue(b_mean, [np.nan])
         self.assertTrue(b_var, [[np.nan, np.nan]])
+    
