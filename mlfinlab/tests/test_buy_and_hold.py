@@ -9,6 +9,8 @@ from mlfinlab.online_portfolio_selection import BuyAndHold
 
 
 class TestBuyAndHold(TestCase):
+    # pylint: disable=too-many-public-methods
+    # pylint: disable=E1136
     """
     Tests different functions of the BuyAndHold class.
     """
