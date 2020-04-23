@@ -49,7 +49,7 @@ class TestFeatureClusters(unittest.TestCase):
         #The ONC should detect somwhere around 5 clusters
         self.assertAlmostEqual(len(clustered_subsets_ha), 5, delta=1)
         self.assertAlmostEqual(len(clustered_subsets_distance), 5, delta=1)
-
+        print('Feature Cluster Testing finished')
 
     def test_value_error_raise(self):
         """
@@ -60,4 +60,3 @@ class TestFeatureClusters(unittest.TestCase):
             get_feature_clusters(self.X, dependence_metric='linear',
                                  distance_metric='angular', linkage_method='single',
                                  n_clusters=int(len(self.data)))
-        print('Feature Cluster Testing finished')
