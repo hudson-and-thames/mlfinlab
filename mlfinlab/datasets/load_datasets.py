@@ -17,7 +17,7 @@ def load_stock_prices() -> pd.DataFrame:
     """
 
     project_path = os.path.dirname(__file__)
-    prices_df = pd.read_csv(os.path.join(project_path,'data/stock_prices.csv'), index_col=0, parse_dates=[0])
+    prices_df = pd.read_csv(os.path.join(project_path, 'data/stock_prices.csv'), index_col=0, parse_dates=[0])
     return prices_df
 
 
