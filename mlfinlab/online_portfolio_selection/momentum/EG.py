@@ -1,7 +1,7 @@
 # pylint: disable=missing-module-docstring
 import pandas as pd
 import numpy as np
-from mlfinlab.online_portfolio_selection.OLPS import OLPS
+from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
 class EG(OLPS):

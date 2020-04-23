@@ -10,7 +10,7 @@ class FTRL(FTL):
     Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December YEAR),
     33 pages. DOI:http://dx.doi.org/10.1145/0000000.0000000.
 
-    Follow the Regularized Leader strategy directly tracks the BCRP until the previous period with an additional regularization term
+    Follow the Regularized Leader strategy directly tracks the BestConstantRebalancedPortfolio until the previous period with an additional regularization term
     """
     def __init__(self, beta=0.1):
         """
@@ -23,7 +23,7 @@ class FTRL(FTL):
 
     def update_weight(self, _weights, _relative_return, _time):
         """
-        Updates weight to find the BCRP and regularization adjusted weights until the last time period
+        Updates weight to find the BestConstantRebalancedPortfolio and regularization adjusted weights until the last time period
 
         :param _weights: (np.array) portfolio weights of the previous period
         :param _relative_return: (np.array) relative returns of all period

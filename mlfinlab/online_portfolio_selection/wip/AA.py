@@ -2,10 +2,10 @@
 import cvxpy as cp
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.OLPS import OLPS
+from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 # parent class to aggregate algorithms
-# for example 1000 strategies involving CORN or 1000 different weights for BCRP
+# for example 1000 strategies involving CORN or 1000 different weights for BestConstantRebalancedPortfolio
 class AA(object):
     # what strategy to implement
     def __init__(self):

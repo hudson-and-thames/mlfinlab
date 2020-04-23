@@ -1,6 +1,6 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
-from mlfinlab.online_portfolio_selection.OLPS import OLPS
+from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
 class OLMAR(OLPS):
@@ -71,6 +71,42 @@ class OLMAR(OLPS):
             raise ValueError()
         # if not in simplex domain
         return self.simplex_projection(new_weights)
+
+    def simplex_projection(self,
+                           _optimize_weight):
+        """
+        Calculates the simplex projection of the weights
+        https://stanford.edu/~jduchi/projects/DuchiShSiCh08.pdf
+
+        :param _optimize_weight: (np.array) a weight that will be projected onto the simplex domain
+        :return weights.value: (np.array) simplex projection of the original weight
+        """
+
+        # return itself if already a simplex projection
+        if np.sum(_optimize_weight) == 1 and np.all(_optimize_weight >= 0):
+            return _optimize_weight
+
+        # sort descending
+        _mu = np.sort(_optimize_weight)[::-1]
+
+        # adjusted sum
+        adjusted_sum = np.cumsum(_mu) - 1
+
+        # number
+        j = np.arange(len(_optimize_weight)) + 1
+
+        # condition
+        cond = _mu - adjusted_sum / j > 0
+
+        # define max rho
+        rho = float(j[cond][-1])
+
+        # define theta
+        theta = adjusted_sum[cond][-1] / rho
+
+        # calculate new weight
+        new_weight = np.maximum(_optimize_weight - theta, 0)
+        return new_weight
 
     def calculate_rolling_moving_average(self, _asset_prices, _window, _reversion_method, _alpha):
         """

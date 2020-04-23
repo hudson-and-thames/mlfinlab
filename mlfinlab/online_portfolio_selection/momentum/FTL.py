@@ -9,12 +9,12 @@ class FTL(OLPS):
     Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December YEAR),
     33 pages. DOI:http://dx.doi.org/10.1145/0000000.0000000.
 
-    Follow the Leader strategy directly tracks the BCRP until the previous period.
+    Follow the Leader strategy directly tracks the BestConstantRebalancedPortfolio until the previous period.
     """
 
     def update_weight(self, _weights, _relative_return, _time):
         """
-        Updates weight to find the BCRP weights until the last time period
+        Updates weight to find the BestConstantRebalancedPortfolio weights until the last time period
 
         :param _weights: (np.array) portfolio weights of the previous period
         :param _relative_return: (np.array) relative returns of all period

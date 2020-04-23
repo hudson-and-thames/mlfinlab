@@ -1,7 +1,7 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
-from mlfinlab.online_portfolio_selection.OLPS import OLPS
-from mlfinlab.online_portfolio_selection.benchmarks.CRP import CRP
+from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
+from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio import ConstantRebalancedPortfolio
 
 
 class UP(OLPS):
@@ -68,7 +68,7 @@ class UP(OLPS):
         """
         self.generate_simplex(self.number_of_experts, self.number_of_assets)
         for exp in range(self.number_of_experts):
-            self.experts.append(CRP(weights=self.expert_params[exp]))
+            self.experts.append(ConstantRebalancedPortfolio(weights=self.expert_params[exp]))
 
     def generate_simplex(self, _number_of_experts, _number_of_assets):
         """

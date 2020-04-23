@@ -64,10 +64,10 @@ mlfinlab/online_portfolio_selection/OLPS.py
 mlfinlab/online_portfolio_selection/UP.py
 mlfinlab/online_portfolio_selection/__init__.py
 mlfinlab/online_portfolio_selection/olps_utils.py
-mlfinlab/online_portfolio_selection/benchmarks/BAH.py
-mlfinlab/online_portfolio_selection/benchmarks/BCRP.py
-mlfinlab/online_portfolio_selection/benchmarks/BESTSTOCK.py
-mlfinlab/online_portfolio_selection/benchmarks/CRP.py
+mlfinlab/online_portfolio_selection/benchmarks/BuyAndHold.py
+mlfinlab/online_portfolio_selection/benchmarks/BestConstantRebalancedPortfolio.py
+mlfinlab/online_portfolio_selection/benchmarks/BestStock.py
+mlfinlab/online_portfolio_selection/benchmarks/ConstantRebalancedPortfolio.py
 mlfinlab/online_portfolio_selection/benchmarks/__init__.py
 mlfinlab/online_portfolio_selection/mean_reversion/CWMR.py
 mlfinlab/online_portfolio_selection/mean_reversion/OLMAR.py

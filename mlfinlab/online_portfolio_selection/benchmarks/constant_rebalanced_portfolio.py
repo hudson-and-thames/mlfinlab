@@ -1,8 +1,8 @@
 # pylint: disable=missing-module-docstring
-from mlfinlab.online_portfolio_selection.OLPS import OLPS
+from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class CRP(OLPS):
+class ConstantRebalancedPortfolio(OLPS):
     """
     This class implements the Buy and Hold strategy. It is reproduced with modification from the following paper:
     Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December YEAR),
@@ -13,7 +13,7 @@ class CRP(OLPS):
     :ivar weights: (np.array) any initial weights that the user wants to use
     """
     def __init__(self, weights=None):
-        super(CRP, self).__init__()
+        super(ConstantRebalancedPortfolio, self).__init__()
         self.weights = weights
 
     def first_weight(self, _weights):

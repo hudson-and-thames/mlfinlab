@@ -2,7 +2,7 @@
 import cvxpy as cp
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.OLPS import OLPS
+from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
 class CORN(OLPS):
@@ -81,6 +81,46 @@ class CORN(OLPS):
                 constraints=allocation_constraints
         )
 
+        problem.solve(warm_start=True, solver=_solver)
+        return weights.value
+
+    def optimize(self,
+                 _optimize_array,
+                 _solver=cp.SCS):
+        """
+        Calculates weights that maximize returns over a given _optimize_array
+
+        :param _optimize_array: (np.array) relative returns of the assets for a given time period
+        :param _solver: (cp.SOLVER) set the solver to be a particular cvxpy solver
+        :return weights.value: (np.array) weights that maximize the returns for the given optimize_array
+        """
+        # calcualte length of time
+        length_of_time = _optimize_array.shape[0]
+        # calculate number of assets
+        number_of_assets = _optimize_array.shape[1]
+        # edge case to speed up calculation
+        if length_of_time == 1:
+            # in case that the optimize array is only one row, weights will be 1 for the highest relative return asset
+            best_idx = np.argmax(_optimize_array)
+            # initialize np.array of zeros
+            weight = np.zeros(number_of_assets)
+            # add 1 to the best performing stock
+            weight[best_idx] = 1
+            return weight
+
+        # initialize weights for optimization problem
+        weights = cp.Variable(self.number_of_assets)
+
+        # used cp.log and cp.sum to make the cost function a convex function
+        # multiplying continuous returns equates to summing over the log returns
+        portfolio_return = cp.sum(cp.log(_optimize_array * weights))
+
+        # Optimization objective and constraints
+        allocation_objective = cp.Maximize(portfolio_return)
+        allocation_constraints = [cp.sum(weights) == 1, cp.min(weights) >= 0]
+        # Define and solve the problem
+        problem = cp.Problem(objective=allocation_objective, constraints=allocation_constraints)
+        # if there is a specified solver use it
         problem.solve(warm_start=True, solver=_solver)
         return weights.value
 

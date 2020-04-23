@@ -191,7 +191,7 @@ class OLPS:
 
     def optimize(self,
                  _optimize_array,
-                 _solver=None):
+                 _solver=cp.SCS):
         """
         Calculates weights that maximize returns over a given _optimize_array
 
@@ -203,15 +203,6 @@ class OLPS:
         length_of_time = _optimize_array.shape[0]
         # calculate number of assets
         number_of_assets = _optimize_array.shape[1]
-        # edge case to speed up calculation
-        if length_of_time == 1:
-            # in case that the optimize array is only one row, weights will be 1 for the highest relative return asset
-            best_idx = np.argmax(_optimize_array)
-            # initialize np.array of zeros
-            weight = np.zeros(number_of_assets)
-            # add 1 to the best performing stock
-            weight[best_idx] = 1
-            return weight
 
         # initialize weights for optimization problem
         weights = cp.Variable(self.number_of_assets)
@@ -226,10 +217,7 @@ class OLPS:
         # Define and solve the problem
         problem = cp.Problem(objective=allocation_objective, constraints=allocation_constraints)
         # if there is a specified solver use it
-        if _solver:
-            problem.solve(warm_start=True, solver=_solver)
-        else:
-            problem.solve(warm_start=True)
+        problem.solve(warm_start=True, solver=_solver)
         return weights.value
 
     def round_weights(self,
@@ -237,7 +225,6 @@ class OLPS:
         """
         Drops weights below a certain threshold
 
-        :param _all_weights: (np.array) portfolio weights for the time period
         :param threshold: (float) drop all values below this threshold
         :return (None): (np.array) sets all_weights as cleaned portfolio weights for the time period
         """
@@ -247,8 +234,8 @@ class OLPS:
         new_all_weights = np.apply_along_axis(lambda x: x / np.sum(x), 1, new_all_weights)
         self.all_weights = new_all_weights
 
-    def normalize(self,
-                  _weights):
+    @staticmethod
+    def normalize(_weights):
         """
         Normalize sum of weights to one
 
@@ -256,7 +243,7 @@ class OLPS:
         :return (None): (np.array) normalize the input and sets self.weights
         """
         norm_weights = _weights / np.sum(_weights)
-        self.weights = norm_weights
+        return norm_weights
 
     def uniform_weight(self):
         """
@@ -284,53 +271,6 @@ def calculate_relative_return(_asset_prices):
     return relative_return
 
 
-def sigmoid(val):
-    """
-    Generates the resulting sigmoid function
-
-    :param val: (float) input for the sigmoid function
-    :return sig: (float) sigmoid(x)
-    """
-    res = 1 / (1 + np.exp(-val))
-    return res
-
-
-def simplex_projection(_optimize_weight):
-    """
-    Calculates the simplex projection of the weights
-    https://stanford.edu/~jduchi/projects/DuchiShSiCh08.pdf
-
-    :param _optimize_weight: (np.array) a weight that will be projected onto the simplex domain
-    :return weights.value: (np.array) simplex projection of the original weight
-    """
-
-    # return itself if already a simplex projection
-    if np.sum(_optimize_weight) == 1 and np.all(_optimize_weight >= 0):
-        return _optimize_weight
-
-    # sort descending
-    _mu = np.sort(_optimize_weight)[::-1]
-
-    # adjusted sum
-    adjusted_sum = np.cumsum(_mu) - 1
-
-    # number
-    j = np.arange(len(_optimize_weight)) + 1
-
-    # condition
-    cond = _mu - adjusted_sum / j > 0
-
-    # define max rho
-    rho = float(j[cond][-1])
-
-    # define theta
-    theta = adjusted_sum[cond][-1] / rho
-
-    # calculate new weight
-    new_weight = np.maximum(_optimize_weight - theta, 0)
-    return new_weight
-
-
 def check_asset(_asset_prices,
                 _weights,
                 _resample_by):
@@ -343,11 +283,6 @@ def check_asset(_asset_prices,
                               None for no resampling
     :return: (None) raises ValueError if there are incorrect inputs
     """
-
-    # Check if _asset_prices were given
-    if _asset_prices is None:
-        raise ValueError("You need to supply price returns data")
-
     # if weights are given
     if _weights is not None:
         # check if number of assets match

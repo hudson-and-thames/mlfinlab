@@ -1,6 +1,6 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
-from mlfinlab.online_portfolio_selection.OLPS import OLPS
+from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
 class PAMR(OLPS):

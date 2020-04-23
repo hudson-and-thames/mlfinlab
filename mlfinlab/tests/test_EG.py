@@ -11,7 +11,7 @@ from mlfinlab.online_portfolio_selection import EG
 class TestEG(TestCase):
     # pylint: disable=too-many-public-methods
     """
-    Tests different functions of the BAH class.
+    Tests different functions of the BuyAndHold class.
     """
 
     def setUp(self):

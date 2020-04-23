@@ -34,6 +34,15 @@ class FCORN(SCORN):
             new_weights = self.optimize(_relative_return, activation_fn)
         return new_weights
 
+    def sigmoid(val):
+        """
+        Generates the resulting sigmoid function
+
+        :param val: (float) input for the sigmoid function
+        :return sig: (float) sigmoid(x)
+        """
+        res = 1 / (1 + np.exp(-val))
+        return res
 
 def main():
     """

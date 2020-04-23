@@ -3,13 +3,13 @@
 
 
 ## Benchmarks:
-### Buy and Hold: BAH
+### Buy and Hold: BuyAndHold
 Never rebalances after initial purchase
 ### Best Stock: Best_Stock
 Tracks the best performing stock in hindsight
-### Constant Rebalanced Portfolio: CRP
+### Constant Rebalanced Portfolio: ConstantRebalancedPortfolio
 Rebalances weight each day to a predetermined weight
-### Best Constant Rebalanced Portfolio: BCRP
+### Best Constant Rebalanced Portfolio: BestConstantRebalancedPortfolio
 Tracks the best constant rebalanced portfolio in hindsight
 ## Follow-the-Winner: (Momentum)
 ### Universal Portfolio: UP

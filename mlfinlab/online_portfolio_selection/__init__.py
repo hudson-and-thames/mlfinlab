@@ -3,13 +3,13 @@ Classes derived from Online Portfolio Selection module
 
 """
 # Parent Method
-from mlfinlab.online_portfolio_selection.OLPS import OLPS
+from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 from mlfinlab.online_portfolio_selection.UP import UP
 # Benchmarks
-from mlfinlab.online_portfolio_selection.benchmarks.BAH import BAH
-from mlfinlab.online_portfolio_selection.benchmarks.BESTSTOCK import BESTSTOCK
-from mlfinlab.online_portfolio_selection.benchmarks.CRP import CRP
-from mlfinlab.online_portfolio_selection.benchmarks.BCRP import BCRP
+from mlfinlab.online_portfolio_selection.benchmarks.buy_and_hold import BuyAndHold
+from mlfinlab.online_portfolio_selection.benchmarks.best_stock import BestStock
+from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio import ConstantRebalancedPortfolio
+from mlfinlab.online_portfolio_selection.benchmarks.best_constant_rebalanced_portfolio import BestConstantRebalancedPortfolio
 # Momentum
 from mlfinlab.online_portfolio_selection.momentum.EG import EG
 from mlfinlab.online_portfolio_selection.momentum.FTL import FTL
