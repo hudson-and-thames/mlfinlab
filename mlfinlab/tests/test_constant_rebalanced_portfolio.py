@@ -10,7 +10,7 @@ from mlfinlab.online_portfolio_selection import ConstantRebalancedPortfolio
 
 class TestConstantRebalancedPortfolio(TestCase):
     # pylint: disable=too-many-public-methods
-    # pylint: disable=E1136
+    # pylint: disable=unsubscriptable-object
     """
     Tests different functions of the ConstantRebalancedPortfolio class.
     """
@@ -73,7 +73,7 @@ class TestConstantRebalancedPortfolio(TestCase):
 
     def test_given_allocate_weights_crp_solution(self):
         """
-        Test the calculation of constant rebalanced portfolio weights with weights given in allocate.
+        Test calculation of constant rebalanced portfolio weights with weights given in allocate.
         """
         # create user input weights that place 1 on the first stock and 0 on the rest
         weights = np.zeros(self.data.shape[1])

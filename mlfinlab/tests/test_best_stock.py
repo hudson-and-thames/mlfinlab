@@ -50,7 +50,26 @@ class TestBestStock(TestCase):
         Test that returning weights indicate the best performing asset.
         """
         # initialize BestStock
+        beststock1 = BestStock()
+        # allocates self.data to BestStock
+        beststock1.allocate(self.data)
+        # best performing asset calculated by dividing the last row by the first row
+        price_diff = self.data.iloc[-1] / self.data.iloc[0]
+        calc_weight = np.array(price_diff)
+        # weight returned by beststock
+        beststock_weight = np.array(beststock1.all_weights)[0]
+        # compare the two weights
+        np.testing.assert_equal(calc_weight, price_diff)
+
+    def test_number_of_nonzero(self):
+        """
+        Test that the weights returned have only one value that is non-zero.
+        """
+        # initialize BestStock
         beststock = BestStock()
         # allocates self.data to BestStock
         beststock.allocate(self.data)
-        # best performing asset calculated by taking the
+        # weight returned by beststock
+        beststock_weight = np.array(beststock.all_weights)[0]
+        # compare the two weights
+        np.testing.assert_equal(np.count_nonzero(beststock_weight), 1)
