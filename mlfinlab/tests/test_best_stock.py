@@ -10,6 +10,7 @@ from mlfinlab.online_portfolio_selection import BestStock
 
 class TestBestStock(TestCase):
     # pylint: disable=too-many-public-methods
+    # pylint: disable=E1136
     """
     Tests different functions of the BestStock class.
     """
@@ -43,4 +44,3 @@ class TestBestStock(TestCase):
             assert (weights >= 0).all()
             assert len(weights) == self.data.shape[1]
             np.testing.assert_almost_equal(np.sum(weights), 1)
-

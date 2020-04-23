@@ -199,10 +199,6 @@ class OLPS:
         :param _solver: (cp.SOLVER) set the solver to be a particular cvxpy solver
         :return weights.value: (np.array) weights that maximize the returns for the given optimize_array
         """
-        # calcualte length of time
-        length_of_time = _optimize_array.shape[0]
-        # calculate number of assets
-        number_of_assets = _optimize_array.shape[1]
 
         # initialize weights for optimization problem
         weights = cp.Variable(self.number_of_assets)

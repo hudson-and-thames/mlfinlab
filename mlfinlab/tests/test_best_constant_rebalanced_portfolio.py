@@ -10,6 +10,7 @@ from mlfinlab.online_portfolio_selection import BestConstantRebalancedPortfolio
 
 class TestBestConstantRebalancedPortfolio(TestCase):
     # pylint: disable=too-many-public-methods
+    # pylint: disable=E1136
     """
     Tests different functions of the BestConstantRebalancedPortfolio class.
     """
@@ -27,7 +28,7 @@ class TestBestConstantRebalancedPortfolio(TestCase):
         # dropna
         self.data = self.data.dropna(axis=1)
 
-    def test_best_constant_rebalanced_portfolio_solution(self):
+    def test_bcrp_solution(self):
         """
         Test the calculation of best constant rebalanced portfolio weights.
         """
