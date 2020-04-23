@@ -42,7 +42,7 @@ class TestFeatureClusters(unittest.TestCase):
         clustered_subsets_distance = get_feature_clusters(self.X, dependence_metric='linear',
                                                           distance_metric=None, linkage_method=None,
                                                           n_clusters=None, critical_threshold=0.2)
-        print('Feature Cluster Testing finished')
+
         #assertions
         #output clusters must be 2
         self.assertEqual(len(clustered_subsets), 2)
@@ -60,3 +60,4 @@ class TestFeatureClusters(unittest.TestCase):
             get_feature_clusters(self.X, dependence_metric='linear',
                                  distance_metric='angular', linkage_method='single',
                                  n_clusters=int(len(self.data)))
+        print('Feature Cluster Testing finished')
