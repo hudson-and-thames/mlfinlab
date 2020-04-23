@@ -28,8 +28,8 @@ def calculate_t_values(subset, min_sample_length, step):
         X_subset[:, 1] = np.arange(y_subset.shape[0])
 
         # Get regression coefficients estimates
-        xy = X.transpose() @ y_subset
-        xx = X.transpose() @ X
+        xy = X_subset.transpose() @ y_subset
+        xx = X_subset.transpose() @ X_subset
 
         #   check for singularity
         det = np.linalg.det(xx)
