@@ -88,3 +88,23 @@ class TestOLPS(TestCase):
         data = self.data.reset_index()
         with self.assertRaises(ValueError):
             olps4.allocate(data)
+
+    def test_user_weight(self):
+        """
+        Test the calculation of OLPS weights.
+        """
+        # user weight
+        weight = np.zeros(self.data.shape[1])
+        weight[0] = 1
+        # initialize OLPS
+        olps5 = OLPS()
+        # allocates self.data to OLPS
+        olps5.allocate(self.data, weights=weight)
+        # create np.array of all_weights
+        all_weights = np.array(olps5.all_weights)
+        # checks if all weights sum to 1
+        for i in range(all_weights.shape[0]):
+            weights = all_weights[i]
+            assert (weights >= 0).all()
+            assert len(weights) == self.data.shape[1]
+            np.testing.assert_almost_equal(np.sum(weights), 1)
