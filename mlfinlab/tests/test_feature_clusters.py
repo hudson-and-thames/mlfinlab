@@ -26,8 +26,8 @@ class TestFeatureClusters(unittest.TestCase):
         #test for different dependence matrix
 
         clustered_subsets = get_feature_clusters(self.X, dependence_metric='linear',
-                                                    distance_metric='angular', linkage_method='single',
-                                                    n_clusters=2)
+                                                 distance_metric='angular', linkage_method='single',
+                                                 n_clusters=2)
         #hierarchical auto clustering
         clustered_subsets_ha = get_feature_clusters(self.X, dependence_metric='linear',
                                                     distance_metric='angular', linkage_method='single',
