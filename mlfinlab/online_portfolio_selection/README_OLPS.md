@@ -21,7 +21,7 @@ Tracks the best constant rebalanced portfolio in hindsight
 ## Follow-the-Loser: (Mean-Reversion)
 ### Anti Correlation
 ### Passive Aggressive Mean Reversion: PassiveAggressiveMeanReversion
-### Confidence Weighted Mean Reversion: ConstantWeightedMeanReversion
+### Confidence Weighted Mean Reversion: ConfidenceWeightedMeanReversion
 ### Online Moving Average Reversion: OnlineMovingAverageReversion
 ### Robust Median Reversion
 

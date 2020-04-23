@@ -8,7 +8,7 @@ import pandas as pd
 from mlfinlab.online_portfolio_selection.mean_reversion.online_moving_average_reversion import OnlineMovingAverageReversion
 
 
-class TestBestStock(TestCase):
+class TestOnlineMovingAverageReversion(TestCase):
     # pylint: disable=too-many-public-methods
     # pylint: disable=E1136
     """

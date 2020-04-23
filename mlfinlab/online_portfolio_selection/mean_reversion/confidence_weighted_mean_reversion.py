@@ -1,16 +1,20 @@
 # pylint: disable=missing-module-docstring
 import pandas as pd
-import cvxpy as cp
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class ConstantWeightedMeanReversion(OLPS):
+class ConfidenceWeightedMeanReversion(OLPS):
     """
-    NOT IMPLEMENTED YET
-    This class implements the Constant Weighted Mean Reversion strategy.
+    This class implements the Confidence Weighted Mean Reversion strategy. It is reproduced with modification from the following paper:
+    Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December YEAR),
+    33 pages. DOI:http://dx.doi.org/10.1145/2512962.
+
+    Online Moving Average Reversion reverts to the SMA or EMA of the underlying assets based on the given threshold.
     """
 
-    def __init__(self, confidence=0.5, epsilon=0.5):
+    def __init__(self,
+                 confidence=0.5,
+                 epsilon=0.5):
         """
         Constructor.
         """
@@ -46,7 +50,7 @@ class ConstantWeightedMeanReversion(OLPS):
 def main():
     stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    cwmr = ConstantWeightedMeanReversion()
+    cwmr = ConfidenceWeightedMeanReversion()
     cwmr.allocate(stock_price, resample_by='M')
     print(cwmr.all_weights)
     print(cwmr.portfolio_return)

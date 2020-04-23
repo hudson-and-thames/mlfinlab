@@ -165,7 +165,9 @@ class OLPS:
         # weight do not change for this class
         return self.weights
 
-    def calculate_portfolio_returns(self, _all_weights, _relative_return):
+    def calculate_portfolio_returns(self,
+                                    _all_weights,
+                                    _relative_return):
         """
         Calculates cumulative portfolio returns
 
@@ -178,7 +180,9 @@ class OLPS:
         # take the cumulative product of the returns to calculate returns over time
         self.portfolio_return = np.diagonal(np.dot(_relative_return, _all_weights.T)).cumprod()
 
-    def conversion(self, _all_weights, _portfolio_return):
+    def conversion(self,
+                   _all_weights,
+                   _portfolio_return):
         """
         Converts the given np.array to pd.Dataframe for visibility
 
@@ -250,6 +254,41 @@ class OLPS:
         # divide by n after creating numpy arrays of one
         uni_weight = np.ones(self.number_of_assets) / self.number_of_assets
         return uni_weight
+
+    @staticmethod
+    def simplex_projection(weight):
+        """
+        Calculates the simplex projection of the weights
+        https://stanford.edu/~jduchi/projects/DuchiShSiCh08.pdf
+
+        :param weight: (np.array) calculated weight to be projected onto the simplex domain
+        :return weights.value: (np.array) simplex projection of the original weight
+        """
+        # return itself if already a simplex projection
+        if np.sum(weight) == 1 and np.all(weight >= 0):
+            return weight
+
+        # sort descending
+        _mu = np.sort(weight)[::-1]
+
+        # adjusted sum
+        adjusted_sum = np.cumsum(_mu) - 1
+
+        # number
+        j = np.arange(len(weight)) + 1
+
+        # condition
+        cond = _mu - adjusted_sum / j > 0
+
+        # define max rho
+        rho = float(j[cond][-1])
+
+        # define theta
+        theta = adjusted_sum[cond][-1] / rho
+
+        # calculate new weight
+        new_weight = np.maximum(weight - theta, 0)
+        return new_weight
 
 
 def calculate_relative_return(_asset_prices):
