@@ -5,12 +5,12 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection import BestConstantRebalancedPortfolio
+from mlfinlab.online_portfolio_selection import BestConstantRebalancedPortfolio, ConstantRebalancedPortfolio
 
 
 class TestBestConstantRebalancedPortfolio(TestCase):
     # pylint: disable=too-many-public-methods
-    # pylint: disable=E1136
+    # pylint: disable=unsubscriptable-object
     """
     Tests different functions of the BestConstantRebalancedPortfolio class.
     """
@@ -47,3 +47,23 @@ class TestBestConstantRebalancedPortfolio(TestCase):
             assert len(weights) == self.data.shape[1]
             assert (weights == one_weight).all()
             np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_bcrp_returns(self):
+        """
+        Test that BCRP returns are higher than other CRP's.
+        """
+        # initialize BCRP
+        bcrp1 = BestConstantRebalancedPortfolio()
+        # allocates self.data to BCRP, resample by months for speed
+        bcrp1.allocate(self.data, resample_by='M')
+        # get the final returns for bcrp1
+        bcrp1_returns = np.array(bcrp1.portfolio_return)[-1]
+        # set an arbitray weight
+        weight = bcrp1.uniform_weight()
+        # initialize CRP
+        crp = ConstantRebalancedPortfolio(weight)
+        crp.allocate(self.data,resample_by='M')
+        # get the final returns for crp
+        crp_returns = np.array(crp.portfolio_return)[-1]
+        # check that crp returns are lower than bcrp returns
+        np.testing.assert_array_less(crp_returns, bcrp1_returns)

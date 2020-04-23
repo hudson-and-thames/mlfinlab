@@ -32,7 +32,6 @@ class TestBuyAndHold(TestCase):
         """
         Test the calculation of buy and hold weights.
         """
-
         # initialize BuyAndHold
         bah = BuyAndHold()
         # allocates self.data to BuyAndHold
@@ -45,3 +44,45 @@ class TestBuyAndHold(TestCase):
             assert (weights >= 0).all()
             assert len(weights) == self.data.shape[1]
             np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_buy_two_assets(self):
+        """
+        Test that weights are changing for a portfolio of two assets.
+        """
+        # weights with 0.5 on two random assets
+        weight = np.zeros(self.data.shape[1])
+        weight[:2] = 0.5
+        # initialize BuyAndHold
+        bah1 = BuyAndHold()
+        # allocates self.data to BuyAndHold
+        bah1.allocate(self.data, weight)
+        # get the second to last weight
+        last_bah1_weight = np.array(bah1.all_weights)[-1]
+        # relative price calculated by dividing the second to last row by the first row
+        price_diff = np.array(self.data.iloc[-2] / self.data.iloc[0])
+        # calculate portfolio growth
+        new_last_weight = price_diff * weight
+        # normalize to sum the weight to one
+        norm_new_weight = new_last_weight/np.sum(new_last_weight)
+        np.testing.assert_almost_equal(last_bah1_weight, norm_new_weight)
+
+    def test_buy_five_assets(self):
+        """
+        Test that weights are changing for a portfolio of five assets.
+        """
+        # weights with 0.5 on two random assets
+        weight = np.zeros(self.data.shape[1])
+        weight[:5] = 0.2
+        # initialize BuyAndHold
+        bah2 = BuyAndHold()
+        # allocates self.data to BuyAndHold
+        bah2.allocate(self.data, weight)
+        # get the second to last weight
+        last_bah2_weight = np.array(bah2.all_weights)[-1]
+        # relative price calculated by dividing the second to last row by the first row
+        price_diff = np.array(self.data.iloc[-2] / self.data.iloc[0])
+        # calculate portfolio growth
+        new_last_weight = price_diff * weight
+        # normalize to sum the weight to one
+        norm_new_weight = new_last_weight/np.sum(new_last_weight)
+        np.testing.assert_almost_equal(last_bah2_weight, norm_new_weight)

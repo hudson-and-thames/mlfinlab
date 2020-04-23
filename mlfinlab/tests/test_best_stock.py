@@ -10,7 +10,7 @@ from mlfinlab.online_portfolio_selection import BestStock
 
 class TestBestStock(TestCase):
     # pylint: disable=too-many-public-methods
-    # pylint: disable=E1136
+    # pylint: disable=unsubscriptable-object
     """
     Tests different functions of the BestStock class.
     """
@@ -30,7 +30,7 @@ class TestBestStock(TestCase):
 
     def test_best_stock_solution(self):
         """
-        Test the calculation of best stock weights.
+        Test the calculation of best stock weights and ensure that weights sum to 1.
         """
         # initialize BestStock
         beststock = BestStock()
@@ -44,3 +44,32 @@ class TestBestStock(TestCase):
             assert (weights >= 0).all()
             assert len(weights) == self.data.shape[1]
             np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_best_performing(self):
+        """
+        Test that returning weights indicate the best performing asset.
+        """
+        # initialize BestStock
+        beststock1 = BestStock()
+        # allocates self.data to BestStock
+        beststock1.allocate(self.data)
+        # best performing asset calculated by dividing the last row by the first row
+        price_diff = self.data.iloc[-1] / self.data.iloc[0]
+        calc_weight = np.array(price_diff)
+        # weight returned by beststock
+        beststock_weight = np.array(beststock1.all_weights)[0]
+        # compare the two weights
+        np.testing.assert_equal(calc_weight, price_diff)
+
+    def test_number_of_nonzero(self):
+        """
+        Test that the weights returned have only one value that is non-zero.
+        """
+        # initialize BestStock
+        beststock = BestStock()
+        # allocates self.data to BestStock
+        beststock.allocate(self.data)
+        # weight returned by beststock
+        beststock_weight = np.array(beststock.all_weights)[0]
+        # compare the two weights
+        np.testing.assert_equal(np.count_nonzero(beststock_weight), 1)
