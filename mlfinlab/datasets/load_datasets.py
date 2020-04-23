@@ -5,6 +5,7 @@ sandbox data
 
 import pandas as pd
 
+
 def load_stock_prices() -> pd.DataFrame:
     """
     Loads stock prices data sets consisting of
@@ -17,6 +18,7 @@ def load_stock_prices() -> pd.DataFrame:
     prices_df = pd.read_csv('../tests/test_data/stock_prices.csv', index_col=0, parse_dates=[0])
     return prices_df
 
+
 def load_tick_sample() -> pd.DataFrame:
     """
     Loads E-Mini S&P 500 futures tick data sample
@@ -25,6 +27,7 @@ def load_tick_sample() -> pd.DataFrame:
 
     tick_df = pd.read_csv('../tests/test_data/tick_data.csv', index_col=0, parse_dates=[0])
     return tick_df
+
 
 def load_dollar_bar_sample() -> pd.DataFrame:
     """
