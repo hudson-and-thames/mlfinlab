@@ -26,7 +26,7 @@ class TestCodependence(unittest.TestCase):
         self.x = state.normal(size=1000)
         self.y_1 = self.x ** 2 + state.normal(size=1000) / 5
         self.y_2 = abs(self.x) + state.normal(size=1000) / 5
-        self.X_matrix,_ = get_classification_data(40, 5, 30, 1000, sigmaStd=2)
+        self.X_matrix, _ = get_classification_data(6, 2, 2, 1000, sigmaStd=0.125)
 
     def test_correlations(self):
         """
@@ -108,4 +108,4 @@ class TestCodependence(unittest.TestCase):
             get_dependence_matrix(self.X_matrix, dependence_method='unknown')
         #Unkown distance_metric
         with self.assertRaises(ValueError):
-            get_distance_matrix(vi_matrix, distance_metric='unknown')
+            get_distance_matrix(self.X_matrix, distance_metric='unknown')
