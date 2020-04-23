@@ -11,9 +11,9 @@ from mlfinlab.online_portfolio_selection import OLPS
 
 class TestOLPS(TestCase):
     # pylint: disable=too-many-public-methods
-    # pylint: disable=E1136
+    # pylint: disable=unsubscriptable-object
     """
-    Tests different functions of the OLPS class.
+    Test different functions of the OLPS class.
     """
 
     def setUp(self):
@@ -31,7 +31,7 @@ class TestOLPS(TestCase):
 
     def test_olps_solution(self):
         """
-        Test the calculation of OLPS weights.
+        Test the calculation of OLPS weights and ensure that weights sum to 1.
         """
         # initialize OLPS
         olps = OLPS()
@@ -48,7 +48,7 @@ class TestOLPS(TestCase):
 
     def test_olps_weight_mismatch(self):
         """
-        Test if the user inputted weights have matching dimensions as the data
+        Test that the user inputted weights have matching dimensions as the data's.
         """
         # initialize OLPS
         olps1 = OLPS()
@@ -58,7 +58,7 @@ class TestOLPS(TestCase):
 
     def test_olps_weight_incorrect_sum(self):
         """
-        Test if the user inputted weights do not sum to one
+        Test ValueError if the user inputted weights do not sum to one.
         """
         with self.assertRaises(AssertionError):
             # initialize OLPS
@@ -70,7 +70,7 @@ class TestOLPS(TestCase):
 
     def test_olps_incorrect_data(self):
         """
-        Test that user inputted data is a dataframe
+        Test ValueError if the user inputted data is not a dataframe.
         """
         with self.assertRaises(ValueError):
             # initialize OLPS
@@ -80,7 +80,7 @@ class TestOLPS(TestCase):
 
     def test_olps_index_error(self):
         """
-        Test ValueError on passing dataframe not indexed by date.
+        Test ValueError if the passing dataframe is not indexed by date.
         """
         # initialize OLPS
         olps4 = OLPS()
@@ -91,7 +91,7 @@ class TestOLPS(TestCase):
 
     def test_user_weight(self):
         """
-        Test the calculation of OLPS weights.
+        Test that OLPS works if the user inputs their own weight.
         """
         # user weight
         weight = np.zeros(self.data.shape[1])
@@ -108,3 +108,21 @@ class TestOLPS(TestCase):
             assert (weights >= 0).all()
             assert len(weights) == self.data.shape[1]
             np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_uniform_weight(self):
+        """
+        Test that uniform weights return equal allocation of weights.
+        """
+        olps6 = OLPS()
+        olps6.allocate(self.data)
+        olps6_uni_weight = olps6.uniform_weight()
+        np.testing.assert_almost_equal(olps6_uni_weight, np.array(olps6.all_weights)[0])
+
+    def test_normalize(self):
+        """
+        Test that weights sum to 1.
+        """
+        olps7 = OLPS()
+        random_weight = np.ones(3)
+        normalized_weight = olps7.normalize(random_weight)
+        np.testing.assert_almost_equal(normalized_weight, random_weight / 3)

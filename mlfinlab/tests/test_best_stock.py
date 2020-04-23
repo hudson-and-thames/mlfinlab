@@ -10,7 +10,7 @@ from mlfinlab.online_portfolio_selection import BestStock
 
 class TestBestStock(TestCase):
     # pylint: disable=too-many-public-methods
-    # pylint: disable=E1136
+    # pylint: disable=unsubscriptable-object
     """
     Tests different functions of the BestStock class.
     """
@@ -30,7 +30,7 @@ class TestBestStock(TestCase):
 
     def test_best_stock_solution(self):
         """
-        Test the calculation of best stock weights.
+        Test the calculation of best stock weights and ensure that weights sum to 1.
         """
         # initialize BestStock
         beststock = BestStock()
@@ -44,3 +44,13 @@ class TestBestStock(TestCase):
             assert (weights >= 0).all()
             assert len(weights) == self.data.shape[1]
             np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_best_performing(self):
+        """
+        Test that returning weights indicate the best performing asset.
+        """
+        # initialize BestStock
+        beststock = BestStock()
+        # allocates self.data to BestStock
+        beststock.allocate(self.data)
+        # best performing asset calculated by taking the

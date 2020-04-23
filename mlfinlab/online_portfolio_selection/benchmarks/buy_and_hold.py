@@ -13,16 +13,12 @@ class BuyAndHold(OLPS):
     periods.
     """
 
-    def update_weight(self,
-                      _time):
+    def update_weight(self, _time):
         """
-        Changes step-by-step update method to adjsut for underlying asset price changes
+        Changes weights to adjust for underlying asset price changes.
 
         :param _time: (int) current time period
         :return (None) adjusts weights for previous time's price changes
         """
-        # return same weights because price has not changed
-        if _time == 0:
-            return self.weights
-        # adjust it for price differences
-        return self.normalize(self.weights * self.relative_return[_time - 1])
+        # adjust weights for price differences
+        return self.normalize(self.weights * self.relative_return[_time])
