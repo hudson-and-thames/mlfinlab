@@ -10,6 +10,7 @@ from mlfinlab.online_portfolio_selection import ConstantRebalancedPortfolio
 
 class TestConstantRebalancedPortfolio(TestCase):
     # pylint: disable=too-many-public-methods
+    # pylint: disable=E1136
     """
     Tests different functions of the ConstantRebalancedPortfolio class.
     """
@@ -27,7 +28,7 @@ class TestConstantRebalancedPortfolio(TestCase):
         # dropna
         self.data = self.data.dropna(axis=1)
 
-    def test_default_constant_rebalanced_portfolio_solution(self):
+    def test_default_crp_solution(self):
         """
         Test the calculation of constant rebalanced portfolio weights with default settings.
         """
@@ -47,7 +48,7 @@ class TestConstantRebalancedPortfolio(TestCase):
             assert (weights == one_weight).all()
             np.testing.assert_almost_equal(np.sum(weights), 1)
 
-    def test_given_weights_constant_rebalanced_portfolio_solution(self):
+    def test_given_weights_crp_solution(self):
         """
         Test the calculation of constant rebalanced portfolio weights with weights given initially.
         """
@@ -70,7 +71,7 @@ class TestConstantRebalancedPortfolio(TestCase):
             assert (weights == one_weight).all()
             np.testing.assert_almost_equal(np.sum(weights), 1)
 
-    def test_given_allocate_weights_constant_rebalanced_portfolio_solution(self):
+    def test_given_allocate_weights_crp_solution(self):
         """
         Test the calculation of constant rebalanced portfolio weights with weights given in allocate.
         """
@@ -92,4 +93,3 @@ class TestConstantRebalancedPortfolio(TestCase):
             assert len(weights) == self.data.shape[1]
             assert (weights == one_weight).all()
             np.testing.assert_almost_equal(np.sum(weights), 1)
-

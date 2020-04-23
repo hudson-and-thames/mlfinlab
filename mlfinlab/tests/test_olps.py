@@ -10,6 +10,8 @@ from mlfinlab.online_portfolio_selection import OLPS
 
 
 class TestOLPS(TestCase):
+    # pylint: disable=too-many-public-methods
+    # pylint: disable=E1136
     """
     Tests different functions of the OLPS class.
     """
