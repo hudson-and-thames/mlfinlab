@@ -18,7 +18,7 @@ class TestFeatureClusters(unittest.TestCase):
         Create X, y datasets
         """
         self.X, self.y = get_classification_data(40, 5, 30, 1000, sigmaStd=2)
-        self.X_matrix, _ = get_classification_data(6, 2, 2, 1000, sigmaStd=0)
+
     def test_get_feature_clusters(self):
         """
         Test get_feature_clusters arguments
@@ -56,6 +56,6 @@ class TestFeatureClusters(unittest.TestCase):
         """
         #Number of clusters larger than number of features
         with self.assertRaises(ValueError):
-            get_feature_clusters(self.X_matrix, dependence_metric='linear',
+            get_feature_clusters(self.X, dependence_metric='linear',
                                  distance_metric='angular', linkage_method='single',
-                                 n_clusters=int(len(self.data)))
+                                 n_clusters=int(len(41)))
