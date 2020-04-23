@@ -13,9 +13,9 @@ Rebalances weight each day to a predetermined weight
 Tracks the best constant rebalanced portfolio in hindsight
 ## Follow-the-Winner: (Momentum)
 ### Universal Portfolio: UP
-### Exponential Gradient: EG
-### Follow the Leader: FTL
-### Follow the Reguliarized Leader: FTRL
+### Exponential Gradient: ExponentialGradient
+### Follow the Leader: FollowTheLeader
+### Follow the Reguliarized Leader: FollowTheRegularizedLeader
 ### Aggregating-type Algorithms --- skip over for now
 
 ## Follow-the-Loser: (Mean-Reversion)

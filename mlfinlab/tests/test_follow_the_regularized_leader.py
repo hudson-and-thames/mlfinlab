@@ -1,14 +1,14 @@
 """
-Tests Follow the Leader (FollowTheLeader).
+Tests Follow the RegularizedLeader (FollowTheRegularizedLeader).
 """
 from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.momentum.follow_the_leader import FollowTheLeader
+from mlfinlab.online_portfolio_selection.momentum.follow_the_regularized_leader import FollowTheRegularizedLeader
 
 
-class TestFollowTheLeader(TestCase):
+class TestFollowTheRegularizedLeader(TestCase):
     # pylint: disable=too-many-public-methods
     # pylint: disable=E1136
     """
@@ -28,15 +28,15 @@ class TestFollowTheLeader(TestCase):
         # dropna
         self.data = self.data.dropna(axis=1)
 
-    def test_ftl_solution(self):
+    def test_ftrl_solution(self):
         """
         Test the calculation of follow the leader
         """
         # uses multiplicative update rule
-        ftl = FollowTheLeader()
+        ftrl = FollowTheRegularizedLeader(beta=0.2)
         # resamples monthly
-        ftl.allocate(self.data, resample_by='M')
-        all_weights = np.array(ftl.all_weights)
+        ftrl.allocate(self.data, resample_by='M')
+        all_weights = np.array(ftrl.all_weights)
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]
             assert (weights >= 0).all()

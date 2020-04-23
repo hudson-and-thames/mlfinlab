@@ -1,17 +1,17 @@
 """
-Tests Follow the Regularized Leader (FTRL).
+Tests Follow the Regularized Leader (FollowTheRegularizedLeader).
 """
 from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection import FTRL
+from mlfinlab.online_portfolio_selection import FollowTheRegularizedLeader
 
 
 class TestFTRL(TestCase):
     # pylint: disable=too-many-public-methods
     """
-    Tests different functions of the FTRL class.
+    Tests different functions of the FollowTheRegularizedLeader class.
     """
 
     def setUp(self):
@@ -29,7 +29,7 @@ class TestFTRL(TestCase):
         Test the calculation of follow the regularized leader
         """
 
-        ftrl = FTRL(beta=0.1)
+        ftrl = FollowTheRegularizedLeader(beta=0.1)
         ftrl.allocate(self.data)
         all_weights = np.array(ftrl.all_weights)
         for i in range(all_weights.shape[0]):
