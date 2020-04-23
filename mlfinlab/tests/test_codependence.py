@@ -83,7 +83,9 @@ class TestCodependence(unittest.TestCase):
         Test the get_dependence_matrix and get_distance_matrix function
         '''
         #Dependence_matrix
+        print('Now doing distance variation_information matrix test')
         vi_matrix = get_dependence_matrix(self.X_matrix, dependence_method='information_variation')
+        print('Now doing distance mutual_information matrix test')
         mi_matrix = get_dependence_matrix(self.X_matrix, dependence_method='mutual_information')
         print('Now doing distance correlation matrix test')
         corr_matrix = get_dependence_matrix(self.X_matrix, dependence_method='distance_correlation')
@@ -110,3 +112,4 @@ class TestCodependence(unittest.TestCase):
         #Unkown distance_metric
         with self.assertRaises(ValueError):
             get_distance_matrix(self.X_matrix, distance_metric='unknown')
+        print('Test finished for codependence_matrix')
