@@ -12,14 +12,14 @@ class ConstantRebalancedPortfolio(OLPS):
 
     :ivar weights: (np.array) any initial weights that the user wants to use
     """
-    def __init__(self, weights=None):
+    def __init__(self, weight=None):
         """
         Sets the recurring weights for the Constant Rebalanced Portfolio.
 
-        :param weights: (list/np.array/pd.Dataframe) initial weights set by the user.
+        :param weight: (list/np.array/pd.Dataframe) initial weight set by the user.
         """
         super(ConstantRebalancedPortfolio, self).__init__()
-        self.weights = weights
+        self.weight = weight
 
     def first_weight(self, weights):
         """
@@ -28,9 +28,9 @@ class ConstantRebalancedPortfolio(OLPS):
         :param weights: (list/np.array/pd.Dataframe) initial weights set by the user.
         :return weights: (np.array) returns the first portfolio weight.
         """
-        # initialize with the given weights
-        if self.weights is not None:
-            return self.weights
+        # initialize with the given weight
+        if self.weight is not None:
+            return self.weight
         # if no weights are given, automatically set weights to uniform weights
         if weights is None:
             weights = self.uniform_weight()
