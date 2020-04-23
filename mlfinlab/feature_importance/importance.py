@@ -71,8 +71,8 @@ def mean_decrease_impurity(model, feature_names, clustered_subsets=None):
         for subset in clustered_subsets: #iterating over each cluster
             subset_feat_imp = feature_imp_df[subset].sum(axis=1)
             #importance of each feature within a subsets is equal to the importance of that subset
-            importance[subset, 'mean'] = subset_feat_imp.mean()
-            importance[subset, 'std'] = subset_feat_imp.std()*subset_feat_imp.shape[0]**-.5
+            importance.loc[subset, 'mean'] = subset_feat_imp.mean()
+            importance.loc[subset, 'std'] = subset_feat_imp.std()*subset_feat_imp.shape[0]**-.5
     else:
         importance = pd.concat({'mean': feature_imp_df.mean(),
                                 'std': feature_imp_df.std() * feature_imp_df.shape[0] ** -0.5},
