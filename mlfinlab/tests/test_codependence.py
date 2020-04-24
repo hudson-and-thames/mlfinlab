@@ -26,7 +26,7 @@ class TestCodependence(unittest.TestCase):
         self.x = state.normal(size=1000)
         self.y_1 = self.x ** 2 + state.normal(size=1000) / 5
         self.y_2 = abs(self.x) + state.normal(size=1000) / 5
-        self.X_matrix, _ = get_classification_data(4, 1, 1, 100, sigmaStd=0)
+        self.X_matrix, _ = get_classification_data(6, 2, 2, 100, sigmaStd=0)
 
     def test_correlations(self):
         """
