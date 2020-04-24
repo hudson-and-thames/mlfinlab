@@ -58,4 +58,4 @@ class TestFeatureClusters(unittest.TestCase):
         with self.assertRaises(ValueError):
             get_feature_clusters(self.X, dependence_metric='linear',
                                  distance_metric='angular', linkage_method='single',
-                                 n_clusters=int(len(41)))
+                                 n_clusters=int(41))
