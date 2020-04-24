@@ -25,13 +25,13 @@ class TestFeatureClusters(unittest.TestCase):
         """
         #test for different dependence matrix
 
-        clustered_subsets = get_feature_clusters(self.X, dependence_metric='linear',
+        clustered_subsets = get_feature_clusters(self.X, dependence_metric='information_variation',
                                                  distance_metric='angular', linkage_method='single',
                                                  n_clusters=2)
         #hierarchical auto clustering
         clustered_subsets_ha = get_feature_clusters(self.X, dependence_metric='linear',
                                                     distance_metric='angular', linkage_method='single',
-                                                    n_clusters=None)
+                                                    n_clusters=None, critical_threshold=0.2)
         #test for optimal number of clusters and  _check_for_low_silhouette_scores
         #since this is done on test dataset so there will be no features with low silhouette score
         #so we will make a feature with some what lower silhouette score (near to zero) and set
