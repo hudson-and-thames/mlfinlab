@@ -27,7 +27,7 @@ class TestFeatureImportance(unittest.TestCase):
         Generate X, y datasets and fit a RF
         """
         #Generate datasets
-        self.X, self.y = get_classification_data(40, 5, 30, 10000, sigmaStd=.125)
+        self.X, self.y = get_classification_data(10, 5, 2, 1000, random_state=0, sigmaStd=.125)
         # Fit a RF
         self.clf_base = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
                                                class_weight='balanced_subsample')
@@ -50,15 +50,15 @@ class TestFeatureImportance(unittest.TestCase):
         self.assertAlmostEqual(np.mean(pca_features[:, 6]), 0, delta=1e-7)
 
         # Check particular PCA values std
-        self.assertAlmostEqual(np.std(pca_features[:, 1]), 1.2503, delta=0.2)
-        self.assertAlmostEqual(np.std(pca_features[:, 3]), 1.0292, delta=0.2)
-        self.assertAlmostEqual(np.std(pca_features[:, 4]), 1.0134, delta=0.2)
+        self.assertAlmostEqual(np.std(pca_features[:, 1]), 1.3813, delta=0.2)
+        self.assertAlmostEqual(np.std(pca_features[:, 3]), 1.0255, delta=0.2)
+        self.assertAlmostEqual(np.std(pca_features[:, 4]), 1.0011, delta=0.2)
 
         mdi_feat_imp = mean_decrease_impurity(self.fit_clf, self.X.columns)
         pca_corr_res = feature_pca_analysis(self.X, mdi_feat_imp)
 
         # Check correlation metrics results
-        self.assertAlmostEqual(pca_corr_res['Weighted_Kendall_Rank'][0], -0.0724, delta=1e-1)
+        self.assertAlmostEqual(pca_corr_res['Weighted_Kendall_Rank'][0], 0.7424, delta=1e-1)
 
     def test_feature_importance(self):
         """
@@ -100,46 +100,51 @@ class TestFeatureImportance(unittest.TestCase):
         #This is done verify the theory that if number clusters is equal to number of features then the
         #result will be same as MDA
         feature_subset_single = [[x] for x in self.X.columns]
+
+        mdi_cfi_single = mean_decrease_impurity(self.fit_clf, X.columns,
+                                                clustered_subsets=feature_subset_single)
         mda_cfi_single = mean_decrease_accuracy(self.bag_clf, self.X, self.y, self.cv_gen,
                                                 clustered_subsets=feature_subset_single)
 
         # MDI assertions
         self.assertAlmostEqual(mdi_feat_imp['mean'].sum(), 1, delta=0.001)
         # The most informative features
-        self.assertAlmostEqual(mdi_feat_imp.loc['I_1', 'mean'], 0.47075, delta=0.01)
-        self.assertAlmostEqual(mdi_feat_imp.loc['I_0', 'mean'], 0.09291, delta=0.01)
+        self.assertAlmostEqual(mdi_feat_imp.loc['I_1', 'mean'], 0.48058, delta=0.01)
+        self.assertAlmostEqual(mdi_feat_imp.loc['I_0', 'mean'], 0.08214, delta=0.01)
         # Redundant feature
-        self.assertAlmostEqual(mdi_feat_imp.loc['R_0', 'mean'], 0.07436, delta=0.01)
+        self.assertAlmostEqual(mdi_feat_imp.loc['R_0', 'mean'], 0.06511, delta=0.01)
         # Noisy feature
-        self.assertAlmostEqual(mdi_feat_imp.loc['N_0', 'mean'], 0.01798, delta=0.01)
+        self.assertAlmostEqual(mdi_feat_imp.loc['N_0', 'mean'], 0.02229, delta=0.01)
 
         # MDA(log_loss) assertions
-        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['I_1', 'mean'], 0.59684, delta=0.1)
-        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['R_0', 'mean'], 0.13177, delta=0.1)
+        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['I_1', 'mean'], 0.65522, delta=0.1)
+        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['R_0', 'mean'], 0.00332, delta=0.1)
 
         # MDA(f1) assertions
-        self.assertAlmostEqual(mda_feat_imp_f1.loc['I_1', 'mean'], 0.52268, delta=0.1)
-        self.assertAlmostEqual(mda_feat_imp_f1.loc['I_2', 'mean'], 0.29533, delta=0.1)
+        self.assertAlmostEqual(mda_feat_imp_f1.loc['I_1', 'mean'], 0.47751, delta=0.1)
+        self.assertAlmostEqual(mda_feat_imp_f1.loc['I_2', 'mean'], 0.33617, delta=0.1)
 
         # SFI(log_loss) assertions
-        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['I_0', 'mean'], -6.50385, delta=0.1)
-        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['R_0', 'mean'], -3.27282, delta=0.1)
+        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['I_0', 'mean'], -6.39442, delta=0.1)
+        self.assertAlmostEqual(sfi_feat_imp_log_loss.loc['R_0', 'mean'], -5.04315, delta=0.1)
 
         # SFI(accuracy) assertions
-        self.assertAlmostEqual(sfi_feat_imp_f1.loc['I_0', 'mean'], 0.48530, delta=0.1)
-        self.assertAlmostEqual(sfi_feat_imp_f1.loc['I_1', 'mean'], 0.78778, delta=0.1)
+        self.assertAlmostEqual(sfi_feat_imp_f1.loc['I_0', 'mean'], 0.48915, delta=0.1)
+        self.assertAlmostEqual(sfi_feat_imp_f1.loc['I_1', 'mean'], 0.78443, delta=0.1)
 
         #Cluster MDI  assertions
-        self.assertAlmostEqual(clustered_mdi.loc['R_0', 'mean'], 0.0218752, delta=0.1)
-        self.assertAlmostEqual(clustered_mdi.loc['I_0', 'mean'], 0.028433, delta=0.1)
+        self.assertAlmostEqual(clustered_mdi.loc['R_0', 'mean'], 0.01912, delta=0.1)
+        self.assertAlmostEqual(clustered_mdi.loc['I_0', 'mean'], 0.06575, delta=0.1)
 
         #Clustered MDA (log_loss) assertions
-        self.assertAlmostEqual(clustered_mda.loc['I_0', 'mean'], 0.169471, delta=0.1)
-        self.assertAlmostEqual(clustered_mda.loc['R_0', 'mean'], 0.136713, delta=0.1)
+        self.assertAlmostEqual(clustered_mda.loc['I_0', 'mean'], 0.04154, delta=0.1)
+        self.assertAlmostEqual(clustered_mda.loc['R_0', 'mean'], 0.02940, delta=0.1)
 
-        #Test if CFI with number of clusters same to number features is equal to MDA results
-        self.assertEqual(mda_feat_imp_log_loss.loc['I_1', 'mean'], mda_cfi_single.loc['I_1', 'mean'])
-        self.assertEqual(mda_feat_imp_log_loss.loc['R_0', 'mean'], mda_cfi_single.loc['R_0', 'mean'])
+        #Test if CFI with number of clusters same to number features is equal to normal MDI & MDA results
+        self.assertAlmostEqual(mdi_feat_imp.loc['I_1', 'mean'], mdi_cfi_single.loc['I_1', 'mean'], delta=0.1)
+        self.assertAlmostEqual(mdi_feat_imp.loc['R_0', 'mean'], mdi_cfi_single.loc['R_', 'mean'], delta=0.1)
+        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['I_1', 'mean'], mda_cfi_single.loc['I_1', 'mean'], delta=0.1)
+        self.assertAlmostEqual(mda_feat_imp_log_loss.loc['R_0', 'mean'], mda_cfi_single.loc['R_0', 'mean'], delta=0.1)
 
     def test_plot_feature_importance(self):
         """
