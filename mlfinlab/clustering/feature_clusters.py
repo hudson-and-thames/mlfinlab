@@ -140,5 +140,5 @@ def _check_for_low_silhouette_scores(X: pd.DataFrame, critical_threshold: int = 
         print(f'{len(low_silh_feat)} feature/s found with low silhouette score {low_silh_feat}. Returning the transformed dataset')
         #returning the transformed dataset
         return _cluster_transformation(X, clstrs, low_silh_feat)
-    print('There is no feature/s found with low silhouette score. All features belongs to its respective clusters')
+    print('No feature/s found with low silhouette score. All features belongs to its respective clusters')
     return X
