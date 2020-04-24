@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import cvxpy as cp
+import sys
 
 
 class OLPS:
@@ -116,6 +117,8 @@ class OLPS:
             # update weights
             self.weights = self.update_weight(time)
             self.all_weights[time + 1] = self.weights
+            self.print_progress(time, self.length_of_time, prefix='Progress:', suffix='Complete',
+                                  length=50)
 
         # remove final prediction because that information is stored in self.weights
         self.all_weights = self.all_weights[:-1]
@@ -299,3 +302,31 @@ class OLPS:
         # calculate new weight
         new_weight = np.maximum(weight - theta, 0)
         return new_weight
+
+    @staticmethod
+    def print_progress(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█'):
+        """
+        Call in a loop to create terminal progress bar.
+        https://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console
+
+        :param iteration: (int) current iteration.
+        :param total: (int) total iterations
+        :param prefix: (str) prefix string
+        :param suffix: (str) suffix string
+        :param decimals: (int) positive number of decimals in percent complete
+        :param length: (int) character length of bar
+        :param fill: (str) bar fill character
+        """
+        # add 1 to the iteration as we want 100% for completion
+        iteration += 1
+        # calculates the percent completed
+        percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+        # calculats length of bar
+        filledLength = int(length * iteration // total)
+        # creates bars to represent completion
+        bar = fill * filledLength + '-' * (length - filledLength)
+        # print statements
+        print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end="\r")
+        # print new line on complete
+        if iteration == total:
+            print()
