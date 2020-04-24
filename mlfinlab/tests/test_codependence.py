@@ -93,12 +93,12 @@ class TestCodependence(unittest.TestCase):
         abs_angl = get_distance_matrix(corr_matrix, distance_metric='abs_angular')
 
         #assertions
-        self.assertEqual(vi_matrix.shape[1], self.X_matrix.shape[0])
-        self.assertEqual(mi_matrix.shape[1], self.X_matrix.shape[0])
-        self.assertEqual(corr_matrix.shape[1], self.X_matrix.shape[0])
-        self.assertEqual(angl.shape[1], self.X_matrix.shape[0])
-        self.assertEqual(sq_angl.shape[1], self.X_matrix.shape[0])
-        self.assertEqual(abs_angl.shape[1], self.X_matrix.shape[0])
+        self.assertEqual(vi_matrix.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(mi_matrix.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(corr_matrix.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(angl.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(sq_angl.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(abs_angl.shape[0], self.X_matrix.shape[1])
 
     def test_value_error_raise(self):
         '''
