@@ -30,11 +30,56 @@ class TestFollowTheRegularizedLeader(TestCase):
 
     def test_ftrl_solution(self):
         """
-        Test the calculation of follow the leader
+        Test calculation of follow the regularized leader.
         """
-        # uses multiplicative update rule
+        # initialize FTRL
         ftrl = FollowTheRegularizedLeader(beta=0.2)
-        # resamples monthly
+        # allocates data
+        ftrl.allocate(self.data, resample_by='M')
+        all_weights = np.array(ftrl.all_weights)
+        for i in range(all_weights.shape[0]):
+            weights = all_weights[i]
+            assert (weights >= 0).all()
+            assert len(weights) == self.data.shape[1]
+            np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_beta_0_solution(self):
+        """
+        Test calculation of follow the regularized leader for beta value of 0.
+        """
+        # initialize FTRL
+        ftrl = FollowTheRegularizedLeader(beta=0)
+        # allocates data
+        ftrl.allocate(self.data, resample_by='M')
+        all_weights = np.array(ftrl.all_weights)
+        for i in range(all_weights.shape[0]):
+            weights = all_weights[i]
+            assert (weights >= 0).all()
+            assert len(weights) == self.data.shape[1]
+            np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_beta_1_solution(self):
+        """
+        Test calculation of follow the regularized leader for beta value of 1.
+        """
+        # initialize FTRL
+        ftrl = FollowTheRegularizedLeader(beta=1)
+        # allocates data
+        ftrl.allocate(self.data, resample_by='M')
+        all_weights = np.array(ftrl.all_weights)
+        for i in range(all_weights.shape[0]):
+            weights = all_weights[i]
+            assert (weights >= 0).all()
+            assert len(weights) == self.data.shape[1]
+            np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_beta_10_solution(self):
+        """
+        Test calculation of follow the regularized leader for beta value of 10.
+        """
+        # initialize FTRL
+        ftrl = FollowTheRegularizedLeader(beta=10)
+        # allocates data
         ftrl.allocate(self.data, resample_by='M')
         all_weights = np.array(ftrl.all_weights)
         for i in range(all_weights.shape[0]):

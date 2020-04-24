@@ -9,8 +9,7 @@ rm -fR cover/
 coverage erase
 
 # Discover and run all tests
-#coverage run --concurrency=multiprocessing ./scripts/run_tests.py discover -v
-coverage run --include={./mlfinlab/online_portfolio_selection/}
+coverage run --concurrency=multiprocessing ./scripts/run_tests.py discover -v
 
 coverage combine
 res_combine=$?

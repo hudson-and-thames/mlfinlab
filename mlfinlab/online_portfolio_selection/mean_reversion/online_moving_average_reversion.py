@@ -12,58 +12,42 @@ class OnlineMovingAverageReversion(OLPS):
     Online Moving Average Reversion reverts to the SMA or EMA of the underlying assets based on the given threshold.
     """
 
-    def __init__(self,
-                 reversion_method,
-                 epsilon,
-                 window=None,
-                 alpha=None):
-        """
-        :ivar epsilon: (float) reversion threshold >= 1
-        :ivar window: (int) number of windows to calculate Simple Moving Average
-        :ivar alpha: (float) ratio between 0 and 1 for Exponentially Weighted Average
-        :ivar reversion_method: (int) 1 for SMA, 2 for EWA
-        :ivar moving_average_reversion: (np.array) calculated moving average reversion to speed up online learning
-        """
-        self.epsilon = epsilon
-        self.window = window
-        self.alpha = alpha
-        self.reversion_method = reversion_method
-        self.moving_average_reversion = None
+    def __init__(self, reversion_method, epsilon, window=None, alpha=None):
+        self.epsilon = epsilon  # (float) reversion threshold >= 1
+        self.window = window  # (int) number of windows to calculate Simple Moving Average
+        self.alpha = alpha  # (float) ratio between 0 and 1 for Exponentially Weighted Average
+        self.reversion_method = reversion_method  # (int) 1 for SMA, 2 for EWA
+        self.moving_average_reversion = None  # (np.array) calculated moving average reversion to speed up online learning
         super().__init__()
 
     # intialize moving average reversion
-    def initialize(self,
-                   _asset_prices,
-                   _weights,
-                   _resample_by):
+    def initialize(self, asset_prices, weights, resample_by):
         """
         Initializes the important variables for the object
 
-        :param _asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
-        :param _weights: (list/np.array/pd.Dataframe) any initial weights that the user wants to use
-        :param _resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
+        :param weights: (list/np.array/pd.Dataframe) any initial weights that the user wants to use
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
-        :return: (None) Sets all the important information regarding the portfolio
         """
-        super(OnlineMovingAverageReversion, self).initialize(_asset_prices, _weights, _resample_by)
+        super(OnlineMovingAverageReversion, self).initialize(asset_prices, weights, resample_by)
 
         # pre-calculate moving_average_reversion to speed up
         self.moving_average_reversion = self.calculate_rolling_moving_average(self.asset_prices, self.window,
                                                                               self.reversion_method, self.alpha)
 
-    def update_weight(self,
-                      _time):
+    def update_weight(self, time):
         """
         Updates portfolio weights
 
-        :param _time: (int) current time period
+        :param time: (int) current time period
         :return (None) sets new weights to be the same as old weights
         """
         # return predetermined weights for time periods with no significant data
-        if self.reversion_method == 1 and _time < self.window or _time == 0:
+        if self.reversion_method == 1 and time < self.window or time == 0:
             return self.weights
         # get predicted change through SMA or EWA
-        predicted_change = self.moving_average_reversion[_time]
+        predicted_change = self.moving_average_reversion[time]
         # calculate the mean of the predicted change
         mean_relative = np.mean(predicted_change)
         # portfoliio weights of mean prediction
@@ -79,34 +63,6 @@ class OnlineMovingAverageReversion(OLPS):
         new_weights = self.weights + lambd * (predicted_change - mean_change)
         # project to simplex as most likely weights will not sum to 1
         return self.simplex_projection(new_weights)
-
-    @staticmethod
-    def simplex_projection(weight):
-        """
-        Calculates the simplex projection of the weights
-        https://stanford.edu/~jduchi/projects/DuchiShSiCh08.pdf
-
-        :param weight: (np.array) calculated weight to be projected onto the simplex domain
-        :return weights.value: (np.array) simplex projection of the original weight
-        """
-        # return itself if already a simplex projection
-        if np.sum(weight) == 1 and np.all(weight >= 0):
-            return weight
-        # sort descending
-        _mu = np.sort(weight)[::-1]
-        # adjusted sum
-        adjusted_sum = np.cumsum(_mu) - 1
-        # number
-        j = np.arange(len(weight)) + 1
-        # condition
-        cond = _mu - adjusted_sum / j > 0
-        # define max rho
-        rho = float(j[cond][-1])
-        # define theta
-        theta = adjusted_sum[cond][-1] / rho
-        # calculate new weight
-        new_weight = np.maximum(weight - theta, 0)
-        return new_weight
 
     @staticmethod
     def calculate_rolling_moving_average(_asset_prices,

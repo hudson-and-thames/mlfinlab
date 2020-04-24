@@ -138,9 +138,11 @@ class OLPS:
         Predicts the next time's portfolio weight.
 
         :param time: (int) current time period.
+        :return new_weights: (np.array) identical weights are returned for OLPS.
         """
         # weights do not change for this class
-        return self.all_weights[time]
+        new_weights = self.all_weights[time]
+        return new_weights
 
     def calculate_portfolio_returns(self, all_weights, relative_return):
         """
@@ -173,7 +175,7 @@ class OLPS:
 
         :param optimize_array: (np.array) relative returns of the assets for a given time period.
         :param solver: (cp.solver) set the solver to be a particular cvxpy solver.
-        :return weights.value: (np.array) weights that maximize the returns for the given optimize_array.
+        :return weights.value: (np.array) weights that maximize the returns for the given array.
         """
 
         # initialize weights for optimization problem
@@ -276,10 +278,6 @@ class OLPS:
         :param weight: (np.array) calculated weight to be projected onto the simplex domain
         :return weights.value: (np.array) simplex projection of the original weight
         """
-        # return itself if already a simplex projection
-        if np.sum(weight) == 1 and np.all(weight >= 0):
-            return weight
-
         # sort descending
         _mu = np.sort(weight)[::-1]
 

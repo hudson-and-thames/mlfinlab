@@ -10,7 +10,7 @@ from mlfinlab.online_portfolio_selection.momentum.exponential_gradient import Ex
 
 class TestExponentialGradient(TestCase):
     # pylint: disable=too-many-public-methods
-    # pylint: disable=E1136
+    # pylint: disable=unsubscriptable-object
     """
     Tests different functions of the Exponential Gradient class.
     """
@@ -30,10 +30,10 @@ class TestExponentialGradient(TestCase):
 
     def test_mu_solution(self):
         """
-        Test the calculation of exponential gradient weights with multiplicative update rule.
+        Test calculation of exponential gradient weights with multiplicative update rule.
         """
         # uses multiplicative update rule
-        multiplicative_update = ExponentialGradient(update_rule='MU')
+        multiplicative_update = ExponentialGradient(eta=0.05, update_rule='MU')
         # resamples monthly
         multiplicative_update.allocate(self.data, resample_by='M')
         all_weights = np.array(multiplicative_update.all_weights)
@@ -45,10 +45,10 @@ class TestExponentialGradient(TestCase):
 
     def test_gp_solution(self):
         """
-        Test the calculation of exponential gradient weights with gradient projection update rule.
+        Test calculation of exponential gradient weights with gradient projection update rule.
         """
         # uses gradient projection update rule
-        gradient_projection = ExponentialGradient(update_rule='GP')
+        gradient_projection = ExponentialGradient(eta=0.1, update_rule='GP')
         # resamples monthly
         gradient_projection.allocate(self.data, resample_by='M')
         all_weights = np.array(gradient_projection.all_weights)
@@ -60,10 +60,10 @@ class TestExponentialGradient(TestCase):
 
     def test_em_solution(self):
         """
-        Test the calculation of exponential gradient weights with expectation maximization update rule.
+        Test calculation of exponential gradient weights with expectation maximization update rule.
         """
         # uses expectation maximization update rule
-        expectation_maximization = ExponentialGradient(update_rule='EM')
+        expectation_maximization = ExponentialGradient(eta=0.2, update_rule='EM')
         # resamples monthly
         expectation_maximization.allocate(self.data, resample_by='M')
         all_weights = np.array(expectation_maximization.all_weights)

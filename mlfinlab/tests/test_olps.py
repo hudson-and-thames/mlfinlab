@@ -136,3 +136,13 @@ class TestOLPS(TestCase):
         normalized_weight = olps7.normalize(random_weight)
         # compare normalized value and manual calculation
         np.testing.assert_almost_equal(normalized_weight, random_weight / 3)
+
+    def test_simplex_projection(self):
+        """
+        Test simplex edge case of weight already satisfiying simplex requirements
+        """
+        olps8 = OLPS()
+        olps8.allocate(self.data)
+        weights = olps8.uniform_weight()
+        simplex_weights = olps8.simplex_projection(weights)
+        np.testing.assert_almost_equal(weights, simplex_weights)
