@@ -140,7 +140,7 @@ class TestFeatureImportance(unittest.TestCase):
 
         #Test if CFI with number of clusters same to number features is equal to normal MDI & MDA results
         self.assertAlmostEqual(mdi_feat_imp.loc['I_1', 'mean'], mdi_cfi_single.loc['I_1', 'mean'], delta=0.1)
-        self.assertAlmostEqual(mdi_feat_imp.loc['R_0', 'mean'], mdi_cfi_single.loc['R_', 'mean'], delta=0.1)
+        self.assertAlmostEqual(mdi_feat_imp.loc['R_0', 'mean'], mdi_cfi_single.loc['R_0', 'mean'], delta=0.1)
         self.assertAlmostEqual(mda_feat_imp_log_loss.loc['I_1', 'mean'], mda_cfi_single.loc['I_1', 'mean'], delta=0.1)
         self.assertAlmostEqual(mda_feat_imp_log_loss.loc['R_0', 'mean'], mda_cfi_single.loc['R_0', 'mean'], delta=0.1)
 
