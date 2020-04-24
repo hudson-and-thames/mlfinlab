@@ -7,3 +7,6 @@ test_reports
 docs/build/
 .local/
 cover/
+*.pickle
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
