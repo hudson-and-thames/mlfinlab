@@ -129,7 +129,7 @@ class TestOLPS(TestCase):
         # initialize OLPS
         olps7 = OLPS()
         # allocate data
-        OLPS.allocate(self.data)
+        olps7.allocate(self.data)
         # test normalization on random weight
         random_weight = np.ones(3)
         # use class method to normalize it
