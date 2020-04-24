@@ -101,7 +101,7 @@ class TestFeatureImportance(unittest.TestCase):
         #result will be same as MDA
         feature_subset_single = [[x] for x in self.X.columns]
 
-        mdi_cfi_single = mean_decrease_impurity(self.fit_clf, X.columns,
+        mdi_cfi_single = mean_decrease_impurity(self.fit_clf, self.X.columns,
                                                 clustered_subsets=feature_subset_single)
         mda_cfi_single = mean_decrease_accuracy(self.bag_clf, self.X, self.y, self.cv_gen,
                                                 clustered_subsets=feature_subset_single)
