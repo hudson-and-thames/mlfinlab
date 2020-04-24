@@ -447,14 +447,10 @@ def iter_5_jit(mu_2, p_1, m_1, m_2, m_3, m_4, m_5):
         mu_2_squared = a_1 - 3 * sigma_2 ** 2
 
         # Validity check 7: break to avoid complex numbers.
-
         # TODO Avoid Numba object mode.
         # Numba does not support numpy.iscomplex. This creates an overhead.
         with objmode(mu_2_squared_is_complex="boolean"):
-            if np.iscomplex(mu_2_squared):
-                mu_2_squared_is_complex = True
-            else:
-                mu_2_squared_is_complex = False
+            mu_2_squared_is_complex = bool(np.iscomplex(mu_2_squared))
         if mu_2_squared_is_complex or mu_2_squared < 0:
             break
 

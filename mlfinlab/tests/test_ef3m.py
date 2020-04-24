@@ -322,7 +322,7 @@ class TestM2NFit(unittest.TestCase):
 
 class TestM2NEF3M(unittest.TestCase):
     """
-    Tets the EF3M algorithms of the M2N module.
+    Tests the EF3M algorithms of the M2N module.
     """
 
     def test_ef3m_variant_1(self):
