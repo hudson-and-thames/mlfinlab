@@ -117,8 +117,7 @@ class OLPS:
             # update weights
             self.weights = self.update_weight(time)
             self.all_weights[time + 1] = self.weights
-            self.print_progress(time, self.length_of_time, prefix='Progress:', suffix='Complete',
-                                  length=50)
+            self.print_progress(time+1, prefix='Progress:', suffix='Complete')
 
         # remove final prediction because that information is stored in self.weights
         self.all_weights = self.all_weights[:-1]
@@ -303,30 +302,27 @@ class OLPS:
         new_weight = np.maximum(weight - theta, 0)
         return new_weight
 
-    @staticmethod
-    def print_progress(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█'):
+    def print_progress(self, iteration, prefix='', suffix='', decimals=1, bar_length=50):
         """
-        Call in a loop to create terminal progress bar.
-        https://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console
+        Call in a loop to create terminal progress bar
+        https://gist.github.com/aubricus/f91fb55dc6ba5557fbab06119420dd6a
 
         :param iteration: (int) current iteration.
-        :param total: (int) total iterations
         :param prefix: (str) prefix string
         :param suffix: (str) suffix string
         :param decimals: (int) positive number of decimals in percent complete
-        :param length: (int) character length of bar
-        :param fill: (str) bar fill character
+        :param bar_length: (int) character length of bar
         """
-        # add 1 to the iteration as we want 100% for completion
-        iteration += 1
+        str_format = "{0:." + str(decimals) + "f}"
         # calculates the percent completed
-        percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+        percents = str_format.format(100 * (iteration / float(self.length_of_time)))
         # calculats length of bar
-        filledLength = int(length * iteration // total)
+        filled_length = int(round(bar_length * iteration / float(self.length_of_time)))
         # creates bars to represent completion
-        bar = fill * filledLength + '-' * (length - filledLength)
-        # print statements
-        print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end="\r")
+        bar = '█' * filled_length + '-' * (bar_length - filled_length)
         # print new line on complete
-        if iteration == total:
-            print()
+        sys.stdout.write('\r%s |%s| %s%s %s' % (prefix, bar, percents, '%', suffix)),
+
+        if iteration == self.length_of_time:
+            sys.stdout.write('\n')
+        sys.stdout.flush()

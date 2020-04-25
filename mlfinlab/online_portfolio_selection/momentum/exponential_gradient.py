@@ -14,13 +14,13 @@ class ExponentialGradient(OLPS):
     keeping previous portfolio information by using a regularization term.
     """
 
-    def __init__(self, eta, update_rule):
+    def __init__(self, update_rule, eta=0.05):
         """
         Initializes with the designated update rule and eta, the learning rate.
 
-        :param eta: (float) learning rate.
         :param update_rule: (str) 'MU': Multiplicative Update, 'GP': Gradient Projection,
                                   'EM': Expectation Maximization.
+        :param eta: (float) learning rate.
         """
         super().__init__()
         self.eta = eta
