@@ -1,5 +1,5 @@
-# pylint: disable=missing-module-docstring
-import cvxpy as cp
+import numpy as np
+import scipy.optimize as opt
 from mlfinlab.online_portfolio_selection import FollowTheLeader
 
 
@@ -23,22 +23,27 @@ class FollowTheRegularizedLeader(FollowTheLeader):
         super(FollowTheRegularizedLeader, self).__init__()
         self.beta = beta
 
-    def optimize(self, optimize_array, solver=cp.SCS):
+    def fast_optimize(self, optimize_array):
         """
-        Calculates weights that maximize returns over a given optimize_array.
+        Calculates weights that maximize returns over the given array.
 
         :param optimize_array: (np.array) relative returns of the assets for a given time period.
-        :param solver: (cp.SOLVER) set the solver to be a particular cvxpy solver.
-        :return weights.value: (np.array) weights that maximize the returns for the given array.
+        :return: problem.x: (np.array) weights that maximize the returns for the given array.
         """
-        weights = cp.Variable(self.number_of_assets)
-        # added additional l2 regularization term for the weights for calculation
-        returns = cp.sum(cp.log(optimize_array * weights)) - self.beta * cp.norm(weights) / 2
+        # initial guess
+        weights = self.uniform_weight()
 
-        # optimization objective and constraints
-        allocation_objective = cp.Maximize(returns)
-        allocation_constraints = [cp.sum(weights) == 1, cp.min(weights) >= 0]
-        # define and solve the problem
-        problem = cp.Problem(objective=allocation_objective, constraints=allocation_constraints)
-        problem.solve(warm_start=True, solver=solver)
-        return weights.value
+        # use np.log and np.sum to make the cost function a convex function
+        # multiplying continuous returns equates to summing over the log returns
+        # added additional l2 regularization term for the weights for calculation
+        def objective(weight):
+            return -np.sum(np.log(np.dot(optimize_array, weight))) + self.beta * np.linalg.norm(weight) / 2
+
+        # weight bounds
+        bounds = tuple((0.0, 1.0) for asset in range(self.number_of_assets))
+
+        # sum of weights = 1
+        const = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
+
+        problem = opt.minimize(objective, weights, method='SLSQP', bounds=bounds, constraints=const)
+        return problem.x

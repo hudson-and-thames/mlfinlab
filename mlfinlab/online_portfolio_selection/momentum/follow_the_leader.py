@@ -1,5 +1,6 @@
 # pylint: disable=missing-module-docstring
-import cvxpy as cp
+import numpy as np
+import scipy.optimize as opt
 from mlfinlab.online_portfolio_selection import OLPS
 
 
@@ -26,5 +27,29 @@ class FollowTheLeader(OLPS):
         if time == 0:
             return self.weights
         # calculates bcrp weights until the last window
-        new_weights = self.optimize(self.relative_return[:time+1], solver=cp.SCS)
+        new_weights = self.fast_optimize(self.relative_return[:time+1])
         return new_weights
+
+    def fast_optimize(self, optimize_array):
+        """
+        Calculates weights that maximize returns over the given array.
+
+        :param optimize_array: (np.array) relative returns of the assets for a given time period.
+        :return: problem.x: (np.array) weights that maximize the returns for the given array.
+        """
+        # initial guess
+        weights = self.uniform_weight()
+
+        # use np.log and np.sum to make the cost function a convex function
+        # multiplying continuous returns equates to summing over the log returns
+        def objective(weight):
+            return -np.sum(np.log(np.dot(optimize_array, weight)))
+
+        # weight bounds
+        bounds = tuple((0.0, 1.0) for asset in range(self.number_of_assets))
+
+        # sum of weights = 1
+        const = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
+
+        problem = opt.minimize(objective, weights, method='SLSQP', bounds=bounds, constraints=const)
+        return problem.x

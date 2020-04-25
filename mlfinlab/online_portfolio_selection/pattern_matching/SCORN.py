@@ -10,6 +10,7 @@ class SCORN(CORN):
     """
     This class implements the Symmetric Correlation Driven Nonparametric Learning strategy.
     """
+
     # check -1 <= rho <= 1
     # check window >= 1
 
@@ -41,8 +42,10 @@ class SCORN(CORN):
     def optimize(self, _optimize_array, _activation_fn):
         # initial guess
         weights = self.uniform_weight(self.number_of_assets)
+
         def objective(_weights):
             return -np.dot(_activation_fn, np.log(np.dot(_optimize_array, _weights)))
+
         # weight bounds
         bounds = tuple((0.0, 1.0) for asset in range(self.number_of_assets))
         # sum of weights = 1
@@ -51,12 +54,14 @@ class SCORN(CORN):
         problem = opt.minimize(objective, weights, method='SLSQP', bounds=bounds, constraints=const)
         return problem.x
 
+
 def main():
     """
 
     :return:
     """
-    stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
+    stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True,
+                              index_col='Date')
     stock_price = stock_price.dropna(axis=1)
     scorn = SCORN(window=5, rho=0.2)
     scorn.allocate(stock_price)
