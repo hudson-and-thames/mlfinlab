@@ -1,5 +1,5 @@
 """
-Tests Constant Rebalanced Portfolio (ConstantRebalancedPortfolio)
+Tests Constant Rebalanced Portfolio.
 """
 from unittest import TestCase
 import os
@@ -17,30 +17,28 @@ class TestConstantRebalancedPortfolio(TestCase):
 
     def setUp(self):
         """
-        Set the file path for the tick data csv.
+        Sets the file path for the tick data csv.
         """
-        # sets project path to current directory
+        # Set project path to current directory.
         project_path = os.path.dirname(__file__)
-        # adds new data path to match stock_prices.csv data
+        # Add new data path to match stock_prices.csv data.
         data_path = project_path + '/test_data/stock_prices.csv'
-        # read_csv and parse dates
-        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
-        # dropna
-        self.data = self.data.dropna(axis=1)
+        # Read csv, parse dates, and drop NaN.
+        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date").dropna(axis=1)
 
     def test_default_crp_solution(self):
         """
-        Test the calculation of constant rebalanced portfolio weights with default settings.
+        Tests the calculation of CRP weights with default settings.
         """
-        # initialize CRP
+        # Initialize CRP.
         crp = ConstantRebalancedPortfolio()
-        # allocates self.data to CRP and resamble by month for speed
+        # Allocates asset prices to CRP.
         crp.allocate(self.data, resample_by='M')
-        # create np.array of all_weights
+        # Create np.array of all_weights.
         all_weights = np.array(crp.all_weights)
-        # all weights have to be the same so make a default weight called one_weight
+        # All weights for the strategy have to be the same.
         one_weight = all_weights[0]
-        # iterate through all to check weights equal original weight
+        # Iterate through all_weights to check that weights equal to the first weight.
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]
             assert (weights >= 0).all()
@@ -50,20 +48,21 @@ class TestConstantRebalancedPortfolio(TestCase):
 
     def test_given_weights_crp_solution(self):
         """
-        Test the calculation of constant rebalanced portfolio weights with weights given initially.
+        Tests the calculation of constant rebalanced portfolio weights with weights given initially.
         """
-        # create user input weights that place 1 on the first stock and 0 on the rest
+        # Create user input weights
         weights = np.zeros(self.data.shape[1])
+        # Set 1 on the first stock and 0 on the rest.
         weights[0] = 1
-        # initialize CRP
+        # Initialize CRP.
         crp = ConstantRebalancedPortfolio(weights)
-        # allocates self.data to CRP and resamble by month for speed
+        # Allocates asset prices to CRP.
         crp.allocate(self.data, resample_by='M')
-        # create np.array of all_weights
+        # Create np.array of all_weights.
         all_weights = np.array(crp.all_weights)
-        # all weights have to be the same so make a default weight called one_weight
+        # All weights for the strategy have to be the same.
         one_weight = all_weights[0]
-        # iterate through all to check weights equal original weight
+        # Iterate through all_weights to check that weights equal to the first weight.
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]
             assert (weights >= 0).all()
@@ -75,18 +74,19 @@ class TestConstantRebalancedPortfolio(TestCase):
         """
         Test calculation of constant rebalanced portfolio weights with weights given in allocate.
         """
-        # create user input weights that place 1 on the first stock and 0 on the rest
+        # Create user input weights
         weights = np.zeros(self.data.shape[1])
+        # Set 1 on the first stock and 0 on the rest.
         weights[0] = 1
-        # initialize CRP
+        # Initialize CRP.
         crp = ConstantRebalancedPortfolio()
-        # allocates self.data to CRP and resamble by month for speed
+        # Allocates asset prices to CRP.
         crp.allocate(self.data, weights, resample_by='M')
-        # create np.array of all_weights
+        # Create np.array of all_weights.
         all_weights = np.array(crp.all_weights)
-        # all weights have to be the same so make a default weight called one_weight
+        # All weights for the strategy have to be the same.
         one_weight = all_weights[0]
-        # iterate through all to check weights equal original weight
+        # Iterate through all_weights to check that weights equal to the first weight.
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]
             assert (weights >= 0).all()

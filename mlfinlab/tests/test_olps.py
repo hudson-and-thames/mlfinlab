@@ -1,5 +1,5 @@
 """
-Tests Online Portfolio Selection (OLPS).
+Tests Online Portfolio Selection.
 """
 
 from unittest import TestCase
@@ -13,33 +13,31 @@ class TestOLPS(TestCase):
     # pylint: disable=too-many-public-methods
     # pylint: disable=unsubscriptable-object
     """
-    Test different functions of the OLPS class.
+    Tests different functions of the OLPS class.
     """
 
     def setUp(self):
         """
-        Set the file path for the tick data csv.
+        Sets the file path for the tick data csv.
         """
-        # sets project path to current directory
+        # Set project path to current directory.
         project_path = os.path.dirname(__file__)
-        # adds new data path to match stock_prices.csv data
+        # Add new data path to match stock_prices.csv data.
         data_path = project_path + '/test_data/stock_prices.csv'
-        # read_csv and parse dates
-        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
-        # dropna
-        self.data = self.data.dropna(axis=1)
+        # Read csv, parse dates, and drop NaN.
+        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date").dropna(axis=1)
 
     def test_olps_solution(self):
         """
-        Test the calculation of OLPS weights and ensure that weights sum to 1.
+        Test the calculation of OLPS weights.
         """
-        # initialize OLPS
+        # Initialize OLPS.
         olps = OLPS()
-        # allocates self.data to OLPS
+        # Allocates asset prices to OLPS.
         olps.allocate(self.data)
-        # create np.array of all_weights
+        # Create np.array of all_weights.
         all_weights = np.array(olps.all_weights)
-        # checks if all weights sum to 1
+        # Check if all weights sum to 1.
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]
             assert (weights >= 0).all()
@@ -48,61 +46,63 @@ class TestOLPS(TestCase):
 
     def test_olps_weight_mismatch(self):
         """
-        Test that the user inputted weights have matching dimensions as the data's.
+        Tests that the user inputted weights have matching dimensions as the data's dimensions.
         """
-        # initialize OLPS
+        # Initialize OLPS.
         olps1 = OLPS()
-        # weight length of 1 does not match data.shape[1]
+        # Raise error if weight does not match data.shape[1].
         with self.assertRaises(ValueError):
             olps1.allocate(self.data, weights=[1])
 
     def test_olps_weight_incorrect_sum(self):
         """
-        Test ValueError if the user inputted weights do not sum to one.
+        Tests ValueError if the user inputted weights do not sum to one.
         """
         with self.assertRaises(AssertionError):
-            # initialize OLPS
+            # Initialize OLPS.
             olps2 = OLPS()
-            # weights that sum to 0.4+0.4=0.8
+            # Initialize weights that do not sum to 1.
             weight = np.zeros(self.data.shape[1])
             weight[0], weight[1] = 0.4, 0.4
+            # Running allocate will raise ValueError.
             olps2.allocate(self.data, weight)
 
     def test_olps_incorrect_data(self):
         """
-        Test ValueError if the user inputted data is not a dataframe.
+        Tests ValueError if the user inputted data is not a dataframe.
         """
         with self.assertRaises(ValueError):
-            # initialize OLPS
+            # Initialize OLPS.
             olps3 = OLPS()
-            # wrong data format
+            # Running alloate will raise ValueError.
             olps3.allocate(self.data.values)
 
     def test_olps_index_error(self):
         """
-        Test ValueError if the passing dataframe is not indexed by date.
+        Tests ValueError if the passing dataframe is not indexed by date.
         """
-        # initialize OLPS
+        # Initialize OLPS.
         olps4 = OLPS()
-        # index resetted
+        # Reset index.
         data = self.data.reset_index()
         with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
             olps4.allocate(data)
 
     def test_user_weight(self):
         """
-        Test that OLPS works if the user inputs their own weight.
+        Tests that users can input their own weights for OLPS.
         """
-        # user weight
+        # Initialize user inputted weights.
         weight = np.zeros(self.data.shape[1])
         weight[0] = 1
-        # initialize OLPS
+        # Initialize OLPS.
         olps5 = OLPS()
-        # allocates self.data to OLPS
+        # Allocates asset prices to OLPS.
         olps5.allocate(self.data, weights=weight)
-        # create np.array of all_weights
+        # Create np.array of all_weights.
         all_weights = np.array(olps5.all_weights)
-        # checks if all weights sum to 1
+        # Check if all weights sum to 1.
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]
             assert (weights >= 0).all()
@@ -111,38 +111,43 @@ class TestOLPS(TestCase):
 
     def test_uniform_weight(self):
         """
-        Test that uniform weights return equal allocation of weights.
+        Tests that uniform weights return equal allocation of weights.
         """
-        # initialize OLPS
+        # Initialize OLPS.
         olps6 = OLPS()
-        # allocate data
+        # Allocates asset prices to OLPS.
         olps6.allocate(self.data)
-        # calculate uniform weight
+        # Calculate uniform weights.
         olps6_uni_weight = olps6.uniform_weight()
-        # two weights should be equal
+        # Calculated weights should be equal.
         np.testing.assert_almost_equal(olps6_uni_weight, np.array(olps6.all_weights)[0])
 
     def test_normalize(self):
         """
-        Test that weights sum to 1.
+        Tests that weights sum to 1.
         """
-        # initialize OLPS
+        # Initialize OLPS.
         olps7 = OLPS()
-        # allocate data
+        # Allocates asset prices to OLPS.
         olps7.allocate(self.data)
-        # test normalization on random weight
+        # Test normalization on a random weight.
         random_weight = np.ones(3)
-        # use class method to normalize it
+        # Use method to normalize random_weight.
         normalized_weight = olps7.normalize(random_weight)
-        # compare normalized value and manual calculation
+        # Compare normalized value and manually calculated value.
         np.testing.assert_almost_equal(normalized_weight, random_weight / 3)
 
     def test_simplex_projection(self):
         """
-        Test simplex edge case of weight already satisfiying simplex requirements
+        Tests edge cases where the inputted weights already satisfy the simplex requirements.
         """
+        # Initialize OLPS.
         olps8 = OLPS()
+        # Allocates asset prices to OLPS.
         olps8.allocate(self.data)
+        # Initialize uniform weights.
         weights = olps8.uniform_weight()
+        # Project uniform weights to simplex domain.
         simplex_weights = olps8.simplex_projection(weights)
+        # The two weights should be the same value.
         np.testing.assert_almost_equal(weights, simplex_weights)

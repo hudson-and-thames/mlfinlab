@@ -1,5 +1,5 @@
 """
-Tests Best Constant Rebalanced Portfolio (BestConstantRebalancedPortfolio)
+Tests Best Constant Rebalanced Portfolio.
 """
 from unittest import TestCase
 import os
@@ -12,35 +12,33 @@ class TestBestConstantRebalancedPortfolio(TestCase):
     # pylint: disable=too-many-public-methods
     # pylint: disable=unsubscriptable-object
     """
-    Tests different functions of the BestConstantRebalancedPortfolio class.
+    Tests different functions of the Best Constant Rebalanced Portfolio class.
     """
 
     def setUp(self):
         """
-        Set the file path for the tick data csv.
+        Sets the file path for the tick data csv.
         """
-        # sets project path to current directory
+        # Set project path to current directory.
         project_path = os.path.dirname(__file__)
-        # adds new data path to match stock_prices.csv data
+        # Add new data path to match stock_prices.csv data.
         data_path = project_path + '/test_data/stock_prices.csv'
-        # read_csv and parse dates
-        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
-        # dropna
-        self.data = self.data.dropna(axis=1)
+        # Read csv, parse dates, and drop NaN.
+        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date").dropna(axis=1)
 
     def test_bcrp_solution(self):
         """
-        Test the calculation of best constant rebalanced portfolio weights.
+        Tests the calculation of best constant rebalanced portfolio weights.
         """
-        # initialize BCRP
+        # Initialize BCRP.
         bcrp = BestConstantRebalancedPortfolio()
-        # allocates self.data to BCRP, resample by months for speed
+        # Allocates asset prices to BCRP.
         bcrp.allocate(self.data, resample_by='M')
-        # create np.array of all_weights
+        # Create np.array of all_weights.
         all_weights = np.array(bcrp.all_weights)
-        # all weights have to be the same so make a default weight called one_weight
+        # All weights for the strategy have to be the same.
         one_weight = all_weights[0]
-        # iterate through all to check weights equal original weight
+        # iterate through all_weights to check that weights equal to the first weight.
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]
             assert (weights >= 0).all()
@@ -50,20 +48,20 @@ class TestBestConstantRebalancedPortfolio(TestCase):
 
     def test_bcrp_returns(self):
         """
-        Test that BCRP returns are higher than other CRP's.
+        Tests that BCRP returns are higher than other CRP's.
         """
-        # initialize BCRP
+        # Initialize BCRP
         bcrp1 = BestConstantRebalancedPortfolio()
-        # allocates self.data to BCRP, resample by months for speed
+        # Allocates asset prices to BCRP.
         bcrp1.allocate(self.data, resample_by='M')
-        # get the final returns for bcrp1
+        # Get final returns for bcrp1.
         bcrp1_returns = np.array(bcrp1.portfolio_return)[-1]
-        # set an arbitray weight
+        # Set an arbitray weight to test.
         weight = bcrp1.uniform_weight()
-        # initialize CRP
+        # Initialize CRP.
         crp = ConstantRebalancedPortfolio(weight)
         crp.allocate(self.data, resample_by='M')
-        # get the final returns for crp
+        # Get final returns for CRP.
         crp_returns = np.array(crp.portfolio_return)[-1]
-        # check that crp returns are lower than bcrp returns
+        # Check that CRP returns are lower than BCRP returns.
         np.testing.assert_array_less(crp_returns, bcrp1_returns)
