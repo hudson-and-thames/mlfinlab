@@ -27,33 +27,41 @@ class UP(OLPS):
         self.weights_on_experts = None
         super(UP, self).__init__()
 
-    def initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
-        # initialize the same variables as OLPS
-        super(UP, self).initialize(_asset_prices, _weights, _portfolio_start, _resample_by)
+    def initialize(self, asset_prices, weights, resample_by):
+        """
+        Initializes the important variables for the object.
 
-        # generate all experts
+        :param asset_prices: (pd.DataFrame) Historical asset prices.
+        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :param resample_by: (str) Specifies how to resample the prices.
+        """
+        # Initialize the same variables as OLPS.
+        super(UP, self).initialize(asset_prices, weights, resample_by)
+
+        # Generate all experts.
         self.generate_experts()
 
-        # set experts portfolio returns and weights
-        self.expert_portfolio_returns = np.zeros((self.final_number_of_time, self.number_of_experts))
-        self.expert_all_weights = np.zeros((self.number_of_experts, self.final_number_of_time, self.number_of_assets))
+        # Set experts portfolio returns and weights.
+        self.expert_portfolio_returns = np.zeros((self.length_of_time, self.number_of_experts))
+        self.expert_all_weights = np.zeros((self.number_of_experts, self.length_of_time, self.number_of_assets))
+        self.weights = np.zeros((self.number_of_experts, self.number_of_assets))
 
-    def run(self, _weights, _relative_return):
+    def run(self, weights):
         """
-        Runs all experts by iterating through the initiated array
+        Runs the algorithm by iterating through the given data.
 
-        :param _weights:
-        :param _relative_return:
-        :return:
+        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
         """
-        # run allocate on all the experts
+        # Run allocate on all the experts.
         for exp in range(self.number_of_experts):
-            # allocate to each experts
+            # Allocate to each experts.
             self.experts[exp].allocate(self.asset_prices)
-            # stack the weights
+            # Stack the weights.
             self.expert_all_weights[exp] = self.experts[exp].all_weights
-            # stack the portfolio returns
+            # Stack the portfolio returns.
             self.expert_portfolio_returns[:, [exp]] = self.experts[exp].portfolio_return
+            # Stack final weights.
+            self.weights[exp] = self.experts[exp].weights
 
         self.calculate_weights_on_experts()
         # uniform weight distribution for wealth between managers

@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 from mlfinlab.online_portfolio_selection.pattern_matching.CORN import CORN
-from mlfinlab.online_portfolio_selection.UP import UP
+from mlfinlab.online_portfolio_selection.UniversalPortfolio import UP
 
 
 class CORN_K(UP):

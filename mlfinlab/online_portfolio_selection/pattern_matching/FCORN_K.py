@@ -1,7 +1,7 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.UP import UP
+from mlfinlab.online_portfolio_selection.UniversalPortfolio import UP
 from mlfinlab.online_portfolio_selection.pattern_matching.FCORN import FCORN
 
 
