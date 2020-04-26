@@ -57,7 +57,7 @@ class TestBestConstantRebalancedPortfolio(TestCase):
         # Get final returns for bcrp1.
         bcrp1_returns = np.array(bcrp1.portfolio_return)[-1]
         # Set an arbitray weight to test.
-        weight = bcrp1.uniform_weight()
+        weight = bcrp1._uniform_weight()
         # Initialize CRP.
         crp = ConstantRebalancedPortfolio(weight)
         crp.allocate(self.data, resample_by='M')

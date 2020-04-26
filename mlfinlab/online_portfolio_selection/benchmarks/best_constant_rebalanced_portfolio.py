@@ -14,7 +14,7 @@ class BestConstantRebalancedPortfolio(OLPS):
     given time period. This strategy is implemented in hindsight and is not predictive.
     """
 
-    def first_weight(self, weights):
+    def _first_weight(self, weights):
         """
         Returns the first weight of the given portfolio to be the Best Constant Rebalanced Portfolio
         in hindsight.
@@ -23,5 +23,5 @@ class BestConstantRebalancedPortfolio(OLPS):
         :return new_weights: (np.array) Weights that maximize the returns.
         """
         # Use cp.SCS solver to speed up calculations.
-        new_weights = self.optimize(self.relative_return, solver=cp.SCS)
+        new_weights = self._optimize(self.relative_return, solver=cp.SCS)
         return new_weights
