@@ -8,6 +8,8 @@ from mlfinlab.cross_validation.cross_validation import (
     PurgedKFold
 )
 
+from mlfinlab.cross_validation.combinatorial import CombinatorialPurgedKFold
+
 __all__ = [
     'ml_get_train_times',
     'ml_cross_val_score',
