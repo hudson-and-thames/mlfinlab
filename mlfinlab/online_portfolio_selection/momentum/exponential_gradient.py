@@ -45,7 +45,8 @@ class ExponentialGradient(OLPS):
 
         # Gradient projection.
         elif self.update_rule == 'GP':
-            new_weight = self.weights + self.eta * (relative_return - np.ones(self.number_of_assets) * np.mean(relative_return) / dot_product)
+            new_weight = self.weights + self.eta * (relative_return - np.ones(self.number_of_assets)
+                                                    * np.mean(relative_return) / dot_product)
 
         # Expectation maximization.
         elif self.update_rule == 'EM':

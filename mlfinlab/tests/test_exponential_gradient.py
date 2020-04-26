@@ -1,5 +1,5 @@
 """
-Tests Exponential Gradient (ExponentialGradient).
+Tests Exponential Gradient.
 """
 from unittest import TestCase
 import os
@@ -17,24 +17,22 @@ class TestExponentialGradient(TestCase):
 
     def setUp(self):
         """
-        Set the file path for the tick data csv.
+        Sets the file path for the tick data csv.
         """
-        # sets project path to current directory
+        # Set project path to current directory.
         project_path = os.path.dirname(__file__)
-        # adds new data path to match stock_prices.csv data
+        # Add new data path to match stock_prices.csv data.
         data_path = project_path + '/test_data/stock_prices.csv'
-        # read_csv and parse dates
-        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
-        # dropna
-        self.data = self.data.dropna(axis=1)
+        # Read csv, parse dates, and drop NaN.
+        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date").dropna(axis=1)
 
     def test_mu_solution(self):
         """
         Test calculation of exponential gradient weights with multiplicative update rule.
         """
-        # uses multiplicative update rule
+        # Use multiplicative update rule.
         multiplicative_update = ExponentialGradient(eta=0.05, update_rule='MU')
-        # resamples monthly
+        # Allocates asset prices to MU.
         multiplicative_update.allocate(self.data, resample_by='M')
         all_weights = np.array(multiplicative_update.all_weights)
         for i in range(all_weights.shape[0]):
@@ -47,9 +45,9 @@ class TestExponentialGradient(TestCase):
         """
         Test calculation of exponential gradient weights with gradient projection update rule.
         """
-        # uses gradient projection update rule
+        # Use gradient projection update rule.
         gradient_projection = ExponentialGradient(eta=0.1, update_rule='GP')
-        # resamples monthly
+        # Allocates asset prices to GP.
         gradient_projection.allocate(self.data, resample_by='M')
         all_weights = np.array(gradient_projection.all_weights)
         for i in range(all_weights.shape[0]):
@@ -62,9 +60,9 @@ class TestExponentialGradient(TestCase):
         """
         Test calculation of exponential gradient weights with expectation maximization update rule.
         """
-        # uses expectation maximization update rule
+        # Use expectation maximization update rule.
         expectation_maximization = ExponentialGradient(eta=0.2, update_rule='EM')
-        # resamples monthly
+        # Allocates asset prices to EM.
         expectation_maximization.allocate(self.data, resample_by='M')
         all_weights = np.array(expectation_maximization.all_weights)
         for i in range(all_weights.shape[0]):

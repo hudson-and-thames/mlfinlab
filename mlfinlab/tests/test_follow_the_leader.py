@@ -1,5 +1,5 @@
 """
-Tests Follow the Leader (FollowTheLeader).
+Tests Follow the Leader.
 """
 from unittest import TestCase
 import os
@@ -11,30 +11,29 @@ from mlfinlab.online_portfolio_selection.momentum.follow_the_leader import Follo
 class TestFollowTheLeader(TestCase):
     # pylint: disable=too-many-public-methods
     # pylint: disable=unsubscriptable-object
+    # pylint: disable=protected-access
     """
     Tests different functions of the Follow the Leader class.
     """
 
     def setUp(self):
         """
-        Set the file path for the tick data csv.
+        Sets the file path for the tick data csv.
         """
-        # sets project path to current directory
+        # Set project path to current directory.
         project_path = os.path.dirname(__file__)
-        # adds new data path to match stock_prices.csv data
+        # Add new data path to match stock_prices.csv data.
         data_path = project_path + '/test_data/stock_prices.csv'
-        # read_csv and parse dates
-        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
-        # dropna
-        self.data = self.data.dropna(axis=1)
+        # Read csv, parse dates, and drop NaN.
+        self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date").dropna(axis=1)
 
     def test_ftl_solution(self):
         """
-        Test the calculation of follow the leader
+        Test the calculation of follow the leader.
         """
-        # initialize FTL
+        # Initialize FTL.
         ftl = FollowTheLeader()
-        # allocates data
+        # Allocate asset prices to FTL.
         ftl.allocate(self.data, resample_by='M')
         all_weights = np.array(ftl.all_weights)
         for i in range(all_weights.shape[0]):
@@ -47,11 +46,12 @@ class TestFollowTheLeader(TestCase):
         """
         Tests that the weights calculated for the first time period is uniform.
         """
-        # initialize FTL
+        # Initialize FTL.
         ftl1 = FollowTheLeader()
+        # Allocate asset prices to FTL.
         ftl1.allocate(self.data, resample_by='M')
         all_weights = np.array(ftl1.all_weights)
-        # uniform weights
+        # Get uniform weights.
         uniform_weight = ftl1._uniform_weight()
-        # compare first weight and uniform weights
+        # Compare the first weight to uniform weights.
         np.testing.assert_almost_equal(uniform_weight, all_weights[0])
