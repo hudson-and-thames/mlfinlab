@@ -45,13 +45,13 @@ class OLPS:
         :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
         :param resample_by: (str) Specifies how to resample the prices.
         """
-        # Checks to ensure inputs are correct.
+        # Check to ensure inputs are correct.
         self.check_asset(asset_prices, weights)
 
-        # Initializes all variables.
+        # Initialize all variables.
         self.initialize(asset_prices, weights, resample_by)
 
-        # Tterates through data and calculates weights.
+        # Itterate through data and calculate weights.
         self.run(weights)
 
         # Round weights and drop values that are less than the given threshold.
@@ -60,7 +60,7 @@ class OLPS:
         # Calculate portfolio returns based on weights calculated from the run method.
         self.calculate_portfolio_returns(self.all_weights, self.relative_return)
 
-        # Converts everything to dataframe to make the information presentable.
+        # Convert everything to dataframe to make the information presentable.
         self.conversion()
 
     def initialize(self, asset_prices, weights, resample_by):
@@ -116,9 +116,10 @@ class OLPS:
 
         # Run the algorithm for the rest of data from time 1.
         for time in range(self.length_of_time):
-            # update weights
+            # Update weights.
             self.weights = self.update_weight(time)
             self.all_weights[time + 1] = self.weights
+            # Print progress bar.
             self.print_progress(time+1, prefix='Progress:', suffix='Complete')
 
         # Remove final prediction as that information is stored in self.weights.
@@ -164,10 +165,10 @@ class OLPS:
         """
         Converts the given np.array to pd.Dataframe.
         """
-        # Converts all_weights.
+        # Convert all_weights.
         self.all_weights = pd.DataFrame(self.all_weights, index=self.time, columns=self.asset_name)
 
-        # Converts portfolio_return.
+        # Convert portfolio_return.
         self.portfolio_return = pd.DataFrame(self.portfolio_return, index=self.time, columns=["Returns"])
 
     def optimize(self, optimize_array, solver=cp.SCS):
