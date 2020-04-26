@@ -28,10 +28,10 @@ class FollowTheLeader(OLPS):
         if time == 0:
             return self.weights
         # Calculate BCRP weights until the current window.
-        new_weights = self.fast_optimize(self.relative_return[:time+1])
+        new_weights = self._fast_optimize(self.relative_return[:time + 1])
         return new_weights
 
-    def fast_optimize(self, optimize_array):
+    def _fast_optimize(self, optimize_array):
         """
         Calculates weights that maximize returns over the given array.
 
@@ -43,7 +43,7 @@ class FollowTheLeader(OLPS):
 
         # Use np.log and np.sum to make the cost function a convex function.
         # Multiplying continuous returns equates to summing over the log returns.
-        def objective(weight):
+        def _objective(weight):
             return -np.sum(np.log(np.dot(optimize_array, weight)))
 
         # Weight bounds.
@@ -52,5 +52,5 @@ class FollowTheLeader(OLPS):
         # Sum of weights is 1.
         const = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
 
-        problem = opt.minimize(objective, weights, method='SLSQP', bounds=bounds, constraints=const)
+        problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds, constraints=const)
         return problem.x

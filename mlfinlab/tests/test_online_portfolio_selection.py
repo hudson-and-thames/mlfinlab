@@ -12,6 +12,7 @@ from mlfinlab.online_portfolio_selection import OLPS
 class TestOLPS(TestCase):
     # pylint: disable=too-many-public-methods
     # pylint: disable=unsubscriptable-object
+    # pylint: disable=protected-access
     """
     Tests different functions of the OLPS class.
     """

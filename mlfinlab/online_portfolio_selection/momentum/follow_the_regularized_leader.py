@@ -23,7 +23,7 @@ class FollowTheRegularizedLeader(FollowTheLeader):
         super(FollowTheRegularizedLeader, self).__init__()
         self.beta = beta
 
-    def fast_optimize(self, optimize_array):
+    def _fast_optimize(self, optimize_array):
         """
         Calculates weights that maximize returns over the given array.
 
@@ -36,7 +36,7 @@ class FollowTheRegularizedLeader(FollowTheLeader):
         # Use np.log and np.sum to make the cost function a convex function.
         # Multiplying continuous returns equates to summing over the log returns.
         # Add additional l2 regularization term for the weights for calculation.
-        def objective(weight):
+        def _objective(weight):
             return -np.sum(np.log(np.dot(optimize_array, weight))) + self.beta * np.linalg.norm(weight) / 2
 
         # Weight bounds.
@@ -45,5 +45,5 @@ class FollowTheRegularizedLeader(FollowTheLeader):
         # Sum of weights is 1.
         const = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
 
-        problem = opt.minimize(objective, weights, method='SLSQP', bounds=bounds, constraints=const)
+        problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds, constraints=const)
         return problem.x
