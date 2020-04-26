@@ -1,11 +1,11 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.UniversalPortfolio import UP
+from mlfinlab.online_portfolio_selection.univeral_portfolio import UniversalPortfolio
 from mlfinlab.online_portfolio_selection.pattern_matching.FCORN import FCORN
 
 
-class FCORN_K(UP):
+class FCORN_K(UniversalPortfolio):
     """
     This class implements the Functional Correlation Driven Nonparametric Learning - top k experts strategy.
     """

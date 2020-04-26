@@ -21,7 +21,7 @@ class CORN(OLPS):
         super().__init__()
 
     # calculate corr_coef ahead of updating to speed up calculations
-    def initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
+    def _initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
         """
         :param _asset_prices:
         :param _weights:
@@ -29,10 +29,10 @@ class CORN(OLPS):
         :param _resample_by:
         :return:
         """
-        super(CORN, self).initialize(_asset_prices, _weights, _portfolio_start, _resample_by)
+        super(CORN, self)._initialize(_asset_prices, _weights, _portfolio_start, _resample_by)
         self.corr_coef = self.calculate_rolling_correlation_coefficient(self.final_relative_return)
 
-    def update_weight(self, _weights, _relative_return, _time):
+    def _update_weight(self, _weights, _relative_return, _time):
         """
         :param _weights:
         :param _relative_return:
@@ -40,7 +40,7 @@ class CORN(OLPS):
         :return:
         """
         similar_set = []
-        new_weights = self.uniform_weight(self.number_of_assets)
+        new_weights = self._uniform_weight(self.number_of_assets)
         if _time - 1 > self.window:
             activation_fn = np.zeros(self.final_number_of_time)
             for i in range(self.window + 1, _time - 1):
@@ -49,11 +49,11 @@ class CORN(OLPS):
             if similar_set:
                 # put 1 for the values in the set
                 activation_fn[similar_set] = 1
-                new_weights = self.optimize(_relative_return, activation_fn, cp.SCS)
+                new_weights = self._optimize(_relative_return, activation_fn, cp.SCS)
         return new_weights
 
     # optimize the weight that maximizes the returns
-    def optimize(self, _optimize_array, _activation_fn, _solver=None):
+    def _optimize(self, _optimize_array, _activation_fn, _solver=None):
         length_of_time = _optimize_array.shape[0]
         number_of_assets = _optimize_array.shape[1]
         if length_of_time == 1:

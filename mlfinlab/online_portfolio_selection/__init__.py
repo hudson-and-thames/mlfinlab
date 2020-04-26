@@ -4,7 +4,7 @@ Classes derived from Online Portfolio Selection module
 """
 # Parent Method
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
-from mlfinlab.online_portfolio_selection.UniversalPortfolio import UP
+from mlfinlab.online_portfolio_selection.univeral_portfolio import UniversalPortfolio
 # Benchmarks
 from mlfinlab.online_portfolio_selection.benchmarks.buy_and_hold import BuyAndHold
 from mlfinlab.online_portfolio_selection.benchmarks.best_stock import BestStock

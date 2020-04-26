@@ -52,6 +52,6 @@ class TestFollowTheLeader(TestCase):
         ftl1.allocate(self.data, resample_by='M')
         all_weights = np.array(ftl1.all_weights)
         # uniform weights
-        uniform_weight = ftl1.uniform_weight()
+        uniform_weight = ftl1._uniform_weight()
         # compare first weight and uniform weights
         np.testing.assert_almost_equal(uniform_weight, all_weights[0])

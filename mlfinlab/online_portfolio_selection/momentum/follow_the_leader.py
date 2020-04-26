@@ -15,7 +15,7 @@ class FollowTheLeader(OLPS):
     previous period.
     """
 
-    def update_weight(self, time):
+    def _update_weight(self, time):
         """
         Predicts the next time's portfolio weight by following the Best Constant Rebalanced
         Portfolio.
@@ -39,7 +39,7 @@ class FollowTheLeader(OLPS):
         :return: problem.x: (np.array) Weights that maximize the returns for the given array.
         """
         # Initialize guess.
-        weights = self.uniform_weight()
+        weights = self._uniform_weight()
 
         # Use np.log and np.sum to make the cost function a convex function.
         # Multiplying continuous returns equates to summing over the log returns.

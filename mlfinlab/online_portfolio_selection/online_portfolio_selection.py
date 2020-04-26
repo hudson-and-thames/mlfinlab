@@ -37,33 +37,34 @@ class OLPS:
         self.portfolio_return = None  # (pd.DataFrame) Cumulative portfolio returns over time.
         self.asset_prices = None  # (pd.DataFrame) Historical asset prices (daily close).
 
-    def allocate(self, asset_prices, weights=None, resample_by=None):
+    def allocate(self, asset_prices, weights=None, resample_by=None, verbose=False):
         """
         Allocates weight according to a set of update rules.
 
         :param asset_prices: (pd.DataFrame) Historical asset prices.
         :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
         :param resample_by: (str) Specifies how to resample the prices.
+        :param verbose: (boolean) Prints progress bar if true.
         """
         # Check to ensure inputs are correct.
-        self.check_asset(asset_prices, weights)
+        self._check_asset(asset_prices, weights)
 
         # Initialize all variables.
-        self.initialize(asset_prices, weights, resample_by)
+        self._initialize(asset_prices, weights, resample_by)
 
-        # Itterate through data and calculate weights.
-        self.run(weights)
+        # Iterate through data and calculate weights.
+        self._run(weights, verbose)
 
         # Round weights and drop values that are less than the given threshold.
-        self.round_weights(threshold=1e-6)
+        self._round_weights(threshold=1e-6)
 
         # Calculate portfolio returns based on weights calculated from the run method.
-        self.calculate_portfolio_returns(self.all_weights, self.relative_return)
+        self._calculate_portfolio_returns(self.all_weights, self.relative_return)
 
         # Convert everything to dataframe to make the information presentable.
-        self.conversion()
+        self._conversion()
 
-    def initialize(self, asset_prices, weights, resample_by):
+    def _initialize(self, asset_prices, weights, resample_by):
         """
         Initializes the important variables for the object.
 
@@ -88,7 +89,7 @@ class OLPS:
         self.length_of_time = self.time.size
 
         # Calculate relative returns and final relative returns.
-        self.relative_return = self.calculate_relative_return(asset_prices)
+        self.relative_return = self._calculate_relative_return(asset_prices)
 
         # Set initial weights.
         self.weights = weights
@@ -102,14 +103,15 @@ class OLPS:
         # Pass dataframe to speed up process for universal portfolio.
         self.asset_prices = asset_prices
 
-    def run(self, weights):
+    def _run(self, weights, verbose):
         """
         Runs the algorithm by iterating through the given data.
 
         :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :param verbose: (boolean) Prints progress bar if true.
         """
         # Set initial weights.
-        self.weights = self.first_weight(weights)
+        self.weights = self._first_weight(weights)
 
         # Set initial_all weights to be the first given weight.
         self.all_weights[0] = self.weights
@@ -117,15 +119,16 @@ class OLPS:
         # Run the algorithm for the rest of data from time 1.
         for time in range(self.length_of_time):
             # Update weights.
-            self.weights = self.update_weight(time)
+            self.weights = self._update_weight(time)
             self.all_weights[time + 1] = self.weights
             # Print progress bar.
-            self.print_progress(time+1, prefix='Progress:', suffix='Complete')
+            if verbose:
+                self._print_progress(time + 1, prefix='Progress:', suffix='Complete')
 
         # Remove final prediction as that information is stored in self.weights.
         self.all_weights = self.all_weights[:-1]
 
-    def first_weight(self, weights):
+    def _first_weight(self, weights):
         """
         Returns the first weight of the given portfolio. If the first weight is not given, initialize weights to
         uniform weights.
@@ -135,10 +138,10 @@ class OLPS:
         """
         # If no weights are given, return uniform weights.
         if weights is None:
-            weights = self.uniform_weight()
+            weights = self._uniform_weight()
         return weights
 
-    def update_weight(self, time):
+    def _update_weight(self, time):
         """
         Predicts the next time's portfolio weight.
 
@@ -149,7 +152,7 @@ class OLPS:
         new_weights = self.all_weights[time]
         return new_weights
 
-    def calculate_portfolio_returns(self, all_weights, relative_return):
+    def _calculate_portfolio_returns(self, all_weights, relative_return):
         """
         Calculates cumulative portfolio returns.
 
@@ -161,7 +164,7 @@ class OLPS:
         # Calculate returns by taking the cumulative product.
         self.portfolio_return = np.diagonal(np.dot(relative_return, all_weights.T)).cumprod()
 
-    def conversion(self):
+    def _conversion(self):
         """
         Converts the given np.array to pd.Dataframe.
         """
@@ -171,7 +174,7 @@ class OLPS:
         # Convert portfolio_return.
         self.portfolio_return = pd.DataFrame(self.portfolio_return, index=self.time, columns=["Returns"])
 
-    def optimize(self, optimize_array, solver=cp.SCS):
+    def _optimize(self, optimize_array, solver=cp.SCS):
         """
         Calculates weights that maximize returns over the given array.
 
@@ -198,7 +201,7 @@ class OLPS:
         problem.solve(warm_start=True, solver=solver)
         return weights.value
 
-    def round_weights(self, threshold=1e-6):
+    def _round_weights(self, threshold=1e-6):
         """
         Drops weights that are below a certain threshold.
 
@@ -211,7 +214,7 @@ class OLPS:
         new_all_weights = np.apply_along_axis(lambda x: x / np.sum(x), 1, new_all_weights)
         self.all_weights = new_all_weights
 
-    def uniform_weight(self):
+    def _uniform_weight(self):
         """
         Returns a uniform weight of assets.
 
@@ -221,7 +224,7 @@ class OLPS:
         uni_weight = np.ones(self.number_of_assets) / self.number_of_assets
         return uni_weight
 
-    def print_progress(self, iteration, prefix='', suffix='', decimals=1, bar_length=50):
+    def _print_progress(self, iteration, prefix='', suffix='', decimals=1, bar_length=50):
         # pylint: disable=expression-not-assigned
         """
         Calls in a loop to create a terminal progress bar.
@@ -248,7 +251,7 @@ class OLPS:
         sys.stdout.flush()
 
     @staticmethod
-    def normalize(weights):
+    def _normalize(weights):
         """
         Normalize sum of weights to one.
 
@@ -259,7 +262,7 @@ class OLPS:
         return norm_weights
 
     @staticmethod
-    def calculate_relative_return(asset_prices):
+    def _calculate_relative_return(asset_prices):
         """
         Calculates the relative return of a given price data.
 
@@ -274,7 +277,7 @@ class OLPS:
         return relative_return
 
     @staticmethod
-    def check_asset(asset_prices, weights):
+    def _check_asset(asset_prices, weights):
         """
         Checks if the given input values are valid.
 
@@ -298,7 +301,7 @@ class OLPS:
             raise ValueError("Asset prices dataframe must be indexed by date.")
 
     @staticmethod
-    def simplex_projection(weight):
+    def _simplex_projection(weight):
         """
         Calculates the simplex projection of weights.
         https://stanford.edu/~jduchi/projects/DuchiShSiCh08.pdf

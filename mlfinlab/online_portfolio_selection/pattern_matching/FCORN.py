@@ -13,7 +13,7 @@ class FCORN(SCORN):
         self.lamb = lamb
         super().__init__(window=window, rho=rho)
 
-    def update_weight(self, _weights, _relative_return, _time):
+    def _update_weight(self, _weights, _relative_return, _time):
         """
         :param _weights:
         :param _relative_return:
@@ -22,7 +22,7 @@ class FCORN(SCORN):
         """
         similar_set = []
         opposite_set = []
-        new_weights = self.uniform_weight(self.number_of_assets)
+        new_weights = self._uniform_weight(self.number_of_assets)
         if _time - 1 > self.window:
             activation_fn = np.zeros(self.final_number_of_time)
             for i in range(self.window + 1, _time - 1):
@@ -31,7 +31,7 @@ class FCORN(SCORN):
                     activation_fn[i] = self.sigmoid(-self.lamb * (c - self.rho))
                 else:
                     activation_fn[i] = self.sigmoid(-self.lamb * (c + self.rho))
-            new_weights = self.optimize(_relative_return, activation_fn)
+            new_weights = self._optimize(_relative_return, activation_fn)
         return new_weights
 
     def sigmoid(val):

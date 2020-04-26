@@ -20,7 +20,7 @@ class ConstantRebalancedPortfolio(OLPS):
         super(ConstantRebalancedPortfolio, self).__init__()
         self.weight = weight
 
-    def first_weight(self, weights):
+    def _first_weight(self, weights):
         """
         Sets first weight for Constant Rebalanced Portfolio
 
@@ -32,5 +32,5 @@ class ConstantRebalancedPortfolio(OLPS):
             return self.weight
         # If no weights are given, automatically set weights to uniform weights.
         if weights is None:
-            weights = self.uniform_weight()
+            weights = self._uniform_weight()
         return weights

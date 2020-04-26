@@ -21,7 +21,7 @@ class OnlineMovingAverageReversion(OLPS):
         super().__init__()
 
     # intialize moving average reversion
-    def initialize(self, asset_prices, weights, resample_by):
+    def _initialize(self, asset_prices, weights, resample_by):
         """
         Initializes the important variables for the object
 
@@ -30,13 +30,13 @@ class OnlineMovingAverageReversion(OLPS):
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         """
-        super(OnlineMovingAverageReversion, self).initialize(asset_prices, weights, resample_by)
+        super(OnlineMovingAverageReversion, self)._initialize(asset_prices, weights, resample_by)
 
         # pre-calculate moving_average_reversion to speed up
         self.moving_average_reversion = self.calculate_rolling_moving_average(self.asset_prices, self.window,
                                                                               self.reversion_method, self.alpha)
 
-    def update_weight(self, time):
+    def _update_weight(self, time):
         """
         Updates portfolio weights
 
@@ -62,7 +62,7 @@ class OnlineMovingAverageReversion(OLPS):
             lambd = loss_fn / (np.linalg.norm(predicted_change - mean_change) ** 2)
         new_weights = self.weights + lambd * (predicted_change - mean_change)
         # project to simplex as most likely weights will not sum to 1
-        return self.simplex_projection(new_weights)
+        return self._simplex_projection(new_weights)
 
     @staticmethod
     def calculate_rolling_moving_average(_asset_prices,

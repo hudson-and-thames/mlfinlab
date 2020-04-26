@@ -26,7 +26,7 @@ class ExponentialGradient(OLPS):
         self.eta = eta
         self.update_rule = update_rule
 
-    def update_weight(self, time):
+    def _update_weight(self, time):
         """
         Predicts the next time's portfolio weight.
 
@@ -50,5 +50,5 @@ class ExponentialGradient(OLPS):
         # Expectation maximization.
         elif self.update_rule == 'EM':
             new_weight = self.weights * (1 + self.eta * (relative_return / dot_product - 1))
-        new_weight = self.normalize(new_weight)
+        new_weight = self._normalize(new_weight)
         return new_weight

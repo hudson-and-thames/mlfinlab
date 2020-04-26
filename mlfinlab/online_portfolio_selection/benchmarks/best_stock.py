@@ -13,7 +13,7 @@ class BestStock(OLPS):
     The Best Stock strategy represents the best performing asset over the period in hindsight.
     """
 
-    def first_weight(self, weights):
+    def _first_weight(self, weights):
         """
         Sets the initial weight to the best performing stock over the entire time period.
 

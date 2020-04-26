@@ -14,7 +14,7 @@ class SCORN(CORN):
     # check -1 <= rho <= 1
     # check window >= 1
 
-    def update_weight(self, _weights, _relative_return, _time):
+    def _update_weight(self, _weights, _relative_return, _time):
         """
         :param _weights:
         :param _relative_return:
@@ -23,7 +23,7 @@ class SCORN(CORN):
         """
         similar_set = []
         opposite_set = []
-        new_weights = self.uniform_weight(self.number_of_assets)
+        new_weights = self._uniform_weight(self.number_of_assets)
         if _time - 1 > self.window:
             activation_fn = np.zeros(self.final_number_of_time)
             for i in range(self.window + 1, _time - 1):
@@ -36,12 +36,12 @@ class SCORN(CORN):
                 activation_fn[similar_set] = 1
             if opposite_set:
                 activation_fn[opposite_set] = -1
-            new_weights = self.optimize(_relative_return, activation_fn)
+            new_weights = self._optimize(_relative_return, activation_fn)
         return new_weights
 
-    def optimize(self, _optimize_array, _activation_fn):
+    def _optimize(self, _optimize_array, _activation_fn):
         # initial guess
-        weights = self.uniform_weight(self.number_of_assets)
+        weights = self._uniform_weight(self.number_of_assets)
 
         def objective(_weights):
             return -np.dot(_activation_fn, np.log(np.dot(_optimize_array, _weights)))

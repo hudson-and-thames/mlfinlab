@@ -14,7 +14,7 @@ class BuyAndHold(OLPS):
     and does not rebalance in subsequent periods.
     """
 
-    def update_weight(self, time):
+    def _update_weight(self, time):
         """
         Changes weights to adjust for underlying asset price changes.
 

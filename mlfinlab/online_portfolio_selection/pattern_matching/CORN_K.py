@@ -2,10 +2,10 @@
 import numpy as np
 import pandas as pd
 from mlfinlab.online_portfolio_selection.pattern_matching.CORN import CORN
-from mlfinlab.online_portfolio_selection.UniversalPortfolio import UP
+from mlfinlab.online_portfolio_selection.univeral_portfolio import UniversalPortfolio
 
 
-class CORN_K(UP):
+class CORN_K(UniversalPortfolio):
     """
     This class implements the Correlation Driven Nonparametric Learning - top k experts strategy.
     """
@@ -55,7 +55,7 @@ class CORN_K(UP):
         # create a wealth distribution matrix
         top_k_distribution = np.zeros(self.expert_portfolio_returns.shape)
         # first weight is uniform
-        top_k_distribution[0] = self.uniform_weight(self.number_of_experts)
+        top_k_distribution[0] = self._uniform_weight(self.number_of_experts)
         # for each week put the multiplier for each expert
         # new array where each row represents that week's allocation to the k experts
         for time in range(1, top_k.shape[0] + 1):

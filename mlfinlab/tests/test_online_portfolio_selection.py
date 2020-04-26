@@ -99,7 +99,7 @@ class TestOLPS(TestCase):
         # Initialize OLPS.
         olps5 = OLPS()
         # Allocates asset prices to OLPS.
-        olps5.allocate(self.data, weights=weight)
+        olps5.allocate(self.data, weights=weight, resample_by='M')
         # Create np.array of all_weights.
         all_weights = np.array(olps5.all_weights)
         # Check if all weights sum to 1.
@@ -116,9 +116,9 @@ class TestOLPS(TestCase):
         # Initialize OLPS.
         olps6 = OLPS()
         # Allocates asset prices to OLPS.
-        olps6.allocate(self.data)
+        olps6.allocate(self.data, resample_by='M')
         # Calculate uniform weights.
-        olps6_uni_weight = olps6.uniform_weight()
+        olps6_uni_weight = olps6._uniform_weight()
         # Calculated weights should be equal.
         np.testing.assert_almost_equal(olps6_uni_weight, np.array(olps6.all_weights)[0])
 
@@ -129,11 +129,11 @@ class TestOLPS(TestCase):
         # Initialize OLPS.
         olps7 = OLPS()
         # Allocates asset prices to OLPS.
-        olps7.allocate(self.data)
+        olps7.allocate(self.data, resample_by='M')
         # Test normalization on a random weight.
         random_weight = np.ones(3)
         # Use method to normalize random_weight.
-        normalized_weight = olps7.normalize(random_weight)
+        normalized_weight = olps7._normalize(random_weight)
         # Compare normalized value and manually calculated value.
         np.testing.assert_almost_equal(normalized_weight, random_weight / 3)
 
@@ -144,10 +144,19 @@ class TestOLPS(TestCase):
         # Initialize OLPS.
         olps8 = OLPS()
         # Allocates asset prices to OLPS.
-        olps8.allocate(self.data)
+        olps8.allocate(self.data, resample_by='M')
         # Initialize uniform weights.
-        weights = olps8.uniform_weight()
+        weights = olps8._uniform_weight()
         # Project uniform weights to simplex domain.
-        simplex_weights = olps8.simplex_projection(weights)
+        simplex_weights = olps8._simplex_projection(weights)
         # The two weights should be the same value.
         np.testing.assert_almost_equal(weights, simplex_weights)
+
+    def test_progress_bar(self):
+        """
+        Tests that verbose=True prints out progress bar.
+        """
+        # Initialize OLPS.
+        olps9 = OLPS()
+        # Allocates asset prices to OLPS with verbose=True.
+        olps9.allocate(self.data, resample_by='M', verbose=True)

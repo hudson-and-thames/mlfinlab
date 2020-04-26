@@ -61,7 +61,7 @@ mlfinlab/multi_product/__init__.py
 mlfinlab/multi_product/etf_trick.py
 mlfinlab/online_portfolio_selection/AA.py
 mlfinlab/online_portfolio_selection/OLPS.py
-mlfinlab/online_portfolio_selection/UP.py
+mlfinlab/online_portfolio_selection/UniversalPortfolio.py
 mlfinlab/online_portfolio_selection/__init__.py
 mlfinlab/online_portfolio_selection/olps_utils.py
 mlfinlab/online_portfolio_selection/benchmarks/BuyAndHold.py

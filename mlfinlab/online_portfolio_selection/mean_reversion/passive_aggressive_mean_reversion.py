@@ -29,8 +29,8 @@ class PassiveAggressiveMeanReversion(OLPS):
         self.optimization_method = optimization_method
         super().__init__()
 
-    def update_weight(self,
-                      _time):
+    def _update_weight(self,
+                       _time):
         """
         Updates portfolio weights
 
@@ -43,7 +43,7 @@ class PassiveAggressiveMeanReversion(OLPS):
         # calculation prep
         _past_relative_return = self.relative_return[_time]
         loss = max(0, np.dot(self.weights, _past_relative_return) - self.epsilon)
-        adjusted_market_change = _past_relative_return - self.uniform_weight() * np.mean(_past_relative_return)
+        adjusted_market_change = _past_relative_return - self._uniform_weight() * np.mean(_past_relative_return)
         diff_norm = np.linalg.norm(adjusted_market_change)
 
         # PAMR
@@ -61,4 +61,4 @@ class PassiveAggressiveMeanReversion(OLPS):
 
         new_weights = self.weights - tau * adjusted_market_change
         # if not in simplex domain
-        return self.simplex_projection(new_weights)
+        return self._simplex_projection(new_weights)
