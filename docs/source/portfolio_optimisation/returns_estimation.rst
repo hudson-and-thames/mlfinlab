@@ -70,7 +70,7 @@ The calculation is done in the following way:
       ExponentialAnnualizedMeanReturn_{Decay} = EWMA(R)_{T} * N
       \end{align*}
 
-Where :math:`R_{t}` is the return for :math:`t` -th observation, and :math:`P_{t}` is the price for :math:`t` -th observation,
+Where :math:`R_{t}` is the return for :math:`t` -th observation, :math:`P_{t}` is the price for :math:`t` -th observation,
 :math:`T` is the total number of observations, :math:`N` is an average number of observations in a year, :math:`EWMA(R)_{t}` is the
 :math:`t` -th observation of exponentially-weighted moving average of :math:`R` .
 
