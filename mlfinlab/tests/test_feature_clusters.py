@@ -5,7 +5,7 @@ import unittest
 
 from mlfinlab.util.generate_dataset import get_classification_data
 from mlfinlab.clustering.feature_clusters import get_feature_clusters
-
+from mlfinlab.clustering.feature_clusters import _combine_features
 
 # pylint: disable=invalid-name
 class TestFeatureClusters(unittest.TestCase):
@@ -38,6 +38,7 @@ class TestFeatureClusters(unittest.TestCase):
         #the threshold higher (0.2) than that. Also we need a feature to trigger the low degree of freedom
         #condition so, we create a series of zero in the datasets
         self.X['R_5c'] = self.X['R_5'] #this feature is add to introduce low DF in the regressor.
+        self.['R_1c'] = self.X['R_1'] #this will trigger the expection of LinAlgError i.e. presence of singular matrix
         clustered_subsets_distance = get_feature_clusters(self.X, dependence_metric='linear',
                                                           distance_metric=None, linkage_method=None,
                                                           n_clusters=None, critical_threshold=0.2)
@@ -48,7 +49,6 @@ class TestFeatureClusters(unittest.TestCase):
         #The ONC should detect somwhere around 5 clusters
         self.assertAlmostEqual(len(clustered_subsets_ha), 5, delta=1)
         self.assertAlmostEqual(len(clustered_subsets_distance), 5, delta=1)
-
 
     def test_value_error_raise(self):
         """
