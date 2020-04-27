@@ -32,7 +32,7 @@ class ReturnsEstimation:
     @staticmethod
     def calculate_exponential_historical_returns(asset_prices, resample_by=None, frequency=252, span=500):
         """
-        Calculates the exponentially-weighted mean of historical returns, giving
+        Calculates the exponentially-weighted annualized mean of historical returns, giving
         higher weight to more recent data.
 
         :param asset_prices: (pd.DataFrame) Asset price data
