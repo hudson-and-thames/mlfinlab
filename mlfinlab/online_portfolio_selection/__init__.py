@@ -13,9 +13,9 @@ from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfoli
 from mlfinlab.online_portfolio_selection.benchmarks.best_constant_rebalanced_portfolio import BestConstantRebalancedPortfolio
 
 # Momentum
-# from mlfinlab.online_portfolio_selection.momentum.EG import EG
-# from mlfinlab.online_portfolio_selection.momentum.FTL import FTL
-# from mlfinlab.online_portfolio_selection.momentum.FTRL import FTRL
+from mlfinlab.online_portfolio_selection.momentum.exponential_gradient import ExponentialGradient
+from mlfinlab.online_portfolio_selection.momentum.follow_the_leader import FollowTheLeader
+from mlfinlab.online_portfolio_selection.momentum.follow_the_regularized_leader import FollowTheRegularizedLeader
 
 # Mean Reversion
 # from mlfinlab.online_portfolio_selection.pattern_matching.CORN import CORN
