@@ -92,7 +92,7 @@ Below is an example of how to use the package functions to calculate various est
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.labeling import ReturnsEstimation
+    from mlfinlab.portfolio_optimization import ReturnsEstimation
 
     # Import dataframe of prices for assets in a portfolio
     asset_prices = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)

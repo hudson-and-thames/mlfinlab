@@ -19,7 +19,7 @@ class ReturnsEstimation:
         :param asset_prices: (pd.DataFrame) Asset price data
         :param resample_by: (str) Period to resample data ['D','W','M' etc.] None for no resampling
         :param frequency: (int) Average number of observations per year
-        :return: (np.array) Annualized mean historical returns per asset
+        :return: (pd.Series) Annualized mean historical returns per asset
         """
 
         # Resample the asset prices
@@ -39,7 +39,7 @@ class ReturnsEstimation:
         :param resample_by: (str) Period to resample data ['D','W','M' etc.] None for no resampling
         :param frequency: (int) Average number of observations per year
         :param span: (int) Window length to use in pandas ewm function
-        :return: (np.array) Exponentially-weighted mean of historical returns
+        :return: (pd.Series) Exponentially-weighted mean of historical returns
         """
 
         # Resample the asset prices
