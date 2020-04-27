@@ -44,4 +44,53 @@ class TestUniversalPortfolio(TestCase):
             assert len(weights) == self.data.shape[1]
             np.testing.assert_almost_equal(np.sum(weights), 1)
 
-        print(up.weights_on_experts)
+    def test_up_progress_solution(self):
+        """
+        Tests that UP prints progress bar.
+        """
+        # Initialize OLPS.
+        up = UniversalPortfolio(2)
+        # Allocates asset prices to OLPS.
+        up.allocate(self.data, verbose=True)
+        # Create np.array of all_weights.
+        all_weights = np.array(up.all_weights)
+        # Check if all weights sum to 1.
+        for i in range(all_weights.shape[0]):
+            weights = all_weights[i]
+            assert (weights >= 0).all()
+            assert len(weights) == self.data.shape[1]
+            np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_up_uniform_solution(self):
+        """
+        Tests UP with uniform capital allocation.
+        """
+        # Initialize OLPS.
+        up = UniversalPortfolio(2, weighted='U')
+        # Allocates asset prices to OLPS.
+        up.allocate(self.data)
+        # Create np.array of all_weights.
+        all_weights = np.array(up.all_weights)
+        # Check if all weights sum to 1.
+        for i in range(all_weights.shape[0]):
+            weights = all_weights[i]
+            assert (weights >= 0).all()
+            assert len(weights) == self.data.shape[1]
+            np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_up_top_k_solution(self):
+        """
+        Tests UP with top-k experts capital allocation.
+        """
+        # Initialize OLPS.
+        up = UniversalPortfolio(3, weighted='K')
+        # Allocates asset prices to OLPS.
+        up.allocate(self.data)
+        # Create np.array of all_weights.
+        all_weights = np.array(up.all_weights)
+        # Check if all weights sum to 1.
+        for i in range(all_weights.shape[0]):
+            weights = all_weights[i]
+            assert (weights >= 0).all()
+            assert len(weights) == self.data.shape[1]
+            np.testing.assert_almost_equal(np.sum(weights), 1)

@@ -1,4 +1,6 @@
 # pylint: disable=missing-module-docstring
+import sys
+
 import numpy as np
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio import ConstantRebalancedPortfolio
@@ -13,9 +15,13 @@ class UniversalPortfolio(OLPS):
 
     Universal Portfolio is
     """
-    def __init__(self, number_of_experts):
+    def __init__(self, number_of_experts, weighted='P', k=1):
         """
-        Constructor.
+        Constructor
+
+        :param number_of_experts: (int) Number of total experts
+        :param weighted: (str) Capital allocation method. 'P': Historical Performance, 'U':
+                               Uniform Weights, 'K': Top-K experts
         """
         self.experts = []  # Array to store all experts
         self.number_of_experts = number_of_experts  # Set the number of experts.
@@ -23,6 +29,8 @@ class UniversalPortfolio(OLPS):
         self.expert_portfolio_returns = None  # All experts' portfolio returns over time.
         self.expert_all_weights = None  # Each experts' weights over time.
         self.weights_on_experts = None  # Capital allocation on each experts.
+        self.weighted = weighted  # Weights allocated to each experts.
+        self.k = k  # Number for top-k experts.
         super(UniversalPortfolio, self).__init__()
 
     def _initialize(self, asset_prices, weights, resample_by):
@@ -37,15 +45,15 @@ class UniversalPortfolio(OLPS):
         super(UniversalPortfolio, self)._initialize(asset_prices, weights, resample_by)
 
         # Generate all experts.
-        self.generate_experts()
+        self._generate_experts()
 
         # Set experts portfolio returns and weights.
         self.expert_portfolio_returns = np.zeros((self.length_of_time, self.number_of_experts))
-        self.expert_all_weights = np.zeros((self.number_of_experts, self.length_of_time,
+        self.expert_all_weights = np.zeros((self.number_of_experts, self.length_of_time + 1,
                                             self.number_of_assets))
         self.weights = np.zeros((self.number_of_experts, self.number_of_assets))
 
-    def _run(self, weights):
+    def _run(self, weights, verbose):
         """
         Runs the algorithm by iterating through the given data.
 
@@ -61,22 +69,25 @@ class UniversalPortfolio(OLPS):
             self.expert_portfolio_returns[:, [exp]] = self.experts[exp].portfolio_return
             # Stack final weights.
             self.weights[exp] = self.experts[exp].weights
-
-        self.calculate_weights_on_experts()
+            # Print progress bar.
+            if verbose:
+                self._print_progress(exp + 1, prefix='Progress:', suffix='Complete')
+        # Calculate capital allocation on each experts.
+        self._calculate_weights_on_experts()
         # Uniform weight distribution for wealth between managers.
-        self.calculate_all_weights()
+        self._calculate_all_weights()
 
-    def generate_experts(self):
+    def _generate_experts(self):
         """
         Generate experts with the specified parameter.
         """
         # Generate randomized weights within the simplex.
-        self.generate_simplex(self.number_of_experts, self.number_of_assets)
+        self._generate_simplex(self.number_of_experts, self.number_of_assets)
         # Universal Portfolio looks at different CRP weights.
         for exp in range(self.number_of_experts):
             self.experts.append(ConstantRebalancedPortfolio(weight=self.expert_params[exp]))
 
-    def generate_simplex(self, number_of_experts, number_of_assets):
+    def _generate_simplex(self, number_of_experts, number_of_assets):
         """
         Generate uniform points on a simplex domain.
         https://cs.stackexchange.com/questions/3227/uniform-sampling-from-a-simplex
@@ -92,24 +103,52 @@ class UniversalPortfolio(OLPS):
         # Each interval equates to a uniform sampling of the simplex domain.
         simplex = np.diff(np.hstack([np.zeros((number_of_experts, 1)), simplex,
                                      np.ones((number_of_experts, 1))]))
+        # Set the parameters as the randomly generated simplex weights.
         self.expert_params = simplex
 
-    def calculate_weights_on_experts(self):
+    def _calculate_weights_on_experts(self):
         """
         Calculates the weight allocation on each experts.
-        The initial weights do not change, but total weights do change as underlying asset
-        prices fluctuate.
+        'P': Historical Performance.
+        'U': Uniform Weights.
+        'K': Top-K experts.
         """
-        # Calculate each expert's cumulative return ratio for each time period.
-        expert_returns_ratio = np.apply_along_axis(lambda x: x/np.sum(x), 1,
-                                                   self.expert_portfolio_returns[:-1])
-        print(expert_returns_ratio.shape)
-        # Initial weights are evenly distributed among all experts.
-        expert_returns_ratio = np.vstack((self.uniform_experts(),
-                                          expert_returns_ratio))
-        self.weights_on_experts = expert_returns_ratio
+        # If capital allocation is based on historical performances.
+        if self.weighted == 'P':
+            # Calculate each expert's cumulative return ratio for each time period.
+            expert_returns_ratio = np.apply_along_axis(lambda x: x/np.sum(x), 1,
+                                                       self.expert_portfolio_returns[:-1])
+            # Initial weights are evenly distributed among all experts.
+            expert_returns_ratio = np.vstack((self._uniform_experts(),
+                                              expert_returns_ratio))
+            self.weights_on_experts = expert_returns_ratio
+        # If capital allocation is based on uniform weights.
+        elif self.weighted == 'U':
+            expert_returns_ratio = np.ones(
+                self.expert_portfolio_returns.shape) / self.number_of_experts
+            self.weights_on_experts = expert_returns_ratio
+        # If capital allocation is based on top-K experts.
+        elif self.weighted == 'K':
+            # Only the top k experts get 1/k of the wealth.
+            # https://stackoverflow.com/questions/6910641/
+            # how-do-i-get-indices-of-n-maximum-values-in-a-numpy-array.
+            # Get the indices of top k experts for each time.
+            top_k = np.apply_along_axis(lambda x: np.argpartition(x, -self.k)[-self.k:], 1,
+                                        self.expert_portfolio_returns)
+            # Pop last row.
+            top_k = top_k[:-1]
+            # Create a wealth distribution matrix.
+            top_k_distribution = np.zeros(self.expert_portfolio_returns.shape)
+            # First weight is uniform.
+            top_k_distribution[0] = self._uniform_weight()
+            # For each week set the multiplier for each expert.
+            # Each row represents the week's allocation to the k experts.
+            for time in range(1, top_k.shape[0] + 1):
+                top_k_distribution[time][top_k[time - 1]] = 1 / self.k
 
-    def uniform_experts(self):
+            self.weights_on_experts = top_k_distribution
+
+    def _uniform_experts(self):
         """
         Returns a uniform weight of experts.
 
@@ -119,10 +158,9 @@ class UniversalPortfolio(OLPS):
         uni_weight = np.ones(self.number_of_experts) / self.number_of_experts
         return uni_weight
 
-    def calculate_all_weights(self):
+    def _calculate_all_weights(self):
         """
-        Universal Portfolio allocates the same weight to all experts.
-        The weights will be adjusted each week due to market fluctuations.
+        Calculate portfolio's overall weights with information from each expert's weights.
         """
 
         # Calculate the product of the distribution matrix with the 3d experts x all weights matrix.
@@ -133,3 +171,29 @@ class UniversalPortfolio(OLPS):
                 self.expert_all_weights.shape[0], -1)).reshape(d_shape)
         # We are looking at the diagonal cross section of the multiplication.
         self.all_weights = np.diagonal(weight_change, axis1=0, axis2=1).T
+
+    def _print_progress(self, iteration, prefix='', suffix='', decimals=1, bar_length=50):
+        # pylint: disable=expression-not-assigned
+        """
+        Calls in a loop to create a terminal progress bar.
+        https://gist.github.com/aubricus/f91fb55dc6ba5557fbab06119420dd6a
+
+        :param iteration: (int) Current iteration.
+        :param prefix: (str) Prefix string.
+        :param suffix: (str) Suffix string.
+        :param decimals: (int) Positive number of decimals in percent completed.
+        :param bar_length: (int) Character length of the bar.
+        """
+        str_format = "{0:." + str(decimals) + "f}"
+        # Calculate the percent completed.
+        percents = str_format.format(100 * (iteration / float(self.number_of_experts)))
+        # Calculate the length of bar.
+        filled_length = int(round(bar_length * iteration / float(self.number_of_experts)))
+        # Fill the bar.
+        block = '█' * filled_length + '-' * (bar_length - filled_length)
+        # Print new line.
+        sys.stdout.write('\r%s |%s| %s%s %s' % (prefix, block, percents, '%', suffix)),
+
+        if iteration == self.number_of_experts:
+            sys.stdout.write('\n')
+        sys.stdout.flush()

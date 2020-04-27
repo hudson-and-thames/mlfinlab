@@ -39,7 +39,7 @@ class TestBestConstantRebalancedPortfolio(TestCase):
         all_weights = np.array(bcrp.all_weights)
         # All weights for the strategy have to be the same.
         one_weight = all_weights[0]
-        # iterate through all_weights to check that weights equal to the first weight.
+        # Iterate through all_weights to check that weights equal to the first weight.
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]
             assert (weights >= 0).all()

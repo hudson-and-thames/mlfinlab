@@ -21,7 +21,7 @@ class CORN_U(UniversalPortfolio):
         self.number_of_experts = len(self.window_values) * len(self.rho_values)
         super().__init__(number_of_experts=self.number_of_experts)
 
-    def generate_experts(self):
+    def _generate_experts(self):
         """
         Generates n experts for CORN-U strategy
 
@@ -38,7 +38,7 @@ class CORN_U(UniversalPortfolio):
             param = self.expert_params[exp]
             self.experts.append(CORN(int(param[0]), param[1]))
 
-    def calculate_weights_on_experts(self):
+    def _calculate_weights_on_experts(self):
         """
         Calculates the weight allocation on each experts
         Weights rebalanced to give equal allocation to all managers

@@ -10,7 +10,7 @@ class SCORN_K(CORN_K):
     This class implements the Symmetirc Correlation Driven Nonparametric Learning - top k experts strategy.
     """
 
-    def generate_experts(self):
+    def _generate_experts(self):
         """
         Generates n experts for SCORN-K strategy
 

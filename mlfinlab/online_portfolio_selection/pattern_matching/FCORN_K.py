@@ -21,7 +21,7 @@ class FCORN_K(UniversalPortfolio):
         self.number_of_experts = len(self.window_values) * len(self.rho_values) * len(self.lambda_values)
         super().__init__(number_of_experts=self.number_of_experts)
 
-    def generate_experts(self):
+    def _generate_experts(self):
         """
         Generates n experts for FCORN-K strategy
 
