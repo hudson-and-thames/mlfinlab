@@ -29,5 +29,5 @@ def get_classification_data(n_features=100, n_informative=25, n_redundant=25, n_
     X, y = pd.DataFrame(X, columns=cols), pd.Series(y)
     i = np.random.choice(range(n_informative), size=n_redundant)
     for k, j in enumerate(i):
-        X['R_'+str(k)] = X['I_'+str(j)]+np.random.normal(size=X.shape[0])*sigmaStd
+        X['R_'+str(k)] = X['I_'+str(j)]+np.random.normal(size=X.shape[0])*sigma
     return X, y
