@@ -5,7 +5,6 @@ import unittest
 
 from mlfinlab.util.generate_dataset import get_classification_data
 from mlfinlab.clustering.feature_clusters import get_feature_clusters
-from mlfinlab.clustering.feature_clusters import _combine_features
 
 # pylint: disable=invalid-name
 class TestFeatureClusters(unittest.TestCase):
