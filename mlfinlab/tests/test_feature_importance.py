@@ -27,7 +27,7 @@ class TestFeatureImportance(unittest.TestCase):
         Generate X, y datasets and fit a RF
         """
         #Generate datasets
-        self.X, self.y = get_classification_data(10, 5, 2, 1000, random_state=0, sigmaStd=0)
+        self.X, self.y = get_classification_data(10, 5, 2, 1000, random_state=0, sigma=0)
         # Fit a RF
         self.clf_base = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
                                                class_weight='balanced_subsample')
