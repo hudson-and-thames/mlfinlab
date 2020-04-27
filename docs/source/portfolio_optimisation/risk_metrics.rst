@@ -68,6 +68,12 @@ Where :math:`\alpha` is the confidence level to use, and the :math:`R` is a set 
 CVaR of :math:`0.15` at :math:`\alpha = 0.05` level means that for :math:`5\%` worst cases of returns observations
 the average loss of the portfolio value is :math:`15\%` per observation.
 
+This picture from Y. Vardanyan demonstrates the differences between the VaR and the CVaR concepts:
+
+.. image:: portfolio_optimisation_images/var_cvar_concepts.png
+   :scale: 100 %
+   :align: center
+
 Conditional Drawdown at Risk (CDaR)
 ###################################
 
