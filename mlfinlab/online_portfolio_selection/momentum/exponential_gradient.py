@@ -7,8 +7,8 @@ class ExponentialGradient(OLPS):
     """
     This class implements the Exponential Gradient Portfolio strategy. It is reproduced with
     modification from the following paper:
-    Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
-    Surv. V, N, Article A (December YEAR), 33 pages. <https://arxiv.org/abs/1212.2129>.
+    'Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
+    Surv. V, N, Article A (December YEAR), 33 pages. <https://arxiv.org/abs/1212.2129>'_
 
     Exponential gradient strategy tracks the best performing stock in the last period while
     keeping previous portfolio information by using a regularization term.
@@ -48,6 +48,6 @@ class ExponentialGradient(OLPS):
             new_weight = self.weights + self.eta * (relative_return - np.ones(self.number_of_assets)
                                                     * np.mean(relative_return) / dot_product)
         else:
-            raise ValueError("Please put in the correct update method.")
+            raise ValueError("Incorrect update rule. Try 'MU','EM', or 'GP'.")
         new_weight = self._normalize(new_weight)
         return new_weight

@@ -8,8 +8,8 @@ class FollowTheLeader(OLPS):
     """
     This class implements the Follow the Leader strategy. It is reproduced with modification from
     the following paper:
-    Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
-    Surv. V, N, Article A (December YEAR), 33 pages. <https://arxiv.org/abs/1212.2129>.
+    'Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
+    Surv. V, N, Article A (December YEAR), 33 pages. <https://arxiv.org/abs/1212.2129>'_
 
     Follow the Leader strategy directly tracks the Best Constant Rebalanced Portfolio until the
     previous period.
