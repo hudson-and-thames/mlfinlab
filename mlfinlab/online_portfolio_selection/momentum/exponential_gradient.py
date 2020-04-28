@@ -42,14 +42,12 @@ class ExponentialGradient(OLPS):
         # Multiplicative update.
         if self.update_rule == 'MU':
             new_weight = self.weights * np.exp(self.eta * relative_return / dot_product)
-
-        # Gradient projection.
+        elif self.update_rule == 'EM':
+            new_weight = self.weights * (1 + self.eta * (relative_return / dot_product - 1))
         elif self.update_rule == 'GP':
             new_weight = self.weights + self.eta * (relative_return - np.ones(self.number_of_assets)
                                                     * np.mean(relative_return) / dot_product)
-
-        # Expectation maximization.
-        elif self.update_rule == 'EM':
-            new_weight = self.weights * (1 + self.eta * (relative_return / dot_product - 1))
+        else:
+            raise ValueError("Please put in the correct update method.")
         new_weight = self._normalize(new_weight)
         return new_weight
