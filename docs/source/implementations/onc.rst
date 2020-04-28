@@ -20,9 +20,22 @@ using the following diagrams:
    :scale: 100 %
    :align: center
 
+In the base clustering stage first the distances between the elements are calculated, then the algorithm iterates through
+a set of possible number of clusters :math:`N` times. For each iteration, a clustering result is evaluated using t-statistic of
+the silhouette scores.
+
+The clustering result with the best silhouette score is picked, the correlation matrix is reordered so that clustered elements
+are positioned close to each other.
+
 .. image:: clustering_images/onc_higher_level.png
    :scale: 100 %
    :align: center
+
+On a higher level, the average t-score of the clusters from the base clustering stage is calculated. If more than three
+clusters have a t-score below average, these clusters go through the base clustering stage again.
+
+Then, based on the t-statistic it is checked whether the new clustering has improved the original one. The output of the
+algorithm is the best clustering result, reordered correlation matrix, and silhouette scores.
 
 Implementation
 ##############
