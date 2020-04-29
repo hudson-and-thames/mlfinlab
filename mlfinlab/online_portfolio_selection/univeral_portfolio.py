@@ -1,6 +1,5 @@
 # pylint: disable=missing-module-docstring
 import sys
-
 import numpy as np
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio import ConstantRebalancedPortfolio
@@ -8,10 +7,10 @@ from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfoli
 
 class UniversalPortfolio(OLPS):
     """
-    This class implements the Best Constant Rebalanced Portfolio strategy. It is reproduced with
+    This class implements the Universal Portfolio strategy. It is reproduced with
     modification from the following paper:
-    Cover, T.M. (1991), Universal Portfolios. Mathematical Finance, 1: 1-29.
-    <http://www-isl.stanford.edu/~cover/papers/portfolios_side_info.pdf>.
+    'Cover, T.M. (1991), Universal Portfolios. Mathematical Finance, 1: 1-29.
+    <http://www-isl.stanford.edu/~cover/papers/portfolios_side_info.pdf>'_
 
     Universal Portfolio is
     """
