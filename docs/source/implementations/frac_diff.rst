@@ -8,12 +8,12 @@ One of the challenges of quantitative analysis in finance is that price time ser
 This makes the time series is non-stationary. A non-stationary time series are hard to work with when we want to do inferential
 analysis such as average and variance of returns, or probability of loss.
 
-Many supervised learning algorithms have the underlying assumption that the data is stationar. Specifically, in supervised
-learning one needs to map hitherto unseen observations to a set of labeled examples and determine the label of the new observation.
+Many supervised learning algorithms have the underlying assumption that the data is stationary. Specifically, in supervised
+learning, one needs to map hitherto unseen observations to a set of labeled examples and determine the label of the new observation.
 As Marcos Lopez de Prado (MLdP) says in Chapter 5, “if the features are not stationary we cannot map the new observation
 to a large number of known examples”. However, to make a time series (or a feature) stationary often requires data
-transformations like computing changes (change in price, yields or volatility). These transformations also leave the time
-series bereft of any memory and thereby reducing or eliminating its predictive capability.
+transformations like computing changes (change in price, yields, or volatility). These transformations also leave the time
+series bereft of any memory and thereby reduce or eliminate its predictive capability.
 
 Fractionally differentiated features tackle this problem by deriving features through fractionally differentiating a time
 series to the point where the series is stationary, but not over differencing such that we lose all predictive power.

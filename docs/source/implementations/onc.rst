@@ -92,7 +92,7 @@ Implementation
 Example
 #######
 
-An example showing how the NCO algorithm is used can be seen below:
+An example showing how the ONC algorithm is used can be seen below:
 
 .. code-block::
 
