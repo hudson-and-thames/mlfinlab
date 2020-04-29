@@ -18,7 +18,7 @@ from mlfinlab.codependence.codependence_matrix import get_dependence_matrix, get
 
 # pylint: disable=invalid-name
 def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metric: str = None, linkage_method: str = None,
-                         n_clusters: int = None, critical_threshold: float = 0.0):
+                         n_clusters: int = None, critical_threshold: float = 0.0) -> list:
     """
     Machine Learning for Asset Managers
     Snippet 6.5.2.1 , page 85. Step 1: Features Clustering
@@ -36,7 +36,11 @@ def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metri
                             be generated as it is by the ONC algorithm.
     :param n_clusters: (int) number of clusters to form. Must be less the total number of features. If None then it
                        returns optimal number of clusters decided by the ONC Algorithm.
-    :return: (array) of feature subsets.
+    :param critical_threshold: (float) threshold for determining low silhouette score in the dataset. It can any real number
+                                in [-1,+1], default is 0 which means any feature that has a silhouette score below 0 will be
+                                indentified as having low silhouette and hence requied transformation will be appiled to for
+                                for correction of the same.
+    :return: (list) of feature subsets.
     """
     # Checking if dataset contains features low silhouette
     X = _check_for_low_silhouette_scores(X, critical_threshold)
@@ -62,7 +66,7 @@ def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metri
 
     return clustered_subsets
 
-def _cluster_transformation(X: pd.DataFrame, clusters: dict, feats_to_transform: list):
+def _cluster_transformation(X: pd.DataFrame, clusters: dict, feats_to_transform: list) -> pd.DataFrame:
     """
     Machine Learning for Asset Managers
     Snippet 6.5.2.1 , page 85. Step 1: Features Clustering (last paragraph)
@@ -91,7 +95,7 @@ def _cluster_transformation(X: pd.DataFrame, clusters: dict, feats_to_transform:
                     X[feat] = ols.resid
     return X
 
-def _combine_features(X, clusters, exclude_key):
+def _combine_features(X, clusters, exclude_key) -> np.array:
     """
     This function combines features of each cluster linearly by following
     a minimum variance weighting scheme. The Minimum Variance weights are
@@ -119,7 +123,7 @@ def _combine_features(X, clusters, exclude_key):
             new_exog.append(((subset*wghts).sum(1)).values)
     return np.array(new_exog)
 
-def _check_for_low_silhouette_scores(X: pd.DataFrame, critical_threshold: int = 0.0):
+def _check_for_low_silhouette_scores(X: pd.DataFrame, critical_threshold: float = 0.0) -> pd.DataFrame:
     """
     Machine Learning for Asset Managers
     Snippet 6.5.2.1 , page 85. Step 1: Features Clustering (last paragraph)
@@ -129,7 +133,7 @@ def _check_for_low_silhouette_scores(X: pd.DataFrame, critical_threshold: int = 
     clusters and it needs a transformation.
 
     :param X: (pd.DataFrame) of features.
-    :param critical_threshold: (int) threshold for determining low silhouette score
+    :param critical_threshold: (float) threshold for determining low silhouette score.
     :return: (pd.DataFrame) of features.
     """
     _, clstrs, silh = get_onc_clusters(X.corr())

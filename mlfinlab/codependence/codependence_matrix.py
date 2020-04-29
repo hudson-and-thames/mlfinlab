@@ -11,7 +11,7 @@ from mlfinlab.codependence.correlation import distance_correlation
 
 
 # pylint: disable=invalid-name
-def get_dependence_matrix(df: pd.DataFrame, dependence_method: str):
+def get_dependence_matrix(df: pd.DataFrame, dependence_method: str) -> pd.DataFrame:
     """
     This function returns a dependence matrix for the given method of dependence method.
 
@@ -49,7 +49,7 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str):
     return dependence_df
 
 
-def get_distance_matrix(X: pd.DataFrame, distance_metric: str = 'angular'):
+def get_distance_matrix(X: pd.DataFrame, distance_metric: str = 'angular') -> pd.DataFrame:
     """
     Apply distance operator to a dependence matrix.
 
