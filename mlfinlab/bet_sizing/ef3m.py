@@ -304,9 +304,8 @@ def most_likely_parameters(data, ignore_columns='error', res=10_000):
 
 
 @njit()
-def iter_4_jit(mu_2, p_1, m_1, m_2, m_3, m_4):
+def iter_4_jit(mu_2, p_1, m_1, m_2, m_3, m_4):  # pragma: no cover
     """
-    
     "Numbarized" evaluation of the set of equations that make up variant #1 of the EF3M algorithm (fitting using the first
     four moments).
 
@@ -383,7 +382,7 @@ def iter_4_jit(mu_2, p_1, m_1, m_2, m_3, m_4):
 
 
 @njit()
-def iter_5_jit(mu_2, p_1, m_1, m_2, m_3, m_4, m_5):
+def iter_5_jit(mu_2, p_1, m_1, m_2, m_3, m_4, m_5):  # pragma: no cover
     """
     "Numbarized" evaluation of the set of equations that make up variant #2 of the EF3M algorithm (fitting using the first five
     moments).
