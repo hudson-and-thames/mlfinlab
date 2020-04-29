@@ -24,12 +24,12 @@ def calculate_t_values(subset, min_sample_length, step):
         y_subset = subset[:forward_window].reshape(-1, 1)  # y{t}:y_{t+l}
 
         # Array of [1, 0], [1, 1], [1, 2], ... [1, l] # b_0, b_1 coefficients
-        X_subset = np.ones((y_subset.shape[0], 2))
-        X_subset[:, 1] = np.arange(y_subset.shape[0])
+        x_subset = np.ones((y_subset.shape[0], 2))
+        x_subset[:, 1] = np.arange(y_subset.shape[0])
 
         # Get regression coefficients estimates
-        xy = X_subset.transpose() @ y_subset
-        xx = X_subset.transpose() @ X_subset
+        xy = x_subset.transpose() @ y_subset
+        xx = x_subset.transpose() @ x_subset
 
         #   check for singularity
         det = np.linalg.det(xx)
@@ -41,8 +41,8 @@ def calculate_t_values(subset, min_sample_length, step):
         else:
             xx_inv = np.linalg.inv(xx)
             b_mean = xx_inv @ xy
-            err = y_subset - (X_subset @ b_mean)
-            b_std = np.dot(np.transpose(err), err) / (X_subset.shape[0] - X_subset.shape[1]) * xx_inv
+            err = y_subset - (x_subset @ b_mean)
+            b_std = np.dot(np.transpose(err), err) / (x_subset.shape[0] - x_subset.shape[1]) * xx_inv
         
         # Check if l gives the maximum t-value among all values {0...L}
             t_beta_1 = (b_mean[1] / np.sqrt(b_std[1, 1]))[0]
