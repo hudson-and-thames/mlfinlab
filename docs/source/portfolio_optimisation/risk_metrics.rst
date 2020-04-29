@@ -83,13 +83,21 @@ worst-case scenario, assuming the drawdowns follow a normal distribution.
 The Expected Shortfall of a portfolio is calculated as follows:
 
 .. math::
+      :nowrap:
 
-      CDaR = E[{DD, DD > Quantile_{\alpha}(DD)}]
+      \begin{align*}
+      DD_{t} = max_{0 \le \tau \le t}\{w_{\tau}\} - w_{t}
+      \end{align*}
 
-Where :math:`\alpha` is the confidence level to use, and the :math:`DD` is a list of historical drawdowns of a portfolio.
+      \begin{align*}
+      CDaR = E[{DD_{t}, DD_{t} > Quantile_{\alpha}(DD)}]
+      \end{align*}
 
-CDaR of :math:`0.15` at :math:`\alpha = 0.05` level means that for :math:`5\%` worst cases of portfolio drawdowns
-the drawdown is :math:`15\%`.
+Where :math:`\alpha` is the confidence level to use, :math:`w_{t}` is the price of a portfolio at time :math:`t`,
+and :math:`DD_{t}` is the maximum historical drawdown up to time :math:`t` .
+
+CDaR of :math:`0.15` at :math:`\alpha = 0.95` level means that for :math:`5\%` worst cases of historical portfolio drawdowns,
+the average drawdown is :math:`0.15` units in which the portfolio price is measured.
 
 .. tip::
 
