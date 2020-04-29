@@ -42,7 +42,7 @@ def calculate_t_values(subset, min_sample_length, step):
             xx_inv = np.linalg.inv(xx)
             b_mean = xx_inv @ xy
             err = y_subset - (x_subset @ b_mean)
-            b_std = np.dot(np.transpose(err), err) / (x_subset.shape[0] - x_subset.shape[1]) * xx_inv
+            b_std = np.dot(np.transpose(err), err) / (x_subset.shape[0] - x_subset.shape[1]) * xx_inv  # pylint: disable=E1136  # pylint/issues/3139
         
         # Check if l gives the maximum t-value among all values {0...L}
             t_beta_1 = (b_mean[1] / np.sqrt(b_std[1, 1]))[0]
