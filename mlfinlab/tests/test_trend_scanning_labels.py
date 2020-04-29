@@ -23,9 +23,10 @@ class TestTrendScanningLabels(unittest.TestCase):
         # Data set used for trend scanning labels
         self.eem_close = pd.read_csv(project_path + '/test_data/stock_prices.csv', index_col=0, parse_dates=[0])
         # In 2008, EEM had some clear trends
-        self.eem_close = self.eem_close['EEM'].loc[pd.Timestamp(2008, 4, 1):pd.Timestamp(2008, 10, 1)]
-
-    def test_trend_scanning_labels(self):
+        # self.eem_close = self.eem_close['EEM'].loc[pd.Timestamp(2008, 4, 1):pd.Timestamp(2008, 10, 1)]
+        self.eem_close = self.eem_close['EEM'].reindex(pd.date_range(pd.Timestamp(2008, 4, 1), pd.Timestamp(2008, 10, 1))).dropna()
+        
+    def my_test_trend_scanning_labels(self):
         """
         Test trend scanning labels
         """
@@ -37,7 +38,7 @@ class TestTrendScanningLabels(unittest.TestCase):
 
         # Before 2008/5/12 we had a strong positive trend
         self.assertTrue(
-            set(tr_scan_labels.loc[pd.Timestamp(2008, 1, 1):pd.Timestamp(2008, 5, 9)].bin) == set([1]))
+            set(tr_scan_labels.reindex(pd.date_range(pd.Timestamp(2008, 1, 1), pd.Timestamp(2008, 5, 9))).dropna().bin) == set([1]))
 
         self.assertEqual(tr_scan_labels.bin.value_counts()[-1], 70)  # Number of -1 labels check
         self.assertEqual(tr_scan_labels.bin.value_counts()[1], 40)
