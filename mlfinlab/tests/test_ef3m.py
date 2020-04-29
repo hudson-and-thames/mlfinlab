@@ -7,14 +7,7 @@ import numpy as np
 import pandas as pd
 from scipy.special import comb
 
-from mlfinlab.bet_sizing.ef3m import (
-    M2N,
-    centered_moment,
-    raw_moment,
-    most_likely_parameters,
-    iter_4_jit,
-    iter_5_jit,
-)
+from mlfinlab.bet_sizing.ef3m import (M2N, centered_moment, raw_moment, most_likely_parameters, iter_4_jit, iter_5_jit)
 
 
 class TestM2NConstructor(unittest.TestCase):

@@ -140,13 +140,13 @@ class M2N:
         :return: (list) List of estimated parameter if no invalid values are encountered (e.g. complex values,
          divide-by-zero), otherwise an empty list is returned.
         """
-        m_1, m_2, m_3, m_4 = self.moments[
-            0:4
-        ]  # Expand list of moments to individual variables for clarity.
+        # Expand list of moments to individual variables for clarity.
+        m_1, m_2, m_3, m_4 = self.moments[0:4]
 
         # Check to see if every value made it through.
         param_list = iter_4_jit(mu_2, p_1, m_1, m_2, m_3, m_4)
         param_list = param_list.tolist()
+
         if len(param_list) < 5:
             return []
 
@@ -162,13 +162,9 @@ class M2N:
         :return: (list) List of estimated parameter if no invalid values are encountered (e.g. complex values,
          divide-by-zero), otherwise an empty list is returned.
         """
-        (
-            m_1,
-            m_2,
-            m_3,
-            m_4,
-            m_5,
-        ) = self.moments  # Expand list of moments to individual variables for clarity.
+
+        # Expand list of moments to individual variables for clarity.
+        (m_1, m_2, m_3, m_4, m_5,) = self.moments
 
         # Call numba decorated function to do the actual calculations
         param_list = iter_5_jit(mu_2, p_1, m_1, m_2, m_3, m_4, m_5)
@@ -306,8 +302,8 @@ def most_likely_parameters(data, ignore_columns='error', res=10_000):
 @njit()
 def iter_4_jit(mu_2, p_1, m_1, m_2, m_3, m_4):  # pragma: no cover
     """
-    "Numbarized" evaluation of the set of equations that make up variant #1 of the EF3M algorithm (fitting using the first
-    four moments).
+    "Numbarized" evaluation of the set of equations that make up variant #1 of the EF3M algorithm (fitting using the
+    first four moments).
 
     :param mu_2: (float) Initial parameter value for mu_2
     :param p_1: (float) Probability defining the mixture; p_1, 1 - p_1
@@ -384,8 +380,8 @@ def iter_4_jit(mu_2, p_1, m_1, m_2, m_3, m_4):  # pragma: no cover
 @njit()
 def iter_5_jit(mu_2, p_1, m_1, m_2, m_3, m_4, m_5):  # pragma: no cover
     """
-    "Numbarized" evaluation of the set of equations that make up variant #2 of the EF3M algorithm (fitting using the first five
-    moments).
+    "Numbarized" evaluation of the set of equations that make up variant #2 of the EF3M algorithm (fitting using the
+     first five moments).
 
     :param mu_2: (float) Initial parameter value for mu_2
     :param p_1: (float) Probability defining the mixture; p_1, 1-p_1
@@ -406,28 +402,21 @@ def iter_5_jit(mu_2, p_1, m_1, m_2, m_3, m_4, m_5):  # pragma: no cover
             break
 
         # Calculate sigma_2, Equation (24).
-        sigma_2_squared = (
-            m_3
-            + 2 * p_1 * mu_1 ** 3
-            + (p_1 - 1) * mu_2 ** 3
-            - 3 * mu_1 * (m_2 + mu_2 ** 2 * (p_1 - 1))
-        ) / (3 * (1 - p_1) * (mu_2 - mu_1))
+        sigma_2_squared = (m_3 + 2 * p_1 * mu_1 ** 3 + (p_1 - 1) * mu_2 ** 3 - 3 * mu_1 * (m_2 + mu_2 ** 2 * (p_1 - 1))
+                           ) / (3 * (1 - p_1) * (mu_2 - mu_1))
 
         if sigma_2_squared < 0:
             # Validity check 2: check for upcoming complex numbers.
             break
+
         sigma_2 = sigma_2_squared ** 0.5
 
         # Calculate sigma_1, Equation (23).
-        sigma_1_squared = (
-            (m_2 - sigma_2 ** 2 - mu_2 ** 2) / p_1
-            + sigma_2 ** 2
-            + mu_2 ** 2
-            - mu_1 ** 2
-        )
+        sigma_1_squared = ((m_2 - sigma_2 ** 2 - mu_2 ** 2) / p_1 + sigma_2 ** 2 + mu_2 ** 2 - mu_1 ** 2)
         if sigma_1_squared < 0:
             # Validity check 3: check for upcoming complex numbers.
             break
+
         sigma_1 = sigma_1_squared ** 0.5
 
         # Adjust the guess for mu_2, Equation (27).
@@ -435,9 +424,8 @@ def iter_5_jit(mu_2, p_1, m_1, m_2, m_3, m_4, m_5):  # pragma: no cover
             # Validity check 5: break to prevent divide-by-zero.
             break
 
-        a_1_squared = 6 * sigma_2 ** 4 + (
-            m_4 - p_1 * (3 * sigma_1 ** 4 + 6 * sigma_1 ** 2 * mu_1 ** 2 + mu_1 ** 4)
-        ) / (1 - p_1)
+        a_1_squared = 6 * sigma_2 ** 4 + (m_4 - p_1 * (3 * sigma_1 ** 4 + 6 * sigma_1 ** 2 * mu_1 ** 2 + mu_1 ** 4)
+                                          ) / (1 - p_1)
         if a_1_squared < 0:
             # Validity check 6: break to avoid taking the square root of negative number.
             break
@@ -446,7 +434,7 @@ def iter_5_jit(mu_2, p_1, m_1, m_2, m_3, m_4, m_5):  # pragma: no cover
         mu_2_squared = a_1 - 3 * sigma_2 ** 2
 
         # Validity check 7: break to avoid complex numbers.
-        # TODO Avoid Numba object mode.
+        # Todo: Avoid Numba object mode.
         # Numba does not support numpy.iscomplex. This creates an overhead.
         with objmode(mu_2_squared_is_complex="boolean"):
             mu_2_squared_is_complex = bool(np.iscomplex(mu_2_squared))
