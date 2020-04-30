@@ -18,7 +18,7 @@ def _get_sadf_at_t(X: pd.DataFrame, y: pd.DataFrame, min_length: int, model: str
     :param y: (pd.DataFrame) of y values (either y or y.diff())
     :param min_length: (int) minimum number of samples needed for estimation
     :param model: (str) either 'linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
-    :param phi: (float) in [0, 1], penalize large sample lengths when computing SMT
+    :param phi: (float) coefficient to penalize large sample lengths when computing SMT, in [0, 1]
     :return: (float) of SADF statistics for y.index[-1]
     """
     start_points, bsadf = range(0, y.shape[0] - min_length + 1), -np.inf
@@ -146,7 +146,7 @@ def _sadf_outer_loop(X: pd.DataFrame, y: pd.DataFrame, min_length: int, model: s
     :param y: (pd.DataFrame) of outcomes
     :param min_length: (int) minimum number of observations
     :param model: (str) either 'linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
-    :param phi: (float) in [0, 1], penalize large sample lengths when computing SMT
+    :param phi: (float) coefficient to penalize large sample lengths when computing SMT, in [0, 1]
     :param molecule: (list) of indices to get SADF
     :return: (pd.Series) of SADF statistics
     """
@@ -162,20 +162,24 @@ def _sadf_outer_loop(X: pd.DataFrame, y: pd.DataFrame, min_length: int, model: s
 def get_sadf(series: pd.Series, model: str, lags: Union[int, list], min_length: int, add_const: bool = False,
              phi: float = 0, num_threads: int = 8) -> pd.Series:
     """
-    Multithread implementation of SADF, p. 258-259. SADF fits the ADF regression at each end point t
-    with backwards expanding start points. For the estimation of SADF(t), the right side of the window is fixed at t.
-    SADF recursively expands the beginning of the sample up to t - min_length, and returns the sup of this set.
+    Multithread implementation of SADF, p. 258-259.
+
+    SADF fits the ADF regression at each end point t with backwards expanding start points. For the estimation
+    of SADF(t), the right side of the window is fixed at t. SADF recursively expands the beginning of the sample
+    up to t - min_length, and returns the sup of this set.
+
     When doing with sub- or super-martingale test, the variance of beta of a weak long-run bubble may be smaller than
-    one of a strong short-run bubble, hence biasing the method towards long-run bubbles. To correct for this bias, we
-    can penalize large sample lengths by determining the coefficient phi in [0, 1] that yields best explosiveness
-    signals.
+    one of a strong short-run bubble, hence biasing the method towards long-run bubbles. To correct for this bias,
+    ADF statistic in samples with large lengths can be penalized with the coefficient phi in [0, 1] such that:
+
+    ADF_penalized = ADF / (sample_length ^ phi)
 
     :param series: (pd.Series) for which SADF statistics are generated
     :param model: (str) either 'linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
     :param lags: (int or list) either number of lags to use or array of specified lags
     :param min_length: (int) minimum number of observations needed for estimation
     :param add_const: (bool) flag to add constant
-    :param phi: (float) in [0, 1], penalize large sample lengths when computing SMT
+    :param phi: (float) coefficient to penalize large sample lengths when computing SMT, in [0, 1]
     :param num_threads: (int) number of cores to use
     :return: (pd.Series) of SADF statistics
     """
