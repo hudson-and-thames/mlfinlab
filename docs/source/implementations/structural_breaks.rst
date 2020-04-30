@@ -25,7 +25,7 @@ We can classify the structural break in two general categories:
 
    - **Advances in Financial Machine Learning** *by* Marcos Lopez de Prado *Chapter 17 describes structural breaks in more detail.*
    - **Testing for Speculative Bubbles in Stock Markets: A Comparison of Alternative Methods** *by* Ulrich Homm *and* Jorg Breitung `available here <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.511.6559&rep=rep1&type=pdf>`__. *Explains the Chu-Stinchcombe-White CUSUM Test in more detail.*
-
+   - **Tests of Equality Between Sets of Coefficients in Two Linear Regressions** *by* Gregory C. Chow `available here <http://web.sonoma.edu/users/c/cuellar/econ411/chow>`__. *A work that inspired a family of explosiveness tests.*
 
 .. figure:: structural_breaks_images/sadf.png
    :scale: 70 %
@@ -80,6 +80,99 @@ fixed by estimating :math:`S_{n, t}` on backward-shifting windows :math:`n \in [
     \begin{equation}
     S_{t}= \sup_{n \in [1, t]} \{ S_{n, t}\}
     \end{equation}
+
+.. py:currentmodule:: mlfinlab.structural_breaks.cusum
+
+.. autofunction:: get_chu_stinchcombe_white_statistics
+
+----
+
+Explosiveness tests
+####################
+
+Chow-Type Dickey-Fuller Test
+*****************************
+
+The Chow-Type Dickey-Fuller test is based on an :math:`AR(1)` process:
+
+.. math::
+
+      y_{t} = \rho y_{t} + \varepsilon_{t}
+
+where :math:`\varepsilon_{t}` is white noise.
+
+This test is used for detecting whether the process changes from the random walk (:math:`\rho = 1`) into an explosive
+process at some time :math:`\tau^{*}T`, :math:`\tau^{*} \in (0,1)`, where :math:`T` is the number of observations.
+
+So, the hypothesis :math:`H_{0}` is tested against :math:`H_{1}`:
+
+
+.. math::
+    \begin{equation}
+    \begin{split}
+      H_{0} & : y_{t} = y_{t-1} + \varepsilon_{t} \\
+      H_{1} & :
+      y_{t}=\begin{cases}
+      y_{t-1} + \varepsilon_{t} \ \text{for} \ \ t= 1, ..., \tau^*T  \\
+      \rho y_{t-1} + \varepsilon_{t} \ \text{for} \ \ t= \tau^*T+1, ..., T, \text{ with } \rho > 1
+      \end{cases}
+    \end{split}
+    \end{equation}
+
+To test the hypothesis, following specification is being fit:
+
+.. math::
+    \Delta y_{t} = \delta y_{t-1} D_{t}[\tau^*] + \varepsilon_{t}
+.. math::
+    \begin{equation}
+    \begin{split}
+      D_{t}[\tau^*] & = \begin{cases}
+      0 \ \text{if} \ \ t < \tau^*T  \\
+      1 \ \text{if} \ \ t \geq \tau^*T
+      \end{cases}
+    \end{split}
+    \end{equation}
+
+So, the hypothesis tested are now transformed to:
+
+.. math::
+    \begin{equation}
+    \begin{split}
+      H_{0} & : \delta = 0 \\
+      H_{1} & : \delta > 1 \\
+    \end{split}
+    \end{equation}
+
+And the Dickey-Fuller-Chow(DFC) test-statistics for :math:`\tau^*` is:
+
+.. math::
+
+    DFC_{\tau^*} = \frac{\hat\delta}{\hat\sigma_{\delta}}
+
+As described in the **Advances in Financial Machine Learning**:
+
+The first drawback of this method is that :math:`\tau^{*}` is unknown, and the second one is that Chow's approach
+assumes that there is only one break and that the bubble runs up to the end of the sample.
+
+To address the first issue, in the work **Tests for Parameter Instability and Structural Change With Unknown ChangePoint**
+`available here <https://pdfs.semanticscholar.org/77c9/86937d205592a007df3661778a5ed4fc4e38.pdf>`__, Andrews proposed to
+try all possible :math:`\tau^{*}` in an interval :math:`\tau^{*} \in [\tau_{0}, 1 - \tau_{0}]`
+
+For the unknown :math:`\tau^{*}` the test statistic is the Supremum Dickey-Fuller Chow which is the maximum of all
+:math:`T(1 - 2\tau_{0})` values of :math:`DFC_{\tau^{*}}` :
+
+.. math::
+    \begin{equation}
+    SDFC = \sup_{\tau^* \in [\tau_0,1-\tau_0]} \{ DFC_{\tau^*}\}
+    \end{equation}
+
+To address the second issue, the Supremum Augmented Dickey-Fuler test was introduced.
+
+.. py:currentmodule:: mlfinlab.structural_breaks.chow
+.. autofunction:: get_chow_type_stat
+
+----
+
 
 .. py:currentmodule:: mlfinlab.structural_breaks.cusum
 .. automodule:: mlfinlab.structural_breaks.cusum
