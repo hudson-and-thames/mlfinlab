@@ -27,14 +27,6 @@ We can classify the structural break in two general categories:
    - **Testing for Speculative Bubbles in Stock Markets: A Comparison of Alternative Methods** *by* Ulrich Homm *and* Jorg Breitung `available here <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.511.6559&rep=rep1&type=pdf>`__. *Explains the Chu-Stinchcombe-White CUSUM Test in more detail.*
    - **Tests of Equality Between Sets of Coefficients in Two Linear Regressions** *by* Gregory C. Chow `available here <http://web.sonoma.edu/users/c/cuellar/econ411/chow>`__. *A work that inspired a family of explosiveness tests.*
 
-.. figure:: structural_breaks_images/sadf.png
-   :scale: 70 %
-   :align: center
-   :figclass: align-center
-   :alt: structural breaks
-
-   Image showing SADF test statistic with 5 lags and linear model.
-
 CUSUM tests
 ###########
 
@@ -169,18 +161,77 @@ For the unknown :math:`\tau^{*}` the test statistic is the Supremum Dickey-Fulle
 To address the second issue, the Supremum Augmented Dickey-Fuler test was introduced.
 
 .. py:currentmodule:: mlfinlab.structural_breaks.chow
+
 .. autofunction:: get_chow_type_stat
 
 ----
 
+Supremum Augmented Dickey-Fuller
+********************************
 
-.. py:currentmodule:: mlfinlab.structural_breaks.cusum
-.. automodule:: mlfinlab.structural_breaks.cusum
-   :members:
+This test was proposed by Phillips, Wu and Yu in the work **Explosive Behavior in the 1990s Nasdaq: When Did Exuberance Escalate Asset Values?**
+`available here <https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=2264&context=soe_research>`__. The advantage
+of this test is that it it allows testing for multiple regimes switches (random wak to bubble and back).
+
+The test is based on the following regression:
+
+.. math::
+    \begin{equation}
+     \Delta y_{t} = \alpha + \beta y_{t-1} + \sum_{l=1}^{L}{\gamma\Delta y_{t-l} + \varepsilon_{t}}
+    \end{equation}
+
+And, the hypothesis :math:`H_{0}` is tested against :math:`H_{1}`:
+
+.. math::
+    \begin{equation}
+    \begin{split}
+      H_{0} & : \beta \le 0 \\
+      H_{1} & : \beta > 0 \\
+    \end{split}
+    \end{equation}
+
+The Supremum Augmented Dickey-Fuller fits the above regression for each end point :math:`t` with backward expanding
+start points and calculates the test-statistic as:
+
+.. math::
+    \begin{equation}
+     SADF_{t} = \sup_{t_0 \in [1, t-\tau]}\{ADF_{t_0, t}\} = \sup_{t_0 \in [1, t-\tau]} \Bigg\{\frac{\hat\beta_{t_0,t}}{\hat\sigma_{\beta_{t_0, t}}}\Bigg\}
+    \end{equation}
+
+where :math:`\hat\beta_{t_0,t}` is estimated on the sample from :math:`t_{0}` to :math:`t`, :math:`\tau` is the minimum
+sample length in the analysis, :math:`t_{0}` is the left bound of the backwards expanding window, :math:`t` iterates
+through :math:`[\tau, ..., T]` .
+
+In comparison to SDFC, which is computed only at time :math:`T`, the SADF is computed at each :math:`t \in [\tau, T]`,
+recursively expanding the sample :math:`t_{0} \in [1, t - \tau]` . By doing so, the SADF does not assume a known number of
+regime switches.
+
+.. figure:: structural_breaks_images/sadf.png
+   :scale: 70 %
+   :align: center
+   :figclass: align-center
+   :alt: structural breaks
+
+   Image showing SADF test statistic with 5 lags and linear model. The
+   SADF line spikes when prices exhibit a bubble-like behavior, and returns to low levels
+   when the bubble bursts.
 
 .. py:currentmodule:: mlfinlab.structural_breaks.sadf
-.. automodule:: mlfinlab.structural_breaks.sadf
-   :members:
+
+.. autofunction:: get_sadf
+
+Function used in the SADF Test to estimate the :math:`\hat\beta_{t_0,t}` is:
+
+.. py:currentmodule:: mlfinlab.structural_breaks.sadf
+
+.. autofunction:: get_betas
+
+.. tip::
+
+   **Advances in Financial Machine Learning** book additionally describes why log prices data is more appropriate to use
+   in the above tests, their computational complexity and other details.
+
+----
 
 Examples
 ########
