@@ -54,4 +54,8 @@ Examples
     chow_stats = get_chow_type_stat(log_prices, min_length=20)
 
     # SADF test
-    linear_sadf = get_sadf(log_prices, model='linear', add_const=True, min_length=20, lags=5)
+    linear_sadf = get_sadf(log_prices, model='linear', add_const=True, min_length=20, lags=5, phi=0)
+
+    # Polynomial trend SMT
+    sm_poly_1_sadf = get_sadf(log_prices, model='sm_poly_1', add_const=True, min_length=20, lags=5, phi=0.5)
+    
