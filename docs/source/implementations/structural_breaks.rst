@@ -5,10 +5,10 @@ Structural Breaks
 =================
 
 This implementation is based on Chapter 17 of the book Advances in Financial Machine Learning. Structural breaks, like
-the transition from one market regime to another, represent the shift in behaviour of market participants.
+the transition from one market regime to another, represent the shift in the behaviour of market participants.
 
 The first market participant to notice the changes in the market can adapt to them before others and, consequently,
-gain advantage over market participants who have not yet noticed market regime changes.
+gain an advantage over market participants who have not yet noticed market regime changes.
 
 To quote Marcos Lopez de Prado, "Structural breaks offer some of the best risk/rewards".
 
@@ -40,7 +40,7 @@ predictive of a value :math:`y_{t}` .
     y_{t} = \beta_{t}x_{t} + \epsilon_{t}
 
 Authors of the **Testing for Speculative Bubbles in Stock Markets: A Comparison of Alternative Methods** paper suggest
-assuming :math:`H_{0} : \beta_{t} = 0` and therefore forecast :math:`E_{t-1}[\Delta y_{t}] = 0`. This allows to work directly
+assuming :math:`H_{0} : \beta_{t} = 0` and therefore forecast :math:`E_{t-1}[\Delta y_{t}] = 0`. This allows working directly
 with :math:`y_{t}` instead of computing recursive least squares (RLS) estimates of :math:`\beta` .
 
 As :math:`y_{t}` we take the log-price and calculate the standardized departure of :math:`y_{t}` relative to :math:`y_{n}`
@@ -98,7 +98,6 @@ process at some time :math:`\tau^{*}T`, :math:`\tau^{*} \in (0,1)`, where :math:
 
 So, the hypothesis :math:`H_{0}` is tested against :math:`H_{1}`:
 
-
 .. math::
     \begin{equation}
     \begin{split}
@@ -111,7 +110,7 @@ So, the hypothesis :math:`H_{0}` is tested against :math:`H_{1}`:
     \end{split}
     \end{equation}
 
-To test the hypothesis, following specification is being fit:
+To test the hypothesis, the following specification is being fit:
 
 .. math::
     \Delta y_{t} = \delta y_{t-1} D_{t}[\tau^*] + \varepsilon_{t}
@@ -169,9 +168,9 @@ To address the second issue, the Supremum Augmented Dickey-Fuler test was introd
 Supremum Augmented Dickey-Fuller
 ********************************
 
-This test was proposed by Phillips, Wu and Yu in the work **Explosive Behavior in the 1990s Nasdaq: When Did Exuberance Escalate Asset Values?**
+This test was proposed by Phillips, Wu, and Yu in the work **Explosive Behavior in the 1990s Nasdaq: When Did Exuberance Escalate Asset Values?**
 `available here <https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=2264&context=soe_research>`__. The advantage
-of this test is that it it allows testing for multiple regimes switches (random wak to bubble and back).
+of this test is that it allows testing for multiple regimes switches (random walk to bubble and back).
 
 The test is based on the following regression:
 
@@ -220,7 +219,7 @@ regime switches.
 
 .. autofunction:: get_sadf
 
-Function used in the SADF Test to estimate the :math:`\hat\beta_{t_0,t}` is:
+The function used in the SADF Test to estimate the :math:`\hat\beta_{t_0,t}` is:
 
 .. py:currentmodule:: mlfinlab.structural_breaks.sadf
 
@@ -229,7 +228,7 @@ Function used in the SADF Test to estimate the :math:`\hat\beta_{t_0,t}` is:
 .. tip::
 
    **Advances in Financial Machine Learning** book additionally describes why log prices data is more appropriate to use
-   in the above tests, their computational complexity and other details.
+   in the above tests, their computational complexity, and other details.
 
 ----
 
