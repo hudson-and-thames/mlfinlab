@@ -1,4 +1,5 @@
 # pylint: disable=missing-module-docstring
+# pylint: disable=too-many-instance-attributes
 import sys
 import numpy as np
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
@@ -29,14 +30,15 @@ class UniversalPortfolio(OLPS):
         :param weighted: (str) Capital allocation method. 'P': Historical Performance, 'U':
                                Uniform Weights, 'K': Top-K experts.
         """
-        self.experts = []  # Array to store all experts
-        self.number_of_experts = number_of_experts  # Set the number of experts.
-        self.expert_params = None  # Each expert's parameters.
-        self.expert_portfolio_returns = None  # All experts' portfolio returns over time.
-        self.expert_all_weights = None  # Each experts' weights over time.
-        self.weights_on_experts = None  # Capital allocation on each experts.
-        self.weighted = weighted  # Weights allocated to each experts.
-        self.k = k  # Number of top-k experts.
+        self.experts = []  # (list) Array to store all experts
+        self.number_of_experts = number_of_experts  # (int) Set the number of experts.
+        self.expert_params = None  # (np.array) Each expert's parameters.
+        self.expert_portfolio_returns = None  # (np.array) All experts' portfolio returns over time.
+        self.expert_all_weights = None  # (np.array) Each experts' weights over time.
+        self.expert_weights = None  # (np.array) Each experts' final portfolio weights
+        self.weights_on_experts = None  # (np.array) Capital allocation on each experts.
+        self.weighted = weighted  # (np.array) Weights allocated to each experts.
+        self.k = k  # (int) Number of top-k experts.
         super(UniversalPortfolio, self).__init__()
 
     def _initialize(self, asset_prices, weights, resample_by):
@@ -59,7 +61,7 @@ class UniversalPortfolio(OLPS):
         self.expert_all_weights = np.zeros((self.number_of_experts, self.length_of_time,
                                             self.number_of_assets))
         # Set all experts' predicted weights.
-        self.weights = np.zeros((self.number_of_experts, self.number_of_assets))
+        self.expert_weights = np.zeros((self.number_of_experts, self.number_of_assets))
 
     def _run(self, weights, verbose):
         """
@@ -76,7 +78,7 @@ class UniversalPortfolio(OLPS):
             # Stack the portfolio returns.
             self.expert_portfolio_returns[:, [exp]] = self.experts[exp].portfolio_return
             # Stack predicted weights.
-            self.weights[exp] = self.experts[exp].weights
+            self.expert_weights[exp] = self.experts[exp].weights
             # Print progress bar.
             if verbose:
                 self._print_progress(exp + 1, prefix='Progress:', suffix='Complete')
@@ -84,6 +86,79 @@ class UniversalPortfolio(OLPS):
         self._calculate_weights_on_experts()
         # Uniform weight distribution for wealth between managers.
         self._calculate_all_weights()
+
+    def _calculate_weights_on_experts(self):
+        """
+        Calculates the weight allocation on each experts.
+        'P': Historical Performance.
+        'U': Uniform Weights.
+        'K': Top-K experts.
+        """
+        # If capital allocation is based on historical performances.
+        if self.weighted == 'P':
+            # Calculate each expert's cumulative return ratio for each time period.
+            expert_returns_ratio = np.apply_along_axis(lambda x: x/np.sum(x), 1,
+                                                       self.expert_portfolio_returns)
+            # Initial weights are evenly distributed among all experts.
+            expert_returns_ratio = np.vstack((self._uniform_experts(), expert_returns_ratio))
+            self.weights_on_experts = expert_returns_ratio
+        # If capital allocation is based on uniform weights.
+        elif self.weighted == 'U':
+            # Equal allocation.
+            uniform_ratio = np.ones(
+                self.expert_portfolio_returns.shape) / self.number_of_experts
+            # Initial weights are evenly distributed among all experts.
+            uniform_ratio = np.vstack((self._uniform_experts(), uniform_ratio))
+            self.weights_on_experts = uniform_ratio
+        # If capital allocation is based on top-K experts.
+        elif self.weighted == 'K':
+            # Only the top k experts get 1/k of the wealth.
+            # https://stackoverflow.com/questions/6910641/
+            # how-do-i-get-indices-of-n-maximum-values-in-a-numpy-array.
+            # Get the indices of top k experts for each time.
+            top_k = np.apply_along_axis(lambda x: np.argpartition(x, -self.k)[-self.k:], 1,
+                                        self.expert_portfolio_returns)
+            # Create a wealth distribution matrix.
+            top_k_distribution = np.zeros(self.expert_portfolio_returns.shape)
+            # For each week set the multiplier for each expert.
+            # Each row represents the week's allocation to the k experts.
+            for time in range(top_k.shape[0]):
+                top_k_distribution[time][top_k[time]] = 1 / self.k
+            # Initial weights are evenly distributed among all experts.
+            top_k_distribution = np.vstack((self._uniform_experts(), top_k_distribution))
+            self.weights_on_experts = top_k_distribution
+        else:
+            raise ValueError("Please put in 'P' for Historical Performance, 'U' for Unifrom "
+                             "Distribution, or 'K' for top-K experts.")
+
+    def _uniform_experts(self):
+        """
+        Returns a uniform weight of experts.
+
+        :return uni_weight: (np.array) Uniform weights (1/n, 1/n, 1/n ...).
+        """
+        # Divide by number of assets after creating numpy arrays of one.
+        uni_weight = np.ones(self.number_of_experts) / self.number_of_experts
+        return uni_weight
+
+    def _calculate_all_weights(self):
+        # pylint: disable=unsubscriptable-object
+        """
+        Calculate portfolio's overall weights and final predicted weights with information from
+        each expert's weights.
+        """
+
+        # Calculate the product of the distribution matrix with the 3d experts x all weights matrix.
+        # https://stackoverflow.com/questions/58588378/
+        # how-to-matrix-multiply-a-2d-numpy-array-with-a-3d-array-to-give-a-3d-array
+        d_shape = self.weights_on_experts[:-1].shape[:1] + self.expert_all_weights.shape[1:]
+        weight_change = (self.weights_on_experts[:-1] @ self.expert_all_weights.reshape(
+            self.expert_all_weights.shape[0], -1)).reshape(d_shape)
+        # We are looking at the diagonal cross section of the multiplication.
+        self.all_weights = np.diagonal(weight_change, axis1=0, axis2=1).T
+
+        # Calculate final predicted weights.
+        self.weights = np.dot(self.weights_on_experts[[-1]], self.expert_weights)
 
     def _generate_experts(self):
         """
@@ -113,75 +188,6 @@ class UniversalPortfolio(OLPS):
                                      np.ones((number_of_experts, 1))]))
         # Set the parameters as the randomly generated simplex weights.
         self.expert_params = simplex
-
-    def _calculate_weights_on_experts(self):
-        """
-        Calculates the weight allocation on each experts.
-        'P': Historical Performance.
-        'U': Uniform Weights.
-        'K': Top-K experts.
-        """
-        # If capital allocation is based on historical performances.
-        if self.weighted == 'P':
-            # Calculate each expert's cumulative return ratio for each time period.
-            expert_returns_ratio = np.apply_along_axis(lambda x: x/np.sum(x), 1,
-                                                       self.expert_portfolio_returns[:-1])
-            # Initial weights are evenly distributed among all experts.
-            expert_returns_ratio = np.vstack((self._uniform_experts(),
-                                              expert_returns_ratio))
-            self.weights_on_experts = expert_returns_ratio
-        # If capital allocation is based on uniform weights.
-        elif self.weighted == 'U':
-            expert_returns_ratio = np.ones(
-                self.expert_portfolio_returns.shape) / self.number_of_experts
-            self.weights_on_experts = expert_returns_ratio
-        # If capital allocation is based on top-K experts.
-        elif self.weighted == 'K':
-            # Only the top k experts get 1/k of the wealth.
-            # https://stackoverflow.com/questions/6910641/
-            # how-do-i-get-indices-of-n-maximum-values-in-a-numpy-array.
-            # Get the indices of top k experts for each time.
-            top_k = np.apply_along_axis(lambda x: np.argpartition(x, -self.k)[-self.k:], 1,
-                                        self.expert_portfolio_returns)
-            # Pop last row.
-            top_k = top_k[:-1]
-            # Create a wealth distribution matrix.
-            top_k_distribution = np.zeros(self.expert_portfolio_returns.shape)
-            # First weight is uniform.
-            top_k_distribution[0] = self._uniform_experts()
-            # For each week set the multiplier for each expert.
-            # Each row represents the week's allocation to the k experts.
-            for time in range(1, top_k.shape[0] + 1):
-                top_k_distribution[time][top_k[time - 1]] = 1 / self.k
-            self.weights_on_experts = top_k_distribution
-        else:
-            raise ValueError("Please put in 'P' for Historical Performance, 'U' for Unifrom "
-                             "Distribution, or 'K' for top-K experts.")
-
-    def _uniform_experts(self):
-        """
-        Returns a uniform weight of experts.
-
-        :return uni_weight: (np.array) Uniform weights (1/n, 1/n, 1/n ...).
-        """
-        # Divide by number of assets after creating numpy arrays of one.
-        uni_weight = np.ones(self.number_of_experts) / self.number_of_experts
-        return uni_weight
-
-    def _calculate_all_weights(self):
-        # pylint: disable=unsubscriptable-object
-        """
-        Calculate portfolio's overall weights with information from each expert's weights.
-        """
-
-        # Calculate the product of the distribution matrix with the 3d experts x all weights matrix.
-        # https://stackoverflow.com/questions/58588378/
-        # how-to-matrix-multiply-a-2d-numpy-array-with-a-3d-array-to-give-a-3d-array
-        d_shape = self.weights_on_experts.shape[:1] + self.expert_all_weights.shape[1:]
-        weight_change = (self.weights_on_experts @ self.expert_all_weights.reshape(
-            self.expert_all_weights.shape[0], -1)).reshape(d_shape)
-        # We are looking at the diagonal cross section of the multiplication.
-        self.all_weights = np.diagonal(weight_change, axis1=0, axis2=1).T
 
     def _print_progress(self, iteration, prefix='', suffix='', decimals=1, bar_length=50):
         # pylint: disable=expression-not-assigned
