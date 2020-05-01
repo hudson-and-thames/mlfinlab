@@ -32,11 +32,11 @@ class TestUniversalPortfolio(TestCase):
         Test the calculation of UP weights.
         """
         # Initialize OLPS.
-        up = UniversalPortfolio(2)
+        up1 = UniversalPortfolio(2)
         # Allocates asset prices to OLPS.
-        up.allocate(self.data)
+        up1.allocate(self.data)
         # Create np.array of all_weights.
-        all_weights = np.array(up.all_weights)
+        all_weights = np.array(up1.all_weights)
         # Check if all weights sum to 1.
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]
@@ -49,20 +49,20 @@ class TestUniversalPortfolio(TestCase):
         Tests that UP prints progress bar.
         """
         # Initialize OLPS.
-        up1 = UniversalPortfolio(2)
+        up2 = UniversalPortfolio(2)
         # Allocates asset prices to OLPS.
-        up1.allocate(self.data, verbose=True)
+        up2.allocate(self.data, verbose=True)
 
     def test_up_uniform_solution(self):
         """
         Tests UP with uniform capital allocation.
         """
         # Initialize OLPS.
-        up = UniversalPortfolio(2, weighted='U')
+        up3 = UniversalPortfolio(2, weighted='U')
         # Allocates asset prices to OLPS.
-        up.allocate(self.data)
+        up3.allocate(self.data)
         # Create np.array of all_weights.
-        all_weights = np.array(up.all_weights)
+        all_weights = np.array(up3.all_weights)
         # Check if all weights sum to 1.
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]
@@ -75,11 +75,11 @@ class TestUniversalPortfolio(TestCase):
         Tests UP with top-k experts capital allocation.
         """
         # Initialize OLPS.
-        up = UniversalPortfolio(5, weighted='K', k=2)
+        up4 = UniversalPortfolio(5, weighted='K', k=2)
         # Allocates asset prices to OLPS.
-        up.allocate(self.data)
+        up4.allocate(self.data)
         # Create np.array of all_weights.
-        all_weights = np.array(up.all_weights)
+        all_weights = np.array(up4.all_weights)
         # Check if all weights sum to 1.
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]
@@ -92,7 +92,7 @@ class TestUniversalPortfolio(TestCase):
         Tests ValueError if the method is not 'P', 'U', or 'K'.
         """
         # Initialize OLPS.
-        up = UniversalPortfolio(5, weighted='JJ', k=2)
+        up5 = UniversalPortfolio(5, weighted='JJ', k=2)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
-            up.allocate(self.data)
+            up5.allocate(self.data)
