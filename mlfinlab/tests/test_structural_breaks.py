@@ -105,14 +105,10 @@ class TesStructuralBreaks(unittest.TestCase):
         sm_power_sadf = get_sadf(log_prices, model='sm_power', add_const=True, min_length=min_length, lags=lags_int)
         sm_exp_sadf = get_sadf(log_prices, model='sm_exp', add_const=True, min_length=min_length, lags=lags_int)
 
-        sm_poly_1_sadf_phi = get_sadf(log_prices, model='sm_poly_1', add_const=True, min_length=min_length, lags=lags_int,
-                                  phi=0.5)
-        sm_poly_2_sadf_phi = get_sadf(log_prices, model='sm_poly_2', add_const=True, min_length=min_length, lags=lags_int,
-                                  phi=0.5)
         sm_power_sadf_phi = get_sadf(log_prices, model='sm_power', add_const=True, min_length=min_length, lags=lags_int,
-                                 phi=0.5)
+                                     phi=0.5)
         sm_exp_sadf_phi = get_sadf(log_prices, model='sm_exp', add_const=True, min_length=min_length, lags=lags_int,
-                               phi=0.5)
+                                   phi=0.5)
 
         self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_power_sadf.shape[0])  # -1 for series_diff
         self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, linear_sadf.shape[0])
@@ -120,9 +116,6 @@ class TesStructuralBreaks(unittest.TestCase):
         self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_poly_1_sadf.shape[0])
         self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_poly_2_sadf.shape[0])
         self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_exp_sadf.shape[0])
-        self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_poly_1_sadf_phi.shape[0])
-        self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_poly_2_sadf_phi.shape[0])
-        self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_power_sadf_phi.shape[0])
         self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_exp_sadf_phi.shape[0])
 
         self.assertAlmostEqual(sm_power_sadf.mean(), 28.954, delta=1e-3)
@@ -145,12 +138,6 @@ class TesStructuralBreaks(unittest.TestCase):
 
         self.assertAlmostEqual(sm_exp_sadf.mean(), 28.916, delta=1e-3)
         self.assertAlmostEqual(sm_exp_sadf[29], 17.100, delta=1e-3)
-
-        self.assertAlmostEqual(sm_poly_1_sadf_phi.mean(), 1.2504, delta=1e-3)
-        self.assertAlmostEqual(sm_poly_1_sadf_phi[29], 1.1808, delta=1e-3)
-
-        self.assertAlmostEqual(sm_poly_2_sadf_phi.mean(), 1.2503, delta=1e-3)
-        self.assertAlmostEqual(sm_poly_2_sadf_phi[29], 1.1813, delta=1e-3)
 
         self.assertAlmostEqual(sm_power_sadf_phi.mean(), 1.4874, delta=1e-3)
         self.assertAlmostEqual(sm_power_sadf_phi.iloc[29], 2.4564, delta=1e-3)
