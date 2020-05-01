@@ -59,7 +59,8 @@ def _get_y_x(series: pd.Series, model: str, lags: Union[int, list],
         x['trend'] = np.arange(x.shape[0])  # Add t to the model (0, 1, 2, 3, 4, 5, .... t)
         beta_column = 'y_lagged'  # Column which is used to estimate test beta statistics
     elif model == 'quadratic':
-        x['trend'] = np.arange(x.shape[0]) ** 2  # Add t^2 to the model (0, 1, 4, 9, ....)
+        x['trend'] = np.arange(x.shape[0]) # Add t to the model (0, 1, 2, 3, 4, 5, .... t)
+        x['quad_trend'] = np.arange(x.shape[0]) ** 2 # Add t^2 to the model (0, 1, 4, 9, ....)
         beta_column = 'y_lagged'  # Column which is used to estimate test beta statistics
     elif model == 'sm_poly_1':
         y = series.loc[y.index]

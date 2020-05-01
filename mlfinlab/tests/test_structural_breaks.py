@@ -127,8 +127,8 @@ class TesStructuralBreaks(unittest.TestCase):
         self.assertAlmostEqual(linear_sadf_no_const_lags_arr.mean(), 1.899, delta=1e-3)
         self.assertAlmostEqual(linear_sadf_no_const_lags_arr[29], 1.252, delta=1e-3)
 
-        self.assertAlmostEqual(quadratic_sadf.mean(), -0.651, delta=1e-3)
-        self.assertAlmostEqual(quadratic_sadf[29], -1.065, delta=1e-3)
+        self.assertAlmostEqual(quadratic_sadf.mean(), -1.002, delta=1e-3)
+        self.assertAlmostEqual(quadratic_sadf[29], -1.460, delta=1e-3)
 
         self.assertAlmostEqual(sm_poly_1_sadf.mean(), 26.033, delta=1e-3)
         self.assertAlmostEqual(sm_poly_1_sadf[29], 8.350, delta=1e-3)
