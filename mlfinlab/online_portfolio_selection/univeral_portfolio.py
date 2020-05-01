@@ -12,15 +12,22 @@ class UniversalPortfolio(OLPS):
     'Cover, T.M. (1991), Universal Portfolios. Mathematical Finance, 1: 1-29.
     <http://www-isl.stanford.edu/~cover/papers/portfolios_side_info.pdf>'_
 
-    Universal Portfolio is
+    Universal Portfolio acts as a fund of funds, generating a number of experts with unique
+    strategies. Cover's original universal portfolio integrates over the total simplex domain,
+    but because it is not possible for us to calculate all possibilties, we generate a random
+    distribution of points. The allocation method to each experts can be changed. If no
+    allocation method is given, Universal Portfolio will not rebalance among the experts. Other
+    allocation methods include uniform allocation among experts and top-k experts, which allocate
+    capital based on the top-k performing experts until the last period.
     """
     def __init__(self, number_of_experts, weighted='P', k=1):
         """
-        Constructor
+        Initializes Universal Portfolio with the given number of experts, method of capital
+        allocation to each experts, and k-value for Top-K experts.
 
         :param number_of_experts: (int) Number of total experts
         :param weighted: (str) Capital allocation method. 'P': Historical Performance, 'U':
-                               Uniform Weights, 'K': Top-K experts
+                               Uniform Weights, 'K': Top-K experts.
         """
         self.experts = []  # Array to store all experts
         self.number_of_experts = number_of_experts  # Set the number of experts.
@@ -29,7 +36,7 @@ class UniversalPortfolio(OLPS):
         self.expert_all_weights = None  # Each experts' weights over time.
         self.weights_on_experts = None  # Capital allocation on each experts.
         self.weighted = weighted  # Weights allocated to each experts.
-        self.k = k  # Number for top-k experts.
+        self.k = k  # Number of top-k experts.
         super(UniversalPortfolio, self).__init__()
 
     def _initialize(self, asset_prices, weights, resample_by):
@@ -46,10 +53,12 @@ class UniversalPortfolio(OLPS):
         # Generate all experts.
         self._generate_experts()
 
-        # Set experts portfolio returns and weights.
+        # Set experts' portfolio returns.
         self.expert_portfolio_returns = np.zeros((self.length_of_time, self.number_of_experts))
-        self.expert_all_weights = np.zeros((self.number_of_experts, self.length_of_time + 1,
+        # Set all experts' weights
+        self.expert_all_weights = np.zeros((self.number_of_experts, self.length_of_time,
                                             self.number_of_assets))
+        # Set all experts' predicted weights.
         self.weights = np.zeros((self.number_of_experts, self.number_of_assets))
 
     def _run(self, weights, verbose):
@@ -66,7 +75,7 @@ class UniversalPortfolio(OLPS):
             self.expert_all_weights[exp] = self.experts[exp].all_weights
             # Stack the portfolio returns.
             self.expert_portfolio_returns[:, [exp]] = self.experts[exp].portfolio_return
-            # Stack final weights.
+            # Stack predicted weights.
             self.weights[exp] = self.experts[exp].weights
             # Print progress bar.
             if verbose:
@@ -139,13 +148,15 @@ class UniversalPortfolio(OLPS):
             # Create a wealth distribution matrix.
             top_k_distribution = np.zeros(self.expert_portfolio_returns.shape)
             # First weight is uniform.
-            top_k_distribution[0] = self._uniform_weight()
+            top_k_distribution[0] = self._uniform_experts()
             # For each week set the multiplier for each expert.
             # Each row represents the week's allocation to the k experts.
             for time in range(1, top_k.shape[0] + 1):
                 top_k_distribution[time][top_k[time - 1]] = 1 / self.k
-
             self.weights_on_experts = top_k_distribution
+        else:
+            raise ValueError("Please put in 'P' for Historical Performance, 'U' for Unifrom "
+                             "Distribution, or 'K' for top-K experts.")
 
     def _uniform_experts(self):
         """
@@ -158,6 +169,7 @@ class UniversalPortfolio(OLPS):
         return uni_weight
 
     def _calculate_all_weights(self):
+        # pylint: disable=unsubscriptable-object
         """
         Calculate portfolio's overall weights with information from each expert's weights.
         """
@@ -167,7 +179,7 @@ class UniversalPortfolio(OLPS):
         # how-to-matrix-multiply-a-2d-numpy-array-with-a-3d-array-to-give-a-3d-array
         d_shape = self.weights_on_experts.shape[:1] + self.expert_all_weights.shape[1:]
         weight_change = (self.weights_on_experts @ self.expert_all_weights.reshape(
-                self.expert_all_weights.shape[0], -1)).reshape(d_shape)
+            self.expert_all_weights.shape[0], -1)).reshape(d_shape)
         # We are looking at the diagonal cross section of the multiplication.
         self.all_weights = np.diagonal(weight_change, axis1=0, axis2=1).T
 

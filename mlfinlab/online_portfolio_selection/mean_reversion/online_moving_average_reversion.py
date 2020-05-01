@@ -16,7 +16,8 @@ class OnlineMovingAverageReversion(OLPS):
 
     def __init__(self, reversion_method, epsilon, window=None, alpha=None):
         """
-        Constructor.
+        Initializes Online Moving Average Reversion with the given reversion method, epsilon,
+        window, and alpha.
 
         :param reversion_method: (int) 1 for SMA, 2 for EWA.
         :param epsilon: (float) reversion threshold >= 1.
@@ -39,6 +40,17 @@ class OnlineMovingAverageReversion(OLPS):
         :param resample_by: (str) Specifies how to resample the prices.
         """
         super(OnlineMovingAverageReversion, self)._initialize(asset_prices, weights, resample_by)
+
+        # Check that epsilon values are correct.
+        if self.epsilon < 1:
+            raise ValueError("Epsilon values must be greater or equal to 1.")
+
+        # Check that window is at least 1.
+        if self.reversion_method == 1 and self.window < 1:
+            raise ValueError("Window must be at least 1.")
+
+        if self.reversion_method == 2 and (self.alpha < 0 or self.alpha > 1):
+            raise ValueError("Alpha must be between 0 and 1.")
 
         # Calculate moving average reversion.
         self.moving_average_reversion = self._calculate_rolling_moving_average(self.asset_prices,
@@ -88,8 +100,7 @@ class OnlineMovingAverageReversion(OLPS):
         """
         # MAR-1 reversion method: Simple Moving Average.
         if reversion_method == 1:
-            rolling_ma = np.array(
-                asset_prices.rolling(window).apply(lambda x: np.sum(x) / x[0] / window))
+            rolling_ma = np.array(asset_prices.rolling(window).apply(lambda x: np.sum(x) / x[0] / window))
         # MAR-2 reversion method: Exponential Moving Average.
         elif reversion_method == 2:
             rolling_ma = np.array(asset_prices.ewm(alpha=alpha, adjust=False).mean() / asset_prices)
