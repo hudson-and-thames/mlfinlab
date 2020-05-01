@@ -168,16 +168,14 @@ To address the second issue, the Supremum Augmented Dickey-Fuler test was introd
 Supremum Augmented Dickey-Fuller
 ********************************
 
-This test was proposed by Phillips, Wu, and Yu in the work **Explosive Behavior in the 1990s Nasdaq: When Did Exuberance Escalate Asset Values?**
-`available here <https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=2264&context=soe_research>`__. The advantage
+This test was proposed by Phillips, Shi, and Yu in the work **Testing for Multiple Bubbles: Historical Episodes of Exuberance and Collapse in the S&P 500**
+`available here <http://korora.econ.yale.edu/phillips/pubs/art/p1498.pdf>`__. The advantage
 of this test is that it allows testing for multiple regimes switches (random walk to bubble and back).
 
 The test is based on the following regression:
 
 .. math::
-    \begin{equation}
-     \Delta y_{t} = \alpha + \beta y_{t-1} + \sum_{l=1}^{L}{\gamma\Delta y_{t-l} + \varepsilon_{t}}
-    \end{equation}
+     \Delta y_{t} = \alpha + \beta y_{t-1} + \sum_{l=1}^{L}{\gamma \Delta y_{t-l}} + \varepsilon_{t}
 
 And, the hypothesis :math:`H_{0}` is tested against :math:`H_{1}`:
 
@@ -215,6 +213,35 @@ regime switches.
    SADF line spikes when prices exhibit a bubble-like behavior, and returns to low levels
    when the bubble bursts.
 
+The `model` and the `add_const` parameters of the **get_sadf** function allow for different specification of the
+regression's time trend component.
+
+Linear model (`model='linear'`) uses a linear time trend:
+
+.. math::
+
+      y_{t} = \gamma t + \varepsilon_{t}
+
+Quadratic model (`model='quadratic'`) uses a second-degree polynomial time trend:
+
+.. math::
+
+      y_{t} = \gamma t + \beta t^{2} + \varepsilon_{t}
+
+Adding a constant to those specifications results in:
+
+.. math::
+
+      y_{t} = \alpha + \gamma t + \varepsilon_{t}
+
+and
+
+.. math::
+
+      y_{t} = \alpha + \gamma t + \beta t^{2} + \varepsilon_{t}
+
+respectively.
+
 .. py:currentmodule:: mlfinlab.structural_breaks.sadf
 
 .. autofunction:: get_sadf
@@ -229,6 +256,33 @@ The function used in the SADF Test to estimate the :math:`\hat\beta_{t_0,t}` is:
 
    **Advances in Financial Machine Learning** book additionally describes why log prices data is more appropriate to use
    in the above tests, their computational complexity, and other details.
+
+The SADF also allows for explosiveness testing that doesn't rely on the standard ADF specification. If the process is either
+sub- or super martingale, the hypotheses :math:`H_{0}: \beta = 0, H_{1}: \beta \ne 0` can be tested under these specifications:
+linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
+Polynomial trend (`model='sm_poly_1'`):
+
+.. math::
+
+      y_{t} = \alpha + \gamma t + \beta t^{2} + \varepsilon_{t}
+
+Polynomial trend (`model='sm_poly_2'`):
+
+.. math::
+
+      log[y_{t}] = \alpha + \gamma t + \beta t^{2} + \varepsilon_{t}
+
+Exponential trend (`model='sm_exp'`):
+
+.. math::
+
+      y_{t} = \alpha e^{\beta t} + \varepsilon_{t} \Rightarrow log[y_{t}] = log[\alpha] + \beta t^{2} + \xi_{t}
+
+Power trend (`model='sm_power'`):
+
+.. math::
+
+      y_{t} = \alpha t^{\beta} + \varepsilon_{t} \Rightarrow log[y_{t}] = log[\alpha] + \beta log[t] + \xi_{t}
 
 ----
 
