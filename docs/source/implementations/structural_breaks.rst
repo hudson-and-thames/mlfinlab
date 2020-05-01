@@ -175,7 +175,7 @@ of this test is that it allows testing for multiple regimes switches (random wal
 The test is based on the following regression:
 
 .. math::
-     \Delta y_{t} = \alpha + \beta y_{t-1} + \sum_{l=1}^{L}{\gamma \Delta y_{t-l}} + \varepsilon_{t}
+     \Delta y_{t} = \alpha + \beta y_{t-1} + \sum_{l=1}^{L}{\gamma_{l} \Delta y_{t-l}} + \varepsilon_{t}
 
 And, the hypothesis :math:`H_{0}` is tested against :math:`H_{1}`:
 
@@ -220,25 +220,25 @@ Linear model (`model='linear'`) uses a linear time trend:
 
 .. math::
 
-      y_{t} = \gamma t + \varepsilon_{t}
+      \Delta y_{t} = \beta y_{t-1} + \sum_{l=1}^{L}{\gamma_{l} \Delta y_{t-l}} + \varepsilon_{t}
 
 Quadratic model (`model='quadratic'`) uses a second-degree polynomial time trend:
 
 .. math::
 
-      y_{t} = \gamma t + \beta t^{2} + \varepsilon_{t}
+      \Delta y_{t} = \beta y_{t-1} + \sum_{l=1}^{L}{\gamma_{l} \Delta y_{t-l}} + \sum_{l=1}^{L}{\delta_{l}^2 \Delta y_{t-l}} + \varepsilon_{t}
 
 Adding a constant to those specifications results in:
 
 .. math::
 
-      y_{t} = \alpha + \gamma t + \varepsilon_{t}
+      \Delta y_{t} = \alpha + \beta y_{t-1} + \sum_{l=1}^{L}{\gamma_{l} \Delta y_{t-l}} + \varepsilon_{t}
 
 and
 
 .. math::
 
-      y_{t} = \alpha + \gamma t + \beta t^{2} + \varepsilon_{t}
+      \Delta y_{t} = \alpha + \beta y_{t-1} + \sum_{l=1}^{L}{\gamma_{l} \Delta y_{t-l}} + \sum_{l=1}^{L}{\delta_{l}^2 \Delta y_{t-l}} + \varepsilon_{t}
 
 respectively.
 
@@ -259,7 +259,7 @@ The function used in the SADF Test to estimate the :math:`\hat\beta_{t_0,t}` is:
 
 The SADF also allows for explosiveness testing that doesn't rely on the standard ADF specification. If the process is either
 sub- or super martingale, the hypotheses :math:`H_{0}: \beta = 0, H_{1}: \beta \ne 0` can be tested under these specifications:
-linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
+
 Polynomial trend (`model='sm_poly_1'`):
 
 .. math::
@@ -296,15 +296,18 @@ Examples
     from mlfinlab.structural_breaks import (get_chu_stinchcombe_white_statistics,
                                             get_chow_type_stat, get_sadf)
 
+    # Importing price data
     bars = pd.read_csv('BARS_PATH', index_col = 0, parse_dates=[0])
+
+    # Changing to log prices data
     log_prices = np.log(bars.close) # see p.253, 17.4.2.1 Raw vs Log Prices
 
-    # Chu-Stinchcombe test
+    # Chu-Stinchcombe test (one-sided and two-sided)
     one_sided_test = get_chu_stinchcombe_white_statistics(log_prices, test_type='one_sided')
     two_sided_test = get_chu_stinchcombe_white_statistics(log_prices, test_type='two_sided')
 
     # Chow-type test
     chow_stats = get_chow_type_stat(log_prices, min_length=20)
 
-    # SADF test
+    # SADF test with linear model and a constant, lag of 5 and minimum sample length of 20
     linear_sadf = get_sadf(log_prices, model='linear', add_const=True, min_length=20, lags=5)
