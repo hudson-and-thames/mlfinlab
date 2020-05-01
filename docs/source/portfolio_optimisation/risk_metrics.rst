@@ -32,7 +32,7 @@ The Variance of a portfolio is calculated as follows:
       Var = w^{T} * Cov * w
 
 Where :math:`w` is the vector of weights for instruments in a portfolio, and
-:math:`Cov` is a covariance matrix of instruments in a portfolio. Result :math:`Var`is a scalar.
+:math:`Cov` is a covariance matrix of instruments in a portfolio. Result :math:`Var` is a scalar.
 
 Value at Risk (VaR)
 ###################

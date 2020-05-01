@@ -11,8 +11,8 @@ This TIC class includes an algorithm to calculate the Theory-Implied Correlation
 
    The following sources elaborate extensively on the topic:
 
-   - **Estimation of Theory-Implied Correlation Matrices** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3484152>`_. *Describes the TIC algorithm*
-   - **AMIMO Correlation Matrix based Metric for Characterizing Non-Stationarity** *by* Markus Herdin *and* Ernst Bonek `available here <https://publik.tuwien.ac.at/files/pub-et_8791.pdf>`_. *Describes the Correlation Matrix Distance metric*
+   - **Estimation of Theory-Implied Correlation Matrices** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3484152>`__. *Describes the TIC algorithm*
+   - **AMIMO Correlation Matrix based Metric for Characterizing Non-Stationarity** *by* Markus Herdin *and* Ernst Bonek `available here <https://publik.tuwien.ac.at/files/pub-et_8791.pdf>`__. *Describes the Correlation Matrix Distance metric*
 
 About the Algorithm
 ###################
@@ -26,7 +26,7 @@ Using the TIC approach allows us to include forward-looking views to the world, 
 
 The economic theory in the algorithm is represented in terms of a tree graph. "The tree can include any number of levels needed, each branch should have one or more leaves, some branches may include more levels than others".
 
-An example of how the theoretical structure can be used is the `MSCI's Global Industry Classification Standard (GICS) <https://www.msci.com/gics>`_ for investments. Using this structure, each stock can be classified using four levels of depth.
+An example of how the theoretical structure can be used is the `MSCI's Global Industry Classification Standard (GICS) <https://www.msci.com/gics>`__ for investments. Using this structure, each stock can be classified using four levels of depth.
 
 To use a tree as the input to the algorithm, it should have the "bottom-up order of the columns, where the leftmost column is corresponding to terminal leaves and the rightmost columns corresponding to the tree's root". An  example of a tree graph according to the GICS:
 
@@ -60,7 +60,7 @@ The TIC algorithm consists of three steps:
 
  - For each level of the tree, the elements are grouped by elements from the higher level. The algorithm iterates from the lowest to the highest level of the tree.
 
- - A linkage object is created for these grouped elements based on their distance matrix using the `SciPy linkage function <https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html>`_. Each link in the linkage object is an array representing a cluster of two elements and has the following data as elements:
+ - A linkage object is created for these grouped elements based on their distance matrix using the `SciPy linkage function <https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html>`__. Each link in the linkage object is an array representing a cluster of two elements and has the following data as elements:
 
   - ID of the first element in a cluster
 
@@ -102,12 +102,12 @@ The TIC algorithm consists of three steps:
 
 .. tip::
 
-    The algorithm for de-noising the correlation and the covariance matrix is implemented in the RiskEstimators class of the mlfinlab package. It is described in more detail `here <https://github.com/hudson-and-thames/research/blob/master/RiskEstimators/RiskEstimators.ipynb>`_.
+    The algorithm for de-noising the correlation and the covariance matrix is implemented in the RiskEstimators class of the mlfinlab package. It is described in more detail `here <https://github.com/hudson-and-thames/research/blob/master/RiskEstimators/RiskEstimators.ipynb>`__.
 
 
 .. tip::
 
-    This algorithm is described in more detail in the work **Estimation of Theory-Implied Correlation Matrices** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3484152>`_.
+    This algorithm is described in more detail in the work **Estimation of Theory-Implied Correlation Matrices** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3484152>`__.
 
 Correlation Matrix Distance
 ###########################
@@ -126,7 +126,7 @@ From the work **Estimation of Theory-Implied Correlation Matrices**:
 
 .. tip::
 
-    The Correlation Matrix Distance metric is described in more detail in the work **AMIMO Correlation Matrix based Metric for Characterizing Non-Stationarity** *by* Markus Herdin *and* Ernst Bonek `available here <https://publik.tuwien.ac.at/files/pub-et_8791.pdf>`_.
+    The Correlation Matrix Distance metric is described in more detail in the work **AMIMO Correlation Matrix based Metric for Characterizing Non-Stationarity** *by* Markus Herdin *and* Ernst Bonek `available here <https://publik.tuwien.ac.at/files/pub-et_8791.pdf>`__.
 
 Implementation
 ##############
