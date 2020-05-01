@@ -1,4 +1,5 @@
 # pylint: disable=missing-module-docstring
+# pylint: disable=too-many-instance-attributes
 import sys
 import numpy as np
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
