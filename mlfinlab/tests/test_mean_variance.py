@@ -407,6 +407,21 @@ class TestMVO(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
+    def test_no_asset_names_by_passing_cov(self):
+        """
+        Test MVO when not supplying a list of asset names but passing covariance matrix as input
+        """
+
+        mvo = MeanVarianceOptimisation()
+        expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+                                                                                 resample_by='W')
+        covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
+        mvo.allocate(expected_asset_returns=expected_returns, covariance_matrix=covariance)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
     def test_valuerror_with_no_asset_names(self):
         """
         Test ValueError when not supplying a list of asset names and no other input
@@ -417,4 +432,4 @@ class TestMVO(unittest.TestCase):
             expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
                                                                                      resample_by='W')
             covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
-            mvo.allocate(expected_asset_returns=expected_returns, covariance_matrix=covariance)
+            mvo.allocate(expected_asset_returns=expected_returns, covariance_matrix=covariance.values)
