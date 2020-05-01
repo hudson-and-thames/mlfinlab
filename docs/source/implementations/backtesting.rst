@@ -69,7 +69,7 @@ with each of the methods. (Bonferroni adjustment is calculated using only the :m
 (simulations).
 
 6. For each of the two methods, we eventually have a set of :math:`p^M` values adjusted. The median of this set is the final
-adjusted p-value of the method. So, we obtained p-values for every of the three methods. We then calculate the average
+adjusted p-value of the method. So, we obtained p-values for each of the three methods. We then calculate the average
 p-value as the Average of the methods.
 
 7. The obtained p-values of each method can be then transformed back to Sharpe ratios and
@@ -134,7 +134,7 @@ Adjustment methods include:
 Profit Hurdle algorithm consists of the following steps:
 
 1. We are given the significance level :math:`p`, strategy volatility :math:`\sigma`, the number of observations :math:`T` ,
-and number of tests that have been concluded :math:`T` .
+and the number of tests that have been concluded :math:`T` .
 
 2. Using the HLZ model, we generate :math:`N` t-statistics assuming that the
 average correlation of returns is :math:`\rho` .

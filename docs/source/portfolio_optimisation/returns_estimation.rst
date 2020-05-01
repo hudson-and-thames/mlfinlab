@@ -25,7 +25,7 @@ The calculation is done in the following way:
 
 Where :math:`R_{t}` is the return for :math:`t` -th observation, and :math:`P_{t}` is the price for :math:`t` -th observation.
 
-Annualised mean historical returns
+Annualized mean historical returns
 ##################################
 
 The `calculate_mean_historical_returns` function allows calculating a mean annual return for every element in a dataframe of prices.

@@ -21,7 +21,7 @@ This class includes functions for calculating different types of covariance matr
 Minimum Covariance Determinant
 ##############################
 
-Minimum Covariance Determinant (MCD) is arobust estimator of covariance that was introduced by P.J. Rousseeuw.
+Minimum Covariance Determinant (MCD) is a robust estimator of covariance that was introduced by P.J. Rousseeuw.
 
 Following the **Scikit-learn User Guide on Covariance estimation**:
 
@@ -226,7 +226,7 @@ Below is an example of using the functions from the Risk Estimators module.
     tn_relation = stock_prices.shape[0] / stock_prices.shape[1]
 
     # The bandwidth of the KDE kernel
-    kde_bwidth = 0.25
+    kde_bwidth = 0.01
 
     # Finding the De-noised Сovariance matrix
     cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation,

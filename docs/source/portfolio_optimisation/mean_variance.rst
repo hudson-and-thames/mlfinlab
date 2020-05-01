@@ -23,8 +23,8 @@ Currently, the following solution strings are supported by MVO class:
 3. ``max_sharpe`` : Calculates the weights relating to the maximum Sharpe Ratio portfolio. Users can specify the risk-free return value through the :py:mod:`risk_free_rate` parameter.
 4. ``efficient_risk`` : Calculates an efficient risk portfolio for a specified target return. Users can specify their target return value through the :py:mod:`target_return` parameter.
 
-Inverse Vriance
-###############
+Inverse Variance
+################
 
 With this solution string, only the main diagonal of the covariance matrix is used for weights allocation:
 

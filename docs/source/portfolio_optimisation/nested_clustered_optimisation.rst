@@ -37,9 +37,9 @@ The steps of the NCO algorithm are:
 Convex Optimization Solution (CVO)
 ##################################
 
-The Convex Optimization Solution is the result of convex optimization for the problem of calculating the optimal weight allocation
-using the true covariance matrix and the true vector of means for a set of assets with a goal of maximum Sharpe ratio or minimum
-variance of a portfolio.
+The Convex Optimization Solution is the result of convex optimization when solving a problem of calculating the optimal weight allocation
+using the true covariance matrix and the true vector of means for a portfolio. The goal can be either the maximum Sharpe ratio or
+minimum variance of a portfolio.
 
 If the problem of portfolio optimization is:
 

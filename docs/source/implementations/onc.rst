@@ -1,4 +1,4 @@
-.. _implementations-clustering:
+ .. _implementations-clustering:
 
 ================================
 Optimal Number of Clusters (ONC)
@@ -20,7 +20,7 @@ Marcos Lopez de Prado addresses these two issues.
    The following sources elaborate extensively on the topic:
 
    - **Detection of false investment strategies using unsupervised learning methods** *by* Marcos Lopez de Prado *and* Lewis, M.J. `available here <https://papers.ssrn.com/sol3/abstract_id=3167017>`__. *Describes the ONC algorithm in detail. The code in this module is based on the code written by the researchers.*
-   - **Machine Learning for Asset Managers** *by* Marcos Lopez de Prado `available here <https://www.cambridge.org/core/books/machine-learning-for-asset-managers/6D9211305EA2E425D33A9F38D0AE3545>`__. *Features additional descriptions of the algorithm and includes exercises to understand the topic im more detail.*
+   - **Machine Learning for Asset Managers** *by* Marcos Lopez de Prado `available here <https://www.cambridge.org/core/books/machine-learning-for-asset-managers/6D9211305EA2E425D33A9F38D0AE3545>`__. *Features additional descriptions of the algorithm and includes exercises to understand the topic in more detail.*
    - **Clustering (Presentation Slides)** *by* Marcos Lopez de Prado *and* Lewis, M.J. `available here <https://papers.ssrn.com/sol3/abstract_id=3512998>`__. *Briefly describes the logic behind the ONC algorithm.*
    - **Codependence (Presentation Slides)** *by* Marcos Lopez de Prado *and* Lewis, M.J. `available here <https://papers.ssrn.com/sol3/abstract_id=3512994>`__. *Explains why the angular distance metric is used to get distances between elements.*
 
@@ -53,7 +53,7 @@ The measure of clustering quality :math:`q` or :math:`t-score`:
 
       q= \frac{E[\{S_i\}]}{\sqrt{V[\{S_i\}]}}
 
-where :math:`E[\{S_i\}]`is the mean of the silhouette scores for each cluster, and :math:`V[\{S_i\}]` is the
+where :math:`E[\{S_i\}]` is the mean of the silhouette scores for each cluster, and :math:`V[\{S_i\}]` is the
 variance of the silhouette scores for each cluster.
 
 The ONC algorithm structure is described in the work **Detection of false investment strategies using unsupervised learning methods**
@@ -63,9 +63,9 @@ using the following diagrams:
    :scale: 100 %
    :align: center
 
-In the base clustering stage first the distances between the elements are calculated, then the algorithm iterates through
-a set of possible number of clusters :math:`N` times to find the best clustering from :math:`N` random allocations of K-means.
-For each iteration, a clustering result is evaluated using t-statistic of the silhouette scores.
+In the base clustering stage first, the distances between the elements are calculated, then the algorithm iterates through
+a set of possible number of clusters :math:`N` times to find the best clustering from :math:`N` runs of K-means for every
+possible number of clusters. For each iteration, a clustering result is evaluated using the t-statistic of the silhouette scores.
 
 The clustering result with the best t-statistic is picked, the correlation matrix is reordered so that clustered elements
 are positioned close to each other.
@@ -79,9 +79,9 @@ clusters have a t-score below average, these clusters go through the base cluste
 recursively repeated.
 
 Then, based on the t-statistic of the old and new clusterings it is checked whether the new clustering is better than
-the original one. If not, the old clustering is kept, otherwise the new one is taken.
+the original one. If not, the old clustering is kept, otherwise, the new one is taken.
 
-The output of the algorithm is the best clustering result, reordered correlation matrix, and silhouette scores.
+The output of the algorithm is the reordered correlation matrix, clustering result, and silhouette scores.
 
 Implementation
 ##############
