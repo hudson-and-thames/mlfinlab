@@ -54,7 +54,7 @@ As :math:`y_{t}` we take the log-price and calculate the standardized departure 
     \end{split}
     \end{equation}
 
-With the :math:`H_{0} : \beta_{t} = 0` hypothesis, :math:`S_{n, t} ~ N[0, 1]` .
+With the :math:`H_{0} : \beta_{t} = 0` hypothesis, :math:`S_{n, t} \sim N[0, 1]` .
 
 We can test the null hypothesis comparing CUSUM statistic :math:`S_{n, t}` with critical value :math:`c_{\alpha}[n, t]`,
 which is calculated using a one-sided test as:
@@ -66,7 +66,7 @@ which is calculated using a one-sided test as:
 The authors in the above paper have derived using Monte Carlo method that :math:`b_{0.05} = 4.6` .
 
 The disadvantage is that :math:`y_{n}` is chosen arbitrarily, and results may be inconsistent due to that. This can be
-fixed by estimating :math:`S_{n, t}` on backward-shifting windows :math:`n \in [1, t]` and pick:
+fixed by estimating :math:`S_{n, t}` on backward-shifting windows :math:`n \in [1, t]` and picking:
 
 .. math::
     \begin{equation}
@@ -157,7 +157,7 @@ For the unknown :math:`\tau^{*}` the test statistic is the Supremum Dickey-Fulle
     SDFC = \sup_{\tau^* \in [\tau_0,1-\tau_0]} \{ DFC_{\tau^*}\}
     \end{equation}
 
-To address the second issue, the Supremum Augmented Dickey-Fuler test was introduced.
+To address the second issue, the Supremum Augmented Dickey-Fuller test was introduced.
 
 .. py:currentmodule:: mlfinlab.structural_breaks.chow
 
@@ -213,7 +213,7 @@ regime switches.
    SADF line spikes when prices exhibit a bubble-like behavior, and returns to low levels
    when the bubble bursts.
 
-The `model` and the `add_const` parameters of the **get_sadf** function allow for different specification of the
+The `model` and the `add_const` parameters of the **get_sadf** function allow for different specifications of the
 regression's time trend component.
 
 Linear model (`model='linear'`) uses a linear time trend:
@@ -228,7 +228,7 @@ Quadratic model (`model='quadratic'`) uses a second-degree polynomial time trend
 
       \Delta y_{t} = \beta y_{t-1} + \sum_{l=1}^{L}{\gamma_{l} \Delta y_{t-l}} + \sum_{l=1}^{L}{\delta_{l}^2 \Delta y_{t-l}} + \varepsilon_{t}
 
-Adding a constant to those specifications results in:
+Adding a constant (`add_const=True`) to those specifications results in:
 
 .. math::
 
@@ -283,6 +283,26 @@ Power trend (`model='sm_power'`):
 .. math::
 
       y_{t} = \alpha t^{\beta} + \varepsilon_{t} \Rightarrow log[y_{t}] = log[\alpha] + \beta log[t] + \xi_{t}
+
+Again, the SADF fits the above regressions for each end point :math:`t` with backward expanding start points,
+but the test statistic is taken as an absolute value, as we're testing both the explosive growth and collapse.
+This is described in more detail in the **Advances in Financial Machine Learning** book p. 260.
+
+The test statistic calculated (SMT for Sub/Super Martingale Tests) is:
+
+.. math::
+
+     SMT_{t} = \sup_{t_0 \in [1, t-\tau]} \Bigg\{\frac{ | \hat\beta_{t_0,t} | }{\hat\sigma_{\beta_{t_0, t}}}\Bigg\}
+
+From the book:
+
+Parameter `phi` in range (0, 1) can be used (`phi=0.5`) to penalize large sample lengths ( "this corrects for the bias that the :math:`\hat\sigma_{\beta_{t_0, t}}`
+of a weak long-run bubble  may be smaller than the :math:`\hat\sigma_{\beta_{t_0, t}}` of a strong short-run bubble,
+hence biasing method towards long-run bubbles" ):
+
+.. math::
+
+     SMT_{t} = \sup_{t_0 \in [1, t-\tau]} \Bigg\{\frac{ | \hat\beta_{t_0,t} | }{\hat\sigma_{\beta_{t_0, t}}(t-t_{0})^{\phi}}\Bigg\}
 
 ----
 
