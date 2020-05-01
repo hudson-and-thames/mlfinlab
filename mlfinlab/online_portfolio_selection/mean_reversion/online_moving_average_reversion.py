@@ -7,8 +7,9 @@ class OnlineMovingAverageReversion(OLPS):
     """
     This class implements the Online Moving Average Reversion strategy. It is reproduced with
     modification from the following paper:
-    Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
-    Surv. V, N, Article A (December YEAR), 33 pages. <https://arxiv.org/abs/1212.2129>.
+    'Li, Bin & Hoi, Steven. (2012). On-Line Portfolio
+    Selection with Moving Average Reversion. Proceedings of the 29th International Conference on
+    Machine Learning, ICML 2012. 1. <https://arxiv.org/pdf/1206.4626.pdf>_'
 
     Online Moving Average Reversion reverts to the SMA or EMA of the underlying assets based on
     the given threshold.
@@ -20,9 +21,9 @@ class OnlineMovingAverageReversion(OLPS):
         window, and alpha.
 
         :param reversion_method: (int) 1 for SMA, 2 for EWA.
-        :param epsilon: (float) reversion threshold >= 1.
-        :param window: (int) number of windows to calculate Simple Moving Average.
-        :param alpha: (float) ratio between 0 and 1 for Exponentially Weighted Average.
+        :param epsilon: (float) Reversion threshold. Must be greater or equal to 1.
+        :param window: (int) Number of windows to calculate Simple Moving Average.
+        :param alpha: (float) Ratio between 0 and 1 for Exponentially Weighted Average.
         """
         self.epsilon = epsilon
         self.window = window
