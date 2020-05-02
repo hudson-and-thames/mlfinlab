@@ -58,7 +58,7 @@ class TestUniversalPortfolio(TestCase):
         Tests UP with uniform capital allocation.
         """
         # Initialize OLPS.
-        up3 = UniversalPortfolio(2, weighted='U')
+        up3 = UniversalPortfolio(2, weighted='uniform')
         # Allocates asset prices to OLPS.
         up3.allocate(self.data)
         # Create np.array of all_weights.
@@ -75,7 +75,7 @@ class TestUniversalPortfolio(TestCase):
         Tests UP with top-k experts capital allocation.
         """
         # Initialize OLPS.
-        up4 = UniversalPortfolio(5, weighted='K', k=2)
+        up4 = UniversalPortfolio(5, weighted='top-k', k=2)
         # Allocates asset prices to OLPS.
         up4.allocate(self.data)
         # Create np.array of all_weights.
@@ -89,10 +89,10 @@ class TestUniversalPortfolio(TestCase):
 
     def test_up_wrong_method(self):
         """
-        Tests ValueError if the method is not 'P', 'U', or 'K'.
+        Tests ValueError if the method is not 'hist_performance', 'uniform', or 'top-k'.
         """
         # Initialize OLPS.
-        up5 = UniversalPortfolio(5, weighted='JJ', k=2)
+        up5 = UniversalPortfolio(5, weighted='random', k=2)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             up5.allocate(self.data)

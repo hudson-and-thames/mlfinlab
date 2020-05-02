@@ -10,8 +10,8 @@ class UniversalPortfolio(OLPS):
     """
     This class implements the Universal Portfolio strategy. It is reproduced with
     modification from the following paper:
-    'Cover, T.M. (1991), Universal Portfolios. Mathematical Finance, 1: 1-29.
-    <http://www-isl.stanford.edu/~cover/papers/portfolios_side_info.pdf>'_
+    `Cover, T.M. (1991), Universal Portfolios. Mathematical Finance, 1: 1-29.
+    <http://www-isl.stanford.edu/~cover/papers/portfolios_side_info.pdf>`_
 
     Universal Portfolio acts as a fund of funds, generating a number of experts with unique
     strategies. Cover's original universal portfolio integrates over the total simplex domain,
@@ -21,14 +21,14 @@ class UniversalPortfolio(OLPS):
     allocation methods include uniform allocation among experts and top-k experts, which allocate
     capital based on the top-k performing experts until the last period.
     """
-    def __init__(self, number_of_experts, weighted='P', k=1):
+    def __init__(self, number_of_experts, weighted='hist_performance', k=1):
         """
         Initializes Universal Portfolio with the given number of experts, method of capital
         allocation to each experts, and k-value for Top-K experts.
 
         :param number_of_experts: (int) Number of total experts
-        :param weighted: (str) Capital allocation method. 'P': Historical Performance, 'U':
-                               Uniform Weights, 'K': Top-K experts.
+        :param weighted: (str) Capital allocation method. 'hist_performance': Historical Performance,
+                               'uniform': Uniform Weights, 'top-k': Top-K experts.
         """
         self.experts = []  # (list) Array to store all experts
         self.number_of_experts = number_of_experts  # (int) Set the number of experts.
@@ -95,7 +95,7 @@ class UniversalPortfolio(OLPS):
         'K': Top-K experts.
         """
         # If capital allocation is based on historical performances.
-        if self.weighted == 'P':
+        if self.weighted == 'hist_performance':
             # Calculate each expert's cumulative return ratio for each time period.
             expert_returns_ratio = np.apply_along_axis(lambda x: x/np.sum(x), 1,
                                                        self.expert_portfolio_returns)
@@ -103,7 +103,7 @@ class UniversalPortfolio(OLPS):
             expert_returns_ratio = np.vstack((self._uniform_experts(), expert_returns_ratio))
             self.weights_on_experts = expert_returns_ratio
         # If capital allocation is based on uniform weights.
-        elif self.weighted == 'U':
+        elif self.weighted == 'uniform':
             # Equal allocation.
             uniform_ratio = np.ones(
                 self.expert_portfolio_returns.shape) / self.number_of_experts
@@ -111,7 +111,7 @@ class UniversalPortfolio(OLPS):
             uniform_ratio = np.vstack((self._uniform_experts(), uniform_ratio))
             self.weights_on_experts = uniform_ratio
         # If capital allocation is based on top-K experts.
-        elif self.weighted == 'K':
+        elif self.weighted == 'top-k':
             # Only the top k experts get 1/k of the wealth.
             # https://stackoverflow.com/questions/6910641/
             # how-do-i-get-indices-of-n-maximum-values-in-a-numpy-array.
@@ -128,8 +128,8 @@ class UniversalPortfolio(OLPS):
             top_k_distribution = np.vstack((self._uniform_experts(), top_k_distribution))
             self.weights_on_experts = top_k_distribution
         else:
-            raise ValueError("Please put in 'P' for Historical Performance, 'U' for Unifrom "
-                             "Distribution, or 'K' for top-K experts.")
+            raise ValueError("Please put in 'hist_performance' for Historical Performance, "
+                             "'uniform' for Uniform Distribution, or 'top-k' for top-K experts.")
 
     def _uniform_experts(self):
         """
@@ -152,8 +152,8 @@ class UniversalPortfolio(OLPS):
         # https://stackoverflow.com/questions/58588378/
         # how-to-matrix-multiply-a-2d-numpy-array-with-a-3d-array-to-give-a-3d-array
         d_shape = self.weights_on_experts[:-1].shape[:1] + self.expert_all_weights.shape[1:]
-        weight_change = (self.weights_on_experts[:-1] @ self.expert_all_weights.reshape(
-            self.expert_all_weights.shape[0], -1)).reshape(d_shape)
+        reshaped_all_weights = self.expert_all_weights.reshape(self.expert_all_weights.shape[0], -1)
+        weight_change = np.dot(self.weights_on_experts[:-1], reshaped_all_weights).reshape(d_shape)
         # We are looking at the diagonal cross section of the multiplication.
         self.all_weights = np.diagonal(weight_change, axis1=0, axis2=1).T
 

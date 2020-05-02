@@ -1,8 +1,7 @@
 """
-Classes derived from Online Portfolio Selection module
-
+Initialize Online Portfolio Selection Module.
 """
-# Parent Method
+# Parent Class
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 from mlfinlab.online_portfolio_selection.universal_portfolio import UniversalPortfolio
 
