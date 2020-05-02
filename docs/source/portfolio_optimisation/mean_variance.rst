@@ -23,8 +23,11 @@ Currently, the following solution strings are supported by MVO class:
 3. ``max_sharpe`` : Calculates the weights relating to the maximum Sharpe Ratio portfolio. Users can specify the risk-free return value through the :py:mod:`risk_free_rate` parameter.
 4. ``efficient_risk`` : Calculates an efficient risk portfolio for a specified target return. Users can specify their target return value through the :py:mod:`target_return` parameter.
 
+Solutions
+#########
+
 Inverse Variance
-################
+****************
 
 With this solution string, only the main diagonal of the covariance matrix is used for weights allocation:
 
@@ -36,7 +39,7 @@ Where :math:`W_{i}` is the weight allocated to the :math:`i` -th element in a po
 on the main diagonal of the covariance matrix of elements in a portfolio, :math:`N` is the number of elements in a portfolio.
 
 Minimum Variance
-################
+****************
 
 With this solution string, the entire covariance matrix is used for weights allocation.
 
@@ -52,7 +55,7 @@ Where :math:`W` is the vector of weights, :math:`Cov` is the covariance matrix o
 :math:`N` is the number of elements in a portfolio.
 
 Maximum Sharpe Ratio
-####################
+********************
 
 With this solution string, the entire covariance matrix, the vector of mean returns, and the risk-free ratio are used
 for weights allocation.
@@ -87,10 +90,10 @@ Where :math:`W` is the vector of weights, :math:`Y` is the vector of unscaled we
 .. tip::
 
     The process of deriving this optimisation problem from the standard maximising Sharpe ratio problem is described
-    in the **IEOR 4500 Maximizing the Sharpe ratio** note of Columbia University `available here <https://www.coursehero.com/file/7013169/maximizing-the-sharpe-ratio/>`__.
+    in the notes `IEOR 4500 Maximizing the Sharpe ratio <https://www.coursehero.com/file/7013169/maximizing-the-sharpe-ratio/>`_  from Columbia University.
 
 Efficient Risk
-####################
+**************
 
 With this solution string, the entire covariance matrix, the vector of mean returns, and the target return are used
 for weights allocation.
@@ -179,8 +182,8 @@ Basic example
     as the parameter :py:mod:`asset_prices` in which case the expected returns and covariance matrix will be calculated
     using this data. Else, they can also pass pre-calculated :py:mod:`expected_returns` and :py:mod:`covariance_matrix`.
 
-Mean Variance class and it's different solutions
-************************************************
+Different solutions
+*******************
 
 .. code-block::
 

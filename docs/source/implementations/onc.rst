@@ -56,12 +56,16 @@ The measure of clustering quality :math:`q` or :math:`t-score`:
 where :math:`E[\{S_i\}]` is the mean of the silhouette scores for each cluster, and :math:`V[\{S_i\}]` is the
 variance of the silhouette scores for each cluster.
 
-The ONC algorithm structure is described in the work **Detection of false investment strategies using unsupervised learning methods**
+The ONC algorithm structure is described in the work `Detection of false investment strategies using unsupervised learning methods <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3167017>`_
 using the following diagrams:
 
-.. image:: clustering_images/onc_base_clustering.png
+.. figure:: clustering_images/onc_base_clustering.png
    :scale: 100 %
    :align: center
+   :figclass: align-center
+   :alt: ONC Base Clustering
+
+   Structure of ONC's base clustering stage.
 
 In the base clustering stage first, the distances between the elements are calculated, then the algorithm iterates through
 a set of possible number of clusters :math:`N` times to find the best clustering from :math:`N` runs of K-means for every
@@ -70,9 +74,13 @@ possible number of clusters. For each iteration, a clustering result is evaluate
 The clustering result with the best t-statistic is picked, the correlation matrix is reordered so that clustered elements
 are positioned close to each other.
 
-.. image:: clustering_images/onc_higher_level.png
+.. figure:: clustering_images/onc_higher_level.png
    :scale: 100 %
    :align: center
+   :figclass: align-center
+   :alt: Structure of ONC’s higher-level stage
+
+   Structure of ONC’s higher-level stage.
 
 On a higher level, the average t-score of the clusters from the base clustering stage is calculated. If more than two
 clusters have a t-score below average, these clusters go through the base clustering stage again. This process is

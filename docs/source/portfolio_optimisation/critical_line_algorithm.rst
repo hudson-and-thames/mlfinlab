@@ -31,6 +31,9 @@ the number of constraints to be solved.
 
    - **An Open-Source Implementation of the Critical-Line Algorithm for Portfolio Optimization** *by* David H. Bailey *and* Marcos Lopez de Prado `available here <https://papers.ssrn.com/sol3/abstract_id=2197616>`_.
 
+Solutions
+#########
+
 The current CLA implementation in the package supports the following solution strings:
 
 1. ``cla_turning_points`` : Calculates the set of CLA turning points. These are the original solution weights calculated the CLA algorithm.
@@ -38,22 +41,22 @@ The current CLA implementation in the package supports the following solution st
 3. ``min_volatility`` : Calculates the weights relating to Minimum Variance portfolio.
 4. ``efficient_frontier`` : Calculates all weights in the efficient frontier(also includes the CLA turning points).
 
-CLA Turning Points
-##################
 
-With this solution string, the output will be a list of weights that satisfy the optimisation conditions - turning points.
+CLA Turning Points
+******************
+
+The output will be a list of weights that satisfy the optimisation conditions - turning points.
 
 Maximum Sharpe Ratio
-####################
+********************
 
-With this solution string, the output weights will be chosen as a convex combination of weights from turning points
+The output weights will be chosen as a convex combination of weights from turning points
 with the highest Sharpe ratio. The convex combination is found using the Golden section method.
 
 Minimum Variance
-################
+****************
 
-With this solution string, the output weights will be chosen from sets of weights from turning points
-with the lowest variance calculated as:
+The output weights will be chosen from sets of weights from turning points with the lowest variance calculated as:
 
 .. math::
 
@@ -62,10 +65,10 @@ with the lowest variance calculated as:
 Where :math:`w` is the vector of weights, :math:`\Sigma` is the covariance matrix of elements in a portfolio.
 
 Efficient Frontier
-##################
+******************
 
-With this solution string, the output will be a list of evenly spaced :math:`N` weights sets, where each weights
-set is a convex combination of weights from turning points. :math:`N` parameter is provided by the user.
+The output will be a list of evenly spaced :math:`N` weights sets, where each weights set is a convex combination of
+weights from turning points. :math:`N` parameter is provided by the user.
 
 Implementation
 ##############
