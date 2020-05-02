@@ -2,11 +2,11 @@
 import cvxpy as cp
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.pattern_matching.CORN import CORN
+from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import CorrelationDrivenNonparametricLearning
 from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
 
 
-class CORN_DENOISE(CORN):
+class CorrelationDrivenNonparametricLearning_DENOISE(CorrelationDrivenNonparametricLearning):
     """
     This class implements the Correlation Driven Nonparametric Learning strategy.
     """
@@ -54,7 +54,7 @@ def main():
     """
     stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
     stock_price = stock_price.dropna(axis=1)
-    corn_d = CORN_DENOISE(window=1, rho=0.1)
+    corn_d = CorrelationDrivenNonparametricLearning_DENOISE(window=1, rho=0.1)
     corn_d.allocate(stock_price, resample_by='w')
     print(corn_d.all_weights)
     print(corn_d.portfolio_return)

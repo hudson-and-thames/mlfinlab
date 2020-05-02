@@ -3,10 +3,10 @@ import cvxpy as cp
 import numpy as np
 import pandas as pd
 import scipy.optimize as opt
-from mlfinlab.online_portfolio_selection.pattern_matching.CORN import CORN
+from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import CorrelationDrivenNonparametricLearning
 
 
-class SCORN(CORN):
+class SCORN(CorrelationDrivenNonparametricLearning):
     """
     This class implements the Symmetric Correlation Driven Nonparametric Learning strategy.
     """

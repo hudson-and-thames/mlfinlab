@@ -5,39 +5,48 @@ import pandas as pd
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class CORN(OLPS):
+class CorrelationDrivenNonparametricLearning(OLPS):
     """
-    This class implements the Correlation Driven Nonparametric Learning strategy.
+    This class implements the Correlation Driven Nonparametric Learning strategy. It is
+    reproduced with modification from the following paper:
+    'Li, B., Hoi, S.C., & Gopalkrishnan, V. (2011). CORN: Correlation-driven nonparametric
+    learning approach for portfolio selection. ACM TIST, 2,
+    21:1-21:29.<https://dl.acm.org/doi/abs/10.1145/1961189.1961193>_'
+
+    Correlation Driven Nonparametric Learning finds similar windows from the past and looks to
+    create a portfolio weights that will maximize returns in the similar sets.
     """
     # check -1 <= rho <= 1
     # check window >= 1
     def __init__(self, window, rho):
         """
-        Constructor.
+        Initializes Correlation Driven Nonparametric Learning with the given window and rho value.
+
+        :param window: (int) Number of windows to look back for similarity sets.
+        :param rho: (float) Threshold for similarity.
         """
         self.window = window
         self.rho = rho
         self.corr_coef = None
         super().__init__()
 
-    # calculate corr_coef ahead of updating to speed up calculations
-    def _initialize(self, _asset_prices, _weights, _portfolio_start, _resample_by):
+    def _initialize(self, asset_prices, weights, resample_by):
         """
-        :param _asset_prices:
-        :param _weights:
-        :param _portfolio_start:
-        :param _resample_by:
-        :return:
-        """
-        super(CORN, self)._initialize(_asset_prices, _weights, _portfolio_start, _resample_by)
-        self.corr_coef = self.calculate_rolling_correlation_coefficient(self.final_relative_return)
+        Initializes the important variables for the object.
 
-    def _update_weight(self, _weights, _relative_return, _time):
+        :param asset_prices: (pd.DataFrame) Historical asset prices.
+        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :param resample_by: (str) Specifies how to resample the prices.
         """
-        :param _weights:
-        :param _relative_return:
-        :param _time:
-        :return:
+        super(CorrelationDrivenNonparametricLearning, self)._initialize(asset_prices, weights, resample_by)
+        self.corr_coef = self.calculate_rolling_correlation_coefficient()
+
+    def _update_weight(self, time):
+        """
+        Predicts the next time's portfolio weight.
+
+        :param time: (int) Current time period.
+        :return new_weights: (np.array) Predicted weights.
         """
         similar_set = []
         new_weights = self._uniform_weight(self.number_of_assets)
@@ -138,20 +147,3 @@ class CORN(OLPS):
         # calculate the correlation coefficient for the different window's overall returns
         rolling_corr_coef = np.corrcoef(np.exp(np.log(pd.DataFrame(_relative_return)).rolling(self.window).sum()))
         return rolling_corr_coef
-
-def main():
-    """
-
-    :return:
-    """
-    stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
-    stock_price = stock_price.dropna(axis=1)
-    corn = CORN(window=1, rho=0.1)
-    corn.allocate(stock_price, resample_by='w')
-    print(corn.all_weights)
-    print(corn.portfolio_return)
-    corn.portfolio_return.plot()
-
-
-if __name__ == "__main__":
-    main()

@@ -1,7 +1,7 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.pattern_matching.CORN import CORN
+from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import CorrelationDrivenNonparametricLearning
 from mlfinlab.online_portfolio_selection.universal_portfolio import UniversalPortfolio
 
 
@@ -23,7 +23,7 @@ class CORN_K(UniversalPortfolio):
 
     def _generate_experts(self):
         """
-        Generates n experts for CORN-K strategy
+        Generates n experts for CorrelationDrivenNonparametricLearning-K strategy
 
         :return:
         """
@@ -36,7 +36,7 @@ class CORN_K(UniversalPortfolio):
 
         for exp in range(self.number_of_experts):
             param = self.expert_params[exp]
-            self.experts.append(CORN(int(param[0]), param[1]))
+            self.experts.append(CorrelationDrivenNonparametricLearning(int(param[0]), param[1]))
 
     def _calculate_weights_on_experts(self):
         """
