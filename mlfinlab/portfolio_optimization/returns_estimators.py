@@ -14,10 +14,12 @@ class ReturnsEstimation:
     @staticmethod
     def calculate_mean_historical_returns(asset_prices, resample_by=None, frequency=252):
         """
-        Calculate the annualised mean historical returns from asset price data.
+        Calculates the annualised mean historical returns from asset price data.
 
-        :param asset_prices: (pd.DataFrame) asset price data
-        :return: (np.array) returns per asset
+        :param asset_prices: (pd.DataFrame) Asset price data
+        :param resample_by: (str) Period to resample data ['D','W','M' etc.] None for no resampling
+        :param frequency: (int) Average number of observations per year
+        :return: (pd.Series) Annualized mean historical returns per asset
         """
 
         # Resample the asset prices
@@ -30,11 +32,14 @@ class ReturnsEstimation:
     @staticmethod
     def calculate_exponential_historical_returns(asset_prices, resample_by=None, frequency=252, span=500):
         """
-        Calculate the exponentially-weighted mean of (daily) historical returns, giving
+        Calculates the exponentially-weighted annualized mean of historical returns, giving
         higher weight to more recent data.
 
-        :param asset_prices: (pd.DataFrame) asset price data
-        :return: (np.array) returns per asset
+        :param asset_prices: (pd.DataFrame) Asset price data
+        :param resample_by: (str) Period to resample data ['D','W','M' etc.] None for no resampling
+        :param frequency: (int) Average number of observations per year
+        :param span: (int) Window length to use in pandas ewm function
+        :return: (pd.Series) Exponentially-weighted mean of historical returns
         """
 
         # Resample the asset prices
@@ -47,12 +52,11 @@ class ReturnsEstimation:
     @staticmethod
     def calculate_returns(asset_prices, resample_by=None):
         """
-        Calculate the annualised mean historical returns from asset price data.
+        Calculates a dataframe of returns from a dataframe of prices.
 
-        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
-        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                  None for no resampling
-        :return: (pd.Dataframe) stock returns
+        :param asset_prices: (pd.Dataframe) Historical asset prices
+        :param resample_by: (str) Period to resample data ['D','W','M' etc.] None for no resampling
+        :return: (pd.Dataframe) Returns per asset
         """
 
         if resample_by:

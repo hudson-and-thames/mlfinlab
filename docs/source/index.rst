@@ -200,6 +200,7 @@ This project is licensed under an all rights reserved licence.
     additional_information/contact
     getting_started/barriers_to_entry
     getting_started/researcher
+    getting_started/datasets
 
 .. toctree::
     :maxdepth: 2
