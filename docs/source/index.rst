@@ -243,7 +243,7 @@ This project is licensed under an all rights reserved licence.
 
     implementations/onc
     implementations/feature_clusters
-    
+
 .. toctree::
     :maxdepth: 2
     :caption: Backtest Overfitting
@@ -251,7 +251,6 @@ This project is licensed under an all rights reserved licence.
 
     implementations/backtesting
     implementations/backtest_statistics
-
 
 .. toctree::
     :maxdepth: 2

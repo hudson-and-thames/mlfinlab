@@ -103,64 +103,106 @@ Research Notebook
 Clustered Feature Importance
 ############################
 
-In the book Machine Learning for Asset Managers, as an approach to deal with substitution effect Clustered Feature Importance was introduced. It cluster similar features and apply the feature importance analysis (like MDA and MDI) at the cluster level. The idea behind clustering is that the clusters are mutually dissimilar and hence taming the substitution
-effects. It can be implemented in two steps as described in the book :-
+In the book Machine Learning for Asset Managers, as an approach to deal with substitution effect Clustered Feature
+Importance was introduced. It clusters similar features and applies feature importance analysis (like MDA and MDI) at
+the cluster level. The value add of clustering is that the clusters are mutually dissimilar and hence reduces the substitution
+effects.
 
-1) **Features Clustering**: As first step we need to generate the clusters or subsets of features we want to analyse with feature importance methods. This can be done using feature cluster module. It implement the method of generating feature clusters as in the book.
-2) **Clustered Importance**: Now that we have identified the number and composition of the clusters of features. We can use this information to apply MDI and MDA on groups of similar features, rather than on individual features. Clustered Feature Importance can be implemented by simply passing the feature clusters obtained in Step-1 to the clustered_subsets argument of the MDI or MDA feature importance algorithm.
+It can be implemented in two steps as described in the book:
 
-Ways by Cluster Feature Importance can be applied :
-A) Clustered MDI (code Snippet 6.4 page 86 ): We compute the clustered MDI as the sum of the MDI values of the features that constitute that cluster. If there is one feature per cluster, then MDI and clustered MDI are the same.
-B) Clustered MDA (code Snippet 6.5 page 87 ): As an extension to normal MDA to tackle multi-collinearity and (linear or non-linear) substitution effect. Its implementation was also discussed by Dr. Marcos Lopez de Prado in the `Clustered Feature Importance (Presentaion Slides) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595>`_.
+1) **Features Clustering**: As a first step we need to generate the clusters or subsets of features we want to analyse
+   with feature importance methods. This can be done using the feature cluster module. It implement the method of generating
+   feature clusters as in the book.
+2) **Clustered Importance**: Now that we have identified the number and composition of the clusters of features.
+   We can use this information to apply MDI and MDA on groups of similar features, rather than on individual features.
+   Clustered Feature Importance can be implemented by simply passing the feature clusters obtained in Step-1 to the
+   clustered_subsets argument of the MDI or MDA feature importance algorithm.
+
+Ways by Cluster Feature Importance can be applied:
+
+1) Clustered MDI (code Snippet 6.4 page 86 ): We compute the clustered MDI as the sum of the MDI values of the features
+   that constitute that cluster. If there is one feature per cluster, then MDI and clustered MDI are the same.
+2) Clustered MDA (code Snippet 6.5 page 87 ): As an extension to normal MDA to tackle multi-collinearity and
+   (linear or non-linear) substitution effect. Its implementation was also discussed by Dr. Marcos Lopez de Prado
+   in the `Clustered Feature Importance (Presentaion Slides) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595>`_.
+
+.. note::
+
+   The implementation of Clustered feature importance is included in the functions for MDI and MDA.
+
 
 Example
 *******
 .. code-block::
 
-  import pandas as pd
-  from sklearn.tree import DecisionTreeClassifier
-  from sklearn.ensemble import BaggingClassifier
-  from sklearn.metrics import accuracy_score, log_loss
-  from sklearn.model_selection._split import KFold
+   import pandas as pd
+   from sklearn.tree import DecisionTreeClassifier
+   from sklearn.ensemble import BaggingClassifier
+   from sklearn.metrics import accuracy_score, log_loss
+   from sklearn.model_selection._split import KFold
 
-  from mlfinlab.util.generate_dataset import get_classification_data
-  from mlfinlab.feature_importance import (mean_decrease_impurity, mean_decrease_accuracy, plot_feature_importance)
-  from mlfinlab.cross_validation import  ml_cross_val_score
-  from mlfinlab.clustering.feature_clusters import get_feature_clusters
+   from mlfinlab.util.generate_dataset import get_classification_data
+   from mlfinlab.feature_importance import (mean_decrease_impurity, mean_decrease_accuracy,
+                                           plot_feature_importance)
+   from mlfinlab.cross_validation import  ml_cross_val_score
+   from mlfinlab.clustering.feature_clusters import get_feature_clusters
 
-  X, y = get_classification_data(n_features=40, n_informative=5, n_redundant=30, n_samples=1000, sigmaStd=.1)
-  feature_clusters = get_feature_clusters(X, dependence_metric='linear', n_clusters=None)
+   # Create Clusters
+   X, y = get_classification_data(n_features=40, n_informative=5, n_redundant=30,
+                                  n_samples=1000, sigmaStd=.1)
+   feature_clusters = get_feature_clusters(X, dependence_metric='linear', n_clusters=None)
 
-  cvGen = KFold(n_splits=10)
-  oos_score = ml_cross_val_score(clf, X, y, cv_gen=cv_gen, sample_weight_train=None, scoring=accuracy_score).mean()
+   # Fit model
+   clf_base=DecisionTreeClassifier(criterion='entropy', max_features=1, class_weight='balanced',
+                                   min_weight_fraction_leaf=0)
+   clf=BaggingClassifier(base_estimator=clf_base, n_estimators=1000, max_features=1.0,
+                         max_samples=1.0, oob_score=True)
+   fit=clf.fit(X,y)
 
-  clf_base=DecisionTreeClassifier(criterion='entropy', max_features=1, class_weight='balanced', min_weight_fraction_leaf=0)
-  clf=BaggingClassifier(base_estimator=clf_base, n_estimators=1000, max_features=1.0, max_samples=1.0, oob_score=True)
-  fit=clf.fit(X,y)
+   # Score model
+   cvGen = KFold(n_splits=10)
+   oos_score = ml_cross_val_score(clf, X, y, cv_gen=cv_gen, sample_weight_train=None,
+                                  scoring=accuracy_score).mean()
 
-  clustered_mdi = mean_decrease_impurity(clf, X_train.columns, clustered_subsets=feature_clusters)
-  clustered_mda = mean_decrease_accuracy(clf, X_train, y_train, cv_gen, clustered_subsets=feature_clusters, scoring=log_loss)
+   # Feature Importance
+   clustered_mdi = mean_decrease_impurity(clf, X_train.columns,
+                                          clustered_subsets=feature_clusters)
+   clustered_mda = mean_decrease_accuracy(clf, X_train, y_train, cv_gen,
+                                          clustered_subsets=feature_clusters, scoring=log_loss)
 
-  plot_feature_importance(clustered_mdi, oob_score=clf.oob_score_, oos_score=oos_score,
-                          save_fig=True, output_path='clustered_mdi.png')
-  plot_feature_importance(clustered_mda, oob_score=clf.oob_score_, oos_score=oos_score,
-                          save_fig=True, output_path='clustered_mda.png')
+   # Plot
+   plot_feature_importance(clustered_mdi, oob_score=clf.oob_score_, oos_score=oos_score,
+                           save_fig=True, output_path='clustered_mdi.png')
+   plot_feature_importance(clustered_mda, oob_score=clf.oob_score_, oos_score=oos_score,
+                           save_fig=True, output_path='clustered_mda.png')
 
 The following are the resulting images from the Clustered MDI & Clustered MDA feature importances respectively:
 
-.. image:: feature_imp_images/clustered_mdi.png
-   :scale: 40 %
+.. figure:: feature_imp_images/clustered_mdi.png
+   :scale: 70 %
    :align: center
+   :figclass: align-center
+   :alt: Clustered MDI
 
-.. image:: feature_imp_images/clustered_mda.png
-  :scale: 40 %
-  :align: center
+   Clustered MDI
+
+.. figure:: feature_imp_images/clustered_mda.png
+   :scale: 70 %
+   :align: center
+   :figclass: align-center
+   :alt: Clustered MDA
+
+   Clustered MDA
+
 
 Research Notebook
 *****************
 The following research notebooks can be used to better understand the Clustered Feature Importance and its implementations.
 
+* `Clustered Feature Importance`_
+
 .. _Clustered Feature Importance: https://github.com/hudson-and-thames/research/blob/master/Chapter8_FeatureImportance/Cluster_Feature_Importance.ipynb
+
 ------------------
 
 |

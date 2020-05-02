@@ -1,19 +1,21 @@
 """
-Module which implements feature importance algorithms as described in Chapter 8 of Advances in Financial Machine Learning and
-Clustered Feature Importance algorithms as described in Chapter 6 Section 6.5.2 of Machine Learning for Asset Manager.
+Module which implements feature importance algorithms as described in Chapter 8 of Advances in Financial Machine
+Learning and Clustered Feature Importance algorithms as described in Chapter 6 Section 6.5.2 of Machine Learning for
+Asset Managers.
 """
 
 import pandas as pd
 import numpy as np
 from sklearn.metrics import log_loss
 import matplotlib.pyplot as plt
+
 from mlfinlab.cross_validation.cross_validation import ml_cross_val_score
 
 
 # pylint: disable=invalid-name
 # pylint: disable=invalid-unary-operand-type
 # pylint: disable=comparison-with-callable
-#pylint: disable=too-many-locals
+# pylint: disable=too-many-locals
 
 def mean_decrease_impurity(model, feature_names, clustered_subsets=None):
     """
@@ -66,11 +68,11 @@ def mean_decrease_impurity(model, feature_names, clustered_subsets=None):
     feature_imp_df = feature_imp_df.replace(0, np.nan)  # Because max_features = 1
 
     if clustered_subsets is not None:
-        #getting subset wise importance
+        # Getting subset wise importance
         importance = pd.DataFrame(index=feature_names, columns=['mean', 'std'])
-        for subset in clustered_subsets: #iterating over each cluster
+        for subset in clustered_subsets: # Iterating over each cluster
             subset_feat_imp = feature_imp_df[subset].sum(axis=1)
-            #importance of each feature within a subsets is equal to the importance of that subset
+            # Importance of each feature within a subsets is equal to the importance of that subset
             importance.loc[subset, 'mean'] = subset_feat_imp.mean()
             importance.loc[subset, 'std'] = subset_feat_imp.std()*subset_feat_imp.shape[0]**-.5
     else:
@@ -82,7 +84,8 @@ def mean_decrease_impurity(model, feature_names, clustered_subsets=None):
     return importance
 
 
-def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_weight_train=None, sample_weight_score=None, scoring=log_loss, random_state=42):
+def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_weight_train=None,
+                           sample_weight_score=None, scoring=log_loss, random_state=42):
     """
     Snippet 8.3, page 116-117. MDA Feature Importance
 
@@ -133,9 +136,9 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
         sample_weight_score = np.ones((X.shape[0],))
 
     fold_metrics_values, features_metrics_values = pd.Series(), pd.DataFrame(columns=X.columns)
-    #generating a numpy random state object for the given random_state
+    # Generating a numpy random state object for the given random_state
     rs_obj = np.random.RandomState(seed=random_state)
-    # clustered feature subsets will be used for CFI if clustered_subsets exists else will operate on the single column as MDA
+    # Clustered feature subsets will be used for CFI if clustered_subsets exists else will operate on the single column as MDA
     feature_sets = clustered_subsets if clustered_subsets else [[x] for x in X.columns]
     for i, (train, test) in enumerate(cv_gen.split(X=X)):
         fit = model.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight_train[train])

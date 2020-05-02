@@ -15,15 +15,15 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str) -> pd.DataFr
     """
     This function returns a dependence matrix for the given method of dependence method.
 
-    :param df: (pd.DataFrame) of features
+    :param df: (pd.DataFrame) of features.
     :param dependence_method: (str) the algorithm to be use for generating dependence_matrix, either
        'information_variation' or 'mutual_information' or 'distance_correlation'.
     :return: (pd.DataFrame) of dependence_matrix.
     """
-    # Get the feature names
+    # Get the feature names.
     features_cols = df.columns.values
 
-    # Defining the dependence function
+    # Defining the dependence function.
     if dependence_method == 'information_variation':
         dep_function = variation_of_information_score
     elif dependence_method == 'mutual_information':
@@ -34,13 +34,13 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str) -> pd.DataFr
         raise ValueError(f"{dependence_method} is not a valid method. Use either 'information_variation'\
                                  or 'mutual_information' or 'distance_correlation'.")
 
-    # Generating the dependence_matrix for the defined method
+    # Generating the dependence_matrix for the defined method.
     if dependence_method != 'distance_correlation':
         dependence_matrix = [[dep_function(df[x].values, df[y].values, normalize=True) for x in features_cols] for y in features_cols]
     else:
         dependence_matrix = [[dep_function(df[x].values, df[y].values) for x in features_cols] for y in features_cols]
 
-    #  Dependence_matrix converted into a DataFrame
+    #  Dependence_matrix converted into a DataFrame.
     dependence_df = pd.DataFrame(data=dependence_matrix, index=features_cols, columns=features_cols)
 
     if dependence_method == 'information_variation':

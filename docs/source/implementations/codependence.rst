@@ -328,13 +328,15 @@ This module consists two functions that generate the following:
 2. **Distance Matrix** can used to compute distance of a given matrix using various metrics like angular, squared
    angular and absolute angular.
 
+.. note::
+
+   MlFinLab makes use of these functions in the clustered feature importance.
+
 Implementation
 **************
 
 .. py:currentmodule:: mlfinlab.codependence.codependence_matrix
-
 .. autofunction:: get_dependence_matrix
-
 .. autofunction:: get_distance_matrix
 
 
