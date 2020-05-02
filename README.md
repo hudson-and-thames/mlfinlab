@@ -102,10 +102,9 @@ Benefits include:
 ---
 
 ## Contact us
-
 <div align="center">
-   <a href="https://hudsonthames.org">
-   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/Slack.png" height="400"><br>
+   <a href="https://www.patreon.com/HudsonThames">
+   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/Slack.png" height="200"><br>
 </div>
 
 
