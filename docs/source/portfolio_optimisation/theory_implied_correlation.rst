@@ -102,12 +102,9 @@ The TIC algorithm consists of three steps:
 
 .. tip::
 
-    The algorithm for de-noising the correlation and the covariance matrix is implemented in the RiskEstimators class of the mlfinlab package. It is described in more detail `here <https://github.com/hudson-and-thames/research/blob/master/RiskEstimators/RiskEstimators.ipynb>`__.
+    * The algorithm for de-noising the correlation and the covariance matrix is implemented in the RiskEstimators class of the mlfinlab package. It is described in more detail `here <https://github.com/hudson-and-thames/research/blob/master/RiskEstimators/RiskEstimators.ipynb>`__.
 
-
-.. tip::
-
-    This algorithm is described in more detail in the work **Estimation of Theory-Implied Correlation Matrices** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3484152>`__.
+    * This algorithm is described in more detail in the paper **Estimation of Theory-Implied Correlation Matrices** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3484152>`__.
 
 Correlation Matrix Distance
 ###########################
