@@ -12,13 +12,13 @@ from numba import njit
 def calculate_t_values(subset, min_sample_length, step):
     """
     For loop for calculating linear regression every n steps.
-    
+
     :param subset: (np.array) subset of indecies for which we want to calculate t values
     :return: (float) maximum t value and index of maximum t value
     """
     max_abs_t_value = -np.inf  # Maximum abs t-value of b_1 coefficient among l values
     max_t_value_index = None  # Index with maximum t-value
-    
+
     for forward_window in np.arange(min_sample_length, subset.shape[0], step):
 
         y_subset = subset[:forward_window].reshape(-1, 1)  # y{t}:y_{t+l}
@@ -28,29 +28,29 @@ def calculate_t_values(subset, min_sample_length, step):
         x_subset[:, 1] = np.arange(y_subset.shape[0])
 
         # Get regression coefficients estimates
-        xy = x_subset.transpose() @ y_subset
-        xx = x_subset.transpose() @ x_subset
+        xy_ = x_subset.transpose() @ y_subset
+        xx_ = x_subset.transpose() @ x_subset
 
         #   check for singularity
-        det = np.linalg.det(xx)
-        
+        det = np.linalg.det(xx_)
+
         # get coefficient and std from linear regression
         if det == 0:
             b_mean = [np.nan]
             b_std = [[np.nan, np.nan]]
         else:
-            xx_inv = np.linalg.inv(xx)
-            b_mean = xx_inv @ xy
+            xx_inv = np.linalg.inv(xx_)
+            b_mean = xx_inv @ xy_
             err = y_subset - (x_subset @ b_mean)
             b_std = np.dot(np.transpose(err), err) / (x_subset.shape[0] - x_subset.shape[1]) * xx_inv  # pylint: disable=E1136  # pylint/issues/3139
-        
+
         # Check if l gives the maximum t-value among all values {0...L}
             t_beta_1 = (b_mean[1] / np.sqrt(b_std[1, 1]))[0]
             if abs(t_beta_1) > max_abs_t_value:
                 max_abs_t_value = abs(t_beta_1)
                 max_t_value = t_beta_1
                 max_t_value_index = forward_window
-                
+
     return max_t_value_index, max_t_value
 
 

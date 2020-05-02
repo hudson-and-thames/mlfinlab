@@ -23,10 +23,9 @@ class TestTrendScanningLabels(unittest.TestCase):
         # Data set used for trend scanning labels
         self.eem_close = pd.read_csv(project_path + '/test_data/stock_prices.csv', index_col=0, parse_dates=[0])
         # In 2008, EEM had some clear trends
-        # self.eem_close = self.eem_close['EEM'].loc[pd.Timestamp(2008, 4, 1):pd.Timestamp(2008, 10, 1)]
         self.eem_close = self.eem_close['EEM'].reindex(pd.date_range(pd.Timestamp(2008, 4, 1), pd.Timestamp(2008, 10, 1))).dropna()
-        
-    def my_test_trend_scanning_labels(self):
+
+    def test_trend_scanning_labels(self):
         """
         Test trend scanning labels
         """
