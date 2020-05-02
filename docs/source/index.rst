@@ -169,7 +169,7 @@ Early Adopters:
 +-----------------------+------------------------+-----------------------+------------------------+
 | Golam Sakline         | `Ilya Pikulin`_        | Isabel Gonzalez       | Jason Harris           |
 +-----------------------+------------------------+-----------------------+------------------------+
-| Joshua Cortez         | Kofi Glover            | Kristian Schmidt      | Lucas Astorian         |
+| Joshua Cortez         | `Kofi Glover`_         | Kristian Schmidt      | Lucas Astorian         |
 +-----------------------+------------------------+-----------------------+------------------------+
 | Luque Li              | `Mikhail Shishlenin`_  | Minsu Yeom            | `Mislav Sagovac`_      |
 +-----------------------+------------------------+-----------------------+------------------------+
@@ -209,6 +209,7 @@ Early Adopters:
 .. _`Shawn Unger`: https://www.linkedin.com/in/shawnunger1/
 .. _`Ruifan Pei`: https://www.linkedin.com/in/ruifan-pei-b994b177/
 .. _`Sritanu Chakraborty`: https://www.linkedin.com/in/sritanuchakraborty/
+.. _`Kofi Glove`: https://www.linkedin.com/in/kofiglover/
 
 License
 #######
