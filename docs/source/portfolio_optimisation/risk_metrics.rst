@@ -96,7 +96,7 @@ The Expected Shortfall of a portfolio is calculated as follows:
 Where :math:`\alpha` is the confidence level to use, :math:`w_{t}` is the price of a portfolio at time :math:`t`,
 and :math:`DD_{t}` is the maximum historical drawdown up to time :math:`t` .
 
-CDaR of :math:`0.15` at :math:`\alpha = 0.95` level means that for :math:`5\%` worst cases of historical portfolio drawdowns,
+CDaR of :math:`0.15` at :math:`\alpha = 0.05` level means that for :math:`5\%` worst cases of historical portfolio drawdowns,
 the average drawdown is :math:`0.15` units in which the portfolio price is measured.
 
 .. tip::
