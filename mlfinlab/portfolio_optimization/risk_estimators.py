@@ -23,7 +23,7 @@ class RiskEstimators:
         return
 
     @staticmethod
-    def _fit_kde(observations, kde_bwidth=0.25, kde_kernel='gaussian', eval_points=None):
+    def _fit_kde(observations, kde_bwidth=0.01, kde_kernel='gaussian', eval_points=None):
         """
         Fits kernel to a series of observations (in out case eigenvalues), and derives the
         probability density function of observations.
@@ -31,8 +31,8 @@ class RiskEstimators:
         :param observations: (np.array) Array of observations (eigenvalues) eigenvalues to fit kernel to
         :param kde_bwidth: (float) The bandwidth of the kernel
         :param kde_kernel: (str) Kernel to use [‘gaussian’|’tophat’|’epanechnikov’|’exponential’|’linear’|’cosine’]
-        :param eval_points: (np.array) Array of values on which the fit of the KDE will be evaluated
-                                       If not provided, the unique values of observations are used
+        :param eval_points: (np.array) Array of values on which the fit of the KDE will be evaluated.
+                                       If None, the unique values of observations are used
         :return: (pd.Series) Series with estimated pdf values in the eval_points
         """
 
@@ -227,21 +227,25 @@ class RiskEstimators:
 
         return corr
 
-    def denoise_covariance(self, cov, tn_relation, kde_bwidth):
+    def denoise_covariance(self, cov, tn_relation, kde_bwidth=0.01):
         """
-        Computes a de-noised covariance matrix from a given covariance matrix.
+        Computes a de-noised covariance/correlation matrix from a given covariance/correlation matrix.
 
         As a threshold for the denoising the correlation matrix, the maximum eigenvalue
         that fits the theoretical distribution is used.
 
-        :param cov: (np.array) Covariance matrix
+        This algorithm is reproduced with minor modifications from the following paper:
+        `Marcos Lopez de Prado “A Robust Estimator of the Efficient Frontier”, (2019).
+        <https://papers.ssrn.com/abstract_id=3469961>`_.
+
+        :param cov: (np.array) Covariance/correlation matrix
         :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
-                                    covariance matrix.
-        :param kde_bwidth: (float) The bandwidth of the kernel to fit KDE
-        :return: (np.array) De-noised covariance matrix
+                                    covariance/correlation matrix.
+        :param kde_bwidth: (float) The bandwidth of the kernel to fit
+        :return: (np.array) De-noised covariance/correlation matrix
         """
 
-        # Correlation matrix computation
+        # Correlation matrix computation (if correlation matrix given, nothing changes)
         corr = self.cov_to_corr(cov)
 
         # Calculating eigenvalues and eigenvectors

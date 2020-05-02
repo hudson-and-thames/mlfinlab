@@ -12,16 +12,111 @@ Mean-Variance Optimisation
 ==========================
 
 This class contains some classic Mean-Variance optimisation techniques based on Harry Markowitz's methods. We use
-`cvxopt <https://cvxopt.org/>`_ as our quadratic optimiser instead of the more frequently used
+`cvxpy <https://www.cvxpy.org/index.html>`_ as our quadratic optimiser instead of the more frequently used
 `scipy.optimize <https://docs.scipy.org/doc/scipy/reference/optimize.html>`_. This was a design choice for two reasons:
-(a) the documentation of cvxopt is better than that of scipy and (b) cvxopt's code is much more readable and easier to understand.
+(a) the documentation of cvxpy is better than that of scipy and (b) cvxpy's code is much more readable and easier to understand.
 
 Currently, the following solution strings are supported by MVO class:
 
 1. ``inverse_variance`` : Calculates the weights according to simple inverse-variance allocation.
-2. ``max_sharpe`` : Calculates the weights relating to the maximum Sharpe Ratio portfolio. Users can specify the risk free return value through the :py:mod:`risk_free_rate` parameter.
-3. ``min_volatility`` : Calculates the weights relating to Minimum Variance portfolio.
+2. ``min_volatility`` : Calculates the weights relating to Minimum Variance portfolio.
+3. ``max_sharpe`` : Calculates the weights relating to the maximum Sharpe Ratio portfolio. Users can specify the risk-free return value through the :py:mod:`risk_free_rate` parameter.
 4. ``efficient_risk`` : Calculates an efficient risk portfolio for a specified target return. Users can specify their target return value through the :py:mod:`target_return` parameter.
+
+Solutions
+#########
+
+Inverse Variance
+****************
+
+With this solution string, only the main diagonal of the covariance matrix is used for weights allocation:
+
+.. math::
+
+      W_{i} = \frac{\frac{1}{Cov_{i,i}}}{\sum_{j=1}^{N}{\frac{1}{Cov_{j,j}}}}
+
+Where :math:`W_{i}` is the weight allocated to the :math:`i` -th element in a portfolio, :math:`Cov_{i,i}` is the :math:`i` -th element
+on the main diagonal of the covariance matrix of elements in a portfolio, :math:`N` is the number of elements in a portfolio.
+
+Minimum Variance
+****************
+
+With this solution string, the entire covariance matrix is used for weights allocation.
+
+The following optimisation problem is being solved:
+
+.. math::
+
+      minimise: W^{T} * Cov * W
+
+      s.t.: \sum_{j=1}^{N}{W_{j}} = 1
+
+Where :math:`W` is the vector of weights, :math:`Cov` is the covariance matrix of elements in a portfolio,
+:math:`N` is the number of elements in a portfolio.
+
+Maximum Sharpe Ratio
+********************
+
+With this solution string, the entire covariance matrix, the vector of mean returns, and the risk-free ratio are used
+for weights allocation.
+
+The following optimisation problem is being solved:
+
+.. math::
+      :nowrap:
+
+      \begin{align*}
+      minimise: Y^{T} * Cov * Y
+      \end{align*}
+
+      \begin{align*}
+      s.t.: \sum_{j=1}^{N}{(MeanRet_{j} - R_{f}) * Y_{j}} = 1
+      \end{align*}
+
+      \begin{align*}
+      \sum_{j=1}^{N}{Y_{j}} = \kappa
+      \end{align*}
+
+      \begin{align*}
+      \kappa \ge 0
+      \end{align*}
+
+After the optimisation: :math:`W_{j} = Y_{j} / \kappa`
+
+Where :math:`W` is the vector of weights, :math:`Y` is the vector of unscaled weights, :math:`\kappa` is the scaling factor,
+:math:`Cov` is the covariance matrix of elements in a portfolio, :math:`MeanRet` is the vector of mean returns,
+:math:`R_{f}` is the risk-free rate, :math:`N` is the number of elements in a portfolio.
+
+.. tip::
+
+    The process of deriving this optimisation problem from the standard maximising Sharpe ratio problem is described
+    in the notes `IEOR 4500 Maximizing the Sharpe ratio <https://www.coursehero.com/file/7013169/maximizing-the-sharpe-ratio/>`_  from Columbia University.
+
+Efficient Risk
+**************
+
+With this solution string, the entire covariance matrix, the vector of mean returns, and the target return are used
+for weights allocation.
+
+The following optimisation problem is being solved:
+
+.. math::
+      :nowrap:
+
+      \begin{align*}
+      minimise : W^{T} * Cov * W
+      \end{align*}
+
+      \begin{align*}
+      s.t.: \sum_{j=1}^{N}{MeanRet_{j} * W_{j}} = TrgetRet
+      \end{align*}
+
+      \begin{align*}
+      \sum_{j=1}^{N}{W_{j}} = 1
+      \end{align*}
+
+Where :math:`W` is the vector of weights, :math:`Cov` is the covariance matrix of elements in a portfolio,
+:math:`MeanRet` is the vector of mean returns, :math:`TrgetRet` is the target return, :math:`N` is the number of elements in a portfolio.
 
 .. tip::
 
@@ -31,7 +126,6 @@ Currently, the following solution strings are supported by MVO class:
       tuple needs to be passed: (low, high). By default a bound of (0, 1) is applied.
     - If individual bounds are required, then a dictionary needs to be passed with the key being the asset index and
       the value being the tuple of lower and higher bound values. Something like this: ``{asset_index : (low_i, high_i)}``
-
 
 Implementation
 ##############
@@ -88,8 +182,8 @@ Basic example
     as the parameter :py:mod:`asset_prices` in which case the expected returns and covariance matrix will be calculated
     using this data. Else, they can also pass pre-calculated :py:mod:`expected_returns` and :py:mod:`covariance_matrix`.
 
-Mean Variance class and it's different solutions
-************************************************
+Different solutions
+*******************
 
 .. code-block::
 

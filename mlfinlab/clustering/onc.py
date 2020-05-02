@@ -56,7 +56,6 @@ def _cluster_kmeans_base(corr_mat: pd.DataFrame, max_num_clusters: int = 10, rep
 
     # Distance matrix
     distance = ((1 - corr_mat.fillna(0)) / 2.0) ** 0.5
-
     silh = pd.Series()
 
     # Get optimal num clusters
