@@ -50,6 +50,22 @@ Adjustment methods include:
 The method returns np.array of adjusted p-values, adjusted Sharpe ratios, and haircuts as rows. Elements in a row are
 ordered by adjustment methods in the following way [Bonferroni, Holm, BHY, Average].
 
+Haircut Sharpe Ratio algorithm consists of the following steps:
+
+1. We are given the observed Sharpe ratio :math:`SR` in :math:`T` periods, based on this information we can calculate the
+   p-value of a single test :math:`p^S`.
+2. Assuming that :math:`N` other strategies have been tried and that the average correlation of returns from the strategies
+   is :math:`\rho` , we use the HLZ model to generate :math:`N` number of t-statistics from the model. We also transform the
+   calculated :math:`p^S` to a t-statistic.
+3. This :math:`N+1` t-statistics are transformed again to p-values, taking into account the data mining adjustment.
+4. This set of :math:`N+1` p-values are fed to two models described above (Holm and BHY) to get the adjusted p-values
+   with each of the methods. (Bonferroni adjustment is calculated using only the :math:`p^S` and :math:`N`)
+5. The steps 2-4 are repeated multiple times (simulations).
+6. For each of the two methods, we eventually have a set of :math:`p^M` values adjusted. The median of this set is the final
+   adjusted p-value of the method. So, we obtained p-values for each of the three methods. We then calculate the average
+   p-value as the Average of the methods.
+7. The obtained p-values of each method can be then transformed back to Sharpe ratios and the haircuts can be calculated.
+
 Implementation
 **************
 .. py:currentmodule:: mlfinlab.backtest_statistics.backtests
@@ -106,6 +122,18 @@ Adjustment methods include:
 - Benjamini, Hochberg, and Yekutieli (BHY)
 - Average of the methods above
 
+Profit Hurdle algorithm consists of the following steps:
+
+1. We are given the significance level :math:`p`, strategy volatility :math:`\sigma`, the number of observations :math:`T` ,
+   and the number of tests that have been concluded :math:`T` .
+2. Using the HLZ model, we generate :math:`N` t-statistics assuming that the average correlation of returns is :math:`\rho` .
+3. Using two methods (Holm and BHY) we calculate the threshold t-statistic that matches the :math:`p` significance level.
+4. The steps 2-3 are repeated multiple times (simulations).
+5. For the two methods (Holm and BHY) we have a set of t-statistics. We then take the median of t-statistics in each set
+   and call it a t-statistic for the method. T-ststistic for Bonferroni is calculated based on :math:`p` and :math:`N`, as
+   in the previous algorithm (Haircut Sharpe Ratios).
+6. The obtained t-statistics of each method can be then transformed to mean monthly returns. We then calculate the average
+   mean monthly return as the Average of the methods returns.
 
 Implementation
 **************
