@@ -27,8 +27,8 @@ We source all of our implementations from the most elite and peer-reviewed journ
 
 We are making a big drive to include techniques from various authors, however the most dominant author would be Dr. Marcos Lopez de Prado ([QuantResearch.org](http://www.quantresearch.org/)).
 This package has its foundations in the two graduate level textbooks: 
-1. Advances in Financial Machine Learning
-2. Machine Learning for Asset Managers
+1. [Advances in Financial Machine Learning](https://www.amazon.co.uk/Advances-Financial-Machine-Learning-Marcos/dp/1119482089)
+2. [Machine Learning for Asset Managers](https://www.cambridge.org/core/books/machine-learning-for-asset-managers/6D9211305EA2E425D33A9F38D0AE3545)
 
 ## Unlocking the Commons
 We are currently running a sponsorship model of “Unlocking the Commmons”. Our code base, online documentation, 
@@ -48,6 +48,12 @@ and [tutorial notebooks](https://github.com/hudson-and-thames/research), with co
 ## Who is Hudson & Thames?
 We are a private research group focused on implementing research based financial machine learning. We all work in 
 virtual teams, spread across the world, primarily: New York, London, and Kyiv.
+
+* [Website](https://hudsonthames.org/)
+* [Github Group](https://github.com/hudson-and-thames)
+* [Project Boards](https://github.com/orgs/hudson-and-thames/projects)
+* [Documentation](https://mlfinlab.readthedocs.io/en/latest/)
+
 
 ## Sponsors and Donating
 A special thank you to our sponsors! If you would like to become a sponsor and help support our research, please sign 
@@ -70,7 +76,7 @@ Benefits include:
    <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/docs/source/logo/machine-factor-technologies.png" height="200"><br>
 </div>
 
-|
+
 
 * [Machine Factor Technologies](https://machinefactor.tech/)
 
@@ -80,7 +86,7 @@ Benefits include:
    <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/docs/source/logo/gold_sponsors.png" height="200"><br>
 </div>
 
-|
+
 
 * [E.P. Chan & Associates](https://www.epchan.com/)
 * [Markov Capital](http://www.markovcapital.se/)
