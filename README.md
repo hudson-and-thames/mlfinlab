@@ -3,6 +3,7 @@
    <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/.github/logo/hudson_and_thames_logo.png" height="300"><br>
 </div>
 
+
 -----------------
 # Machine Learning Financial Laboratory (MlFinLab)
 [![PyPi](https://img.shields.io/pypi/v/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
@@ -48,8 +49,10 @@ and [tutorial notebooks](https://github.com/hudson-and-thames/research), with co
 ## Who is Hudson & Thames?
 <div align="center">
    <a href="https://hudsonthames.org">
-   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/HnT.png" height="200"><br>
+   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/HnT.png" height="250">
+   <br></br>
 </div>
+
 
 We are a private research group focused on implementing research based financial machine learning. We all work in 
 virtual teams, spread across the world, primarily: New York, London, and Kyiv.
@@ -102,8 +105,10 @@ Benefits include:
 
 <div align="center">
    <a href="https://hudsonthames.org">
-   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/Slack.png" height="300"><br>
+   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/Slack.png" height="400"><br>
 </div>
+
+
 
 We host a booming community of like minded data scientists and quants, join the 
 [Slack Channel](https://www.patreon.com/HudsonThames) now! Open to sponsors of our package. 
