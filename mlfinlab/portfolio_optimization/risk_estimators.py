@@ -234,6 +234,10 @@ class RiskEstimators:
         As a threshold for the denoising the correlation matrix, the maximum eigenvalue
         that fits the theoretical distribution is used.
 
+        This algorithm is reproduced with minor modifications from the following paper:
+        `Marcos Lopez de Prado “A Robust Estimator of the Efficient Frontier”, (2019).
+        <https://papers.ssrn.com/abstract_id=3469961>`_.
+
         :param cov: (np.array) Covariance/correlation matrix
         :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
                                     covariance/correlation matrix.

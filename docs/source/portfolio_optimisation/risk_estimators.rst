@@ -17,6 +17,7 @@ This class includes functions for calculating different types of covariance matr
    - **Shrinkage Algorithms for MMSE Covariance Estimation** *by* Y. Chen, A. Wiesel, Y.C. Eldar and A.O. Hero `available here <https://webee.technion.ac.il/people/YoninaEldar/104.pdf>`__. *Introduces the Oracle Approximating shrinkage method.*
    - **Minimum Downside Volatility Indices** *by* Solactive AG - German Index Engineering `available here <https://www.solactive.com/wp-content/uploads/2018/04/Solactive_Minimum-Downside-Volatility-Indices.pdf>`__. *Describes examples of use of the Semi-Covariance matrix.*
    - **Financial applications of random matrix theory: Old laces and new pieces** *by* Potter M., J.P. Bouchaud, L. Laloux `available here <https://arxiv.org/abs/physics/0507111>`__. *Describes the process of de-noising of the covariance matrix.*
+   - **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/sol3/abstract_id=3469961>`__. *Describes the De-noising Covariance/Correlation Matrix algorithm.*
 
 Minimum Covariance Determinant
 ##############################
@@ -143,8 +144,8 @@ and :math:`j` -th asset, :math:`EWMA(Covar)_{t}` is the :math:`t` -th observatio
 moving average of :math:`Covar` .
 
 
-De-noising Covariance Matrix
-#############################
+De-noising Covariance/Correlation Matrix
+########################################
 
 The main idea behind de-noising is to separate the noise-related eigenvalues from the signal-related ones. This is achieved
 through fitting the Marcenko-Pastur distribution of the empirical distribution of eigenvalues using a Kernel Density Estimate (KDE).
@@ -167,8 +168,11 @@ The de-noising function works as follows:
 
 - The new correlation matrix is then transformed back to the new de-noised covariance matrix.
 
+(If the correlation matrix is given as an input, the first and the last steps of the algorithm are omitted)
+
 .. tip::
-    The algorithm behind this method is described in more detail in the NCO Notebook.
+
+    The de-noising algorithm is described in more detail in the work **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3469961>`_.
 
 Transforming Covariance to Correlation and Back
 #############################################################
