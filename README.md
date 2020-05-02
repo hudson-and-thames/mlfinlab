@@ -97,8 +97,7 @@ Benefits include:
 ## Contact us
 <div align="center">
    <a href="https://www.patreon.com/HudsonThames/">
-   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/Slack.png" height="400"><br>
-   <>
+   <img src="https://i.dlpng.com/static/png/451725_preview.png">
 </div>
 
 
