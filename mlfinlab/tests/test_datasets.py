@@ -8,12 +8,12 @@ from mlfinlab.datasets.load_datasets import (load_tick_sample, load_stock_prices
 
 class TestDatasets(unittest.TestCase):
     """
-    Test load_tick_sample, load_stock_prices, load_dollar_bar_sample
+    Test load_tick_sample, load_stock_prices, load_dollar_bar_sample.
     """
 
     def test_load_tick_sample(self):
         """
-        Test load_tick_sample function
+        Test load_tick_sample function.
         """
 
         tick_sample_df = load_tick_sample()
@@ -23,7 +23,7 @@ class TestDatasets(unittest.TestCase):
 
     def test_load_stock_prices(self):
         """
-        Test load_stock_prices function
+        Test load_stock_prices function.
         """
         stock_prices_df = load_stock_prices()
         self.assertEqual(stock_prices_df.shape[0], 2141)
@@ -33,7 +33,7 @@ class TestDatasets(unittest.TestCase):
 
     def test_load_dollar_bar_sample(self):
         """
-        Test load_dollar_bar_samples
+        Test load_dollar_bar_samples.
         """
         dollar_bars_df = load_dollar_bar_sample()
         self.assertEqual(dollar_bars_df.shape[0], 1000)

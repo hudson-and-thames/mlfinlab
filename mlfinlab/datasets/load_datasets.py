@@ -10,8 +10,8 @@ import pandas as pd
 def load_stock_prices() -> pd.DataFrame:
     """
     Loads stock prices data sets consisting of
-    EEM,EWG,TIP,EWJ,EFA,IEF,EWQ,EWU,XLB,XLE,XLF,LQD,XLK,XLU,EPP,FXI,VGK,VPL,SPY,TLT,BND,CSJ,DIA starting from 2008
-    till 2016.
+    EEM, EWG, TIP, EWJ, EFA, IEF, EWQ, EWU, XLB, XLE, XLF, LQD, XLK, XLU, EPP, FXI, VGK, VPL, SPY, TLT, BND, CSJ,
+    DIA starting from 2008 till 2016.
 
     :return: (pd.DataFrame) stock_prices data frame
     """
