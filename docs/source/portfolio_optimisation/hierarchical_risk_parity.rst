@@ -55,7 +55,7 @@ Example Code
     hrp.allocate(asset_prices=stock_prices, resample_by='B')
     hrp_weights = hrp.weights.sort_values(by=0, ascending=False, axis=1)
 
-    # Building a delta neutral Long/Short portfolio by shorting the first 4 stocks and being long the others
+    # Building a dollar neutral Long/Short portfolio by shorting the first 4 stocks and being long the others
     hrp = HierarchicalRiskParity()
     side_weights = pd.Series([1]*stock_prices.shape[1], index=self.data.columns)
     side_weights.loc[stock_prices.columns[:4]] = -1
