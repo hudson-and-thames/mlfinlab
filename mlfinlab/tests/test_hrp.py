@@ -169,9 +169,9 @@ class TestHRP(unittest.TestCase):
         distance_matrix = np.sqrt((1 - corr).round(5) / 2)
         hrp.allocate(asset_names=self.data.columns, covariance_matrix=covariance, distance_matrix=distance_matrix)
         weights = hrp.weights.values[0]
-        assert (weights >= 0).all()
-        assert len(weights) == self.data.shape[1]
-        np.testing.assert_almost_equal(np.sum(weights), 1)
+        self.assertTrue((weights >= 0).all())
+        self.assertTrue(len(weights) == self.data.shape[1])
+        self.assertAlmostEqual(np.sum(weights), 1)
 
     def test_hrp_with_linkage_method(self):
         """
@@ -183,9 +183,9 @@ class TestHRP(unittest.TestCase):
         weights = hrp.weights.values[0]
         assert hrp.ordered_indices == [13, 7, 1, 6, 4, 16, 3, 17, 14, 0, 15, 8,
                                        9, 10, 12, 18, 22, 5, 19, 2, 20, 11, 21]
-        assert (weights >= 0).all()
-        assert len(weights) == self.data.shape[1]
-        np.testing.assert_almost_equal(np.sum(weights), 1)
+        self.assertTrue((weights >= 0).all())
+        self.assertTrue(len(weights) == self.data.shape[1])
+        self.assertAlmostEqual(np.sum(weights), 1)
 
     def test_no_asset_names(self):
         """
