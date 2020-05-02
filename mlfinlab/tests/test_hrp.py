@@ -47,8 +47,8 @@ class TestHRP(unittest.TestCase):
         side_weights.loc[self.data.columns[:4]] = -1
         hrp.allocate(asset_prices=self.data, asset_names=self.data.columns, side_weights=side_weights)
         weights = hrp.weights.values[0]
-        self.assertAlmostEqual(len(weights) - self.data.shape[1], 0)
-        np.testing.assert_almost_equal(np.sum(weights), 0)
+        self.assertEqual(len(weights) - self.data.shape[1], 0)
+        self.assertAlmostEqual(np.sum(weights), 0)
 
     def test_hrp_with_shrinkage(self):
         """
