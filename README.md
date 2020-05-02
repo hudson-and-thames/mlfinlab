@@ -95,6 +95,9 @@ Benefits include:
 ---
 
 ## Contact us
+
+![MlFinLab Slack Channel](https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/Slack.png)
+
 We host a booming community of like minded data scientists and quants, join the 
 [Slack Channel](https://www.patreon.com/HudsonThames) now! Open to sponsors of our package. 
 
