@@ -49,8 +49,8 @@ and [tutorial notebooks](https://github.com/hudson-and-thames/research), with co
 ## Who is Hudson & Thames?
 
 <div align="center">
-   <a href="https://hudsonthames.org">
-   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/HnT.png" height="320"><br>
+   <a href="https://hudsonthames.org/">
+   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/HnT.png" height="270"><br>
 </div>
 
 
@@ -103,10 +103,9 @@ Benefits include:
 
 ## Contact us
 <div align="center">
-   <a href="https://www.patreon.com/HudsonThames">
+   <a href="https://www.patreon.com/HudsonThames/">
    <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/Slack.png" height="550"><br>
 </div>
-.
 
 
 We host a booming community of like minded data scientists and quants, join the 
