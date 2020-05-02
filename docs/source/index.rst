@@ -270,6 +270,7 @@ This project is licensed under an all rights reserved licence.
     :hidden:
 
     implementations/onc
+    implementations/feature_clusters
 
 .. toctree::
     :maxdepth: 2
@@ -278,7 +279,6 @@ This project is licensed under an all rights reserved licence.
 
     implementations/backtesting
     implementations/backtest_statistics
-
 
 .. toctree::
     :maxdepth: 2
