@@ -33,7 +33,7 @@ This package has its foundations in the two graduate level textbooks:
 
 <div align="center">
    <a href="https://mlfinlab.readthedocs.io/en/latest/">
-   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/journals.png"><br>
+   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/docs/source/logo/journals.png"><br>
 </div>
 
 ## Unlocking the Commons
