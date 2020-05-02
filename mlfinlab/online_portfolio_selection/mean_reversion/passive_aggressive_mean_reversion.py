@@ -7,26 +7,46 @@ class PassiveAggressiveMeanReversion(OLPS):
     """
     This class implements the Passive Aggressive Mean Reversion strategy. It is reproduced with
     modification from the following paper:
-    Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
-    Surv. V, N, Article A (December YEAR), 33 pages. <https://arxiv.org/abs/1212.2129>.
+    'Li, B., Zhao, P., Hoi, S.C., & Gopalkrishnan, V. (2012). PAMR: Passive aggressive mean
+    reversion strategy for portfolio selection. Machine Learning, 87, 221-258.
+    <https://link.springer.com/content/pdf/10.1007%2Fs10994-012-5281-z.pdf>_'
 
     Passive Aggressive Mean Reversion strategy switches between a passive and an aggressive mean
-    reversion strategy based on epsilon, a measure of sensitivty to the market. Hyperparameter C
-    denotes the aggressiveness of reverting to a partciular strategy.
+    reversion strategy based on epsilon, a measure of sensitivty to the market, and hyperparameter C,
+    which denotes the aggressiveness of reverting to a partciular strategy.
     """
 
     def __init__(self, epsilon, agg, optimization_method):
         """
+        Initializes Passive Aggressive Mean Reversionw ith the given epsilon, aggressiveness,
+        and optimzation method.
 
         :param epsilon: (float) Sensitivity to the market.
         :param agg: (float) Aggressiveness to mean reversion.
         :param optimization_method: (int) 0 for PAMR, 1 for PAMR-1, 2 for PAMR-2
         """
-        # Check that sensitivity is within [0,1]
         self.epsilon = epsilon
         self.agg = agg
         self.optimization_method = optimization_method
         super().__init__()
+
+    def _initialize(self, asset_prices, weights, resample_by):
+        """
+        Initializes the important variables for the object.
+
+        :param asset_prices: (pd.DataFrame) Historical asset prices.
+        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :param resample_by: (str) Specifies how to resample the prices.
+        """
+        super(PassiveAggressiveMeanReversion, self)._initialize(asset_prices, weights, resample_by)
+
+        # Check that epsilon is greater than or equal to 0.
+        if self.epsilon < 0 or self.epsilon > 1:
+            raise ValueError("Epsilon values must be between 0 and 1")
+
+        # Check that optimization method is either 1 or 2.
+        if self.optimization_method not in [0, 1, 2]:
+            raise ValueError("Optimization method must be either 0, 1, or 2.")
 
     def _update_weight(self, time):
         """

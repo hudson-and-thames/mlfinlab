@@ -1,61 +1,130 @@
 # pylint: disable=missing-module-docstring
-import pandas as pd
+import numpy as np
+from scipy.stats import norm
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
 class ConfidenceWeightedMeanReversion(OLPS):
     """
-    This class implements the Confidence Weighted Mean Reversion strategy. It is reproduced with modification from the following paper:
-    Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December YEAR),
-    33 pages. DOI:http://dx.doi.org/10.1145/2512962.
+    This class implements the Confidence Weighted Mean Reversion strategy. It is reproduced with
+    modification from the following paper:
+    'Li, B., Hoi, S.C., Zhao, P. & Gopalkrishnan, V.. (2011). Confidence Weighted Mean Reversion
+    Strategy for On-Line Portfolio Selection. Proceedings of the Fourteenth International
+    Conference on Artificial Intelligence and Statistics, in PMLR 15:434-442.
+    <https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=3292&context=sis_research>_ '
 
-    Online Moving Average Reversion reverts to the SMA or EMA of the underlying assets based on the given threshold.
+    Confidence Weighted Mean Reversion exploits both the popular mean reversion techniques and
+    second-order information to model weights as a gaussian distribution.
     """
 
-    def __init__(self,
-                 confidence=0.5,
-                 epsilon=0.5):
+    def __init__(self, confidence, epsilon, method='Var'):
         """
-        Constructor.
+        Initializes Confidence Weighted Mean Reversion with the given confidence, epsilon, and method.
+
+        :param confidence: (float) Confidence parameter. Must be between 0 and 1.
+        :param epsilon: (float) Mean reversion parameter. Must be between 0 and 1.
+        :param method:
         """
         self.confidence = confidence
+        self.theta = None
         self.epsilon = epsilon
+        self.method = method
+        self.sigma = None  # (np.array) Variance of the portfolio distribution.
+        self.mu_dist = None # (np.array) Mean of the portfolio distribution.
         super().__init__()
 
-    # will update later
+    def _initialize(self, asset_prices, weights, resample_by):
+        """
+        Initializes the important variables for the object.
 
-    # def update_weight(self, _weights, _relative_return, _time):
-    #     # calculation prep
-    #     _past_relative_return = _relative_return[_time - 1]
-    #     loss = max(0, np.dot(_weights, _past_relative_return))
-    #     adjusted_market_change = _past_relative_return - self.uniform_weight(self.number_of_assets) * np.mean(
-    #         _past_relative_return)
-    #     diff_norm = np.linalg.norm(adjusted_market_change)
-    #
-    #     # different optimization methods
-    #     if self.optimization_method == 0:
-    #         tau = loss / (diff_norm ** 2)
-    #     elif self.optimization_method == 1:
-    #         tau = min(self.aggressiveness, loss / (diff_norm ** 2))
-    #     elif self.optimization_method == 2:
-    #         tau = loss / (diff_norm ** 2 + 1 / (2 * self.aggressiveness))
-    #
-    #     new_weights = _weights - tau * adjusted_market_change
-    #     # if not in simplex domain
-    #     if ((new_weights > 1) | (new_weights < 0)).any():
-    #         return self.optimize(new_weights)
-    #     else:
-    #         return new_weights
+        :param asset_prices: (pd.DataFrame) Historical asset prices.
+        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :param resample_by: (str) Specifies how to resample the prices.
+        """
+        super(ConfidenceWeightedMeanReversion, self)._initialize(asset_prices, weights, resample_by)
 
-def main():
-    stock_price = pd.read_csv("../../tests/test_data/stock_prices.csv", parse_dates=True, index_col='Date')
-    stock_price = stock_price.dropna(axis=1)
-    cwmr = ConfidenceWeightedMeanReversion()
-    cwmr.allocate(stock_price, resample_by='M')
-    print(cwmr.all_weights)
-    print(cwmr.portfolio_return)
-    cwmr.portfolio_return.plot()
+        # Check that epsilon value is correct.
+        if self.epsilon < 0 or self.epsilon > 1:
+            raise ValueError("Epsilon values must be between 0 and 1.")
 
+        # Check that the confidence value is correct.
+        if self.confidence < 0 or self.confidence > 1:
+            raise ValueError("Confidence values must be between 0 and 1.")
 
-if __name__ == "__main__":
-    main()
+        # If confidence is valid, set theta value.
+        self.theta = norm.ppf(self.confidence)
+
+        # Check that the given method is correct.
+        if self.method != 'Var' and self.method != 'SD':
+            raise ValueError("Method must be either 'Var' or 'SD'.")
+
+    def _update_weight(self, time):
+        """
+        Predicts the next time's portfolio weight.
+
+        :param time: (int) Current time period.
+        :return new_weights: (np.array) Predicted weights.
+        """
+        # Set current relative returns.
+        curr_relative_return = self.relative_return[[time]]
+        # Calculate dot product of relative returns and current weights.
+        new_m = np.dot(curr_relative_return, self.weights)[0]
+        # Calculate the variance of current relative returns.
+        new_v = np.dot(np.dot(curr_relative_return, self.sigma), curr_relative_return.T)[0][0]
+        # Calculate weighted variance.
+        new_w = np.dot(np.dot(curr_relative_return, self.sigma), np.identity(self.number_of_assets))[0]
+        # Calculate weighted average.
+        mean_x = np.diag(self.sigma) / np.trace(self.sigma)
+
+        # Expression to speed up calculations.
+        expn = new_v - np.dot(mean_x, new_w) + self.theta ** 2 * new_v / 2
+
+        # Calculate constants for quadratic equation.
+        quad_a = expn ** 2 - self.theta ** 4 * new_v ** 2 / 4
+        quad_b = 2 * (self.epsilon - new_m) * expn
+        quad_c = (self.epsilon - new_m) ** 2 - self.theta ** 2 * new_v
+
+        # Calculate lagrangian.
+        if quad_b ** 2 - 4 * quad_a * quad_c < 0:
+            lambd = np.max([-quad_c/quad_b, 0])
+        else:
+            lambd = np.max([(-quad_b + np.sqrt(quad_b ** 2 - 4 * quad_a * quad_c)) / (2 * quad_a),
+                            (-quad_b - np.sqrt(quad_b ** 2 - 4 * quad_a * quad_c)) / (2 * quad_a),
+                            -quad_c / quad_b, 0])
+        # Update mu.
+        self.mu_dist -= lambd * np.dot(curr_relative_return - mean_x, self.sigma).reshape((self.number_of_assets,))
+
+        if self.method == 'SD':
+            # Component for new variance calculation.
+            sqrt_u = (-lambd * self.theta * new_v + np.sqrt(lambd ** 2 * self.theta ** 2 * new_v ** 2 + 4 * new_v)) / 2
+            # Update variance.
+            self.sigma = np.linalg.inv(np.linalg.inv(self.sigma) + lambd * self.theta / sqrt_u * np.diag(curr_relative_return) ** 2)
+        if self.method == 'Var':
+            # Update variance.
+            self.sigma = np.linalg.inv(
+                np.linalg.inv(self.sigma) + 2 * lambd * self.theta * np.diag(curr_relative_return) ** 2)
+        # Normalize variance.
+        self.sigma /= new_m * np.trace(self.sigma)
+        # Simplex projection.
+        self.mu_dist = self._simplex_projection(self.mu_dist)
+
+        return self.mu_dist
+
+    def _first_weight(self, weights):
+        """
+        Returns the first weight of the given portfolio. If the first weight is not given, initialize weights to
+        uniform weights.
+
+        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :return (weights): (np.array) First portfolio weight.
+        """
+        # Set sigma, the variance of the portfolio distribution.
+        self.sigma = np.identity(self.number_of_assets) / (self.number_of_assets ** 2)
+
+        # If no weights are given, return uniform weights.
+        if weights is None:
+            weights = self._uniform_weight()
+
+        # Set mu, the mean of the portfolio distribution.
+        self.mu_dist = weights
+        return weights

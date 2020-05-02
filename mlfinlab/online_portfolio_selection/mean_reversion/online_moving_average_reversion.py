@@ -29,7 +29,7 @@ class OnlineMovingAverageReversion(OLPS):
         self.window = window
         self.alpha = alpha
         self.reversion_method = reversion_method
-        self.moving_average_reversion = None  # Calculated moving average.
+        self.moving_average_reversion = None  # (np.array) Calculated moving average.
         super().__init__()
 
     def _initialize(self, asset_prices, weights, resample_by):
