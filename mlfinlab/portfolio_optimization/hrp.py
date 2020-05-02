@@ -14,7 +14,6 @@ class HierarchicalRiskParity:
     Building Diversified Portfolios that Outperform Out-of-Sample (May 23, 2016). Journal of Portfolio Management,
     2016 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_; The code is reproduced with modification from his book:
     Advances in Financial Machine Learning, Chp-16
-
     By removing exact analytical approach to the calculation of weights and instead relying on an approximate
     machine learning based approach (hierarchical tree-clustering), Hierarchical Risk Parity produces weights which are stable to
     random shocks in the stock-market. Moreover, previous algorithms like CLA involve the inversion of covariance matrix which is
@@ -25,7 +24,6 @@ class HierarchicalRiskParity:
 
     def __init__(self):
         self.weights = list()
-        self.seriated_correlations = None
         self.seriated_distances = None
         self.ordered_indices = None
         self.clusters = None
@@ -37,24 +35,31 @@ class HierarchicalRiskParity:
                  asset_prices=None,
                  asset_returns=None,
                  covariance_matrix=None,
+                 distance_matrix=None,
+                 side_weights=None,
+                 linkage_method='single',
                  resample_by=None,
                  use_shrinkage=False):
         # pylint: disable=invalid-name, too-many-branches
         """
         Calculate asset allocations using HRP algorithm.
-
         :param asset_names: (list) a list of strings containing the asset names
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
                                             indexed by date
         :param asset_returns: (pd.Dataframe/numpy matrix) user supplied matrix of asset returns
         :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns
+        :param distance_matrix: (pd.Dataframe/numpy matrix) user supplied distance matrix
+        :param side_weights: (pd.Series/numpy matrix) with asset_names in index and value 1 for Buy, -1 for Sell
+                                (default 1 for all)
+        :param linkage: (string) type of linkage used for Hierarchical Clustering ex: single, average, complete...
         :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         :param use_shrinkage: (Boolean) specifies whether to shrink the covariances
         """
 
         if asset_prices is None and asset_returns is None and covariance_matrix is None:
-            raise ValueError("You need to supply either raw prices or returns or a covariance matrix of asset returns")
+            raise ValueError(
+                "You need to supply either raw prices or returns or a covariance matrix of asset returns")
 
         if asset_prices is not None:
             if not isinstance(asset_prices, pd.DataFrame):
@@ -81,42 +86,43 @@ class HierarchicalRiskParity:
                 covariance_matrix = self._shrink_covariance(asset_returns=asset_returns)
             else:
                 covariance_matrix = asset_returns.cov()
-        cov = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
+        covariance_matrix = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
 
-        # Calculate correlation from covariance matrix
-        corr = self._cov2corr(covariance=cov)
+        # Calculate correlation and distance from covariance matrix
+        if distance_matrix is None:
+            correlation_matrix = self._cov2corr(covariance=covariance_matrix)
+            distance_matrix = np.sqrt((1 - correlation_matrix).round(5) / 2)
+        distance_matrix = pd.DataFrame(distance_matrix, index=asset_names, columns=asset_names)
 
         # Step-1: Tree Clustering
-        distances, self.clusters = self._tree_clustering(correlation=corr)
+        self.clusters = self._tree_clustering(distance=distance_matrix, method=linkage_method)
 
         # Step-2: Quasi Diagnalization
         num_assets = len(asset_names)
         self.ordered_indices = self._quasi_diagnalization(num_assets, 2 * num_assets - 2)
-        self.seriated_distances, self.seriated_correlations = self._get_seriated_matrix(assets=asset_names,
-                                                                                        distances=distances,
-                                                                                        correlations=corr)
+        self.seriated_distances = self._get_seriated_matrix(assets=asset_names, distance=distance_matrix)
+
+        if side_weights is None:
+            side_weights = pd.Series([1] * num_assets, index=asset_names)
+        side_weights = pd.Series(side_weights, index=asset_names)
 
         # Step-3: Recursive Bisection
-        self._recursive_bisection(covariance=cov, assets=asset_names)
+        self._recursive_bisection(covariance=covariance_matrix, assets=asset_names, side_weights=side_weights)
 
     @staticmethod
-    def _tree_clustering(correlation, method='single'):
+    def _tree_clustering(distance, method='single'):
         """
         Perform the traditional heirarchical tree clustering.
-
         :param correlation: (np.array) correlation matrix of the assets
         :param method: (str) the type of clustering to be done
         :return: distance matrix and clusters
         """
-
-        distances = np.sqrt((1 - correlation).round(5) / 2)
-        clusters = linkage(squareform(distances.values), method=method)
-        return distances, clusters
+        clusters = linkage(squareform(distance.values), method=method)
+        return clusters
 
     def _quasi_diagnalization(self, num_assets, curr_index):
         """
         Rearrange the assets to reorder them according to hierarchical tree clustering order.
-
         :param num_assets: (int) the total number of assets
         :param curr_index: (int) current index
         :return: (list) the assets rearranged according to hierarchical clustering
@@ -130,27 +136,23 @@ class HierarchicalRiskParity:
 
         return (self._quasi_diagnalization(num_assets, left) + self._quasi_diagnalization(num_assets, right))
 
-    def _get_seriated_matrix(self, assets, distances, correlations):
+    def _get_seriated_matrix(self, assets, distance):
         """
         Based on the quasi-diagnalization, reorder the original distance matrix, so that assets within
         the same cluster are grouped together.
-
         :param assets: (list) list of asset names in the portfolio
-        :param distances: (pd.Dataframe) distance values between asset returns
-        :param correlations: (pd.Dataframe) correlations between asset returns
+        :param distance: (pd.Dataframe) distance values between asset returns
         :return: (np.array) re-arranged distance matrix based on tree clusters
         """
 
         ordering = assets[self.ordered_indices]
-        seriated_distances = distances.loc[ordering, ordering]
-        seriated_correlations = correlations.loc[ordering, ordering]
-        return seriated_distances, seriated_correlations
+        seriated_distances = distance.loc[ordering, ordering]
+        return seriated_distances
 
     @staticmethod
     def _get_inverse_variance_weights(covariance):
         """
         Calculate the inverse variance weight allocations.
-
         :param covariance: (pd.Dataframe) covariance matrix of assets
         :return: (list) inverse variance weight values
         """
@@ -162,7 +164,6 @@ class HierarchicalRiskParity:
     def _get_cluster_variance(self, covariance, cluster_indices):
         """
         Calculate cluster variance.
-
         :param covariance: (pd.Dataframe) covariance matrix of assets
         :param cluster_indices: (list) list of asset indices for the cluster
         :return: (float) variance of the cluster
@@ -173,14 +174,12 @@ class HierarchicalRiskParity:
         cluster_variance = self.risk_metrics.calculate_variance(covariance=cluster_covariance, weights=parity_w)
         return cluster_variance
 
-    def _recursive_bisection(self, covariance, assets):
+    def _recursive_bisection(self, covariance, assets, side_weights):
         """
         Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets.
-
         :param covariance: (pd.Dataframe) the covariance matrix
         :param assets: (list) list of asset names in the portfolio
         """
-
         self.weights = pd.Series(1, index=self.ordered_indices)
         clustered_alphas = [self.ordered_indices]
 
@@ -206,12 +205,22 @@ class HierarchicalRiskParity:
         # Assign actual asset values to weight index
         self.weights.index = assets[self.ordered_indices]
         self.weights = pd.DataFrame(self.weights)
+
+        # Build Long/Short portfolio if needed
+        short_ptf = side_weights[side_weights == -1].index
+        buy_ptf = side_weights[side_weights == 1].index
+        if not short_ptf.empty:
+            # Short half size
+            self.weights.loc[short_ptf] /= self.weights.loc[short_ptf].sum().values[0]
+            self.weights.loc[short_ptf] *= -0.5
+            # Buy other half
+            self.weights.loc[buy_ptf] /= self.weights.loc[buy_ptf].sum().values[0]
+            self.weights.loc[buy_ptf] *= 0.5
         self.weights = self.weights.T
 
     def plot_clusters(self, assets):
         """
         Plot a dendrogram of the hierarchical clusters.
-
         :param assets: (list) list of asset names in the portfolio
         """
 
@@ -222,7 +231,6 @@ class HierarchicalRiskParity:
     def _shrink_covariance(asset_returns):
         """
         Regularise/Shrink the asset covariances.
-
         :param asset_returns: (pd.Dataframe) asset returns
         :return: (pd.Dataframe) shrinked asset returns covariances
         """
@@ -236,7 +244,6 @@ class HierarchicalRiskParity:
     def _cov2corr(covariance):
         """
         Calculate the correlations from asset returns covariance matrix.
-
         :param covariance: (pd.Dataframe) asset returns covariances
         :return: (pd.Dataframe) correlations between asset returns
         """
