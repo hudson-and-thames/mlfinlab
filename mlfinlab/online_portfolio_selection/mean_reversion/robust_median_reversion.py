@@ -58,24 +58,3 @@ class RobustMedianReversion(OLPS):
         :param time: (int) Current time period.
         :return new_weights: (np.array) Predicted weights.
         """
-
-        """
-        :param window: Lookback window.
-        :param eps: Constraint on return for new weights on last price (average of prices).
-            x * w >= eps for new weights w.
-        :param tau: Precision for finding median. Recommended value is around 0.001. Strongly
-                    affects algo speed.
-        """
-        super(RMR, self).__init__(window, eps)
-        self.tau = tau
-
-    def predict(self, x, history):
-        """ find L1 median to historical prices """
-        y = history.mean()
-        y_last = None
-        while y_last is None or norm(y - y_last) / norm(y_last) > self.tau:
-            y_last = y
-            d = norm(history - y)
-            y = history.div(d, axis=0).sum() / (1. / d).sum()
-        return y / x
-
