@@ -9,7 +9,7 @@ class CorrelationDrivenNonparametricLearning(OLPS):
     """
     This class implements the Correlation Driven Nonparametric Learning strategy. It is
     reproduced with modification from the following paper:
-    'Li, B., Hoi, S.C., & Gopalkrishnan, V. (2011). CORN: Correlation-driven nonparametric
+    `Li, B., Hoi, S.C., & Gopalkrishnan, V. (2011). CORN: Correlation-driven nonparametric
     learning approach for portfolio selection. ACM TIST, 2,
     21:1-21:29.<https://dl.acm.org/doi/abs/10.1145/1961189.1961193>_'
 

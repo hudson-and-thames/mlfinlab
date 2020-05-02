@@ -7,9 +7,9 @@ class OnlineMovingAverageReversion(OLPS):
     """
     This class implements the Online Moving Average Reversion strategy. It is reproduced with
     modification from the following paper:
-    'Li, Bin & Hoi, Steven. (2012). On-Line Portfolio
+    `Li, Bin & Hoi, Steven. (2012). On-Line Portfolio
     Selection with Moving Average Reversion. Proceedings of the 29th International Conference on
-    Machine Learning, ICML 2012. 1. <https://arxiv.org/pdf/1206.4626.pdf>_'
+    Machine Learning, ICML 2012. 1. <https://arxiv.org/pdf/1206.4626.pdf>`_
 
     Online Moving Average Reversion reverts to the SMA or EMA of the underlying assets based on
     the given threshold.

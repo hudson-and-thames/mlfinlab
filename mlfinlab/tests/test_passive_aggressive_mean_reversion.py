@@ -101,7 +101,7 @@ class TestPassiveAggressiveMeanReversion(TestCase):
 
     def test_pamr_method_error(self):
         """
-        Tests ValueError if optimzation method is not 0, 1, or 2.
+        Tests ValueError if optimization method is not 0, 1, or 2.
         """
         # Initialize PAMR.
         pamr5 = PassiveAggressiveMeanReversion(epsilon=2, agg=10, optimization_method=5)

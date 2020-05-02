@@ -7,9 +7,9 @@ class PassiveAggressiveMeanReversion(OLPS):
     """
     This class implements the Passive Aggressive Mean Reversion strategy. It is reproduced with
     modification from the following paper:
-    'Li, B., Zhao, P., Hoi, S.C., & Gopalkrishnan, V. (2012). PAMR: Passive aggressive mean
+    `Li, B., Zhao, P., Hoi, S.C., & Gopalkrishnan, V. (2012). PAMR: Passive aggressive mean
     reversion strategy for portfolio selection. Machine Learning, 87, 221-258.
-    <https://link.springer.com/content/pdf/10.1007%2Fs10994-012-5281-z.pdf>_'
+    <https://link.springer.com/content/pdf/10.1007%2Fs10994-012-5281-z.pdf>`_
 
     Passive Aggressive Mean Reversion strategy switches between a passive and an aggressive mean
     reversion strategy based on epsilon, a measure of sensitivty to the market, and hyperparameter C,
