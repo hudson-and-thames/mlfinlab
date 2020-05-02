@@ -64,7 +64,7 @@ class TestRiskEstimators(unittest.TestCase):
         eval_points = np.array([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
 
         # Calculating the pdf in 7 chosen points
-        pdf_kde = risk_estimators._fit_kde(observations, eval_points=eval_points)
+        pdf_kde = risk_estimators._fit_kde(observations, eval_points=eval_points, kde_bwidth=0.25)
 
         # Testing the values and if the pdf is symmetric
         self.assertEqual(pdf_kde[0.0], pdf_kde[0.6])
@@ -73,7 +73,7 @@ class TestRiskEstimators(unittest.TestCase):
         self.assertAlmostEqual(pdf_kde[0.3], 1.44413, delta=1e-5)
 
         # Testing also on unique values of the set as a default output
-        pdf_kde_default = risk_estimators._fit_kde(observations)
+        pdf_kde_default = risk_estimators._fit_kde(observations, kde_bwidth=0.25)
         self.assertEqual(pdf_kde[0.1], pdf_kde_default[0.1])
         self.assertEqual(pdf_kde_default[0.2], pdf_kde_default[0.4])
 
