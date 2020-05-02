@@ -369,6 +369,7 @@ class TIC:
         :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
                                     correlation matrix
         :param kde_bwidth: (float) The bandwidth of the kernel to fit KDE for de-noising the correlation matrix
+                                   (0.01 by default)
         :return: (np.array) Theory-Implied Correlation matrix
         """
 

@@ -264,9 +264,17 @@ The following example highlights how the various metrics behave under various va
     y_4 = np.random.RandomState(0).normal(size=1000) * np.random.RandomState(5).normal(size=1000)
 
     for y, dependency in zip([y_1, y_2, y_3, y_4], ['linear', 'squared', 'y=|x|', 'independent']):
-        text = "Pearson corr: {:0.2f} \nNorm.mutual info: {:0.2f}\nDistance correlation: {:0.2f} \nInformation variation: {:0.2f} \nMax correlation: {:0.2f}".format(
-        np.corrcoef(x, y)[0, 1], get_mutual_info(x, y, normalize=True), distance_correlation(x, y), variation_of_information_score(x, y, normalize=True), max_correlation(x, y))
+        text = "Pearson corr: {:0.2f} " + \
+               "\nNorm.mutual info: {:0.2f} " + \
+               "\nDistance correlation: {:0.2f} " + \
+               "\nInformation variation: {:0.2f} " + \
+               "\nMax correlation: {:0.2f}"
 
+        text = text.format(np.corrcoef(x, y)[0, 1],
+                           get_mutual_info(x, y, normalize=True),
+                           distance_correlation(x, y),
+                           variation_of_information_score(x, y, normalize=True),
+                           max_correlation(x, y))
 
         # Plot relationships
         fig, ax = plt.subplots(figsize=(8,7))
