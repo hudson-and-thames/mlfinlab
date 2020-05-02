@@ -7,13 +7,14 @@ import numpy as np
 import pandas as pd
 from scipy.special import comb
 
-from mlfinlab.bet_sizing.ef3m import M2N, centered_moment, raw_moment, most_likely_parameters
+from mlfinlab.bet_sizing.ef3m import (M2N, centered_moment, raw_moment, most_likely_parameters, iter_4_jit, iter_5_jit)
 
 
 class TestM2NConstructor(unittest.TestCase):
     """
     Tests the constructor method of the M2N class.
     """
+
     def test_m2n_constructor(self):
         """
         Tests that the constructor of the M2N class executes properly.
@@ -310,6 +311,60 @@ class TestM2NFit(unittest.TestCase):
         m2n_test = M2N(moments_test, epsilon_test, factor_test, n_runs_test, variant_test, max_iter_test)
         m2n_test.fit(mu_2=mu_2_test)
         self.assertTrue(len(m2n_test.parameters) == 5)
+
+
+class TestM2NEF3M(unittest.TestCase):
+    """
+    Tests the EF3M algorithms of the M2N module.
+    """
+
+    def test_ef3m_variant_1(self):
+        """
+        Tests the 'iter_4_jit' function of the M2N module (using variant 1).
+        """
+        mu_2 = -0.5876905479546004
+        p_1 = 0.020950069267730465
+        moments_test = [
+            -0.59,
+            9.830000000000002,
+            -19.922000000000004,
+            264.254,
+        ]
+        expected_parameters = [
+            -0.6979265579594388,
+            -0.5876905479546004,
+            20.80638279572574,
+            0.6488995559493259,
+            0.0004662589937450317,
+        ]
+        param_list = iter_4_jit(mu_2, p_1, *moments_test)
+        param_list = param_list.tolist()
+        self.assertTrue(expected_parameters == param_list)
+
+    def test_ef3m_variant_2(self):
+        """
+        Tests the 'iter_5_jit' function of the M2N module (using variant 2).
+        """
+        mu_2 = -0.07037328978510915
+        p_1 = 0.09166890087206325
+        moments_test = [
+            -0.59,
+            9.830000000000002,
+            -19.922000000000004,
+            264.254,
+            -818.2100000000003,
+        ]
+        expected_parameters = [
+            -5.738890150700704,
+            0.1755905244444409,
+            0.862038546663441,
+            2.723656932895561,
+            0.12317856407155195,
+        ]
+        param_list = iter_5_jit(mu_2, p_1, *moments_test)
+        param_list = param_list.tolist()
+        self.assertTrue(expected_parameters == param_list)
+
 
 class TestM2NSingleFitLoop(unittest.TestCase):
     """
