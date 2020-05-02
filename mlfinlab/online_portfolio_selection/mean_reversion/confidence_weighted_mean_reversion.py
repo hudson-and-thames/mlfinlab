@@ -8,16 +8,16 @@ class ConfidenceWeightedMeanReversion(OLPS):
     """
     This class implements the Confidence Weighted Mean Reversion strategy. It is reproduced with
     modification from the following paper:
-    'Li, B., Hoi, S.C., Zhao, P. & Gopalkrishnan, V.. (2011). Confidence Weighted Mean Reversion
+    `Li, B., Hoi, S.C., Zhao, P. & Gopalkrishnan, V.. (2011). Confidence Weighted Mean Reversion
     Strategy for On-Line Portfolio Selection. Proceedings of the Fourteenth International
     Conference on Artificial Intelligence and Statistics, in PMLR 15:434-442.
-    <https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=3292&context=sis_research>_ '
+    <https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=3292&context=sis_research>`_
 
     Confidence Weighted Mean Reversion exploits both the popular mean reversion techniques and
     second-order information to model weights as a gaussian distribution.
     """
 
-    def __init__(self, confidence, epsilon, method='Var'):
+    def __init__(self, confidence, epsilon, method='var'):
         """
         Initializes Confidence Weighted Mean Reversion with the given confidence, epsilon, and method.
 
@@ -55,8 +55,8 @@ class ConfidenceWeightedMeanReversion(OLPS):
         self.theta = norm.ppf(self.confidence)
 
         # Check that the given method is correct.
-        if self.method != 'Var' and self.method != 'SD':
-            raise ValueError("Method must be either 'Var' or 'SD'.")
+        if self.method != 'var' and self.method != 'sd':
+            raise ValueError("Method must be either 'var' or 'sd'.")
 
     def _update_weight(self, time):
         """
@@ -94,12 +94,12 @@ class ConfidenceWeightedMeanReversion(OLPS):
         # Update mu.
         self.mu_dist -= lambd * np.dot(curr_relative_return - mean_x, self.sigma).reshape((self.number_of_assets,))
 
-        if self.method == 'SD':
+        if self.method == 'sd':
             # Component for new variance calculation.
             sqrt_u = (-lambd * self.theta * new_v + np.sqrt(lambd ** 2 * self.theta ** 2 * new_v ** 2 + 4 * new_v)) / 2
             # Update variance.
             self.sigma = np.linalg.inv(np.linalg.inv(self.sigma) + lambd * self.theta / sqrt_u * np.diag(curr_relative_return) ** 2)
-        if self.method == 'Var':
+        if self.method == 'var':
             # Update variance.
             self.sigma = np.linalg.inv(
                 np.linalg.inv(self.sigma) + 2 * lambd * self.theta * np.diag(curr_relative_return) ** 2)

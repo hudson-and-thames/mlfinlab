@@ -104,7 +104,7 @@ class TestPassiveAggressiveMeanReversion(TestCase):
         Tests ValueError if optimization method is not 0, 1, or 2.
         """
         # Initialize PAMR.
-        pamr5 = PassiveAggressiveMeanReversion(epsilon=2, agg=10, optimization_method=5)
+        pamr5 = PassiveAggressiveMeanReversion(epsilon=0.5, agg=10, optimization_method=5)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             pamr5.allocate(self.data)

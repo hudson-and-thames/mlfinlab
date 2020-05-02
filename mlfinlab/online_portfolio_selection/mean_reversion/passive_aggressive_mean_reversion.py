@@ -44,7 +44,7 @@ class PassiveAggressiveMeanReversion(OLPS):
         if self.epsilon < 0 or self.epsilon > 1:
             raise ValueError("Epsilon values must be between 0 and 1")
 
-        # Check that optimization method is either 1 or 2.
+        # Check that optimization method is either 0, 1, or 2.
         if self.optimization_method not in [0, 1, 2]:
             raise ValueError("Optimization method must be either 0, 1, or 2.")
 
@@ -75,7 +75,7 @@ class PassiveAggressiveMeanReversion(OLPS):
         elif self.optimization_method == 1:
             tau = min(self.agg, loss / (diff_norm ** 2))
         # PAMR-2 introduces a quadratic slack variable for tradeoff between epsilon and C.
-        elif self.optimization_method == 2:
+        else:
             tau = loss / (diff_norm ** 2 + 1 / (2 * self.agg))
         # Calculate new weights.
         new_weights = self.weights - tau * adjusted_market_change

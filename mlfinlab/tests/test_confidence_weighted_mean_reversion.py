@@ -31,7 +31,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
         Test the calculation of CWMR with the original method.
         """
         # Initialize CWMR.
-        cwmr = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=0.5, method='Var')
+        cwmr = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=0.5, method='var')
         # Allocates asset prices to OLMAR.
         cwmr.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -48,7 +48,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
         Test the calculation of CWMR with the second method.
         """
         # Initialize CWMR.
-        cwmr = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=0.5, method='SD')
+        cwmr = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=0.5, method='sd')
         # Allocates asset prices to OLMAR.
         cwmr.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -102,10 +102,10 @@ class TestConfidenceWeightedMeanReversion(TestCase):
 
     def test_cwmr_method_error(self):
         """
-        Tests ValueError if method is not 'SD' or 'Var'.
+        Tests ValueError if method is not 'sd' or 'var'.
         """
         # Initialize CWMR.
-        cwmr5 = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=0.5, method='SS')
+        cwmr5 = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=0.5, method='normal')
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             cwmr5.allocate(self.data)
