@@ -32,7 +32,7 @@ This package has its foundations in the two graduate level textbooks:
 2. [Machine Learning for Asset Managers](https://www.cambridge.org/core/books/machine-learning-for-asset-managers/6D9211305EA2E425D33A9F38D0AE3545)
 
 <div align="center">
-   <a href="https://hudsonthames.org/">
+   <a href="https://mlfinlab.readthedocs.io/en/latest/">
    <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/journals.png"><br>
 </div>
 
