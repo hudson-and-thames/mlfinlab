@@ -47,13 +47,6 @@ We lower barriers to entry for all users by providing extensive [documentation](
 and [tutorial notebooks](https://github.com/hudson-and-thames/research), with code examples.
 
 ## Who is Hudson & Thames?
-
-<div align="center">
-   <a href="https://hudsonthames.org/">
-   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/HnT.png" height="270"><br>
-</div>
-
-
 We are a private research group focused on implementing research based financial machine learning. We all work in 
 virtual teams, spread across the world, primarily: New York, London, and Kyiv.
 
@@ -102,12 +95,6 @@ Benefits include:
 ---
 
 ## Contact us
-<div align="center">
-   <a href="https://www.patreon.com/HudsonThames/">
-   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/Slack.png" height="550"><br>
-</div>
-
-
 We host a booming community of like minded data scientists and quants, join the 
 [Slack Channel](https://www.patreon.com/HudsonThames) now! Open to sponsors of our package. 
 
