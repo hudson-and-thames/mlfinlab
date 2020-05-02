@@ -95,17 +95,11 @@ Benefits include:
 ---
 
 ## Contact us
-### Gold Sponsors:
 <div align="center">
-   <a href="https://hudsonthames.org/sponsors/">
-   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/docs/source/logo/gold_sponsors.png" height="200"><br>
+   <a href="https://www.patreon.com/HudsonThames/">
+   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/update_readme/docs/source/logo/Slack.png" height="400"><br>
+   <>
 </div>
-
-
-* asd
-* [E.P. Chan & Associates](https://www.epchan.com/)
-* [Markov Capital](http://www.markovcapital.se/)
-
 
 
 We host a booming community of like minded data scientists and quants, join the 
