@@ -31,6 +31,11 @@ This package has its foundations in the two graduate level textbooks:
 1. [Advances in Financial Machine Learning](https://www.amazon.co.uk/Advances-Financial-Machine-Learning-Marcos/dp/1119482089)
 2. [Machine Learning for Asset Managers](https://www.cambridge.org/core/books/machine-learning-for-asset-managers/6D9211305EA2E425D33A9F38D0AE3545)
 
+<div align="center">
+   <a href="https://hudsonthames.org/">
+   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/.github/logo/hudson_and_thames_logo.png" height="300"><br>
+</div>
+
 ## Unlocking the Commons
 We are currently running a sponsorship model of “Unlocking the Commmons”. Our code base, online documentation, 
 tutorial notebooks and presentations will remain open to everyone for so long as we can meet our minimum sponsorship 
@@ -78,7 +83,6 @@ Benefits include:
 </div>
 
 
-
 * [Machine Factor Technologies](https://machinefactor.tech/)
 
 ### Gold Sponsors:
@@ -88,19 +92,12 @@ Benefits include:
 </div>
 
 
-
 * [E.P. Chan & Associates](https://www.epchan.com/)
 * [Markov Capital](http://www.markovcapital.se/)
 
 ---
 
 ## Contact us
-<div align="center">
-   <a href="https://www.patreon.com/HudsonThames/">
-   <img src="https://i.dlpng.com/static/png/451725_preview.png">
-</div>
-
-
 We host a booming community of like minded data scientists and quants, join the 
 [Slack Channel](https://www.patreon.com/HudsonThames) now! Open to sponsors of our package. 
 
