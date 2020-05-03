@@ -99,3 +99,13 @@ class TestOnlineMovingAverageReversion(TestCase):
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             olmar5.allocate(self.data)
+
+    def test_olmar_method_error(self):
+        """
+        Tests ValueError if reversion method is 2 and alpha is less than 1.
+        """
+        # Initialize OLMAR.
+        olmar6 = OnlineMovingAverageReversion(reversion_method=4, epsilon=2, alpha=-1)
+        with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
+            olmar6.allocate(self.data)

@@ -42,6 +42,10 @@ class OnlineMovingAverageReversion(OLPS):
         """
         super(OnlineMovingAverageReversion, self)._initialize(asset_prices, weights, resample_by)
 
+        # Check that reversion method is either 1 or 2.
+        if self.reversion_method not in [1, 2]:
+            raise ValueError("Reversion method must be either 1 or 2.")
+
         # Check that epsilon values are correct.
         if self.epsilon < 1:
             raise ValueError("Epsilon values must be greater or equal to 1.")
@@ -104,6 +108,6 @@ class OnlineMovingAverageReversion(OLPS):
         if reversion_method == 1:
             rolling_ma = np.array(asset_prices.rolling(window).apply(lambda x: np.sum(x) / x[0] / window))
         # MAR-2 reversion method: Exponential Moving Average.
-        elif reversion_method == 2:
+        else:
             rolling_ma = np.array(asset_prices.ewm(alpha=alpha, adjust=False).mean() / asset_prices)
         return rolling_ma

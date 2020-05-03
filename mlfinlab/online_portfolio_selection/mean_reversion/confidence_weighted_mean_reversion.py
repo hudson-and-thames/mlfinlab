@@ -112,8 +112,8 @@ class ConfidenceWeightedMeanReversion(OLPS):
 
     def _first_weight(self, weights):
         """
-        Returns the first weight of the given portfolio. If the first weight is not given, initialize weights to
-        uniform weights.
+        Returns the first weight of the given portfolio. If the first weight is not given,
+        initialize weights to uniform weights.
 
         :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
         :return (weights): (np.array) First portfolio weight.
