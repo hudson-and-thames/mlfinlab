@@ -100,7 +100,9 @@ class HierarchicalRiskParity:
         # Step-2: Quasi Diagnalization
         num_assets = len(asset_names)
         self.ordered_indices = self._quasi_diagnalization(num_assets, 2 * num_assets - 2)
-        self.seriated_distances = self._get_seriated_matrix(assets=asset_names, distance=distance_matrix)
+        self.seriated_distances, self.seriated_correlations = self._get_seriated_matrix(assets=asset_names,
+                                                                                        distance=distance_matrix,
+                                                                                        correlation=correlation_matrix)
 
         if side_weights is None:
             side_weights = pd.Series([1] * num_assets, index=asset_names)
@@ -136,18 +138,20 @@ class HierarchicalRiskParity:
 
         return (self._quasi_diagnalization(num_assets, left) + self._quasi_diagnalization(num_assets, right))
 
-    def _get_seriated_matrix(self, assets, distance):
+    def _get_seriated_matrix(self, assets, distance, correlation):
         """
         Based on the quasi-diagnalization, reorder the original distance matrix, so that assets within
         the same cluster are grouped together.
         :param assets: (list) list of asset names in the portfolio
         :param distance: (pd.Dataframe) distance values between asset returns
+        :param correlation: (pd.Dataframe) correlations between asset returns
         :return: (np.array) re-arranged distance matrix based on tree clusters
         """
 
         ordering = assets[self.ordered_indices]
         seriated_distances = distance.loc[ordering, ordering]
-        return seriated_distances
+        seriated_correlations = correlation.loc[ordering, ordering]
+        return seriated_distances, seriated_correlations
 
     @staticmethod
     def _get_inverse_variance_weights(covariance):
