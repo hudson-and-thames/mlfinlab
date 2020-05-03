@@ -109,3 +109,23 @@ class TestConfidenceWeightedMeanReversion(TestCase):
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             cwmr5.allocate(self.data)
+
+    def test_cwmr_weights_solution(self):
+        """
+        Test the calculation of CWMR with given weights.
+        """
+        # Set weights.
+        weight = np.zeros(self.data.iloc[0].shape)
+        weight[0] = 1
+        # Initialize CWMR.
+        cwmr6 = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=0.5, method='var')
+        # Allocates asset prices to CWMR.
+        cwmr6.allocate(self.data, weights=weight, resample_by='M')
+        # Create np.array of all_weights.
+        all_weights = np.array(cwmr6.all_weights)
+        # Check if all weights sum to 1.
+        for i in range(all_weights.shape[0]):
+            weights = all_weights[i]
+            assert (weights >= 0).all()
+            assert len(weights) == self.data.shape[1]
+            np.testing.assert_almost_equal(np.sum(weights), 1)
