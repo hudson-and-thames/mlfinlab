@@ -50,6 +50,7 @@ class OnlineMovingAverageReversion(OLPS):
         if self.reversion_method == 1 and self.window < 1:
             raise ValueError("Window must be at least 1.")
 
+        # Chat that alpha is between 0 and 1 for method 2.
         if self.reversion_method == 2 and (self.alpha < 0 or self.alpha > 1):
             raise ValueError("Alpha must be between 0 and 1.")
 

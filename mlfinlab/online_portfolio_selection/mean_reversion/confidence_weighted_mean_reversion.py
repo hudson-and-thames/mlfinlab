@@ -30,7 +30,7 @@ class ConfidenceWeightedMeanReversion(OLPS):
         self.epsilon = epsilon
         self.method = method
         self.sigma = None  # (np.array) Variance of the portfolio distribution.
-        self.mu_dist = None # (np.array) Mean of the portfolio distribution.
+        self.mu_dist = None  # (np.array) Mean of the portfolio distribution.
         super().__init__()
 
     def _initialize(self, asset_prices, weights, resample_by):
@@ -107,8 +107,8 @@ class ConfidenceWeightedMeanReversion(OLPS):
         self.sigma /= new_m * np.trace(self.sigma)
         # Simplex projection.
         self.mu_dist = self._simplex_projection(self.mu_dist)
-
-        return self.mu_dist
+        new_weights = self.mu_dist
+        return new_weights
 
     def _first_weight(self, weights):
         """

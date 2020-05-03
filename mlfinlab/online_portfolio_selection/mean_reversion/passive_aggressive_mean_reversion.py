@@ -12,8 +12,8 @@ class PassiveAggressiveMeanReversion(OLPS):
     <https://link.springer.com/content/pdf/10.1007%2Fs10994-012-5281-z.pdf>`_
 
     Passive Aggressive Mean Reversion strategy switches between a passive and an aggressive mean
-    reversion strategy based on epsilon, a measure of sensitivty to the market, and hyperparameter C,
-    which denotes the aggressiveness of reverting to a partciular strategy.
+    reversion strategy based on epsilon, a measure of sensitivity to the market,
+    and hyperparameter C, which denotes the aggressiveness of reverting to a partciular strategy.
     """
 
     def __init__(self, epsilon, agg, optimization_method):
@@ -23,7 +23,7 @@ class PassiveAggressiveMeanReversion(OLPS):
 
         :param epsilon: (float) Sensitivity to the market.
         :param agg: (float) Aggressiveness to mean reversion.
-        :param optimization_method: (int) 0 for PAMR, 1 for PAMR-1, 2 for PAMR-2
+        :param optimization_method: (int) 0 for PAMR, 1 for PAMR-1, 2 for PAMR-2.
         """
         self.epsilon = epsilon
         self.agg = agg
@@ -65,7 +65,7 @@ class PassiveAggressiveMeanReversion(OLPS):
         # Calculate the adjusted market change.
         adjusted_market_change = current_relative_return - self._uniform_weight() \
                                  * np.mean(current_relative_return)
-        # calculate the norm of the adjusted market change.
+        # Calculate the norm of the adjusted market change.
         diff_norm = np.linalg.norm(adjusted_market_change)
 
         # PAMR method looks to passively perform mean reversion.
