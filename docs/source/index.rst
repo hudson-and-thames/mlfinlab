@@ -154,17 +154,33 @@ Looking forward to hearing from you!
 Early Adopters:
 ###############
 
-+-----------------------+-----------------------+-----------------------+
-| `John B. Keown`_      | `Roberto Spadim`_     | `Zack Gow`_           |
-+-----------------------+-----------------------+-----------------------+
-| `Jack Yu`_            |  Егор Тарасенок       | Joseph Matthew        |
-+-----------------------+-----------------------+-----------------------+
-| Justin Gerard         |  Jason Young          | `Shaun McDonogh`_     |
-+-----------------------+-----------------------+-----------------------+
-| `Christian Beckmann`_ |  Jeffrey Wang         | `Eugene Tartakovsky`_ |
-+-----------------------+-----------------------+-----------------------+
-| `Ming Wu`_            | `Richard Scheiwe`_    |  `Tianfang Wu`_       |
-+-----------------------+-----------------------+-----------------------+
++-----------------------+------------------------+-----------------------+------------------------+
+| `John B. Keown`_      | `Roberto Spadim`_      | `Zack Gow`_           | Alex Zivkovic          |
++-----------------------+------------------------+-----------------------+------------------------+
+| `Jack Yu`_            |  Егор Тарасенок        | `Joseph Matthew`_     | `Aman Dhaliwal`_       |
++-----------------------+------------------------+-----------------------+------------------------+
+| Justin Gerard         |  Jason Young           | `Shaun McDonogh`_     | Austin Hubbell         |
++-----------------------+------------------------+-----------------------+------------------------+
+| `Christian Beckmann`_ |  Jeffrey Wang          | `Eugene Tartakovsky`_ | `Ben Zhang`_           |
++-----------------------+------------------------+-----------------------+------------------------+
+| `Ming Wu`_            | `Richard Scheiwe`_     |  `Tianfang Wu`_       | `Brian Christopher`_   |
++-----------------------+------------------------+-----------------------+------------------------+
+| `Eric Detterman`_     | Eric Huang             | Gunther Schulz        | Geoff Foster           |
++-----------------------+------------------------+-----------------------+------------------------+
+| Golam Sakline         | `Ilya Pikulin`_        | Isabel Gonzalez       | Jason Harris           |
++-----------------------+------------------------+-----------------------+------------------------+
+| Joshua Cortez         | `Kofi Glover`_         | Kristian Schmidt      | Lucas Astorian         |
++-----------------------+------------------------+-----------------------+------------------------+
+| Luque Li              | `Mikhail Shishlenin`_  | Minsu Yeom            | `Mislav Sagovac`_      |
++-----------------------+------------------------+-----------------------+------------------------+
+| Paul Morgen           | `Rino Hilman`_         | `Ruifan Pei`_         | `Shawn Unger`_         |
++-----------------------+------------------------+-----------------------+------------------------+
+| Bramantyo Erlangga    | `Sritanu Chakraborty`_ | Stephen Caraher       | Swaminathan Sethuraman |
++-----------------------+------------------------+-----------------------+------------------------+
+| Thiago Matos          | Thyme Sage             | Tom Celig             | `Tom Parnell`_         |
++-----------------------+------------------------+-----------------------+------------------------+
+| William Thompkins     |                        |                       |                        |
++-----------------------+------------------------+-----------------------+------------------------+
 
 
 .. _`Machine Factor Technologies`: https://machinefactor.tech/
@@ -180,7 +196,20 @@ Early Adopters:
 .. _`Richard Scheiwe`: https://www.linkedin.com/in/richardscheiwe/
 .. _`Shaun McDonogh`: https://www.linkedin.com/in/shaunmcdonogh/
 .. _`Tianfang Wu`: https://www.linkedin.com/in/tianfangwu/
-
+.. _`Ilya Pikulin`: https://www.linkedin.com/in/ilyapikulin/
+.. _`Tom Parnell`: https://www.linkedin.com/in/thomas-parnell-7233a234/
+.. _`Rino Hilman`: https://www.linkedin.com/in/rino-hilman-854a89181/
+.. _`Joseph Matthew`: https://www.linkedin.com/in/jmatthew/
+.. _`Aman Dhaliwal`: https://www.linkedin.com/in/amandhaliwal44/
+.. _`Ben Zhang`: https://www.linkedin.com/in/haozhang777/
+.. _`Brian Christopher`: https://www.linkedin.com/in/bcrblackarbs/
+.. _`Eric Detterman`: https://www.linkedin.com/in/ericdetterman/
+.. _`Mislav Sagovac`: https://www.linkedin.com/in/mislav-%C5%A1agovac-a72a6044
+.. _`Mikhail Shishlenin`: https://www.linkedin.com/in/mikhail-shishlenin/
+.. _`Shawn Unger`: https://www.linkedin.com/in/shawnunger1/
+.. _`Ruifan Pei`: https://www.linkedin.com/in/ruifan-pei-b994b177/
+.. _`Sritanu Chakraborty`: https://www.linkedin.com/in/sritanuchakraborty/
+.. _`Kofi Glove`: https://www.linkedin.com/in/kofiglover/
 
 License
 #######
@@ -200,6 +229,7 @@ This project is licensed under an all rights reserved licence.
     additional_information/contact
     getting_started/barriers_to_entry
     getting_started/researcher
+    getting_started/datasets
 
 .. toctree::
     :maxdepth: 2
@@ -241,6 +271,7 @@ This project is licensed under an all rights reserved licence.
     :hidden:
 
     implementations/onc
+    implementations/feature_clusters
 
 .. toctree::
     :maxdepth: 2
@@ -249,7 +280,6 @@ This project is licensed under an all rights reserved licence.
 
     implementations/backtesting
     implementations/backtest_statistics
-
 
 .. toctree::
     :maxdepth: 2
