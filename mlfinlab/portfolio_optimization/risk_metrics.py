@@ -14,11 +14,11 @@ class RiskMetrics:
     @staticmethod
     def calculate_variance(covariance, weights):
         """
-        Calculate the variance of a portfolio/asset.
+        Calculate the variance of a portfolio.
 
-        :param covariance: (pd.DataFrame/np.matrix) covariance matrix of assets
-        :param weights: (list) list of asset weights
-        :return: (float) variance
+        :param covariance: (pd.DataFrame/np.matrix) Covariance matrix of assets
+        :param weights: (list) List of asset weights
+        :return: (float) Variance of a portfolio
         """
 
         return np.dot(weights, np.dot(covariance, weights))
@@ -28,8 +28,8 @@ class RiskMetrics:
         """
         Calculate the value at risk (VaR) of a portfolio/asset.
 
-        :param returns: (pd.DataFrame/np.array) asset/portfolio historical returns
-        :param confidence_level: (float) confidence level (alpha)
+        :param returns: (pd.DataFrame/np.array) Historical returns for an asset / portfolio
+        :param confidence_level: (float) Confidence level (alpha)
         :return: (float) VaR
         """
 
@@ -42,9 +42,9 @@ class RiskMetrics:
         """
         Calculate the expected shortfall (CVaR) of a portfolio/asset.
 
-        :param returns: (pd.DataFrame/np.array) asset/portfolio historical returns
-        :param confidence_level: (float) confidence level (alpha)
-        :return: (float) expected shortfall
+        :param returns: (pd.DataFrame/np.array) Historical returns for an asset / portfolio
+        :param confidence_level: (float) Confidence level (alpha)
+        :return: (float) Expected shortfall
         """
 
         if not isinstance(returns, pd.DataFrame):
@@ -59,9 +59,9 @@ class RiskMetrics:
         """
         Calculate the conditional drawdown of risk (CDaR) of a portfolio/asset.
 
-        :param returns: (pd.DataFrame/np.array) asset/portfolio historical returns
-        :param confidence_level: (float) confidence level (alpha)
-        :return: (float) conditional drawdown risk
+        :param returns: (pd.DataFrame/np.array) Historical returns for an asset / portfolio
+        :param confidence_level: (float) Confidence level (alpha)
+        :return: (float) Conditional drawdown risk
         """
 
         if not isinstance(returns, pd.DataFrame):
@@ -69,6 +69,8 @@ class RiskMetrics:
 
         drawdown = returns.expanding().max() - returns
         max_drawdown = drawdown.expanding().max()
-        max_drawdown_at_confidence_level = max_drawdown.quantile(confidence_level, interpolation='higher')
-        conditional_drawdown = np.nanmean(max_drawdown[max_drawdown > max_drawdown_at_confidence_level])
+
+        # Use (1-confidence_level) because the worst drawdowns are the biggest positive values
+        max_drawdown_at_confidence_level = max_drawdown.quantile(1-confidence_level, interpolation='higher')
+        conditional_drawdown = np.nanmean(max_drawdown[max_drawdown >= max_drawdown_at_confidence_level])
         return conditional_drawdown

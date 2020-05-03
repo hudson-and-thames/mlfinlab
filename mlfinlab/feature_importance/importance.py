@@ -1,19 +1,23 @@
 """
-Module which implements feature importance algorithms as described in Chapter 8 of Advances in Financial Machine Learning.
+Module which implements feature importance algorithms as described in Chapter 8 of Advances in Financial Machine
+Learning and Clustered Feature Importance algorithms as described in Chapter 6 Section 6.5.2 of Machine Learning for
+Asset Managers.
 """
 
 import pandas as pd
 import numpy as np
 from sklearn.metrics import log_loss
 import matplotlib.pyplot as plt
+
 from mlfinlab.cross_validation.cross_validation import ml_cross_val_score
 
 
 # pylint: disable=invalid-name
 # pylint: disable=invalid-unary-operand-type
 # pylint: disable=comparison-with-callable
+# pylint: disable=too-many-locals
 
-def mean_decrease_impurity(model, feature_names):
+def mean_decrease_impurity(model, feature_names, clustered_subsets=None):
     """
     Snippet 8.2, page 115. MDI Feature importance
 
@@ -40,8 +44,18 @@ def mean_decrease_impurity(model, feature_names):
     * Sklearn’s RandomForest class implements MDI as the default feature importance score. This choice is likely
       motivated by the ability to compute MDI on the fly, with minimum computational cost.
 
+    Clustered Feature Importance( Machine Learning for Asset Manager snippet 6.4 page 86) :
+    Clustered MDI  is the  modified version of MDI (Mean Decreased Impurity). It  is robust to substitution effect that
+    takes place when two or more explanatory variables share a substantial amount of information (predictive power).CFI
+    algorithm described by Dr Marcos Lopez de Prado  in Clustered Feature  Importance section of book Machine Learning
+    for Asset Manager. Here  instead of  taking the importance  of  every feature, we consider the importance of every
+    feature subsets, thus every feature receive the importance of subset it belongs to.
+
     :param model: (model object): Trained tree based classifier.
     :param feature_names: (list): Array of feature names.
+    :param clustered_subsets: (list) of feature clusters for Clustered Feature Importance (CFI). Default None will not apply CFI.
+                              Structure of the input must be a list of list/s i.e. a list containing the clusters/subsets of feature
+                              name/s inside a list. E.g- [['I_0','I_1','R_0','R_1'],['N_1','N_2'],['R_3']]
     :return: (pd.DataFrame): Mean and standard deviation feature importance.
     """
     # Feature importance based on in-sample (IS) mean impurity reduction
@@ -53,14 +67,25 @@ def mean_decrease_impurity(model, feature_names):
     # was not randomly chosen. Replace those values with np.nan
     feature_imp_df = feature_imp_df.replace(0, np.nan)  # Because max_features = 1
 
-    importance = pd.concat({'mean': feature_imp_df.mean(),
-                            'std': feature_imp_df.std() * feature_imp_df.shape[0] ** -0.5},
-                           axis=1)
+    if clustered_subsets is not None:
+        # Getting subset wise importance
+        importance = pd.DataFrame(index=feature_names, columns=['mean', 'std'])
+        for subset in clustered_subsets: # Iterating over each cluster
+            subset_feat_imp = feature_imp_df[subset].sum(axis=1)
+            # Importance of each feature within a subsets is equal to the importance of that subset
+            importance.loc[subset, 'mean'] = subset_feat_imp.mean()
+            importance.loc[subset, 'std'] = subset_feat_imp.std()*subset_feat_imp.shape[0]**-.5
+    else:
+        importance = pd.concat({'mean': feature_imp_df.mean(),
+                                'std': feature_imp_df.std() * feature_imp_df.shape[0] ** -0.5},
+                               axis=1)
+
     importance /= importance['mean'].sum()
     return importance
 
 
-def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight_train=None, sample_weight_score=None, scoring=log_loss):
+def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_weight_train=None,
+                           sample_weight_score=None, scoring=log_loss, random_state=42):
     """
     Snippet 8.3, page 116-117. MDA Feature Importance
 
@@ -82,14 +107,25 @@ def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight_train=None, sample
       OOS performance.
     * The CV must be purged and embargoed.
 
+    Clustered Feature Importance( Machine Learning for Asset Manager snippet 6.5 page 87) :
+    Clustered MDA is the modified version of MDA (Mean Decreased Accuracy). It is robust to substitution effect that takes
+    place when two or more explanatory variables share a substantial amount of information (predictive power).CFI algorithm
+    described by Dr Marcos Lopez de Prado  in Clustered Feature  Importance (Presentation Slides)
+    https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595. Instead of shuffling (permutating) all variables
+    individually (like in MDA), we shuffle all variables in cluster together. Next, we follow all the  rest of the
+    steps as in MDA. It can used by simply specifying the clustered_subsets argument.
 
     :param model: (sklearn.Classifier): Any sklearn classifier.
     :param X: (pd.DataFrame): Train set features.
     :param y: (pd.DataFrame, np.array): Train set labels.
     :param cv_gen: (cross_validation.PurgedKFold): Cross-validation object.
+    :param clustered_subsets: (list) of feature clusters for Clustered Feature Importance (CFI). Default None will not apply CFI.
+                              Structure of the input must be a list of list/s i.e. a list containing the clusters/subsets of feature
+                              name/s inside a list. E.g- [['I_0','I_1','R_0','R_1'],['N_1','N_2'],['R_3']]
     :param sample_weight_train: A numpy array of sample weights used to train the model for each record in the dataset.
     :param sample_weight_score: A numpy array of sample weights used to evaluate the model quality.
     :param scoring: (function): Scoring function used to determine importance.
+    :param random_state: (int) random seed for shuffling the features.
     :return: (pd.DataFrame): Mean and standard deviation of feature importance.
     """
 
@@ -100,7 +136,10 @@ def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight_train=None, sample
         sample_weight_score = np.ones((X.shape[0],))
 
     fold_metrics_values, features_metrics_values = pd.Series(), pd.DataFrame(columns=X.columns)
-
+    # Generating a numpy random state object for the given random_state
+    rs_obj = np.random.RandomState(seed=random_state)
+    # Clustered feature subsets will be used for CFI if clustered_subsets exists else will operate on the single column as MDA
+    feature_sets = clustered_subsets if clustered_subsets else [[x] for x in X.columns]
     for i, (train, test) in enumerate(cv_gen.split(X=X)):
         fit = model.fit(X=X.iloc[train, :], y=y.iloc[train], sample_weight=sample_weight_train[train])
         pred = fit.predict(X.iloc[test, :])
@@ -114,9 +153,10 @@ def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight_train=None, sample
             fold_metrics_values.loc[i] = scoring(y.iloc[test], pred, sample_weight=sample_weight_score[test])
 
         # Get feature specific metric on out-of-sample fold
-        for j in X.columns:
+        for j in feature_sets:
             X1_ = X.iloc[test, :].copy(deep=True)
-            np.random.shuffle(X1_[j].values)  # Permutation of a single column
+            for j_i in j:
+                rs_obj.shuffle(X1_[j_i].values)  # Permutation of a single column for MDA or through the whole subset for CFI
             if scoring == log_loss:
                 prob = fit.predict_proba(X1_)
                 features_metrics_values.loc[i, j] = -scoring(y.iloc[test], prob,
@@ -131,7 +171,7 @@ def mean_decrease_accuracy(model, X, y, cv_gen, sample_weight_train=None, sample
     if scoring == log_loss:
         importance = importance / -features_metrics_values
     else:
-        importance = importance / (1.0 - features_metrics_values)
+        importance = importance / (1.0 - features_metrics_values).replace(0, np.nan)
     importance = pd.concat({'mean': importance.mean(), 'std': importance.std() * importance.shape[0] ** -.5}, axis=1)
     importance.replace([-np.inf, np.nan], 0, inplace=True)  # Replace infinite values
 
