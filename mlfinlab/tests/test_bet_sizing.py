@@ -16,6 +16,7 @@ from mlfinlab.bet_sizing.ch10_snippets import (get_signal, avg_active_signals, d
                                                get_w, get_target_pos, limit_price, bet_size)
 from mlfinlab.bet_sizing.ef3m import M2N, raw_moment, most_likely_parameters
 
+
 class TestBetSizeProbability(unittest.TestCase):
     """
     Tests the 'bet_size_probability' function.
@@ -82,6 +83,7 @@ class TestBetSizeProbability(unittest.TestCase):
         self.assertTrue(signal_1.equals(bet_size_probability(events=events_test, prob=events_test['prob'], num_classes=2,
                                                              pred=events_test['side'], step_size=0.1)))
 
+
 class TestBetSizeDynamic(unittest.TestCase):
     """
     Tests the 'bet_size_dynamic' function.
@@ -115,6 +117,7 @@ class TestBetSizeDynamic(unittest.TestCase):
         # Evaluate.
         self.assertTrue(df_result.equals(bet_size_dynamic(events_test['pos'], events_test['max_pos'],
                                                           events_test['m_p'], events_test['f'])))
+
 
 class TestBetSizeBudget(unittest.TestCase):
     """
@@ -241,6 +244,7 @@ class TestBetSizeReserve(unittest.TestCase):
         self.assertEqual(test_params, eval_params)
         self.assertTrue(events_active.equals(eval_events))
 
+
 class TestConfirmAndCastToDf(unittest.TestCase):
     """
     Tests the 'confirm_and_cast_to_df' function.
@@ -297,6 +301,7 @@ class TestConfirmAndCastToDf(unittest.TestCase):
         df_results = confirm_and_cast_to_df(d_events)
         self.assertTrue(np.allclose(events_test.to_numpy(), df_results.to_numpy(), 1e-9))
 
+
 class TestGetConcurrentSides(unittest.TestCase):
     """
     Tests the function 'get_concurrent_sides' for successful operation.
@@ -336,6 +341,7 @@ class TestGetConcurrentSides(unittest.TestCase):
         df_results = get_concurrent_sides(df_events['t1'], df_events['side'])
         self.assertTrue(np.allclose(events_test.to_numpy(), df_results[['active_long', 'active_short']].to_numpy(), 1e-9))
 
+
 class TestCdfMixture(unittest.TestCase):
     """
     Tests the 'cdf_mixture' function.
@@ -353,6 +359,7 @@ class TestCdfMixture(unittest.TestCase):
         expected_result = (p_1 * norm.cdf(x_value, mu_1, sigma_1)) + ((1-p_1) * norm.cdf(x_value, mu_2, sigma_2))
         # Evaluate.
         self.assertEqual(expected_result, cdf_mixture(x_value, params))
+
 
 class TestSingleBetSizeMixed(unittest.TestCase):
     """

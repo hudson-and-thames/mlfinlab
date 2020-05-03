@@ -9,8 +9,8 @@ from mlfinlab.codependence.correlation import (squared_angular_distance, angular
                                                distance_correlation)
 from mlfinlab.codependence.information import (get_mutual_info, variation_of_information_score,
                                                get_optimal_number_of_bins)
-
-
+from mlfinlab.codependence.codependence_matrix import (get_dependence_matrix, get_distance_matrix)
+from mlfinlab.util.generate_dataset import get_classification_data
 # pylint: disable=invalid-name
 
 class TestCodependence(unittest.TestCase):
@@ -26,6 +26,7 @@ class TestCodependence(unittest.TestCase):
         self.x = state.normal(size=1000)
         self.y_1 = self.x ** 2 + state.normal(size=1000) / 5
         self.y_2 = abs(self.x) + state.normal(size=1000) / 5
+        self.X_matrix, _ = get_classification_data(6, 2, 2, 100, sigma=0)
 
     def test_correlations(self):
         """
@@ -76,3 +77,36 @@ class TestCodependence(unittest.TestCase):
 
         self.assertEqual(n_bins_x, 15)
         self.assertEqual(n_bins_x_y, 9)
+
+    def test_codependence_matrix(self):
+        '''
+        Test the get_dependence_matrix and get_distance_matrix function
+        '''
+        #Dependence_matrix
+
+        vi_matrix = get_dependence_matrix(self.X_matrix, dependence_method='information_variation')
+        mi_matrix = get_dependence_matrix(self.X_matrix, dependence_method='mutual_information')
+        corr_matrix = get_dependence_matrix(self.X_matrix, dependence_method='distance_correlation')
+        #Distance_matrix
+        angl = get_distance_matrix(vi_matrix, distance_metric='angular')
+        sq_angl = get_distance_matrix(mi_matrix, distance_metric='squared_angular')
+        abs_angl = get_distance_matrix(corr_matrix, distance_metric='abs_angular')
+
+        #assertions
+        self.assertEqual(vi_matrix.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(mi_matrix.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(corr_matrix.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(angl.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(sq_angl.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(abs_angl.shape[0], self.X_matrix.shape[1])
+
+    def test_value_error_raise(self):
+        '''
+        Test of invailid arguments
+        '''
+        #Unkown dependence_metric
+        with self.assertRaises(ValueError):
+            get_dependence_matrix(self.X_matrix, dependence_method='unknown')
+        #Unkown distance_metric
+        with self.assertRaises(ValueError):
+            get_distance_matrix(self.X_matrix, distance_metric='unknown')

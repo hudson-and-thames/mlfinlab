@@ -55,7 +55,7 @@ class NCO:
 
         return w_cvo
 
-    def allocate_nco(self, cov, mu_vec=None, max_num_clusters=None):
+    def allocate_nco(self, cov, mu_vec=None, max_num_clusters=None, n_init=10):
         """
         Estimates the optimal allocation using the nested clustered optimization (NCO) algorithm.
 
@@ -76,7 +76,8 @@ class NCO:
         :param cov: (np.array) Covariance matrix of the variables.
         :param mu_vec: (np.array) Expected value of draws from the variables for maximum Sharpe ratio.
                               None if outputting the minimum variance portfolio.
-        :param max_тum_сlusters: (int) Allowed maximum number of clusters.
+        :param max_тum_сlusters: (int) Allowed maximum number of clusters. If None then taken as num_elements/2.
+        :param n_init: (float) Number of time the k-means algorithm will run with different centroid seeds (default 10)
         :return: (np.array) Optimal allocation using the NCO algorithm.
         """
 
@@ -94,7 +95,7 @@ class NCO:
         corr = risk_estimators.cov_to_corr(cov)
 
         # Optimal partition of clusters (step 1)
-        corr, clusters, _ = self._cluster_kmeans_base(corr, max_num_clusters, n_init=10)
+        corr, clusters, _ = self._cluster_kmeans_base(corr, max_num_clusters, n_init=n_init)
 
         # Weights inside clusters
         w_intra_clusters = pd.DataFrame(0, index=cov.index, columns=clusters.keys())
@@ -123,7 +124,7 @@ class NCO:
 
         return w_nco
 
-    def allocate_mcos(self, mu_vec, cov, num_obs, num_sims, kde_bwidth, min_var_portf, lw_shrinkage):
+    def allocate_mcos(self, mu_vec, cov, num_obs, num_sims=100, kde_bwidth=0.01, min_var_portf=True, lw_shrinkage=False):
         """
         Estimates the optimal allocation using the Monte Carlo optimization selection (MCOS) algorithm.
 
@@ -134,12 +135,12 @@ class NCO:
         :param mu_vec: (np.array) The original vector of expected outcomes.
         :param cov: (np.array )The original covariance matrix of outcomes.
         :param num_obs: (int) The number of observations T used to compute mu_vec and cov.
-        :param num_sims: (int) The number of Monte Carlo simulations to run.
-        :param kde_bwidth: (float) The bandwidth of the KDE used to de-noise the covariance matrix.
+        :param num_sims: (int) The number of Monte Carlo simulations to run. (100 by default)
+        :param kde_bwidth: (float) The bandwidth of the KDE used to de-noise the covariance matrix. (0.01 by default)
         :param min_var_portf: (bool) When True, the minimum variance solution is computed. Otherwise, the
-                                     maximum Sharpe ratio solution is computed.
+                                     maximum Sharpe ratio solution is computed. (True by default)
         :param lw_shrinkage: (bool) When True, the covariance matrix is subjected to the Ledoit-Wolf shrinkage
-                                    procedure.
+                                    procedure. (False by default)
         :return: (pd.dataframe, pd.dataframe) DataFrames with allocations for CVO and NCO algorithms.
         """
 
@@ -171,7 +172,7 @@ class NCO:
 
         return w_cvo, w_nco
 
-    def estim_errors_mcos(self, w_cvo, w_nco, mu_vec, cov, min_var_portf):
+    def estim_errors_mcos(self, w_cvo, w_nco, mu_vec, cov, min_var_portf=True):
         """
         Computes the true optimal allocation w, and compares that result with the estimated ones by MCOS.
 
@@ -183,7 +184,7 @@ class NCO:
         :param mu_vec: (np.array) The original vector of expected outcomes.
         :param cov: (np.array)The original covariance matrix of outcomes.
         :param min_var_portf: (bool) When True, the minimum variance solution was computed. Otherwise, the
-                                     maximum Sharpe ratio solution was computed.
+                                     maximum Sharpe ratio solution was computed. (True by default)
         :return: (float, float) Mean standard deviation of weights for CVO and NCO algorithms.
         """
 
@@ -212,7 +213,7 @@ class NCO:
         :param mu_vector: (np.array) True means vector for X distributions
         :param cov_matrix: (np.array) True covariance matrix for X distributions
         :param num_obs: (int) Number of observations to draw for every X
-        :param lw_shrinkage: (bool) Flag to apply Ledoit-Wolf shrinkage to X
+        :param lw_shrinkage: (bool) Flag to apply Ledoit-Wolf shrinkage to X (False by default)
         :return: (np.array, np.array) Empirical means vector, empirical covariance matrix
         """
 
@@ -243,8 +244,8 @@ class NCO:
         with samples that are similar to themselves.
 
         :param corr: (pd.DataFrame) DataFrame with correlation matrix
-        :param max_num_clusters: (float) Maximum allowed number of clusters
-        :param n_init: (float) Number of time the k-means algorithm will be run with different centroid seeds
+        :param max_num_clusters: (float) Maximum allowed number of clusters. If None then taken as num_elements/2
+        :param n_init: (float) Number of time the k-means algorithm will run with different centroid seeds (default 10)
         :return: (np.array, dict, pd.Series) Correlation matrix of clustered elements, dict with clusters,
                                              Silhouette Coefficient series
         """
@@ -331,7 +332,7 @@ class NCO:
         :param num_blocks: (int) Number of blocks in matrix
         :param block_size: (int) Size of a single block
         :param block_corr: (float) Correlation of elements in a block
-        :param std: (float) Correlation between the clusters
+        :param std: (float) Correlation between the clusters. If None, taken a random value from uniform dist[0.05, 0.2]
         :return: (np.array, pd.dataframe) Resulting vector of means and the dataframe with covariance matrix
         """
 
