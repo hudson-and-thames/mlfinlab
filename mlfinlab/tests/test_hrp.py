@@ -38,6 +38,18 @@ class TestHRP(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
+    def test_hrp_long_short(self):
+        """
+        Test the Long Short Portfolio via side_weights Serries 1 for Long, -1 for Short (index=asset names)
+        """
+        hrp = HierarchicalRiskParity()
+        side_weights = pd.Series([1] * self.data.shape[1], index=self.data.columns)
+        side_weights.loc[self.data.columns[:4]] = -1
+        hrp.allocate(asset_prices=self.data, asset_names=self.data.columns, side_weights=side_weights)
+        weights = hrp.weights.values[0]
+        self.assertEqual(len(weights) - self.data.shape[1], 0)
+        self.assertAlmostEqual(np.sum(weights), 0)
+
     def test_hrp_with_shrinkage(self):
         """
         Test the weights calculated by HRP algorithm with covariance shrinkage.
@@ -139,6 +151,41 @@ class TestHRP(unittest.TestCase):
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_hrp_with_input_as_distance_matrix(self):
+        """
+        Test HRP when passing a distance matrix as input.
+        """
+
+        hrp = HierarchicalRiskParity()
+        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        covariance = returns.cov()
+        d_matrix = np.zeros_like(covariance)
+        diagnoal_sqrt = np.sqrt(np.diag(covariance))
+        np.fill_diagonal(d_matrix, diagnoal_sqrt)
+        d_inv = np.linalg.inv(d_matrix)
+        corr = np.dot(np.dot(d_inv, covariance), d_inv)
+        corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
+        distance_matrix = np.sqrt((1 - corr).round(5) / 2)
+        hrp.allocate(asset_names=self.data.columns, covariance_matrix=covariance, distance_matrix=distance_matrix)
+        weights = hrp.weights.values[0]
+        self.assertTrue((weights >= 0).all())
+        self.assertTrue(len(weights) == self.data.shape[1])
+        self.assertAlmostEqual(np.sum(weights), 1)
+
+    def test_hrp_with_linkage_method(self):
+        """
+        Test HRP when passing a custom linkage method.
+        """
+
+        hrp = HierarchicalRiskParity()
+        hrp.allocate(asset_names=self.data.columns, asset_prices=self.data, linkage_method='ward')
+        weights = hrp.weights.values[0]
+        assert hrp.ordered_indices == [13, 7, 1, 6, 4, 16, 3, 17, 14, 0, 15, 8,
+                                       9, 10, 12, 18, 22, 5, 19, 2, 20, 11, 21]
+        self.assertTrue((weights >= 0).all())
+        self.assertTrue(len(weights) == self.data.shape[1])
+        self.assertAlmostEqual(np.sum(weights), 1)
 
     def test_no_asset_names(self):
         """
