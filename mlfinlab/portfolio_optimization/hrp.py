@@ -25,6 +25,7 @@ class HierarchicalRiskParity:
     def __init__(self):
         self.weights = list()
         self.seriated_distances = None
+        self.seriated_correlations = None
         self.ordered_indices = None
         self.clusters = None
         self.returns_estimator = ReturnsEstimation()
@@ -89,8 +90,8 @@ class HierarchicalRiskParity:
         covariance_matrix = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
 
         # Calculate correlation and distance from covariance matrix
+        correlation_matrix = self._cov2corr(covariance=covariance_matrix)
         if distance_matrix is None:
-            correlation_matrix = self._cov2corr(covariance=covariance_matrix)
             distance_matrix = np.sqrt((1 - correlation_matrix).round(5) / 2)
         distance_matrix = pd.DataFrame(distance_matrix, index=asset_names, columns=asset_names)
 
