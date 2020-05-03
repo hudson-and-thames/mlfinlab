@@ -264,9 +264,17 @@ The following example highlights how the various metrics behave under various va
     y_4 = np.random.RandomState(0).normal(size=1000) * np.random.RandomState(5).normal(size=1000)
 
     for y, dependency in zip([y_1, y_2, y_3, y_4], ['linear', 'squared', 'y=|x|', 'independent']):
-        text = "Pearson corr: {:0.2f} \nNorm.mutual info: {:0.2f}\nDistance correlation: {:0.2f} \nInformation variation: {:0.2f} \nMax correlation: {:0.2f}".format(
-        np.corrcoef(x, y)[0, 1], get_mutual_info(x, y, normalize=True), distance_correlation(x, y), variation_of_information_score(x, y, normalize=True), max_correlation(x, y))
+        text = "Pearson corr: {:0.2f} " + \
+               "\nNorm.mutual info: {:0.2f} " + \
+               "\nDistance correlation: {:0.2f} " + \
+               "\nInformation variation: {:0.2f} " + \
+               "\nMax correlation: {:0.2f}"
 
+        text = text.format(np.corrcoef(x, y)[0, 1],
+                           get_mutual_info(x, y, normalize=True),
+                           distance_correlation(x, y),
+                           variation_of_information_score(x, y, normalize=True),
+                           max_correlation(x, y))
 
         # Plot relationships
         fig, ax = plt.subplots(figsize=(8,7))
@@ -306,5 +314,42 @@ The following example highlights how the various metrics behave under various va
    :align: center
    :figclass: align-center
    :alt: No Relationship
+    
+   Indepedent
+    
 
-   Independent
+Codependence Matrix
+###################
+
+This module consists two functions that generate the following:
+
+1. **Dependence Matrix** to compute dependence of a given matrix using various codependence method like Mutual Information,
+   Variation of Information and Distance Correlation.
+2. **Distance Matrix** can used to compute distance of a given matrix using various metrics like angular, squared
+   angular and absolute angular.
+
+.. note::
+
+   MlFinLab makes use of these functions in the clustered feature importance.
+
+Implementation
+**************
+
+.. py:currentmodule:: mlfinlab.codependence.codependence_matrix
+.. autofunction:: get_dependence_matrix
+.. autofunction:: get_distance_matrix
+
+
+Example
+*******
+
+.. code-block::
+
+   import pandas as pd
+   from mlfinlab.codependence.codependence_matrix import (get_dependence_matrix,
+                                                          get_distance_matrix)
+
+   X = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+
+   dep_matrix = get_dependence_matrix(X, dependence_method='distance_correlation')
+   dist_matrix = get_distance_matrix(dep_matrix, distance_metric='angular')
