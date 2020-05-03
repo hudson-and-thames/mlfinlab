@@ -12,7 +12,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
     # pylint: disable=too-many-public-methods
     # pylint: disable=unsubscriptable-object
     """
-    Tests different functions of the Online Moving Average Reversion class.
+    Tests different functions of the Confidence Weighted Mean Reversion class.
     """
 
     def setUp(self):
@@ -32,7 +32,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
         """
         # Initialize CWMR.
         cwmr = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=0.5, method='var')
-        # Allocates asset prices to OLMAR.
+        # Allocates asset prices to CWMR.
         cwmr.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
         all_weights = np.array(cwmr.all_weights)

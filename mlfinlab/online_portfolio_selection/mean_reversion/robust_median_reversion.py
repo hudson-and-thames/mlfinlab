@@ -20,7 +20,7 @@ class RobustMedianReversion(OLPS):
         """
         Initializes Robust Median Reversion with the given epsilon, window, and tau values.
 
-        :param epsilon: (float) Reversion threshold. > 1
+        :param epsilon: (float) Reversion threshold.
         :param n_iteration: (int) Maximum number of iterations.
         :param window: (int) Size of window.
         :param tau: (float) Toleration level.
@@ -29,7 +29,7 @@ class RobustMedianReversion(OLPS):
         self.n_iteration = n_iteration
         self.window = window
         self.tau = tau
-        self.l1_median = None  # (np.array) L1 Median of prices.
+        self.predicted_relatives = None  # (np.array) Predicted relatives using l1 median.
         super().__init__()
 
     def _initialize(self, asset_prices, weights, resample_by):
@@ -47,23 +47,22 @@ class RobustMedianReversion(OLPS):
             raise ValueError("Epsilon values must be greater than 1.")
 
         # Check that the n_iteration is an integer.
-        if type(self.n_iteration) != int:
+        if not isinstance(self.n_iteration, int):
             raise ValueError("Number of iterations must be an integer.")
 
-        # Check that the window value is greater or equal to 1.
-        if self.n_iteration >= 1:
-            raise ValueError("Window must be greater or equal to 1.")
+        # Check that the number of iterations is greater or equal to 2.
+        if self.n_iteration < 2:
+            raise ValueError("Number of iterations must be greater or equal to 2.")
 
         # Check that the window value is an integer.
-        if type(self.window) != int:
+        if not isinstance(self.window, int):
             raise ValueError("Window must be an integer.")
 
         # Check that the window value is greater or equal to 2.
         if self.window < 2:
             raise ValueError("Window must be greater or equal to 2.")
 
-        self.l1_median = self._calculate_l1_median()
-
+        self.predicted_relatives = self._calculate_predicted_relatives()
 
     def _update_weight(self, time):
         """
@@ -72,39 +71,81 @@ class RobustMedianReversion(OLPS):
         :param time: (int) Current time period.
         :return new_weights: (np.array) Predicted weights.
         """
+        # Set the current predicted relatives value.
+        current_prediction = self.predicted_relatives[time]
+        # Set the deviation from the mean of current prediction.
+        predicted_deviation = current_prediction - np.ones(self.number_of_assets) * np.mean(
+            current_prediction)
+        # Calculate alpha, the lagrangian multiplier.
+        alpha = np.minimum(0, current_prediction * self.weights - self.epsilon / np.linalg.norm(
+            predicted_deviation, ord=2))
+        # Update new weights.
+        new_weights = self.weights - alpha * predicted_deviation
+        # Project to simplex domain.
+        new_weights = self._simplex_projection(new_weights)
 
-    def _calculate_l1_median(self):
-        rolling_median = self.asset_prices.rolling(self.window).median()
+        return new_weights
 
-    def _iterate_rolling(self, median_price, curr_price):
-        old_median = median_price
-        for iters in range(1, self.n_iteration):
-            new_median = _helper(old_median)
-            if np.linalg.norm(old_median - new_median, ord=1) <= self.tau * np.linalg.norm(new_median):
+    def _calculate_predicted_relatives(self):
+        # pylint: disable=unsubscriptable-object
+        """
+        Calculates the predicted relatives using l1 median.
+
+        :return predicted_relatives: (np.array) Predicted relatives using l1 median.
+        """
+        # Copy to np.array for speed.
+        np_asset_prices = np.array(self.asset_prices)
+        # Initialize new np.array for prediction.
+        predicted = np.ones(np_asset_prices.shape)
+        # Iterate until the end of time while rolling over the windows.
+        for rolling in range(self.window-1, predicted.shape[0]):
+            predicted[rolling] = self._calc_median(np_asset_prices[rolling - 2:rolling + 1])
+        # Divide by the current time's price.
+        predicted_relatives = predicted / np_asset_prices
+        return predicted_relatives
+
+    def _calc_median(self, price_window):
+        """
+        Calculates the L1 median of the price window.
+
+        :param price_window: (np.array) A window of prices provided by the user.
+        :return: new_mu: (np.array) Calculated L1 median approximation
+        """
+        # First step is the median of the prices.
+        old_mu = np.median(price_window, axis=0)
+        new_mu = old_mu
+        # Iterate until the maximum iteration allowed.
+        for _ in range(self.n_iteration - 1):
+            # Transform mu according the Modified Weiszfeld Algorithm
+            new_mu = self._transform(old_mu, price_window)
+            # If condition is satisfied, break.
+            if np.linalg.norm(old_mu - new_mu, ord=1) <= self.tau * np.linalg.norm(new_mu, ord=1):
                 break
-        return new_median / curr_price
+        return new_mu
 
-    # @staticmethod
-    # def _helper(old_median):
-    #
-    #
-    # y = np.mean(X, 0)
-    #
-    # while True:
-    #     D = cdist(X, [y])
-    #     nonzeros = (D != 0)[:, 0]
-    #
-    #     Dinv = 1 / D[nonzeros]
-    #     Dinvs = np.sum(Dinv)
-    #     W = Dinv / Dinvs
-    #     T = np.sum(W * X[nonzeros], 0)
-    #     num_zeros = len(X) - np.sum(nonzeros)
-    #     if num_zeros == 0:
-    #         y1 = T
-    #     elif num_zeros == len(X):
-    #         return y
-    #     else:
-    #         R = (T - y) * Dinvs
-    #         r = np.linalg.norm(R)
-    #         rinv = 0 if r == 0 else num_zeros / r
-    #         y1 = max(0, 1 - rinv) * T + min(1, rinv) * y
+    @staticmethod
+    def _transform(old_mu, price_window):
+        """
+        Calculates L1 median approximation by using the Modified Weiszfeld Algorithm.
+
+        :param old_mu: (np.array) Current value of the predicted median value.
+        :param price_window: (np.array) A window of prices provided by the user.
+        :return next_mu: (np.array) New updated l1 median approximation.
+        """
+        # Calculate the difference set.
+        diff = price_window - old_mu
+        # Remove rows with all zeros.
+        non_mu = diff[~np.all(diff == 0, axis=1)]
+        # Number of zeros.
+        n_zero = diff.shape[0] - non_mu.shape[0]
+        # Calculate eta.
+        eta = 0 if n_zero == 0 else 1
+        # Calculate l1 norm of non_mu.
+        l1_norm = np.linalg.norm(non_mu, ord=1, axis=1)
+        # Calculate tilde.
+        tilde = 1 / np.sum(1 / l1_norm) * np.sum(np.divide(non_mu.T, l1_norm), axis=1)
+        # Calculate gamma.
+        gamma = np.linalg.norm(np.sum(np.apply_along_axis(lambda x: x / np.linalg.norm(x, ord=1), 1, non_mu), axis=0), ord=1)
+        # Calculate next_mu value.
+        next_mu = np.maximum(0, 1 - eta / gamma) * tilde + np.minimum(1, eta / gamma) * old_mu
+        return next_mu
