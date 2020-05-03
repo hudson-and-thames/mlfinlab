@@ -1,26 +1,20 @@
-# Contributing to mlfinlab
+# Contributing to MlFinLab:
+
 First off we wanted to thank you for taking the time to contribute to the project. 
 
-mlfinlab is an open source package based on the research of Dr Marcos Lopez de Prado in his new book
-Advances in Financial Machine Learning. This implementation started out as a platform from which to base a masters research project on, [Masters in Financial Engineering at WorldQuant University](https://wqu.org/).
+We make use of a [mentorship program](https://hudsonthames.org/mentorship/), which caters to ambitious students looking 
+to make an impact on open-source and develop a portfolio of work based on financial machine learning.
 
-As we were working through the book we saw the opportunity to code up the implementations as well answer the 
-questions at the back of every chapter. It has since evolved into a larger project with various implementations of machine learning in finance from various sources, such as the [Journal of Financial Data Science](https://jfds.pm-research.com/).
+This allows us to establish organised collaboration and control the level of code quality. 
 
-## Areas of Contribution
-We have recently opened access to our [Slack channel](https://join.slack.com/t/mlfinlab/shared_invite/enQtOTUzNjAyNDI1NTc1LTU0NTczNWRlM2U5ZDZiZTUxNTgzNzBlNDU3YmY5MThkODdiMTgwNzI5NDQ2NWI0YTYyMmI3MjBkMzY2YjVkNzc) to help form a community and encourage contributions. 
+## External Contributions: 
 
-Additionally we have started to create tickets on the [issues board](https://github.com/hudson-and-thames/mlfinlab/issues) and tagged them with the `good first issue` label to let the community know where we need help.
+We do encourage external contributions which are sourced by members of our community, [Slack Channel](https://www.patreon.com/HudsonThames), 
 
-Needless to say, if you are interested in working on something not on the issues board, just drop us a slack message. We would be very excited to discuss this further with you.
+We have quite a rigorous process of unit testing, code style checks, and documentation.  
 
-Typical contributions are:
-* Answering the questions at the back of a chapter in a Jupyter Notebook. [Research repo](https://github.com/hudson-and-thames/research)
-* Adding new features and core functionality to the mlfinlab package. 
-* Bug fixes
-* Imporved documentaiton
 
-## Templates
+## Raise an Issue
 We have created [templates](https://github.com/hudson-and-thames/mlfinlab/issues/new/choose) to help aid in creating issues and PRs:
 * Bug report
 * Feature request
@@ -30,5 +24,15 @@ We have created [templates](https://github.com/hudson-and-thames/mlfinlab/issues
 ---
 
 ## Contact us
-We have recently opened access to our [Slack channel](https://join.slack.com/t/mlfinlab/shared_invite/enQtOTUzNjAyNDI1NTc1LTU0NTczNWRlM2U5ZDZiZTUxNTgzNzBlNDU3YmY5MThkODdiMTgwNzI5NDQ2NWI0YTYyMmI3MjBkMzY2YjVkNzc) to help form a community and encourage contributions.
+We host a booming community of like minded data scientists and quants, join the 
+[Slack Channel](https://www.patreon.com/HudsonThames) now! Open to sponsors of our package. 
 
+The channel has the following benefits: 
+
+* Community of like minded individuals.
+* Ask questions about the package implementations and get community feedback.
+* Occasional presentations on topics within financial machine learning.
+* A papers channel where we share the papers which are freely available.
+* Access to members of our research group.
+ 
+Looking forward to hearing from you!

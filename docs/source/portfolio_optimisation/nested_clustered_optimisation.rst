@@ -11,6 +11,12 @@ The NCO class includes functions related to:
 - Multiple simulations for the NCO and CVO algorithms using Monte Carlo Optimization Selection (MCOS) algorithm.
 - Sample data generation to use in the above functions.
 
+.. tip::
+   **Underlying Literature**
+
+   The following sources elaborate extensively on the topic:
+
+   - **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/sol3/abstract_id=3469961>`__. *Describes the NCO, CVO, and MCOS algorithms.*
 
 About the Algorithm
 ###################
@@ -31,9 +37,26 @@ The steps of the NCO algorithm are:
 Convex Optimization Solution (CVO)
 ##################################
 
-The Convex Optimization Solution is the result of convex optimization for the problem of calculating the optimal weight allocation
-using the true covariance matrix and the true vector of means for a set of assets with a goal of maximum Sharpe ratio or minimum
-variance of a portfolio.
+The Convex Optimization Solution is the result of convex optimization when solving a problem of calculating the optimal weight allocation
+using the true covariance matrix and the true vector of means for a portfolio. The goal can be either the maximum Sharpe ratio or
+minimum variance of a portfolio.
+
+If the problem of portfolio optimization is:
+
+.. math::
+
+      min_{w}\frac{1}{2}w'Vw
+
+      s.t.: w'a = 1
+
+Where :math:`V` is the covariance matrix of elements in a portfolio, :math:`w` is the vector of weights that minimizes the
+variance or maximizes the Sharpe ratio, :math:`a` is an optimal solution that defines the goal of optimization.
+
+Then the Convex Optimization Solution to the problem is:
+
+.. math::
+
+      w^* = \frac{V^{-1}a}{a'V^{-1}a}
 
 Monte Carlo Optimization Selection (MCOS)
 #########################################
@@ -59,9 +82,11 @@ Sample Data Generating
 
 This method allows creating a random vector of means and a random covariance matrix that has the characteristics of securities. The elements are divided into clusters. The elements in clusters have a given level of correlation. The correlation between the clusters is set at another level. This structure is created in order to test the NCO and MCOS algorithms.
 
-These algorithms are described in more detail in the work **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3469961>`_.
+.. tip::
 
-*Examples of using these functions are available in the NCO Notebook (link in the end of the page).*
+    These algorithms are described in more detail in the work **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3469961>`_.
+
+    Examples of using these functions are available in the `NCO Notebook <https://github.com/hudson-and-thames/research/blob/master/NCO/NCO.ipynb>`_.
 
 Implementation
 ##############
@@ -73,11 +98,45 @@ Implementation
 
         .. automethod:: __init__
 
+Example
+########
+Below is an example of how to use the package functions to calculate risk metrics for a portfolio.
+
+.. code-block::
+
+    import pandas as pd
+    from mlfinlab.portfolio_optimization import NCO
+
+    # Import dataframe of returns for assets in a portfolio
+    assets_returns = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)
+
+    # Calculate empirical covariance of assets
+    assets_cov = assets_returns.cov()
+
+    # Calculate empirical means of assets
+    assets_mean = assets_returns.mean()
+
+    # Class that contains needed functions
+    nco = NCO()
+
+    # Find optimal weights using the NCO algorithm
+    w_nco = nco.allocate_nco(assets_cov, assets_mean)
+
+    # Find optimal weights using the CVO algorithm
+    w_cvo = nco.allocate_cvo(assets_cov, assets_mean)
+
+    # Compare the NCO solutions to the CVO ones using MCOS
+    # Parameters are: 10 simulations, 100 observations in a simulation
+    # goal of minimum variance, no LW shrinkage
+    w_cvo, w_nco = nco.allocate_mcos(assets_mean, assets_cov, 100, 10, 0.01, True, False)
+
+    # Find the errors in estimations of NCO and CVO in simulations
+    err_cvo, err_nco = nco.estim_errors_mcos(w_cvo, w_nco, assets_mean, assets_cov, True)
 
 Research Notebooks
 ##################
 
-The following research notebooks provides a more detailed exploration of the algorithm.
+The following research notebooks provide a more detailed exploration of the algorithm.
 
 * `NCO Notebook`_
 
