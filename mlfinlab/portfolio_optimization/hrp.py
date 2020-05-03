@@ -105,6 +105,7 @@ class HierarchicalRiskParity:
                                                                                         distance=distance_matrix,
                                                                                         correlation=correlation_matrix)
 
+        # Build pandas Series of sides 1/0 (Buy/Sell) for each asset, default 1 for all
         if side_weights is None:
             side_weights = pd.Series([1] * num_assets, index=asset_names)
         side_weights = pd.Series(side_weights, index=asset_names)
@@ -184,6 +185,7 @@ class HierarchicalRiskParity:
         Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets.
         :param covariance: (pd.Dataframe) the covariance matrix
         :param assets: (list) list of asset names in the portfolio
+        :param side_weights: (pd.Series/numpy matrix) side (Buy/Sell) for each asset
         """
         self.weights = pd.Series(1, index=self.ordered_indices)
         clustered_alphas = [self.ordered_indices]

@@ -40,7 +40,7 @@ class TestHRP(unittest.TestCase):
 
     def test_hrp_long_short(self):
         """
-        Test the Long Short Portfolio via side_weights Serries 1 for Long, -1 for Short (index=asset names)
+        Test the Long Short Portfolio via side_weights Series 1 for Long, -1 for Short (index=asset names)
         """
         hrp = HierarchicalRiskParity()
         side_weights = pd.Series([1] * self.data.shape[1], index=self.data.columns)

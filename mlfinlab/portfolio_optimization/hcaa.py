@@ -39,6 +39,8 @@ class HierarchicalClusteringAssetAllocation:
                  asset_prices=None,
                  asset_returns=None,
                  covariance_matrix=None,
+                 distance_matrix=None,
+                 side_weights=None,
                  expected_asset_returns=None,
                  allocation_metric='equal_weighting',
                  linkage='average',
@@ -54,6 +56,9 @@ class HierarchicalClusteringAssetAllocation:
                                             indexed by date
         :param asset_returns: (pd.DataFrame/numpy matrix) user supplied matrix of asset returns
         :param covariance_matrix: (pd.DataFrame/numpy matrix) user supplied covariance matrix of asset returns
+        :param distance_matrix: (pd.DataFrame/numpy matrix) user supplied distance matrix
+        :param side_weights: (pd.Series/numpy matrix) with asset_names in index and value 1 for Buy, -1 for Sell
+                                (default 1 for all)
         :param expected_asset_returns: (list) a list of mean asset returns (mu)
         :param allocation_metric: (str) the metric used for calculating weight allocations. Supported strings - "equal_weighting",
                                         "minimum_variance", "minimum_standard_deviation", "sharpe_ratio", "expected_shortfall",
@@ -102,30 +107,39 @@ class HierarchicalClusteringAssetAllocation:
         # Calculate covariance of returns or use the user specified covariance matrix
         if covariance_matrix is None:
             covariance_matrix = asset_returns.cov()
-        cov = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
+        covariance_matrix = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
 
-        # Calculate correlation from covariance matrix
-        corr = self._cov2corr(covariance=cov)
+        # Calculate correlations and distances from covariance matrix
+        correlation_matrix = self._cov2corr(covariance=covariance_matrix)
+        if distance_matrix is None:
+            distance_matrix = np.sqrt((1 - correlation_matrix).round(5) / 2)
+        distance_matrix = pd.DataFrame(distance_matrix, index=asset_names, columns=asset_names)
 
         # Calculate the optimal number of clusters using the Gap statistic
         if not optimal_num_clusters:
-            optimal_num_clusters = self._get_optimal_number_of_clusters(correlation=corr,
+            optimal_num_clusters = self._get_optimal_number_of_clusters(correlation=correlation_matrix,
                                                                         linkage=linkage,
                                                                         asset_returns=asset_returns)
 
         # Tree Clustering
-        self.clusters = self._tree_clustering(correlation=corr, num_clusters=optimal_num_clusters, linkage=linkage)
+        self.clusters = self._tree_clustering(distance=distance_matrix, num_clusters=optimal_num_clusters, linkage=linkage)
 
         # Quasi Diagnalization
         num_assets = len(asset_names)
         self.ordered_indices = self._quasi_diagnalization(num_assets, 2 * num_assets - 2)
 
+        # Build pandas Series of sides 1/0 (Buy/Sell) for each asset, default 1 for all
+        if side_weights is None:
+            side_weights = pd.Series([1] * num_assets, index=asset_names)
+        side_weights = pd.Series(side_weights, index=asset_names)
+
         # Recursive Bisection
         self._recursive_bisection(expected_asset_returns=expected_asset_returns,
                                   asset_returns=asset_returns,
-                                  covariance_matrix=cov,
+                                  covariance_matrix=covariance_matrix,
                                   assets=asset_names,
                                   allocation_metric=allocation_metric,
+                                  side_weights=side_weights,
                                   confidence_level=confidence_level)
 
     @staticmethod
@@ -190,11 +204,11 @@ class HierarchicalClusteringAssetAllocation:
         return 1 + np.argmax(gap_values)
 
     @staticmethod
-    def _tree_clustering(correlation, num_clusters, linkage):
+    def _tree_clustering(distance, num_clusters, linkage):
         """
         Perform agglomerative clustering on the current portfolio.
 
-        :param correlation: (np.array) matrix of asset correlations
+        :param distance: (np.array) matrix of distances
         :param num_clusters: (int) the number of clusters
         :param linkage (str): the type of linkage method to use for clustering
         :return: (list) structure of hierarchical tree
@@ -203,8 +217,7 @@ class HierarchicalClusteringAssetAllocation:
         cluster_func = AgglomerativeClustering(n_clusters=num_clusters,
                                                affinity='precomputed',
                                                linkage=linkage)
-        distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
-        cluster_func.fit(distance_matrix)
+        cluster_func.fit(distance)
         return cluster_func.children_
 
     def _quasi_diagnalization(self, num_assets, curr_index):
@@ -312,6 +325,7 @@ class HierarchicalClusteringAssetAllocation:
                              covariance_matrix,
                              assets,
                              allocation_metric,
+                             side_weights,
                              confidence_level):
         # pylint: disable=bad-continuation, too-many-locals
         """
@@ -392,6 +406,18 @@ class HierarchicalClusteringAssetAllocation:
         # Assign actual asset values to weight index
         self.weights.index = assets[self.ordered_indices]
         self.weights = pd.DataFrame(self.weights)
+
+        # Build Long/Short portfolio if needed
+        short_ptf = side_weights[side_weights == -1].index
+        buy_ptf = side_weights[side_weights == 1].index
+        if not short_ptf.empty:
+            # Short half size
+            self.weights.loc[short_ptf] /= self.weights.loc[short_ptf].sum().values[0]
+            self.weights.loc[short_ptf] *= -0.5
+            # Buy other half
+            self.weights.loc[buy_ptf] /= self.weights.loc[buy_ptf].sum().values[0]
+            self.weights.loc[buy_ptf] *= 0.5
+
         self.weights = self.weights.T
 
     @staticmethod
