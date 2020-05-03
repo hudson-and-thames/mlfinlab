@@ -10,13 +10,15 @@ from mlfinlab.util.multiprocess import mp_pandas_obj
 
 # pylint: disable=invalid-name
 
-def _get_sadf_at_t(X: pd.DataFrame, y: pd.DataFrame, min_length: int) -> float:
+def _get_sadf_at_t(X: pd.DataFrame, y: pd.DataFrame, min_length: int, model: str, phi: float) -> float:
     """
-    Snippet 17.2, page 258. SADF's Inner Loop (get sadf value at t)
+    Snippet 17.2, page 258. SADF's Inner Loop (get SADF value at t)
 
     :param X: (pd.DataFrame) of lagged values, constants, trend coefficients
     :param y: (pd.DataFrame) of y values (either y or y.diff())
     :param min_length: (int) minimum number of samples needed for estimation
+    :param model: (str) either 'linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
+    :param phi: (float) coefficient to penalize large sample lengths when computing SMT, in [0, 1]
     :return: (float) of SADF statistics for y.index[-1]
     """
     start_points, bsadf = range(0, y.shape[0] - min_length + 1), -np.inf
@@ -26,6 +28,8 @@ def _get_sadf_at_t(X: pd.DataFrame, y: pd.DataFrame, min_length: int) -> float:
         if not np.isnan(b_mean_[0]):
             b_mean_, b_std_ = b_mean_[0, 0], b_std_[0, 0] ** 0.5
             all_adf = b_mean_ / b_std_
+            if model[:2] == 'sm':
+                all_adf = np.abs(all_adf) / (y.shape[0]**phi)
             if all_adf > bsadf:
                 bsadf = all_adf
     return bsadf
@@ -55,7 +59,8 @@ def _get_y_x(series: pd.Series, model: str, lags: Union[int, list],
         x['trend'] = np.arange(x.shape[0])  # Add t to the model (0, 1, 2, 3, 4, 5, .... t)
         beta_column = 'y_lagged'  # Column which is used to estimate test beta statistics
     elif model == 'quadratic':
-        x['trend'] = np.arange(x.shape[0]) ** 2  # Add t^2 to the model (0, 1, 4, 9, ....)
+        x['trend'] = np.arange(x.shape[0]) # Add t to the model (0, 1, 2, 3, 4, 5, .... t)
+        x['quad_trend'] = np.arange(x.shape[0]) ** 2 # Add t^2 to the model (0, 1, 4, 9, ....)
         beta_column = 'y_lagged'  # Column which is used to estimate test beta statistics
     elif model == 'sm_poly_1':
         y = series.loc[y.index]
@@ -133,13 +138,16 @@ def get_betas(X: pd.DataFrame, y: pd.DataFrame) -> Tuple[np.array, np.array]:
     return b_mean, b_var
 
 
-def _sadf_outer_loop(X: pd.DataFrame, y: pd.DataFrame, min_length: int, molecule: list) -> pd.Series:
+def _sadf_outer_loop(X: pd.DataFrame, y: pd.DataFrame, min_length: int, model: str, phi: float,
+                     molecule: list) -> pd.Series:
     """
     This function gets SADF for t times from molecule
 
     :param X: (pd.DataFrame) of features(factors)
     :param y: (pd.DataFrame) of outcomes
     :param min_length: (int) minimum number of observations
+    :param model: (str) either 'linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
+    :param phi: (float) coefficient to penalize large sample lengths when computing SMT, in [0, 1]
     :param molecule: (list) of indices to get SADF
     :return: (pd.Series) of SADF statistics
     """
@@ -147,21 +155,32 @@ def _sadf_outer_loop(X: pd.DataFrame, y: pd.DataFrame, min_length: int, molecule
     for index in molecule:
         X_subset = X.loc[:index].values
         y_subset = y.loc[:index].values.reshape(-1, 1)
-        value = _get_sadf_at_t(X_subset, y_subset, min_length)
+        value = _get_sadf_at_t(X_subset, y_subset, min_length, model, phi)
         sadf_series[index] = value
     return sadf_series
 
 
 def get_sadf(series: pd.Series, model: str, lags: Union[int, list], min_length: int, add_const: bool = False,
-             num_threads: int = 8) -> pd.Series:
+             phi: float = 0, num_threads: int = 8) -> pd.Series:
     """
-    Multithread implementation of SADF, p. 258-259
+    Multithread implementation of SADF, p. 258-259.
+
+    SADF fits the ADF regression at each end point t with backwards expanding start points. For the estimation
+    of SADF(t), the right side of the window is fixed at t. SADF recursively expands the beginning of the sample
+    up to t - min_length, and returns the sup of this set.
+
+    When doing with sub- or super-martingale test, the variance of beta of a weak long-run bubble may be smaller than
+    one of a strong short-run bubble, hence biasing the method towards long-run bubbles. To correct for this bias,
+    ADF statistic in samples with large lengths can be penalized with the coefficient phi in [0, 1] such that:
+
+    ADF_penalized = ADF / (sample_length ^ phi)
 
     :param series: (pd.Series) for which SADF statistics are generated
     :param model: (str) either 'linear', 'quadratic', 'sm_poly_1', 'sm_poly_2', 'sm_exp', 'sm_power'
     :param lags: (int or list) either number of lags to use or array of specified lags
     :param min_length: (int) minimum number of observations needed for estimation
     :param add_const: (bool) flag to add constant
+    :param phi: (float) coefficient to penalize large sample lengths when computing SMT, in [0, 1]
     :param num_threads: (int) number of cores to use
     :return: (pd.Series) of SADF statistics
     """
@@ -173,6 +192,8 @@ def get_sadf(series: pd.Series, model: str, lags: Union[int, list], min_length: 
                                 X=X,
                                 y=y,
                                 min_length=min_length,
+                                model=model,
+                                phi=phi,
                                 num_threads=num_threads,
                                 )
     return sadf_series
