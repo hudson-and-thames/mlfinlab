@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from mlfinlab.portfolio_optimization.hcaa import HierarchicalClusteringAssetAllocation
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.codependence.codependence_matrix import get_dependence_matrix
 
 
 class TestHCAA(unittest.TestCase):
@@ -255,17 +256,11 @@ class TestHCAA(unittest.TestCase):
 
         hcaa = HierarchicalClusteringAssetAllocation()
         returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
-        covariance = returns.cov()
-        d_matrix = np.zeros_like(covariance)
-        diagnoal_sqrt = np.sqrt(np.diag(covariance))
-        np.fill_diagonal(d_matrix, diagnoal_sqrt)
-        d_inv = np.linalg.inv(d_matrix)
-        corr = np.dot(np.dot(d_inv, covariance), d_inv)
-        corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
-        distance_matrix = np.sqrt((1 - corr).round(5) / 2)
+        vi_matrix = get_dependence_matrix(self.data, dependence_method='information_variation')
+        distance_vi = 1 - vi_matrix
         hcaa.allocate(asset_names=self.data.columns,
                       covariance_matrix=returns.cov(),
-                      distance_matrix=distance_matrix,
+                      distance_matrix=distance_vi,
                       optimal_num_clusters=6,
                       asset_returns=returns)
         weights = hcaa.weights.values[0]

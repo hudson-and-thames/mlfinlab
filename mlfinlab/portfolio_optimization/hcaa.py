@@ -100,12 +100,12 @@ class HierarchicalClusteringAssetAllocation:
         # Calculate correlations and distances from covariance matrix
         correlation_matrix = self._cov2corr(covariance=covariance_matrix)
         if distance_matrix is None:
-            distance_matrix = np.sqrt((1 - correlation_matrix).round(5) / 2)
+            distance_matrix = np.sqrt(2 * (1 - correlation_matrix).round(5))
         distance_matrix = pd.DataFrame(distance_matrix, index=asset_names, columns=asset_names)
 
         # Calculate the optimal number of clusters using the Gap statistic
         if not optimal_num_clusters:
-            optimal_num_clusters = self._get_optimal_number_of_clusters(correlation=correlation_matrix,
+            optimal_num_clusters = self._get_optimal_number_of_clusters(distance=distance_matrix,
                                                                         linkage=linkage,
                                                                         asset_returns=asset_returns)
 
@@ -147,14 +147,14 @@ class HierarchicalClusteringAssetAllocation:
         return inertia
 
     def _get_optimal_number_of_clusters(self,
-                                        correlation,
+                                        distance,
                                         asset_returns,
                                         linkage,
                                         num_reference_datasets=5):
         """
         Find the optimal number of clusters for hierarchical clustering using the Gap statistic.
 
-        :param correlation: (np.array) matrix of asset correlations
+        :param distance: (pd.DataFrame) DataFrame of asset distances
         :param asset_returns: (pd.DataFrame) historical asset returns
         :param linkage: (str) the type of linkage method to use for clustering
         :param num_reference_datasets: (int) the number of reference datasets to generate for calculating expected inertia
@@ -163,7 +163,6 @@ class HierarchicalClusteringAssetAllocation:
 
         max_number_of_clusters = min(10, asset_returns.shape[1])
         cluster_func = AgglomerativeClustering(affinity='precomputed', linkage=linkage)
-        original_distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
         gap_values = []
         for num_clusters in range(1, max_number_of_clusters + 1):
             cluster_func.n_clusters = num_clusters
@@ -182,7 +181,7 @@ class HierarchicalClusteringAssetAllocation:
             expected_inertia = np.mean(reference_inertias)
 
             # Calculate inertia from original data
-            original_cluster_asignments = cluster_func.fit_predict(original_distance_matrix)
+            original_cluster_asignments = cluster_func.fit_predict(distance.values)
             inertia = self._compute_cluster_inertia(original_cluster_asignments, asset_returns.values)
 
             # Calculate the gap statistic
