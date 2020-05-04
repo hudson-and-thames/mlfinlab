@@ -9,6 +9,10 @@ class ReturnsEstimation:
     """
 
     def __init__(self):
+        """
+        Initialize
+        """
+
         return
 
     @staticmethod
