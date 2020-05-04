@@ -31,9 +31,9 @@ class TestUniversalPortfolio(TestCase):
         """
         Test the calculation of UP weights.
         """
-        # Initialize OLPS.
+        # Initialize UP.
         up1 = UniversalPortfolio(2)
-        # Allocates asset prices to OLPS.
+        # Allocates asset prices to UP.
         up1.allocate(self.data)
         # Create np.array of all_weights.
         all_weights = np.array(up1.all_weights)
@@ -48,18 +48,18 @@ class TestUniversalPortfolio(TestCase):
         """
         Tests that UP prints progress bar.
         """
-        # Initialize OLPS.
+        # Initialize UP.
         up2 = UniversalPortfolio(2)
-        # Allocates asset prices to OLPS.
+        # Allocates asset prices to UP.
         up2.allocate(self.data, verbose=True)
 
     def test_up_uniform_solution(self):
         """
         Tests UP with uniform capital allocation.
         """
-        # Initialize OLPS.
+        # Initialize UP.
         up3 = UniversalPortfolio(2, weighted='uniform')
-        # Allocates asset prices to OLPS.
+        # Allocates asset prices to UP.
         up3.allocate(self.data)
         # Create np.array of all_weights.
         all_weights = np.array(up3.all_weights)
@@ -74,9 +74,9 @@ class TestUniversalPortfolio(TestCase):
         """
         Tests UP with top-k experts capital allocation.
         """
-        # Initialize OLPS.
+        # Initialize UP.
         up4 = UniversalPortfolio(5, weighted='top-k', k=2)
-        # Allocates asset prices to OLPS.
+        # Allocates asset prices to UP.
         up4.allocate(self.data)
         # Create np.array of all_weights.
         all_weights = np.array(up4.all_weights)
@@ -91,7 +91,7 @@ class TestUniversalPortfolio(TestCase):
         """
         Tests ValueError if the method is not 'hist_performance', 'uniform', or 'top-k'.
         """
-        # Initialize OLPS.
+        # Initialize UP.
         up5 = UniversalPortfolio(5, weighted='random', k=2)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
