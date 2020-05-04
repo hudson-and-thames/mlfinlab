@@ -5,11 +5,19 @@ Contains the logic from chapter 20 on multiprocessing and vectorization.
 import sys
 import time
 import datetime as dt
-
-import multiprocessing as mp
+import importlib
 
 import numpy as np
 import pandas as pd
+
+# Check if Ray module is installed and initialize if present.
+RAY_SPEC = importlib.util.find_spec("ray")
+if RAY_SPEC:
+    import ray
+    if not ray.is_initialized():
+        ray.init()
+else:
+    import multiprocessing as mp
 
 
 # Snippet 20.5 (page 306), the lin_parts function
@@ -124,6 +132,9 @@ def mp_pandas_obj(func, pd_obj, num_threads=24, mp_batches=1, lin_mols=True, ver
     if num_threads == 1:
         out = process_jobs_(jobs)
     else:
+        if RAY_SPEC:
+            out = process_jobs_ray(jobs)
+        else:
         out = process_jobs(jobs, num_threads=num_threads, verbose=verbose)
 
     if isinstance(out[0], pd.DataFrame):
@@ -158,6 +169,16 @@ def process_jobs_(jobs):
         out.append(out_)
 
     return out
+
+
+# Support Ray for snippet 20.10 Passing the job (molecule) to the callback function
+if RAY_SPEC:
+    @ray.remote
+    def expand_call_ray(kargs):
+        """
+        Passing the job to expand_call function
+        """
+        return expand_call(kargs)
 
 
 # Snippet 20.10 Passing the job (molecule) to the callback function
@@ -238,3 +259,18 @@ def process_jobs(jobs, task=None, num_threads=24, verbose=True):
     pool.close()
     pool.join()  # This is needed to prevent memory leaks
     return out
+
+
+# Support Ray for snippet 20.9.2, pg 312, Example of Asynchronous call to pythons multiprocessing library
+def process_jobs_ray(jobs):
+    """
+    Based on Snippet 20.9.2, pg 312, Example of Asynchronous call to pythons multiprocessing library
+    Using Ray instead of pythons multiprocessing module
+
+    Run in parallel. jobs must contain a 'func' callback, for expand_call
+    """
+
+    outputs = []
+    for job in jobs:
+        outputs.append(expand_call_ray.remote(job))
+    return ray.get(outputs)
