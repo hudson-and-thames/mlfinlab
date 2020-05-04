@@ -13,7 +13,7 @@ import pandas as pd
 # Check if Ray module is installed and initialize if present.
 RAY_SPEC = importlib.util.find_spec("ray")
 if RAY_SPEC:
-    import ray
+    import ray  # pylint: disable=import-error
     if not ray.is_initialized():
         ray.init()
 else:
