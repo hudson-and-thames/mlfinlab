@@ -59,10 +59,7 @@ class OnlineMovingAverageReversion(OLPS):
             raise ValueError("Alpha must be between 0 and 1.")
 
         # Calculate moving average reversion.
-        self.moving_average_reversion = self._calculate_rolling_moving_average(self.asset_prices,
-                                                                               self.window,
-                                                                               self.reversion_method,
-                                                                               self.alpha)
+        self.moving_average_reversion = self._calculate_rolling_moving_average()
 
     def _update_weight(self, time):
         """
@@ -93,21 +90,16 @@ class OnlineMovingAverageReversion(OLPS):
         new_weights = self._simplex_projection(new_weights)
         return new_weights
 
-    @staticmethod
-    def _calculate_rolling_moving_average(asset_prices, window, reversion_method, alpha):
+    def _calculate_rolling_moving_average(self):
         """
         Calculates the rolling moving average for Online Moving Average Reversion.
 
-        :param asset_prices: (pd.DataFrame) Historical asset prices.
-        :param window: (int) Number of market windows.
-        :param reversion_method: (int) Reversion method. 1 : SMA, 2: EMA.
-        :param alpha: (int) Exponential weight for the second reversion method.
         :return rolling_ma: (np.array) Rolling moving average for the given reversion method.
         """
         # MAR-1 reversion method: Simple Moving Average.
-        if reversion_method == 1:
-            rolling_ma = np.array(asset_prices.rolling(window).apply(lambda x: np.sum(x) / x[0] / window))
+        if self.reversion_method == 1:
+            rolling_ma = np.array(self.asset_prices.rolling(self.window).apply(lambda x: np.sum(x) / x[0] / self.window))
         # MAR-2 reversion method: Exponential Moving Average.
         else:
-            rolling_ma = np.array(asset_prices.ewm(alpha=alpha, adjust=False).mean() / asset_prices)
+            rolling_ma = np.array(self.asset_prices.ewm(alpha=self.alpha, adjust=False).mean() / self.asset_prices)
         return rolling_ma
