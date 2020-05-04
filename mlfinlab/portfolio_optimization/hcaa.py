@@ -75,21 +75,9 @@ class HierarchicalClusteringAssetAllocation:
         self._perform_checks(asset_prices, asset_returns, covariance_matrix, allocation_metric)
 
         # Calculate the expected returns if the user does not supply any returns
-        if allocation_metric == 'sharpe_ratio' and expected_asset_returns is None:
-            if asset_prices is None:
-                raise ValueError(
-                    "Either provide pre-calculated expected returns or give raw asset prices for inbuilt returns calculation")
-
-            if self.calculate_expected_returns == "mean":
-                expected_asset_returns = self.returns_estimator.calculate_mean_historical_returns(
-                    asset_prices=asset_prices,
-                    resample_by=resample_by)
-            elif self.calculate_expected_returns == "exponential":
-                expected_asset_returns = self.returns_estimator.calculate_exponential_historical_returns(
-                    asset_prices=asset_prices,
-                    resample_by=resample_by)
-            else:
-                raise ValueError("Unknown returns specified. Supported returns - mean, exponential")
+        if expected_asset_returns is None and allocation_metric == 'sharpe_ratio':
+            expected_asset_returns = self._compute_expected_asset_returns(asset_prices=asset_prices,
+                                                                          resample_by=resample_by)
 
         if asset_names is None:
             if asset_prices is not None:
@@ -122,7 +110,8 @@ class HierarchicalClusteringAssetAllocation:
                                                                         asset_returns=asset_returns)
 
         # Tree Clustering
-        self.clusters = self._tree_clustering(distance=distance_matrix, num_clusters=optimal_num_clusters, linkage=linkage)
+        self.clusters = self._tree_clustering(distance=distance_matrix, num_clusters=optimal_num_clusters,
+                                              linkage=linkage)
 
         # Quasi Diagnalization
         num_assets = len(asset_names)
@@ -182,7 +171,6 @@ class HierarchicalClusteringAssetAllocation:
             # Calculate expected inertia from reference datasets
             reference_inertias = []
             for _ in range(num_reference_datasets):
-
                 # Generate reference returns from uniform distribution and calculate the distance matrix.
                 reference_asset_returns = pd.DataFrame(np.random.rand(*asset_returns.shape))
                 reference_correlation = np.array(reference_asset_returns.corr())
@@ -380,24 +368,28 @@ class HierarchicalClusteringAssetAllocation:
                                                                                            confidence_level=confidence_level,
                                                                                            cluster_indices=left_cluster)
                     right_cluster_expected_shortfall = self._get_cluster_expected_shortfall(asset_returns=asset_returns,
-                                                                                           covariance=covariance_matrix,
-                                                                                           confidence_level=confidence_level,
-                                                                                           cluster_indices=right_cluster)
+                                                                                            covariance=covariance_matrix,
+                                                                                            confidence_level=confidence_level,
+                                                                                            cluster_indices=right_cluster)
                     alloc_factor = \
-                        1 - left_cluster_expected_shortfall / (left_cluster_expected_shortfall + right_cluster_expected_shortfall)
+                        1 - left_cluster_expected_shortfall / (
+                                left_cluster_expected_shortfall + right_cluster_expected_shortfall)
                 elif allocation_metric == 'conditional_drawdown_risk':
-                    left_cluster_conditional_drawdown = self._get_cluster_conditional_drawdown_at_risk(asset_returns=asset_returns,
-                                                         covariance=covariance_matrix,
-                                                         confidence_level=confidence_level,
-                                                         cluster_indices=left_cluster)
-                    right_cluster_conditional_drawdown = self._get_cluster_conditional_drawdown_at_risk(asset_returns=asset_returns,
-                                                         covariance=covariance_matrix,
-                                                         confidence_level=confidence_level,
-                                                         cluster_indices=right_cluster)
+                    left_cluster_conditional_drawdown = self._get_cluster_conditional_drawdown_at_risk(
+                        asset_returns=asset_returns,
+                        covariance=covariance_matrix,
+                        confidence_level=confidence_level,
+                        cluster_indices=left_cluster)
+                    right_cluster_conditional_drawdown = self._get_cluster_conditional_drawdown_at_risk(
+                        asset_returns=asset_returns,
+                        covariance=covariance_matrix,
+                        confidence_level=confidence_level,
+                        cluster_indices=right_cluster)
                     alloc_factor = \
-                        1 - left_cluster_conditional_drawdown / (left_cluster_conditional_drawdown + right_cluster_conditional_drawdown)
+                        1 - left_cluster_conditional_drawdown / (
+                                left_cluster_conditional_drawdown + right_cluster_conditional_drawdown)
                 else:
-                    alloc_factor = 0.5 # equal weighting
+                    alloc_factor = 0.5  # equal weighting
 
                 # Assign weights to each sub-cluster
                 self.weights[left_cluster] *= alloc_factor
@@ -436,6 +428,33 @@ class HierarchicalClusteringAssetAllocation:
         corr = np.dot(np.dot(d_inv, covariance), d_inv)
         corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
         return corr
+
+    def _compute_expected_asset_returns(self, asset_prices, resample_by):
+        """
+        Compute expected asset returns
+
+        :param asset_prices: (pd.DataFrame) a dataframe of historical asset prices (daily close)
+                                            indexed by date
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+                                  None for no resampling
+        :return: : (pd.Series) expected returns per asset
+        """
+
+        if asset_prices is None:
+            raise ValueError(
+                "Either provide pre-calculated expected returns or give raw asset prices for inbuilt returns calculation")
+
+        if self.calculate_expected_returns == "mean":
+            expected_asset_returns = self.returns_estimator.calculate_mean_historical_returns(
+                asset_prices=asset_prices,
+                resample_by=resample_by)
+        elif self.calculate_expected_returns == "exponential":
+            expected_asset_returns = self.returns_estimator.calculate_exponential_historical_returns(
+                asset_prices=asset_prices,
+                resample_by=resample_by)
+        else:
+            raise ValueError("Unknown returns specified. Supported returns - mean, exponential")
+        return expected_asset_returns
 
     @staticmethod
     def _perform_checks(asset_prices, asset_returns, covariance_matrix, allocation_metric):
