@@ -90,9 +90,9 @@ class UniversalPortfolio(OLPS):
     def _calculate_weights_on_experts(self):
         """
         Calculates the weight allocation on each experts.
-        'P': Historical Performance.
-        'U': Uniform Weights.
-        'K': Top-K experts.
+        'hist_performance': Historical Performance.
+        'uniform': Uniform Weights.
+        'top-k': Top-K experts.
         """
         # If capital allocation is based on historical performances.
         if self.weighted == 'hist_performance':
