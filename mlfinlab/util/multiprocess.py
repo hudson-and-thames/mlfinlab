@@ -110,7 +110,7 @@ def mp_pandas_obj(func, pd_obj, num_threads=24, mp_batches=1, lin_mols=True, ver
     :param func: (function) A callback function, which will be executed in parallel
     :param pd_obj: (tuple) Element 0: The name of the argument used to pass molecules to the callback function
                     Element 1: A list of indivisible tasks (atoms), which will be grouped into molecules
-    :param num_threads: (int) The number of threads that will be used in parallel (one processor per thread)
+    :param num_threads: (int) The number of threads that will be used in parallel (one processor core per thread)
     :param mp_batches: (int) Number of parallel batches (jobs per core)
     :param lin_mols: (bool) Tells if the method should use linear or nested partitioning
     :param verbose: (bool) Flag to report progress on asynch jobs
@@ -133,7 +133,7 @@ def mp_pandas_obj(func, pd_obj, num_threads=24, mp_batches=1, lin_mols=True, ver
         out = process_jobs_(jobs)
     else:
         if RAY_SPEC:
-            out = process_jobs_ray(jobs)
+            out = process_jobs_ray(jobs, num_cpus=num_threads)
         else:
         out = process_jobs(jobs, num_threads=num_threads, verbose=verbose)
 
@@ -173,7 +173,7 @@ def process_jobs_(jobs):
 
 # Support Ray for snippet 20.10 Passing the job (molecule) to the callback function
 # Skip coverage for optional dependency Ray
-if RAY_SPEC:  # pragma: no cover
+if RAY_SPEC:
     @ray.remote
     def expand_call_ray(kargs):
         """
@@ -263,14 +263,15 @@ def process_jobs(jobs, task=None, num_threads=24, verbose=True):
 
 
 # Support Ray for snippet 20.9.2, pg 312, Example of Asynchronous call to pythons multiprocessing library
-def process_jobs_ray(jobs):  # pragma: no cover
+def process_jobs_ray(jobs, num_cpus=None):
     """
     Based on Snippet 20.9.2, pg 312, Example of Asynchronous call to pythons multiprocessing library
     Using Ray instead of pythons multiprocessing module
 
     Run in parallel. jobs must contain a 'func' callback, for expand_call
     """
-
+    if num_cpus:
+        expand_call_ray.options(num_cpus=num_cpus)
     outputs = []
     for job in jobs:
         outputs.append(expand_call_ray.remote(job))
