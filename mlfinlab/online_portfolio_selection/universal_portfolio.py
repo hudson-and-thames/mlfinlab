@@ -113,8 +113,7 @@ class UniversalPortfolio(OLPS):
         # If capital allocation is based on top-K experts.
         elif self.weighted == 'top-k':
             # Only the top k experts get 1/k of the wealth.
-            # https://stackoverflow.com/questions/6910641/
-            # how-do-i-get-indices-of-n-maximum-values-in-a-numpy-array.
+            # `<https://stackoverflow.com/questions/6910641/how-do-i-get-indices-of-n-maximum-values-in-a-numpy-array>`_
             # Get the indices of top k experts for each time.
             top_k = np.apply_along_axis(lambda x: np.argpartition(x, -self.k)[-self.k:], 1,
                                         self.expert_portfolio_returns)
@@ -149,8 +148,7 @@ class UniversalPortfolio(OLPS):
         """
 
         # Calculate the product of the distribution matrix with the 3d experts x all weights matrix.
-        # https://stackoverflow.com/questions/58588378/
-        # how-to-matrix-multiply-a-2d-numpy-array-with-a-3d-array-to-give-a-3d-array
+        # `<https://stackoverflow.com/questions/58588378/how-to-matrix-multiply-a-2d-numpy-array-with-a-3d-array-to-give-a-3d-array>`_
         d_shape = self.weights_on_experts[:-1].shape[:1] + self.expert_all_weights.shape[1:]
         reshaped_all_weights = self.expert_all_weights.reshape(self.expert_all_weights.shape[0], -1)
         weight_change = np.dot(self.weights_on_experts[:-1], reshaped_all_weights).reshape(d_shape)
@@ -173,7 +171,7 @@ class UniversalPortfolio(OLPS):
     def _generate_simplex(self, number_of_experts, number_of_assets):
         """
         Generate uniform points on a simplex domain.
-        https://cs.stackexchange.com/questions/3227/uniform-sampling-from-a-simplex
+        `<https://cs.stackexchange.com/questions/3227/uniform-sampling-from-a-simplex>`_
 
         :param number_of_experts: (int) Number of experts.
         :param number_of_assets: (int) Number of assets.
@@ -193,7 +191,7 @@ class UniversalPortfolio(OLPS):
         # pylint: disable=expression-not-assigned
         """
         Calls in a loop to create a terminal progress bar.
-        https://gist.github.com/aubricus/f91fb55dc6ba5557fbab06119420dd6a
+        `<https://gist.github.com/aubricus/f91fb55dc6ba5557fbab06119420dd6a>`_
 
         :param iteration: (int) Current iteration.
         :param prefix: (str) Prefix string.
