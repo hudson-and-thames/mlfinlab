@@ -110,7 +110,6 @@ class ConfidenceWeightedMeanReversion(OLPS):
         # Normalize variance.
         self.sigma /= new_m * np.trace(self.sigma)
         # Simplex projection.
-        # print(self.mu_dist,'mu_dist')
         self.mu_dist = self._simplex_projection(self.mu_dist)
         new_weights = self.mu_dist
         return new_weights
