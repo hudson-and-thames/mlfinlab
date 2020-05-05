@@ -23,7 +23,8 @@ class ConfidenceWeightedMeanReversion(OLPS):
 
         :param confidence: (float) Confidence parameter. Must be between 0 and 1.
         :param epsilon: (float) Mean reversion parameter. Must be between 0 and 1.
-        :param method:
+        :param method: (string) Variance update method. Choose 'var' for variance and 'sd' for
+                                standard deviation
         """
         self.confidence = confidence
         self.theta = None

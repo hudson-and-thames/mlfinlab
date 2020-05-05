@@ -84,7 +84,10 @@ class OnlineMovingAverageReversion(OLPS):
             lambd = 0
         # If not, adjust lambda, a multiplicative constant.
         else:
-            lambd = loss_fn / (np.linalg.norm(predicted_change - mean_change) ** 2)
+            try:
+                lambd = loss_fn / (np.linalg.norm(predicted_change - mean_change) ** 2)
+            except:
+                lambd = 0
         new_weights = self.weights + lambd * (predicted_change - mean_change)
         # Projects new weights to simplex domain.
         new_weights = self._simplex_projection(new_weights)
@@ -98,8 +101,10 @@ class OnlineMovingAverageReversion(OLPS):
         """
         # MAR-1 reversion method: Simple Moving Average.
         if self.reversion_method == 1:
-            rolling_ma = np.array(self.asset_prices.rolling(self.window).apply(lambda x: np.sum(x) / x[0] / self.window))
+            rolling_ma = np.array(self.asset_prices.rolling(self.window).apply(
+                lambda x: np.sum(x) / x[0] / self.window))
         # MAR-2 reversion method: Exponential Moving Average.
         else:
-            rolling_ma = np.array(self.asset_prices.ewm(alpha=self.alpha, adjust=False).mean() / self.asset_prices)
+            rolling_ma = np.array(
+                self.asset_prices.ewm(alpha=self.alpha, adjust=False).mean() / self.asset_prices)
         return rolling_ma

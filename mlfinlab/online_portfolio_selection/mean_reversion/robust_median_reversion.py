@@ -16,7 +16,7 @@ class RobustMedianReversion(OLPS):
     information but also seeks to maximize returns from the predicted window.
     """
 
-    def __init__(self, epsilon, n_iteration, window, tau):
+    def __init__(self, epsilon, n_iteration, window, tau=0.001):
         """
         Initializes Robust Median Reversion with the given epsilon, window, and tau values.
 
