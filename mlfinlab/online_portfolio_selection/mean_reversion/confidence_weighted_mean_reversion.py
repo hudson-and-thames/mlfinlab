@@ -92,18 +92,20 @@ class ConfidenceWeightedMeanReversion(OLPS):
             lambd = np.max([(-quad_b + np.sqrt(quad_b ** 2 - 4 * quad_a * quad_c)) / (2 * quad_a),
                             (-quad_b - np.sqrt(quad_b ** 2 - 4 * quad_a * quad_c)) / (2 * quad_a),
                             -quad_c / quad_b, 0])
+
         # Update mu.
         self.mu_dist -= lambd * np.dot(curr_relative_return - mean_x, self.sigma).reshape((self.number_of_assets,))
-
         if self.method == 'sd':
             # Component for new variance calculation.
             sqrt_u = (-lambd * self.theta * new_v + np.sqrt(lambd ** 2 * self.theta ** 2 * new_v ** 2 + 4 * new_v)) / 2
             # Update variance.
-            self.sigma = np.linalg.inv(np.linalg.inv(self.sigma) + lambd * self.theta / sqrt_u * np.diag(curr_relative_return) ** 2)
+            self.sigma = np.linalg.pinv(np.linalg.pinv(self.sigma) + lambd * self.theta / sqrt_u * np.diag(curr_relative_return) ** 2)
         if self.method == 'var':
             # Update variance.
-            self.sigma = np.linalg.inv(
-                np.linalg.inv(self.sigma) + 2 * lambd * self.theta * np.diag(curr_relative_return) ** 2)
+            self.sigma = np.linalg.pinv(
+                np.linalg.pinv(self.sigma) + 2 * lambd * self.theta * np.diag(curr_relative_return) ** 2)
+        # Change to Positive Semi-Definite Matrix.
+        self.sigma[self.sigma < 1e-5 * np.identity(self.number_of_assets)] = 1e-5
         # Normalize variance.
         self.sigma /= new_m * np.trace(self.sigma)
         # Simplex projection.
