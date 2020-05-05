@@ -92,7 +92,8 @@ class ConfidenceWeightedMeanReversion(OLPS):
             lambd = np.max([(-quad_b + np.sqrt(quad_b ** 2 - 4 * quad_a * quad_c)) / (2 * quad_a),
                             (-quad_b - np.sqrt(quad_b ** 2 - 4 * quad_a * quad_c)) / (2 * quad_a),
                             -quad_c / quad_b, 0])
-
+        # Bound lambda for computational issues.
+        lambd = np.minimum(lambd, 1000000)
         # Update mu.
         self.mu_dist -= lambd * np.dot(curr_relative_return - mean_x, self.sigma).reshape((self.number_of_assets,))
         if self.method == 'sd':
@@ -109,6 +110,7 @@ class ConfidenceWeightedMeanReversion(OLPS):
         # Normalize variance.
         self.sigma /= new_m * np.trace(self.sigma)
         # Simplex projection.
+        # print(self.mu_dist,'mu_dist')
         self.mu_dist = self._simplex_projection(self.mu_dist)
         new_weights = self.mu_dist
         return new_weights
