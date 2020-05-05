@@ -14,6 +14,7 @@ import pandas as pd
 RAY_SPEC = importlib.util.find_spec("ray")
 if RAY_SPEC:
     import ray  # pylint: disable=import-error
+
     if not ray.is_initialized():
         ray.init()
 else:
@@ -125,7 +126,7 @@ def mp_pandas_obj(func, pd_obj, num_threads=24, mp_batches=1, lin_mols=True, ver
 
     jobs = []
     for i in range(1, len(parts)):
-        job = {pd_obj[0]: pd_obj[1][parts[i - 1]:parts[i]], 'func': func}
+        job = {pd_obj[0]: pd_obj[1][parts[i - 1] : parts[i]], "func": func}
         job.update(kargs)
         jobs.append(job)
 
@@ -135,12 +136,12 @@ def mp_pandas_obj(func, pd_obj, num_threads=24, mp_batches=1, lin_mols=True, ver
         if RAY_SPEC:
             out = process_jobs_ray(jobs, num_cpus=num_threads)
         else:
-        out = process_jobs(jobs, num_threads=num_threads, verbose=verbose)
+            out = process_jobs(jobs, num_threads=num_threads, verbose=verbose)
 
     if isinstance(out[0], pd.DataFrame):
         df0 = pd.DataFrame()
     elif isinstance(out[0], pd.Series):
-        df0 = pd.Series(dtype='float64')
+        df0 = pd.Series(dtype="float64")
     else:
         return out
 
@@ -174,6 +175,7 @@ def process_jobs_(jobs):
 # Support Ray for snippet 20.10 Passing the job (molecule) to the callback function
 # Skip coverage for optional dependency Ray
 if RAY_SPEC:
+
     @ray.remote
     def expand_call_ray(kargs):
         """
@@ -194,8 +196,8 @@ def expand_call(kargs):
     :param kargs: Job (molecule)
     :return: Result of a job
     """
-    func = kargs['func']
-    del kargs['func']
+    func = kargs["func"]
+    del kargs["func"]
     out = func(**kargs)
     return out
 
@@ -218,13 +220,23 @@ def report_progress(job_num, num_jobs, time0, task):
     msg.append(msg[1] * (1 / msg[0] - 1))
     time_stamp = str(dt.datetime.fromtimestamp(time.time()))
 
-    msg = time_stamp + ' ' + str(round(msg[0] * 100, 2)) + '% ' + task + ' done after ' + \
-          str(round(msg[1], 2)) + ' minutes. Remaining ' + str(round(msg[2], 2)) + ' minutes.'
+    msg = (
+        time_stamp
+        + " "
+        + str(round(msg[0] * 100, 2))
+        + "% "
+        + task
+        + " done after "
+        + str(round(msg[1], 2))
+        + " minutes. Remaining "
+        + str(round(msg[2], 2))
+        + " minutes."
+    )
 
     if job_num < num_jobs:
-        sys.stderr.write(msg + '\r')
+        sys.stderr.write(msg + "\r")
     else:
-        sys.stderr.write(msg + '\n')
+        sys.stderr.write(msg + "\n")
 
 
 # Snippet 20.9.2, pg 312, Example of Asynchronous call to pythons multiprocessing library
@@ -244,7 +256,7 @@ def process_jobs(jobs, task=None, num_threads=24, verbose=True):
     """
 
     if task is None:
-        task = jobs[0]['func'].__name__
+        task = jobs[0]["func"].__name__
 
     pool = mp.Pool(processes=num_threads)
     outputs = pool.imap_unordered(expand_call, jobs)

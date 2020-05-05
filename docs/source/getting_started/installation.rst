@@ -19,6 +19,12 @@ Launch the terminal and run.
 
    pip install mlfinlab
 
+`Ray`_ is optionally supported in place of Pythons `multiprocessing` module for certain multithreaded calculations. It will be utilized automatically when installed.
+
+.. code-block::
+
+   pip install ray
+
 -----------------------------
 
 Installation for Developers
@@ -57,6 +63,12 @@ Accept all the requests to install.
 
    pip install -r requirements.txt
 
+7. To install optional requirements:
+
+.. code-block::
+
+   pip install -r optional-requirements.txt
+
 Windows
 *******
 
@@ -82,6 +94,13 @@ Windows
 
    pip install -r requirements.txt
 
+8. To install optional requirements:
+
+.. code-block::
+
+   pip install -r optional-requirements.txt
+
 .. _package repo: (https://github.com/hudson-and-thames/mlfinlab)
 .. _link: (https://www.anaconda.com/download/#mac)
 .. _Anaconda 3: (https://www.anaconda.com/distribution/#download-section)
+.. _Ray: (https://docs.ray.io/en/master)
