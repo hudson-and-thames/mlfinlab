@@ -52,7 +52,7 @@ class MeanVarianceOptimisation:
                  risk_aversion=10,
                  weight_bounds=None,
                  resample_by=None):
-        # pylint: disable=invalid-name, too-many-branches, bad-continuation
+        # pylint: disable=invalid-name, too-many-branches, bad-continuation, too-many-arguments
         """
         Calculate the portfolio asset allocations using the method specified.
 
@@ -100,7 +100,7 @@ class MeanVarianceOptimisation:
         elif solution == 'max_return_min_volatility':
             self._max_return_min_volatility(covariance=cov,
                                             expected_returns=expected_asset_returns,
-                                            mu=risk_aversion,
+                                            risk_aversion=risk_aversion,
                                             num_assets=len(asset_names))
         elif solution == 'max_sharpe':
             self._max_sharpe(covariance=cov,
@@ -148,7 +148,7 @@ class MeanVarianceOptimisation:
                                   target_risk=0.01,
                                   risk_aversion=10,
                                   resample_by=None):
-        # pylint: disable=bad-continuation
+        # pylint: disable=bad-continuation, eval-used
         """
         Create a portfolio using custom objective and constraints.
 
@@ -274,7 +274,8 @@ class MeanVarianceOptimisation:
         plt.legend(loc='upper left')
         return figure
 
-    def _error_checks(self, asset_names, asset_prices, expected_asset_returns, covariance_matrix):
+    @staticmethod
+    def _error_checks(asset_names, asset_prices, expected_asset_returns, covariance_matrix):
         """
         Some initial error checks on the inputs.
 
@@ -375,6 +376,7 @@ class MeanVarianceOptimisation:
         return ivp
 
     def _min_volatility(self, covariance, expected_returns, num_assets):
+        # pylint: disable=eval-used
         """
         Compute minimum volatility portfolio allocation.
 
@@ -426,13 +428,14 @@ class MeanVarianceOptimisation:
         self.portfolio_risk = risk.value
         self.portfolio_return = portfolio_return.value[0]
 
-    def _max_return_min_volatility(self, covariance, expected_returns, mu, num_assets):
+    def _max_return_min_volatility(self, covariance, expected_returns, risk_aversion, num_assets):
+        # pylint: disable=eval-used
         """
         Calculate maximum return-minimum volatility portfolio allocation.
 
         :param covariance: (pd.Dataframe) covariance dataframe of asset returns
         :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
-        :param mu: (float) quantifies the risk averse nature of the investor - a higher value means
+        :param risk_aversion: (float) quantifies the risk averse nature of the investor - a higher value means
                            more risk averse and vice-versa
         :param num_assets: (int) number of assets in the portfolio
         :return: (np.array, float, float) portfolio weights, risk value and return value
@@ -444,7 +447,7 @@ class MeanVarianceOptimisation:
         risk = cp.quad_form(weights, covariance)
 
         # Optimisation objective and constraints
-        allocation_objective = cp.Minimize(mu * risk - portfolio_return)
+        allocation_objective = cp.Minimize(risk_aversion * risk - portfolio_return)
         allocation_constraints = [
             cp.sum(weights) == 1
         ]
@@ -481,7 +484,7 @@ class MeanVarianceOptimisation:
         self.portfolio_return = portfolio_return.value[0]
 
     def _max_sharpe(self, covariance, expected_returns, num_assets):
-        # pylint: disable=invalid-name
+        # pylint: disable=invalid-name,eval-used
         """
         Compute maximum Sharpe portfolio allocation.
 
@@ -538,6 +541,7 @@ class MeanVarianceOptimisation:
         self.portfolio_return = portfolio_return.value[0]
 
     def _min_volatility_for_target_return(self, covariance, expected_returns, target_return, num_assets):
+        # pylint: disable=eval-used
         """
         Calculate minimum volatility portfolio for a given target return.
 
@@ -592,6 +596,7 @@ class MeanVarianceOptimisation:
         self.portfolio_return = target_return
 
     def _max_return_for_target_risk(self, covariance, expected_returns, target_risk, num_assets):
+        # pylint: disable=eval-used
         """
         Calculate maximum return for a given target volatility/risk.
 
@@ -670,6 +675,7 @@ class MeanVarianceOptimisation:
         self.portfolio_return = portfolio_return
 
     def _max_decorrelation(self, covariance, expected_returns, num_assets):
+        # pylint: disable=eval-used
         """
         Calculate the maximum decorrelated portfolio.
 
