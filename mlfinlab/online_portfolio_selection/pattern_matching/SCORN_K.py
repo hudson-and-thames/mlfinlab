@@ -1,11 +1,11 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.pattern_matching.CORN_K import CORN_K
+from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning_k import CorrelationDrivenNonparametricLearningK
 from mlfinlab.online_portfolio_selection.pattern_matching.SCORN import SCORN
 
 
-class SCORN_K(CORN_K):
+class SCORN_K(CorrelationDrivenNonparametricLearningK):
     """
     This class implements the Symmetirc Correlation Driven Nonparametric Learning - top k experts strategy.
     """

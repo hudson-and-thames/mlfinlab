@@ -20,7 +20,11 @@ class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
 
     def __init__(self, window, rho):
         """
-        Constructor.
+        Initializes Correlation Driven Nonparametric Learning Uniform with the given number of
+        windows and set rho value.
+
+        :param window: (int) Number of windows to look back for similarity sets.
+        :param rho: (float) Threshold for similarity.
         """
         self.window = window
         self.rho = rho
@@ -59,7 +63,8 @@ class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
         self.expert_params = np.zeros((self.number_of_experts, 2))
         # Assign number of windows to each experts.
         for n_window in range(self.window):
-            self.expert_params[n_window-1] = [n_window + 1, self.rho]
+            # Assign expert with parameters (n_window + 1, rho).
+            self.expert_params[n_window] = [n_window + 1, self.rho]
 
         for exp in range(self.number_of_experts):
             param = self.expert_params[exp]
