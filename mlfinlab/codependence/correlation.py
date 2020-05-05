@@ -17,7 +17,7 @@ def angular_distance(x: np.array, y: np.array) -> float:
 
     :param x: (np.array) X vector.
     :param y: (np.array) Y vector.
-    :return: (float) angular distance.
+    :return: (float) Angular distance.
     """
     corr_coef = np.corrcoef(x, y)[0][1]
     return np.sqrt(0.5 * (1 - corr_coef))
@@ -27,9 +27,9 @@ def absolute_angular_distance(x: np.array, y: np.array) -> float:
     """
     Returns a modification of angular distance where absolute value of correlation coefficient is used.
 
-    :param x: (np.array) x vector
-    :param y: (np.array) y vector
-    :return: (float) absolute angular distance
+    :param x: (np.array) X vector
+    :param y: (np.array) Y vector
+    :return: (float) Absolute angular distance
     """
 
     corr_coef = np.corrcoef(x, y)[0][1]
@@ -42,7 +42,7 @@ def squared_angular_distance(x: np.array, y: np.array) -> float:
 
     :param x: (np.array) X vector
     :param y: (np.array) Y vector
-    :return: (float) squared angular distance
+    :return: (float) Squared angular distance
     """
 
     corr_coef = np.corrcoef(x, y)[0][1]
@@ -56,7 +56,7 @@ def distance_correlation(x: np.array, y: np.array) -> float:
 
     :param x: (np.array) X vector
     :param y: (np.array) Y vector
-    :return: (float) distance correlation coefficient
+    :return: (float) Distance correlation coefficient
     """
 
     x = x[:, None]
