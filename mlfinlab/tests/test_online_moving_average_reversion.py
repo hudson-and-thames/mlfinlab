@@ -109,3 +109,13 @@ class TestOnlineMovingAverageReversion(TestCase):
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             olmar6.allocate(self.data)
+
+    def test_olmar_edge_case_error(self):
+        """
+        Tests that lambd returns 0 if predicted change is mean change.
+        """
+        # Initialize OLMAR.
+        olmar7 = OnlineMovingAverageReversion(reversion_method=1, epsilon=2, window=1)
+        no_change_data = self.data
+        no_change_data.iloc[:] = 1
+        olmar7.allocate(no_change_data, resample_by='M')

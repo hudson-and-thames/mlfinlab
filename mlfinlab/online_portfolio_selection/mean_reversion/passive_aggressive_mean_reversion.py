@@ -13,10 +13,10 @@ class PassiveAggressiveMeanReversion(OLPS):
 
     Passive Aggressive Mean Reversion strategy switches between a passive and an aggressive mean
     reversion strategy based on epsilon, a measure of sensitivity to the market,
-    and hyperparameter C, which denotes the aggressiveness of reverting to a partciular strategy.
+    and hyperparameter C, which denotes the aggressiveness of reverting to a particular strategy.
     """
 
-    def __init__(self, epsilon, agg, optimization_method):
+    def __init__(self, optimization_method, epsilon=0.5, agg=10):
         """
         Initializes Passive Aggressive Mean Reversionw ith the given epsilon, aggressiveness,
         and optimzation method.
@@ -40,9 +40,9 @@ class PassiveAggressiveMeanReversion(OLPS):
         """
         super(PassiveAggressiveMeanReversion, self)._initialize(asset_prices, weights, resample_by)
 
-        # Check that epsilon is greater than or equal to 0.
-        if self.epsilon < 0 or self.epsilon > 1:
-            raise ValueError("Epsilon values must be between 0 and 1")
+        # Check that epsilon is greater than 0.
+        if self.epsilon < 0:
+            raise ValueError("Epsilon values must be greater than 0")
 
         # Check that optimization method is either 0, 1, or 2.
         if self.optimization_method not in [0, 1, 2]:
