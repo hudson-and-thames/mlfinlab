@@ -243,13 +243,16 @@ class MeanVarianceOptimisation:
         returns = []
         sharpe_ratios = []
         for portfolio_return in np.linspace(min_return, max_return, 100):
-            self._min_volatility_for_target_return(covariance=covariance,
-                                                    expected_returns=expected_returns,
-                                                    target_return=portfolio_return,
-                                                    num_assets=num_assets)
-            volatilities.append(self.portfolio_risk)
-            returns.append(portfolio_return)
-            sharpe_ratios.append((portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5 + 1e-16))
+            try:
+                self._min_volatility_for_target_return(covariance=covariance,
+                                                        expected_returns=expected_returns,
+                                                        target_return=portfolio_return,
+                                                        num_assets=num_assets)
+                volatilities.append(self.portfolio_risk)
+                returns.append(portfolio_return)
+                sharpe_ratios.append((portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5 + 1e-16))
+            except:
+                continue
         max_sharpe_ratio_index = sharpe_ratios.index(max(sharpe_ratios))
         min_volatility_index = volatilities.index(min(volatilities))
         figure = plt.scatter(volatilities, returns, c=sharpe_ratios, cmap='viridis')
@@ -275,11 +278,11 @@ class MeanVarianceOptimisation:
         """
         Some initial error checks on the inputs.
 
-        :param asset_names:
-        :param asset_prices:
-        :param expected_asset_returns:
-        :param covariance_matrix:
-        :return:
+        :param asset_names: (list) a list of strings containing the asset names
+        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
+        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
+        :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns (sigma)
+        :return: (list) list of asset names in the portfolio
         """
 
         if asset_prices is None and (expected_asset_returns is None or covariance_matrix is None):
@@ -312,12 +315,13 @@ class MeanVarianceOptimisation:
         """
         Calculate the expected returns and covariance matrix of assets in the portfolio.
 
-        :param asset_names:
-        :param asset_prices:
-        :param expected_asset_returns:
-        :param covariance_matrix:
-        :param resample_by:
-        :return:
+        :param asset_names: (list) a list of strings containing the asset names
+        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
+        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
+        :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns (sigma)
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+                                  None for no resampling
+        :return: (np.array, pd.DataFrame) expected asset returns and covariance matrix
         """
 
         # Calculate the expected returns if the user does not supply any returns
