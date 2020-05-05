@@ -99,7 +99,7 @@ class RobustMedianReversion(OLPS):
         predicted = np.ones(np_asset_prices.shape)
         # Iterate until the end of time while rolling over the windows.
         for rolling in range(self.window-1, predicted.shape[0]):
-            predicted[rolling] = self._calc_median(np_asset_prices[rolling - 2:rolling + 1])
+            predicted[rolling] = self._calc_median(np_asset_prices[rolling - self.window + 1:rolling + 1])
         # Divide by the current time's price.
         predicted_relatives = predicted / np_asset_prices
         return predicted_relatives
@@ -136,6 +136,9 @@ class RobustMedianReversion(OLPS):
         diff = price_window - old_mu
         # Remove rows with all zeros.
         non_mu = diff[~np.all(diff == 0, axis=1)]
+        # Edge case for identical price windows.
+        if non_mu.shape[0] == 0:
+            return non_mu
         # Number of zeros.
         n_zero = diff.shape[0] - non_mu.shape[0]
         # Calculate eta.

@@ -1,7 +1,7 @@
 # pylint: disable=missing-module-docstring
-import cvxpy as cp
 import numpy as np
 import pandas as pd
+import scipy.optimize as opt
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
@@ -11,10 +11,10 @@ class CorrelationDrivenNonparametricLearning(OLPS):
     reproduced with modification from the following paper:
     `Li, B., Hoi, S.C., & Gopalkrishnan, V. (2011). CORN: Correlation-driven nonparametric
     learning approach for portfolio selection. ACM TIST, 2,
-    21:1-21:29.<https://dl.acm.org/doi/abs/10.1145/1961189.1961193>_'
+    21:1-21:29.<https://dl.acm.org/doi/abs/10.1145/1961189.1961193>`_
 
     Correlation Driven Nonparametric Learning finds similar windows from the past and looks to
-    create a portfolio weights that will maximize returns in the similar sets.
+    create portfolio weights that will maximize returns in the similar sets.
     """
     # check -1 <= rho <= 1
     # check window >= 1
@@ -38,7 +38,17 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
         :param resample_by: (str) Specifies how to resample the prices.
         """
-        super(CorrelationDrivenNonparametricLearning, self)._initialize(asset_prices, weights, resample_by)
+        super(CorrelationDrivenNonparametricLearning, self)._initialize(asset_prices, weights,
+                                                                        resample_by)
+        # Check that window value is an integer.
+        if not isinstance(self.window, int):
+            raise ValueError("Window value must be an integer.")
+        # Check that window value is at least 1.
+        if self.window < 1:
+            raise ValueError("Window value must be greater than or equal to 1.")
+        # Check that rho is between -1 and 1.
+        if self.rho < -1 or self.rho > 1:
+            raise ValueError("Rho must be between -1 and 1.")
         self.corr_coef = self.calculate_rolling_correlation_coefficient()
 
     def _update_weight(self, time):
@@ -49,89 +59,41 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         :return new_weights: (np.array) Predicted weights.
         """
         similar_set = []
-        new_weights = self._uniform_weight(self.number_of_assets)
-        if _time - 1 > self.window:
-            activation_fn = np.zeros(self.final_number_of_time)
-            for i in range(self.window + 1, _time - 1):
-                if self.corr_coef[i - 1][_time - 1] > self.rho:
+        new_weights = self._uniform_weight()
+        if time - 1 > self.window:
+            activation_fn = np.zeros(self.length_of_time)
+            for i in range(self.window + 1, time - 1):
+                if self.corr_coef[i - 1][time - 1] > self.rho:
                     similar_set.append(i)
             if similar_set:
                 # put 1 for the values in the set
                 activation_fn[similar_set] = 1
-                new_weights = self._optimize(_relative_return, activation_fn, cp.SCS)
+                new_weights = self._optimize(relative_return, activation_fn, cp.SCS)
         return new_weights
 
-    # optimize the weight that maximizes the returns
-    def _optimize(self, _optimize_array, _activation_fn, _solver=None):
-        length_of_time = _optimize_array.shape[0]
-        number_of_assets = _optimize_array.shape[1]
-        if length_of_time == 1:
-            best_idx = np.argmax(_optimize_array)
-            weight = np.zeros(number_of_assets)
-            weight[best_idx] = 1
-            return weight
-
-        # initialize weights
-        weights = cp.Variable(self.number_of_assets)
-
-        # used cp.log and cp.sum to make the cost function a convex function
-        # multiplying continuous returns equates to summing over the log returns
-        portfolio_return = _activation_fn * cp.log(_optimize_array * weights)
-
-        # Optimization objective and constraints
-        allocation_objective = cp.Maximize(portfolio_return)
-        allocation_constraints = [
-                cp.sum(weights) == 1,
-                weights >= 0
-        ]
-        # Define and solve the problem
-        problem = cp.Problem(
-                objective=allocation_objective,
-                constraints=allocation_constraints
-        )
-
-        problem.solve(warm_start=True, solver=_solver)
-        return weights.value
-
-    def optimize(self,
-                 _optimize_array,
-                 _solver=cp.SCS):
+    def _fast_optimize(self, optimize_array):
         """
-        Calculates weights that maximize returns over a given _optimize_array
+        Calculates weights that maximize returns over the given array.
 
-        :param _optimize_array: (np.array) relative returns of the assets for a given time period
-        :param _solver: (cp.SOLVER) set the solver to be a particular cvxpy solver
-        :return weights.value: (np.array) weights that maximize the returns for the given optimize_array
+        :param optimize_array: (np.array) Relative returns of the assets for a given time period.
+        :return: problem.x: (np.array) Weights that maximize the returns for the given array.
         """
-        # calcualte length of time
-        length_of_time = _optimize_array.shape[0]
-        # calculate number of assets
-        number_of_assets = _optimize_array.shape[1]
-        # edge case to speed up calculation
-        if length_of_time == 1:
-            # in case that the optimize array is only one row, weights will be 1 for the highest relative return asset
-            best_idx = np.argmax(_optimize_array)
-            # initialize np.array of zeros
-            weight = np.zeros(number_of_assets)
-            # add 1 to the best performing stock
-            weight[best_idx] = 1
-            return weight
+        # Initialize guess.
+        weights = self._uniform_weight()
 
-        # initialize weights for optimization problem
-        weights = cp.Variable(self.number_of_assets)
+        # Use np.log and np.sum to make the cost function a convex function.
+        # Multiplying continuous returns equates to summing over the log returns.
+        def _objective(weight):
+            return -np.sum(np.log(np.dot(optimize_array, weight)))
 
-        # used cp.log and cp.sum to make the cost function a convex function
-        # multiplying continuous returns equates to summing over the log returns
-        portfolio_return = cp.sum(cp.log(_optimize_array * weights))
+        # Weight bounds.
+        bounds = tuple((0.0, 1.0) for asset in range(self.number_of_assets))
 
-        # Optimization objective and constraints
-        allocation_objective = cp.Maximize(portfolio_return)
-        allocation_constraints = [cp.sum(weights) == 1, cp.min(weights) >= 0]
-        # Define and solve the problem
-        problem = cp.Problem(objective=allocation_objective, constraints=allocation_constraints)
-        # if there is a specified solver use it
-        problem.solve(warm_start=True, solver=_solver)
-        return weights.value
+        # Sum of weights is 1.
+        const = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
+
+        problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds, constraints=const)
+        return problem.x
 
     def calculate_rolling_correlation_coefficient(self, _relative_return):
         """

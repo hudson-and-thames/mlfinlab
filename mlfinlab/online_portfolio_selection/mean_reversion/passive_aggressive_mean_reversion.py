@@ -42,7 +42,7 @@ class PassiveAggressiveMeanReversion(OLPS):
 
         # Check that epsilon is greater than 0.
         if self.epsilon < 0:
-            raise ValueError("Epsilon values must be greater than 0")  # CHANGEEEEE
+            raise ValueError("Epsilon values must be greater than 0")
 
         # Check that optimization method is either 0, 1, or 2.
         if self.optimization_method not in [0, 1, 2]:

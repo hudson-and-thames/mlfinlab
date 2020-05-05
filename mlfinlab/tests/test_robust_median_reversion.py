@@ -109,22 +109,16 @@ class TestRobustMedianReversion(TestCase):
             assert (weights >= 0).all()
             assert len(weights) == self.data.shape[1]
             np.testing.assert_almost_equal(np.sum(weights), 1)
-    #
-    # def test_rmr_transform(self):
-    #     """
-    #     Test the eta edge case in _transform method for RMR.
-    #     """
-    #     temp_data = self.data
-    #     temp_data[:] = 1
-    #     # Initialize RMR.
-    #     rmr7 = RobustMedianReversion(epsilon=1.1, n_iteration=10, window=3, tau=0.001)
-    #     # Allocates asset prices to RMR.
-    #     rmr7.allocate(temp_data, resample_by='M')
-    #     # Create np.array of all_weights.
-    #     all_weights = np.array(rmr7.all_weights)
-    #     # Check if all weights sum to 1.
-    #     for i in range(all_weights.shape[0]):
-    #         weights = all_weights[i]
-    #         assert (weights >= 0).all()
-    #         assert len(weights) == self.data.shape[1]
-    #         np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_rmr_transform_non_mu(self):
+        """
+        Tests edge case for _transform non_mu edge case.
+        """
+        # pylint: disable=protected-access
+        # pylint: disable=no-self-use
+        # Initialize RMR.
+        rmr7 = RobustMedianReversion(epsilon=1.1, n_iteration=10, window=3, tau=1)
+        # Make an empty array.
+        empty = np.zeros((1, 2))
+        # Calculate edge case.
+        rmr7._transform(empty, empty)
