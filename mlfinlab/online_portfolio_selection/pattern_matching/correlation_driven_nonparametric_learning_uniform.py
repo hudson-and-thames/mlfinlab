@@ -1,9 +1,7 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
-import pandas as pd
-
-from mlfinlab.online_portfolio_selection import CorrelationDrivenNonparametricLearning
 from mlfinlab.online_portfolio_selection.universal_portfolio import UniversalPortfolio
+from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import CorrelationDrivenNonparametricLearning
 
 
 class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
@@ -26,7 +24,7 @@ class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
         """
         self.window = window
         self.rho = rho
-        self.number_of_experts = len(self.window) * len(self.rho)
+        self.number_of_experts = int(self.window)
         super().__init__(number_of_experts=self.number_of_experts, weighted='uniform')
 
     def _initialize(self, asset_prices, weights, resample_by):
@@ -37,9 +35,6 @@ class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
         :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
         :param resample_by: (str) Specifies how to resample the prices.
         """
-        super(CorrelationDrivenNonparametricLearningUniform, self)._initialize(asset_prices,
-                                                                               weights,
-                                                                               resample_by)
         # Check that window value is an integer.
         if not isinstance(self.window, int):
             raise ValueError("Window value must be an integer.")
@@ -52,6 +47,10 @@ class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
         if self.rho < -1 or self.rho > 1:
             raise ValueError("Rho must be between -1 and 1.")
 
+        super(CorrelationDrivenNonparametricLearningUniform, self)._initialize(asset_prices,
+                                                                               weights,
+                                                                               resample_by)
+
     def _generate_experts(self):
         """
         Generates W experts from window of 1 to w and same rho values.
@@ -59,7 +58,7 @@ class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
         # Initialize expert parameters.
         self.expert_params = np.zeros((self.number_of_experts, 2))
         # Assign number of windows to each experts.
-        for n_window in self.window:
+        for n_window in range(self.window):
             self.expert_params[n_window-1] = [n_window + 1, self.rho]
 
         for exp in range(self.number_of_experts):

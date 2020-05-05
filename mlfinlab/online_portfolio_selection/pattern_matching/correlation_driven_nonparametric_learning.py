@@ -64,8 +64,6 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         new_weights = self._uniform_weight()
         # Calculate for similar sets if time is greater or equal to window size.
         if time >= self.window:
-            # Create activation_fn to set which time period is relevant.
-            activation_fn = np.zeros(self.length_of_time)
             # Iterate through past windows.
             for past_time in range(time - self.window + 1):
                 # Check for windows that are above rho.
