@@ -78,8 +78,8 @@ def get_ind_mat_label_uniqueness(ind_mat):
 
     Returns the indicator matrix element uniqueness.
 
-    :param ind_mat: (np.matrix) indicator binary matrix
-    :return: (np.matrix) element uniqueness
+    :param ind_mat: (np.matrix) Indicator binary matrix
+    :return: (np.matrix) Element uniqueness
     """
     concurrency = ind_mat.sum(axis=1)
     uniqueness = ind_mat.T / concurrency

@@ -126,8 +126,8 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
     :param clustered_subsets: (list) Feature clusters for Clustered Feature Importance (CFI). Default None will not apply CFI.
                               Structure of the input must be a list of list/s i.e. a list containing the clusters/subsets of feature
                               name/s inside a list. E.g- [['I_0','I_1','R_0','R_1'],['N_1','N_2'],['R_3']]
-    :param sample_weight_train: A numpy array of sample weights used to train the model for each record in the dataset.
-    :param sample_weight_score: A numpy array of sample weights used to evaluate the model quality.
+    :param sample_weight_train: (np.array) Sample weights used to train the model for each record in the dataset.
+    :param sample_weight_score: (np.array) Sample weights used to evaluate the model quality.
     :param scoring: (function): Scoring function used to determine importance.
     :param random_state: (int) Random seed for shuffling the features.
     :return: (pd.DataFrame): Mean and standard deviation of feature importance.
@@ -212,8 +212,8 @@ def single_feature_importance(clf, X, y, cv_gen, sample_weight_train=None, sampl
     :param X: (pd.DataFrame): Train set features.
     :param y: (pd.DataFrame, np.array): Train set labels.
     :param cv_gen: (cross_validation.PurgedKFold): Cross-validation object.
-    :param sample_weight_train: A numpy array of sample weights used to train the model for each record in the dataset.
-    :param sample_weight_score: A numpy array of sample weights used to evaluate the model quality.
+    :param sample_weight_train: (np.array) Sample weights used to train the model for each record in the dataset.
+    :param sample_weight_score: (np.array) Sample weights used to evaluate the model quality.
     :param scoring: (function): Scoring function used to determine importance.
     :return: (pd.DataFrame): Mean and standard deviation of feature importance.
     """
