@@ -84,9 +84,10 @@ class OnlineMovingAverageReversion(OLPS):
             lambd = 0
         # If not, adjust lambda, a multiplicative constant.
         else:
-            try:
-                lambd = loss_fn / (np.linalg.norm(predicted_change - mean_change) ** 2)
-            except:
+            check = np.linalg.norm(predicted_change - mean_change) ** 2
+            if check != 0:
+                lambd = loss_fn / check
+            else:
                 lambd = 0
         new_weights = self.weights + lambd * (predicted_change - mean_change)
         # Projects new weights to simplex domain.
