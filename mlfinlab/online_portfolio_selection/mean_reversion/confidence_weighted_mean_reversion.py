@@ -99,11 +99,11 @@ class ConfidenceWeightedMeanReversion(OLPS):
             # Component for new variance calculation.
             sqrt_u = (-lambd * self.theta * new_v + np.sqrt(lambd ** 2 * self.theta ** 2 * new_v ** 2 + 4 * new_v)) / 2
             # Update variance.
-            self.sigma = np.linalg.inv(np.linalg.inv(self.sigma) + lambd * self.theta / sqrt_u * np.diag(curr_relative_return) ** 2)
+            self.sigma = np.linalg.pinv(np.linalg.pinv(self.sigma) + lambd * self.theta / sqrt_u * np.diag(curr_relative_return) ** 2)
         if self.method == 'var':
             # Update variance.
-            self.sigma = np.linalg.inv(
-                np.linalg.inv(self.sigma) + 2 * lambd * self.theta * np.diag(curr_relative_return) ** 2)
+            self.sigma = np.linalg.pinv(
+                np.linalg.pinv(self.sigma) + 2 * lambd * self.theta * np.diag(curr_relative_return) ** 2)
         # Normalize variance.
         self.sigma /= new_m * np.trace(self.sigma)
         # Simplex projection.

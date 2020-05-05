@@ -16,8 +16,7 @@ class CorrelationDrivenNonparametricLearning(OLPS):
     Correlation Driven Nonparametric Learning finds similar windows from the past and looks to
     create portfolio weights that will maximize returns in the similar sets.
     """
-    # check -1 <= rho <= 1
-    # check window >= 1
+
     def __init__(self, window, rho):
         """
         Initializes Correlation Driven Nonparametric Learning with the given window and rho value.
@@ -27,7 +26,7 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         """
         self.window = window
         self.rho = rho
-        self.corr_coef = None
+        self.corr_coef = None  # (np.array) Rolling correlation coefficients.
         super().__init__()
 
     def _initialize(self, asset_prices, weights, resample_by):
@@ -43,9 +42,11 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         # Check that window value is an integer.
         if not isinstance(self.window, int):
             raise ValueError("Window value must be an integer.")
+
         # Check that window value is at least 1.
         if self.window < 1:
             raise ValueError("Window value must be greater than or equal to 1.")
+
         # Check that rho is between -1 and 1.
         if self.rho < -1 or self.rho > 1:
             raise ValueError("Rho must be between -1 and 1.")
@@ -58,17 +59,24 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         :param time: (int) Current time period.
         :return new_weights: (np.array) Predicted weights.
         """
+        # Create similar set.
         similar_set = []
+        # Default is uniform weights.
         new_weights = self._uniform_weight()
-        if time - 1 > self.window:
+        # Calculate for similar sets if time is greater or equal to window size.
+        if time >= self.window:
+            # Create activation_fn to set which time period is relevant.
             activation_fn = np.zeros(self.length_of_time)
-            for i in range(self.window + 1, time - 1):
-                if self.corr_coef[i - 1][time - 1] > self.rho:
-                    similar_set.append(i)
+            # Iterate through past windows.
+            for past_time in range(time - self.window + 1):
+                # Check for windows that are above rho.
+                if self.corr_coef[time - self.window + 1][past_time] > self.rho:
+                    # Append the time for similar set.
+                    similar_set.append(past_time + self.window)
             if similar_set:
-                # put 1 for the values in the set
-                activation_fn[similar_set] = 1
-                new_weights = self._optimize(relative_return, activation_fn, cp.SCS)
+                # Choose the corresponding relative return periods.
+                optimize_array = self.relative_return[similar_set]
+                new_weights = self._fast_optimize(optimize_array)
         return new_weights
 
     def _fast_optimize(self, optimize_array):
@@ -92,20 +100,23 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         # Sum of weights is 1.
         const = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
 
-        problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds, constraints=const)
+        problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds,
+                               constraints=const)
         return problem.x
 
-    def calculate_rolling_correlation_coefficient(self, _relative_return):
+    def calculate_rolling_correlation_coefficient(self):
         """
         Calculates the rolling correlation coefficient for a given relative return and window
 
-        :param _relative_return: (np.array) relative returns of a certain time period specified by the strategy
-        :return rolling_corr_coef: (np.array) rolling correlation coefficient over a given window
+        :return rolling_corr_coef: (np.array) Rolling correlation coefficient over a given window.
         """
-        # take the log of the relative return
-        # first calculate the rolling window the relative return
-        # sum the data which returns the log of the window's return
-        # take the exp to revert back to the original window's returns
-        # calculate the correlation coefficient for the different window's overall returns
-        rolling_corr_coef = np.corrcoef(np.exp(np.log(pd.DataFrame(_relative_return)).rolling(self.window).sum()))
+        # Flatten the array.
+        flattened = self.relative_return.flatten()
+        # Set index of rolled window.
+        idx = np.arange(self.number_of_assets * self.window)[None, :] + self.number_of_assets * \
+              np.arange(self.length_of_time - self.window + 1)[:, None]
+        # Retrieve the results of the rolled window.
+        rolled_returns = flattened[idx]
+        # Calculate correlation coefficient.
+        rolling_corr_coef = np.corrcoef(rolled_returns)
         return rolling_corr_coef
