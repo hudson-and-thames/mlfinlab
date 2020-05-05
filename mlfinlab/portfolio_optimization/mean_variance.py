@@ -64,9 +64,8 @@ class MeanVarianceOptimisation:
                                Currently supported solution strings - inverse_variance, min_volatility, max_sharpe,
                                efficient_risk, max_return_min_volatility, max_diversification, efficient_return
                                and max_decorrelation
-        :param risk_free_rate: (float) the rate of return for a risk-free asset.
         :param target_return: (float) target return of the portfolio
-        :param target_risk: (float)
+        :param target_risk: (float) target risk of the portfolio
         :param risk_aversion: (float) quantifies the risk averse nature of the investor - a higher value means
                                       more risk averse and vice-versa
         :param weight_bounds: (dict/tuple) can be either a single tuple of upper and lower bounds
@@ -153,17 +152,20 @@ class MeanVarianceOptimisation:
         """
         Create a portfolio using custom objective and constraints.
 
-        :param custom_objective:
-        :param weight_bounds:
-        :param asset_names:
-        :param asset_prices:
-        :param expected_asset_returns:
-        :param covariance_matrix:
-        :param target_return:
-        :param target_risk:
-        :param risk_aversion:
-        :param resample_by:
-        :return:
+        :param custom_objective: (dict) a custom objective function with custom constraints. You need to write it in the form
+                                        expected by cvxpy. The objective will be a single string while the constraints can be a
+                                        list of strings specifying the constraints. For e.g. {'objective': 'cp.Maximisie(
+                                        expected_asset_returns)', 'constraints': ['weights >= 0', 'weights <= 1]}.
+        :param asset_names: (list) a list of strings containing the asset names
+        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
+        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
+        :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns (sigma)
+        :param target_return: (float) target return of the portfolio
+        :param target_risk: (float) target risk of the portfolio
+        :param risk_aversion: (float) quantifies the risk averse nature of the investor - a higher value means
+                                      more risk averse and vice-versa
+        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+                                  None for no resampling
         """
 
         asset_names = self._error_checks(asset_names, asset_prices, expected_asset_returns, covariance_matrix)
