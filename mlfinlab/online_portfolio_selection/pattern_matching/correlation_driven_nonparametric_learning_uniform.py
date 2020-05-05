@@ -15,7 +15,7 @@ class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
     21:1-21:29.<https://dl.acm.org/doi/abs/10.1145/1961189.1961193>`_
 
     Correlation Driven Nonparametric Learning Uniform creates W experts that each follow the CORN
-    strategy with the same rhp value and a different window value. After each period, the weights
+    strategy with the same rho value and different window values. After each period, the weights
     are evenly distributed among all the experts to follow the uniform weights allocation method
     for the universal portfolio strategy.
     """
@@ -54,29 +54,14 @@ class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
 
     def _generate_experts(self):
         """
-        Generates w experts, each with different window values.
+        Generates W experts from window of 1 to w and same rho values.
         """
         # Initialize expert parameters.
         self.expert_params = np.zeros((self.number_of_experts, 2))
-        # Pointer to iterate through parameters.
-        pointer = 0
+        # Assign number of windows to each experts.
         for n_window in self.window:
-            self.expert_params[n_window-1] = []
-            self.expert_params[pointer] = [n_window, self.rho]
-            pointer += 1
+            self.expert_params[n_window-1] = [n_window + 1, self.rho]
 
         for exp in range(self.number_of_experts):
             param = self.expert_params[exp]
             self.experts.append(CorrelationDrivenNonparametricLearning(int(param[0]), param[1]))
-
-    def _calculate_weights_on_experts(self):
-        """
-        Calculates the weight allocation on each experts
-        Weights rebalanced to give equal allocation to all managers
-
-        :return: (None) set weights_on_experts
-        """
-
-        # weight allocated is 1/n for all experts
-        expert_returns_ratio = np.ones(self.expert_portfolio_returns.shape) / self.number_of_experts
-        self.weights_on_experts = expert_returns_ratio
