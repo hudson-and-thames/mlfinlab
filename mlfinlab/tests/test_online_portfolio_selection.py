@@ -168,6 +168,8 @@ class TestOLPS(TestCase):
         """
         # Initialize OLPS.
         olps10 = OLPS()
+        # Allocates asset prices to OLPS with verbose=True.
+        olps10.allocate(self.data, resample_by='M')
         # Negative weights.
         neg_weight = np.array([-10e20, -10e20])
         np.testing.assert_almost_equal(olps10._simplex_projection(neg_weight), np.array([0.5, 0.5]))
