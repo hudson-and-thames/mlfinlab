@@ -9,7 +9,7 @@ from numba import njit
 
 
 @njit
-def calculate_t_values(subset, min_sample_length, step):
+def calculate_t_values(subset, min_sample_length, step):  # pragma: no cover
     """
     For loop for calculating linear regression every n steps.
 
@@ -19,7 +19,7 @@ def calculate_t_values(subset, min_sample_length, step):
     max_abs_t_value = -np.inf  # Maximum abs t-value of b_1 coefficient among l values
     max_t_value_index = None  # Index with maximum t-value
 
-    for forward_window in np.arange(min_sample_length, subset.shape[0], step):    # pragma: no cover
+    for forward_window in np.arange(min_sample_length, subset.shape[0], step):
 
         y_subset = subset[:forward_window].reshape(-1, 1)  # y{t}:y_{t+l}
 
