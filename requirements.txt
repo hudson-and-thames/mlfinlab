@@ -1,7 +1,7 @@
 codecov==2.0.15
 coverage==4.5.2
 cvxpy==1.0.25
-numba==0.47.0
+numba==0.49.0
 numpy==1.17.3
 matplotlib==3.1.1
 pandas==0.25.3
