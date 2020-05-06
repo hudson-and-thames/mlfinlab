@@ -19,7 +19,7 @@ def calculate_t_values(subset, min_sample_length, step):
     max_abs_t_value = -np.inf  # Maximum abs t-value of b_1 coefficient among l values
     max_t_value_index = None  # Index with maximum t-value
 
-    for forward_window in np.arange(min_sample_length, subset.shape[0], step):
+    for forward_window in np.arange(min_sample_length, subset.shape[0], step):    # pragma: no cover
 
         y_subset = subset[:forward_window].reshape(-1, 1)  # y{t}:y_{t+l}
 
@@ -36,8 +36,8 @@ def calculate_t_values(subset, min_sample_length, step):
 
         # get coefficient and std from linear regression
         if det == 0:
-            b_mean = [np.nan]
-            b_std = [[np.nan, np.nan]]
+            b_mean = np.array([[np.nan]])
+            b_std = np.array([[np.nan, np.nan]])
         else:
             xx_inv = np.linalg.inv(xx_)
             b_mean = xx_inv @ xy_
