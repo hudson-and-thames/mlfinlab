@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning_k import CorrelationDrivenNonparametricLearningK
-from mlfinlab.online_portfolio_selection.pattern_matching.SCORN import SCORN
+from mlfinlab.online_portfolio_selection.pattern_matching.symmetric_correlation_driven_nonparametric_learning import SymmetricCorrelationDrivenNonparametricLearning
 
 
 class SCORN_K(CorrelationDrivenNonparametricLearningK):
@@ -12,7 +12,7 @@ class SCORN_K(CorrelationDrivenNonparametricLearningK):
 
     def _generate_experts(self):
         """
-        Generates n experts for SCORN-K strategy
+        Generates n experts for SymmetricCorrelationDrivenNonparametricLearning-K strategy
 
         :return:
         """
@@ -25,7 +25,7 @@ class SCORN_K(CorrelationDrivenNonparametricLearningK):
 
         for exp in range(self.number_of_experts):
             param = self.expert_params[exp]
-            self.experts.append(SCORN(int(param[0]), param[1]))
+            self.experts.append(SymmetricCorrelationDrivenNonparametricLearning(int(param[0]), param[1]))
 
 
 def main():

@@ -1,10 +1,10 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.pattern_matching.SCORN import SCORN
+from mlfinlab.online_portfolio_selection.pattern_matching.symmetric_correlation_driven_nonparametric_learning import SymmetricCorrelationDrivenNonparametricLearning
 
 
-class FCORN(SCORN):
+class FCORN(SymmetricCorrelationDrivenNonparametricLearning):
     """
     This class implements the Functional Correlation Driven Nonparametric Learning strategy.
     """
