@@ -285,7 +285,7 @@ class RiskEstimators:
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
         the calculate_returns method from the ReturnsEstimation class.
 
-        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
         :param assume_centered: (bool) Flag for data with mean significantly equal to zero
                                        (Read the documentation for MinCovDet class).
@@ -328,7 +328,7 @@ class RiskEstimators:
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
         the calculate_returns method from the ReturnsEstimation class.
 
-        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
         :param assume_centered: (bool) Flag for data with mean almost, but not exactly zero
                                        (Read documentation for EmpiricalCovariance class).
@@ -369,7 +369,7 @@ class RiskEstimators:
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
         the calculate_returns method from the ReturnsEstimation class.
 
-        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
         :param shrinkage_type: (str) Type of shrinkage to use ('basic','lw','oas','all').
         :param assume_centered: (bool) Flag for data with mean almost, but not exactly zero
@@ -415,7 +415,7 @@ class RiskEstimators:
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
         the calculate_returns method from the ReturnsEstimation class.
 
-        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
         :param threshold_return: (float) Required return for each period in the frequency of the input data
                                          (If the input data is daily, it's a daily threshold return).
@@ -468,7 +468,7 @@ class RiskEstimators:
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
         the calculate_returns method from the ReturnsEstimation class.
 
-        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
         :param window_span: (int) Used to specify decay in terms of span for the exponentially-weighted series.
         :return: (np.array) Exponentially-weighted Covariance matrix.
