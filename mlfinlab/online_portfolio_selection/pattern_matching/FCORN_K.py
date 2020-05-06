@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 from mlfinlab.online_portfolio_selection.universal_portfolio import UniversalPortfolio
-from mlfinlab.online_portfolio_selection.pattern_matching.FCORN import FCORN
+from mlfinlab.online_portfolio_selection.pattern_matching.functional_symmetric_correlation_driven_nonparametric_learning import FCORN
 
 
 class FCORN_K(UniversalPortfolio):
