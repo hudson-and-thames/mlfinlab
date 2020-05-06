@@ -5,8 +5,8 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.pattern_matching.symmetric_correlation_driven_nonparametric_learning \
-    import SymmetricCorrelationDrivenNonparametricLearning
+from mlfinlab.online_portfolio_selection.pattern_matching.functional_symmetric_correlation_driven_nonparametric_learning \
+    import FunctionalCorrelationDrivenNonparametricLearning
 
 
 class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
@@ -27,16 +27,16 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
         # Read csv, parse dates, and drop NaN.
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date").dropna(axis=1)
 
-    def test_scorn_solution(self):
+    def test_fcorn_solution(self):
         """
-        Test the calculation of SCORN.
+        Test the calculation of FCORN.
         """
-        # Initialize SCORN.
-        scorn = SymmetricCorrelationDrivenNonparametricLearning(window=2, rho=0.5)
-        # Allocates asset prices to SCORN.
-        scorn.allocate(self.data, resample_by='M')
+        # Initialize FCORN.
+        fcorn = FunctionalCorrelationDrivenNonparametricLearning(window=1, rho=0.5, lambd=10)
+        # Allocates asset prices to FCORN.
+        fcorn.allocate(self.data, resample_by='Y')
         # Create np.array of all_weights.
-        all_weights = np.array(scorn.all_weights)
+        all_weights = np.array(fcorn.all_weights)
         # Check if all weights sum to 1.
         for i in range(all_weights.shape[0]):
             weights = all_weights[i]

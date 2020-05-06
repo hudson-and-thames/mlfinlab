@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 from mlfinlab.online_portfolio_selection.universal_portfolio import UniversalPortfolio
-from mlfinlab.online_portfolio_selection.pattern_matching.functional_symmetric_correlation_driven_nonparametric_learning import FCORN
+from mlfinlab.online_portfolio_selection.pattern_matching.functional_symmetric_correlation_driven_nonparametric_learning import FunctionalCorrelationDrivenNonparametricLearning
 
 
 class FCORN_K(UniversalPortfolio):
@@ -23,7 +23,7 @@ class FCORN_K(UniversalPortfolio):
 
     def _generate_experts(self):
         """
-        Generates n experts for FCORN-K strategy
+        Generates n experts for FunctionalCorrelationDrivenNonparametricLearning-K strategy
 
         :return:
         """
@@ -37,7 +37,7 @@ class FCORN_K(UniversalPortfolio):
 
         for exp in range(self.number_of_experts):
             param = self.expert_params[exp]
-            self.experts.append(FCORN(window=int(param[0]), rho=param[1], lamb=param[2]))
+            self.experts.append(FunctionalCorrelationDrivenNonparametricLearning(window=int(param[0]), rho=param[1], lamb=param[2]))
 
 
 def main():
