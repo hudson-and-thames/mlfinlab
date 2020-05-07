@@ -44,6 +44,7 @@ class HierarchicalRiskParity:
         # pylint: disable=invalid-name, too-many-branches
         """
         Calculate asset allocations using HRP algorithm.
+
         :param asset_names: (list) a list of strings containing the asset names
         :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
                                             indexed by date
@@ -116,6 +117,7 @@ class HierarchicalRiskParity:
     def _tree_clustering(distance, method='single'):
         """
         Perform the traditional heirarchical tree clustering.
+
         :param correlation: (np.array) correlation matrix of the assets
         :param method: (str) the type of clustering to be done
         :return: distance matrix and clusters
@@ -126,6 +128,7 @@ class HierarchicalRiskParity:
     def _quasi_diagnalization(self, num_assets, curr_index):
         """
         Rearrange the assets to reorder them according to hierarchical tree clustering order.
+
         :param num_assets: (int) the total number of assets
         :param curr_index: (int) current index
         :return: (list) the assets rearranged according to hierarchical clustering
@@ -143,6 +146,7 @@ class HierarchicalRiskParity:
         """
         Based on the quasi-diagnalization, reorder the original distance matrix, so that assets within
         the same cluster are grouped together.
+
         :param assets: (list) list of asset names in the portfolio
         :param distance: (pd.Dataframe) distance values between asset returns
         :param correlation: (pd.Dataframe) correlations between asset returns
@@ -158,6 +162,7 @@ class HierarchicalRiskParity:
     def _get_inverse_variance_weights(covariance):
         """
         Calculate the inverse variance weight allocations.
+
         :param covariance: (pd.Dataframe) covariance matrix of assets
         :return: (list) inverse variance weight values
         """
@@ -169,6 +174,7 @@ class HierarchicalRiskParity:
     def _get_cluster_variance(self, covariance, cluster_indices):
         """
         Calculate cluster variance.
+
         :param covariance: (pd.Dataframe) covariance matrix of assets
         :param cluster_indices: (list) list of asset indices for the cluster
         :return: (float) variance of the cluster
@@ -182,6 +188,7 @@ class HierarchicalRiskParity:
     def _recursive_bisection(self, covariance, assets, side_weights):
         """
         Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets.
+
         :param covariance: (pd.Dataframe) the covariance matrix
         :param assets: (list) list of asset names in the portfolio
         """
@@ -227,6 +234,7 @@ class HierarchicalRiskParity:
     def plot_clusters(self, assets):
         """
         Plot a dendrogram of the hierarchical clusters.
+
         :param assets: (list) list of asset names in the portfolio
         """
 
@@ -237,6 +245,7 @@ class HierarchicalRiskParity:
     def _shrink_covariance(asset_returns):
         """
         Regularise/Shrink the asset covariances.
+
         :param asset_returns: (pd.Dataframe) asset returns
         :return: (pd.Dataframe) shrinked asset returns covariances
         """
@@ -250,6 +259,7 @@ class HierarchicalRiskParity:
     def _cov2corr(covariance):
         """
         Calculate the correlations from asset returns covariance matrix.
+        
         :param covariance: (pd.Dataframe) asset returns covariances
         :return: (pd.Dataframe) correlations between asset returns
         """
