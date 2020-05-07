@@ -35,6 +35,34 @@ Implementation
 
         .. automethod:: __init__
 
+.. code-block::
+
+    import pandas as pd
+    from mlfinlab.portfolio_optimization.hrp import HierarchicalClusteringAssetAllocation
+
+    # Read in data
+    stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
+
+    # Compute HRP weights for minimum variance by specifying the number of clusters
+    hcaa = HierarchicalClusteringAssetAllocation()
+    hcaa.allocate(asset_prices=stock_prices,
+                      asset_names=stock_prices.columns,
+                      optimal_num_clusters=5,
+                      allocation_metric='minimum_variance')
+    weights = hcaa.weights
+
+    # Building a dollar neutral Long/Short portfolio by shorting the first 4 stocks and being long the others
+    hcaa = HierarchicalClusteringAssetAllocation()
+    side_weights = pd.Series([1] * stock_prices.shape[1], index=stock_prices.columns)
+    side_weights.loc[stock_prices.columns[:4]] = -1
+    hcaa.allocate(asset_prices=stock_prices,
+                  asset_names=stock_prices.columns,
+                  optimal_num_clusters=5,
+                  allocation_metric='equal_weighting',
+                  side_weights=side_weights)
+    weights = hcaa.weights
+
+
 .. tip::
     **What are the differences between the 3 Linkage Algorithms?**
 
