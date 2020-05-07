@@ -3,6 +3,8 @@ Tests different algorithms in the Mean Variance class.
 """
 
 import unittest
+from unittest.mock import patch
+from io import StringIO
 import os
 import numpy as np
 import pandas as pd
@@ -338,6 +340,19 @@ class TestMVO(unittest.TestCase):
                          weight_bounds=(0.9, 1),
                          asset_names=self.data.columns)
 
+    def test_value_error_for_no_quadratic_utlity_optimal_weights(self):
+        # pylint: disable=invalid-name
+        """
+        Test ValueError when no optimal weights are found for max return-minimum volatility solution.
+        """
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation()
+            mvo.allocate(asset_prices=self.data,
+                         solution='max_return_min_volatility',
+                         weight_bounds=(0.9, 1),
+                         asset_names=self.data.columns)
+
     def test_value_error_for_no_max_sharpe_optimal_weights(self):
         # pylint: disable=invalid-name
         """
@@ -361,6 +376,45 @@ class TestMVO(unittest.TestCase):
             mvo = MeanVarianceOptimisation()
             mvo.allocate(asset_prices=self.data,
                          solution='efficient_risk',
+                         weight_bounds=(0.9, 1),
+                         asset_names=self.data.columns)
+
+    def test_value_error_for_no_efficient_return_optimal_weights(self):
+        # pylint: disable=invalid-name
+        """
+        Test ValueError when no optimal weights are found for efficient return solution.
+        """
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation()
+            mvo.allocate(asset_prices=self.data,
+                         solution='efficient_return',
+                         weight_bounds=(0.9, 1),
+                         asset_names=self.data.columns)
+
+    def test_value_error_for_no_max_diversification_optimal_weights(self):
+        # pylint: disable=invalid-name
+        """
+        Test ValueError when no optimal weights are found for max diversification solution.
+        """
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation()
+            mvo.allocate(asset_prices=self.data,
+                         solution='max_diversification',
+                         weight_bounds=(0.9, 1),
+                         asset_names=self.data.columns)
+
+    def test_value_error_for_no_max_decorrelation_optimal_weights(self):
+        # pylint: disable=invalid-name
+        """
+        Test ValueError when no optimal weights are found for max decorrelation solution.
+        """
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation()
+            mvo.allocate(asset_prices=self.data,
+                         solution='max_decorrelation',
                          weight_bounds=(0.9, 1),
                          asset_names=self.data.columns)
 
@@ -433,3 +487,29 @@ class TestMVO(unittest.TestCase):
                                                                                      resample_by='W')
             covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
             mvo.allocate(expected_asset_returns=expected_returns, covariance_matrix=covariance.values)
+
+    def test_portfolio_metrics(self):
+        """
+        Test the printing of portfolio metrics to stdout.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        mvo.allocate(asset_prices=self.data)
+        with patch('sys.stdout', new=StringIO()) as fake_out:
+            mvo.get_portfolio_metrics()
+            output = fake_out.getvalue().strip()
+            self.assertTrue('Portfolio Return = 0.017362404155484328' in output)
+            self.assertTrue('Portfolio Risk = 9.385801639141577e-06' in output)
+            self.assertTrue('Portfolio Sharpe Ratio = 9.385801639141577e-06' in output)
+
+    def test_custom_objective_function(self):
+        """
+        Test custom portfolio objective and allocation constraints.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        custom_obj = {
+            'objective': 'cp.Minimize(risk)',
+            'constraints': ['cp.sum(weights) == 1', 'weights >= 0', 'weights <= 1']
+        }
+        mvo.allocate_custom_objective(custom_objective=custom_obj, asset_prices=self.data)

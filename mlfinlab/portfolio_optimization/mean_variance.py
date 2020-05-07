@@ -186,7 +186,9 @@ class MeanVarianceOptimisation:
         # Optimisation objective and constraints
         objective, constraints = custom_objective['objective'], custom_objective['constraints']
         allocation_objective = eval(objective)
-        allocation_constraints = [eval(constraint) for constraint in constraints]
+        allocation_constraints = []
+        for constraint in constraints:
+            allocation_constraints.append(eval(constraint))
 
         # Define and solve the problem
         problem = cp.Problem(
@@ -251,7 +253,7 @@ class MeanVarianceOptimisation:
                 volatilities.append(self.portfolio_risk)
                 returns.append(portfolio_return)
                 sharpe_ratios.append((portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5 + 1e-16))
-            except:
+            except Exception:
                 continue
         max_sharpe_ratio_index = sharpe_ratios.index(max(sharpe_ratios))
         min_volatility_index = volatilities.index(min(volatilities))
@@ -728,4 +730,3 @@ class MeanVarianceOptimisation:
         self.weights = weights.value
         self.portfolio_risk = risk.value
         self.portfolio_return = portfolio_return.value[0]
-
