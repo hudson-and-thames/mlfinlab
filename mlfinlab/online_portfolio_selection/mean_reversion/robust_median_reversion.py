@@ -77,8 +77,11 @@ class RobustMedianReversion(OLPS):
         predicted_deviation = current_prediction - np.ones(self.number_of_assets) * np.mean(
             current_prediction)
         # Calculate alpha, the lagrangian multiplier.
-        alpha = np.minimum(0, current_prediction * self.weights - self.epsilon / np.linalg.norm(
-            predicted_deviation, ord=2))
+        norm2 = np.linalg.norm(predicted_deviation, ord=2)
+        if norm2 == 0:
+            alpha = np.minimum(0, current_prediction * self.weights)
+        else:
+            alpha = np.minimum(0, current_prediction * self.weights - self.epsilon / norm2)
         # Update new weights.
         new_weights = self.weights - alpha * predicted_deviation
         # Project to simplex domain.
