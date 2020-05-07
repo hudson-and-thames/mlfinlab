@@ -401,10 +401,12 @@ class HierarchicalClusteringAssetAllocation:
         # Build Long/Short portfolio if needed
         short_ptf = side_weights[side_weights == -1].index
         buy_ptf = side_weights[side_weights == 1].index
+
         if not short_ptf.empty:
             # Short half size
             self.weights.loc[short_ptf] /= self.weights.loc[short_ptf].sum().values[0]
             self.weights.loc[short_ptf] *= -0.5
+            
             # Buy other half
             self.weights.loc[buy_ptf] /= self.weights.loc[buy_ptf].sum().values[0]
             self.weights.loc[buy_ptf] *= 0.5
