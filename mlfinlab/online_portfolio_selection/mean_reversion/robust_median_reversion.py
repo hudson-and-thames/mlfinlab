@@ -84,8 +84,7 @@ class RobustMedianReversion(OLPS):
         # If norm2 is zero, return previous weights.
         if norm2 == 0:
             return self.weights
-        else:
-            alpha = np.minimum(0, (current_prediction * self.weights - self.epsilon) / norm2)
+        alpha = np.minimum(0, (current_prediction * self.weights - self.epsilon) / norm2)
         # Update new weights.
         new_weights = self.weights - alpha * predicted_deviation
         # Project to simplex domain.
