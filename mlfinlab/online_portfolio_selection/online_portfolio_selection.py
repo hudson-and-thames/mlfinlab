@@ -319,6 +319,11 @@ class OLPS:
         # Determine the conditions.
         cond = _mu - adjusted_sum / j > 0
 
+        # If all conditions are false, return uniform weight.
+        if not cond.any():
+            uniform_weight = np.ones(len(weight)) / len(weight)
+            return uniform_weight
+
         # Define max rho.
         rho = float(j[cond][-1])
 
