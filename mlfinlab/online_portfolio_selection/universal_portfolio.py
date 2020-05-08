@@ -29,6 +29,8 @@ class UniversalPortfolio(OLPS):
         :param number_of_experts: (int) Number of total experts
         :param weighted: (str) Capital allocation method. 'hist_performance': Historical Performance,
                                'uniform': Uniform Weights, 'top-k': Top-K experts.
+        :param k: (int) Number of experts to choose your portfolio. Only necessary if weighted is
+                        'top-k'.
         """
         self.experts = []  # (list) Array to store all experts
         self.number_of_experts = number_of_experts  # (int) Set the number of experts.
@@ -68,6 +70,7 @@ class UniversalPortfolio(OLPS):
         Runs the algorithm by iterating through the given data.
 
         :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :param verbose: (boolean) Prints progress bar if true.
         """
         # Run allocate on all the experts.
         for exp in range(self.number_of_experts):

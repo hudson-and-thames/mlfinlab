@@ -29,7 +29,7 @@ class RobustMedianReversion(OLPS):
         self.n_iteration = n_iteration
         self.window = window
         self.tau = tau
-        self.predicted_relatives = None  # (np.array) Predicted relatives using l1 median.
+        self.np_asset_prices = None  # (np.array) Asset prices converted to np.array.
         super().__init__()
 
     def _initialize(self, asset_prices, weights, resample_by):
@@ -62,7 +62,7 @@ class RobustMedianReversion(OLPS):
         if self.window < 2:
             raise ValueError("Window must be greater or equal to 2.")
 
-        self.predicted_relatives = self._calculate_predicted_relatives()
+        self.np_asset_prices = np.array(self.asset_prices)
 
     def _update_weight(self, time):
         """
@@ -71,14 +71,21 @@ class RobustMedianReversion(OLPS):
         :param time: (int) Current time period.
         :return new_weights: (np.array) Predicted weights.
         """
+        # Until the relative time window, return original weights.
+        if time < self.window - 1:
+            return self.weights
         # Set the current predicted relatives value.
-        current_prediction = self.predicted_relatives[time]
+        current_prediction = self._calculate_predicted_relatives(time)
         # Set the deviation from the mean of current prediction.
         predicted_deviation = current_prediction - np.ones(self.number_of_assets) * np.mean(
             current_prediction)
         # Calculate alpha, the lagrangian multiplier.
-        alpha = np.minimum(0, current_prediction * self.weights - self.epsilon / np.linalg.norm(
-            predicted_deviation, ord=2))
+        norm2 = np.linalg.norm(predicted_deviation, ord=1) ** 2
+        # If norm2 is zero, return previous weights.
+        if norm2 == 0:
+            return self.weights
+        else:
+            alpha = np.minimum(0, (current_prediction * self.weights - self.epsilon) / norm2)
         # Update new weights.
         new_weights = self.weights - alpha * predicted_deviation
         # Project to simplex domain.
@@ -86,42 +93,29 @@ class RobustMedianReversion(OLPS):
 
         return new_weights
 
-    def _calculate_predicted_relatives(self):
+    def _calculate_predicted_relatives(self, time):
         # pylint: disable=unsubscriptable-object
         """
         Calculates the predicted relatives using l1 median.
 
         :return predicted_relatives: (np.array) Predicted relatives using l1 median.
         """
-        # Copy to np.array for speed.
-        np_asset_prices = np.array(self.asset_prices)
-        # Initialize new np.array for prediction.
-        predicted = np.ones(np_asset_prices.shape)
-        # Iterate until the end of time while rolling over the windows.
-        for rolling in range(self.window-1, predicted.shape[0]):
-            predicted[rolling] = self._calc_median(np_asset_prices[rolling - self.window + 1:rolling + 1])
-        # Divide by the current time's price.
-        predicted_relatives = predicted / np_asset_prices
-        return predicted_relatives
+        # Calculate the L1 median of the price window.
+        price_window = self.np_asset_prices[time-self.window+1:time+1]
+        curr_prediction = np.median(price_window, axis=0)
 
-    def _calc_median(self, price_window):
-        """
-        Calculates the L1 median of the price window.
-
-        :param price_window: (np.array) A window of prices provided by the user.
-        :return: new_mu: (np.array) Calculated L1 median approximation
-        """
-        # First step is the median of the prices.
-        old_mu = np.median(price_window, axis=0)
-        new_mu = old_mu
         # Iterate until the maximum iteration allowed.
         for _ in range(self.n_iteration - 1):
+            prev_prediction = curr_prediction
             # Transform mu according the Modified Weiszfeld Algorithm
-            new_mu = self._transform(old_mu, price_window)
+            curr_prediction = self._transform(curr_prediction, price_window)
             # If condition is satisfied, break.
-            if np.linalg.norm(old_mu - new_mu, ord=1) <= self.tau * np.linalg.norm(new_mu, ord=1):
+            if np.linalg.norm(prev_prediction - curr_prediction, ord=1) <= self.tau * np.linalg.norm(curr_prediction, ord=1):
                 break
-        return new_mu
+
+        # Divide by the current time's price.
+        predicted_relatives = curr_prediction / price_window[-1]
+        return predicted_relatives
 
     @staticmethod
     def _transform(old_mu, price_window):

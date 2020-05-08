@@ -122,3 +122,15 @@ class TestRobustMedianReversion(TestCase):
         empty = np.zeros((1, 2))
         # Calculate edge case.
         rmr7._transform(empty, empty)
+
+    def test_rmr_norm2_0_mu(self):
+        """
+        Tests edge case for norm2 = 0 in _transform method.
+        """
+        # Initialize RMR.
+        rmr8 = RobustMedianReversion(epsilon=2, n_iteration=2, window=2, tau=1)
+        # Make the data all ones.
+        new_data = self.data
+        new_data[:] = 1
+        # Calculate edge case.
+        rmr8.allocate(new_data, resample_by='M')
