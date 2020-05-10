@@ -24,15 +24,13 @@ def fixed_time_horizon(close, threshold, h=1):
     # "forward" returns h time intervals in the future, to be compared against the threshold
     forward_ret = pd.Series(list(daily_ret)[h:] + [float("NaN")] * h, index=close.index)
 
-    s_pos = 0
-    s_neg = 0
-
     # compare forward return with the threshold, and returns -1, 0, 1 for lower than/between/greater than threshold
     if isinstance(threshold, (float, int)):
         labels = forward_ret.apply(
-            lambda row: 1 if row > (s_pos + threshold) else (-1 if row < (s_neg - threshold) else 0))
+            lambda row: 1 if row > threshold else (
+                0 if threshold > row > -threshold else (-1 if row < -threshold else np.nan)))
 
-    if isinstance(threshold, pd.Series):
+    elif isinstance(threshold, pd.Series):
         labels = []
         ret_to_threshold = [(i, j) for (i, j) in zip(forward_ret.tolist(), threshold.to_list())]
         for ret, thrsh in ret_to_threshold:
@@ -43,5 +41,8 @@ def fixed_time_horizon(close, threshold, h=1):
             else:
                 labels.append(0)
         labels = pd.Series(labels, index=forward_ret.index)
+
+    else:
+        raise ValueError('threshold is neither float nor pd.Series!')
 
     return labels
