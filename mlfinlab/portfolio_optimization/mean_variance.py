@@ -148,7 +148,7 @@ class MeanVarianceOptimisation:
                                   target_risk=0.01,
                                   risk_aversion=10,
                                   resample_by=None):
-        # pylint: disable=bad-continuation, eval-used
+        # pylint: disable=bad-continuation, eval-used, too-many-locals
         """
         Create a portfolio using custom objective and constraints.
 

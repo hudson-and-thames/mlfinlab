@@ -154,6 +154,21 @@ class TestMVO(unittest.TestCase):
         assert plot.axes.yaxis.label._text == 'Return'
         assert len(plot._A) == 100
 
+    def test_exception_in_plotting_efficient_frontier(self):
+        """
+        Test raising of exception when plotting the efficient frontier.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+                                                                                 resample_by='W')
+        covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
+        plot = mvo.plot_efficient_frontier(covariance=covariance,
+                                           num_assets=self.data.shape[1],
+                                           max_return=1.0,
+                                           expected_asset_returns=expected_returns)
+        assert len(plot._A) == 41
+
     def test_mvo_with_input_as_returns_and_covariance(self):
         # pylint: disable=invalid-name, bad-continuation
         """
@@ -513,3 +528,21 @@ class TestMVO(unittest.TestCase):
             'constraints': ['cp.sum(weights) == 1', 'weights >= 0', 'weights <= 1']
         }
         mvo.allocate_custom_objective(custom_objective=custom_obj, asset_prices=self.data)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_value_error_for_custom_obj_optimal_weights(self):
+        # pylint: disable=invalid-name
+        """
+        Test ValueError when no optimal weights are found for custom objective solution.
+        """
+
+        with self.assertRaises(ValueError):
+            mvo = MeanVarianceOptimisation()
+            custom_obj = {
+                'objective': 'cp.Minimize(risk)',
+                'constraints': ['cp.sum(weights) == 1', 'weights >= 0', 'weights <= 1', 'weights[4] <= -1']
+            }
+            mvo.allocate_custom_objective(custom_objective=custom_obj, asset_prices=self.data)

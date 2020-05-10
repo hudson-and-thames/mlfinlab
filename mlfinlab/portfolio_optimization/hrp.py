@@ -259,7 +259,7 @@ class HierarchicalRiskParity:
     def _cov2corr(covariance):
         """
         Calculate the correlations from asset returns covariance matrix.
-        
+
         :param covariance: (pd.Dataframe) asset returns covariances
         :return: (pd.Dataframe) correlations between asset returns
         """
