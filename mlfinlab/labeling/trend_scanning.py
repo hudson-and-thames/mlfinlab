@@ -27,12 +27,12 @@ def trend_scanning_labels(price_series: pd.Series, t_events: list = None, look_f
     The output of this algorithm is a DataFrame with t1 (time stamp for the farthest observation), t-value, returns for
     the trend, and bin.
 
-    :param price_series: (pd.Series) close prices used to label the data set
-    :param t_events: (list) of filtered events, array of pd.Timestamps
-    :param look_forward_window: (int) maximum look forward window used to get the trend value
-    :param min_sample_length: (int) minimum sample length used to fit regression
-    :param step: (int) optimal t-value index is searched every 'step' indices
-    :return: (pd.DataFrame) of t1, t-value, ret, bin (label information). t1 - label endtime, tvalue,
+    :param price_series: (pd.Series) Close prices used to label the data set
+    :param t_events: (list) Filtered events, array of pd.Timestamps
+    :param look_forward_window: (int) Maximum look forward window used to get the trend value
+    :param min_sample_length: (int) Minimum sample length used to fit regression
+    :param step: (int) Optimal t-value index is searched every 'step' indices
+    :return: (pd.DataFrame) Consists of t1, t-value, ret, bin (label information). t1 - label endtime, tvalue,
         ret - price change %, bin - label value based on price change sign
     """
     # pylint: disable=invalid-name
