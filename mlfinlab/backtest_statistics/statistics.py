@@ -14,15 +14,17 @@ import numpy as np
 
 def timing_of_flattening_and_flips(target_positions: pd.Series) -> pd.DatetimeIndex:
     """
-    Snippet 14.1, page 197, Derives the timestamps of flattening or flipping
-    trades from a pandas series of target positions. Can be used for position
-    changes analysis, such as frequency and balance of position changes.
+    Advances in Financial Machine Learning, Snippet 14.1, page 197
+
+    Derives the timestamps of flattening or flipping trades from a pandas series
+    of target positions. Can be used for position changes analysis, such as
+    frequency and balance of position changes.
 
     Flattenings - times when open position is bing closed (final target position is 0).
     Flips - times when positive position is reversed to negative and vice versa.
 
-    :param target_positions: (pd.Series) target position series with timestamps as indices
-    :return: (pd.DatetimeIndex) timestamps of trades flattening, flipping and last bet
+    :param target_positions: (pd.Series) Target position series with timestamps as indices
+    :return: (pd.DatetimeIndex) Timestamps of trades flattening, flipping and last bet
     """
 
     empty_positions = target_positions[(target_positions == 0)].index  # Empty positions index
@@ -48,8 +50,10 @@ def timing_of_flattening_and_flips(target_positions: pd.Series) -> pd.DatetimeIn
 
 def average_holding_period(target_positions: pd.Series) -> float:
     """
-    Snippet 14.2, page 197, Estimates the average holding period (in days) of a strategy,
-    given a pandas series of target positions using average entry time pairing algorithm.
+    Advances in Financial Machine Learning, Snippet 14.2, page 197
+
+    Estimates the average holding period (in days) of a strategy, given a pandas series
+    of target positions using average entry time pairing algorithm.
 
     Idea of an algorithm:
 
@@ -58,8 +62,8 @@ def average_holding_period(target_positions: pd.Series) -> float:
     * holding_period ['holding_time' = time a position was held, 'weight' = weight of position closed]
     * res = weighted average time a trade was held
 
-    :param target_positions: (pd.Series) target position series with timestamps as indices
-    :return: (float) estimated average holding period, NaN if zero or unpredicted
+    :param target_positions: (pd.Series) Target position series with timestamps as indices
+    :return: (float) Estimated average holding period, NaN if zero or unpredicted
     """
 
     holding_period = pd.DataFrame(columns=['holding_time', 'weight'])
@@ -102,14 +106,15 @@ def average_holding_period(target_positions: pd.Series) -> float:
 
 def bets_concentration(returns: pd.Series) -> float:
     """
-    Snippet 14.3, page 201, Derives the concentration of returns from given
-    pd.Series of returns.
+    Advances in Financial Machine Learning, Snippet 14.3, page 201
+
+    Derives the concentration of returns from given pd.Series of returns.
 
     Algorithm is based on Herfindahl-Hirschman Index where return weights
     are taken as an input.
 
-    :param returns: (pd.Series) returns from bets
-    :return: (float) concentration of returns (nan if less than 3 returns)
+    :param returns: (pd.Series) Returns from bets
+    :return: (float) Concentration of returns (nan if less than 3 returns)
     """
 
     if returns.size <= 2:
@@ -123,21 +128,23 @@ def bets_concentration(returns: pd.Series) -> float:
 
 def all_bets_concentration(returns: pd.Series, frequency: str = 'M') -> tuple:
     """
-    Snippet 14.3, page 201, Given a pd.Series of returns, derives concentration of positive returns, negative returns
-    and concentration of bets grouped by time intervals (daily, monthly etc.). If after time grouping less than
-    3 observations, returns nan.
+    Advances in Financial Machine Learning, Snippet 14.3, page 201
+
+    Given a pd.Series of returns, derives concentration of positive returns, negative returns
+    and concentration of bets grouped by time intervals (daily, monthly etc.).
+    If after time grouping less than 3 observations, returns nan.
 
     Properties or results:
 
-    * low positive_concentration -> no right fat-tail of returns (desirable)
-    * low negative_concentration -> no left fat-tail of returns (desirable)
-    * low time_concentration -> bets are not concentrated in time, or are evenly concentrated (desirable)
+    * low positive_concentration ⇒ no right fat-tail of returns (desirable)
+    * low negative_concentration ⇒ no left fat-tail of returns (desirable)
+    * low time_concentration ⇒ bets are not concentrated in time, or are evenly concentrated (desirable)
     * positive_concentration == 0 ⇔ returns are uniform
     * positive_concentration == 1 ⇔ only one non-zero return exists
 
-    :param returns: (pd.Series) returns from bets
-    :param frequency: (str) desired time grouping frequency from pd.Grouper
-    :return: (tuple of floats) concentration of positive, negative and time grouped concentrations
+    :param returns: (pd.Series) Returns from bets
+    :param frequency: (str) Desired time grouping frequency from pd.Grouper
+    :return: (tuple of floats) Concentration of positive, negative and time grouped concentrations
     """
 
     # Concentration of positive returns per bet
@@ -154,7 +161,9 @@ def all_bets_concentration(returns: pd.Series, frequency: str = 'M') -> tuple:
 
 def drawdown_and_time_under_water(returns: pd.Series, dollars: bool = False) -> tuple:
     """
-    Snippet 14.4, page 201, Calculates drawdowns and time under water for pd.Series of either relative price of a
+    Advances in Financial Machine Learning, Snippet 14.4, page 201
+
+    Calculates drawdowns and time under water for pd.Series of either relative price of a
     portfolio or dollar price of a portfolio.
 
     Intuitively, a drawdown is the maximum loss suffered by an investment between two consecutive high-watermarks.
@@ -170,10 +179,10 @@ def drawdown_and_time_under_water(returns: pd.Series, dollars: bool = False) -> 
       passed till the next high watermark in years. Also includes time between
       the last high watermark and last observation in returns as the last element.
 
-    :param returns: (pd.Series) returns from bets
-    :param dollars: (bool) flag if given dollar performance and not returns.
+    :param returns: (pd.Series) Returns from bets
+    :param dollars: (bool) Flag if given dollar performance and not returns.
                     If dollars, then drawdowns are in dollars, else as a %.
-    :return: (tuple of pd.Series) series of drawdowns and time under water
+    :return: (tuple of pd.Series) Series of drawdowns and time under water
     """
 
     frame = returns.to_frame('pnl')
@@ -206,15 +215,16 @@ def drawdown_and_time_under_water(returns: pd.Series, dollars: bool = False) -> 
 
 def sharpe_ratio(returns: pd.Series, entries_per_year: int = 252, risk_free_rate: float = 0) -> float:
     """
-    Calculates Annualized Sharpe Ratio for pd.Series of normal or log returns.
+    Calculates annualized Sharpe ratio for pd.Series of normal or log returns.
+
     Risk_free_rate should be given for the same period the returns are given.
     For example, if the input returns are observed in 3 months, the risk-free
     rate given should be the 3-month risk-free rate.
 
-    :param returns: (pd.Series) returns - normal or log
-    :param entries_per_year: (int) times returns are recorded per year (daily by default)
-    :param risk_free_rate: (float) risk-free rate (0 by default)
-    :return: (float) Annualized Sharpe Ratio
+    :param returns: (pd.Series) Returns - normal or log
+    :param entries_per_year: (int) Times returns are recorded per year (252 by default)
+    :param risk_free_rate: (float) Risk-free rate (0 by default)
+    :return: (float) Annualized Sharpe ratio
     """
 
     sharpe_r = (returns.mean() - risk_free_rate) / returns.std() * (entries_per_year) ** (1 / 2)
@@ -224,7 +234,8 @@ def sharpe_ratio(returns: pd.Series, entries_per_year: int = 252, risk_free_rate
 
 def information_ratio(returns: pd.Series, benchmark: float = 0, entries_per_year: int = 252) -> float:
     """
-    Calculates Annualized Information Ratio for pd.Series of normal or log returns.
+    Calculates annualized information ratio for pd.Series of normal or log returns.
+
     Benchmark should be provided as a return for the same time period as that between
     input returns. For example, for the daily observations it should be the
     benchmark of daily returns.
@@ -233,10 +244,10 @@ def information_ratio(returns: pd.Series, benchmark: float = 0, entries_per_year
     The excess return is measured as the portfolio’s return in excess of the benchmark’s
     return. The tracking error is estimated as the standard deviation of the excess returns.
 
-    :param returns: (pd.Series) returns - normal or log
-    :param benchmark: (float) benchmark for performance comparison (0 by default)
-    :param entries_per_year: (int) times returns are recorded per year (daily by default)
-    :return: (float) Annualized Information Ratio
+    :param returns: (pd.Series) Returns - normal or log
+    :param benchmark: (float) Benchmark for performance comparison (0 by default)
+    :param entries_per_year: (int) Times returns are recorded per year (252 by default)
+    :return: (float) Annualized information ratio
     """
 
     excess_returns = returns - benchmark
@@ -257,12 +268,12 @@ def probabilistic_sharpe_ratio(observed_sr: float, benchmark_sr: float, number_o
     - It should exceed 0.95, for the standard significance level of 5%.
     - It can be computed on absolute or relative returns.
 
-    :param observed_sr: (float) Sharpe Ratio that is observed
-    :param benchmark_sr: (float) Sharpe Ratio to which observed_SR is tested against
-    :param number_of_returns: (int) times returns are recorded for observed_SR
-    :param skewness_of_returns: (float) skewness of returns (as Gaussian by default)
-    :param kurtosis_of_returns: (float) kurtosis of returns (as Gaussian by default)
-    :return: (float) Probabilistic Sharpe Ratio
+    :param observed_sr: (float) Sharpe ratio that is observed
+    :param benchmark_sr: (float) Sharpe ratio to which observed_SR is tested against
+    :param number_of_returns: (int) Times returns are recorded for observed_SR
+    :param skewness_of_returns: (float) Skewness of returns (0 by default)
+    :param kurtosis_of_returns: (float) Kurtosis of returns (3 by default)
+    :return: (float) Probabilistic Sharpe ratio
     """
 
     probab_sr = ss.norm.cdf(((observed_sr - benchmark_sr) * (number_of_returns - 1) ** (1 / 2)) / \
@@ -289,16 +300,16 @@ def deflated_sharpe_ratio(observed_sr: float, sr_estimates: list, number_of_retu
     Function allows the calculated SR benchmark output and usage of only
     standard deviation and number of SR trails instead of full list of trails.
 
-    :param observed_sr: (float) Sharpe Ratio that is being tested
-    :param sr_estimates: (list) Sharpe Ratios estimates trials list or
+    :param observed_sr: (float) Sharpe ratio that is being tested
+    :param sr_estimates: (list) Sharpe ratios estimates trials list or
         properties list: [Standard deviation of estimates, Number of estimates]
         if estimates_param flag is set to True.
-    :param  number_of_returns: (int) times returns are recorded for observed_SR
-    :param skewness_of_returns: (float) skewness of returns (as Gaussian by default)
-    :param kurtosis_of_returns: (float) kurtosis of returns (as Gaussian by default)
-    :param estimates_param: (bool) allows to use properties of estimates instead of full list
-    :param benchmark_out: (bool) flag to output the calculated benchmark instead of DSR
-    :return: (float) Deflated Sharpe Ratio or Benchmark SR (if benchmark_out)
+    :param  number_of_returns: (int) Times returns are recorded for observed_SR
+    :param skewness_of_returns: (float) Skewness of returns (0 by default)
+    :param kurtosis_of_returns: (float) Kurtosis of returns (3 by default)
+    :param estimates_param: (bool) Flag to use properties of estimates instead of full list
+    :param benchmark_out: (bool) Flag to output the calculated benchmark instead of DSR
+    :return: (float) Deflated Sharpe ratio or Benchmark SR (if benchmark_out)
     """
 
     # Calculating benchmark_SR from the parameters of estimates
@@ -327,21 +338,21 @@ def minimum_track_record_length(observed_sr: float, benchmark_sr: float,
                                 kurtosis_of_returns: float = 3,
                                 alpha: float = 0.05) -> float:
     """
-    Calculates the Minimum Track Record Length - "How long should a track record be
-    in order to have statistical confidence that its Sharpe ratio is above a given
-    threshold?”
+    Calculates the minimum track record length (MinTRL) - "How long should a track
+    record be in order to have statistical confidence that its Sharpe ratio is above
+    a given threshold?”
 
     If a track record is shorter than MinTRL, we do not  have  enough  confidence
     that  the  observed Sharpe ratio ̂is above the designated Sharpe ratio threshold.
 
     MinTRLis expressed in terms of number of observations, not annual or calendar terms.
 
-    :param observed_sr: (float) Sharpe Ratio that is being tested
-    :param benchmark_sr: (float) Sharpe Ratio to which observed_SR is tested against
-    :param  number_of_returns: (int) times returns are recorded for observed_SR
-    :param skewness_of_returns: (float) skewness of returns (as Gaussian by default)
-    :param kurtosis_of_returns: (float) kurtosis of returns (as Gaussian by default)
-    :param alpha: (float) desired significance level (0.05 by default)
+    :param observed_sr: (float) Sharpe ratio that is being tested
+    :param benchmark_sr: (float) Sharpe ratio to which observed_SR is tested against
+    :param  number_of_returns: (int) Times returns are recorded for observed_SR
+    :param skewness_of_returns: (float) Skewness of returns (0 by default)
+    :param kurtosis_of_returns: (float) Kurtosis of returns (3 by default)
+    :param alpha: (float) Desired significance level (0.05 by default)
     :return: (float) Minimum number of track records
     """
 

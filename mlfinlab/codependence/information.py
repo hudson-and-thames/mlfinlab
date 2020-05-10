@@ -13,11 +13,12 @@ def get_optimal_number_of_bins(num_obs: int, corr_coef: float = None) -> int:
     """
     Get optimal number of bins for discretization based on number of observations
     and correlation coefficient (univariate case).
+
     The algorithm is described in https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes (p.26)
 
-    :param num_obs: (int) number of observations.
-    :param corr_coef: (int) correlation coefficient, used to estimate the number of bins for univariate case.
-    :return: (int) optimal number of bins.
+    :param num_obs: (int) Number of observations.
+    :param corr_coef: (float) Correlation coefficient, used to estimate the number of bins for univariate case.
+    :return: (int) Optimal number of bins.
     """
     if corr_coef is None or abs(corr_coef - 1) <= 1e-4:  # Univariate case
         z = (8 + 324 * num_obs + 12 * (36 * num_obs + 729 * num_obs ** 2) ** .5) ** (1 / 3.)
@@ -34,11 +35,11 @@ def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: boo
     Get mutual info score for x and y described in
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes (p.16).
 
-    :param x: (np.array) x vector
-    :param y: (np.array) y vector
-    :param n_bins: (int) number of bins for discretization, if None get number of bins based on correlation coefficient.
+    :param x: (np.array) X vector
+    :param y: (np.array) Y vector
+    :param n_bins: (int) Number of bins for discretization, if None get number of bins based on correlation coefficient.
     :param normalize: (bool) True to normalize the result to [0, 1].
-    :return: (float) mutual info score.
+    :return: (float) Mutual info score.
     """
 
     if n_bins is None:
@@ -59,11 +60,11 @@ def variation_of_information_score(x: np.array, y: np.array, n_bins: int = None,
     Get Variantion of Information (VI) score for X and Y described in
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes (p.19).
 
-    :param x: (np.array) x vector
-    :param y: (np.array) y vector
-    :param n_bins: (int) number of bins for discretization, if None get number of bins based on correlation coefficient.
+    :param x: (np.array) X vector
+    :param y: (np.array) Y vector
+    :param n_bins: (int) Number of bins for discretization, if None get number of bins based on correlation coefficient.
     :param normalize: (bool) True to normalize the result to [0, 1].
-    :return: (float) variation of information score.
+    :return: (float) Variation of information score.
     """
 
     if n_bins is None:

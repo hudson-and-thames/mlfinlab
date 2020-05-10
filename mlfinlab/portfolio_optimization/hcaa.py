@@ -23,8 +23,8 @@ class HierarchicalClusteringAssetAllocation:
         """
         Initialise.
 
-        :param calculate_expected_returns: (str) the method to use for calculation of expected returns.
-                                        Currently supports "mean" and "exponential"
+        :param calculate_expected_returns: (str) The method to use for calculation of expected returns.
+                                                 Currently supports "mean" and "exponential"
         """
 
         self.weights = list()
@@ -49,20 +49,20 @@ class HierarchicalClusteringAssetAllocation:
         """
         Calculate asset allocations using the HCAA algorithm.
 
-        :param asset_names: (list) a list of strings containing the asset names
-        :param asset_prices: (pd.DataFrame) a dataframe of historical asset prices (daily close)
+        :param asset_names: (list) A list of strings containing the asset names
+        :param asset_prices: (pd.DataFrame) A dataframe of historical asset prices (daily close)
                                             indexed by date
-        :param asset_returns: (pd.DataFrame/numpy matrix) user supplied matrix of asset returns
-        :param covariance_matrix: (pd.DataFrame/numpy matrix) user supplied covariance matrix of asset returns
-        :param expected_asset_returns: (list) a list of mean asset returns (mu)
-        :param allocation_metric: (str) the metric used for calculating weight allocations. Supported strings - "equal_weighting",
+        :param asset_returns: (pd.DataFrame/numpy matrix) User supplied matrix of asset returns
+        :param covariance_matrix: (pd.DataFrame/numpy matrix) User supplied covariance matrix of asset returns
+        :param expected_asset_returns: (list) A list of mean asset returns (mu)
+        :param allocation_metric: (str) The metric used for calculating weight allocations. Supported strings - "equal_weighting",
                                         "minimum_variance", "minimum_standard_deviation", "sharpe_ratio", "expected_shortfall",
                                         "conditional_drawdown_risk"
-        :param linkage: (str) the type of linkage method to use for clustering. Supported strings - "single", "average", "complete"
-        :param confidence_level: (float) the confidence level (alpha) used for calculating expected shortfall and conditional
+        :param linkage: (str) The type of linkage method to use for clustering. Supported strings - "single", "average", "complete"
+        :param confidence_level: (float) The confidence level (alpha) used for calculating expected shortfall and conditional
                                          drawdown at risk
-        :param optimal_num_clusters: (int) optimal number of clusters for hierarchical clustering
-        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+        :param optimal_num_clusters: (int) Optimal number of clusters for hierarchical clustering
+        :param resample_by: (str) Specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         """
 
@@ -133,9 +133,9 @@ class HierarchicalClusteringAssetAllocation:
         """
         Calculate the cluster inertia (within cluster sum-of-squares).
 
-        :param labels: (list) cluster labels
-        :param asset_returns: (pd.DataFrame) historical asset returns
-        :return: (float) cluster inertia value
+        :param labels: (list) Cluster labels
+        :param asset_returns: (pd.DataFrame) Historical asset returns
+        :return: (float) Cluster inertia value
         """
 
         unique_labels = np.unique(labels)
@@ -151,11 +151,11 @@ class HierarchicalClusteringAssetAllocation:
         """
         Find the optimal number of clusters for hierarchical clustering using the Gap statistic.
 
-        :param correlation: (np.array) matrix of asset correlations
-        :param asset_returns: (pd.DataFrame) historical asset returns
-        :param linkage: (str) the type of linkage method to use for clustering
-        :param num_reference_datasets: (int) the number of reference datasets to generate for calculating expected inertia
-        :return: (int) the optimal number of clusters
+        :param correlation: (np.array) Matrix of asset correlations
+        :param asset_returns: (pd.DataFrame) Historical asset returns
+        :param linkage: (str) The type of linkage method to use for clustering
+        :param num_reference_datasets: (int) The number of reference datasets to generate for calculating expected inertia
+        :return: (int) The optimal number of clusters
         """
 
         max_number_of_clusters = min(10, asset_returns.shape[1])
@@ -194,10 +194,10 @@ class HierarchicalClusteringAssetAllocation:
         """
         Perform agglomerative clustering on the current portfolio.
 
-        :param correlation: (np.array) matrix of asset correlations
-        :param num_clusters: (int) the number of clusters
-        :param linkage (str): the type of linkage method to use for clustering
-        :return: (list) structure of hierarchical tree
+        :param correlation: (np.array) Matrix of asset correlations
+        :param num_clusters: (int) The number of clusters
+        :param linkage (str): The type of linkage method to use for clustering
+        :return: (list) Structure of hierarchical tree
         """
 
         cluster_func = AgglomerativeClustering(n_clusters=num_clusters,
@@ -211,9 +211,9 @@ class HierarchicalClusteringAssetAllocation:
         """
         Rearrange the assets to reorder them according to hierarchical tree clustering order.
 
-        :param num_assets: (int) the total number of assets
-        :param curr_index: (int) current index
-        :return: (list) the assets rearranged according to hierarchical clustering
+        :param num_assets: (int) The total number of assets
+        :param curr_index: (int) Current index
+        :return: (list) The assets rearranged according to hierarchical clustering
         """
 
         if curr_index < num_assets:
@@ -229,8 +229,8 @@ class HierarchicalClusteringAssetAllocation:
         """
         Calculate the inverse variance weight allocations.
 
-        :param covariance: (pd.DataFrame) covariance matrix of assets
-        :return: (list) inverse variance weight values
+        :param covariance: (pd.DataFrame) Covariance matrix of assets
+        :return: (list) Inverse variance weight values
         """
 
         inv_diag = 1 / np.diag(covariance.values)
@@ -241,9 +241,9 @@ class HierarchicalClusteringAssetAllocation:
         """
         Calculate cluster variance.
 
-        :param covariance: (pd.DataFrame) covariance matrix of assets
-        :param cluster_indices: (list) list of asset indices for the cluster
-        :return: (float) variance of the cluster
+        :param covariance: (pd.DataFrame) Covariance matrix of assets
+        :param cluster_indices: (list) List of asset indices for the cluster
+        :return: (float) Variance of the cluster
         """
 
         cluster_covariance = covariance.iloc[cluster_indices, cluster_indices]
@@ -255,10 +255,10 @@ class HierarchicalClusteringAssetAllocation:
         """
         Calculate cluster Sharpe Ratio.
 
-        :param expected_asset_returns: (list) a list of mean asset returns (mu)
-        :param covariance: (pd.DataFrame) covariance matrix of assets
-        :param cluster_indices: (list) list of asset indices for the cluster
-        :return: (float) sharpe ratio of the cluster
+        :param expected_asset_returns: (list) A list of mean asset returns (mu)
+        :param covariance: (pd.DataFrame) Covariance matrix of assets
+        :param cluster_indices: (list) List of asset indices for the cluster
+        :return: (float) Sharpe ratio of the cluster
         """
 
         cluster_expected_returns = expected_asset_returns[cluster_indices]
@@ -272,11 +272,11 @@ class HierarchicalClusteringAssetAllocation:
         """
         Calculate cluster expected shortfall.
 
-        :param asset_returns: (pd.DataFrame) historical asset returns
-        :param covariance: (pd.DataFrame) covariance matrix of assets
-        :param confidence_level: (float) the confidence level (alpha)
-        :param cluster_indices: (list) list of asset indices for the cluster
-        :return: (float) expected shortfall of the cluster
+        :param asset_returns: (pd.DataFrame) Historical asset returns
+        :param covariance: (pd.DataFrame) Covariance matrix of assets
+        :param confidence_level: (float) The confidence level (alpha)
+        :param cluster_indices: (list) List of asset indices for the cluster
+        :return: (float) Expected shortfall of the cluster
         """
 
         cluster_asset_returns = asset_returns.iloc[:, cluster_indices]
@@ -291,10 +291,10 @@ class HierarchicalClusteringAssetAllocation:
         """
         Calculate cluster conditional drawdown at risk.
 
-        :param asset_returns: (pd.DataFrame) historical asset returns
-        :param covariance: (pd.DataFrame) covariance matrix of assets
-        :param confidence_level: (float) the confidence level (alpha)
-        :param cluster_indices: (list) list of asset indices for the cluster
+        :param asset_returns: (pd.DataFrame) Historical asset returns
+        :param covariance: (pd.DataFrame) Covariance matrix of assets
+        :param confidence_level: (float) The confidence level (alpha)
+        :param cluster_indices: (list) List of asset indices for the cluster
         :return: (float) CDD of the cluster
         """
 
@@ -317,12 +317,12 @@ class HierarchicalClusteringAssetAllocation:
         """
         Recursively assign weights to the clusters - ultimately assigning weights to the individual assets.
 
-        :param expected_asset_returns: (list) a list of mean asset returns (mu)
-        :param asset_returns: (pd.DataFrame) historical asset returns
-        :param covariance_matrix: (pd.DataFrame) the covariance matrix
-        :param assets: (list) list of asset names in the portfolio
-        :param allocation_metric: (str) the metric used for calculating weight allocations
-        :param confidence_level: (float) the confidence level (alpha)
+        :param expected_asset_returns: (list) A list of mean asset returns (mu)
+        :param asset_returns: (pd.DataFrame) Historical asset returns
+        :param covariance_matrix: (pd.DataFrame) The covariance matrix
+        :param assets: (list) List of asset names in the portfolio
+        :param allocation_metric: (str) The metric used for calculating weight allocations
+        :param confidence_level: (float) The confidence level (alpha)
         """
 
         self.weights = pd.Series(1, index=self.ordered_indices)
@@ -399,8 +399,8 @@ class HierarchicalClusteringAssetAllocation:
         """
         Calculate the correlations from asset returns covariance matrix.
 
-        :param covariance: (pd.DataFrame) asset returns covariances
-        :return: (pd.DataFrame) correlations between asset returns
+        :param covariance: (pd.DataFrame) Asset returns covariances
+        :return: (pd.DataFrame) Correlations between asset returns
         """
 
         d_matrix = np.zeros_like(covariance)
@@ -417,11 +417,11 @@ class HierarchicalClusteringAssetAllocation:
         """
         Perform initial warning checks.
 
-        :param asset_prices: (pd.DataFrame) a dataframe of historical asset prices (daily close)
+        :param asset_prices: (pd.DataFrame) A dataframe of historical asset prices (daily close)
                                             indexed by date
-        :param asset_returns: (pd.DataFrame/numpy matrix) user supplied matrix of asset returns
-        :param covariance_matrix: (pd.DataFrame/numpy matrix) user supplied covariance matrix of asset returns
-        :param allocation_metric: (str) the metric used for calculating weight allocations
+        :param asset_returns: (pd.DataFrame/numpy matrix) User supplied matrix of asset returns
+        :param covariance_matrix: (pd.DataFrame/numpy matrix) User supplied covariance matrix of asset returns
+        :param allocation_metric: (str) The metric used for calculating weight allocations
         :return:
         """
 

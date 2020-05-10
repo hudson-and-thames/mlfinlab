@@ -19,7 +19,9 @@ from mlfinlab.cross_validation.cross_validation import ml_cross_val_score
 
 def mean_decrease_impurity(model, feature_names, clustered_subsets=None):
     """
-    Snippet 8.2, page 115. MDI Feature importance
+    Advances in Financial Machine Learning, Snippet 8.2, page 115.
+
+    MDI Feature importance
 
     Mean decrease impurity (MDI) is a fast, explanatory-importance (in-sample, IS) method specific to tree-based
     classifiers, like RF. At each node of each decision tree, the selected feature splits the subset it received in
@@ -53,7 +55,7 @@ def mean_decrease_impurity(model, feature_names, clustered_subsets=None):
 
     :param model: (model object): Trained tree based classifier.
     :param feature_names: (list): Array of feature names.
-    :param clustered_subsets: (list) of feature clusters for Clustered Feature Importance (CFI). Default None will not apply CFI.
+    :param clustered_subsets: (list) Feature clusters for Clustered Feature Importance (CFI). Default None will not apply CFI.
                               Structure of the input must be a list of list/s i.e. a list containing the clusters/subsets of feature
                               name/s inside a list. E.g- [['I_0','I_1','R_0','R_1'],['N_1','N_2'],['R_3']]
     :return: (pd.DataFrame): Mean and standard deviation feature importance.
@@ -87,7 +89,9 @@ def mean_decrease_impurity(model, feature_names, clustered_subsets=None):
 def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_weight_train=None,
                            sample_weight_score=None, scoring=log_loss, random_state=42):
     """
-    Snippet 8.3, page 116-117. MDA Feature Importance
+    Advances in Financial Machine Learning, Snippet 8.3, page 116-117.
+
+    MDA Feature Importance
 
     Mean decrease accuracy (MDA) is a slow, predictive-importance (out-of-sample, OOS) method. First, it fits a
     classifier; second, it derives its performance OOS according to some performance score (accuracy, negative log-loss,
@@ -119,13 +123,13 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
     :param X: (pd.DataFrame): Train set features.
     :param y: (pd.DataFrame, np.array): Train set labels.
     :param cv_gen: (cross_validation.PurgedKFold): Cross-validation object.
-    :param clustered_subsets: (list) of feature clusters for Clustered Feature Importance (CFI). Default None will not apply CFI.
+    :param clustered_subsets: (list) Feature clusters for Clustered Feature Importance (CFI). Default None will not apply CFI.
                               Structure of the input must be a list of list/s i.e. a list containing the clusters/subsets of feature
                               name/s inside a list. E.g- [['I_0','I_1','R_0','R_1'],['N_1','N_2'],['R_3']]
-    :param sample_weight_train: A numpy array of sample weights used to train the model for each record in the dataset.
-    :param sample_weight_score: A numpy array of sample weights used to evaluate the model quality.
+    :param sample_weight_train: (np.array) Sample weights used to train the model for each record in the dataset.
+    :param sample_weight_score: (np.array) Sample weights used to evaluate the model quality.
     :param scoring: (function): Scoring function used to determine importance.
-    :param random_state: (int) random seed for shuffling the features.
+    :param random_state: (int) Random seed for shuffling the features.
     :return: (pd.DataFrame): Mean and standard deviation of feature importance.
     """
 
@@ -180,7 +184,9 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
 
 def single_feature_importance(clf, X, y, cv_gen, sample_weight_train=None, sample_weight_score=None, scoring=log_loss):
     """
-    Snippet 8.4, page 118. Implementation of SFI
+    Advances in Financial Machine Learning, Snippet 8.4, page 118.
+
+    Implementation of SFI
 
     Substitution effects can lead us to discard important features that happen to be redundant. This is not generally a
     problem in the context of prediction, but it could lead us to wrong conclusions when we are trying to understand,
@@ -206,8 +212,8 @@ def single_feature_importance(clf, X, y, cv_gen, sample_weight_train=None, sampl
     :param X: (pd.DataFrame): Train set features.
     :param y: (pd.DataFrame, np.array): Train set labels.
     :param cv_gen: (cross_validation.PurgedKFold): Cross-validation object.
-    :param sample_weight_train: A numpy array of sample weights used to train the model for each record in the dataset.
-    :param sample_weight_score: A numpy array of sample weights used to evaluate the model quality.
+    :param sample_weight_train: (np.array) Sample weights used to train the model for each record in the dataset.
+    :param sample_weight_score: (np.array) Sample weights used to evaluate the model quality.
     :param scoring: (function): Scoring function used to determine importance.
     :return: (pd.DataFrame): Mean and standard deviation of feature importance.
     """
@@ -231,7 +237,9 @@ def single_feature_importance(clf, X, y, cv_gen, sample_weight_train=None, sampl
 
 def plot_feature_importance(importance_df, oob_score, oos_score, save_fig=False, output_path=None):
     """
-    Snippet 8.10, page 124. Feature importance plotting function.
+    Advances in Financial Machine Learning, Snippet 8.10, page 124.
+
+    Feature importance plotting function.
 
     Plot feature importance.
 
