@@ -155,6 +155,7 @@ class TestMVO(unittest.TestCase):
         assert len(plot._A) == 100
 
     def test_exception_in_plotting_efficient_frontier(self):
+        # pylint: disable=invalid-name, bad-continuation, protected-access
         """
         Test raising of exception when plotting the efficient frontier.
         """
