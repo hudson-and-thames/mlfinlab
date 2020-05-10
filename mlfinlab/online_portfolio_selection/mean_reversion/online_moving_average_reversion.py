@@ -71,14 +71,19 @@ class OnlineMovingAverageReversion(OLPS):
         # Return predetermined weights for time periods with no significant data.
         if self.reversion_method == 1 and time < self.window or time == 0:
             return self.weights
+
         # Get predicted change through SMA or EWA.
         predicted_change = self.moving_average_reversion[time]
+
         # Calculate the mean of the predicted change.
         mean_relative = np.mean(predicted_change)
+
         # Portfolio weights of mean prediction.
         mean_change = np.ones(self.number_of_assets) * mean_relative
+
         # Loss function to switch mean reversion strategy.
         loss_fn = max(0, (self.epsilon - np.dot(self.weights, predicted_change)))
+
         # If loss function is 0, set multiplicative constant to zero.
         if loss_fn == 0:
             lambd = 0
@@ -90,6 +95,7 @@ class OnlineMovingAverageReversion(OLPS):
             else:
                 lambd = 0
         new_weights = self.weights + lambd * (predicted_change - mean_change)
+
         # Projects new weights to simplex domain.
         new_weights = self._simplex_projection(new_weights)
         return new_weights
