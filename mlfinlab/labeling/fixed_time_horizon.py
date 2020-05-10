@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 
-def fixed_time_horizon(close, threshold, h=1):
+def fixed_time_horizon(close, threshold, h=1, get_forward_ret=False):
     """
     Fixed-Time Horizon Labelling Method
     Returns 1 if return at h-th bar after t_0 is greater than the threshold, -1 if less, and 0 if in between
@@ -16,6 +16,7 @@ def fixed_time_horizon(close, threshold, h=1):
     :param threshold: (float or pd.Series) when the abs(change) is larger than the threshold, it is labelled as 1 or -1.
                     If change is smaller, it's labelled as 0. Can be dynamic if threshold is pd.Series
     :param h: (int) number of ticks to look forward when calculating future return rate
+    :param get_forward_ret: (bool) whether to get the forward returns as well as labels. False by default
     :return: (series) series of -1, 0, or 1 denoting whether return is under/between/greater than the threshold
     """
     # daily returns
@@ -36,13 +37,18 @@ def fixed_time_horizon(close, threshold, h=1):
         for ret, thrsh in ret_to_threshold:
             if ret > thrsh:
                 labels.append(1)
+            elif -thrsh < ret < thrsh:
+                labels.append(0)
             elif ret < -thrsh:
                 labels.append(-1)
             else:
-                labels.append(0)
+                labels.append(np.nan)
         labels = pd.Series(labels, index=forward_ret.index)
 
     else:
         raise ValueError('threshold is neither float nor pd.Series!')
 
-    return labels
+    if get_forward_ret:
+        return labels, forward_ret
+    else:
+        return labels
