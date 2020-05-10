@@ -7,3 +7,4 @@ test_reports
 docs/build/
 .local/
 cover/
+mlfinlab.egg-info/*

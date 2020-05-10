@@ -17,13 +17,13 @@ from mlfinlab.online_portfolio_selection.momentum.follow_the_leader import Follo
 from mlfinlab.online_portfolio_selection.momentum.follow_the_regularized_leader import FollowTheRegularizedLeader
 
 # Mean Reversion
-# from mlfinlab.online_portfolio_selection.pattern_matching.CORN import CORN
-# from mlfinlab.online_portfolio_selection.mean_reversion.PAMR import PAMR
-# from mlfinlab.online_portfolio_selection.mean_reversion.CWMR import CWMR
-# from mlfinlab.online_portfolio_selection.mean_reversion.OLMAR import OLMAR
+from mlfinlab.online_portfolio_selection.mean_reversion.robust_median_reversion import RobustMedianReversion
+from mlfinlab.online_portfolio_selection.mean_reversion.passive_aggressive_mean_reversion import PassiveAggressiveMeanReversion
+from mlfinlab.online_portfolio_selection.mean_reversion.confidence_weighted_mean_reversion import ConfidenceWeightedMeanReversion
+from mlfinlab.online_portfolio_selection.mean_reversion.online_moving_average_reversion import OnlineMovingAverageReversion
 
 # Pattern Matching
-# from mlfinlab.online_portfolio_selection.pattern_matching.CORN import CORN
+# from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import CorrelationDrivenNonparametricLearning
 # from mlfinlab.online_portfolio_selection.pattern_matching.CORN_U import CORN_U
 # from mlfinlab.online_portfolio_selection.pattern_matching.CORN_K import CORN_K
 # from mlfinlab.online_portfolio_selection.pattern_matching.SCORN import SCORN
