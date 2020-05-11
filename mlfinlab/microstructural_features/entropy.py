@@ -10,9 +10,11 @@ import numpy as np
 
 def get_shannon_entropy(message: str) -> float:
     """
-    Get Shannon entropy from message, page 263-264.
+    Advances in Financial Machine Learning, page 263-264.
 
-    :param message: (str) encoded message
+    Get Shannon entropy from message
+
+    :param message: (str) Encoded message
     :return: (float) Shannon entropy
     """
     exr = {}
@@ -32,9 +34,11 @@ def get_shannon_entropy(message: str) -> float:
 
 def get_lempel_ziv_entropy(message: str) -> float:
     """
-    Get Lempel-Ziv entropy estimate, Snippet 18.2, page 266.
+    Advances in Financial Machine Learning, Snippet 18.2, page 266.
 
-    :param message: (str) encoded message
+    Get Lempel-Ziv entropy estimate
+
+    :param message: (str) Encoded message
     :return: (float) Lempel-Ziv entropy
     """
     i, lib = 1, [message[0]]
@@ -50,11 +54,13 @@ def get_lempel_ziv_entropy(message: str) -> float:
 
 def _prob_mass_function(message: str, word_length: int) -> dict:
     """
-    Compute probability mass function for a one-dim discete rv, Snippet 18.1, page 266.
+    Advances in Financial Machine Learning, Snippet 18.1, page 266.
 
-    :param message: (str or array) encoded message
-    :param word_length: (int) approximate word length
-    :return: (dict) of pmf for each word from message
+    Compute probability mass function for a one-dim discete rv
+
+    :param message: (str or array) Encoded message
+    :param word_length: (int) Approximate word length
+    :return: (dict) Dict of pmf for each word from message
     """
     lib = {}
     if not isinstance(message, str):
@@ -72,10 +78,12 @@ def _prob_mass_function(message: str, word_length: int) -> dict:
 
 def get_plug_in_entropy(message: str, word_length: int = None) -> float:
     """
-    Get Plug-in entropy estimator, Snippet 18.1, page 265.
+    Advances in Financial Machine Learning, Snippet 18.1, page 265.
 
-    :param message: (str or array) encoded message
-    :param word_length: (int) approximate word length
+    Get Plug-in entropy estimator
+
+    :param message: (str or array) Encoded message
+    :param word_length: (int) Approximate word length
     :return: (float) Plug-in entropy
     """
     if word_length is None:
@@ -87,11 +95,14 @@ def get_plug_in_entropy(message: str, word_length: int = None) -> float:
 
 def _match_length(message: str, start_index: int, window: int) -> Union[int, str]:
     """
-    Snippet 18.3, Function That Computes the Length of the Longest Match, p.267
-    :param message: (str or array) encoded message
-    :start_index: (int) start index for search
-    :window: (int) window length
-    :return: (int, str) match length and matched string
+    Advances in Financial Machine Learning, Snippet 18.3, page 267.
+
+    Function That Computes the Length of the Longest Match
+
+    :param message: (str or array) Encoded message
+    :param start_index: (int) Start index for search
+    :param window: (int) Window length
+    :return: (int, str) Match length and matched string
     """
     # Maximum matched length+1, with overlap.
     sub_str = np.empty(shape=0)
@@ -109,10 +120,14 @@ def _match_length(message: str, start_index: int, window: int) -> Union[int, str
 
 def get_konto_entropy(message: str, window: int = 0) -> float:
     """
+    Advances in Financial Machine Learning, Snippet 18.4, page 268.
+
+    Implementations of Algorithms Discussed in Gao et al.[2008]
+
     Get Kontoyiannis entropy
-    Snippet 18.4, Implementations of Algorithms Discussed in Gao et al.[2008]
-    :param message: (str or array) encoded message
-    :param window: (int) expanding window length, can be negative
+
+    :param message: (str or array) Encoded message
+    :param window: (int) Expanding window length, can be negative
     :return: (float) Kontoyiannis entropy
     """
     out = {

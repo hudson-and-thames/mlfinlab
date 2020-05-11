@@ -15,16 +15,19 @@ from sklearn.model_selection import BaseCrossValidator
 def ml_get_train_times(samples_info_sets: pd.Series, test_times: pd.Series) -> pd.Series:
     # pylint: disable=invalid-name
     """
-    Snippet 7.1, page 106,  Purging observations in the training set
+    Advances in Financial Machine Learning, Snippet 7.1, page 106.
+
+    Purging observations in the training set
 
     This function find the training set indexes given the information on which each record is based
     and the range for the test set.
     Given test_times, find the times of the training observations.
 
-    :param samples_info_sets: The information range on which each record is constructed from
+    :param samples_info_sets: (pd.Series) The information range on which each record is constructed from
         *samples_info_sets.index*: Time when the information extraction started.
         *samples_info_sets.value*: Time when the information extraction ended.
-    :param test_times: Times for the test dataset.
+    :param test_times: (pd.Series) Times for the test dataset.
+    :return: (pd.Series) Training set
     """
     train = samples_info_sets.copy(deep=True)
     for start_ix, end_ix in test_times.iteritems():
@@ -38,14 +41,15 @@ def ml_get_train_times(samples_info_sets: pd.Series, test_times: pd.Series) -> p
 class PurgedKFold(KFold):
     """
     Extend KFold class to work with labels that span intervals
+
     The train is purged of observations overlapping test-label intervals
     Test set is assumed contiguous (shuffle=False), w/o training samples in between
 
-    :param n_splits: The number of splits. Default to 3
-    :param samples_info_sets: The information range on which each record is constructed from
+    :param n_splits: (int) The number of splits. Default to 3
+    :param samples_info_sets: (pd.Series) The information range on which each record is constructed from
         *samples_info_sets.index*: Time when the information extraction started.
         *samples_info_sets.value*: Time when the information extraction ended.
-    :param pct_embargo: Percent that determines the embargo size.
+    :param pct_embargo: (float) Percent that determines the embargo size.
     """
 
     def __init__(self,
@@ -68,12 +72,12 @@ class PurgedKFold(KFold):
         """
         The main method to call for the PurgedKFold class
 
-        :param X: The pd.DataFrame samples dataset that is to be split
-        :param y: The pd.Series sample labels series
-        :param groups: array-like, with shape (n_samples,), optional
+        :param X: (pd.DataFrame) Samples dataset that is to be split
+        :param y: (pd.Series) Sample labels series
+        :param groups: (array-like), with shape (n_samples,), optional
             Group labels for the samples used while splitting the dataset into
             train/test set.
-        :return: This method yields uples of (train, test) where train and test are lists of sample indices
+        :return: (tuple) [train list of sample indices, and test list of sample indices]
         """
         if X.shape[0] != self.samples_info_sets.shape[0]:
             raise ValueError("X and the 'samples_info_sets' series param must be the same length")
@@ -109,7 +113,10 @@ def ml_cross_val_score(
     # pylint: disable=invalid-name
     # pylint: disable=comparison-with-callable
     """
-    Snippet 7.4, page 110, Using the PurgedKFold Class.
+    Advances in Financial Machine Learning, Snippet 7.4, page 110.
+
+    Using the PurgedKFold Class.
+
     Function to run a cross-validation evaluation of the using sample weights and a custom CV generator.
 
     Note: This function is different to the book in that it requires the user to pass through a CV object. The book
@@ -124,14 +131,14 @@ def ml_cross_val_score(
         cv_gen = PurgedKFold(n_splits=n_splits, samples_info_sets=samples_info_sets, pct_embargo=pct_embargo)
         scores_array = ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring=accuracy_score)
 
-    :param classifier: A sk-learn Classifier object instance.
-    :param X: The dataset of records to evaluate.
-    :param y: The labels corresponding to the X dataset.
-    :param cv_gen: Cross Validation generator object instance.
-    :param sample_weight_train: A numpy array of sample weights used to train the model for each record in the dataset.
-    :param sample_weight_score: A numpy array of sample weights used to evaluate the model quality.
-    :param scoring: A metric scoring, can be custom sklearn metric.
-    :return: The computed score as a numpy array.
+    :param classifier: (ClassifierMixin) A sk-learn Classifier object instance.
+    :param X: (pd.DataFrame) The dataset of records to evaluate.
+    :param y: (pd.Series) The labels corresponding to the X dataset.
+    :param cv_gen: (BaseCrossValidator) Cross Validation generator object instance.
+    :param sample_weight_train: (np.array) Sample weights used to train the model for each record in the dataset.
+    :param sample_weight_score: (np.array) Sample weights used to evaluate the model quality.
+    :param scoring: (Callable) A metric scoring, can be custom sklearn metric.
+    :return: (np.array) The computed score.
     """
 
     # If no sample_weight then broadcast a value of 1 to all samples (full weight).
