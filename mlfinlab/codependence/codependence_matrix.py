@@ -41,7 +41,7 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str) -> pd.DataFr
         dependence_matrix = np.array([
             [
                 dep_function(np_df[i], np_df[j], normalize=True) if j < i else
-                0.5 if j == 1 else  # Leave diagonal elements as 0.5 to later double them to 1
+                0.5 * dep_function(np_df[i], np_df[j], normalize=True) if j == i else  # Leave diagonal elements as 0.5 to later double them to 1
                 0  # Make upper triangle 0 to fill it later on
                 for j in range(n)
             ]
@@ -51,7 +51,7 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str) -> pd.DataFr
         dependence_matrix = np.array([
             [
                 dep_function(np_df[i], np_df[j]) if j < i else
-                0.5 if j == 1 else  # Leave diagonal elements as 0.5 to later double them to 1
+                0.5 * dep_function(np_df[i], np_df[j]) if j == i else  # Leave diagonal elements as 0.5 to later double them to 1
                 0  # Make upper triangle 0 to fill it later on
                 for j in range(n)
             ]
