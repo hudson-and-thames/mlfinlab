@@ -17,9 +17,9 @@ class TailSetLabels:
 
     def __init__(self, prices, window, mean_abs_dev):
         """
-        :param prices: (DataFrame) Asset prices.
+        :param prices: (pd.DataFrame) Asset prices.
         :param window: (int) Window period used in the calculation of the volatility.
-        :param mean_abs_dev: (Boolean) To use the mean absolute deviation or traditional standard deviation.
+        :param mean_abs_dev: (bool) To use the mean absolute deviation or traditional standard deviation.
         """
         self.prices = prices
         self.rets = np.log(prices).diff().dropna()
@@ -40,7 +40,7 @@ class TailSetLabels:
         Computes the tail sets (positive and negative) and then returns a tuple with 3 elements, positive set, negative
         set, full matrix set.
 
-        The positive and negative sets are each a series of lists with the names of the securites that fall within each
+        The positive and negative sets are each a series of lists with the names of the securities that fall within each
         set at a specific timestamp.
 
         For the full matirx a value of 1 indicates the volatility adjusted returns were in the upper decile, a value of
@@ -76,8 +76,8 @@ class TailSetLabels:
 
         Currently this method splits the data using deciles (10 groups).
 
-        :param row: (Series) vol adjusted returns for a given date.
-        :return: (Series) Tail set with positive and negative labels.
+        :param row: (pd.Series) Vol adjusted returns for a given date.
+        :return: (pd.Series) Tail set with positive and negative labels.
         """
         # Get decile labels
         row_deciles = pd.qcut(x=row, q=10, labels=range(1, 11), retbins=False)
@@ -96,25 +96,25 @@ class TailSetLabels:
     @staticmethod
     def _positive_tail_set(row):
         """
-        Takes as input a row from the vol_adj_price DataFrame and then returns a list of names of the securites in the
+        Takes as input a row from the vol_adj_price DataFrame and then returns a list of names of the securities in the
         positive tail set, for this specific row date.
 
         This method is used in an apply() setting.
 
-        :param row: (Series) of volatility adjusted prices.
-        :return: (list) of securities in the positive tail set.
+        :param row: (pd.Series) Volatility adjusted prices.
+        :return: (list) Securities in the positive tail set.
         """
         return list(row[row == 1].index)
 
     @staticmethod
     def _negative_tail_set(row):
         """
-        Takes as input a row from the vol_adj_price DataFrame and then returns a list of names of the securites in the
+        Takes as input a row from the vol_adj_price DataFrame and then returns a list of names of the securities in the
         negative tail set, for this specific row date.
 
         This method is used in an apply() setting.
 
-        :param row: (Series) of volatility adjusted prices.
-        :return: (list) of securities in the negative tail set.
+        :param row: (pd.Series) Volatility adjusted prices.
+        :return: (list) Securities in the negative tail set.
         """
         return list(row[row == -1].index)

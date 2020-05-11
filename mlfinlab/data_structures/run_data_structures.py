@@ -45,13 +45,13 @@ class EMARunBars(BaseRunBars):
         """
         Constructor
 
-        :param metric: (str) type of run bar to create. Example: "dollar_run"
+        :param metric: (str) Type of run bar to create. Example: "dollar_run"
         :param num_prev_bars: (int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
         :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
         :param exp_num_ticks_init: (int) Initial number of expected ticks
         :param exp_num_ticks_constraints (list) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
         :param batch_size: (int) Number of rows to read in from the csv, per batch
-        :param analyse_thresholds: (bool) flag to return thresholds values (theta, exp_num_ticks, exp_imbalance) in a
+        :param analyse_thresholds: (bool) Flag to return thresholds values (theta, exp_num_ticks, exp_imbalance) in a
                                           form of Pandas DataFrame
         """
         BaseRunBars.__init__(self, metric, batch_size, num_prev_bars, expected_imbalance_window,
@@ -87,7 +87,7 @@ class ConstRunBars(BaseRunBars):
         """
         Constructor
 
-        :param metric: (str) type of run bar to create. Example: "dollar_run"
+        :param metric: (str) Type of run bar to create. Example: "dollar_run"
         :param num_prev_bars: (int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
         :param expected_imbalance_window: (int) EMA window used to estimate expected run
         :param exp_num_ticks_init: (int) Initial number of expected ticks
@@ -114,7 +114,7 @@ def get_ema_dollar_run_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFr
                             in the format[date_time, price, volume]
     :param num_prev_bars: (int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
     :param expected_imbalance_window: (int) EMA window used to estimate expected run
-    :param exp_num_ticks_init: (int) initial expected number of ticks per bar
+    :param exp_num_ticks_init: (int) Initial expected number of ticks per bar
     :param exp_num_ticks_constraints: (list) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
@@ -145,7 +145,7 @@ def get_ema_volume_run_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFr
                             in the format[date_time, price, volume]
     :param num_prev_bars: (int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
     :param expected_imbalance_window: (int) EMA window used to estimate expected run
-    :param exp_num_ticks_init: (int) initial expected number of ticks per bar
+    :param exp_num_ticks_init: (int) Initial expected number of ticks per bar
     :param exp_num_ticks_constraints: (list) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
@@ -176,7 +176,7 @@ def get_ema_tick_run_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFram
                             in the format[date_time, price, volume]
     :param num_prev_bars: (int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
     :param expected_imbalance_window: (int) EMA window used to estimate expected run
-    :param exp_num_ticks_init: (int) initial expected number of ticks per bar
+    :param exp_num_ticks_init: (int) Initial expected number of ticks per bar
     :param exp_num_ticks_constraints: (list) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
@@ -206,13 +206,13 @@ def get_const_dollar_run_bars(file_path_or_df: Union[str, Iterable[str], pd.Data
                             in the format[date_time, price, volume]
     :param num_prev_bars: (int) Window size for estimating buy ticks proportion (number of previous bars to use in EWMA)
     :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
-    :param exp_num_ticks_init: (int) initial expected number of ticks per bar
+    :param exp_num_ticks_init: (int) Initial expected number of ticks per bar
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
     :param analyse_thresholds: (bool) Flag to save  and return thresholds used to sample run bars
     :param output_path: (str) Path to csv file, if to_csv is True
-    :return: DataFrame of dollar bars and DataFrame of thresholds, if to_csv=True returns None
+    :return: (pd.DataFrame) DataFrame of dollar bars and DataFrame of thresholds, if to_csv=True returns None
     """
     bars = ConstRunBars(metric='dollar_run', num_prev_bars=num_prev_bars,
                         expected_imbalance_window=expected_imbalance_window,
@@ -235,13 +235,13 @@ def get_const_volume_run_bars(file_path_or_df: Union[str, Iterable[str], pd.Data
                             in the format[date_time, price, volume]
     :param num_prev_bars: (int) Window size for estimating buy ticks proportion (number of previous bars to use in EWMA)
     :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
-    :param exp_num_ticks_init: (int) initial expected number of ticks per bar
+    :param exp_num_ticks_init: (int) Initial expected number of ticks per bar
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
     :param analyse_thresholds: (bool) Flag to save  and return thresholds used to sample run bars
     :param output_path: (str) Path to csv file, if to_csv is True
-    :return: DataFrame of volume bars and DataFrame of thresholds
+    :return: (pd.DataFrame) DataFrame of volume bars and DataFrame of thresholds
     """
     bars = ConstRunBars(metric='volume_run', num_prev_bars=num_prev_bars,
                         expected_imbalance_window=expected_imbalance_window,
@@ -264,13 +264,13 @@ def get_const_tick_run_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFr
                             in the format[date_time, price, volume]
     :param num_prev_bars: (int) Window size for estimating buy ticks proportion (number of previous bars to use in EWMA)
     :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
-    :param exp_num_ticks_init: (int) initial expected number of ticks per bar
+    :param exp_num_ticks_init: (int) Initial expected number of ticks per bar
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
     :param analyse_thresholds: (bool) Flag to save  and return thresholds used to sample run bars
     :param output_path: (str) Path to csv file, if to_csv is True
-    :return: DataFrame of tick bars and DataFrame of thresholds
+    :return: (pd.DataFrame) DataFrame of tick bars and DataFrame of thresholds
     """
     bars = ConstRunBars(metric='tick_run', num_prev_bars=num_prev_bars,
                         expected_imbalance_window=expected_imbalance_window,

@@ -121,8 +121,6 @@ Platinum Sponsor:
    :alt: Platinum Sponsors
    :target: https://machinefactor.tech/
 
-   `Machine Factor Technologies`_
-
 Gold Sponsors:
 **************
 
@@ -131,8 +129,7 @@ Gold Sponsors:
    :align: center
    :figclass: align-center
    :alt: Gold Sponsors
-
-   `E.P. Chan & Associates`_ &  `Markov Capital`_
+   :target: https://hudsonthames.org/sponsors/
 
 Contact us
 ##########

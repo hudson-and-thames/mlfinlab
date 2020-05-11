@@ -29,9 +29,9 @@ class CLA:
         """
         Initialise the storage arrays and some preprocessing.
 
-        :param weight_bounds: (tuple) a tuple specifying the lower and upper bound ranges for the portfolio weights
-        :param calculate_expected_returns: (str) the method to use for calculation of expected returns.
-                                        Currently supports "mean" and "exponential"
+        :param weight_bounds: (tuple) A tuple specifying the lower and upper bound ranges for the portfolio weights
+        :param calculate_expected_returns: (str) The method to use for calculation of expected returns.
+                                                 Currently supports "mean" and "exponential"
         """
 
         self.weight_bounds = weight_bounds
@@ -61,13 +61,13 @@ class CLA:
         """
         Calculate the portfolio asset allocations using the method specified.
 
-        :param asset_names: (list) a list of strings containing the asset names
-        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (adj closed)
-        :param expected_asset_returns: (list) a list of mean stock returns (mu)
-        :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns
-        :param solution: (str) specify the type of solution to compute. Supported strings: "cla_turning_points", "max_sharpe",
+        :param asset_names: (list) List of strings containing the asset names
+        :param asset_prices: (pd.Dataframe) Dataframe of historical asset prices (adj closed)
+        :param expected_asset_returns: (list) List of mean stock returns (mu)
+        :param covariance_matrix: (pd.Dataframe/numpy matrix) User supplied covariance matrix of asset returns
+        :param solution: (str) Specifies the type of solution to compute. Supported strings: "cla_turning_points", "max_sharpe",
                                "min_volatility", "efficient_frontier"
-        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+        :param resample_by: (str) Specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         """
 
@@ -149,7 +149,7 @@ class CLA:
         """
         Converts a Nonetype object to inf.
 
-        :param number: (int/float/None) a number
+        :param number: (int/float/None) Number
         :return: (float) -inf or number
         """
         return float("-inf") if number is None else number
@@ -186,11 +186,11 @@ class CLA:
         """
         Calculates which bound value to assign to a bounded asset - lower bound or upper bound.
 
-        :param c_final: (float) a value calculated using the covariance matrices of free weights.
-                          Refer to https://pdfs.semanticscholar.org/4fb1/2c1129ba5389bafe47b03e595d098d0252b9.pdf for
-                          more information.
-        :param asset_bounds_i: (list) a list containing the lower and upper bound values for the ith weight
-        :return: bounded weight value
+        :param c_final: (float) A value calculated using the covariance matrices of free weights.
+                                Refer to https://pdfs.semanticscholar.org/4fb1/2c1129ba5389bafe47b03e595d098d0252b9.pdf
+                                for more information.
+        :param asset_bounds_i: (list) A list containing the lower and upper bound values for the ith weight
+        :return: (float) Bounded weight value
         """
 
         if c_final > 0:
@@ -201,12 +201,11 @@ class CLA:
         """
         Compute the turning point associated with the current set of free weights F.
 
-        :param covar_f_inv: (np.array) inverse of covariance matrix of free assets
-        :param covar_fb: (np.array) covariance matrix between free assets and bounded assets
-        :param mean_f: (np.array) expected returns of free assets
-        :param w_b: (np.array) bounded asset weight values
-
-        :return: (array, float) list of turning point weights and gamma value from the langrange equation
+        :param covar_f_inv: (np.array) Inverse of covariance matrix of free assets
+        :param covar_fb: (np.array) Covariance matrix between free assets and bounded assets
+        :param mean_f: (np.array) Expected returns of free assets
+        :param w_b: (np.array) Bounded asset weight values
+        :return: (array, float) List of turning point weights and gamma value from the lagrange equation
         """
 
         # Compute gamma
@@ -231,15 +230,15 @@ class CLA:
 
     def _compute_lambda(self, covar_f_inv, covar_fb, mean_f, w_b, asset_index, b_i):
         """
-        Calculate the lambda value in the langrange optimsation equation.
+        Calculate the lambda value in the lagrange optimsation equation.
 
-        :param covar_f_inv: (np.array) inverse of covariance matrix of free assets
-        :param covar_fb: (np.array) covariance matrix between free assets and bounded assets
-        :param mean_f: (np.array) expected returns of free assets
-        :param w_b: (np.array) bounded asset weight values
-        :param asset_index: (int) index of the asset in the portfolio
-        :param b_i: (list) list of upper and lower bounded weight values
-        :return: (float) lambda value
+        :param covar_f_inv: (np.array) Inverse of covariance matrix of free assets
+        :param covar_fb: (np.array) Covariance matrix between free assets and bounded assets
+        :param mean_f: (np.array) Expected returns of free assets
+        :param w_b: (np.array) Bounded asset weight values
+        :param asset_index: (int) Index of the asset in the portfolio
+        :param b_i: (list) List of upper and lower bounded weight values
+        :return: (float) Lambda value
         """
 
         # Compute C
@@ -274,8 +273,8 @@ class CLA:
         """
         Calculate the required matrices between free and bounded assets.
 
-        :param free_weights: (list) list of free assets/weights
-        :return: (tuple of np.array matrices) the corresponding matrices
+        :param free_weights: (list) List of free assets/weights
+        :return: (tuple of np.array matrices) The corresponding matrices
         """
 
         covar_f = self._reduce_matrix(self.cov_matrix, free_weights, free_weights)
@@ -289,8 +288,8 @@ class CLA:
         """
         Compute the list of bounded assets.
 
-        :param free_weights: (np.array) list of free weights/assets
-        :return: (np.array) list of bounded assets/weights
+        :param free_weights: (np.array) List of free weights/assets
+        :return: (np.array) List of bounded assets/weights
         """
 
         return self._diff_lists(list(range(self.expected_returns.shape[0])), free_weights)
@@ -300,9 +299,9 @@ class CLA:
         """
         Calculate the set difference between two lists.
 
-        :param list_1: (list) a list of asset indices
-        :param list_2: (list) another list of asset indices
-        :return: (list) set difference between the two input lists
+        :param list_1: (list) A list of asset indices
+        :param list_2: (list) Another list of asset indices
+        :return: (list) Set difference between the two input lists
         """
 
         return list(set(list_1) - set(list_2))
@@ -312,10 +311,10 @@ class CLA:
         """
         Reduce a matrix to the provided set of rows and columns.
 
-        :param matrix: (np.array) a matrix whose subset of rows and columns we need
-        :param row_indices: (list) list of row indices for the matrix
-        :param col_indices: (list) list of column indices for the matrix
-        :return: (np.array) subset of input matrix
+        :param matrix: (np.array) A matrix whose subset of rows and columns we need
+        :param row_indices: (list) List of row indices for the matrix
+        :param col_indices: (list) List of column indices for the matrix
+        :return: (np.array) Subset of input matrix
         """
 
         return matrix[np.ix_(row_indices, col_indices)]
@@ -324,7 +323,7 @@ class CLA:
         """
         Purge violations of inequality constraints (associated with ill-conditioned cov matrix).
 
-        :param tol: (float) tolerance level for purging
+        :param tol: (float) Tolerance level for purging
         """
 
         index_1 = 0
@@ -423,9 +422,9 @@ class CLA:
         """
         Evaluate the sharpe ratio of the portfolio within the convex combination.
 
-        :param alpha: (float) convex combination value
-        :param w_0: (list) first endpoint of convex combination of weights
-        :param w_1: (list) second endpoint of convex combination of weights
+        :param alpha: (float) Convex combination value
+        :param w_0: (list) First endpoint of convex combination of weights
+        :param w_1: (list) Second endpoint of convex combination of weights
         :return:
         """
 
@@ -438,8 +437,8 @@ class CLA:
         """
         Add a free weight to list of bounded weights.
 
-        :param free_weights: (list) list of free-weight indices
-        :return: (float, int, int) lambda value, index of free weight to be bounded, bound weight value
+        :param free_weights: (list) List of free-weight indices
+        :return: (float, int, int) Lambda value, index of free weight to be bounded, bound weight value
         """
 
         lambda_in = None
@@ -462,8 +461,8 @@ class CLA:
         """
         Add a bounded weight to list of free weights.
 
-        :param free_weights: (list) list of free-weight indices
-        :return: (float, int) lambda value, index of the bounded weight to be made free
+        :param free_weights: (list) List of free-weight indices
+        :return: (float, int) Lambda value, index of the bounded weight to be made free
         """
 
         lambda_out = None
@@ -490,11 +489,11 @@ class CLA:
         """
         Initialise covariances, upper-counds, lower-bounds and storage buffers.
 
-        :param asset_prices: (pd.Dataframe) dataframe of asset prices indexed by date
-        :param expected_asset_returns: (list) a list of mean stock returns (mu)
-        :param covariance_matrix: (pd.Dataframe) user supplied dataframe of asset returns indexed by date. Used for
-                                              calculation of covariance matrix
-        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+        :param asset_prices: (pd.Dataframe) Dataframe of asset prices indexed by date
+        :param expected_asset_returns: (list) A list of mean stock returns (mu)
+        :param covariance_matrix: (pd.Dataframe) User supplied dataframe of asset returns indexed by date. Used for
+                                                 calculation of covariance matrix
+        :param resample_by: (str) Specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   'B' meaning daily business days which is equivalent to no resampling
         """
 
@@ -543,8 +542,8 @@ class CLA:
         """
         Compute the desired solution to the portfolio optimisation problem.
 
-        :param assets: (list) a list of asset names
-        :param solution: (str) specify the type of solution to compute. Options are: cla_turning_points, max_sharpe,
+        :param assets: (list) A list of asset names
+        :param solution: (str) Specify the type of solution to compute. Options are: cla_turning_points, max_sharpe,
                                min_volatility, efficient_frontier
         """
 
@@ -578,7 +577,7 @@ class CLA:
         """
         Compute the maximum sharpe portfolio allocation.
 
-        :return: (float, np.array) tuple of max. sharpe value and the set of weight allocations
+        :return: (float, np.array) Tuple of max. sharpe value and the set of weight allocations
         """
 
         # 1) Compute the local max SR portfolio between any two neighbor turning points
@@ -599,7 +598,7 @@ class CLA:
         """
         Compute minimum volatility portfolio allocation.
 
-        :return: (float, np.array) tuple of minimum variance value and the set of weight allocations
+        :return: (float, np.array) Tuple of minimum variance value and the set of weight allocations
         """
 
         var = []
@@ -614,8 +613,8 @@ class CLA:
         """
         Compute the entire efficient frontier solution.
 
-        :param points: (int) number of efficient frontier points to be calculated
-        :return: tuple of mean, variance amd weights of the frontier solutions
+        :param points: (int) Number of efficient frontier points to be calculated
+        :return: (tuple) Tuple of mean, variance amd weights of the frontier solutions
         """
 
         means, sigma, weights = [], [], []

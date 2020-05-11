@@ -15,7 +15,9 @@ import pandas as pd
 # Snippet 20.5 (page 306), the lin_parts function
 def lin_parts(num_atoms, num_threads):
     """
-    Snippet 20.5 (page 306), the lin_parts function
+    Advances in Financial Machine Learning, Snippet 20.5, page 306.
+
+    The lin_parts function
 
     The simplest way to form molecules is to partition a list of atoms in subsets of equal size,
     where the number of subsets is the minimum between the number of processors and the number
@@ -24,6 +26,10 @@ def lin_parts(num_atoms, num_threads):
 
     This function partitions a list of atoms in subsets (molecules) of equal size.
     An atom is a set of indivisible set of tasks.
+
+    :param num_atoms: (int) Number of atoms
+    :param num_threads: (int) Number of processors
+    :return: (np.array) Partition of atoms
     """
     # Partition of atoms with a single loop
     parts = np.linspace(0, num_atoms, min(num_threads, num_atoms) + 1)
@@ -34,9 +40,15 @@ def lin_parts(num_atoms, num_threads):
 # Snippet 20.6 (page 308), The nested_parts function
 def nested_parts(num_atoms, num_threads, upper_triangle=False):
     """
-    Snippet 20.6 (page 308), The nested_parts function
+    Advances in Financial Machine Learning, Snippet 20.6, page 308.
+
+    The nested_parts function
 
     This function enables parallelization of nested loops.
+    :param num_atoms: (int) Number of atoms
+    :param num_threads: (int) Number of processors
+    :param upper_triangle: (bool) Flag to order atoms as an upper triangular matrix (including the main diagonal)
+    :return: (np.array) Partition of atoms
     """
     # Partition of atoms with an inner loop
     parts = [0]
@@ -59,7 +71,9 @@ def nested_parts(num_atoms, num_threads, upper_triangle=False):
 # Snippet 20.7 (page 310), The mpPandasObj, used at various points in the book
 def mp_pandas_obj(func, pd_obj, num_threads=24, mp_batches=1, lin_mols=True, **kargs):
     """
-    Snippet 20.7 (page 310), The mpPandasObj, used at various points in the book
+    Advances in Financial Machine Learning, Snippet 20.7, page 310.
+
+    The mpPandasObj, used at various points in the book
 
     Parallelize jobs, return a dataframe or series.
     Example: df1=mp_pandas_obj(func,('molecule',df0.index),24,**kwds)
@@ -85,14 +99,14 @@ def mp_pandas_obj(func, pd_obj, num_threads=24, mp_batches=1, lin_mols=True, **k
 
     Fourth, we stitch together the output from every molecule into a single list, series, or dataframe.
 
-    :param func: A callback function, which will be executed in parallel
+    :param func: (function) A callback function, which will be executed in parallel
     :param pd_obj: (tuple) Element 0: The name of the argument used to pass molecules to the callback function
                     Element 1: A list of indivisible tasks (atoms), which will be grouped into molecules
     :param num_threads: (int) The number of threads that will be used in parallel (one processor per thread)
     :param mp_batches: (int) Number of parallel batches (jobs per core)
     :param lin_mols: (bool) Tells if the method should use linear or nested partitioning
     :param kargs: (var args) Keyword arguments needed by func
-    :return: (data frame) of results
+    :return: (pd.DataFrame) of results
     """
 
     if lin_mols:
@@ -128,9 +142,14 @@ def mp_pandas_obj(func, pd_obj, num_threads=24, mp_batches=1, lin_mols=True, **k
 # Snippet 20.8, pg 311, Single thread execution, for debugging
 def process_jobs_(jobs):
     """
-    # Snippet 20.8, pg 311, Single thread execution, for debugging
+    Advances in Financial Machine Learning, Snippet 20.8, page 311.
+
+    Single thread execution, for debugging
 
     Run jobs sequentially, for debugging
+
+    :param jobs: (list) Jobs (molecules)
+    :return: (list) Results of jobs
     """
     out = []
     for job in jobs:
@@ -143,9 +162,14 @@ def process_jobs_(jobs):
 # Snippet 20.10 Passing the job (molecule) to the callback function
 def expand_call(kargs):
     """
-    Snippet 20.10 Passing the job (molecule) to the callback function
+    Advances in Financial Machine Learning, Snippet 20.10.
+
+    Passing the job (molecule) to the callback function
 
     Expand the arguments of a callback function, kargs['func']
+
+    :param kargs: Job (molecule)
+    :return: Result of a job
     """
     func = kargs['func']
     del kargs['func']
@@ -156,7 +180,15 @@ def expand_call(kargs):
 # Snippet 20.9.1, pg 312, Example of Asynchronous call to pythons multiprocessing library
 def report_progress(job_num, num_jobs, time0, task):
     """
-    Snippet 20.9.1, pg 312, Example of Asynchronous call to pythons multiprocessing library
+    Advances in Financial Machine Learning, Snippet 20.9.1, pg 312.
+
+    Example of Asynchronous call to pythons multiprocessing library
+
+    :param job_num: (int) Number of current job
+    :param num_jobs: (int) Total number of jobs
+    :param time0: (time) Start time
+    :param task: (str) Task description
+    :return: (None)
     """
     # Report progress as asynch jobs are completed
     msg = [float(job_num) / num_jobs, (time.time() - time0) / 60.0]
@@ -175,9 +207,16 @@ def report_progress(job_num, num_jobs, time0, task):
 # Snippet 20.9.2, pg 312, Example of Asynchronous call to pythons multiprocessing library
 def process_jobs(jobs, task=None, num_threads=24):
     """
-    Snippet 20.9.2, pg 312, Example of Asynchronous call to pythons multiprocessing library
+    Advances in Financial Machine Learning, Snippet 20.9.2, page 312.
+
+    Example of Asynchronous call to pythons multiprocessing library
 
     Run in parallel. jobs must contain a 'func' callback, for expand_call
+
+    :param jobs: (list) Jobs (molecules)
+    :param task: (str) Task description
+    :param num_threads: (int) The number of threads that will be used in parallel (one processor per thread)
+    :return: (None)
     """
 
     if task is None:
