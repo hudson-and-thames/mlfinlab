@@ -22,7 +22,7 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str) -> pd.DataFr
     """
     # Get the feature names.
     features_cols = df.columns.values
-    n = df.shape[0]
+    n = df.shape[1]
     np_df = df.values.T  # Make columnar access, but for np.array
 
     # Defining the dependence function.
