@@ -1,10 +1,13 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import pandas as pd
-from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics.pairwise import pairwise_distances
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
 from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
+from scipy.cluster.hierarchy import fcluster
+from scipy.cluster.hierarchy import dendrogram
+from scipy.cluster.hierarchy import linkage as scipy_linkage
+from scipy.spatial.distance import squareform
 
 
 class HierarchicalClusteringAssetAllocation:
@@ -41,7 +44,7 @@ class HierarchicalClusteringAssetAllocation:
                  covariance_matrix=None,
                  expected_asset_returns=None,
                  allocation_metric='equal_weighting',
-                 linkage='average',
+                 linkage='ward',
                  confidence_level=0.05,
                  optimal_num_clusters=None,
                  resample_by=None):
@@ -59,6 +62,7 @@ class HierarchicalClusteringAssetAllocation:
                                         "minimum_variance", "minimum_standard_deviation", "sharpe_ratio", "expected_shortfall",
                                         "conditional_drawdown_risk"
         :param linkage: (str) the type of linkage method to use for clustering. Supported strings - "single", "average", "complete"
+                              and "ward"
         :param confidence_level: (float) the confidence level (alpha) used for calculating expected shortfall and conditional
                                          drawdown at risk
         :param optimal_num_clusters: (int) optimal number of clusters for hierarchical clustering
@@ -114,9 +118,11 @@ class HierarchicalClusteringAssetAllocation:
                                                                         asset_returns=asset_returns)
 
         # Tree Clustering
-        self.clusters = self._tree_clustering(correlation=corr, num_clusters=optimal_num_clusters, linkage=linkage)
+        self.clusters, self.cluster_children = self._tree_clustering(correlation=corr,
+                                                                     num_clusters=optimal_num_clusters,
+                                                                     linkage=linkage)
 
-        # Quasi Diagnalization
+        # Get the flattened order of assets in hierarchical clustering tree
         num_assets = len(asset_names)
         self.ordered_indices = self._quasi_diagnalization(num_assets, 2 * num_assets - 2)
 
@@ -126,7 +132,17 @@ class HierarchicalClusteringAssetAllocation:
                                   covariance_matrix=cov,
                                   assets=asset_names,
                                   allocation_metric=allocation_metric,
+                                  optimal_num_clusters=optimal_num_clusters,
                                   confidence_level=confidence_level)
+
+    def plot_clusters(self, assets):
+        """
+        Plot a dendrogram of the hierarchical clusters.
+        :param assets: (list) list of asset names in the portfolio
+        """
+
+        dendrogram_plot = dendrogram(self.clusters, labels=assets)
+        return dendrogram_plot
 
     @staticmethod
     def _compute_cluster_inertia(labels, asset_returns):
@@ -159,11 +175,9 @@ class HierarchicalClusteringAssetAllocation:
         """
 
         max_number_of_clusters = min(10, asset_returns.shape[1])
-        cluster_func = AgglomerativeClustering(affinity='precomputed', linkage=linkage)
         original_distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
         gap_values = []
         for num_clusters in range(1, max_number_of_clusters + 1):
-            cluster_func.n_clusters = num_clusters
 
             # Calculate expected inertia from reference datasets
             reference_inertias = []
@@ -174,14 +188,17 @@ class HierarchicalClusteringAssetAllocation:
                 reference_correlation = np.array(reference_asset_returns.corr())
                 reference_distance_matrix = np.sqrt(2 * (1 - reference_correlation).round(5))
 
-                reference_cluster_assignments = cluster_func.fit_predict(reference_distance_matrix)
+                # reference_cluster_assignments = cluster_func.fit_predict(reference_distance_matrix)
+                reference_clusters = scipy_linkage(squareform(reference_distance_matrix), method=linkage)
+                reference_cluster_assignments = fcluster(reference_clusters, num_clusters, criterion='maxclust')
                 inertia = self._compute_cluster_inertia(reference_cluster_assignments, reference_asset_returns.values)
                 reference_inertias.append(inertia)
             expected_inertia = np.mean(reference_inertias)
 
             # Calculate inertia from original data
-            original_cluster_asignments = cluster_func.fit_predict(original_distance_matrix)
-            inertia = self._compute_cluster_inertia(original_cluster_asignments, asset_returns.values)
+            original_clusters = scipy_linkage(squareform(original_distance_matrix), method=linkage)
+            original_cluster_assignments = fcluster(original_clusters, num_clusters, criterion='maxclust')
+            inertia = self._compute_cluster_inertia(original_cluster_assignments, asset_returns.values)
 
             # Calculate the gap statistic
             gap = expected_inertia - inertia
@@ -189,8 +206,7 @@ class HierarchicalClusteringAssetAllocation:
 
         return 1 + np.argmax(gap_values)
 
-    @staticmethod
-    def _tree_clustering(correlation, num_clusters, linkage):
+    def _tree_clustering(self, correlation, num_clusters, linkage):
         """
         Perform agglomerative clustering on the current portfolio.
 
@@ -200,12 +216,14 @@ class HierarchicalClusteringAssetAllocation:
         :return: (list) structure of hierarchical tree
         """
 
-        cluster_func = AgglomerativeClustering(n_clusters=num_clusters,
-                                               affinity='precomputed',
-                                               linkage=linkage)
         distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
-        cluster_func.fit(distance_matrix)
-        return cluster_func.children_
+        clusters = scipy_linkage(squareform(distance_matrix.values), method=linkage)
+        clustering_inds = fcluster(clusters, num_clusters, criterion='maxclust')
+        cluster_children = {i - 1: [] for i in range(min(clustering_inds),
+                                         max(clustering_inds) + 1)}
+        for i, v in enumerate(clustering_inds):
+            cluster_children[v - 1].append(i)
+        return clusters, cluster_children
 
     def _quasi_diagnalization(self, num_assets, curr_index):
         """
@@ -223,6 +241,122 @@ class HierarchicalClusteringAssetAllocation:
         right = int(self.clusters[curr_index - num_assets, 1])
 
         return (self._quasi_diagnalization(num_assets, left) + self._quasi_diagnalization(num_assets, right))
+
+    def _recursive_bisection(self,
+                             expected_asset_returns,
+                             asset_returns,
+                             covariance_matrix,
+                             assets,
+                             allocation_metric,
+                             optimal_num_clusters,
+                             confidence_level):
+        # pylint: disable=bad-continuation, too-many-locals
+        """
+        Recursively assign weights to the clusters - ultimately assigning weights to the individual assets.
+
+        :param expected_asset_returns: (list) a list of mean asset returns (mu)
+        :param asset_returns: (pd.DataFrame) historical asset returns
+        :param covariance_matrix: (pd.DataFrame) the covariance matrix
+        :param assets: (list) list of asset names in the portfolio
+        :param allocation_metric: (str) the metric used for calculating weight allocations
+        optimal_num_clusters: (int) optimal number of clusters for hierarchical tree clustering
+        :param confidence_level: (float) the confidence level (alpha)
+        """
+
+        num_assets = len(assets)
+        self.weights = np.ones(shape=num_assets)
+        clusters_contribution = np.ones(shape=optimal_num_clusters)
+        clusters_weights = np.ones(shape=optimal_num_clusters)
+        clusters_variance = np.ones(shape=optimal_num_clusters)
+
+        # Calculate the corresponding risk measure for the clusters
+        for cluster_index in range(optimal_num_clusters):
+            cluster_asset_indices = self.cluster_children[cluster_index]
+
+            if allocation_metric == 'minimum_variance':
+                clusters_contribution[cluster_index] = self._get_cluster_variance(covariance_matrix, cluster_asset_indices)
+            elif allocation_metric == 'minimum_standard_deviation':
+                clusters_contribution[cluster_index] = np.sqrt(self._get_cluster_variance(covariance_matrix, cluster_asset_indices))
+            elif allocation_metric == 'sharpe_ratio':
+                clusters_contribution[cluster_index] = self._get_cluster_sharpe_ratio(expected_asset_returns,
+                                                                      covariance_matrix,
+                                                                      cluster_asset_indices)
+                clusters_variance[cluster_index] = self._get_cluster_variance(covariance_matrix, cluster_asset_indices)
+            elif allocation_metric == 'expected_shortfall':
+                clusters_contribution[cluster_index] = self._get_cluster_expected_shortfall(asset_returns=asset_returns,
+                                                                                       covariance=covariance_matrix,
+                                                                                       confidence_level=confidence_level,
+                                                                                       cluster_indices=cluster_asset_indices)
+            elif allocation_metric == 'conditional_drawdown_risk':
+                clusters_contribution[cluster_index] = self._get_cluster_conditional_drawdown_at_risk(
+                    asset_returns=asset_returns,
+                    covariance=covariance_matrix,
+                    confidence_level=confidence_level,
+                    cluster_indices=cluster_asset_indices)
+
+        # Recursive bisection taking into account the dendrogram structure
+        for cluster_index in range(optimal_num_clusters - 1):
+
+            # Get the left and right cluster ids
+            left_cluster_ids, right_cluster_ids = self._get_children_cluster_ids(num_assets=num_assets,
+                                                                                 parent_cluster_index=cluster_index)
+
+            # Compute alpha
+            left_cluster_contribution = np.sum(clusters_contribution[left_cluster_ids])
+            right_cluster_contribution = np.sum(clusters_contribution[right_cluster_ids])
+            if allocation_metric in {'minimum_variance', 'minimum_standard_deviation', 'expected_shortfall',
+                                     'conditional_drawdown_risk'}:
+                alloc_factor = 1 - left_cluster_contribution / (left_cluster_contribution + right_cluster_contribution)
+            elif allocation_metric == 'sharpe_ratio':
+                alloc_factor = left_cluster_contribution / (left_cluster_contribution + right_cluster_contribution)
+
+                # If sharp ratio allocation factor is not within limits, then calculate normal cluster variance allocation
+                # factor
+                if alloc_factor < 0 or alloc_factor > 1:
+                    left_cluster_variance = np.sum(clusters_variance[left_cluster_ids])
+                    right_cluster_variance = np.sum(clusters_variance[right_cluster_ids])
+                    alloc_factor = 1 - left_cluster_variance / (left_cluster_variance + right_cluster_variance)
+            else:
+                alloc_factor = 0.5 # equal weighting
+
+            # Assign weights to each sub-cluster
+            clusters_weights[left_cluster_ids] *= alloc_factor
+            clusters_weights[right_cluster_ids] *= 1 - alloc_factor
+
+        # Compute the final weights
+        for cluster_index in range(optimal_num_clusters):
+            cluster_asset_indices = self.cluster_children[cluster_index]
+            cluster_covariance = covariance_matrix.iloc[cluster_asset_indices, cluster_asset_indices]
+            ivp_weights = self._get_inverse_variance_weights(cluster_covariance)
+            self.weights[cluster_asset_indices] = ivp_weights * clusters_weights[cluster_index]
+
+        # Assign actual asset names to weight index
+        self.weights = pd.DataFrame(self.weights)
+        self.weights.index = assets[self.ordered_indices]
+        self.weights = self.weights.T
+
+    def _get_children_cluster_ids(self, num_assets, parent_cluster_index):
+        """
+
+        :param num_assets:
+        :param parent_cluster_index:
+        :return:
+        """
+
+        left = int(self.clusters[num_assets - 2 - parent_cluster_index, 0])
+        right = int(self.clusters[num_assets - 2 - parent_cluster_index, 1])
+        left_cluster = self._quasi_diagnalization(num_assets, left)
+        right_cluster = self._quasi_diagnalization(num_assets, right)
+
+        left_cluster_ids = []
+        right_cluster_ids = []
+        for id_cluster, cluster in self.cluster_children.items():
+            if sorted(self._intersection(left_cluster, cluster)) == sorted(cluster):
+                left_cluster_ids.append(id_cluster)
+            if sorted(self._intersection(right_cluster, cluster)) == sorted(cluster):
+                right_cluster_ids.append(id_cluster)
+
+        return left_cluster_ids, right_cluster_ids
 
     @staticmethod
     def _get_inverse_variance_weights(covariance):
@@ -306,93 +440,9 @@ class HierarchicalClusteringAssetAllocation:
                                                                                              confidence_level=confidence_level)
         return cluster_conditional_drawdown
 
-    def _recursive_bisection(self,
-                             expected_asset_returns,
-                             asset_returns,
-                             covariance_matrix,
-                             assets,
-                             allocation_metric,
-                             confidence_level):
-        # pylint: disable=bad-continuation, too-many-locals
-        """
-        Recursively assign weights to the clusters - ultimately assigning weights to the individual assets.
-
-        :param expected_asset_returns: (list) a list of mean asset returns (mu)
-        :param asset_returns: (pd.DataFrame) historical asset returns
-        :param covariance_matrix: (pd.DataFrame) the covariance matrix
-        :param assets: (list) list of asset names in the portfolio
-        :param allocation_metric: (str) the metric used for calculating weight allocations
-        :param confidence_level: (float) the confidence level (alpha)
-        """
-
-        self.weights = pd.Series(1, index=self.ordered_indices)
-        clustered_alphas = [self.ordered_indices]
-
-        while clustered_alphas:
-            clustered_alphas = [cluster[start:end]
-                                for cluster in clustered_alphas
-                                for start, end in ((0, len(cluster) // 2), (len(cluster) // 2, len(cluster)))
-                                if len(cluster) > 1]
-
-            for subcluster in range(0, len(clustered_alphas), 2):
-                left_cluster = clustered_alphas[subcluster]
-                right_cluster = clustered_alphas[subcluster + 1]
-
-                # Calculate allocation factor based on the metric
-                if allocation_metric == 'minimum_variance':
-                    left_cluster_variance = self._get_cluster_variance(covariance_matrix, left_cluster)
-                    right_cluster_variance = self._get_cluster_variance(covariance_matrix, right_cluster)
-                    alloc_factor = 1 - left_cluster_variance / (left_cluster_variance + right_cluster_variance)
-                elif allocation_metric == 'minimum_standard_deviation':
-                    left_cluster_sd = np.sqrt(self._get_cluster_variance(covariance_matrix, left_cluster))
-                    right_cluster_sd = np.sqrt(self._get_cluster_variance(covariance_matrix, right_cluster))
-                    alloc_factor = 1 - left_cluster_sd / (left_cluster_sd + right_cluster_sd)
-                elif allocation_metric == 'sharpe_ratio':
-                    left_cluster_sharpe_ratio = self._get_cluster_sharpe_ratio(expected_asset_returns,
-                                                                               covariance_matrix,
-                                                                               left_cluster)
-                    right_cluster_sharpe_ratio = self._get_cluster_sharpe_ratio(expected_asset_returns,
-                                                                                covariance_matrix,
-                                                                                right_cluster)
-                    alloc_factor = left_cluster_sharpe_ratio / (left_cluster_sharpe_ratio + right_cluster_sharpe_ratio)
-
-                    if alloc_factor < 0 or alloc_factor > 1:
-                        left_cluster_variance = self._get_cluster_variance(covariance_matrix, left_cluster)
-                        right_cluster_variance = self._get_cluster_variance(covariance_matrix, right_cluster)
-                        alloc_factor = 1 - left_cluster_variance / (left_cluster_variance + right_cluster_variance)
-                elif allocation_metric == 'expected_shortfall':
-                    left_cluster_expected_shortfall = self._get_cluster_expected_shortfall(asset_returns=asset_returns,
-                                                                                           covariance=covariance_matrix,
-                                                                                           confidence_level=confidence_level,
-                                                                                           cluster_indices=left_cluster)
-                    right_cluster_expected_shortfall = self._get_cluster_expected_shortfall(asset_returns=asset_returns,
-                                                                                           covariance=covariance_matrix,
-                                                                                           confidence_level=confidence_level,
-                                                                                           cluster_indices=right_cluster)
-                    alloc_factor = \
-                        1 - left_cluster_expected_shortfall / (left_cluster_expected_shortfall + right_cluster_expected_shortfall)
-                elif allocation_metric == 'conditional_drawdown_risk':
-                    left_cluster_conditional_drawdown = self._get_cluster_conditional_drawdown_at_risk(asset_returns=asset_returns,
-                                                         covariance=covariance_matrix,
-                                                         confidence_level=confidence_level,
-                                                         cluster_indices=left_cluster)
-                    right_cluster_conditional_drawdown = self._get_cluster_conditional_drawdown_at_risk(asset_returns=asset_returns,
-                                                         covariance=covariance_matrix,
-                                                         confidence_level=confidence_level,
-                                                         cluster_indices=right_cluster)
-                    alloc_factor = \
-                        1 - left_cluster_conditional_drawdown / (left_cluster_conditional_drawdown + right_cluster_conditional_drawdown)
-                else:
-                    alloc_factor = 0.5 # equal weighting
-
-                # Assign weights to each sub-cluster
-                self.weights[left_cluster] *= alloc_factor
-                self.weights[right_cluster] *= 1 - alloc_factor
-
-        # Assign actual asset values to weight index
-        self.weights.index = assets[self.ordered_indices]
-        self.weights = pd.DataFrame(self.weights)
-        self.weights = self.weights.T
+    @staticmethod
+    def _intersection(lst1, lst2):
+        return list(set(lst1) & set(lst2))
 
     @staticmethod
     def _cov2corr(covariance):
