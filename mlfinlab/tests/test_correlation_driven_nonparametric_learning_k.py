@@ -92,3 +92,23 @@ class TestCorrelationDrivenNonparametricLearningK(TestCase):
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn_k5.allocate(self.data)
+
+    def test_corn_k_k1_error(self):
+        """
+        Tests ValueError if k is an integer
+        """
+        # Initialize CORN-K.
+        corn_k6 = CorrelationDrivenNonparametricLearningK(window=2, rho=2, k=1.5)
+        with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
+            corn_k6.allocate(self.data)
+
+    def test_corn_k_k2_error(self):
+        """
+        Tests ValueError if k is greater than or equal to 1.
+        """
+        # Initialize CORN-K.
+        corn_k7 = CorrelationDrivenNonparametricLearningK(window=2, rho=2, k=0)
+        with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
+            corn_k7.allocate(self.data)

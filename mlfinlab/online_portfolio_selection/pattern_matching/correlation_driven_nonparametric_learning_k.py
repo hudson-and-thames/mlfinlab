@@ -50,6 +50,10 @@ class CorrelationDrivenNonparametricLearningK(UniversalPortfolio):
         if not isinstance(self.rho, int):
             raise ValueError("Rho value must be an integer.")
 
+        # Check that k value is an integer.
+        if not isinstance(self.k, int):
+            raise ValueError("K value must be an integer.")
+
         # Check that window value is at least 1.
         if self.window < 1:
             raise ValueError("Window value must be greater than or equal to 1.")
@@ -58,9 +62,13 @@ class CorrelationDrivenNonparametricLearningK(UniversalPortfolio):
         if self.rho < 1:
             raise ValueError("Rho value must be greater than or equal to 1.")
 
-        # Check that k value is at least window * rho.
+        # Check that k value is at least 1.
+        if self.k < 1:
+            raise ValueError("K value must be greater than or equal to 1.")
+
+        # Check that k value is less than window * rho.
         if self.k > self.number_of_experts:
-            raise ValueError("K must be less than window * rho.")
+            raise ValueError("K must be less than or equal to window * rho.")
 
         super(CorrelationDrivenNonparametricLearningK, self)._initialize(asset_prices,
                                                                          weights,
@@ -72,8 +80,10 @@ class CorrelationDrivenNonparametricLearningK(UniversalPortfolio):
         """
         # Initialize expert parameters.
         self.expert_params = np.zeros((self.number_of_experts, 2))
+
         # Pointer to iterate through parameter locations.
         pointer = 0
+
         # Window from 1 to self.window.
         for n_window in range(self.window):
             # Rho from 0 to (rho - 1)/rho.
@@ -82,7 +92,7 @@ class CorrelationDrivenNonparametricLearningK(UniversalPortfolio):
                 self.expert_params[pointer] = [n_window + 1, n_rho/self.rho]
                 # Next pointer.
                 pointer += 1
-
+        # Assign parameters.
         for exp in range(self.number_of_experts):
             param = self.expert_params[exp]
             self.experts.append(CorrelationDrivenNonparametricLearning(int(param[0]), param[1]))

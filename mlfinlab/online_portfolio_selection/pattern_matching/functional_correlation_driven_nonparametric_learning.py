@@ -41,11 +41,11 @@ class FunctionalCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparam
         """
         # Default is uniform weights.
         new_weights = self._uniform_weight()
+
         # Calculate for similar sets if time is greater or equal to window size.
         if time >= self.window:
             # Create activation_fn to scale the relative returns during the optimization process.
             activation_fn = np.zeros(time + 1)
-            # activation_fn = np.zeros(self.length_of_time)
             # Iterate through past windows.
             for past_time in range(time - self.window + 1):
                 # Get correlation between the two windows.
@@ -56,12 +56,14 @@ class FunctionalCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparam
                     activation_fn[past_time + self.window] = self.sigmoid(
                         self.lambd * (corr - self.rho))
                 # If correlation is negative.
-                else:
+                elif corr < 0:
                     activation_fn[past_time + self.window] = self.sigmoid(
                         self.lambd * (corr + self.rho)) - 1
+                # For NaN correlation values, return 0.
+                else:
+                    activation_fn[past_time + self.window] = 0
                 # Calculate new weights based on activation_fn and relatives returns to date.
                 new_weights = self._fcorn_optimize(activation_fn, self.relative_return[:time+1])
-                # new_weights = self._fcorn_optimize(activation_fn, self.relative_return)
         return new_weights
 
     def _fcorn_optimize(self, activation_fn, relative_return):
@@ -77,20 +79,16 @@ class FunctionalCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparam
 
         # Use np.log and np.sum to make the cost function a convex function.
         # Multiplying continuous returns equates to summing over the log returns.
-        # def _objective(weight):
-        #     return -np.sum(np.dot(activation_fn, np.log(np.dot(relative_return, weight))))
         def _objective(weight):
-            return -np.product(relative_return.dot(weight) ** activation_fn)
-        #
-        # # Weight bounds.
-        # bounds = tuple((0.0, 1.0) for asset in range(self.number_of_assets))
-        #
-        # # Sum of weights is 1.
-        # const = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1.0})
-        #
-        # problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds, constraints=const)
-        const = ({'type': 'ineq', 'fun': lambda w: 1 - np.sum(w)}, {'type': 'ineq', 'fun': lambda x: x})
-        problem = opt.minimize(_objective, weights, method='COBYLA', constraints=const, tol=1e-7)
+            return -np.sum(np.dot(activation_fn, np.log(np.dot(relative_return, weight))))
+
+        # Weight bounds.
+        bounds = tuple((0.0, 1.0) for asset in range(self.number_of_assets))
+
+        # Sum of weights is 1.
+        const = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1.0})
+
+        problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds, constraints=const, tol=1e-5)
         return problem.x
 
     @staticmethod

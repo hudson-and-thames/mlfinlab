@@ -43,3 +43,51 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
             assert (weights >= 0).all()
             assert len(weights) == self.data.shape[1]
             np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_fcorn_window_error(self):
+        """
+        Tests ValueError if window is not an integer.
+        """
+        # Initialize FCORN.
+        fcorn1 = FunctionalCorrelationDrivenNonparametricLearning(window=2.5, rho=0.5, lambd=1)
+        with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
+            fcorn1.allocate(self.data)
+
+    def test_fcorn_window1_error(self):
+        """
+        Tests ValueError if window is less than 1.
+        """
+        # Initialize FCORN.
+        fcorn2 = FunctionalCorrelationDrivenNonparametricLearning(window=0, rho=0.5, lambd=2)
+        with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
+            fcorn2.allocate(self.data)
+
+    def test_fcorn_rho_error(self):
+        """
+        Tests ValueError if rho is less than -1.
+        """
+        # Initialize FCORN.
+        fcorn3 = FunctionalCorrelationDrivenNonparametricLearning(window=2, rho=-2, lambd=4)
+        with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
+            fcorn3.allocate(self.data)
+
+    def test_corn_rho1_error(self):
+        """
+        Tests ValueError if rho is less than -1.
+        """
+        # Initialize FCORN.
+        fcorn4 = FunctionalCorrelationDrivenNonparametricLearning(window=2, rho=2, lambd=8)
+        with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
+            fcorn4.allocate(self.data)
+
+    def test_sigmoid(self):
+        """
+        Tests Sigmoid Calculation.
+        """
+        # Initialize FCORN.
+        fcorn5 = FunctionalCorrelationDrivenNonparametricLearning(window=2, rho=2, lambd=16)
+        np.testing.assert_almost_equal(fcorn5.sigmoid(0), 0.5)

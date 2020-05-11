@@ -93,3 +93,23 @@ class TestSymmetricCorrelationDrivenNonparametricLearningK(TestCase):
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             scorn_k5.allocate(self.data)
+
+    def test_scorn_k_k1_error(self):
+        """
+        Tests ValueError if k is an integer
+        """
+        # Initialize SCORN-K.
+        scorn_k6 = SymmetricCorrelationDrivenNonparametricLearningK(window=2, rho=2, k=1.5)
+        with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
+            scorn_k6.allocate(self.data)
+
+    def test_scorn_k_k2_error(self):
+        """
+        Tests ValueError if k is greater than or equal to 1.
+        """
+        # Initialize SCORN-K.
+        scorn_k7 = SymmetricCorrelationDrivenNonparametricLearningK(window=2, rho=2, k=0)
+        with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
+            scorn_k7.allocate(self.data)

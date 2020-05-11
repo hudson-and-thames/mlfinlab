@@ -28,8 +28,10 @@ class SymmetricCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparame
         similar_set = []
         # Creat opposite set.
         opposite_set = []
+
         # Default is uniform weights.
         new_weights = self._uniform_weight()
+
         # Calculate for similar sets if time is greater or equal to window size.
         if time >= self.window:
             # Iterate through past windows.

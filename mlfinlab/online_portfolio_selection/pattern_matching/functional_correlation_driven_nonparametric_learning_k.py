@@ -1,6 +1,5 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
-import pandas as pd
 from mlfinlab.online_portfolio_selection.universal_portfolio import UniversalPortfolio
 from mlfinlab.online_portfolio_selection.pattern_matching.functional_correlation_driven_nonparametric_learning import \
     FunctionalCorrelationDrivenNonparametricLearning
