@@ -85,6 +85,7 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
             fcorn4.allocate(self.data)
 
     def test_sigmoid(self):
+        # pylint: disable=no-self-use
         """
         Tests Sigmoid Calculation.
         """
