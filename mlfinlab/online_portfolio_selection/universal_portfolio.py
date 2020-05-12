@@ -133,6 +133,42 @@ class UniversalPortfolio(OLPS):
             raise ValueError("Please put in 'hist_performance' for Historical Performance, "
                              "'uniform' for Uniform Distribution, or 'top-k' for top-K experts.")
 
+    def recalculate_k(self, k):
+        """
+        Calculates the existing strategy with a different k value. The user does not have to
+        rerun the entire strategy, but can simply recalculate with another k parameter.
+
+        :param k: (int) Number of new top-k experts.
+        """
+        # Check that k value is an integer.
+        if not isinstance(k, int):
+            raise ValueError("K value must be an integer.")
+
+        # Check that k value is at least 1.
+        if k < 1:
+            raise ValueError("K value must be greater than or equal to 1.")
+
+        # Check that k value is less than window * rho.
+        if k > self.number_of_experts:
+            raise ValueError("K must be less than or equal to window * rho.")
+
+        self.k = k
+
+        # Calculate capital allocation on each experts.
+        self._calculate_weights_on_experts()
+
+        # Uniform weight distribution for wealth between managers.
+        self._calculate_all_weights()
+
+        # Round weights and drop values that are less than the given threshold.
+        self._round_weights(threshold=1e-6)
+
+        # Calculate portfolio returns based on weights calculated from the run method.
+        self._calculate_portfolio_returns(self.all_weights, self.relative_return)
+
+        # Convert everything to dataframe to make the information presentable.
+        self._conversion()
+
     def _uniform_experts(self):
         """
         Returns a uniform weight of experts.
