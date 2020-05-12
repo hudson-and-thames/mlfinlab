@@ -72,12 +72,10 @@ class TestLabellingFixedTime(unittest.TestCase):
         # Dynamic threshold, also apply a standardization to the data
         mean_std = [(-0.1, 0.005), (0.01, 0.05), (0.02, 0.0007), (-0.1, 0.5), (0.01, 0.01)]
         threshold_dynamic = pd.Series(np.random.random(len(close)))
-        #threshold_dynamic = pd.Series(np.random.random(len(close)) / 50)
         for lookfwd in [1, 3]:
             # Apply standardization to the forward return
             forward_ret = standardize(get_forward_return(close, lookfwd), mean_std)
             labels = fixed_time_horizon(close, threshold_dynamic, lookfwd=lookfwd, standardized=mean_std)
-            print(labels)
             for i, _ in enumerate(labels):
                 if labels[i] == 1:
                     self.assertTrue(forward_ret[i] > threshold_dynamic[i])
