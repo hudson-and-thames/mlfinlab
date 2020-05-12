@@ -67,16 +67,16 @@ def fixed_time_horizon(close, threshold, lookfwd=1, standardized=None):
 
     elif isinstance(threshold, pd.Series):
         labels = []
-        ret_to_threshold = [(i, j) for (i, j) in zip(forward_ret.tolist(), threshold.to_list())]
-        for ret, thrsh in ret_to_threshold:
-            if ret > thrsh:
+        for i, _ in enumerate(threshold):
+            if forward_ret[i] > threshold[i]:
                 labels.append(1)
-            elif -thrsh < ret < thrsh:
+            elif -threshold[i] < forward_ret[i] < threshold[i]:
                 labels.append(0)
-            elif ret < -thrsh:
+            elif forward_ret[i] < -threshold[i]:
                 labels.append(-1)
             else:
                 labels.append(np.nan)
+
         labels = pd.Series(labels, index=forward_ret.index)
 
     else:

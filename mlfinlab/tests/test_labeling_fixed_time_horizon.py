@@ -38,9 +38,14 @@ class TestLabellingFixedTime(unittest.TestCase):
         """
         Assert that standardization is accurate
         """
-        returns = pd.Series([-0.000483, -0.024506, -0.000849, -0.016148, float("NaN")])
+        # Find forward return
+        close = self.data['SPY'][:5]
+        returns = get_forward_return(close, 1)
+
+        # Scale by subtracting the mean and dividing by the standard deviation
         mean_std = [(0, 0.005), (0.01, 0.05), (0.02, 0.0007), (-0.1, 0.5), (0.01, 0.01)]
         calculated = standardize(returns, mean_std)
+
         actual = pd.Series([-0.0966, -0.69012, -29.7843, 0.1677, float("NaN")], index=calculated.index)
         pd.testing.assert_series_equal(calculated, actual, check_less_precise=3)
 
