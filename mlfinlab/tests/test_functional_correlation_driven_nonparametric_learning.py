@@ -32,9 +32,9 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
         Test the calculation of FCORN.
         """
         # Initialize FCORN.
-        fcorn = FunctionalCorrelationDrivenNonparametricLearning(window=1, rho=0.5, lambd=10)
+        fcorn = FunctionalCorrelationDrivenNonparametricLearning(window=2, rho=0.5, lambd=10)
         # Allocates asset prices to FCORN.
-        fcorn.allocate(self.data, resample_by='Y')
+        fcorn.allocate(self.data, resample_by='6M')
         # Create np.array of all_weights.
         all_weights = np.array(fcorn.all_weights)
         # Check if all weights sum to 1.
@@ -74,7 +74,7 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
             # Running allocate will raise ValueError.
             fcorn3.allocate(self.data)
 
-    def test_corn_rho1_error(self):
+    def test_fcorn_rho1_error(self):
         """
         Tests ValueError if rho is less than -1.
         """
@@ -86,9 +86,28 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
 
     def test_sigmoid(self):
         # pylint: disable=no-self-use
+        # pylint: disable=protected-access
         """
         Tests Sigmoid Calculation.
         """
         # Initialize FCORN.
-        fcorn5 = FunctionalCorrelationDrivenNonparametricLearning(window=2, rho=2, lambd=16)
-        np.testing.assert_almost_equal(fcorn5.sigmoid(0), 0.5)
+        fcorn5 = FunctionalCorrelationDrivenNonparametricLearning(window=1, rho=0.5, lambd=10)
+        sig = fcorn5._sigmoid(0.0)
+        np.testing.assert_almost_equal(sig, 0.5)
+
+    def test_fcorn_solution1(self):
+        """
+        Test the calculation of FCORN for edge case that activation function is 0.
+        """
+        # Initialize FCORN.
+        fcorn6 = FunctionalCorrelationDrivenNonparametricLearning(window=1, rho=0.5, lambd=10)
+        # Allocates asset prices to FCORN.
+        fcorn6.allocate(self.data, resample_by='Y')
+        # Create np.array of all_weights.
+        all_weights = np.array(fcorn6.all_weights)
+        # Check if all weights sum to 1.
+        for i in range(all_weights.shape[0]):
+            weights = all_weights[i]
+            assert (weights >= 0).all()
+            assert len(weights) == self.data.shape[1]
+            np.testing.assert_almost_equal(np.sum(weights), 1)

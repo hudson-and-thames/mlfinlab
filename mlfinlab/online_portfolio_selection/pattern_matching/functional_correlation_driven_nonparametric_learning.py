@@ -1,7 +1,8 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import scipy.optimize as opt
-from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import CorrelationDrivenNonparametricLearning
+from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import \
+    CorrelationDrivenNonparametricLearning
 
 
 class FunctionalCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparametricLearning):
@@ -31,7 +32,6 @@ class FunctionalCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparam
         self.lambd = lambd
         super().__init__(window=window, rho=rho)
 
-
     def _update_weight(self, time):
         """
         Predicts the next time's portfolio weight.
@@ -53,17 +53,24 @@ class FunctionalCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparam
                 # If correlation is non-negative.
                 if corr >= 0:
                     # Set corresponding activation function
-                    activation_fn[past_time + self.window] = self.sigmoid(
+                    activation_fn[past_time + self.window] = self._sigmoid(
                         self.lambd * (corr - self.rho))
                 # If correlation is negative.
                 elif corr < 0:
-                    activation_fn[past_time + self.window] = self.sigmoid(
+                    activation_fn[past_time + self.window] = self._sigmoid(
                         self.lambd * (corr + self.rho)) - 1
                 # For NaN correlation values, return 0.
                 else:
                     activation_fn[past_time + self.window] = 0
+                # If all values are 0, return uniform weights.
+                if not np.any(activation_fn):
+                    return new_weights
+                # Negative activation function to minimize final objective function.
+                activation_fn = -activation_fn
+                # Current relative returns.
+                curr_time = np.asfortranarray(self.relative_return[:time + 1])
                 # Calculate new weights based on activation_fn and relatives returns to date.
-                new_weights = self._fcorn_optimize(activation_fn, self.relative_return[:time+1])
+                new_weights = self._fcorn_optimize(activation_fn, curr_time)
         return new_weights
 
     def _fcorn_optimize(self, activation_fn, relative_return):
@@ -80,7 +87,7 @@ class FunctionalCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparam
         # Use np.log and np.sum to make the cost function a convex function.
         # Multiplying continuous returns equates to summing over the log returns.
         def _objective(weight):
-            return -np.sum(np.dot(activation_fn, np.log(np.dot(relative_return, weight))))
+            return np.dot(activation_fn, np.log(np.dot(relative_return, weight)))
 
         # Weight bounds.
         bounds = tuple((0.0, 1.0) for asset in range(self.number_of_assets))
@@ -88,11 +95,13 @@ class FunctionalCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparam
         # Sum of weights is 1.
         const = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1.0})
 
-        problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds, constraints=const, tol=1e-5)
+        problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds,
+                               constraints=const,
+                               options={'eps': 1e-3})
         return problem.x
 
     @staticmethod
-    def sigmoid(val):
+    def _sigmoid(val):
         """
         Generates the resulting sigmoid function
 
