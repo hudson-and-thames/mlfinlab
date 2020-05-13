@@ -2,12 +2,11 @@
 import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import pairwise_distances
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
-from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
 from scipy.cluster.hierarchy import fcluster
-from scipy.cluster.hierarchy import dendrogram
 from scipy.cluster.hierarchy import linkage as scipy_linkage
 from scipy.spatial.distance import squareform
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
 
 
 class HierarchicalClusteringAssetAllocation:
@@ -33,6 +32,7 @@ class HierarchicalClusteringAssetAllocation:
         self.weights = list()
         self.clusters = None
         self.ordered_indices = None
+        self.cluster_children = None
         self.returns_estimator = ReturnsEstimation()
         self.risk_metrics = RiskMetrics()
         self.calculate_expected_returns = calculate_expected_returns
@@ -71,14 +71,10 @@ class HierarchicalClusteringAssetAllocation:
         """
 
         # Perform initial checks
-        self._perform_checks(asset_prices, asset_returns, covariance_matrix, allocation_metric)
+        self._perform_checks(asset_prices, asset_returns, expected_asset_returns, covariance_matrix, allocation_metric)
 
-        # Calculate the expected returns if the user does not supply any returns
+        # Calculate the expected returns if the user does not supply any returns (only required for sharpe_ratio allocation metric)
         if allocation_metric == 'sharpe_ratio' and expected_asset_returns is None:
-            if asset_prices is None:
-                raise ValueError(
-                    "Either provide pre-calculated expected returns or give raw asset prices for inbuilt returns calculation")
-
             if self.calculate_expected_returns == "mean":
                 expected_asset_returns = self.returns_estimator.calculate_mean_historical_returns(
                     asset_prices=asset_prices,
@@ -99,7 +95,7 @@ class HierarchicalClusteringAssetAllocation:
                 raise ValueError("Please provide a list of asset names")
 
         # Calculate the returns if the user does not supply a returns dataframe
-        if asset_returns is None:
+        if allocation_metric in {'exxpected_shortfall', 'conditional_drawdown_risk'} and asset_returns is None:
             asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
         asset_returns = pd.DataFrame(asset_returns, columns=asset_names)
 
@@ -135,15 +131,6 @@ class HierarchicalClusteringAssetAllocation:
                                   optimal_num_clusters=optimal_num_clusters,
                                   confidence_level=confidence_level)
 
-    def plot_clusters(self, assets):
-        """
-        Plot a dendrogram of the hierarchical clusters.
-        :param assets: (list) list of asset names in the portfolio
-        """
-
-        dendrogram_plot = dendrogram(self.clusters, labels=assets)
-        return dendrogram_plot
-
     @staticmethod
     def _compute_cluster_inertia(labels, asset_returns):
         """
@@ -164,6 +151,7 @@ class HierarchicalClusteringAssetAllocation:
                                         asset_returns,
                                         linkage,
                                         num_reference_datasets=5):
+        # pylint: disable=too-many-locals
         """
         Find the optimal number of clusters for hierarchical clustering using the Gap statistic.
 
@@ -206,7 +194,8 @@ class HierarchicalClusteringAssetAllocation:
 
         return 1 + np.argmax(gap_values)
 
-    def _tree_clustering(self, correlation, num_clusters, linkage):
+    @staticmethod
+    def _tree_clustering(correlation, num_clusters, linkage):
         """
         Perform agglomerative clustering on the current portfolio.
 
@@ -219,10 +208,9 @@ class HierarchicalClusteringAssetAllocation:
         distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
         clusters = scipy_linkage(squareform(distance_matrix.values), method=linkage)
         clustering_inds = fcluster(clusters, num_clusters, criterion='maxclust')
-        cluster_children = {i - 1: [] for i in range(min(clustering_inds),
-                                         max(clustering_inds) + 1)}
-        for i, v in enumerate(clustering_inds):
-            cluster_children[v - 1].append(i)
+        cluster_children = {index - 1: [] for index in range(min(clustering_inds), max(clustering_inds) + 1)}
+        for index, cluster_index in enumerate(clustering_inds):
+            cluster_children[cluster_index - 1].append(index)
         return clusters, cluster_children
 
     def _quasi_diagnalization(self, num_assets, curr_index):
@@ -279,8 +267,8 @@ class HierarchicalClusteringAssetAllocation:
                 clusters_contribution[cluster_index] = np.sqrt(self._get_cluster_variance(covariance_matrix, cluster_asset_indices))
             elif allocation_metric == 'sharpe_ratio':
                 clusters_contribution[cluster_index] = self._get_cluster_sharpe_ratio(expected_asset_returns,
-                                                                      covariance_matrix,
-                                                                      cluster_asset_indices)
+                                                                                      covariance_matrix,
+                                                                                      cluster_asset_indices)
                 clusters_variance[cluster_index] = self._get_cluster_variance(covariance_matrix, cluster_asset_indices)
             elif allocation_metric == 'expected_shortfall':
                 clusters_contribution[cluster_index] = self._get_cluster_expected_shortfall(asset_returns=asset_returns,
@@ -299,7 +287,7 @@ class HierarchicalClusteringAssetAllocation:
 
             # Get the left and right cluster ids
             left_cluster_ids, right_cluster_ids = self._get_children_cluster_ids(num_assets=num_assets,
-                                                                                 parent_cluster_index=cluster_index)
+                                                                                 parent_cluster_id=cluster_index)
 
             # Compute alpha
             left_cluster_contribution = np.sum(clusters_contribution[left_cluster_ids])
@@ -335,16 +323,17 @@ class HierarchicalClusteringAssetAllocation:
         self.weights.index = assets[self.ordered_indices]
         self.weights = self.weights.T
 
-    def _get_children_cluster_ids(self, num_assets, parent_cluster_index):
+    def _get_children_cluster_ids(self, num_assets, parent_cluster_id):
+        """
+        Find the left and right children cluster id of the given parent cluster id.
+
+        :param num_assets: (int) the number of assets in the portfolio
+        :param parent_cluster_index: (int) the current parent cluster id
+        :return: (list, list) list of cluster ids to the left and right of the parent cluster in the hierarchical tree
         """
 
-        :param num_assets:
-        :param parent_cluster_index:
-        :return:
-        """
-
-        left = int(self.clusters[num_assets - 2 - parent_cluster_index, 0])
-        right = int(self.clusters[num_assets - 2 - parent_cluster_index, 1])
+        left = int(self.clusters[num_assets - 2 - parent_cluster_id, 0])
+        right = int(self.clusters[num_assets - 2 - parent_cluster_id, 1])
         left_cluster = self._quasi_diagnalization(num_assets, left)
         right_cluster = self._quasi_diagnalization(num_assets, right)
 
@@ -462,7 +451,7 @@ class HierarchicalClusteringAssetAllocation:
         return corr
 
     @staticmethod
-    def _perform_checks(asset_prices, asset_returns, covariance_matrix, allocation_metric):
+    def _perform_checks(asset_prices, asset_returns, expected_asset_returns, covariance_matrix, allocation_metric):
         # pylint: disable=bad-continuation
         """
         Perform initial warning checks.
@@ -470,9 +459,9 @@ class HierarchicalClusteringAssetAllocation:
         :param asset_prices: (pd.DataFrame) a dataframe of historical asset prices (daily close)
                                             indexed by date
         :param asset_returns: (pd.DataFrame/numpy matrix) user supplied matrix of asset returns
+        :param expected_asset_returns: (list) a list of mean asset returns (mu)
         :param covariance_matrix: (pd.DataFrame/numpy matrix) user supplied covariance matrix of asset returns
         :param allocation_metric: (str) the metric used for calculating weight allocations
-        :return:
         """
 
         if asset_prices is None and asset_returns is None and covariance_matrix is None:
@@ -490,3 +479,14 @@ class HierarchicalClusteringAssetAllocation:
             raise ValueError("Unknown allocation metric specified. Supported metrics are - minimum_variance, "
                              "minimum_standard_deviation, sharpe_ratio, equal_weighting, expected_shortfall, "
                              "conditional_drawdown_risk")
+
+        if allocation_metric in {'expected_shortfall', 'conditional_drawdown_risk'} and \
+                asset_returns is None and asset_prices is None:
+            raise ValueError("An asset returns dataframe/matrix is required when using the following allocation metrics - "
+                             "expected_shortfall and conditional_drawdown_risk. Either provide pre-calculated asset returns or "
+                             "give raw asset prices for inbuilt returns calculation.")
+
+        if allocation_metric == 'sharpe_ratio' and expected_asset_returns is None and asset_prices is None:
+            raise ValueError("Either provide pre-calculated asset returns or give raw asset prices for "
+                             "inbuilt returns calculation.")
+
