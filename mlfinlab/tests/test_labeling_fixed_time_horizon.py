@@ -77,7 +77,6 @@ class TestLabellingFixedTime(unittest.TestCase):
             # Apply standardization to the forward return
             forward_ret = standardize(get_forward_return(close, lookfwd), mean_std)
             labels = fixed_time_horizon(close, threshold_dynamic, lookfwd=lookfwd, standardized=mean_std)
-            print(labels)
             for i, _ in enumerate(labels):
                 if labels[i] == 1:
                     self.assertTrue(forward_ret[i] > threshold_dynamic[i])
@@ -91,5 +90,3 @@ class TestLabellingFixedTime(unittest.TestCase):
             fixed_time_horizon(close, 'string', lookfwd=1)
 
 
-if __name__ == '__main__':
-    unittest.main()

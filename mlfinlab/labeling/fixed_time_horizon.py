@@ -10,9 +10,9 @@ import pandas as pd
 def get_forward_return(close, lookfwd):
     """
     Gets forward return of a series of close prices, given a specified number of ticks to look forward
-    :param close: (series) of Close prices
+    :param close: (pd.Series) of Close prices
     :param lookfwd: (int) Number of ticks to look forward when calculating forward return rate
-    :return: (series) of Forward returns
+    :return: (pd.Series) of Forward returns
     """
     # Daily returns
     daily_ret = close.pct_change(periods=lookfwd)
@@ -23,18 +23,18 @@ def get_forward_return(close, lookfwd):
     return forward_ret
 
 
-def standardize(forward_ret, standardized):
+def standardize(forward_ret, msd):
     """
     Applies standardization a pd.Series of returns for a stock when the market return and standard deviation are
     known
-    :param forward_ret: (series) of Forward returns
-    :param standardized: (list) of Tuples (mean, stdev) of returns corresponding to each day in forward_ret
-    :return: (series) of Standardized returns
+    :param forward_ret: (pd.Series) of Forward returns
+    :param msd: (pd.DataFrame, or any format easily convertible to pd.DataFrame, e.g. list of tuples) of means and
+                standard deviations corresponding to days in forward_ret
+    :return: (pd.Series) of Standardized returns
     """
-    mean = pd.Series([i for i, j in standardized], index=forward_ret.index)
-    stdev = pd.Series([j for i, j in standardized], index=forward_ret.index)
-    forward_ret_adj = forward_ret.sub(mean)
-    forward_ret_adj = forward_ret_adj.div(stdev)
+    msd = pd.DataFrame(msd, columns=['mean', 'sd'], index=forward_ret.index)
+    forward_ret_adj = forward_ret - msd['mean']
+    forward_ret_adj = forward_ret_adj / msd['sd']
 
     return forward_ret_adj
 
@@ -44,13 +44,13 @@ def fixed_time_horizon(close, threshold, lookfwd=1, standardized=None):
     Fixed-Time Horizon Labelling Method
     Returns 1 if return at h-th bar after t_0 is greater than the threshold, -1 if less, and 0 if in between
 
-    :param close: (series) of Close prices
+    :param close: (pd.Series) of Close prices
     :param threshold: (float or pd.Series) When the abs(change) is larger than the threshold, it is labelled as 1 or -1.
                     If change is smaller, it's labelled as 0. Can be dynamic if threshold is pd.Series
     :param lookfwd: : (int) Number of ticks to look forward when calculating future return rate
     :param standardized: (list) of Tuples (mean, stdev) of returns corresponding to each day in close. If not None, the
                     forward returns are for each day are adjusted by the mean and stdev
-    :return: (series) Series of -1, 0, or 1 denoting whether return is under/between/greater than the threshold
+    :return: (pd.Series) Series of -1, 0, or 1 denoting whether return is under/between/greater than the threshold
     """
     # Forward returns
     forward_ret = get_forward_return(close, lookfwd)
@@ -66,18 +66,25 @@ def fixed_time_horizon(close, threshold, lookfwd=1, standardized=None):
                 0 if threshold > row > -threshold else (-1 if row < -threshold else np.nan)))
 
     elif isinstance(threshold, pd.Series):
-        labels = []
-        for i, _ in enumerate(threshold):
-            if forward_ret[i] > threshold[i]:
-                labels.append(1)
-            elif -threshold[i] < forward_ret[i] < threshold[i]:
-                labels.append(0)
-            elif forward_ret[i] < -threshold[i]:
-                labels.append(-1)
-            else:
-                labels.append(np.nan)
+        compare = pd.DataFrame(forward_ret, columns=['fwd_ret'], index=forward_ret.index)
+        compare['low'] = -threshold
+        compare['high'] = threshold
+        compare['label'] = np.nan
+        # Mark label as -1 if <low, 1 if >high, or 0 if in between
+        compare.loc[compare['fwd_ret'] < compare['low'], 'label'] = -1
+        compare.loc[(compare['fwd_ret'] <= compare['high']) & (compare['fwd_ret'] >= compare['low']), 'label'] = 0
+        compare.loc[compare['fwd_ret'] > compare['high'], 'label'] = 1
+        labels = compare['label']
 
-        labels = pd.Series(labels, index=forward_ret.index)
+        # for i, _ in enumerate(threshold):
+        #     if forward_ret[i] > threshold[i]:
+        #         labels.append(1)
+        #     elif -threshold[i] < forward_ret[i] < threshold[i]:
+        #         labels.append(0)
+        #     elif forward_ret[i] < -threshold[i]:
+        #         labels.append(-1)
+        #     else:
+        #         labels.append(np.nan)
 
     else:
         raise ValueError('threshold is neither float nor pd.Series!')

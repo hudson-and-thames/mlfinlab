@@ -8,8 +8,15 @@ Fixed horizon labels is a classification labeling technique used in the followin
 Bang, J., 2016. Classification-based Financial Markets Prediction using Deep Neural Networks.
 arXiv:1603.08604. <https://arxiv.org/abs/1603.08604>`_
 
-The most common method of labeling data is the fixed horizon method, usually time bars. The forward rate of return relative
-to t_0 over a time horizon h is calculated as follows:
+Fixed time horizon is a common method used in labeling financial data, usually applied on time bars. The forward rate of return relative
+to :math:`t_0` over time horizon :math:`h` is calculated as follows:
+
+.. math::
+    r_{t0,t1} = p_{t1}/
+
+t_0 over a time horizon h is calculated as follows:
+
+Where :math:`R(t-t',t)`
 
 .. math::
     r_t
