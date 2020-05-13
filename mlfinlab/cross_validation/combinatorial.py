@@ -13,6 +13,16 @@ from sklearn.model_selection import KFold
 from .cross_validation import ml_get_train_times
 
 
+def _get_number_of_backtest_paths(n_train_splits: int, n_test_splits: int) -> float:
+    """
+    Number of combinatorial paths for CPCV(N,K)
+    :param n_train_splits: (int) number of train splits
+    :param n_test_splits: (int) number of test splits
+    :return: (int) number of backtest paths for CPCV(N,k)
+    """
+    return int(comb(n_train_splits, n_train_splits - n_test_splits) * n_test_splits / n_train_splits)
+
+
 class CombinatorialPurgedKFold(KFold):
     """
     Advances in Financial Machine Learning, Chapter 12.
@@ -42,7 +52,7 @@ class CombinatorialPurgedKFold(KFold):
         self.samples_info_sets = samples_info_sets
         self.pct_embargo = pct_embargo
         self.n_test_splits = n_test_splits
-        self.num_backtest_paths = self._get_number_of_backtest_paths(self.n_splits, self.n_test_splits)
+        self.num_backtest_paths = _get_number_of_backtest_paths(self.n_splits, self.n_test_splits)
         self.backtest_paths = []  # Array of backtest paths
 
     def _generate_combinatorial_test_ranges(self, splits_indices: dict) -> List:
@@ -64,14 +74,22 @@ class CombinatorialPurgedKFold(KFold):
             combinatorial_test_ranges.append(temp_test_indices)
         return combinatorial_test_ranges
 
-    def _get_number_of_backtest_paths(self, n: int, k: int) -> float:
+    def _fill_backtest_paths(self, train_indices: list, test_splits: list):
         """
-        Number of combinatorial paths for CPCV(N,K)
-        :param n: (int) number of train splits
-        :param k: (int) number of test splits
-        :return: (int) number of backtest paths for CPCV(N,k)
+        Using start and end indices of test splits and purged/embargoed train indices from CPCV, find backtest path and
+        place in the path where these indices should be used.
+
+        :param test_splits: (list) of lists with first element corresponding to test start index and second - test end
         """
-        return int(comb(n, n - k) * k / n)
+        # Fill backtest paths using train/test splits from CPCV
+        for split in test_splits:
+            found = False  # Flag indicating that split was found and filled in one of backtest paths
+            for path in self.backtest_paths:
+                for path_el in path:
+                    if path_el['train'] is None and split == path_el['test'] and found is False:
+                        path_el['train'] = np.array(train_indices)
+                        path_el['test'] = list(range(split[0], split[-1]))
+                        found = True
 
     # noinspection PyPep8Naming
     def split(self,
@@ -125,24 +143,6 @@ class CombinatorialPurgedKFold(KFold):
             for train_ix in train_times.index:
                 train_indices.append(self.samples_info_sets.index.get_loc(train_ix))
 
-            # Fill backtest paths using train/test splits from CPCV
-            for split in test_splits:
-                found = False  # Flag indicating that split was found and filled in one of backtest paths
-                for path in self.backtest_paths:
-                    for path_el in path:
-                        if path_el['train'] is None and split == path_el['test'] and found is False:
-                            path_el['train'] = np.array(train_indices)
-                            path_el['test'] = list(range(split[0], split[-1]))
-                            found = True
+            self._fill_backtest_paths(train_indices, test_splits)
 
             yield np.array(train_indices), np.array(test_indices)
-
-    def get_backtest_paths(self, X: pd.DataFrame, y: pd.DataFrame) -> List:
-        """
-        Get backtest paths from CPCV. Backtest paths can be used to generate many backtest scenarios instead of one
-        historical simulation
-
-        :param X: (pd.DataFrame) Samples dataset that is to be split
-        :param y: (pd.Series) Sample labels series
-        :return: (list) of lists where each list is a separate path containing dictionaries {'train': [], 'test': []}
-        """
