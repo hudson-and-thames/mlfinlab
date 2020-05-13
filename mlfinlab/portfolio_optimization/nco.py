@@ -141,7 +141,7 @@ class NCO:
                                      maximum Sharpe ratio solution is computed. (True by default)
         :param lw_shrinkage: (bool) When True, the covariance matrix is subjected to the Ledoit-Wolf shrinkage
                                     procedure. (False by default)
-        :return: (pd.dataframe, pd.dataframe) DataFrames with allocations for CVO and NCO algorithms.
+        :return: (pd.DataFrame, pd.DataFrame) DataFrames with allocations for CVO and NCO algorithms.
         """
 
         # Creating DataFrames for CVO results and NCO results
@@ -179,8 +179,8 @@ class NCO:
         The result is the mean standard deviation between the true weights and the ones obtained from the simulation
         for each algorithm - CVO and NCO.
 
-        :param w_cvo: (pd.dataframe) DataFrame with weights from the CVO algorithm.
-        :param w_nco: (pd.dataframe) DataFrame with weights from the NCO algorithm.
+        :param w_cvo: (pd.DataFrame) DataFrame with weights from the CVO algorithm.
+        :param w_nco: (pd.DataFrame) DataFrame with weights from the NCO algorithm.
         :param mu_vec: (np.array) The original vector of expected outcomes.
         :param cov: (np.array)The original covariance matrix of outcomes.
         :param min_var_portf: (bool) When True, the minimum variance solution was computed. Otherwise, the
@@ -333,7 +333,7 @@ class NCO:
         :param block_size: (int) Size of a single block
         :param block_corr: (float) Correlation of elements in a block
         :param std: (float) Correlation between the clusters. If None, taken a random value from uniform dist[0.05, 0.2]
-        :return: (np.array, pd.dataframe) Resulting vector of means and the dataframe with covariance matrix
+        :return: (np.array, pd.DataFrame) Resulting vector of means and the dataframe with covariance matrix
         """
 
         # Creating a block correlation matrix

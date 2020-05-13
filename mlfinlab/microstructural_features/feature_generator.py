@@ -20,11 +20,12 @@ class MicrostructuralFeaturesGenerator:
     """
     Class which is used to generate inter-bar features when bars are already compressed.
 
-    :param trades_input: (Str or pd.DataFrame) Path to the csv file or Pandas DataFrame containing raw tick data in the format[date_time, price, volume]
-    :param tick_num_series: (pd.Series) of tick number where bar was formed.
+    :param trades_input: (str or pd.DataFrame) Path to the csv file or Pandas DataFrame containing raw tick data
+                                               in the format[date_time, price, volume]
+    :param tick_num_series: (pd.Series) Series of tick number where bar was formed.
     :param batch_size: (int) Number of rows to read in from the csv, per batch.
     :param volume_encoding: (dict) Dictionary of encoding scheme for trades size used to calculate entropy on encoded messages
-    :param pct_encoding: (dict)  Dictionary of encoding scheme for log returns used to calculate entropy on encoded messages
+    :param pct_encoding: (dict) Dictionary of encoding scheme for log returns used to calculate entropy on encoded messages
 
     """
 
@@ -32,6 +33,13 @@ class MicrostructuralFeaturesGenerator:
                  volume_encoding: dict = None, pct_encoding: dict = None):
         """
         Constructor
+
+        :param trades_input: (str or pd.DataFrame) Path to the csv file or Pandas DataFrame containing raw tick data
+                                                   in the format[date_time, price, volume]
+        :param tick_num_series: (pd.Series) Series of tick number where bar was formed.
+        :param batch_size: (int) Number of rows to read in from the csv, per batch.
+        :param volume_encoding: (dict) Dictionary of encoding scheme for trades size used to calculate entropy on encoded messages
+        :param pct_encoding: (dict) Dictionary of encoding scheme for log returns used to calculate entropy on encoded messages
         """
 
         if isinstance(trades_input, str):
@@ -72,10 +80,10 @@ class MicrostructuralFeaturesGenerator:
         Plug-in entropies if corresponding mapping dictionaries are provided (self.volume_encoding, self.pct_encoding).
         The csv file must have only 3 columns: date_time, price, & volume.
 
-        :param verbose: (Boolean) Flag whether to print message on each processed batch or not
-        :param to_csv: (Boolean) Flag for writing the results of bars generation to local csv file, or to in-memory DataFrame
-        :param output_path: (Boolean) Path to results file, if to_csv = True
-        :return: (DataFrame or None) of microstructural features for bar index
+        :param verbose: (bool) Flag whether to print message on each processed batch or not
+        :param to_csv: (bool) Flag for writing the results of bars generation to local csv file, or to in-memory DataFrame
+        :param output_path: (bool) Path to results file, if to_csv = True
+        :return: (DataFrame or None) Microstructural features for bar index
         """
 
         if to_csv is True:
@@ -142,7 +150,8 @@ class MicrostructuralFeaturesGenerator:
     def _extract_bars(self, data):
         """
         For loop which calculates features for formed bars using trades data
-        :param data: Contains 3 columns - date_time, price, and volume.
+
+        :param data: (tuple) Contains 3 columns - date_time, price, and volume.
         """
 
         # Iterate over rows
@@ -187,9 +196,9 @@ class MicrostructuralFeaturesGenerator:
         """
         Calculate inter-bar features: lambdas, entropies, avg_tick_size, vwap
 
-        :param date_time: (pd.Timestamp) when bar was formed
-        :param list_bars: (list) of previously formed bars
-        :return: (list) of inter-bar features
+        :param date_time: (pd.Timestamp) When bar was formed
+        :param list_bars: (list) Previously formed bars
+        :return: (list) Inter-bar features
         """
         features = [date_time]
 
@@ -229,9 +238,12 @@ class MicrostructuralFeaturesGenerator:
 
     def _apply_tick_rule(self, price: float) -> int:
         """
-        Applies the tick rule as defined on page 29.
-        :param price: Price at time t
-        :return: The signed tick
+        Advances in Financial Machine Learning, page 29.
+
+        Applies the tick rule
+
+        :param price: (float) Price at time t
+        :return: (int) The signed tick
         """
         if self.prev_price is not None:
             tick_diff = price - self.prev_price
@@ -250,8 +262,8 @@ class MicrostructuralFeaturesGenerator:
         """
         Get price difference between ticks
 
-        :param price: Price at time t
-        return: price difference
+        :param price: (float) Price at time t
+        :return: (float) Price difference
         """
         if self.prev_price is not None:
             price_diff = price - self.prev_price
@@ -263,8 +275,8 @@ class MicrostructuralFeaturesGenerator:
         """
         Get log return between ticks
 
-        :param price: Price at time t
-        return: log return
+        :param price: (float) Price at time t
+        :return: (float) Log return
         """
         if self.prev_price is not None:
             log_ret = np.log(price / self.prev_price)
@@ -277,7 +289,9 @@ class MicrostructuralFeaturesGenerator:
         """
         Tests that the csv file read has the format: date_time, price, and volume.
         If not then the user needs to create such a file. This format is in place to remove any unwanted overhead.
-        :param test_batch: (DataFrame) the first row of the dataset.
+
+        :param test_batch: (pd.DataFrame) the first row of the dataset.
+        :return: (None)
         """
         assert test_batch.shape[1] == 3, 'Must have only 3 columns in csv: date_time, price, & volume.'
         assert isinstance(test_batch.iloc[0, 1], float), 'price column in csv not float.'

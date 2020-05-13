@@ -489,4 +489,3 @@ class HierarchicalClusteringAssetAllocation:
         if allocation_metric == 'sharpe_ratio' and expected_asset_returns is None and asset_prices is None:
             raise ValueError("Either provide pre-calculated asset returns or give raw asset prices for "
                              "inbuilt returns calculation.")
-
