@@ -18,7 +18,7 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str) -> pd.DataFr
     :param df: (pd.DataFrame) of features.
     :param dependence_method: (str) the algorithm to be use for generating dependence_matrix, either
        'information_variation' or 'mutual_information' or 'distance_correlation'.
-    :return: (pd.DataFrame) of dependence_matrix.
+    :return: (pd.DataFrame) Dependence_matrix.
     """
     # Get the feature names.
     features_cols = df.columns.values
@@ -72,10 +72,10 @@ def get_distance_matrix(X: pd.DataFrame, distance_metric: str = 'angular') -> pd
     """
     Apply distance operator to a dependence matrix.
 
-    :param X: (pd.DataFrame) to which distance operator to be applied.
-    :param distance_metric: (str) the distance operator to be used for generating the distance matrix.
+    :param X: (pd.DataFrame) Dataframe to which distance operator to be applied.
+    :param distance_metric: (str) The distance operator to be used for generating the distance matrix.
        The methods that can be applied are: 'angular', 'squared_angular' and 'absolute_angular'.
-    :return: (pd.DataFrame) of distance matrix
+    :return: (pd.DataFrame) Distance matrix
     """
     if distance_metric == 'angular':
         distfun = lambda x: ((1 - x).round(5) / 2.) ** .5

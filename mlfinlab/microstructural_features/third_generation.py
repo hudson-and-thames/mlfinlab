@@ -6,11 +6,13 @@ import pandas as pd
 
 def get_vpin(volume: pd.Series, buy_volume: pd.Series, window: int = 1) -> pd.Series:
     """
-    Get Volume-Synchronized Probability of Informed Trading (VPIN) from bars, p. 292-293.
+    Advances in Financial Machine Learning, p. 292-293.
 
-    :param volume: (pd.Series) bar volume
-    :param buy_volume: (pd.Series) bar volume classified as buy (either tick rule, BVC or aggressor side methods applied)
-    :param window: (int) estimation window
+    Get Volume-Synchronized Probability of Informed Trading (VPIN) from bars
+
+    :param volume: (pd.Series) Bar volume
+    :param buy_volume: (pd.Series) Bar volume classified as buy (either tick rule, BVC or aggressor side methods applied)
+    :param window: (int) Estimation window
     :return: (pd.Series) VPIN series
     """
     sell_volume = volume - buy_volume
