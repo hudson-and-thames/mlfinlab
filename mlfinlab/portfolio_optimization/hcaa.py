@@ -95,8 +95,10 @@ class HierarchicalClusteringAssetAllocation:
                 raise ValueError("Please provide a list of asset names")
 
         # Calculate the returns if the user does not supply a returns dataframe
-        if allocation_metric in {'exxpected_shortfall', 'conditional_drawdown_risk'} and asset_returns is None:
-            asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
+        if asset_returns is None:
+            if allocation_metric in {'expected_shortfall', 'conditional_drawdown_risk'} or \
+                    covariance_matrix is None or not optimal_num_clusters:
+                asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
         asset_returns = pd.DataFrame(asset_returns, columns=asset_names)
 
         # Calculate covariance of returns or use the user specified covariance matrix
@@ -465,7 +467,7 @@ class HierarchicalClusteringAssetAllocation:
         """
 
         if asset_prices is None and asset_returns is None and covariance_matrix is None:
-            raise ValueError("You need to supply either raw prices or returns or a covariance matrix of asset returns")
+            raise ValueError("You need to supply either raw prices or returns or covariance matrix")
 
         if asset_prices is not None:
             if not isinstance(asset_prices, pd.DataFrame):
@@ -487,5 +489,5 @@ class HierarchicalClusteringAssetAllocation:
                              "give raw asset prices for inbuilt returns calculation.")
 
         if allocation_metric == 'sharpe_ratio' and expected_asset_returns is None and asset_prices is None:
-            raise ValueError("Either provide pre-calculated asset returns or give raw asset prices for "
+            raise ValueError("Either provide pre-calculated expected asset returns or give raw asset prices for "
                              "inbuilt returns calculation.")
