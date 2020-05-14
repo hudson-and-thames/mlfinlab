@@ -114,5 +114,5 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         # Retrieve the results of the rolled window.
         rolled_returns = flattened[idx]
         # Calculate correlation coefficient.
-        rolling_corr_coef = np.corrcoef(rolled_returns)
+        rolling_corr_coef = np.nan_to_num(np.corrcoef(rolled_returns), nan=0)
         return rolling_corr_coef

@@ -56,21 +56,15 @@ class FunctionalCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparam
                     activation_fn[past_time + self.window] = self._sigmoid(
                         self.lambd * (corr - self.rho))
                 # If correlation is negative.
-                elif corr < 0:
+                else:
                     activation_fn[past_time + self.window] = self._sigmoid(
                         self.lambd * (corr + self.rho)) - 1
-                # For NaN correlation values, return 0.
-                else:
-                    activation_fn[past_time + self.window] = 0
-                # If all values are 0, return uniform weights.
-                if not np.any(activation_fn):
-                    return new_weights
-                # Negative activation function to minimize final objective function.
-                activation_fn = -activation_fn
-                # Current relative returns.
-                curr_time = np.asfortranarray(self.relative_return[:time + 1])
-                # Calculate new weights based on activation_fn and relatives returns to date.
-                new_weights = self._fcorn_optimize(activation_fn, curr_time)
+            # Negative activation function to minimize final objective function.
+            activation_fn = -activation_fn
+            # Current relative returns.
+            curr_time = np.asfortranarray(self.relative_return[:time + 1])
+            # Calculate new weights based on activation_fn and relatives returns to date.
+            new_weights = self._fcorn_optimize(activation_fn, curr_time)
         return new_weights
 
     def _fcorn_optimize(self, activation_fn, relative_return):
@@ -89,6 +83,10 @@ class FunctionalCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparam
         def _objective(weight):
             return np.dot(activation_fn, np.log(np.dot(relative_return, weight)))
 
+        def _derivative(weight):
+            total_returns = np.dot(relative_return, weight)
+            return np.dot(activation_fn / total_returns, relative_return)
+
         # Weight bounds.
         bounds = tuple((0.0, 1.0) for asset in range(self.number_of_assets))
 
@@ -96,8 +94,7 @@ class FunctionalCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparam
         const = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1.0})
 
         problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds,
-                               constraints=const,
-                               options={'eps': 1e-3})
+                               constraints=const, jac=_derivative)
         return problem.x
 
     @staticmethod
