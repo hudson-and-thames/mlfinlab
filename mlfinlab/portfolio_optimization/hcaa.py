@@ -432,8 +432,16 @@ class HierarchicalClusteringAssetAllocation:
         return cluster_conditional_drawdown
 
     @staticmethod
-    def _intersection(lst1, lst2):
-        return list(set(lst1) & set(lst2))
+    def _intersection(list1, list2):
+        """
+        Calculate the intersection of two lists
+
+        :param list1: (list) the first list of items
+        :param list2: (list) the second list of items
+        :return: (list) list containing the intersection of the input lists
+        """
+
+        return list(set(list1) & set(list2))
 
     @staticmethod
     def _cov2corr(covariance):
@@ -466,8 +474,8 @@ class HierarchicalClusteringAssetAllocation:
         :param allocation_metric: (str) the metric used for calculating weight allocations
         """
 
-        if asset_prices is None and asset_returns is None and covariance_matrix is None:
-            raise ValueError("You need to supply either raw prices or returns or covariance matrix")
+        if asset_prices is None and asset_returns is None and expected_asset_returns is None:
+            raise ValueError("You need to supply either raw prices or returns or expected asset returns.")
 
         if asset_prices is not None:
             if not isinstance(asset_prices, pd.DataFrame):
@@ -482,12 +490,6 @@ class HierarchicalClusteringAssetAllocation:
                              "minimum_standard_deviation, sharpe_ratio, equal_weighting, expected_shortfall, "
                              "conditional_drawdown_risk")
 
-        if allocation_metric in {'expected_shortfall', 'conditional_drawdown_risk'} and \
-                asset_returns is None and asset_prices is None:
-            raise ValueError("An asset returns dataframe/matrix is required when using the following allocation metrics - "
-                             "expected_shortfall and conditional_drawdown_risk. Either provide pre-calculated asset returns or "
-                             "give raw asset prices for inbuilt returns calculation.")
-
         if allocation_metric == 'sharpe_ratio' and expected_asset_returns is None and asset_prices is None:
-            raise ValueError("Either provide pre-calculated expected asset returns or give raw asset prices for "
-                             "inbuilt returns calculation.")
+            raise ValueError("An expected asset returns list is required for sharpe ratio metric. Either provide pre-calculated"
+                             "expected asset returns or give raw asset prices for inbuilt returns calculation.")

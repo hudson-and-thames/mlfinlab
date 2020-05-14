@@ -89,6 +89,7 @@ class TestHCAA(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_hcaa_sharpe_ratio_alloc_factor_less_than_one(self):
+        # pylint: disable=invalid-name
         """
         Test the condition when allocation factor calculated for sharpe ratio metric is less than 0
         or greater than 1 (in which case the variance is used as the metric).
@@ -300,7 +301,7 @@ class TestHCAA(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
-    def test_valuerror_with_no_asset_names(self):
+    def test_valu_error_with_no_asset_names(self):
         """
         Test ValueError when not supplying a list of asset names and no other input
         """
