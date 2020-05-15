@@ -31,7 +31,7 @@ def spearmans_rho(x: np.array, y: np.array) -> float:
     return rho
 
 
-def gnp_distance(x: np.array, y: np.array, theta: float) -> float:
+def gpr_distance(x: np.array, y: np.array, theta: float) -> float:
     """
     Calculates the distance between to Gaussians under the Generic Parametric Representation (GPR) approach.
 
@@ -92,8 +92,8 @@ def gnpr_distance(x: np.array, y: np.array, theta: float, bandwidth: float = 0.0
 
     # Creating a grid and histograms
     bins = np.arange(min_val, max_val + bandwidth, bandwidth)
-    hist_x = np.np.histogram(x, bins)[0]
-    hist_y = np.np.histogram(y, bins)[0]
+    hist_x = np.histogram(x, bins)[0]
+    hist_y = np.histogram(y, bins)[0]
 
     # Calculating the d_0 distance
     dist_0 = np.power(hist_x**(1/2) - hist_y**(1/2), 2).sum() / 2
