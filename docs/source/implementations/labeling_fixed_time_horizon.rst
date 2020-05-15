@@ -12,9 +12,12 @@ Fixed time horizon is a common method used in labeling financial data, usually a
 to :math:`t_0` over time horizon :math:`h` is calculated as follows:
 
 .. math::
-    r_{t0,t1} = p_{t1}/
+    r_{t0,t1} = p_{t1} / p_{t0} - 1
 
-t_0 over a time horizon h is calculated as follows:
+Where :math:`t_1 = t_0 + h` is the time bar index after a fixed horizon of :math:`h` ticks have passed, and:math:`p_{t0}, p_{t1}`
+are prices at times :math:`t_0, t_1`.
+
+
 
 Where :math:`R(t-t',t)`
 
