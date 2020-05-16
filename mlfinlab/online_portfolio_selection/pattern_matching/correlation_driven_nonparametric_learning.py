@@ -91,13 +91,18 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         def _objective(weight):
             return -np.sum(np.log(np.dot(optimize_array, weight)))
 
+        # Derivative of the objective function.
+        def _derivative(weight):
+            total_returns = np.dot(optimize_array, weight)
+            return -np.dot(1 / total_returns, optimize_array)
+
         # Weight bounds.
         bounds = tuple((0.0, 1.0) for asset in range(self.number_of_assets))
 
         # Sum of weights is 1.
         const = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
 
-        problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds, constraints=const)
+        problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds, constraints=const, jac=_derivative)
         return problem.x
 
     def calculate_rolling_correlation_coefficient(self):
