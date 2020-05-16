@@ -243,5 +243,5 @@ The following research notebook can be used to better understand how the algorit
 
 * `Risk Estimators Notebook`_
 
-.. _Risk Estimators Notebook: https://github.com/hudson-and-thames/research/blob/master/RiskEstimators/RiskEstimators.ipynb
+.. _Risk Estimators Notebook: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Risk%20Estimators/RiskEstimators.ipynb
 
