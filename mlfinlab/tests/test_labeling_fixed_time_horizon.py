@@ -19,40 +19,73 @@ class TestLabellingFixedTime(unittest.TestCase):
         project_path = os.path.dirname(__file__)
         self.path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(self.path, index_col='Date')
-        self.data.index = pd.to_datetime(self.data.index)
 
-    def test_fixed_time_horizon(self):
+    def test_basic(self):
         """
-        Assert that the fixed time horizon labelling works as expected.
-        Checks a range of static and dynamic thresholds.
+        Tests for basic cases, constant threshold and no standardization, varied lookforward periods
         """
         close = self.data['SPY'][:10]
-        test_threshold1 = pd.Series([0.01, 0.005, 0, 0.01, 0.02, 0.03, 0.1, -1, 0.99, 0], index=close.index)
-        test_threshold2 = pd.Series([1, 2, 0, 0.5, 0.02, 1.5, 10, -1, 500, 1], index=close.index)
-        test_standardize = [(0.1, 0.1), (-0.025, 0.01), (0, 0.01), (0, 0.01), (0, 0.01), (0.1, 0.1), (-0.025, 0.01),
-                            (0, 0.9), (-9999, 0.01), (0, 0.01)]
-
-        # Test cases without standardization
-        test1 = fixed_time_horizon(close, 0, 1)
-        test2 = fixed_time_horizon(close, 0, 3)
-        test3 = fixed_time_horizon(close, 0.01, 1)
-        test4 = fixed_time_horizon(close, test_threshold1, 1)
-        test5 = fixed_time_horizon(close, 0.05, 3)
+        test1 = fixed_time_horizon(close, 0, look_forward=1)
+        test2 = fixed_time_horizon(close, 0, look_forward=3)
+        test3 = fixed_time_horizon(close, 0.01, look_forward=1)
+        test4 = fixed_time_horizon(close, 1.0, look_forward=2)
         test1_actual = np.array([-1, -1, -1, -1, 1, 1, -1, 1, -1, np.nan])
         test2_actual = np.array([-1, -1, -1, 1, 1, 1, -1, np.nan, np.nan, np.nan])
-        test3_actual = np.array([0, -1, 0, -1, 1, 0, 0, 0, -1, np.nan])
-        test4_actual = np.array([0, -1, -1, -1, 0, 0, 0, 1, 0., np.nan])
-        test5_actual = np.array([0, 0, 0, 0, 0, 0, 0, np.nan, np.nan, np.nan])
+        test3_actual = np.array([0, -1,  0, -1,  1,  0,  0,  0, -1, np.nan])
+        test4_actual = np.array([0, 0,  0, 0,  0,  0,  0,  0, np.nan, np.nan])
         np.testing.assert_allclose(test1_actual, test1)
         np.testing.assert_allclose(test2_actual, test2)
         np.testing.assert_allclose(test3_actual, test3)
         np.testing.assert_allclose(test4_actual, test4)
-        np.testing.assert_allclose(test5_actual, test5)
 
-        # Test with standardization
-        test6 = fixed_time_horizon(close, 1, lookfwd=1, standardized=test_standardize)
-        test7 = fixed_time_horizon(close, test_threshold2, lookfwd=2, standardized=test_standardize)
-        test6_actual = np.array([-1., 0., 0., -1., 1., 0., 1., 0., 1., np.nan])
-        test7_actual = np.array([-1., 0., -1., -1., 1., 0., 0., 1., np.nan, np.nan])
+    def test_dynamic_threshold(self):
+        """
+        Tests for when threshold is a pd.Series rather than a constant
+        """
+        close = self.data['SPY'][:10]
+        threshold1 = pd.Series([0.01, 0.005, 0, 0.01, 0.02, 0.03, 0.1, -1, 0.99, 0], index=self.data[:10].index)
+
+        test5 = fixed_time_horizon(close, threshold1, look_forward=1)
+        test6 = fixed_time_horizon(close, threshold1, look_forward=4)
+        test5_actual = np.array([0, -1, -1, -1,  0,  0,  0,  1,  0, np.nan])
+        test6_actual = np.array([-1, -1, -1,  0,  0,  0, np.nan, np.nan, np.nan, np.nan])
+        np.testing.assert_allclose(test5_actual, test5)
         np.testing.assert_allclose(test6_actual, test6)
+
+    def test_with_standardization(self):
+        """
+        Test cases with standardization, with constant and dynamic threshold
+        """
+        close = self.data['SPY'][:10]
+        threshold2 = pd.Series([1, 2, 0, 0.5, 0.02, 1.5, 10, -1, 500, 1], index=self.data[:10].index)
+
+        test7 = fixed_time_horizon(close, 1, look_forward=1, standardized=True, window=4)
+        test8 = fixed_time_horizon(close, 0.1, look_forward=1, standardized=True, window=5)
+        test9 = fixed_time_horizon(close, threshold2, look_forward=2, standardized=True, window=3)
+        test7_actual = np.array([np.nan, np.nan, np.nan,  0,  1,  0,  0,  0, -1, np.nan])
+        test8_actual = np.array([np.nan, np.nan, np.nan, np.nan,  1,  1, -1,  1, -1, np.nan])
+        test9_actual = np.array([np.nan, np.nan,  1,  1,  1,  0,  0, -1, np.nan, np.nan])
         np.testing.assert_allclose(test7_actual, test7)
+        np.testing.assert_allclose(test8_actual, test8)
+        np.testing.assert_allclose(test9_actual, test9)
+
+    def test_look_forward_warning(self):
+        """
+        Verifies that the correct warning is raised if look_forward is greater than the length of the data
+        """
+        close = self.data['SPY'][:10]
+        with self.assertWarns(UserWarning):
+            labels = fixed_time_horizon(close, 0.01, look_forward=50)
+        np.testing.assert_allclose(labels, [np.nan]*len(self.data['SPY'][:10]))
+
+    def test_standardization_warning(self):
+        """
+        Verify that an exception is raised if standardization is set to true, but window is not specified as an int.
+        Checks warning when look_forward is greater than the length of the data series
+        """
+        close = self.data['SPY'][:10]
+        with self.assertRaises(Exception):
+            fixed_time_horizon(close, 0.01, look_forward=50, standardized=True)
+        with self.assertWarns(UserWarning):
+            labels = fixed_time_horizon(close, 0.01, look_forward=50, standardized=True, window=50)
+        np.testing.assert_allclose(labels, [np.nan]*len(self.data['SPY'][:10]))

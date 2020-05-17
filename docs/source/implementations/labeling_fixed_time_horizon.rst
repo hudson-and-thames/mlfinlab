@@ -1,8 +1,8 @@
 .. _implementations-labeling_fixed_time_horizon:
 
-=============
-Fixed Horizon
-=============
+====================
+Fixed Horizon Method
+====================
 
 Fixed horizon labels is a classification labeling technique used in the following paper: `Dixon, M., Klabjan, D. and
 Bang, J., 2016. Classification-based Financial Markets Prediction using Deep Neural Networks.
@@ -12,101 +12,31 @@ Fixed time horizon is a common method used in labeling financial data, usually a
 to :math:`t_0` over time horizon :math:`h` is calculated as follows:
 
 .. math::
-    r_{t0,t1} = p_{t1} / p_{t0} - 1
+    r_{t0,t1} = \frac{p_{t1}}{p_{t0}} - 1
 
-Where :math:`t_1 = t_0 + h` is the time bar index after a fixed horizon of :math:`h` ticks have passed, and:math:`p_{t0}, p_{t1}`
-are prices at times :math:`t_0, t_1`.
-
-
-
-Where :math:`R(t-t',t)`
+Where :math:`t_1 = t_0 + h` is the time bar index after a fixed horizon of :math:`h` ticks have passed, and :math:`p_{t0}, p_{t1}`
+are prices at times :math:`t_0, t_1`. This method assigns a label based on comparison of rate of return to a threshold :math:`\tau`
 
 .. math::
-    r_t
+    -1 \text{ if } r_{t0, t1} < -\tau\\
+    0 \text{ if } -\tau \leq r_{t0, t1} \geq \tau\\
+    1 \text{ if } r_{t0, t1} > \tau
 
-where  p is the price
-
-Though fixed time bars is the most common format for financial data, there are potential problems with its use.
-
-1. Real returns
-2. Residual alpha after regression on the sector index
-3. Volatility-adjusted returns
-
-.. image:: labeling_images/performance_tail_sets.png
-   :scale: 100 %
-   :align: center
-
-For our particular implementation, we have focused on the volatility-adjusted returns.
-
-Metric: Volatility-Adjusted Returns
-###################################
-
-The formula for the volatility-adjusted returns are as follows:
-
-.. math::
-
-      r(t - t', t) = \frac{R(t-t',t)}{vol(t)}
-
-Where :math:`R(t-t',t)` is the return for the asset, in our case we make use of daily (single period) returns, and
-:math:`vol(t-1)` is a measure for volatility on daily returns. We provide two implementations for estimations of
-volatility, first the exponential moving average of the mean absolute returns, and second the traditional standard
-deviation. (The paper suggests a 180 day window period.)
-
-To quote the paper: "Huffman and Moll (2011) show that risk measured as the mean absolute deviation has more explanatory
-power for future expected returns than standard deviation."
-
-Creating Tail Sets
-##################
-
-Once the volatility adjusted returns have been applied to the DataFrame of prices we then loop over each timestamp
-and group the assets into deciles (10 groups). The upper and lower most deciles are labeled 1 and -1 respectively. These
-then form part of the positive and negative tail sets.
-
-Its important to note that we drop the 0 labels (for a given timestamp) and only train the model assets that made it into
-the tail sets.
-
-The following figure from the paper shows the distribution of the 91-day volatility-adjusted returns for the
-industrials sector.
-
-.. image:: labeling_images/var_distribution.png
-   :scale: 100 %
-   :align: center
-
-"The positive tail sets are the 10% most positive volatility-adjusted returns, and the negative tail sets are the 10% most negative.
-The vertical dotted lines represent the decile cut. The + and − regions are the ones used for model training."
+Though time bars are the most common format for financial data, there can be potential problems with over reliance on time bars. First,
+time bars exhibit high seasonality, as trading behavior may be quite different at the open or close versus midday; thus it will not be
+informative to apply the same thershold on non-uniform distribution. Solutions include applying the fixed horizon method to tick or
+volume bars instead of time bars, using data sampled at the same time every day (e.g. closing prices) or inputting a dynamic threshold
+as a pd.Series corresponding to the times in the dataset. If desired, a pd.DataFrame-like object can be passed to scale the data by
+known mean and standard deviation for the given time index.
 
 
-How to use these labels in practice?
-####################################
-
-The tail set labels from the code above returns the names of the assets which should be labeled with a positive or
-negative label. Its important to note that the model you  would develop is a many to one model, in that it has many
-x variables and only one y variable. The model is a binary classifier.
-
-The model is trained on the training data and then used to score every security in the test data (on a given day).
-Example: On December 1st 2019, the strategy needs to rebalance its positions, we score all 100 securities in our tradable
-universe and then rank the outputs in a top down fashion. We form a long / short portfolio by going long the top 10
-stocks and short the bottom 10 (equally weighted). We then hold the position to the next rebalance date.
-
-The paper provides the following investment performance:
-
-.. image:: labeling_images/tail_sets_perf.png
-   :scale: 100 %
-   :align: center
-
-.. warning::
-   The Tail Set labels are for the current day! In order to use them as a labeling technique you need to lag them so that
-   they can be forward looking. We recommend using the pandas DataFrames ``df.lag(1)`` method.
 
 Implementation
 ##############
 
-.. automodule:: mlfinlab.labeling.tail_sets
-
-    .. autoclass:: TailSetLabels
-        :members:
-
-        .. automethod:: __init__
+.. py:currentmodule:: mlfinlab.labeling.fixed_time_horizon
+.. automodule:: mlfinlab.labeling.fixed_time_horizon
+   :members:
 
 Example
 ########
@@ -116,19 +46,14 @@ Below is an example on how to create the positive, negative, and full matrix Tai
 
     import numpy as np
     import pandas as pd
-    from mlfinlab.labeling import TailSetLabels
+    from mlfinlab.labeling import fixed_time_horizon
 
     # Import price data
     data = pd.read_csv('../Sample-Data/stock_prices.csv', index_col='Date', parse_dates=True)
+    ticker = 'SPY'
 
-    # Create tail set labels
-    labels = TailSetLabels(data, window=180, mean_abs_dev=True)
-    pos_set, neg_set, matrix_set = labels.get_tail_sets()
-
-    # Lag the labels to make them forward looking
-    pos_set = pos_set.lag(1)
-    neg_set = neg_set.lag(1)
-    matrix_set = matrix_set.lag(1)
+    # Create labels
+    labels = fixed_time_horizon(data[ticker], 0.01, lookfwd=1, standardized=None)
 
 
 Research Notebooks

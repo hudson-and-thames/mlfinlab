@@ -4,32 +4,48 @@ Described in "Classification-based Financial Markets Prediction using Deep Neura
 """
 
 import numpy as np
-import pandas as pd
+import warnings
 
 
-def fixed_time_horizon(close, threshold, lookfwd=1, standardized=None):
+def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, window=None):
     """
     Fixed-Time Horizon Labelling Method
     Returns 1 if return at h-th bar after t_0 is greater than the threshold, -1 if less, and 0 if in between
 
-    :param close: (pd.Series) of Close prices
+    :param close: (pd.Series) of Close prices over fixed horizons (usually time bars, but can be any format as long as
+                    index is timestamps)  for a stock ticker
     :param threshold: (float or pd.Series) When the abs(change) is larger than the threshold, it is labelled as 1 or -1.
-                    If change is smaller, it's labelled as 0. Can be dynamic if threshold is pd.Series
-    :param lookfwd: : (int) Number of ticks to look forward when calculating future return rate
-    :param standardized: (pd.DataFrame, or DataFrame-like) of (mean, stdev) of returns corresponding to days in close
-    :return: (pd.Series) Series of -1, 0, or 1 denoting whether return is under/between/greater than the threshold
+                    If change is smaller, it's labelled as 0. Can be dynamic if threshold is pd.Series. If threshold is
+                    a series, threshold.index must match close.index. If threshold is negative, then the directionality
+                    of the labels will be reversed
+    :param look_forward: : (int) Number of ticks to look forward when calculating future return rate. By default, 1.
+    :param standardized: (bool) Whether returns are scaled by mean and standard deviation
+    :param window: (int) If standardized is True, the rolling window period for calculating the mean and standard
+                    deviation of returns
+    :return: (np.Array) of -1, 0, or 1 denoting whether return for each tick is under/between/greater than the threshold
     """
     # Calculate forward price with
-    fwd = close.pct_change(periods=lookfwd).shift(-lookfwd)
+    forward_return = close.pct_change(periods=look_forward).shift(-look_forward)
 
-    # Adjust by mean and stdev, if provided
-    if standardized is not None:
-        standardize = pd.DataFrame(standardized, columns=['mean', 'sd'], index=fwd.index)
-        fwd -= standardize['mean']
-        fwd /= standardize['sd']
+    # Warning if look_forward is greater than the length of the series,
+    if look_forward >= len(forward_return):
+        warnings.warn('look_forward period is greater than the length of the Series. All labels will be NaN.',
+                      UserWarning)
+
+    # Adjust by mean and stdev, if desired. Assert that window must exist if standardization is on. Warning if window is
+    # too large.
+    if standardized:
+        assert isinstance(window, int), "when standardized is True, window must be int"
+        if window >= len(forward_return):
+            warnings.warn('window is greater than the length of the Series. All labels will be NaN.', UserWarning)
+        mu = forward_return.rolling(window=window).mean()
+        sigma = forward_return.rolling(window=window).std()
+        forward_return -= mu
+        forward_return /= sigma
 
     # Conditions for 1, 0, -1
-    conditions = [fwd > threshold, (fwd <= threshold) & (fwd >= -threshold), fwd < -threshold]
+    conditions = [forward_return > threshold, (forward_return <= threshold) & (forward_return >= -threshold),
+                  forward_return < -threshold]
     choices = [1, 0, -1]
     labels = np.select(conditions, choices, default=np.nan)
 
