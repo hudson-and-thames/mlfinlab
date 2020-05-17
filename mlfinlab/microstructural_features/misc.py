@@ -9,8 +9,8 @@ def vwap(dollar_volume: list, volume: list) -> float:
     """
     Get Volume Weighted Average Price (VWAP).
 
-    :param dollar_volume: (list) of dollar volumes
-    :param volume: (list) of trades sizes
+    :param dollar_volume: (list) Dollar volumes
+    :param volume: (list) Trades sizes
     :return: (float) VWAP value
     """
     return sum(dollar_volume) / sum(volume)
@@ -19,7 +19,8 @@ def vwap(dollar_volume: list, volume: list) -> float:
 def get_avg_tick_size(tick_size_arr: list) -> float:
     """
     Get average tick size in a bar.
-    :param tick_size_arr: (list) of trade sizes
-    :return: (float) average trade size
+
+    :param tick_size_arr: (list) Trade sizes
+    :return: (float) Average trade size
     """
     return np.mean(tick_size_arr)

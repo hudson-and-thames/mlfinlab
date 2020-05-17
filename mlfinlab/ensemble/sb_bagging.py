@@ -168,19 +168,19 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
            set (X, y).
         Parameters
         ----------
-        X : {array-like, sparse matrix} of shape = [n_samples, n_features]
+        X : (array-like, sparse matrix) of shape = [n_samples, n_features]
             The training input samples. Sparse matrices are accepted only if
             they are supported by the base estimator.
-        y : array-like, shape = [n_samples]
+        y : (array-like), shape = [n_samples]
             The target values (class labels in classification, real numbers in
             regression).
-        sample_weight : array-like, shape = [n_samples] or None
+        sample_weight : (array-like), shape = [n_samples] or None
             Sample weights. If None, then samples are equally weighted.
             Note that this is supported only if the base estimator supports
             sample weighting.
         Returns
         -------
-        self : object
+        self : (object)
         """
         return self._fit(X, y, self.max_samples, sample_weight=sample_weight)
 
@@ -189,24 +189,24 @@ class SequentiallyBootstrappedBaseBagging(BaseBagging, metaclass=ABCMeta):
            set (X, y).
         Parameters
         ----------
-        X : {array-like, sparse matrix} of shape = [n_samples, n_features]
+        X : (array-like, sparse matrix) of shape = [n_samples, n_features]
             The training input samples. Sparse matrices are accepted only if
             they are supported by the base estimator.
-        y : array-like, shape = [n_samples]
+        y : (array-like), shape = [n_samples]
             The target values (class labels in classification, real numbers in
             regression).
-        max_samples : int or float, optional (default=None)
+        max_samples : (int or float), optional (default=None)
             Argument to use instead of self.max_samples.
-        max_depth : int, optional (default=None)
+        max_depth : (int), optional (default=None)
             Override value used when constructing base estimator. Only
             supported if the base estimator has a max_depth parameter.
-        sample_weight : array-like, shape = [n_samples] or None
+        sample_weight : (array-like), shape = [n_samples] or None
             Sample weights. If None, then samples are equally weighted.
             Note that this is supported only if the base estimator supports
             sample weighting.
         Returns
         -------
-        self : object
+        self : (object)
         """
         random_state = check_random_state(self.random_state)
         self.X_time_index = X.index  # Remember X index for future sampling
@@ -332,59 +332,59 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
     tree), by introducing randomization into its construction procedure and
     then making an ensemble out of it.
 
-    :param samples_info_sets: pd.Series, The information range on which each record is constructed from
+    :param samples_info_sets: (pd.Series), The information range on which each record is constructed from
         *samples_info_sets.index*: Time when the information extraction started.
         *samples_info_sets.value*: Time when the information extraction ended.
-    :param price_bars: pd.DataFrame
+    :param price_bars: (pd.DataFrame)
         Price bars used in samples_info_sets generation
-    :param base_estimator: object or None, optional (default=None)
+    :param base_estimator: (object or None), optional (default=None)
         The base estimator to fit on random subsets of the dataset.
         If None, then the base estimator is a decision tree.
-    :param n_estimators: int, optional (default=10)
+    :param n_estimators: (int), optional (default=10)
         The number of base estimators in the ensemble.
-    :param max_samples: int or float, optional (default=1.0)
+    :param max_samples: (int or float), optional (default=1.0)
         The number of samples to draw from X to train each base estimator.
         If int, then draw `max_samples` samples. If float, then draw `max_samples * X.shape[0]` samples.
-    :param max_features: int or float, optional (default=1.0)
+    :param max_features: (int or float), optional (default=1.0)
         The number of features to draw from X to train each base estimator.
         If int, then draw `max_features` features. If float, then draw `max_features * X.shape[1]` features.
-    :param bootstrap_features: boolean, optional (default=False)
+    :param bootstrap_features: (bool), optional (default=False)
         Whether features are drawn with replacement.
-    :param oob_score: bool, optional (default=False)
+    :param oob_score: (bool), optional (default=False)
         Whether to use out-of-bag samples to estimate
         the generalization error.
-    :param warm_start: bool, optional (default=False)
+    :param warm_start: (bool), optional (default=False)
         When set to True, reuse the solution of the previous call to fit
         and add more estimators to the ensemble, otherwise, just fit
         a whole new ensemble.
-    :param n_jobs: int or None, optional (default=None)
+    :param n_jobs: (int or None), optional (default=None)
         The number of jobs to run in parallel for both `fit` and `predict`.
         ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
         ``-1`` means using all processors.
-    :param random_state: int, RandomState instance or None, optional (default=None)
+    :param random_state: (int), RandomState instance or None, optional (default=None)
         If int, random_state is the seed used by the random number generator;
         If RandomState instance, random_state is the random number generator;
         If None, the random number generator is the RandomState instance used
         by `np.random`.
-    :param verbose: int, optional (default=0)
+    :param verbose: (int), optional (default=0)
         Controls the verbosity when fitting and predicting.
 
-    :ivar base_estimator_: estimator
+    :ivar base_estimator_: (estimator)
         The base estimator from which the ensemble is grown.
-    :ivar estimators_: list of estimators
+    :ivar estimators_: (list of estimators)
         The collection of fitted base estimators.
-    :ivar estimators_samples_: list of arrays
+    :ivar estimators_samples_: (list of arrays)
         The subset of drawn samples (i.e., the in-bag samples) for each base
         estimator. Each subset is defined by an array of the indices selected.
-    :ivar estimators_features_: list of arrays
+    :ivar estimators_features_: (list of arrays)
         The subset of drawn features for each base estimator.
-    :ivar classes_: array of shape = [n_classes]
+    :ivar classes_: (array) of shape = [n_classes]
         The classes labels.
-    :ivar n_classes_: int or list
+    :ivar n_classes_: (int or list)
         The number of classes.
-    :ivar oob_score_: float
+    :ivar oob_score_: (float)
         Score of the training dataset obtained using an out-of-bag estimate.
-    :ivar oob_decision_function_: array of shape = [n_samples, n_classes]
+    :ivar oob_decision_function_: (array) of shape = [n_samples, n_classes]
         Decision function computed with out-of-bag estimate on the training
         set. If n_estimators is small it might be possible that a data point
         was never left out during the bootstrap. In this case,
@@ -471,53 +471,53 @@ class SequentiallyBootstrappedBaggingRegressor(SequentiallyBootstrappedBaseBaggi
     tree), by introducing randomization into its construction procedure and
     then making an ensemble out of it.
 
-    :param samples_info_sets: pd.Series, The information range on which each record is constructed from
+    :param samples_info_sets: (pd.Series), The information range on which each record is constructed from
         *samples_info_sets.index*: Time when the information extraction started.
         *samples_info_sets.value*: Time when the information extraction ended.
 
-    :param price_bars: pd.DataFrame
+    :param price_bars: (pd.DataFrame)
         Price bars used in samples_info_sets generation
-    :param base_estimator: object or None, optional (default=None)
+    :param base_estimator: (object or None), optional (default=None)
         The base estimator to fit on random subsets of the dataset. If None, then the base estimator is a decision tree.
-    :param n_estimators: int, optional (default=10)
+    :param n_estimators: (int), optional (default=10)
         The number of base estimators in the ensemble.
-    :param max_samples: int or float, optional (default=1.0)
+    :param max_samples: (int or float), optional (default=1.0)
         The number of samples to draw from X to train each base estimator.
         If int, then draw `max_samples` samples. If float, then draw `max_samples * X.shape[0]` samples.
-    :param max_features: int or float, optional (default=1.0)
+    :param max_features: (int or float), optional (default=1.0)
         The number of features to draw from X to train each base estimator.
         If int, then draw `max_features` features. If float, then draw `max_features * X.shape[1]` features.
-    :param bootstrap_features: boolean, optional (default=False)
+    :param bootstrap_features: (bool), optional (default=False)
         Whether features are drawn with replacement.
-    :param oob_score: bool
+    :param oob_score: (bool)
         Whether to use out-of-bag samples to estimate
         the generalization error.
-    :param warm_start: bool, optional (default=False)
+    :param warm_start: (bool), optional (default=False)
         When set to True, reuse the solution of the previous call to fit
         and add more estimators to the ensemble, otherwise, just fit
         a whole new ensemble.
-    :param n_jobs: int or None, optional (default=None)
+    :param n_jobs: (int or None), optional (default=None)
         The number of jobs to run in parallel for both `fit` and `predict`.
         ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
         ``-1`` means using all processors.
-    :param random_state: int, RandomState instance or None, optional (default=None)
+    :param random_state: (int, RandomState instance or None), optional (default=None)
         If int, random_state is the seed used by the random number generator;
         If RandomState instance, random_state is the random number generator;
         If None, the random number generator is the RandomState instance used
         by `np.random`.
-    :param verbose: int, optional (default=0)
+    :param verbose: (int), optional (default=0)
         Controls the verbosity when fitting and predicting.
 
-    :ivar estimators_: list of estimators
+    :ivar estimators_: (list) of estimators
         The collection of fitted sub-estimators.
-    :ivar estimators_samples_: list of arrays
+    :ivar estimators_samples_: (list) of arrays
         The subset of drawn samples (i.e., the in-bag samples) for each base
         estimator. Each subset is defined by an array of the indices selected.
-    :ivar estimators_features_: list of arrays
+    :ivar estimators_features_: (list) of arrays
         The subset of drawn features for each base estimator.
-    :ivar oob_score_: float
+    :ivar oob_score_: (float)
         Score of the training dataset obtained using an out-of-bag estimate.
-    :ivar oob_prediction_: array of shape = [n_samples]
+    :ivar oob_prediction_: (array) of shape = [n_samples]
         Prediction computed with out-of-bag estimate on the training
         set. If n_estimators is small it might be possible that a data point
         was never left out during the bootstrap. In this case,

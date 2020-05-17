@@ -27,8 +27,8 @@ class MeanVarianceOptimisation:
         """
         Constructor.
 
-        :param calculate_expected_returns: (str) the method to use for calculation of expected returns.
-        Currently supports "mean" and "exponential"
+        :param calculate_expected_returns: (str) The method to use for calculation of expected returns.
+                                                 Currently supports "mean" and "exponential"
         """
 
         self.weights = list()
@@ -369,8 +369,8 @@ class MeanVarianceOptimisation:
         """
         Calculate weights using inverse-variance allocation.
 
-        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
-        :return: (np.array) array of portfolio weights
+        :param covariance: (pd.Dataframe) Covariance dataframe of asset returns
+        :return: (np.array) Array of portfolio weights
         """
 
         ivp = 1. / np.diag(covariance)
@@ -547,11 +547,11 @@ class MeanVarianceOptimisation:
         """
         Calculate minimum volatility portfolio for a given target return.
 
-        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
-        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
-        :param target_return: (float) target return of the portfolio
-        :param num_assets: (int) number of assets in the portfolio
-        :return: (np.array, float, float) portfolio weights, risk value and return value
+        :param covariance: (pd.Dataframe) Covariance dataframe of asset returns
+        :param expected_asset_returns: (list/np.array/pd.dataframe) A list of mean stock returns (mu)
+        :param target_return: (float) Target return of the portfolio
+        :param num_assets: (int) Number of assets in the portfolio
+        :return: (np.array, float, float) Portfolio weights, risk value and return value
         """
 
         weights = cp.Variable(num_assets)
