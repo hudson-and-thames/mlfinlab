@@ -233,9 +233,13 @@ class HierarchicalClusteringAssetAllocation:
         clusters_variance = np.ones(shape=optimal_num_clusters)
 
         # Calculate the corresponding risk measure for the clusters
-        self._calculate_risk_contribution_of_clusters(clusters_contribution, clusters_variance, allocation_metric,
-                                                 optimal_num_clusters, covariance_matrix, expected_asset_returns,
-                                                 asset_returns)
+        self._calculate_risk_contribution_of_clusters(clusters_contribution,
+                                                      clusters_variance,
+                                                      allocation_metric,
+                                                      optimal_num_clusters,
+                                                      covariance_matrix,
+                                                      expected_asset_returns,
+                                                      asset_returns)
 
         # Recursive bisection taking into account the dendrogram structure
         for cluster_index in range(optimal_num_clusters - 1):
