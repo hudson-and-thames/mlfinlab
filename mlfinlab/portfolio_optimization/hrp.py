@@ -146,7 +146,7 @@ class HierarchicalRiskParity:
         """
         Based on the quasi-diagnalization, reorder the original distance matrix, so that assets within
         the same cluster are grouped together.
-        
+
         :param assets: (list) Asset names in the portfolio
         :param distance: (pd.Dataframe) Distance values between asset returns
         :param correlation: (pd.Dataframe) Correlations between asset returns
@@ -174,7 +174,7 @@ class HierarchicalRiskParity:
     def _get_cluster_variance(self, covariance, cluster_indices):
         """
         Calculate cluster variance.
-        
+
         :param covariance: (pd.Dataframe) Covariance matrix of assets
         :param cluster_indices: (list) Asset indices for the cluster
         :return: (float) Variance of the cluster
