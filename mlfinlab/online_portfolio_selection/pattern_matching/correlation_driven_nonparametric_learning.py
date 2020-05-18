@@ -21,7 +21,9 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         Initializes Correlation Driven Nonparametric Learning with the given window and rho value.
 
         :param window: (int) Number of windows to look back for similarity sets.
-        :param rho: (float) Threshold for similarity.
+        :param rho: (float) Threshold for similarity. Rho should set in the range of [-1, 1].
+                    Lower rho values will classify more periods as being similar, and higher values
+                    will be more strict on identifying a period as similarly correlated.
         """
         self.window = window
         self.rho = rho
@@ -33,7 +35,7 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         Initializes the important variables for the object.
 
         :param asset_prices: (pd.DataFrame) Historical asset prices.
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
         :param resample_by: (str) Specifies how to resample the prices.
         """
         super(CorrelationDrivenNonparametricLearning, self)._initialize(asset_prices, weights,
@@ -60,8 +62,10 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         """
         # Create similar set.
         similar_set = []
+
         # Default is uniform weights.
         new_weights = self._uniform_weight()
+
         # Calculate for similar sets if time is greater or equal to window size.
         if time >= self.window:
             # Iterate through past windows.
@@ -70,6 +74,7 @@ class CorrelationDrivenNonparametricLearning(OLPS):
                 if self.corr_coef[time - self.window + 1][past_time] > self.rho:
                     # Append the time for similar set.
                     similar_set.append(past_time + self.window)
+
             if similar_set:
                 # Choose the corresponding relative return periods.
                 optimize_array = self.relative_return[similar_set]
@@ -113,11 +118,14 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         """
         # Flatten the array.
         flattened = self.relative_return.flatten()
+
         # Set index of rolled window.
         idx = np.arange(self.number_of_assets * self.window)[None, :] + self.number_of_assets * \
               np.arange(self.length_of_time - self.window + 1)[:, None]
+
         # Retrieve the results of the rolled window.
         rolled_returns = flattened[idx]
+
         # Calculate correlation coefficient.
         rolling_corr_coef = np.nan_to_num(np.corrcoef(rolled_returns), nan=0)
         return rolling_corr_coef

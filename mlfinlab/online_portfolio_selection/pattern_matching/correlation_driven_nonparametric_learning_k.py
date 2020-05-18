@@ -25,7 +25,7 @@ class CorrelationDrivenNonparametricLearningK(UniversalPortfolio):
         windows, rho values, and k experts.
 
         :param window: (int) Number of windows to look back for similarity sets. (1, 2, ..., w).
-        :param rho: (float) Number of rho values for threshold. (0, 1/rho, ..., (rho-1)/rho).
+        :param rho: (int) Number of rho values for threshold. (0, 1/rho, ..., (rho-1)/rho).
         :param k: (int) Number of top-k experts.
         """
         self.window = window
@@ -85,11 +85,11 @@ class CorrelationDrivenNonparametricLearningK(UniversalPortfolio):
         pointer = 0
 
         # Window from 1 to self.window.
-        for n_window in range(self.window):
+        for n_window in range(1, self.window):
             # Rho from 0 to (rho - 1)/rho.
             for n_rho in range(self.rho):
                 # Assign experts with parameters (n_window + 1, n_rho/rho).
-                self.expert_params[pointer] = [n_window + 1, n_rho/self.rho]
+                self.expert_params[pointer] = [n_window, n_rho/self.rho]
                 # Next pointer.
                 pointer += 1
         # Assign parameters.
