@@ -63,6 +63,6 @@ Research Notebooks
 
 The following research notebooks can be used to better understand the Tail Set labeling technique.
 
-* `Tail Set Labels Example`_
+* `Fixed Horizon Example`_
 
-.. _`Tail Set Labels Example`: https://github.com/hudson-and-thames/research/blob/master/labels_tail_sets/tail_set_labels_example.ipynb
+.. _`Fixed Horizon Example`: https://github.com/hudson-and-thames/research/blob/master/labels_fixed_horizon/Fixed_Time_Horizon.ipynb
