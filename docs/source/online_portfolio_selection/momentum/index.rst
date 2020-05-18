@@ -1,16 +1,35 @@
 .. _online_portfolio_selection-momentum-index:
 
-.. note::
-    The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies. Each
-    algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
-    on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
-    Next up, lets discuss about some of these implementations and the different parameters they require.
-
 ==========
 Momentum
 ==========
 
-There are four different benchmarks strategies implemented in the Online Portfolio Selection module.
+.. toctree::
+    :maxdepth: 3
+    :caption: Exponential Gradient
+    :hidden:
+
+    exponential_gradient
+
+.. toctree::
+    :maxdepth: 3
+    :caption: Follow the Leader
+    :hidden:
+
+    follow_the_leader
+
+.. toctree::
+    :maxdepth: 3
+    :caption: Follow the Regularized Leader
+    :hidden:
+
+    follow_the_regularized_leader
+
+Momentum strategies have been a popular quantitative strategy in recent decades as the simple but powerful trend-following
+allows investors to exponentially increase their returns. This module will implement two types of momentum strategy with one
+following the best-performing assets in the last period and the other following the Best Constant Rebalanced Portfolio until the last period.
+
+There are three different momentum strategies implemented in the Online Portfolio Selection module.
 
 1. Exponential Gradient
 
@@ -21,9 +40,8 @@ There are four different benchmarks strategies implemented in the Online Portfol
 Research Notebooks
 ##################
 
-The following research notebooks provides a more detailed exploration of the algorithm as outlined at the back of Ch16 in
-Advances in Financial Machine Learning.
+The following research notebooks provides a more detailed exploration of the strategies.
 
-* `Chapter 16 Exercise Notebook`_
+* `Momentum Notebook`_
 
-.. _Chapter 16 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Chapter16/Chapter16.ipynb
+.. _Momentum Notebook: https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb
