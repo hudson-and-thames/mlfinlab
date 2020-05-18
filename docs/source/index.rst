@@ -236,6 +236,7 @@ This project is licensed under an all rights reserved licence.
     implementations/data_structures
     implementations/filters
     implementations/codependence
+    implementations/codependence_marti
     implementations/frac_diff
     implementations/structural_breaks
     implementations/microstructural_features
