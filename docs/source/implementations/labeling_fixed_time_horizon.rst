@@ -26,8 +26,7 @@ Though time bars are the most common format for financial data, there can be pot
 time bars exhibit high seasonality, as trading behavior may be quite different at the open or close versus midday; thus it will not be
 informative to apply the same thershold on non-uniform distribution. Solutions include applying the fixed horizon method to tick or
 volume bars instead of time bars, using data sampled at the same time every day (e.g. closing prices) or inputting a dynamic threshold
-as a pd.Series corresponding to the times in the dataset. If desired, a pd.DataFrame-like object can be passed to scale the data by
-known mean and standard deviation for the given time index.
+as a pd.Series corresponding to the times in the dataset.
 
 
 
@@ -53,7 +52,10 @@ Below is an example on how to create the positive, negative, and full matrix Tai
     ticker = 'SPY'
 
     # Create labels
-    labels = fixed_time_horizon(data[ticker], 0.01, lookfwd=1, standardized=None)
+    labels = fixed_time_horizon(data[ticker], 0.01, look_forward=1)
+
+    # Create labels with standardization
+    labels = fixed_time_horizon(data[ticker], 1, look_forward=1, standardized=True, window=5)
 
 
 Research Notebooks
