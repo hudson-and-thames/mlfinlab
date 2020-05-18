@@ -24,9 +24,16 @@ class CorrelationDrivenNonparametricLearningK(UniversalPortfolio):
         Initializes Correlation Driven Nonparametric Learning - K with the given number of
         windows, rho values, and k experts.
 
-        :param window: (int) Number of windows to look back for similarity sets. (1, 2, ..., w).
-        :param rho: (int) Number of rho values for threshold. (0, 1/rho, ..., (rho-1)/rho).
-        :param k: (int) Number of top-k experts.
+        :param window: (int) Number of windows to look back for similarity sets. Generates
+                             experts with range of [1, 2, ..., w]. The window ranges typically work
+                             well with shorter terms of [1, 7].
+        :param rho: (int) Number of rho values for threshold. Generates experts with range of
+                          [0, 1, (rho-1)/rho]. Higher rho values allow for a greater coverage of
+                          possible parameters, but it will slow down the calculations. Rho ranges
+                          typically work well with [2, 7].
+        :param k: (int) Number of top-k experts. K values have range of [1, window * rho]. Higher
+                        number of experts gives a higher exposure to a number of strategies. K value of
+                        1 or 2 had the best results as some parameters significantly outperform others.
         """
         self.window = window
         self.rho = rho
@@ -39,8 +46,9 @@ class CorrelationDrivenNonparametricLearningK(UniversalPortfolio):
         Initializes the important variables for the object.
 
         :param asset_prices: (pd.DataFrame) Historical asset prices.
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
-        :param resample_by: (str) Specifies how to resample the prices.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
+        :param resample_by: (str) Specifies how to resample the prices. 'D' for Day, 'W' for Week,
+                                  'M' for Month. The inputs are based on pandas' resample method.
         """
         # Check that window value is an integer.
         if not isinstance(self.window, int):
@@ -76,7 +84,7 @@ class CorrelationDrivenNonparametricLearningK(UniversalPortfolio):
 
     def _generate_experts(self):
         """
-        Generates window * rho experts from window of 1 to w and rho of 0 to (rho-1)/rho.
+        Generates window * rho experts from window of [1, w] and rho of [0, (rho - 1) / rho].
         """
         # Initialize expert parameters.
         self.expert_params = np.zeros((self.number_of_experts, 2))

@@ -13,8 +13,8 @@ class SymmetricCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparame
     <https://jfds.pm-research.com/content/1/2/78>`_
 
     Symmetric Correlation Driven Nonparametric Learning is an extension of the CORN strategy
-    proposed by Li and Hoi. SCORN looks to not only maximize the returns for the similar periods but
-    also minimize the losses from the negatively correlated periods.
+    proposed by Yang Wang and Dong Wang. SCORN looks to not only maximize the returns for the similar
+    periods but also minimize the losses from the negatively correlated periods.
     """
 
     def _update_weight(self, time):
@@ -22,10 +22,11 @@ class SymmetricCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparame
         Predicts the next time's portfolio weight.
 
         :param time: (int) Current time period.
-        :return new_weights: (np.array) Predicted weights.
+        :return: (np.array) Predicted weights.
         """
         # Create similar set.
         similar_set = []
+
         # Creat opposite set.
         opposite_set = []
 
@@ -37,13 +38,16 @@ class SymmetricCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparame
             # Iterate through past windows.
             for past_time in range(time - self.window + 1):
                 # Check for windows that are above rho.
+
                 if self.corr_coef[time - self.window + 1][past_time] > self.rho:
                     # Append the time for similar set.
                     similar_set.append(past_time + self.window)
+
                 # Check for windows that are below rho.
                 elif self.corr_coef[time - self.window + 1][past_time] < -self.rho:
                     # Append the time for opposite set.
                     opposite_set.append(past_time + self.window)
+
             # If either set exists, continue to return new weights.
             if similar_set or opposite_set:
                 # Choose the corresponding relative return periods.
@@ -58,7 +62,7 @@ class SymmetricCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparame
 
         :param similar: (np.array) Relative returns of similar periods.
         :param opposite: (np.array) Relative returns of inversely similar periods.
-        :return problem.x: (np.array) Weights that maximize the returns for the given array.
+        :return: (np.array) Weights that maximize the returns for the given array.
         """
         # Initialize guess.
         weights = self._uniform_weight()

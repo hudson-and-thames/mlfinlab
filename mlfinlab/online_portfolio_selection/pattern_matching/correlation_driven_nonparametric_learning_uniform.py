@@ -23,8 +23,12 @@ class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
         Initializes Correlation Driven Nonparametric Learning Uniform with the given number of
         windows and set rho value.
 
-        :param window: (int) Number of windows to look back for similarity sets.
-        :param rho: (float) Threshold for similarity.
+        :param window: (int) Number of windows to look back for similarity sets. CORN-K generates
+                             experts with range of [1, 2, ..., w]. The window ranges typically work well
+                             with shorter terms of [1, 7].
+        :param rho: (float) Threshold for similarity. Rho should set in the range of [-1, 1].
+                            Lower rho values will classify more periods as being similar, and higher
+                            values will be more strict on identifying a period as similarly correlated.
         """
         self.window = window
         self.rho = rho
@@ -36,8 +40,9 @@ class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
         Initializes the important variables for the object.
 
         :param asset_prices: (pd.DataFrame) Historical asset prices.
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
-        :param resample_by: (str) Specifies how to resample the prices.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
+        :param resample_by: (str) Specifies how to resample the prices. 'D' for Day, 'W' for Week,
+                                  'M' for Month. The inputs are based on pandas' resample method.
         """
         # Check that window value is an integer.
         if not isinstance(self.window, int):
@@ -57,7 +62,7 @@ class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
 
     def _generate_experts(self):
         """
-        Generates W experts from window of 1 to w and same rho values.
+        Generates W experts from window of [1, w] and same rho value.
         """
         # Initialize expert parameters.
         self.expert_params = np.zeros((self.number_of_experts, 2))

@@ -9,7 +9,6 @@ from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_non
 
 
 class TestCorrelationDrivenNonparametricLearningUniform(TestCase):
-    # pylint: disable=too-many-public-methods
     # pylint: disable=unsubscriptable-object
     """
     Tests different functions of the Correlation Driven Nonparametric Learning Uniform class.
@@ -45,7 +44,7 @@ class TestCorrelationDrivenNonparametricLearningUniform(TestCase):
 
     def test_corn_u_window_error(self):
         """
-        Tests ValueError if window is not an integer.
+        Tests ValueError if window is not an integer or less than 1.
         """
         # Initialize CORN-U.
         corn_u1 = CorrelationDrivenNonparametricLearningUniform(window=2.5, rho=0.5)
@@ -53,10 +52,6 @@ class TestCorrelationDrivenNonparametricLearningUniform(TestCase):
             # Running allocate will raise ValueError.
             corn_u1.allocate(self.data)
 
-    def test_corn_u_window1_error(self):
-        """
-        Tests ValueError if window is less than 1.
-        """
         # Initialize CORN-U.
         corn_u2 = CorrelationDrivenNonparametricLearningUniform(window=0, rho=0.5)
         with self.assertRaises(ValueError):
@@ -65,7 +60,7 @@ class TestCorrelationDrivenNonparametricLearningUniform(TestCase):
 
     def test_corn_u_rho_error(self):
         """
-        Tests ValueError if rho is less than -1.
+        Tests ValueError if rho is less than -1 or more than 1.
         """
         # Initialize CORN-U.
         corn_u3 = CorrelationDrivenNonparametricLearningUniform(window=2, rho=-2)
@@ -73,10 +68,6 @@ class TestCorrelationDrivenNonparametricLearningUniform(TestCase):
             # Running allocate will raise ValueError.
             corn_u3.allocate(self.data)
 
-    def test_corn_u_rho1_error(self):
-        """
-        Tests ValueError if rho is less than -1.
-        """
         # Initialize CORN-U.
         corn_u4 = CorrelationDrivenNonparametricLearningUniform(window=2, rho=2)
         with self.assertRaises(ValueError):

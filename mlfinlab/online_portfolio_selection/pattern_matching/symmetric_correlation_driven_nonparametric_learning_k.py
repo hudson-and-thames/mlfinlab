@@ -22,12 +22,14 @@ class SymmetricCorrelationDrivenNonparametricLearningK(CorrelationDrivenNonparam
 
     def _generate_experts(self):
         """
-        Generates window * rho experts from window of 1 to w and rho of 0 to (rho-1)/rho.
+        Generates window * rho experts from window of [1, w] and rho of [0, (rho - 1) / rho].
         """
         # Initialize expert parameters.
         self.expert_params = np.zeros((self.number_of_experts, 2))
+
         # Pointer to iterate through parameter locations.
         pointer = 0
+
         # Window from 1 to self.window.
         for n_window in range(self.window):
             # Rho from 0 to (rho - 1)/rho.

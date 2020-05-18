@@ -10,7 +10,6 @@ from mlfinlab.online_portfolio_selection.pattern_matching.functional_correlation
 
 
 class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
-    # pylint: disable=too-many-public-methods
     # pylint: disable=unsubscriptable-object
     """
     Tests different functions of the Functional Correlation Driven Nonparametric Learning - K class.
@@ -46,7 +45,7 @@ class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
 
     def test_fcorn_k_window_error(self):
         """
-        Tests ValueError if window is not an integer.
+        Tests ValueError if window is not an integer or less than 1.
         """
         # Initialize FCORN-K.
         fcorn_k1 = FunctionalCorrelationDrivenNonparametricLearningK(window=2.5, rho=2, lambd=1, k=1)
@@ -54,10 +53,6 @@ class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
             # Running allocate will raise ValueError.
             fcorn_k1.allocate(self.data)
 
-    def test_fcorn_k_window1_error(self):
-        """
-        Tests ValueError if window is less than 1.
-        """
         # Initialize FCORN-K.
         fcorn_k2 = FunctionalCorrelationDrivenNonparametricLearningK(window=0, rho=2, lambd=1, k=1)
         with self.assertRaises(ValueError):
@@ -66,7 +61,7 @@ class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
 
     def test_fcorn_k_rho_error(self):
         """
-        Tests ValueError if rho is not an integer.
+        Tests ValueError if rho is not an integer or less than 1.
         """
         # Initialize FCORN-K.
         fcorn_k3 = FunctionalCorrelationDrivenNonparametricLearningK(window=2, rho=2.5, lambd=1, k=1)
@@ -74,10 +69,6 @@ class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
             # Running allocate will raise ValueError.
             fcorn_k3.allocate(self.data)
 
-    def test_fcorn_k_rho1_error(self):
-        """
-        Tests ValueError if rho is less than 1.
-        """
         # Initialize FCORN-K.
         fcorn_k4 = FunctionalCorrelationDrivenNonparametricLearningK(window=2, rho=0, lambd=1, k=1)
         with self.assertRaises(ValueError):
@@ -86,7 +77,7 @@ class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
 
     def test_fcorn_k_lambd_error(self):
         """
-        Tests ValueError if lambd is not an integer.
+        Tests ValueError if lambd is not an integer or less than 1.
         """
         # Initialize FCORN-K.
         fcorn_k5 = FunctionalCorrelationDrivenNonparametricLearningK(window=2, rho=2, lambd=1.5, k=1)
@@ -94,10 +85,6 @@ class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
             # Running allocate will raise ValueError.
             fcorn_k5.allocate(self.data)
 
-    def test_fcorn_k_lambd1_error(self):
-        """
-        Tests ValueError if lambd is less than 1.
-        """
         # Initialize FCORN-K.
         fcorn_k6 = FunctionalCorrelationDrivenNonparametricLearningK(window=2, rho=2, lambd=0, k=1)
         with self.assertRaises(ValueError):

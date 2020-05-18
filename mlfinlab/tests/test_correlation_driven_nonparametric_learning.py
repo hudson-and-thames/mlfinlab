@@ -45,7 +45,7 @@ class TestCorrelationDrivenNonparametricLearning(TestCase):
 
     def test_corn_window_error(self):
         """
-        Tests ValueError if window is not an integer.
+        Tests ValueError if window is not an integer or less than 1.
         """
         # Initialize CORN.
         corn1 = CorrelationDrivenNonparametricLearning(window=2.5, rho=0.5)
@@ -53,10 +53,6 @@ class TestCorrelationDrivenNonparametricLearning(TestCase):
             # Running allocate will raise ValueError.
             corn1.allocate(self.data)
 
-    def test_corn_window1_error(self):
-        """
-        Tests ValueError if window is less than 1.
-        """
         # Initialize CORN.
         corn2 = CorrelationDrivenNonparametricLearning(window=0, rho=0.5)
         with self.assertRaises(ValueError):
@@ -65,7 +61,7 @@ class TestCorrelationDrivenNonparametricLearning(TestCase):
 
     def test_corn_rho_error(self):
         """
-        Tests ValueError if rho is less than -1.
+        Tests ValueError if rho is less than -1 or more than 1.
         """
         # Initialize CORN.
         corn3 = CorrelationDrivenNonparametricLearning(window=2, rho=-2)
@@ -73,10 +69,6 @@ class TestCorrelationDrivenNonparametricLearning(TestCase):
             # Running allocate will raise ValueError.
             corn3.allocate(self.data)
 
-    def test_corn_rho1_error(self):
-        """
-        Tests ValueError if rho is less than -1.
-        """
         # Initialize CORN.
         corn4 = CorrelationDrivenNonparametricLearning(window=2, rho=2)
         with self.assertRaises(ValueError):

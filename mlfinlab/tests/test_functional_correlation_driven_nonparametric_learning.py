@@ -46,7 +46,7 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
 
     def test_fcorn_window_error(self):
         """
-        Tests ValueError if window is not an integer.
+        Tests ValueError if window is not an integer or less than 1.
         """
         # Initialize FCORN.
         fcorn1 = FunctionalCorrelationDrivenNonparametricLearning(window=2.5, rho=0.5, lambd=1)
@@ -54,10 +54,6 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
             # Running allocate will raise ValueError.
             fcorn1.allocate(self.data)
 
-    def test_fcorn_window1_error(self):
-        """
-        Tests ValueError if window is less than 1.
-        """
         # Initialize FCORN.
         fcorn2 = FunctionalCorrelationDrivenNonparametricLearning(window=0, rho=0.5, lambd=2)
         with self.assertRaises(ValueError):
@@ -66,7 +62,7 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
 
     def test_fcorn_rho_error(self):
         """
-        Tests ValueError if rho is less than -1.
+        Tests ValueError if rho is less than -1 or more than 1.
         """
         # Initialize FCORN.
         fcorn3 = FunctionalCorrelationDrivenNonparametricLearning(window=2, rho=-2, lambd=4)
@@ -74,10 +70,6 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
             # Running allocate will raise ValueError.
             fcorn3.allocate(self.data)
 
-    def test_fcorn_rho1_error(self):
-        """
-        Tests ValueError if rho is less than -1.
-        """
         # Initialize FCORN.
         fcorn4 = FunctionalCorrelationDrivenNonparametricLearning(window=2, rho=2, lambd=8)
         with self.assertRaises(ValueError):

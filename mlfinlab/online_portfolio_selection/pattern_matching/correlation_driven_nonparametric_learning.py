@@ -20,10 +20,12 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         """
         Initializes Correlation Driven Nonparametric Learning with the given window and rho value.
 
-        :param window: (int) Number of windows to look back for similarity sets.
+        :param window: (int) Number of windows to look back for similarity sets. Windows can be set
+                             to any values but typically work well in a shorter term of [1, 7].
         :param rho: (float) Threshold for similarity. Rho should set in the range of [-1, 1].
-                    Lower rho values will classify more periods as being similar, and higher values
-                    will be more strict on identifying a period as similarly correlated.
+                            Lower rho values will classify more periods as being similar, and higher
+                            values will be more strict on identifying a period as similarly correlated.
+                            Rho values between [0, 0.1] typically had higher results.
         """
         self.window = window
         self.rho = rho
@@ -36,7 +38,8 @@ class CorrelationDrivenNonparametricLearning(OLPS):
 
         :param asset_prices: (pd.DataFrame) Historical asset prices.
         :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
-        :param resample_by: (str) Specifies how to resample the prices.
+        :param resample_by: (str) Specifies how to resample the prices. 'D' for Day, 'W' for Week,
+                                 'M' for Month. The inputs are based on pandas' resample method.
         """
         super(CorrelationDrivenNonparametricLearning, self)._initialize(asset_prices, weights,
                                                                         resample_by)
@@ -58,7 +61,7 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         Predicts the next time's portfolio weight.
 
         :param time: (int) Current time period.
-        :return new_weights: (np.array) Predicted weights.
+        :return: (np.array) Predicted weights.
         """
         # Create similar set.
         similar_set = []
@@ -86,7 +89,7 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         Calculates weights that maximize returns over the given array.
 
         :param optimize_array: (np.array) Relative returns of the assets for a given time period.
-        :return: problem.x: (np.array) Weights that maximize the returns for the given array.
+        :return: (np.array) Weights that maximize the returns for the given array.
         """
         # Initialize guess.
         weights = self._uniform_weight()
@@ -107,14 +110,15 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         # Sum of weights is 1.
         const = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
 
-        problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds, constraints=const, jac=_derivative)
+        problem = opt.minimize(_objective, weights, method='SLSQP', bounds=bounds,
+                               constraints=const, jac=_derivative)
         return problem.x
 
     def calculate_rolling_correlation_coefficient(self):
         """
         Calculates the rolling correlation coefficient for a given relative return and window
 
-        :return rolling_corr_coef: (np.array) Rolling correlation coefficient over a given window.
+        :return: (np.array) Rolling correlation coefficient over a given window.
         """
         # Flatten the array.
         flattened = self.relative_return.flatten()

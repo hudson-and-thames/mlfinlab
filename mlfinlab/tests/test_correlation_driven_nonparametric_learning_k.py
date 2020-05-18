@@ -9,7 +9,6 @@ from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_non
 
 
 class TestCorrelationDrivenNonparametricLearningK(TestCase):
-    # pylint: disable=too-many-public-methods
     # pylint: disable=unsubscriptable-object
     """
     Tests different functions of the Correlation Driven Nonparametric Learning - K class.
@@ -45,7 +44,7 @@ class TestCorrelationDrivenNonparametricLearningK(TestCase):
 
     def test_corn_k_window_error(self):
         """
-        Tests ValueError if window is not an integer.
+        Tests ValueError if window is not an integer or less than 1.
         """
         # Initialize CORN-K.
         corn_k1 = CorrelationDrivenNonparametricLearningK(window=2.5, rho=2, k=1)
@@ -53,10 +52,6 @@ class TestCorrelationDrivenNonparametricLearningK(TestCase):
             # Running allocate will raise ValueError.
             corn_k1.allocate(self.data)
 
-    def test_corn_k_window1_error(self):
-        """
-        Tests ValueError if window is less than 1.
-        """
         # Initialize CORN-K.
         corn_k2 = CorrelationDrivenNonparametricLearningK(window=0, rho=2, k=1)
         with self.assertRaises(ValueError):
@@ -65,7 +60,7 @@ class TestCorrelationDrivenNonparametricLearningK(TestCase):
 
     def test_corn_k_rho_error(self):
         """
-        Tests ValueError if rho is not an integer.
+        Tests ValueError if rho is not an integer or less than 1.
         """
         # Initialize CORN-K.
         corn_k3 = CorrelationDrivenNonparametricLearningK(window=2, rho=2.5, k=1)
@@ -73,10 +68,6 @@ class TestCorrelationDrivenNonparametricLearningK(TestCase):
             # Running allocate will raise ValueError.
             corn_k3.allocate(self.data)
 
-    def test_corn_k_rho1_error(self):
-        """
-        Tests ValueError if rho is less than 1.
-        """
         # Initialize CORN-K.
         corn_k4 = CorrelationDrivenNonparametricLearningK(window=2, rho=0, k=1)
         with self.assertRaises(ValueError):
@@ -85,7 +76,7 @@ class TestCorrelationDrivenNonparametricLearningK(TestCase):
 
     def test_corn_k_k_error(self):
         """
-        Tests ValueError if k is greater than window * rho
+        Tests ValueError if k is greater than window * rho, greater than 1, or an integer.
         """
         # Initialize CORN-K.
         corn_k5 = CorrelationDrivenNonparametricLearningK(window=2, rho=2, k=5)
@@ -93,20 +84,12 @@ class TestCorrelationDrivenNonparametricLearningK(TestCase):
             # Running allocate will raise ValueError.
             corn_k5.allocate(self.data)
 
-    def test_corn_k_k1_error(self):
-        """
-        Tests ValueError if k is an integer
-        """
         # Initialize CORN-K.
         corn_k6 = CorrelationDrivenNonparametricLearningK(window=2, rho=2, k=1.5)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn_k6.allocate(self.data)
 
-    def test_corn_k_k2_error(self):
-        """
-        Tests ValueError if k is greater than or equal to 1.
-        """
         # Initialize CORN-K.
         corn_k7 = CorrelationDrivenNonparametricLearningK(window=2, rho=2, k=0)
         with self.assertRaises(ValueError):
