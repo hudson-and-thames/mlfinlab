@@ -42,9 +42,8 @@ class OLPS:
         Allocates weight according to a set of update rules.
 
         :param asset_prices: (pd.DataFrame) Historical asset prices.
-        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
-        :param resample_by: (str) Specifies how to resample the prices. Some examples are are 'M' for
-                            month and 'W' for week, whcih follow the pandas resample inputs.
+        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :param resample_by: (str) Specifies how to resample the prices.
         :param verbose: (boolean) Prints progress bar if true.
         """
         # Check to ensure inputs are correct.

@@ -8,7 +8,7 @@ class BestStock(OLPS):
     This class implements the Buy and Hold strategy. It is reproduced with modification from the
     following paper:
     `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
-    Surv. V, N, Article A (December YEAR), 33 pages. <https://arxiv.org/abs/1212.2129>`_
+    Surv. V, N, Article A (December YEAR), 33 pages. <https://arxiv.org/abs/1212.2129>'_
 
     The Best Stock strategy represents the best performing asset over the period in hindsight.
     """
