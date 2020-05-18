@@ -9,15 +9,21 @@ import pandas as pd
 
 from mlfinlab.codependence.information import variation_of_information_score, get_mutual_info
 from mlfinlab.codependence.correlation import distance_correlation
-
+from mlfinlab.codependence.gnpr_distance import spearmans_rho, gpr_distance, gnpr_distance
 
 # pylint: disable=invalid-name
-def get_dependence_matrix(df: pd.DataFrame, dependence_method: str) -> pd.DataFrame:
+def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float = 0.5,
+                          bandwidth: float = 0.01) -> pd.DataFrame:
     """
     This function returns a dependence matrix for the given method of dependence method.
-    :param df: (pd.DataFrame) of features.
-    :param dependence_method: (str) the algorithm to be use for generating dependence_matrix, either
-       'information_variation' or 'mutual_information' or 'distance_correlation'.
+
+    List of supported algorithms to use for generating the dependence_matrix: 'information_variation',
+    'mutual_information', 'distance_correlation', 'spearmans_rho', 'gpr_distance', 'gnpr_distance'
+
+    :param df: (pd.DataFrame) Features.
+    :param dependence_method: (str) Algorithm to be use for generating dependence_matrix.
+    :param theta: (float) Type of information being tested in the GPR and GNPR distances. Falls in range [0, 1]
+    :param bandwidth: (float) Bandwidth to use for splitting observations in the GPR and GNPR distances.
     :return: (pd.DataFrame) Dependence_matrix.
     """
     # Get the feature names.
@@ -32,6 +38,12 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str) -> pd.DataFr
         dep_function = get_mutual_info
     elif dependence_method == 'distance_correlation':
         dep_function = distance_correlation
+    elif dependence_method == 'spearmans_rho':
+        dep_function = spearmans_rho
+    elif dependence_method == 'gpr_distance':
+        dep_function = gpr_distance
+    elif dependence_method == 'gnpr_distance':
+        dep_function = gnpr_distance
     else:
         raise ValueError(f"{dependence_method} is not a valid method. Use either 'information_variation'\
                                  or 'mutual_information' or 'distance_correlation'.")
