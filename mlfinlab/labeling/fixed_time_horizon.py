@@ -4,7 +4,7 @@ Described in "Classification-based Financial Markets Prediction using Deep Neura
 """
 
 import warnings
-import numpy as 
+import numpy as np
 
 
 def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, window=None):
