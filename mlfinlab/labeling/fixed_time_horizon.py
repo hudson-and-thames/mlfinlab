@@ -3,8 +3,8 @@ Chapter 3.2 Fixed-Time Horizon Method
 Described in "Classification-based Financial Markets Prediction using Deep Neural Networks" Dixon et al. (2016)
 """
 
-import numpy as np
 import warnings
+import numpy as np
 
 
 def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, window=None):
@@ -38,10 +38,10 @@ def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, win
         assert isinstance(window, int), "when standardized is True, window must be int"
         if window >= len(forward_return):
             warnings.warn('window is greater than the length of the Series. All labels will be NaN.', UserWarning)
-        mu = forward_return.rolling(window=window).mean()
-        sigma = forward_return.rolling(window=window).std()
-        forward_return -= mu
-        forward_return /= sigma
+        mean = forward_return.rolling(window=window).mean()
+        stdev = forward_return.rolling(window=window).std()
+        forward_return -= mean
+        forward_return /= stdev
 
     # Conditions for 1, 0, -1
     conditions = [forward_return > threshold, (forward_return <= threshold) & (forward_return >= -threshold),
