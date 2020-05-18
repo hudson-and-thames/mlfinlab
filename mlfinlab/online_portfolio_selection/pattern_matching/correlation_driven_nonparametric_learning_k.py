@@ -93,7 +93,7 @@ class CorrelationDrivenNonparametricLearningK(UniversalPortfolio):
         pointer = 0
 
         # Window from 1 to self.window.
-        for n_window in range(1, self.window):
+        for n_window in range(1, self.window + 1):
             # Rho from 0 to (rho - 1)/rho.
             for n_rho in range(self.rho):
                 # Assign experts with parameters (n_window + 1, n_rho/rho).
