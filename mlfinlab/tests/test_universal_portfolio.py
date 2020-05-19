@@ -96,3 +96,58 @@ class TestUniversalPortfolio(TestCase):
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             up5.allocate(self.data)
+
+    def test_up_recalculate_solution(self):
+        """
+        Tests recalculate method in UP.
+        """
+        # Initialize UP.
+        up6 = UniversalPortfolio(3, weighted='top-k', k=2)
+        # Allocates asset prices to UP.
+        up6.allocate(self.data)
+        # Recalculate with k=1.
+        up6.recalculate_k(1)
+        # Create np.array of all_weights.
+        all_weights = np.array(up6.all_weights)
+        # Check if all weights sum to 1.
+        for i in range(all_weights.shape[0]):
+            weights = all_weights[i]
+            assert (weights >= 0).all()
+            assert len(weights) == self.data.shape[1]
+            np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_up_recalculate_error(self):
+        """
+        Tests ValueError if k is greater number of experts for recalculate.
+        """
+        # Initialize UP.
+        up7 = UniversalPortfolio(3, weighted='top-k', k=2)
+        # Allocates asset prices to UP.
+        up7.allocate(self.data)
+        with self.assertRaises(ValueError):
+            # Recalculate will raise ValueError.
+            up7.recalculate_k(4)
+
+    def test_up_recalculate1_error(self):
+        """
+        Tests ValueError if k is not an integer for recalculate.
+        """
+        # Initialize UP.
+        up8 = UniversalPortfolio(3, weighted='top-k', k=2)
+        # Allocates asset prices to UP.
+        up8.allocate(self.data)
+        with self.assertRaises(ValueError):
+            # Recalculate will raise ValueError.
+            up8.recalculate_k(1.5)
+
+    def test_up_recalculate2_error(self):
+        """
+        Tests ValueError if k is not greater than or equal to 1.
+        """
+        # Initialize UP.
+        up9 = UniversalPortfolio(3, weighted='top-k', k=2)
+        # Allocates asset prices to UP.
+        up9.allocate(self.data)
+        with self.assertRaises(ValueError):
+            # Recalculate will raise ValueError.
+            up9.recalculate_k(0)
