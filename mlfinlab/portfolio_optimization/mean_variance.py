@@ -8,6 +8,7 @@ from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
 
 
 class MeanVarianceOptimisation:
+    # pylint: disable=too-many-instance-attributes
     """
     This class implements some classic mean-variance optimisation techniques for calculating the efficient frontier solutions.
     With the help of quadratic optimisers, users can generate optimal portfolios for different objective functions. Currently
@@ -24,7 +25,6 @@ class MeanVarianceOptimisation:
     """
 
     def __init__(self, calculate_expected_returns='mean', risk_free_rate=0.03):
-        # pylint: disable=too-many-instance-attributes
         """
         Constructor.
 
