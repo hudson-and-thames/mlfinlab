@@ -482,8 +482,8 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
-                                                                                 resample_by='W')
+        expected_returns = ReturnsEstimation().calculate_exponential_historical_returns(asset_prices=self.data,
+                                                                                        resample_by='W')
         covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
         mvo.allocate(expected_asset_returns=expected_returns, covariance_matrix=covariance)
         weights = mvo.weights.values[0]
