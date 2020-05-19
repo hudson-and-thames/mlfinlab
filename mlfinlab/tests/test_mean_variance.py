@@ -92,7 +92,8 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        mvo.allocate(asset_prices=self.data, solution='efficient_risk', asset_names=self.data.columns, resample_by='W')
+        prices = self.data.resample('W').last()
+        mvo.allocate(asset_prices=prices, solution='efficient_risk', asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -105,7 +106,7 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        mvo.allocate(asset_prices=self.data, solution='efficient_return', asset_names=self.data.columns, resample_by='W')
+        mvo.allocate(asset_prices=self.data, solution='efficient_return', asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -118,7 +119,7 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        mvo.allocate(asset_prices=self.data, solution='max_diversification', asset_names=self.data.columns, resample_by='M')
+        mvo.allocate(asset_prices=self.data, solution='max_diversification', asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -131,7 +132,7 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        mvo.allocate(asset_prices=self.data, solution='max_decorrelation', asset_names=self.data.columns, resample_by='W')
+        mvo.allocate(asset_prices=self.data, solution='max_decorrelation', asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -148,7 +149,6 @@ class TestMVO(unittest.TestCase):
                                                                                  resample_by='W')
         covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
         plot = mvo.plot_efficient_frontier(covariance=covariance,
-                                           num_assets=self.data.shape[1],
                                            expected_asset_returns=expected_returns)
         assert plot.axes.xaxis.label._text == 'Volatility'
         assert plot.axes.yaxis.label._text == 'Return'
@@ -165,7 +165,6 @@ class TestMVO(unittest.TestCase):
                                                                                  resample_by='W')
         covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
         plot = mvo.plot_efficient_frontier(covariance=covariance,
-                                           num_assets=self.data.shape[1],
                                            max_return=1.0,
                                            expected_asset_returns=expected_returns)
         assert len(plot._A) == 41
@@ -307,7 +306,7 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation(calculate_expected_returns='exponential')
-        mvo.allocate(asset_prices=self.data, resample_by='B', solution='inverse_variance', asset_names=self.data.columns)
+        mvo.allocate(asset_prices=self.data, solution='inverse_variance', asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -450,7 +449,7 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        mvo.allocate(asset_prices=self.data, solution='inverse_variance', resample_by='B', asset_names=self.data.columns)
+        mvo.allocate(asset_prices=self.data, solution='inverse_variance', asset_names=self.data.columns)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
