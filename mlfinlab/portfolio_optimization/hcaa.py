@@ -136,7 +136,6 @@ class HierarchicalClusteringAssetAllocation:
         return inertia
 
     def _get_optimal_number_of_clusters(self, correlation, asset_returns, linkage, num_reference_datasets=5):
-        # pylint: disable=too-many-locals
         """
         Find the optimal number of clusters for hierarchical clustering using the Gap statistic.
 
@@ -153,18 +152,7 @@ class HierarchicalClusteringAssetAllocation:
         for num_clusters in range(1, max_number_of_clusters + 1):
 
             # Calculate expected inertia from reference datasets
-            reference_inertias = []
-            for _ in range(num_reference_datasets):
-                # Generate reference returns from uniform distribution and calculate the distance matrix.
-                reference_asset_returns = pd.DataFrame(np.random.rand(*asset_returns.shape))
-                reference_correlation = np.array(reference_asset_returns.corr())
-                reference_distance_matrix = np.sqrt(2 * (1 - reference_correlation).round(5))
-
-                reference_clusters = scipy_linkage(squareform(reference_distance_matrix), method=linkage)
-                reference_cluster_assignments = fcluster(reference_clusters, num_clusters, criterion='maxclust')
-                inertia = self._compute_cluster_inertia(reference_cluster_assignments, reference_asset_returns.values)
-                reference_inertias.append(inertia)
-            expected_inertia = np.mean(reference_inertias)
+            expected_inertia = self._calculate_expected_inertia(num_reference_datasets, asset_returns, num_clusters, linkage)
 
             # Calculate inertia from original data
             original_clusters = scipy_linkage(squareform(original_distance_matrix), method=linkage)
@@ -176,6 +164,30 @@ class HierarchicalClusteringAssetAllocation:
             gap_values.append(gap)
 
         return 1 + np.argmax(gap_values)
+
+    def _calculate_expected_inertia(self, num_reference_datasets, asset_returns, num_clusters, linkage):
+        """
+        Calculate the expected inertia by generating clusters from a uniform distribution.
+
+        :param num_reference_datasets: (int) The number of reference datasets to generate from the distribution.
+        :param asset_returns: (pd.DataFrame) Historical asset returns.
+        :param num_clusters: (int) The number of clusters to generate.
+        :param linkage: (str) The type of linkage criterion to use for hierarchical clustering.
+        :return: (float) The expected inertia from the reference datasets.
+        """
+
+        reference_inertias = []
+        for _ in range(num_reference_datasets):
+            # Generate reference returns from uniform distribution and calculate the distance matrix.
+            reference_asset_returns = pd.DataFrame(np.random.rand(*asset_returns.shape))
+            reference_correlation = np.array(reference_asset_returns.corr())
+            reference_distance_matrix = np.sqrt(2 * (1 - reference_correlation).round(5))
+
+            reference_clusters = scipy_linkage(squareform(reference_distance_matrix), method=linkage)
+            reference_cluster_assignments = fcluster(reference_clusters, num_clusters, criterion='maxclust')
+            inertia = self._compute_cluster_inertia(reference_cluster_assignments, reference_asset_returns.values)
+            reference_inertias.append(inertia)
+        return np.mean(reference_inertias)
 
     @staticmethod
     def _tree_clustering(correlation, num_clusters, linkage):
