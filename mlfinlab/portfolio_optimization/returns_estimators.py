@@ -9,6 +9,10 @@ class ReturnsEstimation:
     """
 
     def __init__(self):
+        """
+        Initialize
+        """
+
         return
 
     @staticmethod
@@ -54,9 +58,9 @@ class ReturnsEstimation:
         """
         Calculates a dataframe of returns from a dataframe of prices.
 
-        :param asset_prices: (pd.Dataframe) Historical asset prices
+        :param asset_prices: (pd.DataFrame) Historical asset prices
         :param resample_by: (str) Period to resample data ['D','W','M' etc.] None for no resampling
-        :return: (pd.Dataframe) Returns per asset
+        :return: (pd.DataFrame) Returns per asset
         """
 
         if resample_by:
