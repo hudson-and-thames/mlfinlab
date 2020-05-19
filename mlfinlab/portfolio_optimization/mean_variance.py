@@ -229,7 +229,7 @@ class MeanVarianceOptimisation:
         plt.legend(loc='upper left')
         return figure
 
-    def _error_checks(self, asset_names, asset_prices, expected_asset_returns, covariance_matrix, solution):
+    def _error_checks(self, asset_names, asset_prices, expected_asset_returns, covariance_matrix, solution=None):
         """
         Some initial error checks on the inputs.
 
@@ -253,7 +253,7 @@ class MeanVarianceOptimisation:
             if not isinstance(asset_prices.index, pd.DatetimeIndex):
                 raise ValueError("Asset prices dataframe must be indexed by date.")
 
-        if solution not in {"inverse_variance", "min_volatility", "max_sharpe", "efficient_risk",
+        if solution is not None and solution not in {"inverse_variance", "min_volatility", "max_sharpe", "efficient_risk",
                          "max_return_min_volatility", "max_diversification", "efficient_return", "max_decorrelation"}:
             raise ValueError("Unknown solution string specified. Supported solutions - "
                              "inverse_variance, min_volatility, max_sharpe, efficient_risk"
