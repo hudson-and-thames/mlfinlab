@@ -46,6 +46,16 @@ class TestCombinatorialPurgedCV(unittest.TestCase):
             self.assertEqual(test_idx[0], start_idx)
             self.assertEqual(test_idx[-1], end_idx)
 
+        # Test backtest paths
+        self.assertEqual(len(cv_gen.backtest_paths), cv_gen.n_splits - 1)  # phi[N, 2] = N - 1
+        self.assertTrue((cv_gen.backtest_paths[0][0]['train'] == train_splits[0]).all())
+        self.assertTrue((cv_gen.backtest_paths[0][1]['train'] == train_splits[0]).all())
+        self.assertTrue((cv_gen.backtest_paths[1][0]['train'] == train_splits[1]).all())
+        self.assertTrue((cv_gen.backtest_paths[1][2]['train'] == train_splits[5]).all())
+        self.assertTrue((cv_gen.backtest_paths[-1][-1]['train'] == train_splits[-1]).all())
+        self.assertTrue((cv_gen.backtest_paths[-1][-2]['train'] == train_splits[-1]).all())
+
+
     def test_purge_and_embargo(self):
         """
         Test that purging and embargo works correctly
