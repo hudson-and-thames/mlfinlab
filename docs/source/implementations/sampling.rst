@@ -24,7 +24,7 @@ Imagine that:
 
 In this case we see that A used information about returns on :math:`[t_1,t_8]` to generate label-endtime which overlaps
 with :math:`[t_3, t_6]` which was used by B, however C didn't use any returns information which was used by to label
-other samples. Here we would like to introduce the concept of concurrency.
+other samples. Here we would like to introduce the concept of concurrency. <-- small comment: doesn't C overlap with A on [t_7, t_8], and therefore depends on r_8? Or do we want to say C doesn't overlap with BOTH A, and B
 
 We say that labels :math:`y_i` and :math:`y_j` are concurrent at :math:`t` if they are a function of at least one
 common return at :math:`r_{t-1,t}`
