@@ -121,8 +121,8 @@ class TestCodependence(unittest.TestCase):
         rho_xy1 = spearmans_rho(self.x, self.y_1)
         rho_xy2 = spearmans_rho(self.x, self.y_2)
 
-        self.assertAlmostEqual(rho_xy1, 0.9999787, delta=1e-7)
-        self.assertAlmostEqual(rho_xy2, 0.9999889, delta=1e-7)
+        self.assertAlmostEqual(rho_xy1, 0.0105586, delta=1e-7)
+        self.assertAlmostEqual(rho_xy2, 0.0289523, delta=1e-7)
 
     def test_gpr_distance(self):
         """
@@ -138,8 +138,8 @@ class TestCodependence(unittest.TestCase):
         self.assertAlmostEqual(gpr0_xy1, 0.5586512, delta=1e-7)
         self.assertAlmostEqual(gpr0_xy2, 0.6401989, delta=1e-7)
 
-        self.assertAlmostEqual(gpr1_xy1, 0.0032625, delta=1e-7)
-        self.assertAlmostEqual(gpr1_xy2, 0.0023459, delta=1e-7)
+        self.assertAlmostEqual(gpr1_xy1, 0.7033639, delta=1e-7)
+        self.assertAlmostEqual(gpr1_xy2, 0.6967954, delta=1e-7)
 
     def test_gnpr_distance(self):
         """

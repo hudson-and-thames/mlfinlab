@@ -4,6 +4,7 @@ clustering of financial time series and applications to credit default swaps" by
 https://www.researchgate.net/publication/322714557
 """
 import numpy as np
+from scipy.stats import spearmanr
 
 # pylint: disable=invalid-name
 
@@ -11,25 +12,26 @@ def spearmans_rho(x: np.array, y: np.array) -> float:
     """
     Calculates a statistical estimate of Spearman's rho - a copula-based dependence measure.
 
-    It is more robust to noise and can be defined if the variables have an infinite second moment.
-
-    Formula for the statistic is taken form https://www.researchgate.net/publication/322714557 (p.54)
-
+    Formula for calculation:
     rho = 1 - (6)/(T*(T^2-1)) * Sum((X_t-Y_t)^2)
+
+    It is more robust to noise and can be defined if the variables have an infinite second moment.
+    This statistic is described in more detail in the work by Gautier Marti
+    https://www.researchgate.net/publication/322714557 (p.54)
+
+    This method is a wrapper for the scipy spearmanr function. For more details about the function and its parameters,
+    please visit scipy documentation
+    https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.spearmanr.html
 
     :param x: (np.array) X vector
     :param y: (np.array) Y vector (same number of observations as X)
     :return: (float) Spearman's rho statistical estimate
     """
 
-    # Number of observations
-    num_obs = x.shape[0]
-
-    # Coefficient calculation
-    rho = 1 - (6) / (num_obs * (num_obs**2 - 1)) * (np.power(x - y, 2).sum())
+    # Coefficient calculationS
+    rho, _ = spearmanr(x, y)
 
     return rho
-
 
 def gpr_distance(x: np.array, y: np.array, theta: float) -> float:
     """
