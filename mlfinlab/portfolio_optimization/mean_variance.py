@@ -23,8 +23,8 @@ class MeanVarianceOptimisation:
         """
         Constructor.
 
-        :param calculate_expected_returns: (str) the method to use for calculation of expected returns.
-                                           Currently supports "mean" and "exponential"
+        :param calculate_expected_returns: (str) The method to use for calculation of expected returns.
+                                                 Currently supports "mean" and "exponential"
         """
 
         self.weights = list()
@@ -49,20 +49,20 @@ class MeanVarianceOptimisation:
         """
         Calculate the portfolio asset allocations using the method specified.
 
-        :param asset_names: (list) a list of strings containing the asset names
-        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
-        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
-        :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns (sigma)
-        :param solution: (str) the type of solution/algorithm to use to calculate the weights.
+        :param asset_names: (list) Strings containing the asset names
+        :param asset_prices: (pd.Dataframe) A dataframe of historical asset prices (daily close)
+        :param expected_asset_returns: (list/np.array/pd.dataframe) A list of mean stock returns (mu)
+        :param covariance_matrix: (pd.Dataframe/numpy matrix) User supplied covariance matrix of asset returns (sigma)
+        :param solution: (str) The type of solution/algorithm to use to calculate the weights.
                                Currently supported solution strings - inverse_variance, min_volatility, max_sharpe and
                                efficient_risk
-        :param risk_free_rate: (float) the rate of return for a risk-free asset.
-        :param target_return: (float) target return of the portfolio
-        :param weight_bounds: (dict/tuple) can be either a single tuple of upper and lower bounds
-                                          for all portfolio weights or a dictionary mapping of individual asset indices
-                                          to tuples of upper and lower bounds. Those indices which do not have any mapping
-                                          will have a (0, 1) default bound.
-        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+        :param risk_free_rate: (float) The rate of return for a risk-free asset.
+        :param target_return: (float) Target return of the portfolio
+        :param weight_bounds: (dict/tuple) Can be either a single tuple of upper and lower bounds
+                                           for all portfolio weights or a dictionary mapping of individual asset indices
+                                           to tuples of upper and lower bounds. Those indices which do not have any mapping
+                                           will have a (0, 1) default bound.
+        :param resample_by: (str) Specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         """
 
@@ -145,8 +145,8 @@ class MeanVarianceOptimisation:
         """
         Calculate weights using inverse-variance allocation.
 
-        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
-        :return: (np.array) array of portfolio weights
+        :param covariance: (pd.Dataframe) Covariance dataframe of asset returns
+        :return: (np.array) Array of portfolio weights
         """
 
         ivp = 1. / np.diag(covariance)
@@ -157,9 +157,9 @@ class MeanVarianceOptimisation:
         """
         Compute minimum volatility portfolio allocation.
 
-        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
-        :param num_assets: (int) number of assets in the portfolio
-        :return: (np.array, float) portfolio weights and risk value
+        :param covariance: (pd.Dataframe) Covariance dataframe of asset returns
+        :param num_assets: (int) Number of assets in the portfolio
+        :return: (np.array, float) Portfolio weights and risk value
         """
 
         weights = cp.Variable(num_assets)
@@ -204,11 +204,11 @@ class MeanVarianceOptimisation:
         """
         Compute maximum Sharpe portfolio allocation.
 
-        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
-        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
-        :param risk_free_rate: (float) the rate of return for a risk-free asset.
-        :param num_assets: (int) number of assets in the portfolio
-        :return: (np.array, float, float) portfolio weights, risk value and return value
+        :param covariance: (pd.Dataframe) Covariance dataframe of asset returns
+        :param expected_asset_returns: (list/np.array/pd.dataframe) A list of mean stock returns (mu)
+        :param risk_free_rate: (float) The rate of return for a risk-free asset.
+        :param num_assets: (int) Number of assets in the portfolio
+        :return: (np.array, float, float) Portfolio weights, risk value and return value
         """
 
         y = cp.Variable(num_assets)
@@ -257,11 +257,11 @@ class MeanVarianceOptimisation:
         """
         Calculate minimum volatility portfolio for a given target return.
 
-        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
-        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
-        :param target_return: (float) target return of the portfolio
-        :param num_assets: (int) number of assets in the portfolio
-        :return: (np.array, float, float) portfolio weights, risk value and return value
+        :param covariance: (pd.Dataframe) Covariance dataframe of asset returns
+        :param expected_asset_returns: (list/np.array/pd.dataframe) A list of mean stock returns (mu)
+        :param target_return: (float) Target return of the portfolio
+        :param num_assets: (int) Number of assets in the portfolio
+        :return: (np.array, float, float) Portfolio weights, risk value and return value
         """
 
         weights = cp.Variable(num_assets)
@@ -312,12 +312,12 @@ class MeanVarianceOptimisation:
         """
         Plot the Markowitz efficient frontier.
 
-        :param covariance: (pd.Dataframe) covariance dataframe of asset returns
-        :param expected_asset_returns: (list/np.array/pd.dataframe) a list of mean stock returns (mu)
-        :param num_assets: (int) number of assets in the portfolio
-        :param min_return: (float) minimum target return
-        :param max_return: (float) maximum target return
-        :param risk_free_rate: (float) the rate of return for a risk-free asset.
+        :param covariance: (pd.Dataframe) Covariance dataframe of asset returns
+        :param expected_asset_returns: (list/np.array/pd.dataframe) A list of mean stock returns (mu)
+        :param num_assets: (int) Number of assets in the portfolio
+        :param min_return: (float) Minimum target return
+        :param max_return: (float) Maximum target return
+        :param risk_free_rate: (float) The rate of return for a risk-free asset.
         """
 
         expected_returns = np.array(expected_asset_returns).reshape((len(expected_asset_returns), 1))

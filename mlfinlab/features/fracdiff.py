@@ -18,7 +18,8 @@ class FractionalDifferentiation:
     @staticmethod
     def get_weights(diff_amt, size):
         """
-        Source: Chapter 5, AFML (section 5.4.2, page 79)
+        Advances in Financial Machine Learning, Chapter 5, section 5.4.2, page 79.
+
         The helper function generates weights that are used to compute fractionally
         differentiated series. It computes the weights that get used in the computation
         of  fractionally differentiated series. This generates a non-terminating series
@@ -34,9 +35,9 @@ class FractionalDifferentiation:
         selected more than once or as many times as one chooses (multisets with
         unbounded multiplicity) - see http://faculty.uml.edu/jpropp/msri-up12.pdf.
 
-        :param diff_amt: (float) differencing amount
-        :param size: (int) length of the series
-        :return: (ndarray) weight vector
+        :param diff_amt: (float) Differencing amount
+        :param size: (int) Length of the series
+        :return: (np.ndarray) Weight vector
         """
 
         # The algorithm below executes the iterative estimation (section 5.4.2, page 78)
@@ -52,7 +53,7 @@ class FractionalDifferentiation:
     @staticmethod
     def frac_diff(series, diff_amt, thresh=0.01):
         """
-        Source: Chapter 5, AFML (section 5.5, page 82);
+        Advances in Financial Machine Learning, Chapter 5, section 5.5, page 82.
 
         References:
         https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086
@@ -67,10 +68,10 @@ class FractionalDifferentiation:
         Note 1: For thresh-1, nothing is skipped
         Note 2: diff_amt can be any positive fractional, not necessarility bounded [0, 1]
 
-        :param series: (pd.Series) a time series that needs to be differenced
+        :param series: (pd.Series) A time series that needs to be differenced
         :param diff_amt: (float) Differencing amount
-        :param thresh: (float) threshold or epsilon
-        :return: (pd.DataFrame) data frame of differenced series
+        :param thresh: (float) Threshold or epsilon
+        :return: (pd.DataFrame) Differenced series
         """
 
         # 1. Compute weights for the longest series
@@ -101,7 +102,7 @@ class FractionalDifferentiation:
     @staticmethod
     def get_weights_ffd(diff_amt, thresh, lim):
         """
-        Source: Chapter 5, AFML (section 5.4.2, page 83)
+        Advances in Financial Machine Learning, Chapter 5, section 5.4.2, page 83.
 
         The helper function generates weights that are used to compute fractionally
         differentiate dseries. It computes the weights that get used in the computation
@@ -115,10 +116,10 @@ class FractionalDifferentiation:
         The discussion of positive and negative d is similar to that in get_weights
         (see the function get_weights)
 
-        :param diff_amt: (float) differencing amount
-        :param thresh: (float) threshold for minimum weight
-        :param lim: (int) maximum length of the weight vector
-        :return: (ndarray) weight vector
+        :param diff_amt: (float) Differencing amount
+        :param thresh: (float) Threshold for minimum weight
+        :param lim: (int) Maximum length of the weight vector
+        :return: (np.ndarray) Weight vector
         """
 
         weights = [1.]
@@ -147,7 +148,7 @@ class FractionalDifferentiation:
     @staticmethod
     def frac_diff_ffd(series, diff_amt, thresh=1e-5):
         """
-        Source: Chapter 5, AFML (section 5.5, page 83);
+        Advances in Financial Machine Learning, Chapter 5, section 5.5, page 83.
 
         References:
 
@@ -164,10 +165,10 @@ class FractionalDifferentiation:
         Note 1: thresh determines the cut-off weight for the window
         Note 2: diff_amt can be any positive fractional, not necessarity bounded [0, 1].
 
-        :param series: (pd.Series)
-        :param diff_amt: (float) differencing amount
-        :param thresh: (float) threshold for minimum weight
-        :return: (pd.DataFrame) a data frame of differenced series
+        :param series: (pd.Series) A time series that needs to be differenced
+        :param diff_amt: (float) Differencing amount
+        :param thresh: (float) Threshold for minimum weight
+        :return: (pd.DataFrame) A data frame of differenced series
         """
 
         # 1) Compute weights for the longest series
@@ -214,7 +215,7 @@ def get_weights_ffd(diff_amt, thresh, lim):
 
 def frac_diff_ffd(series, diff_amt, thresh=1e-5):
     """
-    Source: Chapter 5, AFML (section 5.5, page 83);
+    Advances in Financial Machine Learning, Chapter 5, section 5.5, page 83.
 
     References:
 
@@ -231,9 +232,9 @@ def frac_diff_ffd(series, diff_amt, thresh=1e-5):
     Note 1: thresh determines the cut-off weight for the window
     Note 2: diff_amt can be any positive fractional, not necessarity bounded [0, 1].
 
-    :param series: (pd.Series)
-    :param diff_amt: (float) differencing amount
-    :param thresh: (float) threshold for minimum weight
-    :return: (pd.DataFrame) a data frame of differenced series
+    :param series: (pd.Series) A time series that needs to be differenced
+    :param diff_amt: (float) Differencing amount
+    :param thresh: (float) Threshold for minimum weight
+    :return: (pd.DataFrame) A data frame of differenced series
     """
     return FractionalDifferentiation.frac_diff_ffd(series, diff_amt, thresh)

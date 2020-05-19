@@ -24,6 +24,9 @@ Marcos Lopez de Prado addresses these two issues.
    - **Clustering (Presentation Slides)** *by* Marcos Lopez de Prado *and* Lewis, M.J. `available here <https://papers.ssrn.com/sol3/abstract_id=3512998>`__. *Briefly describes the logic behind the ONC algorithm.*
    - **Codependence (Presentation Slides)** *by* Marcos Lopez de Prado *and* Lewis, M.J. `available here <https://papers.ssrn.com/sol3/abstract_id=3512994>`__. *Explains why the angular distance metric is used to get distances between elements.*
 
+Based on the **Detection of false investment strategies using unsupervised learning methods** paper, this is how the
+distances and scores are calculated:
+
 Distances between the elements in the ONC algorithm are calculated using the same angular distance used in the HRP algorithm:
 
 .. math::
