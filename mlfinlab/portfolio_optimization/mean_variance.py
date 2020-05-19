@@ -24,6 +24,7 @@ class MeanVarianceOptimisation:
     """
 
     def __init__(self, calculate_expected_returns='mean', risk_free_rate=0.03):
+        # pylint: disable=too-many-instance-attributes
         """
         Constructor.
 
@@ -254,7 +255,8 @@ class MeanVarianceOptimisation:
                 raise ValueError("Asset prices dataframe must be indexed by date.")
 
         if solution is not None and solution not in {"inverse_variance", "min_volatility", "max_sharpe", "efficient_risk",
-                         "max_return_min_volatility", "max_diversification", "efficient_return", "max_decorrelation"}:
+                                                     "max_return_min_volatility", "max_diversification", "efficient_return",
+                                                     "max_decorrelation"}:
             raise ValueError("Unknown solution string specified. Supported solutions - "
                              "inverse_variance, min_volatility, max_sharpe, efficient_risk"
                              "max_return_min_volatility, max_diversification, efficient_return and max_decorrelation")
