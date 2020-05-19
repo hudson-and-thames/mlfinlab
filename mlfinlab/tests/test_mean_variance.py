@@ -139,7 +139,7 @@ class TestMVO(unittest.TestCase):
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_plotting_efficient_frontier(self):
-        # pylint: disable=invalid-name, bad-continuation, protected-access
+        # pylint: disable=invalid-name, protected-access
         """
         Test the plotting of the efficient frontier.
         """
@@ -155,7 +155,7 @@ class TestMVO(unittest.TestCase):
         assert len(plot._A) == 100
 
     def test_exception_in_plotting_efficient_frontier(self):
-        # pylint: disable=invalid-name, bad-continuation, protected-access
+        # pylint: disable=invalid-name, protected-access
         """
         Test raising of exception when plotting the efficient frontier.
         """
@@ -170,7 +170,7 @@ class TestMVO(unittest.TestCase):
         assert len(plot._A) == 41
 
     def test_mvo_with_input_as_returns_and_covariance(self):
-        # pylint: disable=invalid-name, bad-continuation
+        # pylint: disable=invalid-name
         """
         Test MVO when we pass expected returns and covariance matrix as input.
         """
