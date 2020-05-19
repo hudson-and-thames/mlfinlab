@@ -9,13 +9,15 @@ from scipy.stats import weightedtau, kendalltau, spearmanr, pearsonr
 
 def _get_eigen_vector(dot_matrix, variance_thresh):
     """
-    Snippet 8.5, page 119. Computation of Orthogonal Features
+    Advances in Financial Machine Learning, Snippet 8.5, page 119.
 
-    Get eigen values and eigen vector from matrix which explain % variance_thresh of total variance.
+    Computation of Orthogonal Features
+
+    Gets eigen values and eigen vector from matrix which explain % variance_thresh of total variance.
 
     :param dot_matrix: (np.array): Matrix for which eigen values/vectors should be computed.
     :param variance_thresh: (float): Percentage % of overall variance which compressed vectors should explain.
-    :return: (pd.Series, pd.DataFrame): Eigen values, Eigen vectors.
+    :return: (pd.Series, pd.DataFrame): Eigenvalues, Eigenvectors.
     """
     # Compute eigen_vec from dot prod matrix, reduce dimension
     eigen_val, eigen_vec = np.linalg.eigh(dot_matrix)
@@ -38,17 +40,19 @@ def _standardize_df(data_frame):
     """
     Helper function which divides df by std and extracts mean.
 
-    :param data_frame: (pd.DataFrame): to standardize
-    :return: (pd.DataFrame): standardized data frame
+    :param data_frame: (pd.DataFrame): Dataframe to standardize
+    :return: (pd.DataFrame): Standardized dataframe
     """
     return data_frame.sub(data_frame.mean(), axis=1).div(data_frame.std(), axis=1)
 
 
 def get_orthogonal_features(feature_df, variance_thresh=.95):
     """
-    Snippet 8.5, page 119. Computation of Orthogonal Features.
+    Advances in Financial Machine Learning, Snippet 8.5, page 119.
 
-    Get PCA orthogonal features.
+    Computation of Orthogonal Features.
+
+    Gets PCA orthogonal features.
 
     :param feature_df: (pd.DataFrame): Dataframe of features.
     :param variance_thresh: (float): Percentage % of overall variance which compressed vectors should explain.
@@ -65,7 +69,9 @@ def get_orthogonal_features(feature_df, variance_thresh=.95):
 
 def get_pca_rank_weighted_kendall_tau(feature_imp, pca_rank):
     """
-    Snippet 8.6, page 121. Computation of Weighted Kendall's Tau Between Feature Importance and Inverse PCA Ranking.
+    Advances in Financial Machine Learning, Snippet 8.6, page 121.
+
+    Computes Weighted Kendall's Tau Between Feature Importance and Inverse PCA Ranking.
 
     :param feature_imp: (np.array): Feature mean importance.
     :param pca_rank: (np.array): PCA based feature importance rank.
@@ -76,8 +82,10 @@ def get_pca_rank_weighted_kendall_tau(feature_imp, pca_rank):
 
 def feature_pca_analysis(feature_df, feature_importance, variance_thresh=0.95):
     """
-    Perform correlation analysis between feature importance (MDI for example, supervised) and PCA eigen values
-    (unsupervised). High correlation means that probably the pattern identified by the ML algorithm is not entirely overfit.
+    Performs correlation analysis between feature importance (MDI for example, supervised) and PCA eigenvalues
+    (unsupervised).
+
+    High correlation means that probably the pattern identified by the ML algorithm is not entirely overfit.
 
     :param feature_df: (pd.DataFrame): Features dataframe.
     :param feature_importance: (pd.DataFrame): Individual MDI feature importance.

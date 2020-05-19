@@ -45,7 +45,7 @@ class EMAImbalanceBars(BaseImbalanceBars):
         """
         Constructor
 
-        :param metric: (str) type of imbalance bar to create. Example: "dollar_imbalance"
+        :param metric: (str) Type of imbalance bar to create. Example: "dollar_imbalance"
         :param num_prev_bars: (int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
         :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
         :param exp_num_ticks_init: (int) Initial number of expected ticks
@@ -88,7 +88,7 @@ class ConstImbalanceBars(BaseImbalanceBars):
         """
         Constructor
 
-        :param metric: (str) type of imbalance bar to create. Example: "dollar_imbalance"
+        :param metric: (str) Type of imbalance bar to create. Example: "dollar_imbalance"
         :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
         :param exp_num_ticks_init: (int) Initial number of expected ticks
         :param batch_size: (int) Number of rows to read in from the csv, per batch
@@ -114,7 +114,7 @@ def get_ema_dollar_imbalance_bars(file_path_or_df: Union[str, Iterable[str], pd.
                             in the format[date_time, price, volume]
     :param num_prev_bars: (int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
     :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
-    :param exp_num_ticks_init: initial expected number of ticks per bar
+    :param exp_num_ticks_init: (int) Initial expected number of ticks per bar
     :param exp_num_ticks_constraints: (list) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
@@ -145,7 +145,7 @@ def get_ema_volume_imbalance_bars(file_path_or_df: Union[str, Iterable[str], pd.
                             in the format[date_time, price, volume]
     :param num_prev_bars: (int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
     :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
-    :param exp_num_ticks_init: initial expected number of ticks per bar
+    :param exp_num_ticks_init: (int) Initial expected number of ticks per bar
     :param exp_num_ticks_constraints: (list) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
@@ -174,13 +174,13 @@ def get_ema_tick_imbalance_bars(file_path_or_df: Union[str, Iterable[str], pd.Da
 
     :param file_path_or_df: (str, iterable of str, or pd.DataFrame) Path to the csv file(s) or Pandas Data Frame containing raw tick data
                              in the format[date_time, price, volume]
-    :param num_prev_bars: (Int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
-    :param expected_imbalance_window: (Int) EMA window used to estimate expected imbalance
-    :param exp_num_ticks_init: (int) initial expected number of ticks per bar
-    :param exp_num_ticks_constraints: (Array) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
+    :param num_prev_bars: (int) Window size for E[T]s (number of previous bars to use for expected number of ticks estimation)
+    :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
+    :param exp_num_ticks_init: (int) Initial expected number of ticks per bar
+    :param exp_num_ticks_constraints: (array) Minimum and maximum possible number of expected ticks. Used to control bars sampling convergence
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
-    :param verbose: (Boolean) Print out batch numbers (True or False)
-    :param to_csv: (Boolean) Save bars to csv after every batch run (True or False)
+    :param verbose: (bool) Print out batch numbers (True or False)
+    :param to_csv: (bool) Save bars to csv after every batch run (True or False)
     :param analyse_thresholds: (bool) Flag to save  and return thresholds used to sample imbalance bars
     :param output_path: (str) Path to csv file, if to_csv is True
     :return: (pd.DataFrame) DataFrame of tick imbalance bars and DataFrame of thresholds, if to_csv=True returns None
@@ -205,7 +205,7 @@ def get_const_dollar_imbalance_bars(file_path_or_df: Union[str, Iterable[str], p
     :param file_path_or_df: (str, iterable of str, or pd.DataFrame) Path to the csv file(s) or Pandas Data Frame containing raw tick data
                             in the format[date_time, price, volume]
     :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
-    :param exp_num_ticks_init: (int) initial expected number of ticks per bar
+    :param exp_num_ticks_init: (int) Initial expected number of ticks per bar
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
@@ -233,7 +233,7 @@ def get_const_volume_imbalance_bars(file_path_or_df: Union[str, Iterable[str], p
     :param file_path_or_df: (str, iterable of str, or pd.DataFrame) Path to the csv file(s) or Pandas Data Frame containing raw tick data
                             in the format[date_time, price, volume]
     :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
-    :param exp_num_ticks_init: (int) initial expected number of ticks per bar
+    :param exp_num_ticks_init: (int) Initial expected number of ticks per bar
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
@@ -260,7 +260,7 @@ def get_const_tick_imbalance_bars(file_path_or_df: Union[str, Iterable[str], pd.
 
     :param file_path_or_df: (str or pd.DataFrame) Path to the csv file or Pandas Data Frame containing raw tick data in the format[date_time, price, volume]
     :param expected_imbalance_window: (int) EMA window used to estimate expected imbalance
-    :param exp_num_ticks_init: (int) initial expected number of ticks per bar
+    :param exp_num_ticks_init: (int) Initial expected number of ticks per bar
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
