@@ -8,21 +8,35 @@ from typing import List
 import pandas as pd
 import numpy as np
 
+from scipy.special import comb
 from sklearn.model_selection import KFold
 from .cross_validation import ml_get_train_times
 
 
+def _get_number_of_backtest_paths(n_train_splits: int, n_test_splits: int) -> float:
+    """
+    Number of combinatorial paths for CPCV(N,K)
+    :param n_train_splits: (int) number of train splits
+    :param n_test_splits: (int) number of test splits
+    :return: (int) number of backtest paths for CPCV(N,k)
+    """
+    return int(comb(n_train_splits, n_train_splits - n_test_splits) * n_test_splits / n_train_splits)
+
+
 class CombinatorialPurgedKFold(KFold):
     """
-    Implements Combinatial Purged Cross Validation (CPCV) from Chapter 12
+    Advances in Financial Machine Learning, Chapter 12.
+
+    Implements Combinatial Purged Cross Validation (CPCV)
+
     The train is purged of observations overlapping test-label intervals
     Test set is assumed contiguous (shuffle=False), w/o training samples in between
 
-    :param n_splits: The number of splits. Default to 3
-    :param samples_info_sets: The information range on which each record is constructed from
+    :param n_splits: (int) The number of splits. Default to 3
+    :param samples_info_sets: (pd.Series) The information range on which each record is constructed from
         *samples_info_sets.index*: Time when the information extraction started.
         *samples_info_sets.value*: Time when the information extraction ended.
-    :param pct_embargo: Percent that determines the embargo size.
+    :param pct_embargo: (float) Percent that determines the embargo size.
     """
 
     def __init__(self,
@@ -38,16 +52,16 @@ class CombinatorialPurgedKFold(KFold):
         self.samples_info_sets = samples_info_sets
         self.pct_embargo = pct_embargo
         self.n_test_splits = n_test_splits
-        self.backtest_paths = {k: list(range(self.n_splits)) for k in
-                               range(self.n_splits - 1)}  # Dictionary of backtest paths, number of paths = n_splits - 1
+        self.num_backtest_paths = _get_number_of_backtest_paths(self.n_splits, self.n_test_splits)
+        self.backtest_paths = []  # Array of backtest paths
 
     def _generate_combinatorial_test_ranges(self, splits_indices: dict) -> List:
         """
         Using start and end indices of test splits from KFolds and number of test_splits (self.n_test_splits),
         generates combinatorial test ranges splits
 
-        :param splits_indices: (dict) of test fold integer index: [start test index, end test index]
-        :return: (list) of combinatorial test splits ([start index, end index])
+        :param splits_indices: (dict) Test fold integer index: [start test index, end test index]
+        :return: (list) Combinatorial test splits ([start index, end index])
         """
 
         # Possible test splits for each fold
@@ -60,6 +74,23 @@ class CombinatorialPurgedKFold(KFold):
             combinatorial_test_ranges.append(temp_test_indices)
         return combinatorial_test_ranges
 
+    def _fill_backtest_paths(self, train_indices: list, test_splits: list):
+        """
+        Using start and end indices of test splits and purged/embargoed train indices from CPCV, find backtest path and
+        place in the path where these indices should be used.
+
+        :param test_splits: (list) of lists with first element corresponding to test start index and second - test end
+        """
+        # Fill backtest paths using train/test splits from CPCV
+        for split in test_splits:
+            found = False  # Flag indicating that split was found and filled in one of backtest paths
+            for path in self.backtest_paths:
+                for path_el in path:
+                    if path_el['train'] is None and split == path_el['test'] and found is False:
+                        path_el['train'] = np.array(train_indices)
+                        path_el['test'] = list(range(split[0], split[-1]))
+                        found = True
+
     # noinspection PyPep8Naming
     def split(self,
               X: pd.DataFrame,
@@ -68,12 +99,12 @@ class CombinatorialPurgedKFold(KFold):
         """
         The main method to call for the PurgedKFold class
 
-        :param X: The pd.DataFrame samples dataset that is to be split
-        :param y: The pd.Series sample labels series
-        :param groups: array-like, with shape (n_samples,), optional
+        :param X: (pd.DataFrame) Samples dataset that is to be split
+        :param y: (pd.Series) Sample labels series
+        :param groups: (array-like), with shape (n_samples,), optional
             Group labels for the samples used while splitting the dataset into
             train/test set.
-        :return: This method yields uples of (train, test) where train and test are lists of sample indices
+        :return: (tuple) [train list of sample indices, and test list of sample indices]
         """
         if X.shape[0] != self.samples_info_sets.shape[0]:
             raise ValueError("X and the 'samples_info_sets' series param must be the same length")
@@ -84,6 +115,12 @@ class CombinatorialPurgedKFold(KFold):
             splits_indices[index] = [start_ix, end_ix]
 
         combinatorial_test_ranges = self._generate_combinatorial_test_ranges(splits_indices)
+        # Prepare backtest paths
+        for _ in range(self.num_backtest_paths):
+            path = []
+            for split_idx in splits_indices.values():
+                path.append({'train': None, 'test': split_idx})
+            self.backtest_paths.append(path)
 
         embargo: int = int(X.shape[0] * self.pct_embargo)
         for test_splits in combinatorial_test_ranges:
@@ -105,4 +142,7 @@ class CombinatorialPurgedKFold(KFold):
             train_indices = []
             for train_ix in train_times.index:
                 train_indices.append(self.samples_info_sets.index.get_loc(train_ix))
+
+            self._fill_backtest_paths(train_indices, test_splits)
+
             yield np.array(train_indices), np.array(test_indices)
