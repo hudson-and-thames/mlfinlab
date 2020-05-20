@@ -357,11 +357,11 @@ Sample Uniqueness and Weights
 
 * `Sample Uniqueness and Weights`_
 
-.. _Sample Uniqueness and Weights: https://github.com/hudson-and-thames/research/blob/master/Chapter4/Chapter4_Exercises.ipynb
+.. _Sample Uniqueness and Weights: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Sample%20Weights/Chapter4_Exercises.ipynb
 
 Sequential Bootstrapping
 ************************
 
 * `Sequential Bootstrapping`_
 
-.. _Sequential Bootstrapping: https://github.com/hudson-and-thames/research/blob/master/Chapter4/Sequential_Bootstrapping.ipynb
+.. _Sequential Bootstrapping: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Sample%20Weights/Sequential_Bootstrapping.ipynb

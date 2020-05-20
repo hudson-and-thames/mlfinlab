@@ -140,4 +140,4 @@ The following research notebooks provide a more detailed exploration of the algo
 
 * `NCO Notebook`_
 
-.. _NCO Notebook: https://github.com/hudson-and-thames/research/blob/master/NCO/NCO.ipynb
+.. _NCO Notebook: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Nested%20Clustered%20Optimisation%20(NCO)/NCO.ipynb
