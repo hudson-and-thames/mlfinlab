@@ -9,10 +9,18 @@ Bang, J., 2016. Classification-based Financial Markets Prediction using Deep Neu
 arXiv:1603.08604. <https://arxiv.org/abs/1603.08604>`_
 
 Fixed time horizon is a common method used in labeling financial data, usually applied on time bars. The forward rate of return relative
-to :math:`t_0` over time horizon :math:`h` is calculated as follows:
+to :math:`t_0` over time horizon :math:`h` is calculated as follows (M.L. de Prado, Advances in Financial Machine Learning, 2018):
 
-.. math::
-    r_{t0,t1} = \frac{p_{t1}}{p_{t0}} - 1
+ .. math::
+     \begin{equation}
+     \begin{split}
+       L_{t0, t1} = \begin{cases}
+       -1 &\ \text{if} \ \ r_{t0, t1} < -\tau\\
+       0 &\ \text{if} \ \ -\tau \leq r_{t0, t1} \leq \tau\\
+       1 &\ \text{if} \ \ r_{t0, t1} > \tau
+       \end{cases}
+     \end{split}
+     \end{equation}
 
 Where :math:`t_1 = t_0 + h` is the time bar index after a fixed horizon of :math:`h` ticks have passed, and :math:`p_{t0}, p_{t1}`
 are prices at times :math:`t_0, t_1`. This method assigns a label based on comparison of rate of return to a threshold :math:`\tau`
@@ -22,9 +30,9 @@ are prices at times :math:`t_0, t_1`. This method assigns a label based on compa
     0 \text{ if } -\tau \leq r_{t0, t1} \geq \tau\\
     1 \text{ if } r_{t0, t1} > \tau
 
-Though time bars are the most common format for financial data, there can be potential problems with over reliance on time bars. First,
-time bars exhibit high seasonality, as trading behavior may be quite different at the open or close versus midday; thus it will not be
-informative to apply the same thershold on non-uniform distribution. Solutions include applying the fixed horizon method to tick or
+Though time bars are the most common format for financial data, there can be potential problems with over-reliance on time bars. Time
+bars exhibit high seasonality, as trading behavior may be quite different at the open or close versus midday; thus it will not be
+informative to apply the same threshold on non-uniform distribution. Solutions include applying the fixed horizon method to tick or
 volume bars instead of time bars, using data sampled at the same time every day (e.g. closing prices) or inputting a dynamic threshold
 as a pd.Series corresponding to the times in the dataset.
 
@@ -43,7 +51,6 @@ Below is an example on how to create the positive, negative, and full matrix Tai
 
 .. code-block::
 
-    import numpy as np
     import pandas as pd
     from mlfinlab.labeling import fixed_time_horizon
 

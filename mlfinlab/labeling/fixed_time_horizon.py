@@ -1,6 +1,7 @@
 """
-Chapter 3.2 Fixed-Time Horizon Method
-Described in "Classification-based Financial Markets Prediction using Deep Neural Networks" Dixon et al. (2016)
+Chapter 3.2 Fixed-Time Horizon Method, in Advances in Financial Machine Learning, by M. L. de Prado
+Described in "Classification-based Financial Markets Prediction using Deep Neural Networks" Dixon et al. (2016) for
+labeling data to be used in training deep neural networks to predict price movements
 """
 
 import warnings
@@ -12,17 +13,19 @@ def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, win
     Fixed-Time Horizon Labelling Method
     Returns 1 if return at h-th bar after t_0 is greater than the threshold, -1 if less, and 0 if in between
 
-    :param close: (pd.Series) of Close prices over fixed horizons (usually time bars, but can be any format as long as
+    :param close: (pd.Series) Close prices over fixed horizons (usually time bars, but can be any format as long as
                     index is timestamps)  for a stock ticker
     :param threshold: (float or pd.Series) When the abs(change) is larger than the threshold, it is labelled as 1 or -1.
                     If change is smaller, it's labelled as 0. Can be dynamic if threshold is pd.Series. If threshold is
                     a series, threshold.index must match close.index. If threshold is negative, then the directionality
                     of the labels will be reversed
-    :param look_forward: : (int) Number of ticks to look forward when calculating future return rate. By default, 1.
+    :param look_forward: (int) Number of ticks to look forward when calculating future return rate. (1 by default)
+                        If n is the numerical value of look_forward, the last n observations will return a label of NaN
+                        due to lack of data to calculate the forward return in those cases
     :param standardized: (bool) Whether returns are scaled by mean and standard deviation
     :param window: (int) If standardized is True, the rolling window period for calculating the mean and standard
                     deviation of returns
-    :return: (np.Array) of -1, 0, or 1 denoting whether return for each tick is under/between/greater than the threshold
+    :return: (np.Array) -1, 0, or 1 denoting whether return for each tick is under/between/greater than the threshold
     """
     # Calculate forward price with
     forward_return = close.pct_change(periods=look_forward).shift(-look_forward)
