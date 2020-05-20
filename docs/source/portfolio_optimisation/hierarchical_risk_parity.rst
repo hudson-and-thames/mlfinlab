@@ -82,13 +82,14 @@ Implementation
     tree. By default, we use the distance matrix mentioned in the original paper,
 
     .. math::
+        D(i, j) = \sqrt{\frac{1}{2} * (1 - \rho(i, j))}
 
-      D(i, j) = \sqrt{\frac{1}{2} * (1 - \rho(i, j))}
-
-    However, users can specify their own custom matrix to be used instead of the default one by passing an :math:`NxN` symmetric
-    pandas dataframe or a numpy matrix using the :py:mod:`distance_matrix` parameter.
+    Here, :math:`\rho` refers to the correlation matrix of assets. Users can specify their own custom matrix to be used instead of
+    the default one by passing an :math:`NxN` symmetric pandas dataframe or a numpy matrix using the :py:mod:`distance_matrix`
+    parameter.
 
     |h4| Constructing a Long/Short Portfolio |h4_|
+    By default, the weights are allocated assuming a long portfolio i.e. all the weights are positive. However, you can also
 
     |h4| Different Linkage Methods |h4_|
     HRP, by default, uses the single-linkage clustering algorithm. (See the tip under the HCAA algorithm for more details.)
