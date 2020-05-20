@@ -1,5 +1,25 @@
 .. _portfolio_optimisation-hierarchical_risk_parity:
 
+.. |br| raw:: html
+
+    <br>
+
+.. |h3| raw:: html
+
+    <h3>
+
+.. |h3_| raw:: html
+
+    </h3>
+
+.. |h4| raw:: html
+
+    <h4>
+
+.. |h4_| raw:: html
+
+    </h4>
+
 .. note::
     The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies. Each
     algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
@@ -10,29 +30,40 @@
 Hierarchical Risk Parity (HRP)
 ==============================
 
-Hierarchical Risk Parity is a novel portfolio optimisation method developed by Marcos Lopez de Prado. A quick overview of the
-different steps in the algorithm:
+The Hierarchical Risk Parity algorithm is a novel portfolio optimisation method developed by Marcos Lopez de Prado. A quick
+overview of the different steps in the algorithm:
 
 
-    **1. Hierarchical Tree Clustering**
-
+    |h3| **1. Hierarchical Tree Clustering** |h3_|
     This step breaks down the assets in our portfolio into different hierarchical clusters using the famous Hierarchical Tree
     Clustering algorithm. The assets in the portfolio are segregated into clusters which mimic the real-life interactions between
     the assets in a portfolio - some stocks are related to each other more than others and hence can be grouped within the same
-    cluster.
+    cluster. At the end of the step, we are left with the follow tree structure (also called a dendrogram),
 
-    **2. Matrix Seriation**
+    .. image:: portfolio_optimisation_images/dendrogram.png
+
+    |br|
+
+    |h3| **2. Matrix Seriation** |h3_|
+    Matrix seriation is a very old statistical technique which is used to rearrange the data to show the inherent clusters
+    clearly. Using the order of hierarchical clusters from the previous step, we rearrange the rows and columns of the covariance
+    matrix of stocks so that similar investments are placed together and dissimilar investments are placed far apart
+
+    .. image:: portfolio_optimisation_images/seriation.png
+
+    |br|
+
+    |h3| **3. Recursive Bisection** |h3_|
+    This is the final and the most important step of this algorithm where the actual weights are assigned to the assets in a
+    top-down recursive manner. Based on the hierarchical tree dendrogram formed in the first step, the weights trickle down the
+    tree and get assigned to the portfolio assets.
 
 
-    **3. Recursive Bisection**
-
-Although, it is a simple algorithm, HRP has been found to be very stable as compared to its older counterparts.
-This is because, HRP does not involve taking inverse of the covariance matrix matrix which makes it robust to small changes
-in the covariances of the asset returns.
+Although, it is a simple algorithm, it has been found to be very stable as compared to its older counterparts (the traditional
+mean variance optimisation methods).
 
 .. tip::
-    * For a detailed explanation of how HRP works, we have written an excellent `blog post <https://hudsonthames.org/an-introduction-to-the-hierarchical-risk-parity-algorithm/>`_ about it.
-    * HRP, by default, uses the single-linkage clustering algorithm. (See the tip under the HCAA algorithm for more details.)
+    * For a detailed explanation of how hierarchical risk parity works, we have written an excellent `blog post <https://hudsonthames.org/an-introduction-to-the-hierarchical-risk-parity-algorithm/>`_ about it.
 
 
 Implementation
@@ -44,6 +75,24 @@ Implementation
         :members:
 
         .. automethod:: __init__
+
+.. tip::
+    |h4| Using Custom Distance Matrix |h4_|
+    The hierarchical clustering step in the algorithm uses a distance matrix to calculate the clusters and form the hierarchical
+    tree. By default, we use the distance matrix mentioned in the original paper,
+
+    .. math::
+
+      D(i, j) = \sqrt{\frac{1}{2} * (1 - \rho(i, j))}
+
+    However, users can specify their own custom matrix to be used instead of the default one by passing an :math:`NxN` symmetric
+    pandas dataframe or a numpy matrix using the :py:mod:`distance_matrix` parameter.
+
+    |h4| Constructing a Long/Short Portfolio |h4_|
+
+    |h4| Different Linkage Methods |h4_|
+    HRP, by default, uses the single-linkage clustering algorithm. (See the tip under the HCAA algorithm for more details.)
+
 
 
 Example Code
