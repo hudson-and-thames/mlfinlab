@@ -125,7 +125,7 @@ The following research notebook can be used to better understand fractionally di
 
 * `Fractionally Differentiated Features`_
 
-.. _Fractionally Differentiated Features: https://github.com/hudson-and-thames/research/blob/master/Chapter5/Chapter5_Exercises.ipynb
+.. _Fractionally Differentiated Features: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Fractionally%20Differentiated%20Features/Chapter5_Exercises.ipynb
 
 
 
