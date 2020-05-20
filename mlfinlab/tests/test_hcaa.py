@@ -21,7 +21,7 @@ class TestHCAA(unittest.TestCase):
         Set the file path for the tick data csv
         """
         project_path = os.path.dirname(__file__)
-        data_path = project_path + '/test_data/stock_prices.csv'
+        data_path = project_path + '/test_data/stock_prices_.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
     def test_hcaa_equal_weight(self):

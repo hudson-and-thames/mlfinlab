@@ -146,10 +146,11 @@ class HierarchicalClusteringAssetAllocation:
         :return: (int) The optimal number of clusters.
         """
 
-        max_number_of_clusters = min(10, asset_returns.shape[1])
         original_distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
         gap_values = []
-        for num_clusters in range(1, max_number_of_clusters + 1):
+        num_clusters = 1
+        max_number_of_clusters = float("-inf")
+        while True:
 
             # Calculate expected inertia from reference datasets
             expected_inertia = self._calculate_expected_inertia(num_reference_datasets, asset_returns, num_clusters, linkage)
@@ -157,12 +158,15 @@ class HierarchicalClusteringAssetAllocation:
             # Calculate inertia from original data
             original_clusters = scipy_linkage(squareform(original_distance_matrix), method=linkage)
             original_cluster_assignments = fcluster(original_clusters, num_clusters, criterion='maxclust')
+            if max(original_cluster_assignments) == max_number_of_clusters or max(original_cluster_assignments) > 10:
+                break
+            max_number_of_clusters = max(original_cluster_assignments)
             inertia = self._compute_cluster_inertia(original_cluster_assignments, asset_returns.values)
 
             # Calculate the gap statistic
             gap = expected_inertia - inertia
             gap_values.append(gap)
-
+            num_clusters += 1
         return 1 + np.argmax(gap_values)
 
     def _calculate_expected_inertia(self, num_reference_datasets, asset_returns, num_clusters, linkage):
