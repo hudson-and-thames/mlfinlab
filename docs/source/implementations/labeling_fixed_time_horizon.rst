@@ -11,6 +11,12 @@ arXiv:1603.08604. <https://arxiv.org/abs/1603.08604>`_
 Fixed time horizon is a common method used in labeling financial data, usually applied on time bars. The forward rate of return relative
 to :math:`t_0` over time horizon :math:`h` is calculated as follows (M.L. de Prado, Advances in Financial Machine Learning, 2018):
 
+.. math::
+    r_{t0,t1} = \frac{p_{t1}}{p_{t0}} - 1
+
+Where :math:`t_1 = t_0 + h` is the time bar index after a fixed horizon of :math:`h` ticks have passed, and :math:`p_{t0}, p_{t1}`
+are prices at times :math:`t_0, t_1`. This method assigns a label based on comparison of rate of return to a threshold :math:`\tau`
+
  .. math::
      \begin{equation}
      \begin{split}
@@ -22,21 +28,18 @@ to :math:`t_0` over time horizon :math:`h` is calculated as follows (M.L. de Pra
      \end{split}
      \end{equation}
 
-Where :math:`t_1 = t_0 + h` is the time bar index after a fixed horizon of :math:`h` ticks have passed, and :math:`p_{t0}, p_{t1}`
-are prices at times :math:`t_0, t_1`. This method assigns a label based on comparison of rate of return to a threshold :math:`\tau`
-
-.. math::
-    -1 \text{ if } r_{t0, t1} < -\tau\\
-    0 \text{ if } -\tau \leq r_{t0, t1} \geq \tau\\
-    1 \text{ if } r_{t0, t1} > \tau
-
 Though time bars are the most common format for financial data, there can be potential problems with over-reliance on time bars. Time
 bars exhibit high seasonality, as trading behavior may be quite different at the open or close versus midday; thus it will not be
-informative to apply the same threshold on non-uniform distribution. Solutions include applying the fixed horizon method to tick or
+informative to apply the same threshold on a non-uniform distribution. Solutions include applying the fixed horizon method to tick or
 volume bars instead of time bars, using data sampled at the same time every day (e.g. closing prices) or inputting a dynamic threshold
 as a pd.Series corresponding to the times in the dataset.
 
+.. tip::
+   **Underlying Literature**
 
+   The following source describes this method in more detail:
+
+   - **Advances in Financial Machine Learning, Chapter 3.2** *by* Marcos Lopez de Prado (p. 43-44).
 
 Implementation
 ##############
@@ -68,7 +71,7 @@ Below is an example on how to create the positive, negative, and full matrix Tai
 Research Notebooks
 ##################
 
-The following research notebooks can be used to better understand the Tail Set labeling technique.
+The following research notebook can be used to better understand the Fixed Horizon labeling technique.
 
 * `Fixed Horizon Example`_
 

@@ -1,7 +1,8 @@
 """
 Chapter 3.2 Fixed-Time Horizon Method, in Advances in Financial Machine Learning, by M. L. de Prado
-Described in "Classification-based Financial Markets Prediction using Deep Neural Networks" Dixon et al. (2016) for
-labeling data to be used in training deep neural networks to predict price movements
+------------------------------------------------------------------------------------------------------------------------
+Work "Classification-based Financial Markets Prediction using Deep Neural Networks" by Dixon et al. (2016) describes how
+labeling data this way can be used in training deep neural networks to predict price movements
 """
 
 import warnings
@@ -11,10 +12,11 @@ import numpy as np
 def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, window=None):
     """
     Fixed-Time Horizon Labelling Method
+    Originally described in the book Advances in Financial Machine Learning, Chapter 3.2
     Returns 1 if return at h-th bar after t_0 is greater than the threshold, -1 if less, and 0 if in between
 
     :param close: (pd.Series) Close prices over fixed horizons (usually time bars, but can be any format as long as
-                    index is timestamps)  for a stock ticker
+                    index is timestamps) for a stock ticker
     :param threshold: (float or pd.Series) When the abs(change) is larger than the threshold, it is labelled as 1 or -1.
                     If change is smaller, it's labelled as 0. Can be dynamic if threshold is pd.Series. If threshold is
                     a series, threshold.index must match close.index. If threshold is negative, then the directionality
@@ -25,7 +27,8 @@ def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, win
     :param standardized: (bool) Whether returns are scaled by mean and standard deviation
     :param window: (int) If standardized is True, the rolling window period for calculating the mean and standard
                     deviation of returns
-    :return: (np.Array) -1, 0, or 1 denoting whether return for each tick is under/between/greater than the threshold
+    :return: (np.array) -1, 0, or 1 denoting whether return for each tick is under/between/greater than the threshold.
+                    The final look_forward number of observations will be labeled np.nan
     """
     # Calculate forward price with
     forward_return = close.pct_change(periods=look_forward).shift(-look_forward)
