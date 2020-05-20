@@ -10,14 +10,21 @@
 Hierarchical Risk Parity (HRP)
 ==============================
 
-Hierarchical Risk Parity is a novel portfolio optimisation method developed by Marcos Lopez de Prado. The working of the
-algorithm can be broken down into 3 steps:
+Hierarchical Risk Parity is a novel portfolio optimisation method developed by Marcos Lopez de Prado. A quick overview of the
+different steps in the algorithm:
 
-1. Based on the expected returns of the assets, they are segregated into clusters via hierarchical tree clustering.
-2. Based on these clusters, the covariance matrix of the returns is diagonalised in a quasi manner such that assets
-   within the same cluster are regrouped together.
-3. Finally, the weights are assigned to each cluster in a recursive manner. At each node, the weights are broken down
-   into the sub-cluster until all the individual assets are assigned a unique weight.
+
+    **1. Hierarchical Tree Clustering**
+
+    This step breaks down the assets in our portfolio into different hierarchical clusters using the famous Hierarchical Tree
+    Clustering algorithm. The assets in the portfolio are segregated into clusters which mimic the real-life interactions between
+    the assets in a portfolio - some stocks are related to each other more than others and hence can be grouped within the same
+    cluster.
+
+    **2. Matrix Seriation**
+
+
+    **3. Recursive Bisection**
 
 Although, it is a simple algorithm, HRP has been found to be very stable as compared to its older counterparts.
 This is because, HRP does not involve taking inverse of the covariance matrix matrix which makes it robust to small changes
