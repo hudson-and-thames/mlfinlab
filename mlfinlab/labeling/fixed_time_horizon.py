@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 
-def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, window=None):
+def fixed_time_horizon(close, threshold=None, look_forward=1, standardized=False, window=None):
     """
     Fixed-Time Horizon Labelling Method
 
@@ -24,7 +24,8 @@ def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, win
     :param threshold: (float or pd.Series) When the abs(change) is larger than the threshold, it is labelled as 1 or -1.
                     If change is smaller, it's labelled as 0. Can be dynamic if threshold is pd.Series. If threshold is
                     a series, threshold.index must match close.index. If threshold is negative, then the directionality
-                    of the labels will be reversed.
+                    of the labels will be reversed. If no threshold is given, then the sign of the observation is
+                    returned.
     :param look_forward: (int) Number of ticks to look forward when calculating future return rate. (1 by default)
                         If n is the numerical value of look_forward, the last n observations will return a label of NaN
                         due to lack of data to calculate the forward return in those cases.
@@ -57,7 +58,11 @@ def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, win
         forward_return -= mean
         forward_return /= stdev
 
-    # Apply labeling
+    # Label with sign only, only if no threshold is given
+    if threshold is None:
+        return np.sign(forward_return).rename(index=None)
+
+    # Apply labeling otherwise
     conditions = [forward_return > threshold, (forward_return <= threshold) & (forward_return >= -threshold),
                   forward_return < -threshold]
     choices = [1, 0, -1]
