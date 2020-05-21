@@ -50,7 +50,7 @@ Implementation
 
 Example
 ########
-Below is an example on how to create the positive, negative, and full matrix Tail Sets.
+Below is an example on how to use the Fixed Horizon labeling technique on real data.
 
 .. code-block::
 

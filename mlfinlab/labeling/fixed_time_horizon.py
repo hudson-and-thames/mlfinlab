@@ -1,6 +1,6 @@
 """
 Chapter 3.2 Fixed-Time Horizon Method, in Advances in Financial Machine Learning, by M. L. de Prado
-------------------------------------------------------------------------------------------------------------------------
+
 Work "Classification-based Financial Markets Prediction using Deep Neural Networks" by Dixon et al. (2016) describes how
 labeling data this way can be used in training deep neural networks to predict price movements
 """
@@ -14,6 +14,7 @@ def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, win
     Fixed-Time Horizon Labelling Method
 
     Originally described in the book Advances in Financial Machine Learning, Chapter 3.2, p.43-44.
+
     Returns 1 if return at h-th bar after t_0 is greater than the threshold, -1 if less, and 0 if in between
 
     :param close: (pd.Series) Close prices over fixed horizons (usually time bars, but can be any format as long as
