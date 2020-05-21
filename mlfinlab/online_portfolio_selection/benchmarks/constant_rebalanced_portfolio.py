@@ -25,7 +25,7 @@ class CRP(OLPS):
         Sets first weight for Constant Rebalanced Portfolio
 
         :param weights: (list/np.array/pd.Dataframe) initial weights set by the user.
-        :return weights: (np.array) First portfolio weight.
+        :return: (np.array) First portfolio weight.
         """
         # Initialize with given weights.
         if self.weight is not None:

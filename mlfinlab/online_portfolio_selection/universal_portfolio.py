@@ -26,11 +26,11 @@ class UP(OLPS):
         Initializes Universal Portfolio with the given number of experts, method of capital
         allocation to each experts, and k-value for Top-K experts.
 
-        :param number_of_experts: (int) Number of total experts
+        :param number_of_experts: (int) Number of total experts.
         :param weighted: (str) Capital allocation method. 'hist_performance': Historical Performance,
                                'uniform': Uniform Weights, 'top-k': Top-K experts.
         :param k: (int) Number of experts to choose your portfolio. Only necessary if weighted is
-                        'top-k'.
+                        'top-k'. Typically lower values of k are more optimal for higher returns.
         """
         self.experts = []  # (list) Array to store all experts
         self.number_of_experts = number_of_experts  # (int) Set the number of experts.
@@ -48,8 +48,9 @@ class UP(OLPS):
         Initializes the important variables for the object.
 
         :param asset_prices: (pd.DataFrame) Historical asset prices.
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
-        :param resample_by: (str) Specifies how to resample the prices.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
+        :param resample_by: (str) Specifies how to resample the prices. 'D' for Day, 'W' for Week,
+                                 'M' for Month. The inputs are based on pandas' resample method.
         """
         # Initialize the same variables as OLPS.
         super(UP, self)._initialize(asset_prices, weights, resample_by)
@@ -69,7 +70,7 @@ class UP(OLPS):
         """
         Runs the algorithm by iterating through the given data.
 
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
         :param verbose: (boolean) Prints progress bar if true.
         """
         # Run allocate on all the experts.
@@ -105,6 +106,7 @@ class UP(OLPS):
             # Initial weights are evenly distributed among all experts.
             expert_returns_ratio = np.vstack((self._uniform_experts(), expert_returns_ratio))
             self.weights_on_experts = expert_returns_ratio
+
         # If capital allocation is based on uniform weights.
         elif self.weighted == 'uniform':
             # Equal allocation.
@@ -113,6 +115,7 @@ class UP(OLPS):
             # Initial weights are evenly distributed among all experts.
             uniform_ratio = np.vstack((self._uniform_experts(), uniform_ratio))
             self.weights_on_experts = uniform_ratio
+
         # If capital allocation is based on top-K experts.
         elif self.weighted == 'top-k':
             # Only the top k experts get 1/k of the wealth.
@@ -124,6 +127,7 @@ class UP(OLPS):
             top_k_distribution = np.zeros(self.expert_portfolio_returns.shape)
             # For each week set the multiplier for each expert.
             # Each row represents the week's allocation to the k experts.
+
             for time in range(top_k.shape[0]):
                 top_k_distribution[time][top_k[time]] = 1 / self.k
             # Initial weights are evenly distributed among all experts.
@@ -173,7 +177,7 @@ class UP(OLPS):
         """
         Returns a uniform weight of experts.
 
-        :return uni_weight: (np.array) Uniform weights (1/n, 1/n, 1/n ...).
+        :return: (np.array) Uniform weights (1/n, 1/n, 1/n ...).
         """
         # Divide by number of assets after creating numpy arrays of one.
         uni_weight = np.ones(self.number_of_experts) / self.number_of_experts

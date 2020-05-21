@@ -18,7 +18,7 @@ class BestStock(OLPS):
         Sets the initial weight to the best performing stock over the entire time period.
 
         :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
-        :return new_weight: (np.array) Weights that allocate to the best performing asset.
+        :return: (np.array) Weights that allocate to the best performing asset.
         """
         # Index of stock that increased the most.
         best_idx = np.argmax(self.relative_return.cumprod(axis=0)[-1])

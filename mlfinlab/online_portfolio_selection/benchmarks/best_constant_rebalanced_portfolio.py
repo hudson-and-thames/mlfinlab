@@ -20,7 +20,7 @@ class BCRP(OLPS):
         in hindsight.
 
         :param weights: (np.array) Given weights by the user.
-        :return new_weights: (np.array) Weights that maximize the returns.
+        :return: (np.array) Weights that maximize the returns.
         """
         # Use cp.SCS solver to speed up calculations.
         new_weights = self._optimize(self.relative_return, solver=cp.SCS)
