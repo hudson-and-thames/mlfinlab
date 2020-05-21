@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.mean_reversion.confidence_weighted_mean_reversion import ConfidenceWeightedMeanReversion
+from mlfinlab.online_portfolio_selection.mean_reversion.confidence_weighted_mean_reversion import CWMR
 
 
 class TestConfidenceWeightedMeanReversion(TestCase):
@@ -31,7 +31,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
         Test the calculation of CWMR with the original method.
         """
         # Initialize CWMR.
-        cwmr = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=0.5, method='var')
+        cwmr = CWMR(confidence=0.5, epsilon=0.5, method='var')
         # Allocates asset prices to CWMR.
         cwmr.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -48,7 +48,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
         Test the calculation of CWMR with the second method.
         """
         # Initialize CWMR.
-        cwmr = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=0.5, method='sd')
+        cwmr = CWMR(confidence=0.5, epsilon=0.5, method='sd')
         # Allocates asset prices to OLMAR.
         cwmr.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -65,7 +65,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
         Tests ValueError if epsilon is greater than 1.
         """
         # Initialize CWMR.
-        cwmr1 = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=2)
+        cwmr1 = CWMR(confidence=0.5, epsilon=2)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             cwmr1.allocate(self.data)
@@ -75,7 +75,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
         Tests ValueError if epsilon is less than 0.
         """
         # Initialize CWMR.
-        cwmr2 = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=-1)
+        cwmr2 = CWMR(confidence=0.5, epsilon=-1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             cwmr2.allocate(self.data)
@@ -85,7 +85,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
         Tests ValueError if confidence is greater than 1.
         """
         # Initialize CWMR.
-        cwmr3 = ConfidenceWeightedMeanReversion(confidence=2, epsilon=0.5)
+        cwmr3 = CWMR(confidence=2, epsilon=0.5)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             cwmr3.allocate(self.data)
@@ -95,7 +95,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
         Tests ValueError if confidence is less than 0.
         """
         # Initialize CWMR.
-        cwmr4 = ConfidenceWeightedMeanReversion(confidence=-1, epsilon=0.5)
+        cwmr4 = CWMR(confidence=-1, epsilon=0.5)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             cwmr4.allocate(self.data)
@@ -105,7 +105,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
         Tests ValueError if method is not 'sd' or 'var'.
         """
         # Initialize CWMR.
-        cwmr5 = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=0.5, method='normal')
+        cwmr5 = CWMR(confidence=0.5, epsilon=0.5, method='normal')
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             cwmr5.allocate(self.data)
@@ -118,7 +118,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
         weight = np.zeros(self.data.iloc[0].shape)
         weight[0] = 1
         # Initialize CWMR.
-        cwmr6 = ConfidenceWeightedMeanReversion(confidence=0.5, epsilon=0.5, method='var')
+        cwmr6 = CWMR(confidence=0.5, epsilon=0.5, method='var')
         # Allocates asset prices to CWMR.
         cwmr6.allocate(self.data, weights=weight, resample_by='M')
         # Create np.array of all_weights.

@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.mean_reversion.online_moving_average_reversion import OnlineMovingAverageReversion
+from mlfinlab.online_portfolio_selection.mean_reversion.online_moving_average_reversion import OLMAR
 
 
 class TestOnlineMovingAverageReversion(TestCase):
@@ -31,7 +31,7 @@ class TestOnlineMovingAverageReversion(TestCase):
         Test the calculation of online moving average reversion with the original reversion method.
         """
         # Initialize OLMAR.
-        olmar = OnlineMovingAverageReversion(reversion_method=1, epsilon=1, window=10)
+        olmar = OLMAR(reversion_method=1, epsilon=1, window=10)
         # Allocates asset prices to OLMAR.
         olmar.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -48,7 +48,7 @@ class TestOnlineMovingAverageReversion(TestCase):
         Test the calculation of online moving average reversion with the second reversion method.
         """
         # Initialize OLMAR.
-        olmar1 = OnlineMovingAverageReversion(reversion_method=2, epsilon=10, alpha=0.5)
+        olmar1 = OLMAR(reversion_method=2, epsilon=10, alpha=0.5)
         # Allocates asset prices to OLMAR.
         olmar1.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -65,7 +65,7 @@ class TestOnlineMovingAverageReversion(TestCase):
         Tests ValueError if epsilon is below than 1.
         """
         # Initialize OLMAR.
-        olmar2 = OnlineMovingAverageReversion(reversion_method=1, epsilon=0, window=10)
+        olmar2 = OLMAR(reversion_method=1, epsilon=0, window=10)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             olmar2.allocate(self.data)
@@ -75,7 +75,7 @@ class TestOnlineMovingAverageReversion(TestCase):
         Tests ValueError if reversion method is 1 and window is less than 1.
         """
         # Initialize OLMAR.
-        olmar3 = OnlineMovingAverageReversion(reversion_method=1, epsilon=2, window=0)
+        olmar3 = OLMAR(reversion_method=1, epsilon=2, window=0)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             olmar3.allocate(self.data)
@@ -85,7 +85,7 @@ class TestOnlineMovingAverageReversion(TestCase):
         Tests ValueError if reversion method is 2 and alpha is greater than 1.
         """
         # Initialize OLMAR.
-        olmar4 = OnlineMovingAverageReversion(reversion_method=2, epsilon=2, alpha=2)
+        olmar4 = OLMAR(reversion_method=2, epsilon=2, alpha=2)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             olmar4.allocate(self.data)
@@ -95,7 +95,7 @@ class TestOnlineMovingAverageReversion(TestCase):
         Tests ValueError if reversion method is 2 and alpha is less than 1.
         """
         # Initialize OLMAR.
-        olmar5 = OnlineMovingAverageReversion(reversion_method=2, epsilon=2, alpha=-1)
+        olmar5 = OLMAR(reversion_method=2, epsilon=2, alpha=-1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             olmar5.allocate(self.data)
@@ -105,7 +105,7 @@ class TestOnlineMovingAverageReversion(TestCase):
         Tests ValueError if reversion method is 2 and alpha is less than 1.
         """
         # Initialize OLMAR.
-        olmar6 = OnlineMovingAverageReversion(reversion_method=4, epsilon=2, alpha=-1)
+        olmar6 = OLMAR(reversion_method=4, epsilon=2, alpha=-1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             olmar6.allocate(self.data)
@@ -115,7 +115,7 @@ class TestOnlineMovingAverageReversion(TestCase):
         Tests that lambd returns 0 if predicted change is mean change.
         """
         # Initialize OLMAR.
-        olmar7 = OnlineMovingAverageReversion(reversion_method=1, epsilon=2, window=1)
+        olmar7 = OLMAR(reversion_method=1, epsilon=2, window=1)
         no_change_data = self.data
         no_change_data.iloc[:] = 1
         olmar7.allocate(no_change_data, resample_by='M')

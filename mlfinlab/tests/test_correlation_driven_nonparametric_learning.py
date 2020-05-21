@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import CorrelationDrivenNonparametricLearning
+from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import CORN
 
 
 class TestCorrelationDrivenNonparametricLearning(TestCase):
@@ -31,7 +31,7 @@ class TestCorrelationDrivenNonparametricLearning(TestCase):
         Test the calculation of CORN.
         """
         # Initialize CORN.
-        corn = CorrelationDrivenNonparametricLearning(window=2, rho=0.5)
+        corn = CORN(window=2, rho=0.5)
         # Allocates asset prices to CORN.
         corn.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -48,13 +48,13 @@ class TestCorrelationDrivenNonparametricLearning(TestCase):
         Tests ValueError if window is not an integer or less than 1.
         """
         # Initialize CORN.
-        corn1 = CorrelationDrivenNonparametricLearning(window=2.5, rho=0.5)
+        corn1 = CORN(window=2.5, rho=0.5)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn1.allocate(self.data)
 
         # Initialize CORN.
-        corn2 = CorrelationDrivenNonparametricLearning(window=0, rho=0.5)
+        corn2 = CORN(window=0, rho=0.5)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn2.allocate(self.data)
@@ -64,13 +64,13 @@ class TestCorrelationDrivenNonparametricLearning(TestCase):
         Tests ValueError if rho is less than -1 or more than 1.
         """
         # Initialize CORN.
-        corn3 = CorrelationDrivenNonparametricLearning(window=2, rho=-2)
+        corn3 = CORN(window=2, rho=-2)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn3.allocate(self.data)
 
         # Initialize CORN.
-        corn4 = CorrelationDrivenNonparametricLearning(window=2, rho=2)
+        corn4 = CORN(window=2, rho=2)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn4.allocate(self.data)

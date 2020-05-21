@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.momentum.follow_the_leader import FollowTheLeader
+from mlfinlab.online_portfolio_selection.momentum.follow_the_leader import FTL
 
 
 class TestFollowTheLeader(TestCase):
@@ -32,7 +32,7 @@ class TestFollowTheLeader(TestCase):
         Test the calculation of follow the leader.
         """
         # Initialize FTL.
-        ftl = FollowTheLeader()
+        ftl = FTL()
         # Allocate asset prices to FTL.
         ftl.allocate(self.data, resample_by='M')
         all_weights = np.array(ftl.all_weights)
@@ -47,7 +47,7 @@ class TestFollowTheLeader(TestCase):
         Tests that the weights calculated for the first time period is uniform.
         """
         # Initialize FTL.
-        ftl1 = FollowTheLeader()
+        ftl1 = FTL()
         # Allocate asset prices to FTL.
         ftl1.allocate(self.data, resample_by='M')
         all_weights = np.array(ftl1.all_weights)

@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning_uniform import CorrelationDrivenNonparametricLearningUniform
+from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning_uniform import CORNU
 
 
 class TestCorrelationDrivenNonparametricLearningUniform(TestCase):
@@ -30,7 +30,7 @@ class TestCorrelationDrivenNonparametricLearningUniform(TestCase):
         Test the calculation of CORN-U.
         """
         # Initialize CORN-U.
-        corn_u = CorrelationDrivenNonparametricLearningUniform(window=2, rho=0.5)
+        corn_u = CORNU(window=2, rho=0.5)
         # Allocates asset prices to CORN-U.
         corn_u.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -47,13 +47,13 @@ class TestCorrelationDrivenNonparametricLearningUniform(TestCase):
         Tests ValueError if window is not an integer or less than 1.
         """
         # Initialize CORN-U.
-        corn_u1 = CorrelationDrivenNonparametricLearningUniform(window=2.5, rho=0.5)
+        corn_u1 = CORNU(window=2.5, rho=0.5)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn_u1.allocate(self.data)
 
         # Initialize CORN-U.
-        corn_u2 = CorrelationDrivenNonparametricLearningUniform(window=0, rho=0.5)
+        corn_u2 = CORNU(window=0, rho=0.5)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn_u2.allocate(self.data)
@@ -63,13 +63,13 @@ class TestCorrelationDrivenNonparametricLearningUniform(TestCase):
         Tests ValueError if rho is less than -1 or more than 1.
         """
         # Initialize CORN-U.
-        corn_u3 = CorrelationDrivenNonparametricLearningUniform(window=2, rho=-2)
+        corn_u3 = CORNU(window=2, rho=-2)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn_u3.allocate(self.data)
 
         # Initialize CORN-U.
-        corn_u4 = CorrelationDrivenNonparametricLearningUniform(window=2, rho=2)
+        corn_u4 = CORNU(window=2, rho=2)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn_u4.allocate(self.data)

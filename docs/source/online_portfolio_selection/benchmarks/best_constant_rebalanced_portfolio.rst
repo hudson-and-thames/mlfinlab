@@ -27,7 +27,7 @@ Implementation
 
 .. automodule:: mlfinlab.online_portfolio_selection.benchmarks.best_constant_rebalanced_portfolio
 
-    .. autoclass:: BestConstantRebalancedPortfolio
+    .. autoclass:: BCRP
         :members:
         :show-inheritance:
         :inherited-members:
@@ -39,13 +39,13 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.online_portfolio_selection.benchmarks.best_constant_rebalanced_portfolio import BestConstantRebalancedPortfolio
+    from mlfinlab.online_portfolio_selection.benchmarks.best_constant_rebalanced_portfolio import BCRP
 
     # Read in data.
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
 
     # Compute Best Constant Rebalanced Portfolio weights with no weights given.
-    bcrp = ConstantRebalancedPortfolio()
+    bcrp = CRP()
     bcrp.allocate(asset_prices=stock_prices, resample_by='W', verbose=True)
 
     # Get the latest predicted weights.

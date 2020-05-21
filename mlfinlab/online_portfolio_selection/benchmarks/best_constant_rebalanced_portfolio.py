@@ -3,7 +3,7 @@ import cvxpy as cp
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class BestConstantRebalancedPortfolio(OLPS):
+class BCRP(OLPS):
     """
     This class implements the Best Constant Rebalanced Portfolio strategy. It is reproduced with
     modification from the following paper:

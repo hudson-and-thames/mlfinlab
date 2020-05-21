@@ -1,12 +1,12 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning_k import \
-    CorrelationDrivenNonparametricLearningK
+    CORNK
 from mlfinlab.online_portfolio_selection.pattern_matching.symmetric_correlation_driven_nonparametric_learning import \
-    SymmetricCorrelationDrivenNonparametricLearning
+    SCORN
 
 
-class SymmetricCorrelationDrivenNonparametricLearningK(CorrelationDrivenNonparametricLearningK):
+class SCORNK(CORNK):
     """
     This class implements the Symmetric Correlation Driven Nonparametric Learning - K strategy. It
     is reproduced with modification from the following paper:
@@ -41,4 +41,4 @@ class SymmetricCorrelationDrivenNonparametricLearningK(CorrelationDrivenNonparam
 
         for exp in range(self.number_of_experts):
             param = self.expert_params[exp]
-            self.experts.append(SymmetricCorrelationDrivenNonparametricLearning(int(param[0]), param[1]))
+            self.experts.append(SCORN(int(param[0]), param[1]))

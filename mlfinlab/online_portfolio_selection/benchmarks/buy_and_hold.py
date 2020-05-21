@@ -2,7 +2,7 @@
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class BuyAndHold(OLPS):
+class BAH(OLPS):
     """
     This class implements the Buy and Hold strategy. It is reproduced with modification from the
     following paper:

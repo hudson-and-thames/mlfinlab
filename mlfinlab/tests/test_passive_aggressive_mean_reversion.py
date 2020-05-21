@@ -6,7 +6,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.online_portfolio_selection.mean_reversion.passive_aggressive_mean_reversion import \
-    PassiveAggressiveMeanReversion
+    PAMR
 
 
 class TestPassiveAggressiveMeanReversion(TestCase):
@@ -33,7 +33,7 @@ class TestPassiveAggressiveMeanReversion(TestCase):
         method.
         """
         # Initialize PAMR.
-        pamr = PassiveAggressiveMeanReversion(optimization_method=0, epsilon=0.5, agg=10)
+        pamr = PAMR(optimization_method=0, epsilon=0.5, agg=10)
         # Allocates asset prices to PAMR.
         pamr.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -50,7 +50,7 @@ class TestPassiveAggressiveMeanReversion(TestCase):
         Test the calculation of passive aggressive mean reversion with PAMR-1 optimization method.
         """
         # Initialize PAMR-1.
-        pamr1 = PassiveAggressiveMeanReversion(optimization_method=1, epsilon=0.5, agg=10)
+        pamr1 = PAMR(optimization_method=1, epsilon=0.5, agg=10)
         # Allocates asset prices to PAMR.
         pamr1.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -67,7 +67,7 @@ class TestPassiveAggressiveMeanReversion(TestCase):
         Test the calculation of passive aggressive mean reversion with the PAMR-2 optimization method
         """
         # Initialize PAMR-2.
-        pamr2 = PassiveAggressiveMeanReversion(optimization_method=2, epsilon=0.5, agg=10)
+        pamr2 = PAMR(optimization_method=2, epsilon=0.5, agg=10)
         # Allocates asset prices to PAMR.
         pamr2.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -84,7 +84,7 @@ class TestPassiveAggressiveMeanReversion(TestCase):
         Tests ValueError if epsilon is less than 0.
         """
         # Initialize PAMR.
-        pamr3 = PassiveAggressiveMeanReversion(optimization_method=2, epsilon=-1, agg=10)
+        pamr3 = PAMR(optimization_method=2, epsilon=-1, agg=10)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             pamr3.allocate(self.data)
@@ -94,7 +94,7 @@ class TestPassiveAggressiveMeanReversion(TestCase):
         Tests ValueError if optimization method is not 0, 1, or 2.
         """
         # Initialize PAMR.
-        pamr4 = PassiveAggressiveMeanReversion(optimization_method=5, epsilon=0.5, agg=10)
+        pamr4 = PAMR(optimization_method=5, epsilon=0.5, agg=10)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             pamr4.allocate(self.data)

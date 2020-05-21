@@ -6,7 +6,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.online_portfolio_selection.pattern_matching.functional_correlation_driven_nonparametric_learning \
-    import FunctionalCorrelationDrivenNonparametricLearning
+    import FCORN
 
 
 class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
@@ -32,7 +32,7 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
         Test the calculation of FCORN.
         """
         # Initialize FCORN.
-        fcorn = FunctionalCorrelationDrivenNonparametricLearning(window=2, rho=0.5, lambd=10)
+        fcorn = FCORN(window=2, rho=0.5, lambd=10)
         # Allocates asset prices to FCORN.
         fcorn.allocate(self.data, resample_by='3M')
         # Create np.array of all_weights.
@@ -49,13 +49,13 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
         Tests ValueError if window is not an integer or less than 1.
         """
         # Initialize FCORN.
-        fcorn1 = FunctionalCorrelationDrivenNonparametricLearning(window=2.5, rho=0.5, lambd=1)
+        fcorn1 = FCORN(window=2.5, rho=0.5, lambd=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             fcorn1.allocate(self.data)
 
         # Initialize FCORN.
-        fcorn2 = FunctionalCorrelationDrivenNonparametricLearning(window=0, rho=0.5, lambd=2)
+        fcorn2 = FCORN(window=0, rho=0.5, lambd=2)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             fcorn2.allocate(self.data)
@@ -65,13 +65,13 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
         Tests ValueError if rho is less than -1 or more than 1.
         """
         # Initialize FCORN.
-        fcorn3 = FunctionalCorrelationDrivenNonparametricLearning(window=2, rho=-2, lambd=4)
+        fcorn3 = FCORN(window=2, rho=-2, lambd=4)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             fcorn3.allocate(self.data)
 
         # Initialize FCORN.
-        fcorn4 = FunctionalCorrelationDrivenNonparametricLearning(window=2, rho=2, lambd=8)
+        fcorn4 = FCORN(window=2, rho=2, lambd=8)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             fcorn4.allocate(self.data)
@@ -83,7 +83,7 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
         Tests Sigmoid Calculation.
         """
         # Initialize FCORN.
-        fcorn5 = FunctionalCorrelationDrivenNonparametricLearning(window=1, rho=0.5, lambd=10)
+        fcorn5 = FCORN(window=1, rho=0.5, lambd=10)
         sig = fcorn5._sigmoid(0.0)
         np.testing.assert_almost_equal(sig, 0.5)
 
@@ -92,7 +92,7 @@ class TestFunctionalCorrelationDrivenNonparametricLearning(TestCase):
         Test the calculation of FCORN for edge case that activation function is 0.
         """
         # Initialize FCORN.
-        fcorn6 = FunctionalCorrelationDrivenNonparametricLearning(window=1, rho=0.5, lambd=10)
+        fcorn6 = FCORN(window=1, rho=0.5, lambd=10)
         # Allocates asset prices to FCORN.
         fcorn6.allocate(self.data, resample_by='Y')
         # Create np.array of all_weights.

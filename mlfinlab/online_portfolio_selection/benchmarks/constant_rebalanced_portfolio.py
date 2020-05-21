@@ -2,7 +2,7 @@
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class ConstantRebalancedPortfolio(OLPS):
+class CRP(OLPS):
     """
     This class implements the Buy and Hold strategy. It is reproduced with modification from
     the following paper:
@@ -17,7 +17,7 @@ class ConstantRebalancedPortfolio(OLPS):
 
         :param weight: (list/np.array/pd.Dataframe) Initial weight set by the user.
         """
-        super(ConstantRebalancedPortfolio, self).__init__()
+        super(CRP, self).__init__()
         self.weight = weight
 
     def _first_weight(self, weights):

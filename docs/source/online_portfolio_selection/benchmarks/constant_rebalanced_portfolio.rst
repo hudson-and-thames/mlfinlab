@@ -27,7 +27,7 @@ Implementation
 
 .. automodule:: mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio
 
-    .. autoclass:: ConstantRebalancedPortfolio
+    .. autoclass:: CRP
         :members:
         :show-inheritance:
         :inherited-members:
@@ -41,17 +41,17 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio import ConstantRebalancedPortfolio
+    from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio import CRP
 
     # Read in data.
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
 
     # Compute Constant Rebalanced Portfolio weights with no weights given.
-    crp = ConstantRebalancedPortfolio()
+    crp = CRP()
     crp.allocate(asset_prices=stock_prices, resample_by='W', verbose=True)
 
     # Compute Constant Rebalanced Portfolio weights with given weights.
-    crp = ConstantRebalancedPortfolio()
+    crp = CRP()
     crp.allocate(asset_prices=stock_prices, weights=some_weight)
 
     # Get the latest predicted weights.

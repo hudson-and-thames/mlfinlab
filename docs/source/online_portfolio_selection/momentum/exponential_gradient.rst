@@ -75,7 +75,7 @@ Implementation
 
 .. automodule:: mlfinlab.online_portfolio_selection.momentum.exponential_gradient
 
-    .. autoclass:: ExponentialGradient
+    .. autoclass:: EG
         :members:
         :show-inheritance:
         :inherited-members:
@@ -88,21 +88,21 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.online_portfolio_selection.momentum.exponential_gradient import ExponentialGradient
+    from mlfinlab.online_portfolio_selection.momentum.exponential_gradient import EG
 
     # Read in data.
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
 
     # Compute Multiplicative Update with eta of 0.2 with no given weights.
-    mu = ExponentialGradient(update_rule='MU', eta=0.2)
+    mu = EG(update_rule='MU', eta=0.2)
     mu.allocate(asset_prices=stock_prices, resample_by='W', verbose=True)
 
     # Compute Gradient Projection with eta of 0.5 with given weights.
-    gp = ExponentialGradient(update_rule='GP', eta=0.5)
+    gp = EG(update_rule='GP', eta=0.5)
     gp.allocate(asset_prices=stock_prices, weights=some_weight)
 
     # Compute Expectation Maximization with eta of 0.8 with given weights.
-    em = ExponentialGradient(update_rule='EM', eta=0.8)
+    em = EG(update_rule='EM', eta=0.8)
     em.allocate(asset_prices=stock_prices, weights=some_weight)
 
     # Get the latest predicted weights.

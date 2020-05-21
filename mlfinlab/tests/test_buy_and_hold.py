@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection import BuyAndHold
+from mlfinlab.online_portfolio_selection import BAH
 
 
 class TestBuyAndHold(TestCase):
@@ -31,7 +31,7 @@ class TestBuyAndHold(TestCase):
         Tests the calculation of buy and hold weights.
         """
         # Initialize BAH.
-        bah = BuyAndHold()
+        bah = BAH()
         # Allocates asset prices to BAH.
         bah.allocate(self.data)
         # Create np.array of all_weights.
@@ -51,7 +51,7 @@ class TestBuyAndHold(TestCase):
         weight = np.zeros(self.data.shape[1])
         weight[:2] = 0.5
         # Initialize BAH.
-        bah1 = BuyAndHold()
+        bah1 = BAH()
         # Allocates asset prices to BAH.
         bah1.allocate(self.data, weight)
         # Get the second to last weight.
@@ -73,7 +73,7 @@ class TestBuyAndHold(TestCase):
         weight = np.zeros(self.data.shape[1])
         weight[:2] = 0.5
         # Initialize BAH.
-        bah2 = BuyAndHold()
+        bah2 = BAH()
         # Allocates asset prices to BAH.
         bah2.allocate(self.data, weight)
         # Get the second to last weight.

@@ -4,7 +4,7 @@ from scipy.stats import norm
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class ConfidenceWeightedMeanReversion(OLPS):
+class CWMR(OLPS):
     """
     This class implements the Confidence Weighted Mean Reversion strategy. It is reproduced with
     modification from the following paper:
@@ -42,7 +42,7 @@ class ConfidenceWeightedMeanReversion(OLPS):
         :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
         :param resample_by: (str) Specifies how to resample the prices.
         """
-        super(ConfidenceWeightedMeanReversion, self)._initialize(asset_prices, weights, resample_by)
+        super(CWMR, self)._initialize(asset_prices, weights, resample_by)
 
         # Check that epsilon value is correct.
         if self.epsilon < 0 or self.epsilon > 1:

@@ -3,10 +3,10 @@
 import sys
 import numpy as np
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
-from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio import ConstantRebalancedPortfolio
+from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio import CRP
 
 
-class UniversalPortfolio(OLPS):
+class UP(OLPS):
     """
     This class implements the Universal Portfolio strategy. It is reproduced with
     modification from the following paper:
@@ -41,7 +41,7 @@ class UniversalPortfolio(OLPS):
         self.weights_on_experts = None  # (np.array) Capital allocation on each experts.
         self.weighted = weighted  # (np.array) Weights allocated to each experts.
         self.k = k  # (int) Number of top-k experts.
-        super(UniversalPortfolio, self).__init__()
+        super(UP, self).__init__()
 
     def _initialize(self, asset_prices, weights, resample_by):
         """
@@ -52,7 +52,7 @@ class UniversalPortfolio(OLPS):
         :param resample_by: (str) Specifies how to resample the prices.
         """
         # Initialize the same variables as OLPS.
-        super(UniversalPortfolio, self)._initialize(asset_prices, weights, resample_by)
+        super(UP, self)._initialize(asset_prices, weights, resample_by)
 
         # Generate all experts.
         self._generate_experts()
@@ -205,7 +205,7 @@ class UniversalPortfolio(OLPS):
         self._generate_simplex(self.number_of_experts, self.number_of_assets)
         # Universal Portfolio looks at different CRP weights.
         for exp in range(self.number_of_experts):
-            self.experts.append(ConstantRebalancedPortfolio(weight=self.expert_params[exp]))
+            self.experts.append(CRP(weight=self.expert_params[exp]))
 
     def _generate_simplex(self, number_of_experts, number_of_assets):
         """

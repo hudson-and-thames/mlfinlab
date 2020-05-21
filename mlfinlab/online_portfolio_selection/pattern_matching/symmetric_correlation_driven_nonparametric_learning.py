@@ -1,10 +1,10 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import scipy.optimize as opt
-from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import CorrelationDrivenNonparametricLearning
+from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import CORN
 
 
-class SymmetricCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparametricLearning):
+class SCORN(CORN):
     """
     This class implements the Symmetric Correlation Driven Nonparametric Learning strategy. It is
     reproduced with modification from the following paper:

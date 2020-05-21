@@ -1,10 +1,10 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import scipy.optimize as opt
-from mlfinlab.online_portfolio_selection.momentum.follow_the_leader import FollowTheLeader
+from mlfinlab.online_portfolio_selection.momentum.follow_the_leader import FTL
 
 
-class FollowTheRegularizedLeader(FollowTheLeader):
+class FTRL(FTL):
     """
     This class implements the Follow the Regularized Leader strategy. It is reproduced with
     modification from the following paper:
@@ -21,7 +21,7 @@ class FollowTheRegularizedLeader(FollowTheLeader):
 
         :param beta: (float) Constant to the regularization term.
         """
-        super(FollowTheRegularizedLeader, self).__init__()
+        super(FTRL, self).__init__()
         self.beta = beta
 
     def _fast_optimize(self, optimize_array):

@@ -3,7 +3,7 @@ import numpy as np
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class PassiveAggressiveMeanReversion(OLPS):
+class PAMR(OLPS):
     """
     This class implements the Passive Aggressive Mean Reversion strategy. It is reproduced with
     modification from the following paper:
@@ -38,7 +38,7 @@ class PassiveAggressiveMeanReversion(OLPS):
         :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
         :param resample_by: (str) Specifies how to resample the prices.
         """
-        super(PassiveAggressiveMeanReversion, self)._initialize(asset_prices, weights, resample_by)
+        super(PAMR, self)._initialize(asset_prices, weights, resample_by)
 
         # Check that epsilon is greater than 0.
         if self.epsilon < 0:

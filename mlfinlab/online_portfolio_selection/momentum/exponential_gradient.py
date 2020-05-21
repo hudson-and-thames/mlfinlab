@@ -3,7 +3,7 @@ import numpy as np
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class ExponentialGradient(OLPS):
+class EG(OLPS):
     """
     This class implements the Exponential Gradient Portfolio strategy. It is reproduced with
     modification from the following paper:

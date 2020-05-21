@@ -23,7 +23,7 @@ Implementation
 
 .. automodule:: mlfinlab.online_portfolio_selection.momentum.follow_the_leader
 
-    .. autoclass:: FollowTheLeader
+    .. autoclass:: FTL
         :members:
         :show-inheritance:
         :inherited-members:
@@ -36,17 +36,17 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.online_portfolio_selection.momentum.follow_the_leader import FollowTheLeader
+    from mlfinlab.online_portfolio_selection.momentum.follow_the_leader import FTL
 
     # Read in data.
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
 
     # Compute Follow the Leader with no given weights.
-    ftl = FollowTheLeader()
+    ftl = FTL()
     ftl.allocate(asset_prices=stock_prices, resample_by='W', verbose=True)
 
     # Compute Follow the Leader with given weights.
-    ftl = FollowTheLeader()
+    ftl = FTL()
     ftl.allocate(asset_prices=stock_prices, weights=some_weight)
 
     # Get the latest predicted weights.

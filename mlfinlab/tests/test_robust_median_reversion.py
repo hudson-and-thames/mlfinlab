@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.mean_reversion.robust_median_reversion import RobustMedianReversion
+from mlfinlab.online_portfolio_selection.mean_reversion.robust_median_reversion import RMR
 
 
 class TestRobustMedianReversion(TestCase):
@@ -31,7 +31,7 @@ class TestRobustMedianReversion(TestCase):
         Test the calculation of RMR with the original method.
         """
         # Initialize RMR.
-        rmr = RobustMedianReversion(epsilon=1.1, n_iteration=10, window=3, tau=0.001)
+        rmr = RMR(epsilon=1.1, n_iteration=10, window=3, tau=0.001)
         # Allocates asset prices to RMR.
         rmr.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -48,7 +48,7 @@ class TestRobustMedianReversion(TestCase):
         Tests ValueError if epsilon is greater than 1.
         """
         # Initialize RMR.
-        rmr1 = RobustMedianReversion(epsilon=0.5, n_iteration=10, window=3, tau=0.001)
+        rmr1 = RMR(epsilon=0.5, n_iteration=10, window=3, tau=0.001)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             rmr1.allocate(self.data)
@@ -58,7 +58,7 @@ class TestRobustMedianReversion(TestCase):
         Tests ValueError if n_iteration is not an integer.
         """
         # Initialize RMR.
-        rmr2 = RobustMedianReversion(epsilon=1.2, n_iteration=1.5, window=3, tau=0.001)
+        rmr2 = RMR(epsilon=1.2, n_iteration=1.5, window=3, tau=0.001)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             rmr2.allocate(self.data)
@@ -68,7 +68,7 @@ class TestRobustMedianReversion(TestCase):
         Tests ValueError if n_iteration is less than 2.
         """
         # Initialize RMR.
-        rmr3 = RobustMedianReversion(epsilon=1.2, n_iteration=1, window=3, tau=0.001)
+        rmr3 = RMR(epsilon=1.2, n_iteration=1, window=3, tau=0.001)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             rmr3.allocate(self.data)
@@ -78,7 +78,7 @@ class TestRobustMedianReversion(TestCase):
         Tests ValueError if window is not an integer.
         """
         # Initialize RMR.
-        rmr4 = RobustMedianReversion(epsilon=1.2, n_iteration=4, window=3.5, tau=0.001)
+        rmr4 = RMR(epsilon=1.2, n_iteration=4, window=3.5, tau=0.001)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             rmr4.allocate(self.data)
@@ -88,7 +88,7 @@ class TestRobustMedianReversion(TestCase):
         Tests ValueError if window is less than 2.
         """
         # Initialize RMR.
-        rmr5 = RobustMedianReversion(epsilon=1.2, n_iteration=4, window=1, tau=0.001)
+        rmr5 = RMR(epsilon=1.2, n_iteration=4, window=1, tau=0.001)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             rmr5.allocate(self.data)
@@ -98,7 +98,7 @@ class TestRobustMedianReversion(TestCase):
         Test the calculation of RMR with the break case in _calc_median.
         """
         # Initialize RMR.
-        rmr6 = RobustMedianReversion(epsilon=1.1, n_iteration=10, window=3, tau=10000)
+        rmr6 = RMR(epsilon=1.1, n_iteration=10, window=3, tau=10000)
         # Allocates asset prices to RMR.
         rmr6.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -117,7 +117,7 @@ class TestRobustMedianReversion(TestCase):
         # pylint: disable=protected-access
         # pylint: disable=no-self-use
         # Initialize RMR.
-        rmr7 = RobustMedianReversion(epsilon=1.1, n_iteration=10, window=3, tau=1)
+        rmr7 = RMR(epsilon=1.1, n_iteration=10, window=3, tau=1)
         # Make an empty array.
         empty = np.zeros((1, 2))
         # Calculate edge case.
@@ -128,7 +128,7 @@ class TestRobustMedianReversion(TestCase):
         Tests edge case for norm2 = 0 in _transform method.
         """
         # Initialize RMR.
-        rmr8 = RobustMedianReversion(epsilon=2, n_iteration=2, window=2, tau=1)
+        rmr8 = RMR(epsilon=2, n_iteration=2, window=2, tau=1)
         # Make the data all ones.
         new_data = self.data
         new_data[:] = 1

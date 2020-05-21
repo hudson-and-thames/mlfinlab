@@ -4,7 +4,7 @@ import scipy.optimize as opt
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class FollowTheLeader(OLPS):
+class FTL(OLPS):
     """
     This class implements the Follow the Leader strategy. It is reproduced with modification from
     the following paper:

@@ -3,7 +3,7 @@ import numpy as np
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class OnlineMovingAverageReversion(OLPS):
+class OLMAR(OLPS):
     """
     This class implements the Online Moving Average Reversion strategy. It is reproduced with
     modification from the following paper:
@@ -40,7 +40,7 @@ class OnlineMovingAverageReversion(OLPS):
         :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
         :param resample_by: (str) Specifies how to resample the prices.
         """
-        super(OnlineMovingAverageReversion, self)._initialize(asset_prices, weights, resample_by)
+        super(OLMAR, self)._initialize(asset_prices, weights, resample_by)
 
         # Check that reversion method is either 1 or 2.
         if self.reversion_method not in [1, 2]:

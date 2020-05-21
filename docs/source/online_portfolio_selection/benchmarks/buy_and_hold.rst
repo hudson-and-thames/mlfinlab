@@ -23,7 +23,7 @@ Implementation
 
 .. automodule:: mlfinlab.online_portfolio_selection.benchmarks.buy_and_hold
 
-    .. autoclass:: BuyAndHold
+    .. autoclass:: BAH
         :members:
         :show-inheritance:
         :inherited-members:
@@ -35,17 +35,17 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.online_portfolio_selection.benchmarks.buy_and_hold import BuyAndHold
+    from mlfinlab.online_portfolio_selection.benchmarks.buy_and_hold import BAH
 
     # Read in data.
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
 
     # Compute Buy and Hold weights with no weights given.
-    bah = BuyAndHold()
+    bah = BAH()
     bah.allocate(asset_prices=stock_prices, resample_by='W', verbose=True)
 
     # Compute Buy and Hold weights with given weights.
-    bah = BuyAndHold()
+    bah = BAH()
     bah.allocate(asset_prices=stock_prices, weights=some_weight)
 
     # Get the latest predicted weights.

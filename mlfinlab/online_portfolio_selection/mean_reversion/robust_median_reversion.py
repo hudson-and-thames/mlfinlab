@@ -3,7 +3,7 @@ import numpy as np
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class RobustMedianReversion(OLPS):
+class RMR(OLPS):
     """
     This class implements the Confidence Weighted Mean Reversion strategy. It is reproduced with
     modification from the following paper:
@@ -40,7 +40,7 @@ class RobustMedianReversion(OLPS):
         :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
         :param resample_by: (str) Specifies how to resample the prices.
         """
-        super(RobustMedianReversion, self)._initialize(asset_prices, weights, resample_by)
+        super(RMR, self)._initialize(asset_prices, weights, resample_by)
 
         # Check that epsilon value is correct.
         if self.epsilon < 1:

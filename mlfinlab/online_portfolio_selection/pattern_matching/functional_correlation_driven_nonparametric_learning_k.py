@@ -1,11 +1,11 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
-from mlfinlab.online_portfolio_selection.universal_portfolio import UniversalPortfolio
+from mlfinlab.online_portfolio_selection.universal_portfolio import UP
 from mlfinlab.online_portfolio_selection.pattern_matching.functional_correlation_driven_nonparametric_learning import \
-    FunctionalCorrelationDrivenNonparametricLearning
+    FCORN
 
 
-class FunctionalCorrelationDrivenNonparametricLearningK(UniversalPortfolio):
+class FCORNK(UP):
     """
     This class implements the Functional Correlation Driven Nonparametric Learning - K strategy. It
     is reproduced with modification from the following paper:
@@ -83,9 +83,9 @@ class FunctionalCorrelationDrivenNonparametricLearningK(UniversalPortfolio):
         if self.k > self.number_of_experts:
             raise ValueError("K must be less than window * rho * lambd.")
 
-        super(FunctionalCorrelationDrivenNonparametricLearningK, self)._initialize(asset_prices,
-                                                                                   weights,
-                                                                                   resample_by)
+        super(FCORNK, self)._initialize(asset_prices,
+                                        weights,
+                                        resample_by)
 
     def _generate_experts(self):
         """
@@ -108,4 +108,4 @@ class FunctionalCorrelationDrivenNonparametricLearningK(UniversalPortfolio):
         for exp in range(self.number_of_experts):
             param = self.expert_params[exp]
             self.experts.append(
-                FunctionalCorrelationDrivenNonparametricLearning(int(param[0]), param[1], param[2]))
+                FCORN(int(param[0]), param[1], param[2]))
