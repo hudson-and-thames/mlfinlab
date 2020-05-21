@@ -27,6 +27,14 @@ are prices at times :math:`t_0, t_1`. This method assigns a label based on compa
      \end{split}
      \end{equation}
 
+
+The following shows the distribution of labels for standardized returns on closing prices of SPY in the time period from Jan 2008 to July 2016
+using a 20 day rolling window for the standard deviation.
+
+.. image:: labeling_images/fixed_horizon_labels_example.png
+   :scale: 100 %
+   :align: center
+
 Though time bars are the most common format for financial data, there can be potential problems with over-reliance on time bars. Time
 bars exhibit high seasonality, as trading behavior may be quite different at the open or close versus midday; thus it will not be
 informative to apply the same threshold on a non-uniform distribution. Solutions include applying the fixed horizon method to tick or
