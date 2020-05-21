@@ -5,8 +5,7 @@ Fixed Horizon Method
 ====================
 
 Fixed horizon labels is a classification labeling technique used in the following paper: `Dixon, M., Klabjan, D. and
-Bang, J., 2016. Classification-based Financial Markets Prediction using Deep Neural Networks.
-arXiv:1603.08604. <https://arxiv.org/abs/1603.08604>`_
+Bang, J., 2016. Classification-based Financial Markets Prediction using Deep Neural Networks. <https://arxiv.org/abs/1603.08604>`_
 
 Fixed time horizon is a common method used in labeling financial data, usually applied on time bars. The forward rate of return relative
 to :math:`t_0` over time horizon :math:`h` is calculated as follows (M.L. de Prado, Advances in Financial Machine Learning, 2018):
@@ -62,14 +61,14 @@ Below is an example on how to use the Fixed Horizon labeling technique on real d
     ticker = 'SPY'
 
     # Create labels
-    labels = fixed_time_horizon(data[ticker], 0.01, look_forward=1)
+    labels = fixed_time_horizon(close=data[ticker], threshold=0.01, look_forward=1)
 
     # Create labels with standardization
-    labels = fixed_time_horizon(data[ticker], 1, look_forward=1, standardized=True, window=5)
+    labels = fixed_time_horizon(close=data[ticker], threshold=1, look_forward=1, standardized=True, window=5)
 
 
-Research Notebooks
-##################
+Research Notebook
+#################
 
 The following research notebook can be used to better understand the Fixed Horizon labeling technique.
 
