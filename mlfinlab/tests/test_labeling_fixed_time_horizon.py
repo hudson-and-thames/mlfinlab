@@ -45,7 +45,7 @@ class TestLabellingFixedTime(unittest.TestCase):
         """
         close = self.data['SPY'][:10]
         test_no_threshold = fixed_time_horizon(close)
-        test_no_threshold_actual = pd.Series([-1, -1, -1, -1,  1,  1, -1,  1, -1, np.nan], index=self.idx10)
+        test_no_threshold_actual = pd.Series([-1, -1, -1, -1, 1, 1, -1, 1, -1, np.nan], index=self.idx10)
         pd.testing.assert_series_equal(test_no_threshold, test_no_threshold_actual)
 
     def test_dynamic_threshold(self):

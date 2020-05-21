@@ -60,7 +60,7 @@ def fixed_time_horizon(close, threshold=None, look_forward=1, standardized=False
 
     # Label with sign only, only if no threshold is given
     if threshold is None:
-        return np.sign(forward_return).rename(index=None)
+        threshold = 0
 
     # Apply labeling otherwise
     conditions = [forward_return > threshold, (forward_return <= threshold) & (forward_return >= -threshold),
