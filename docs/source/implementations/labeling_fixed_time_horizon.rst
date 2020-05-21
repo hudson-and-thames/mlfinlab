@@ -36,9 +36,11 @@ as a pd.Series corresponding to the times in the dataset.
 .. tip::
    **Underlying Literature**
 
-   The following source describes this method in more detail:
+   The following sources describes this method in more detail:
 
    - **Advances in Financial Machine Learning, Chapter 3.2** *by* Marcos Lopez de Prado (p. 43-44).
+   - **Machine Learning for Asset Managers, Chapter 5.2** *by* Marcos Lopez de Prado (p. 65-66).
+
 
 Implementation
 ##############
@@ -74,4 +76,4 @@ The following research notebook can be used to better understand the Fixed Horiz
 
 * `Fixed Horizon Example`_
 
-.. _`Fixed Horizon Example`: https://github.com/hudson-and-thames/research/blob/master/labels_fixed_horizon/Fixed_Time_Horizon.ipynb
+.. _`Fixed Horizon Example`: https://github.com/hudson-and-thames/research/tree/master/Labelling/Labels%20Fixed%20Horizon/Fixed_Time_Horizon.ipynb

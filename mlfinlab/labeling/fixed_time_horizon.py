@@ -7,6 +7,7 @@ labeling data this way can be used in training deep neural networks to predict p
 
 import warnings
 import numpy as np
+import pandas as pd
 
 
 def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, window=None):
@@ -30,8 +31,9 @@ def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, win
     :param standardized: (bool) Whether returns are scaled by mean and standard deviation.
     :param window: (int) If standardized is True, the rolling window period for calculating the mean and standard
                     deviation of returns.
-    :return: (np.array) -1, 0, or 1 denoting whether return for each tick is under/between/greater than the threshold.
-                    The final look_forward number of observations will be labeled np.nan.
+    :return: (pd.Series) -1, 0, or 1 denoting whether return for each tick is under/between/greater than the threshold.
+                    The final look_forward number of observations will be labeled np.nan. Index is same as index of
+                    close.
     """
     # Calculate returns
     forward_return = close.pct_change(periods=look_forward).shift(-look_forward)
@@ -61,4 +63,4 @@ def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, win
     choices = [1, 0, -1]
     labels = np.select(conditions, choices, default=np.nan)
 
-    return labels
+    return pd.Series(labels, index=close.index)

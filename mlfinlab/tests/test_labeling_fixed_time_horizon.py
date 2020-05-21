@@ -19,6 +19,7 @@ class TestLabellingFixedTime(unittest.TestCase):
         project_path = os.path.dirname(__file__)
         self.path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(self.path, index_col='Date')
+        self.idx10 = self.data[:10].index
 
     def test_basic(self):
         """
@@ -29,14 +30,14 @@ class TestLabellingFixedTime(unittest.TestCase):
         test2 = fixed_time_horizon(close, 0, look_forward=3)
         test3 = fixed_time_horizon(close, 0.01, look_forward=1)
         test4 = fixed_time_horizon(close, 1.0, look_forward=2)
-        test1_actual = np.array([-1, -1, -1, -1, 1, 1, -1, 1, -1, np.nan])
-        test2_actual = np.array([-1, -1, -1, 1, 1, 1, -1, np.nan, np.nan, np.nan])
-        test3_actual = np.array([0, -1, 0, -1, 1, 0, 0, 0, -1, np.nan])
-        test4_actual = np.array([0, 0, 0, 0, 0, 0, 0, 0, np.nan, np.nan])
-        np.testing.assert_allclose(test1_actual, test1)
-        np.testing.assert_allclose(test2_actual, test2)
-        np.testing.assert_allclose(test3_actual, test3)
-        np.testing.assert_allclose(test4_actual, test4)
+        test1_actual = pd.Series([-1, -1, -1, -1, 1, 1, -1, 1, -1, np.nan], index=self.idx10)
+        test2_actual = pd.Series([-1, -1, -1, 1, 1, 1, -1, np.nan, np.nan, np.nan], index=self.idx10)
+        test3_actual = pd.Series([0, -1, 0, -1, 1, 0, 0, 0, -1, np.nan], index=self.idx10)
+        test4_actual = pd.Series([0, 0, 0, 0, 0, 0, 0, 0, np.nan, np.nan], index=self.idx10)
+        pd.testing.assert_series_equal(test1_actual, test1)
+        pd.testing.assert_series_equal(test2_actual, test2)
+        pd.testing.assert_series_equal(test3_actual, test3)
+        pd.testing.assert_series_equal(test4_actual, test4)
 
     def test_dynamic_threshold(self):
         """
@@ -47,10 +48,10 @@ class TestLabellingFixedTime(unittest.TestCase):
 
         test5 = fixed_time_horizon(close, threshold1, look_forward=1)
         test6 = fixed_time_horizon(close, threshold1, look_forward=4)
-        test5_actual = np.array([0, -1, -1, -1, 0, 0, 0, 1, 0, np.nan])
-        test6_actual = np.array([-1, -1, -1, 0, 0, 0, np.nan, np.nan, np.nan, np.nan])
-        np.testing.assert_allclose(test5_actual, test5)
-        np.testing.assert_allclose(test6_actual, test6)
+        test5_actual = pd.Series([0, -1, -1, -1, 0, 0, 0, 1, 0, np.nan], index=self.idx10)
+        test6_actual = pd.Series([-1, -1, -1, 0, 0, 0, np.nan, np.nan, np.nan, np.nan], index=self.idx10)
+        pd.testing.assert_series_equal(test5_actual, test5)
+        pd.testing.assert_series_equal(test6_actual, test6)
 
     def test_with_standardization(self):
         """
@@ -62,12 +63,12 @@ class TestLabellingFixedTime(unittest.TestCase):
         test7 = fixed_time_horizon(close, 1, look_forward=1, standardized=True, window=4)
         test8 = fixed_time_horizon(close, 0.1, look_forward=1, standardized=True, window=5)
         test9 = fixed_time_horizon(close, threshold2, look_forward=2, standardized=True, window=3)
-        test7_actual = np.array([np.nan, np.nan, np.nan, 0, 1, 0, 0, 0, -1, np.nan])
-        test8_actual = np.array([np.nan, np.nan, np.nan, np.nan, 1, 1, -1, 1, -1, np.nan])
-        test9_actual = np.array([np.nan, np.nan, 1, 1, 1, 0, 0, -1, np.nan, np.nan])
-        np.testing.assert_allclose(test7_actual, test7)
-        np.testing.assert_allclose(test8_actual, test8)
-        np.testing.assert_allclose(test9_actual, test9)
+        test7_actual = pd.Series([np.nan, np.nan, np.nan, 0, 1, 0, 0, 0, -1, np.nan], index=self.idx10)
+        test8_actual = pd.Series([np.nan, np.nan, np.nan, np.nan, 1, 1, -1, 1, -1, np.nan], index=self.idx10)
+        test9_actual = pd.Series([np.nan, np.nan, 1, 1, 1, 0, 0, -1, np.nan, np.nan], index=self.idx10)
+        pd.testing.assert_series_equal(test7_actual, test7)
+        pd.testing.assert_series_equal(test8_actual, test8)
+        pd.testing.assert_series_equal(test9_actual, test9)
 
     def test_look_forward_warning(self):
         """
