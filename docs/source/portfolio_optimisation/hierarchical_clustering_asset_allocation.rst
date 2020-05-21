@@ -30,20 +30,71 @@
 Hierarchical Clustering Asset Allocation (HCAA)
 ===============================================
 
-The Hierarchical Risk Parity algorithm focuses on allocation of risk using a hierarchical clustering approach and using the
-variance of the clusters to allocate weights. While variance is a very simple and popular representation of risk used in the
-investing world, it is not the optimal one and can underestimate the true risk of a portfolio which is why there are many other
-important risk metrics used by investment managers that can correctly reflect the true risk of a portfolio/asset. With respect to
-this, the original HRP algorithm can be tweaked to allocate its weights based on different risk representations of the clusters
-and generate better weights. This class implements an improved hierarchical clustering algorithm which gives the option of using
-the following metrics:
+The Hierarchical Clustering based Asset Allocation (HCAA) method takes inspiration from the Hierarchical Risk Parity (HRP)
+algorithm and uses machine learning to allocate weights efficiently. While both the HCAA and HRP algorithms use hierarchical tree
+clustering and machine learning to allocate their weights, there are some subtle differences between the two. Lets look at a quick
+overview of how the HCAA algorithm works:
 
-1. ``minimum_variance`` : Variance of the clusters is used as a risk metric.
-2. ``minimum_standard_deviation`` : Standard deviation of the clusters is used as a risk metric.
-3. ``sharpe_ratio`` : Sharpe ratio of the clusters is used as a risk metric.
-4. ``equal_weighting`` : All clusters are weighed equally in terms of risk.
-5. ``expected_shortfall`` : Expected shortfall (CVaR) of the clusters is used as a risk metric.
-6. ``conditional_drawdown_at_risk`` : Conditional drawdown at risk (CDaR) of the clusters is used as a risk metric.
+    |h3| **1. Hierarchical Tree Clustering** |h3_|
+    This step breaks down the assets in our portfolio into different hierarchical clusters using the famous Hierarchical Tree
+    Clustering algorithm (Agglomerative Clustering). The assets in the portfolio are segregated into clusters which mimic the
+    real-life interactions between the assets in a portfolio - some stocks are related to each other more than others and hence
+    can be grouped within the same cluster. At the end of the step, we are left with the follow tree structure (also called a
+    dendrogram),
+
+    .. image:: portfolio_optimisation_images/dendrogram.png
+
+    |br|
+
+    |h3| **2. Calculate Optimal Number of Clusters** |h3_|
+    This step is where HCAA deviates from the traditional HRP algorithm. The hierarchical risk parity method uses single linkage
+    and grows the tree to maximum depth. However, the number of clusters identified by growing the tree maximally may not be the
+    optimal one and can lead to sub-optimal results. **This is why before allocating the weights, HCAA calculates the optimal number of clusters and cuts the hierarchical tree formed in Step-1 to the required height and clusters**. Currently, the Gap Index is used for
+    calculating the required number of clusters.
+
+    .. image:: portfolio_optimisation_images/gap.png
+
+    |br|
+
+    |h3| **3. Top-Down Recursive Bisection** |h3_|
+    This is the step where weights for the clusters are calculated. If you are familiar with how the hierarchical risk parity
+    algorithm works, then you know this is similar to how HRP also allocates its weights. However, there is a fundamental
+    difference between the recursive bisections of the two algorithms.
+
+    .. image:: portfolio_optimisation_images/bisection.png
+
+    As seen in the above image, at each step, the weights in HRP trickle down the tree by breaking it down the middle based on the
+    number of assets. Although, this uses the hierarchical tree identified in Step-1 to allocate weights, it does not make use of
+    the exact structure of the dendrogram while calculating the cluster contributions. This is a fundamental disadvantage of HRP
+    which is improved upon by HCAA by dividing the tree, at each step, based on the structure induced by the dendrogram.
+
+    At each level of the tree, an Equal Risk Contribution allocation is used i.e. the weights are:
+
+    .. math::
+        \alpha_1 = \frac{RC_1}{RC_1 + RC_2}
+
+    where
+
+    |h3| **4. Naive Risk Parity** |h3_|
+    afafaf
+
+
+.. note::
+
+    |h4| Risk Contribution of Clusters |h4_|
+    While variance is a very simple and popular representation of risk used in the
+    investing world, it is not the optimal one and can underestimate the true risk of a portfolio which is why there are many other
+    important risk metrics used by investment managers that can correctly reflect the true risk of a portfolio/asset. With respect
+    to this, the original HRP algorithm can be tweaked to allocate its weights based on different risk representations of the
+    clusters and generate better weights.
+
+    1. ``minimum_variance`` : Variance of the clusters is used as a risk metric.
+    2. ``minimum_standard_deviation`` : Standard deviation of the clusters is used as a risk metric.
+    3. ``sharpe_ratio`` : Sharpe ratio of the clusters is used as a risk metric.
+    4. ``equal_weighting`` : All clusters are weighed equally in terms of risk.
+    5. ``expected_shortfall`` : Expected shortfall (CVaR) of the clusters is used as a risk metric.
+    6. ``conditional_drawdown_at_risk`` : Conditional drawdown at risk (CDaR) of the clusters is used as a risk metric.
+
 
 .. tip::
     |h4| Underlying Literature |h4_|
@@ -60,6 +111,9 @@ Implementation
         :members:
 
         .. automethod:: __init__
+
+.. warning::
+    Hello
 
 .. note::
     |h4| Using Custom Input |h4_|
