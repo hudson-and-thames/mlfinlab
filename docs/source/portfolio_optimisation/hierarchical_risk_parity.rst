@@ -21,10 +21,11 @@
     </h4>
 
 .. note::
-    The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies. Each
-    algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
-    on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
-    Next up, lets discuss about some of these implementations and the different parameters they require.
+    The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies.
+    Each algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight
+    allocations on the specific user data. This way, each implementation can be called in the same way and this makes it simple
+    for users to use them.
+
 
 ==============================
 Hierarchical Risk Parity (HRP)
@@ -63,7 +64,9 @@ Although, it is a simple algorithm, it has been found to be very stable as compa
 mean variance optimisation methods).
 
 .. tip::
-    * For a detailed explanation of how hierarchical risk parity works, we have written an excellent `blog post <https://hudsonthames.org/an-introduction-to-the-hierarchical-risk-parity-algorithm/>`_ about it.
+    |h4| Underlying Literature |h4_|
+
+        * For a detailed explanation of how hierarchical risk parity works, we have written an excellent `blog post <https://hudsonthames.org/an-introduction-to-the-hierarchical-risk-parity-algorithm/>`_ about it.
 
 
 Implementation
@@ -76,6 +79,18 @@ Implementation
 
         .. automethod:: __init__
 
+
+.. note::
+    |h4| Using Custom Input |h4_|
+    We provide great flexibility to the users in terms of the input data - they can either pass their own pre-calculated input
+    matrices/dataframes or leave it to us to calculate them. A quick reference on common input parameters which you will encounter
+    throughout the portfolio optimisation module:
+        * :py:mod:`asset_prices`: Dataframe/matrix of historical raw asset prices **indexed by date**.
+        * :py:mod:`asset_returns`: Dataframe/matrix of historical asset returns. This will be a :math:`TxN` matrix where :math:`T` is the time-series and :math:`N` refers to the number of assets in the portfolio.
+        * :py:mod:`expected_asset_returns`: List of expected returns per asset i.e. the mean of historical asset returns. This refers to the parameter :math:`\mu` used in portfolio optimisation literature. For a portfolio of 5 assets, ``expected_asset_returns = [0.45, 0.56, 0.89, 1.34, 2.4]``.
+        * :py:mod:`covariance_matrix`: The covariance matrix of asset returns.
+
+
 .. tip::
     |h4| Using Custom Distance Matrix |h4_|
     The hierarchical clustering step in the algorithm uses a distance matrix to calculate the clusters and form the hierarchical
@@ -86,10 +101,14 @@ Implementation
 
     Here, :math:`\rho` refers to the correlation matrix of assets. Users can specify their own custom matrix to be used instead of
     the default one by passing an :math:`NxN` symmetric pandas dataframe or a numpy matrix using the :py:mod:`distance_matrix`
-    parameter.
+    parameter. **Note that the** :py:mod:`covariance_matrix` **is still requested for computing the clustered variances.**
 
     |h4| Constructing a Long/Short Portfolio |h4_|
-    By default, the weights are allocated assuming a long portfolio i.e. all the weights are positive. However, you can also
+    By default, the weights are allocated assuming a long portfolio i.e. all the weights are positive. However, users can also opt
+    to have specific assets in their portfolio shorted, by specifying a custom list through the :py:mod:`side_weights` parameter.
+    For e.g. in a portfolio of 5 assets, if you want the 3rd and the 5th asset to be shorted, then simply pass a list containing
+    1s and -1s for long and short positions respectively. In the above case, ``side_weights = [1,1,-1,1,-1]``, where you
+    have -1 at the 3rd and 5th index. By default, a list of 1s will be initialised if no custom input is specified.
 
     |h4| Different Linkage Methods |h4_|
     HRP, by default, uses the single-linkage clustering algorithm. (See the tip under the HCAA algorithm for more details.)
@@ -120,15 +139,6 @@ Example Code
     hrp.allocate(asset_prices=stock_prices, side_weights=side_weights, resample_by='B')
     hrp_weights = hrp.weights.sort_values(by=0, ascending=False, axis=1)
 
-
-.. note::
-
-    We provide great flexibility to the users in terms of the input data - either they can pass raw historical stock prices
-    as the parameter :py:mod:`asset_prices` in which case the expected returns and covariance matrix will be calculated
-    using this data. Else, they can also pass pre-calculated :py:mod:`expected_returns` and :py:mod:`covariance_matrix`.
-    Ultimately, they can pass their own :py:mod:`distance_matrix` but the :py:mod:`covariance_matrix` is still requested
-    for computing the clustered variances. The :py:mod:`linkage` method for the clustering part is also a parameter of the
-    algorithm, default being single linkage.
 
 
 Plotting
