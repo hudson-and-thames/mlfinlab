@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 
-def fixed_time_horizon(close, threshold=None, look_forward=1, standardized=False, window=None):
+def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, window=None):
     """
     Fixed-Time Horizon Labelling Method
 

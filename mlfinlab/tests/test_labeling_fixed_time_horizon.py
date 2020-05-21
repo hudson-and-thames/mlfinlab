@@ -44,7 +44,7 @@ class TestLabellingFixedTime(unittest.TestCase):
         Verifies that if no threshold is given, the function simply returns the sign of the observation
         """
         close = self.data['SPY'][:10]
-        test_no_threshold = fixed_time_horizon(close)
+        test_no_threshold = fixed_time_horizon(close, threshold=None)
         test_no_threshold_actual = pd.Series([-1, -1, -1, -1, 1, 1, -1, 1, -1, np.nan], index=self.idx10)
         pd.testing.assert_series_equal(test_no_threshold, test_no_threshold_actual)
 
