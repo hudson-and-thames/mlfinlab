@@ -1,5 +1,25 @@
 .. _portfolio_optimisation-hierarchical_clustering_asset_allocation:
 
+.. |br| raw:: html
+
+    <br>
+
+.. |h3| raw:: html
+
+    <h3>
+
+.. |h3_| raw:: html
+
+    </h3>
+
+.. |h4| raw:: html
+
+    <h4>
+
+.. |h4_| raw:: html
+
+    </h4>
+
 .. note::
     The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies. Each
     algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
@@ -25,6 +45,12 @@ the following metrics:
 5. ``expected_shortfall`` : Expected shortfall (CVaR) of the clusters is used as a risk metric.
 6. ``conditional_drawdown_at_risk`` : Conditional drawdown at risk (CDaR) of the clusters is used as a risk metric.
 
+.. tip::
+    |h4| Underlying Literature |h4_|
+    This implementation is based on the following two papers written by Thomas Raffinot.
+        * **Hierarchical Clustering based Asset Allocation:** `Raffinot, Thomas, The Hierarchical Equal Risk Contribution Portfolio (August 23, 2018) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3237540>`_
+        * **Hierarchical Equal Risk Contribution:**
+
 Implementation
 ##############
 
@@ -34,6 +60,17 @@ Implementation
         :members:
 
         .. automethod:: __init__
+
+.. note::
+    |h4| Using Custom Input |h4_|
+    We provide great flexibility to the users in terms of the input data - they can either pass their own pre-calculated input
+    matrices/dataframes or leave it to us to calculate them. A quick reference on common input parameters which you will encounter
+    throughout the portfolio optimisation module:
+        * :py:mod:`asset_prices`: Dataframe/matrix of historical raw asset prices **indexed by date**.
+        * :py:mod:`asset_returns`: Dataframe/matrix of historical asset returns. This will be a :math:`TxN` matrix where :math:`T` is the time-series and :math:`N` refers to the number of assets in the portfolio.
+        * :py:mod:`expected_asset_returns`: List of expected returns per asset i.e. the mean of historical asset returns. This refers to the parameter :math:`\mu` used in portfolio optimisation literature. For a portfolio of 5 assets, ``expected_asset_returns = [0.45, 0.56, 0.89, 1.34, 2.4]``.
+        * :py:mod:`covariance_matrix`: The covariance matrix of asset returns.
+
 
 .. tip::
     **What are the differences between the 3 Linkage Algorithms?**

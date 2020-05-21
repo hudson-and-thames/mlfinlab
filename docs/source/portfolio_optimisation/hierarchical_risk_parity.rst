@@ -161,9 +161,12 @@ Plotting
 Research Notebooks
 ##################
 
-The following research notebooks provides a more detailed exploration of the algorithm as outlined at the back of Ch16 in
-Advances in Financial Machine Learning.
+The following research notebooks provide a more detailed exploration of the algorithm.
 
 * `Chapter 16 Exercise Notebook`_
 
 .. _Chapter 16 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Machine%20Learning%20Asset%20Allocation/Chapter16.ipynb
+
+* `How to use mlfinlab's HierarchicalRiskParity class`_
+
+.. _How to use mlfinlab's HierarchicalRiskParity class: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Hierarchical%20Risk%20Parity%20(HRP)/HRP%20use%20examples.ipynb
