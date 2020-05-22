@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from mlfinlab.portfolio_optimization.hcaa import HierarchicalClusteringAssetAllocation
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.codependence.codependence_matrix import get_dependence_matrix
 
 
 class TestHCAA(unittest.TestCase):
@@ -39,6 +40,22 @@ class TestHCAA(unittest.TestCase):
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_hcaa_long_short(self):
+        """
+        Test the Long Short Portfolio via side_weights Series 1 for Long, -1 for Short (index=asset names)
+        """
+        hcaa = HierarchicalClusteringAssetAllocation()
+        side_weights = pd.Series([1] * self.data.shape[1], index=self.data.columns)
+        side_weights.loc[self.data.columns[:4]] = -1
+        hcaa.allocate(asset_prices=self.data,
+                      asset_names=self.data.columns,
+                      optimal_num_clusters=5,
+                      allocation_metric='equal_weighting',
+                      side_weights=side_weights)
+        weights = hcaa.weights.values[0]
+        self.assertEqual(len(weights) - self.data.shape[1], 0)
+        self.assertAlmostEqual(np.sum(weights), 0)
 
     def test_hcaa_min_variance(self):
         """
@@ -264,6 +281,25 @@ class TestHCAA(unittest.TestCase):
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_hcaa_with_input_as_distance_matrix(self):
+        """
+        Test HRP when passing a distance matrix as input.
+        """
+
+        hcaa = HierarchicalClusteringAssetAllocation()
+        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        vi_matrix = get_dependence_matrix(self.data, dependence_method='information_variation')
+        distance_vi = 1 - vi_matrix
+        hcaa.allocate(asset_names=self.data.columns,
+                      covariance_matrix=returns.cov(),
+                      distance_matrix=distance_vi,
+                      optimal_num_clusters=6,
+                      asset_returns=returns)
+        weights = hcaa.weights.values[0]
+        self.assertTrue((weights >= 0).all())
+        self.assertTrue(len(weights) == self.data.shape[1])
+        self.assertAlmostEqual(np.sum(weights), 1)
 
     def test_value_error_for_allocation_metric(self):
         """
