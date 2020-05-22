@@ -48,17 +48,44 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float
         raise ValueError(f"{dependence_method} is not a valid method. Use either 'information_variation'\
                                  or 'mutual_information' or 'distance_correlation'.")
 
+    # TODO: rewtire in a better form
     # Generating the dependence_matrix for the defined method.
-    if dependence_method != 'distance_correlation':
+    if dependence_method in ('information_variation', 'mutual_information'):
         dependence_matrix = np.array([
             [
                 dep_function(np_df[i], np_df[j], normalize=True) if j < i else
-                0.5 * dep_function(np_df[i], np_df[j], normalize=True) if j == i else  # Leave diagonal elements as 0.5 to later double them to 1
+                # Leave diagonal elements as 0.5 to later double them to 1
+                0.5 * dep_function(np_df[i], np_df[j], normalize=True) if j == i else
                 0  # Make upper triangle 0 to fill it later on
                 for j in range(n)
             ]
             for i in range(n)
         ])
+
+    elif dependence_method == 'gpr_distance':
+        dependence_matrix = np.array([
+            [
+                dep_function(np_df[i], np_df[j], theta=theta) if j < i else
+                # Leave diagonal elements as 0.5 to later double them to 1
+                0.5 * dep_function(np_df[i], np_df[j], theta=theta) if j == i else
+                0  # Make upper triangle 0 to fill it later on
+                for j in range(n)
+            ]
+            for i in range(n)
+        ])
+
+    elif dependence_method == 'gnpr_distance':
+        dependence_matrix = np.array([
+            [
+                dep_function(np_df[i], np_df[j], theta=theta, bandwidth=bandwidth) if j < i else
+                # Leave diagonal elements as 0.5 to later double them to 1
+                0.5 * dep_function(np_df[i], np_df[j], theta=theta, bandwidth=bandwidth) if j == i else
+                0  # Make upper triangle 0 to fill it later on
+                for j in range(n)
+            ]
+            for i in range(n)
+        ])
+
     else:
         dependence_matrix = np.array([
             [

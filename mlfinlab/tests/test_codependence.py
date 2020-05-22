@@ -84,11 +84,17 @@ class TestCodependence(unittest.TestCase):
         '''
         Test the get_dependence_matrix and get_distance_matrix function
         '''
+
+        # TODO: add tests for values in matrix
         #Dependence_matrix
 
         vi_matrix = get_dependence_matrix(self.X_matrix, dependence_method='information_variation')
         mi_matrix = get_dependence_matrix(self.X_matrix, dependence_method='mutual_information')
         corr_matrix = get_dependence_matrix(self.X_matrix, dependence_method='distance_correlation')
+        rho_matrix = get_dependence_matrix(self.X_matrix, dependence_method='spearmans_rho')
+        gpr_matrix = get_dependence_matrix(self.X_matrix, dependence_method='gpr_distance', theta=0.5)
+        gnpr_matrix = get_dependence_matrix(self.X_matrix, dependence_method='gnpr_distance', theta=0.5, bandwidth=0.02)
+
         #Distance_matrix
         angl = get_distance_matrix(vi_matrix, distance_metric='angular')
         sq_angl = get_distance_matrix(mi_matrix, distance_metric='squared_angular')
@@ -98,6 +104,10 @@ class TestCodependence(unittest.TestCase):
         self.assertEqual(vi_matrix.shape[0], self.X_matrix.shape[1])
         self.assertEqual(mi_matrix.shape[0], self.X_matrix.shape[1])
         self.assertEqual(corr_matrix.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(rho_matrix.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(gpr_matrix.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(gnpr_matrix.shape[0], self.X_matrix.shape[1])
+
         self.assertEqual(angl.shape[0], self.X_matrix.shape[1])
         self.assertEqual(sq_angl.shape[0], self.X_matrix.shape[1])
         self.assertEqual(abs_angl.shape[0], self.X_matrix.shape[1])
