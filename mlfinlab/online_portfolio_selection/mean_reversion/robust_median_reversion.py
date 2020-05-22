@@ -9,7 +9,7 @@ class RMR(OLPS):
     modification from the following paper:
     `D. Huang, J. Zhou, B. Li, S. C. H. Hoi and S. Zhou, "Robust Median Reversion Strategy for
     Online Portfolio Selection," in IEEE Transactions on Knowledge and Data Engineering, vol. 28,
-    no. 9, pp. 2480-2493, 1 Sept. 2016.<https://www.ijcai.org/Proceedings/13/Papers/296.pdf>`_
+    no. 9, pp. 2480-2493, 1 Sept. 2016. <https://www.ijcai.org/Proceedings/13/Papers/296.pdf>`_
 
     Robust Median Reversion uses a L1-median of historical prices to predict the next time's
     price relative returns. The new weights is then regularized to retain previous portfolio
@@ -18,7 +18,7 @@ class RMR(OLPS):
 
     def __init__(self, epsilon, n_iteration, window, tau=0.001):
         """
-        Initializes Robust Median Reversion with the given epsilon, window, and tau values.
+        Initializes Robust Median Reversion with the given epsilon, n_iteration, window, and tau values.
 
         :param epsilon: (float) Reversion threshold with range [1, inf). Values of [15, 25] had the
                                 highest returns for the dataset provided by the original authors.

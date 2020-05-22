@@ -75,7 +75,8 @@ Then the corresponding update rule becomes
 Parameters
 ##########
 
-The optimal parameters depend on each dataset. For NYSE, a low value of :math:`\eta` was optimal.
+The optimal parameters depend on each dataset. For NYSE, a low value of :math:`\eta` was optimal, which
+indicates a lack of a clear momentum strategy.
 
 .. image:: momentum_images/nyse_eg_eta_0_1.png
    :width: 49 %
@@ -83,7 +84,8 @@ The optimal parameters depend on each dataset. For NYSE, a low value of :math:`\
 .. image:: momentum_images/nyse_eg_eta_1_100.png
    :width: 49 %
 
-However, for the MSCI dataset, we see a high value of optimal :math:`\eta`.
+However, for the MSCI dataset, we see a high value of optimal :math:`\eta`, which indicates a presence
+of a momentum strategy.
 
 .. image:: momentum_images/msci_eg_eta_0_1.png
    :width: 49 %
