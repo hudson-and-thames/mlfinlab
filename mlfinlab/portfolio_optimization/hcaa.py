@@ -42,7 +42,7 @@ class HierarchicalClusteringAssetAllocation:
 
     def allocate(self, asset_names=None, asset_prices=None, asset_returns=None, covariance_matrix=None,
                  distance_matrix=None, side_weights=None, expected_asset_returns=None,
-                 allocation_metric='equal_weighting', linkage='ward',
+                 allocation_metric='equal_weighting', linkage_method='ward',
                  optimal_num_clusters=None):
         """
         Calculate asset allocations using the HCAA algorithm.
@@ -59,7 +59,7 @@ class HierarchicalClusteringAssetAllocation:
         :param allocation_metric: (str) The metric used for calculating weight allocations. Supported strings - "equal_weighting",
                                         "minimum_variance", "minimum_standard_deviation", "sharpe_ratio", "expected_shortfall",
                                         "conditional_drawdown_risk".
-        :param linkage: (str) The type of linkage method to use for clustering. Supported strings - "single", "average", "complete"
+        :param linkage_method: (str) The type of linkage method to use for clustering. Supported strings - "single", "average", "complete"
                               and "ward".
         :param optimal_num_clusters: (int) Optimal number of clusters for hierarchical clustering.
         """
@@ -102,14 +102,14 @@ class HierarchicalClusteringAssetAllocation:
 
         # Calculate the optimal number of clusters using the Gap statistic
         if not optimal_num_clusters:
-            optimal_num_clusters = self._get_optimal_number_of_clusters(correlation=correlation_matrix,
-                                                                        linkage=linkage,
+            optimal_num_clusters = self._get_optimal_number_of_clusters(original_distance_matrix=distance_matrix,
+                                                                        linkage_method=linkage_method,
                                                                         asset_returns=asset_returns)
 
         # Tree Clustering
         self.clusters, self.cluster_children = self._tree_clustering(distance=distance_matrix,
                                                                      num_clusters=optimal_num_clusters,
-                                                                     linkage=linkage)
+                                                                     linkage_method=linkage_method)
 
         # Get the flattened order of assets in hierarchical clustering tree
         num_assets = len(asset_names)
@@ -144,25 +144,24 @@ class HierarchicalClusteringAssetAllocation:
         inertia = np.log(np.sum(inertia))
         return inertia
 
-    def _get_optimal_number_of_clusters(self, correlation, asset_returns, linkage, num_reference_datasets=5):
+    def _get_optimal_number_of_clusters(self, original_distance_matrix, asset_returns, linkage_method, num_reference_datasets=5):
         """
         Find the optimal number of clusters for hierarchical clustering using the Gap statistic.
 
-        :param correlation: (np.array) Matrix of asset correlations.
+        :param original_distance_matrix: (np.array) Matrix of asset distances.
         :param asset_returns: (pd.DataFrame) Historical asset returns.
-        :param linkage: (str) The type of linkage method to use for clustering.
+        :param linkage_method: (str) The type of linkage method to use for clustering.
         :param num_reference_datasets: (int) The number of reference datasets to generate for calculating expected inertia.
         :return: (int) The optimal number of clusters.
         """
 
-        original_distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
         gap_values = []
         num_clusters = 1
         max_number_of_clusters = float("-inf")
         while True:
 
             # Calculate inertia from original data
-            original_clusters = scipy_linkage(squareform(original_distance_matrix), method=linkage)
+            original_clusters = scipy_linkage(squareform(original_distance_matrix.values), method=linkage_method)
             original_cluster_assignments = fcluster(original_clusters, num_clusters, criterion='maxclust')
             if max(original_cluster_assignments) == max_number_of_clusters or max(original_cluster_assignments) > 10:
                 break
@@ -171,7 +170,7 @@ class HierarchicalClusteringAssetAllocation:
 
             # Calculate expected inertia from reference datasets
             expected_inertia = self._calculate_expected_inertia(num_reference_datasets, asset_returns, num_clusters,
-                                                                linkage)
+                                                                linkage_method)
 
             # Calculate the gap statistic
             gap = expected_inertia - inertia
@@ -204,17 +203,17 @@ class HierarchicalClusteringAssetAllocation:
         return np.mean(reference_inertias)
 
     @staticmethod
-    def _tree_clustering(distance, num_clusters, linkage):
+    def _tree_clustering(distance, num_clusters, linkage_method):
         """
         Perform agglomerative clustering on the current portfolio.
 
         :param distance: (np.array) Matrix of asset distances.
         :param num_clusters: (int) The number of clusters.
-        :param linkage (str): The type of linkage method to use for clustering.
+        :param linkage_method (str): The type of linkage method to use for clustering.
         :return: (list) Structure of hierarchical tree.
         """
 
-        clusters = scipy_linkage(squareform(distance.values), method=linkage)
+        clusters = scipy_linkage(squareform(distance.values), method=linkage_method)
         clustering_inds = fcluster(clusters, num_clusters, criterion='maxclust')
         cluster_children = {index - 1: [] for index in range(min(clustering_inds), max(clustering_inds) + 1)}
         for index, cluster_index in enumerate(clustering_inds):

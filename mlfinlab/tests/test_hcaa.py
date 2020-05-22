@@ -219,7 +219,7 @@ class TestHCAA(unittest.TestCase):
 
         hcaa = HierarchicalClusteringAssetAllocation()
         hcaa.allocate(asset_prices=self.data,
-                      linkage='single',
+                      linkage_method='single',
                       optimal_num_clusters=5,
                       asset_names=self.data.columns)
         assert hcaa.ordered_indices == [13, 9, 10, 8, 14, 7, 1, 6, 4, 16, 3, 17,
@@ -284,13 +284,15 @@ class TestHCAA(unittest.TestCase):
 
     def test_hcaa_with_input_as_distance_matrix(self):
         """
-        Test HRP when passing a distance matrix as input.
+        Test HCAA when passing a distance matrix as input.
         """
 
         hcaa = HierarchicalClusteringAssetAllocation()
         returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
         vi_matrix = get_dependence_matrix(self.data, dependence_method='information_variation')
         distance_vi = 1 - vi_matrix
+        # make sure diagonal is exactly 0
+        np.fill_diagonal(distance_vi.values, 0)
         hcaa.allocate(asset_names=self.data.columns,
                       covariance_matrix=returns.cov(),
                       distance_matrix=distance_vi,
