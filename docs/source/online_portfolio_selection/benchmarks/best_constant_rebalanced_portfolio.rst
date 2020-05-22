@@ -6,9 +6,9 @@
     on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
     Next up, lets discuss about some of these implementations and the different parameters they require.
 
-==============================
+==================================
 Best Constant Rebalanced Portfolio
-==============================
+==================================
 
 Best Constant Rebalanced Portfolio is a strategy that is implemented in hindsight, which is similar to Best Stock. It uses the same weight
 for all time periods. However, it determines those weights by having the complete market sequence of the past. The objective function for
@@ -32,6 +32,10 @@ Implementation
         :show-inheritance:
         :inherited-members:
 
+.. tip::
+
+    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
+    provides a more detailed exploration of the strategies.
 
 Example Code
 ############
@@ -56,12 +60,3 @@ Example Code
 
     # Get portfolio returns.
     bcrp.portfolio_return
-
-Research Notebooks
-##################
-
-The following research notebooks provides a more detailed exploration of the strategies.
-
-* `Benchmarks Notebook`_
-
-.. _Benchmarks Notebook: https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb

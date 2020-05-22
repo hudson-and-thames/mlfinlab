@@ -48,11 +48,7 @@ There are four different benchmarks strategies implemented in the Online Portfol
 
 4. Best Constant Rebalanced Portfolio
 
-Research Notebooks
-##################
+.. tip::
 
-The following research notebooks provides a more detailed exploration of the strategies.
-
-* `Benchmarks Notebook`_
-
-.. _Benchmarks Notebook: https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb
+    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
+    provides a more detailed exploration of the strategies.

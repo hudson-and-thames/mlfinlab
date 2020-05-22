@@ -1,23 +1,8 @@
 .. _online_portfolio_selection-index:
 
-==============================
+==========================
 Online Portfolio Selection
-==============================
-
-Online Portfolio Selection is an algorithmic trading strategy that sequentially allocates capital among a group of assets to
-maximize the final returns of the investment.
-
-Traditional theories for portfolio selection, such as Markowitz’s Modern Portfolio Theory, optimize the balance between the
-portfolio's risks and returns. However, OLPS is founded on the capital growth theory, which solely focuses on maximizing the returns
-of the current portfolio.
-
-Through these walkthroughs of different portfolio selection strategies, we hope to introduce a set of different selection tools available
-for everyone. Most of the works will be based on Dr. Bin Li and Dr. Steven Hoi’s book, Online Portfolio Selection: Principles and Algorithms,
-and further recent papers will be implemented to assist the development and understanding of these unique portfolio selection strategies.
-
-There are four different strategies currently implemented in the Online Portfolio Selection module.
-
-1. Benchmarks
+==========================
 
 .. toctree::
     :maxdepth: 4
@@ -26,16 +11,12 @@ There are four different strategies currently implemented in the Online Portfoli
 
     benchmarks/index
 
-2. Momentum
-
 .. toctree::
     :maxdepth: 4
     :caption: Momentum
     :hidden:
 
     momentum/index
-
-3. Mean Reversion
 
 .. toctree::
     :maxdepth: 4
@@ -44,11 +25,49 @@ There are four different strategies currently implemented in the Online Portfoli
 
     mean_reversion/index
 
-4. Pattern Matching
-
 .. toctree::
     :maxdepth: 4
     :caption: Pattern Matching
     :hidden:
 
     pattern_matching/index
+
+There are four different strategies currently implemented in the Online Portfolio Selection module.
+
+1. Benchmarks
+
+2. Momentum
+
+3. Mean Reversion
+
+4. Pattern Matching
+
+Online Portfolio Selection
+##########################
+
+In general, most of these strategies will follow the structure of the parent class: OLPS.
+
+The parent class exists to quickly build a new strategy. Each strategy is modularized to ensure maximum
+efficiency to switch around the update algorithms.
+
+.. automodule:: mlfinlab.online_portfolio_selection.online_portfolio_selection
+
+    .. autoclass:: OLPS
+        :members:
+
+Universal Portfolio
+###################
+
+For the ensemble methods of Universal Portfolio, there is a sub-parent class of Universal Portfolio.
+
+Universal Portfolio effectively acts as a fund of funds. It is possible to generate differents experts
+with different parameters and gather the performance through different methods.
+
+.. automodule:: mlfinlab.online_portfolio_selection.universal_portfolio
+
+    .. autoclass:: UP
+        :members:
+        :show-inheritance:
+        :inherited-members:
+
+        .. automethod:: __init__
