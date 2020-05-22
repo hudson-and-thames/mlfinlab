@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 
-def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, window=None):
+def fixed_time_horizon(close, threshold=0, look_forward=1, standardized=False, window=None):
     """
     Fixed-Time Horizon Labelling Method
 
@@ -57,10 +57,6 @@ def fixed_time_horizon(close, threshold, look_forward=1, standardized=False, win
         stdev = forward_return.rolling(window=window).std()
         forward_return -= mean
         forward_return /= stdev
-
-    # Label with sign only, only if no threshold is given
-    if threshold is None:
-        threshold = 0
 
     # Apply labeling otherwise
     conditions = [forward_return > threshold, (forward_return <= threshold) & (forward_return >= -threshold),
