@@ -20,10 +20,16 @@ class RMR(OLPS):
         """
         Initializes Robust Median Reversion with the given epsilon, window, and tau values.
 
-        :param epsilon: (float) Reversion threshold.
-        :param n_iteration: (int) Maximum number of iterations.
-        :param window: (int) Size of window.
-        :param tau: (float) Toleration level.
+        :param epsilon: (float) Reversion threshold with range [1, inf). Values of [15, 25] had the
+                                highest returns for the dataset provided by the original authors.
+        :param n_iteration: (int) Maximum number of iterations with range [2, inf). Iteration of 200
+                                  produced a adequate balance between performance and computational
+                                  time for the strategy.
+        :param window: (int) Size of window with range [2, inf). Typically window of 2, 7, or 21
+                             produced the highest results. This parameter depends on the underlying
+                             data's price movements and mean reversion tendencies.
+        :param tau: (float) Toleration level with range [0, 1). It is suggested to keep the toleration
+                            level at 0.001 for computational efficiency.
         """
         self.epsilon = epsilon
         self.n_iteration = n_iteration
@@ -37,8 +43,9 @@ class RMR(OLPS):
         Initializes the important variables for the object.
 
         :param asset_prices: (pd.DataFrame) Historical asset prices.
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
-        :param resample_by: (str) Specifies how to resample the prices.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
+        :param resample_by: (str) Specifies how to resample the prices. 'D' for Day, 'W' for Week,
+                                 'M' for Month. The inputs are based on pandas' resample method.
         """
         super(RMR, self)._initialize(asset_prices, weights, resample_by)
 
@@ -69,24 +76,30 @@ class RMR(OLPS):
         Predicts the next time's portfolio weight.
 
         :param time: (int) Current time period.
-        :return new_weights: (np.array) Predicted weights.
+        :return: (np.array) Predicted weights.
         """
         # Until the relative time window, return original weights.
         if time < self.window - 1:
             return self.weights
+
         # Set the current predicted relatives value.
         current_prediction = self._calculate_predicted_relatives(time)
+
         # Set the deviation from the mean of current prediction.
         predicted_deviation = current_prediction - np.ones(self.number_of_assets) * np.mean(
             current_prediction)
+
         # Calculate alpha, the lagrangian multiplier.
         norm2 = np.linalg.norm(predicted_deviation, ord=1) ** 2
+
         # If norm2 is zero, return previous weights.
         if norm2 == 0:
             return self.weights
         alpha = np.minimum(0, (current_prediction * self.weights - self.epsilon) / norm2)
+
         # Update new weights.
         new_weights = self.weights - alpha * predicted_deviation
+
         # Project to simplex domain.
         new_weights = self._simplex_projection(new_weights)
 
@@ -97,7 +110,7 @@ class RMR(OLPS):
         """
         Calculates the predicted relatives using l1 median.
 
-        :return predicted_relatives: (np.array) Predicted relatives using l1 median.
+        :return: (np.array) Predicted relatives using l1 median.
         """
         # Calculate the L1 median of the price window.
         price_window = self.np_asset_prices[time-self.window+1:time+1]
@@ -123,25 +136,33 @@ class RMR(OLPS):
 
         :param old_mu: (np.array) Current value of the predicted median value.
         :param price_window: (np.array) A window of prices provided by the user.
-        :return next_mu: (np.array) New updated l1 median approximation.
+        :return: (np.array) New updated l1 median approximation.
         """
         # Calculate the difference set.
         diff = price_window - old_mu
+
         # Remove rows with all zeros.
         non_mu = diff[~np.all(diff == 0, axis=1)]
+
         # Edge case for identical price windows.
         if non_mu.shape[0] == 0:
             return non_mu
+
         # Number of zeros.
         n_zero = diff.shape[0] - non_mu.shape[0]
+
         # Calculate eta.
         eta = 0 if n_zero == 0 else 1
+
         # Calculate l1 norm of non_mu.
         l1_norm = np.linalg.norm(non_mu, ord=1, axis=1)
+
         # Calculate tilde.
         tilde = 1 / np.sum(1 / l1_norm) * np.sum(np.divide(non_mu.T, l1_norm), axis=1)
+
         # Calculate gamma.
         gamma = np.linalg.norm(np.sum(np.apply_along_axis(lambda x: x / np.linalg.norm(x, ord=1), 1, non_mu), axis=0), ord=1)
+
         # Calculate next_mu value.
         next_mu = np.maximum(0, 1 - eta / gamma) * tilde + np.minimum(1, eta / gamma) * old_mu
         return next_mu
