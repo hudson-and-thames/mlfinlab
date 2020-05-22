@@ -17,16 +17,16 @@ According to the author's classification:
 "Many statistical distances exist to measure the dissimilarity of two random variables, and therefore two i.i.d. random
 processes. Such distances can be roughly classified in two families:
 
-1. distributional distances, ... which focus on dissimilarity between probability distributions and quantify divergences
-in marginal behaviours,
+    1. distributional distances, [...] which focus on dissimilarity between probability distributions and quantify divergences
+    in marginal behaviours,
 
-2. dependence distances, such as the distance correlation or copula-based kernel dependency measures ...,
-which focus on the joint behaviours of random variables, generally ignoring their distribution properties.
+    2. dependence distances, such as the distance correlation or copula-based kernel dependency measures [...],
+    which focus on the joint behaviours of random variables, generally ignoring their distribution properties.
 
 However, we may want to be able to discriminate random variables both on distribution and dependence. This can be
 motivated, for instance, from the study of financial assets returns: are two perfectly correlated random variables
 (assets returns), but one being normally distributed and the other one following a heavy-tailed distribution, similar?
-From risk perspective, the answer is no ..., hence the propounded distance of this article".
+From risk perspective, the answer is no [...], hence the propounded distance of this article".
 
 .. Tip::
    Read the original work to understand the motivation behind creating the novel technique deeper and check the reference
@@ -70,6 +70,39 @@ Implementation
 Generic Parametric Representation (GPR) distance
 ################################################
 
+Theoretically, Marty defines the distance :math:`d_{\Theta}` between two random variables as:
+
+" Let :math:`\theta \in [0, 1]` . Let :math:`(X, Y) \in \nu^{2}` , where :math:`\nu` is the space of all continuous
+real-valued random variables. Let :math:`G = (G_{X}, G_{Y})` , where :math:`G_{X}` and :math:`G_{Y}` are respectively
+:math:`X` and :math:`Y` marginal cdfs. We define the following distance
+
+.. math::
+    d_{\Theta}^{2}(X, Y) = \Theta d_{1}^{2}(G_{X}(X), G_{Y}(Y)) + (1 - \Theta) d_{0}^{2}(G_{X}, G_{Y})
+
+where
+
+.. math::
+    d_{1}^{2}(G_{X}(X), G_{Y}(Y)) = 3 \mathbb{E}[|G_{X}(X) - G_{Y}(Y)|^{2}]
+
+and
+
+.. math::
+    d_{0}^{2}(G_{X}, G_{Y}) = \frac{1}{2} \int_{R} (\sqrt{\frac{d G_{X}}{d \lambda}} -
+    \sqrt{\frac{d G_{Y}}{d \lambda}})^{2} d \lambda \text{"}
+
+For two Gaussian random variables, the distance :math:`d_{\Theta}` is therefore defined by Marti as:
+
+" Let :math:`(X, Y)` be a bivariate Gaussian vector, with :math:`X \sim \mathcal{N}(\mu_{X}, \sigma_{X}^{2})` ,
+:math:`Y \sim \mathcal{N}(\mu_{Y}, \sigma_{Y}^{2})` and :math:`\rho (X,Y)` . We obtain,
+
+.. math::
+    d_{\Theta}^{2}(X, Y) = \Theta \frac{1 - \rho_{S}}{2} + (1 - \Theta) (1 -
+    \sqrt{\frac{2 \sigma_{X} \sigma_{Y}}{\sigma_{X}^{2} + \sigma_{Y}^{2}}} e^{ -
+    \frac{1}{4} \frac{(\mu_{X} - \mu_{Y})^{2}}{\sigma_{X}^{2} + \sigma_{Y}^{2}}}) \text{"}
+
+.. Tip::
+   The provess of deriving this definition is present in the work:
+   `Some contributions to the clustering of financial time series and applications to credit default swaps <https://www.researchgate.net/publication/322714557>`_.
 
 Implementation
 ==============
