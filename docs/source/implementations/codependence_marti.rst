@@ -100,9 +100,18 @@ For two Gaussian random variables, the distance :math:`d_{\Theta}` is therefore 
     \sqrt{\frac{2 \sigma_{X} \sigma_{Y}}{\sigma_{X}^{2} + \sigma_{Y}^{2}}} e^{ -
     \frac{1}{4} \frac{(\mu_{X} - \mu_{Y})^{2}}{\sigma_{X}^{2} + \sigma_{Y}^{2}}}) \text{"}
 
+Use of this distance is referenced as the generic parametric representation (GPR) approach.
+
+From the paper:
+
+"GPR distance is a fast and good proxy for distance :math:`d_{\Theta}` when the first two moments :math:`\mu`
+and :math:`{\sigma}` predominate. Nonetheless, for datasets which contain heavy-tailed distributions,
+GPR fails to capture this information."
+
 .. Tip::
-   The provess of deriving this definition is present in the work:
+   The process of deriving this definition as well as a proof that :math:`d_{\Theta}` is a metric is present in the work:
    `Some contributions to the clustering of financial time series and applications to credit default swaps <https://www.researchgate.net/publication/322714557>`_.
+
 
 Implementation
 ==============
@@ -112,8 +121,48 @@ Implementation
 Generic Non-Parametric Representation (GNPR) distance
 #####################################################
 
+The statistical estimate of the distance :math:`\tilde{d}_{\Theta}` working on realizations of the i.i.d. random variables
+is defined by the author as:
 
+" Let :math:`(X^{t})_{t=1}^{T}` and :math:`(Y^{t})_{t=1}^{T}` be :math:`T` realizations of real-valued random variables
+:math:`X, Y \in \nu` respectively. An empirical distance between realizations of random variables can be defined by
 
+.. math::
+    \tilde{d}_{\Theta}^{2}((X^{t})_{t=1}^{T}, (Y^{t})_{t=1}^{T}) \stackrel{\text{a.s.}}{=}
+    \Theta \tilde{d}_{1}^{2} + (1 - \Theta) \tilde{d}_{0}^{2}
+
+where
+
+.. math::
+    \tilde{d}_{1}^{2} = \frac{3}{T(T^{2} - 1)} \sum_{t = 1}^{T} (X^{(t)} - Y^{(t)}) ^ {2}
+
+and
+
+.. math::
+    \tilde{d}_{0}^{2} = \frac{1}{2} \sum_{k = - \infty}^{+ \infty} (\sqrt{g_{X}^{h}(hk)} - \sqrt{g_{Y}^{h}(hk)})^{2}
+
+:math:`h` being here a suitable bandwidth, and
+:math:`g_{X}^{h}(x) = \frac{1}{T} \sum_{t = 1}^{T} \mathbf{1}(\lfloor \frac{x}{h} \rfloor h \le X^{t} <
+(\lfloor \frac{x}{h} \rfloor + 1)h)` being a density histogram estimating dpf :math:`g_{X}` from
+:math:`(X^{t})_{t=1}^{T}` , :math:`T` realization of random variable :math:`X \in \nu` ."
+
+Use of this distance is referenced as the generic non-parametric representation (GNPR) approach.
+
+As written in the paper:
+
+" To use effectively :math:`d_{\Theta}` and its statistical estimate, it boils down to select a particular value for
+:math:`\Theta` . We suggest here an exploratory approach where one can test
+
+    (i) distribution information (θ = 0),
+
+    (ii) dependence information (θ = 1), and
+
+    (iii) a mix of both information (θ = 0:5).
+
+Ideally, :math:`\Theta` should reflect the balance of dependence and distribution information in the data.
+In a supervised setting, one could select an estimate :math:`\hat{\Theta}` of the right balance :math:`\Theta^{*}`
+optimizing some loss function by techniques such as cross-validation. Yet, the lack of a clear loss function makes
+the estimation of :math:`\Theta^{*}` difficult in an unsupervised setting"
 
 Implementation
 ==============

@@ -79,7 +79,7 @@ def gnpr_distance(x: np.array, y: np.array, theta: float, bandwidth: float = 0.0
     :param y: (np.array) Y vector (same number of observations as X)
     :param theta: (float) Type of information being tested. Falls in range [0, 1]
     :param bandwidth: (float) Bandwidth to use for splitting the X and Y vector observations (0.01 by default)
-    :return: (float) Distance under GPR approach
+    :return: (float) Distance under GNPR approach
     """
 
     # Number of observations
