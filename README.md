@@ -95,7 +95,7 @@ Benefits include:
 * [E.P. Chan & Associates](https://www.epchan.com/)
 * [Markov Capital](http://www.markovcapital.se/)
 * [Consilium Crypto](https://consiliumcrypto.ai)
-* [3Jane](https://3jane.com/)
+* [3Jane Capital](https://3jane.com/)
 
 ---
 
