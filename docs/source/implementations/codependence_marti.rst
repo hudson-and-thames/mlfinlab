@@ -1,7 +1,7 @@
 .. _implementations-codependence_marti:
 
 .. note::
-   The following implementations and documentation, closely follows the work of Gautier Marti:
+   The following implementations and documentation closely follows the work of Gautier Marti:
    `Some contributions to the clustering of financial time series and applications to credit default swaps <https://www.researchgate.net/publication/322714557>`_.
 
 =====================
@@ -9,7 +9,7 @@ Codependence by Marti
 =====================
 
 The work mentioned above introduces a new approach of representing the random variables that splits apart dependency and
-distribution without loosing any information. It also contains a distance metric between two financial time series based
+distribution without losing any information. It also contains a distance metric between two financial time series based
 on the novel approach.
 
 According to the author's classification:
@@ -100,7 +100,7 @@ For two Gaussian random variables, the distance :math:`d_{\Theta}` is therefore 
     \sqrt{\frac{2 \sigma_{X} \sigma_{Y}}{\sigma_{X}^{2} + \sigma_{Y}^{2}}} e^{ -
     \frac{1}{4} \frac{(\mu_{X} - \mu_{Y})^{2}}{\sigma_{X}^{2} + \sigma_{Y}^{2}}}) \text{"}
 
-Use of this distance is referenced as the generic parametric representation (GPR) approach.
+The use of this distance is referenced as the generic parametric representation (GPR) approach.
 
 From the paper:
 
