@@ -3,10 +3,10 @@
 import sys
 import numpy as np
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
-from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio import ConstantRebalancedPortfolio
+from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio import CRP
 
 
-class UniversalPortfolio(OLPS):
+class UP(OLPS):
     """
     This class implements the Universal Portfolio strategy. It is reproduced with
     modification from the following paper:
@@ -26,11 +26,11 @@ class UniversalPortfolio(OLPS):
         Initializes Universal Portfolio with the given number of experts, method of capital
         allocation to each experts, and k-value for Top-K experts.
 
-        :param number_of_experts: (int) Number of total experts
+        :param number_of_experts: (int) Number of total experts.
         :param weighted: (str) Capital allocation method. 'hist_performance': Historical Performance,
                                'uniform': Uniform Weights, 'top-k': Top-K experts.
         :param k: (int) Number of experts to choose your portfolio. Only necessary if weighted is
-                        'top-k'.
+                        'top-k'. Typically lower values of k are more optimal for higher returns.
         """
         self.experts = []  # (list) Array to store all experts
         self.number_of_experts = number_of_experts  # (int) Set the number of experts.
@@ -41,18 +41,19 @@ class UniversalPortfolio(OLPS):
         self.weights_on_experts = None  # (np.array) Capital allocation on each experts.
         self.weighted = weighted  # (np.array) Weights allocated to each experts.
         self.k = k  # (int) Number of top-k experts.
-        super(UniversalPortfolio, self).__init__()
+        super(UP, self).__init__()
 
     def _initialize(self, asset_prices, weights, resample_by):
         """
         Initializes the important variables for the object.
 
         :param asset_prices: (pd.DataFrame) Historical asset prices.
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
-        :param resample_by: (str) Specifies how to resample the prices.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
+        :param resample_by: (str) Specifies how to resample the prices. 'D' for Day, 'W' for Week,
+                                 'M' for Month. The inputs are based on pandas' resample method.
         """
         # Initialize the same variables as OLPS.
-        super(UniversalPortfolio, self)._initialize(asset_prices, weights, resample_by)
+        super(UP, self)._initialize(asset_prices, weights, resample_by)
 
         # Generate all experts.
         self._generate_experts()
@@ -69,7 +70,7 @@ class UniversalPortfolio(OLPS):
         """
         Runs the algorithm by iterating through the given data.
 
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
         :param verbose: (boolean) Prints progress bar if true.
         """
         # Run allocate on all the experts.
@@ -105,6 +106,7 @@ class UniversalPortfolio(OLPS):
             # Initial weights are evenly distributed among all experts.
             expert_returns_ratio = np.vstack((self._uniform_experts(), expert_returns_ratio))
             self.weights_on_experts = expert_returns_ratio
+
         # If capital allocation is based on uniform weights.
         elif self.weighted == 'uniform':
             # Equal allocation.
@@ -113,6 +115,7 @@ class UniversalPortfolio(OLPS):
             # Initial weights are evenly distributed among all experts.
             uniform_ratio = np.vstack((self._uniform_experts(), uniform_ratio))
             self.weights_on_experts = uniform_ratio
+
         # If capital allocation is based on top-K experts.
         elif self.weighted == 'top-k':
             # Only the top k experts get 1/k of the wealth.
@@ -124,6 +127,7 @@ class UniversalPortfolio(OLPS):
             top_k_distribution = np.zeros(self.expert_portfolio_returns.shape)
             # For each week set the multiplier for each expert.
             # Each row represents the week's allocation to the k experts.
+
             for time in range(top_k.shape[0]):
                 top_k_distribution[time][top_k[time]] = 1 / self.k
             # Initial weights are evenly distributed among all experts.
@@ -173,7 +177,7 @@ class UniversalPortfolio(OLPS):
         """
         Returns a uniform weight of experts.
 
-        :return uni_weight: (np.array) Uniform weights (1/n, 1/n, 1/n ...).
+        :return: (np.array) Uniform weights (1/n, 1/n, 1/n ...).
         """
         # Divide by number of assets after creating numpy arrays of one.
         uni_weight = np.ones(self.number_of_experts) / self.number_of_experts
@@ -205,7 +209,7 @@ class UniversalPortfolio(OLPS):
         self._generate_simplex(self.number_of_experts, self.number_of_assets)
         # Universal Portfolio looks at different CRP weights.
         for exp in range(self.number_of_experts):
-            self.experts.append(ConstantRebalancedPortfolio(weight=self.expert_params[exp]))
+            self.experts.append(CRP(weight=self.expert_params[exp]))
 
     def _generate_simplex(self, number_of_experts, number_of_assets):
         """

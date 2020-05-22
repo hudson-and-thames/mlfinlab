@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.momentum.exponential_gradient import ExponentialGradient
+from mlfinlab.online_portfolio_selection.momentum.exponential_gradient import EG
 
 
 class TestExponentialGradient(TestCase):
@@ -31,7 +31,7 @@ class TestExponentialGradient(TestCase):
         Test calculation of exponential gradient weights with multiplicative update rule.
         """
         # Use multiplicative update rule.
-        multiplicative_update = ExponentialGradient(update_rule='MU')
+        multiplicative_update = EG(update_rule='MU')
         # Allocates asset prices to MU.
         multiplicative_update.allocate(self.data, resample_by='M')
         all_weights = np.array(multiplicative_update.all_weights)
@@ -46,7 +46,7 @@ class TestExponentialGradient(TestCase):
         Test calculation of exponential gradient weights with gradient projection update rule.
         """
         # Use gradient projection update rule.
-        gradient_projection = ExponentialGradient(update_rule='GP')
+        gradient_projection = EG(update_rule='GP')
         # Allocates asset prices to GP.
         gradient_projection.allocate(self.data, resample_by='M')
         all_weights = np.array(gradient_projection.all_weights)
@@ -61,7 +61,7 @@ class TestExponentialGradient(TestCase):
         Test calculation of exponential gradient weights with expectation maximization update rule.
         """
         # Use expectation maximization update rule.
-        expectation_maximization = ExponentialGradient(update_rule='EM')
+        expectation_maximization = EG(update_rule='EM')
         # Allocates asset prices to EM.
         expectation_maximization.allocate(self.data, resample_by='M')
         all_weights = np.array(expectation_maximization.all_weights)
@@ -76,7 +76,7 @@ class TestExponentialGradient(TestCase):
         Tests ValueError if the passing update rule is not correct.
         """
         # Put in incorrect update rule.
-        expectation_maximization = ExponentialGradient(update_rule='SS')
+        expectation_maximization = EG(update_rule='SS')
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             expectation_maximization.allocate(self.data, resample_by='M')

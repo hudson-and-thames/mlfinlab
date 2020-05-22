@@ -1,15 +1,15 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import scipy.optimize as opt
-from mlfinlab.online_portfolio_selection.momentum.follow_the_leader import FollowTheLeader
+from mlfinlab.online_portfolio_selection.momentum.follow_the_leader import FTL
 
 
-class FollowTheRegularizedLeader(FollowTheLeader):
+class FTRL(FTL):
     """
     This class implements the Follow the Regularized Leader strategy. It is reproduced with
     modification from the following paper:
     `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
-    Surv. V, N, Article A (December YEAR), 33 pages. <https://arxiv.org/abs/1212.2129>`_
+    Surv. V, N, Article A (December 2012), 33 pages. <https://arxiv.org/abs/1212.2129>`_
 
     Follow the Regularized Leader strategy directly tracks the Best Constant Rebalanced Portfolio
     until the previous period with an additional regularization term
@@ -19,9 +19,12 @@ class FollowTheRegularizedLeader(FollowTheLeader):
         """
         Initializes Follow the Regularized Leader with a beta constant term.
 
-        :param beta: (float) Constant to the regularization term.
+        :param beta: (float) Constant to the regularization term. Typical ranges for interesting
+                             results include [0, 0.2], 1, and any high values. Low beta
+                             FTRL strategies are identical to FTL, and high beta indicates more
+                             regularization to return a uniform CRP.
         """
-        super(FollowTheRegularizedLeader, self).__init__()
+        super(FTRL, self).__init__()
         self.beta = beta
 
     def _fast_optimize(self, optimize_array):
@@ -29,7 +32,7 @@ class FollowTheRegularizedLeader(FollowTheLeader):
         Calculates weights that maximize returns over the given array.
 
         :param optimize_array: (np.array) Relative returns of the assets for a given time period.
-        :return: problem.x: (np.array) Weights that maximize the returns for the given array.
+        :return: (np.array) Weights that maximize the returns for the given array.
         """
         # Initialize guess.
         weights = self._uniform_weight()

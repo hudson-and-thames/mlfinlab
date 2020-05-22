@@ -6,7 +6,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.online_portfolio_selection.pattern_matching.functional_correlation_driven_nonparametric_learning_k \
-    import FunctionalCorrelationDrivenNonparametricLearningK
+    import FCORNK
 
 
 class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
@@ -31,7 +31,7 @@ class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
         Test the calculation of FCORN-K.
         """
         # Initialize FCORN-K.
-        fcorn_k = FunctionalCorrelationDrivenNonparametricLearningK(window=1, rho=1, lambd=1, k=1)
+        fcorn_k = FCORNK(window=1, rho=1, lambd=1, k=1)
         # Allocates asset prices to FCORN-K.
         fcorn_k.allocate(self.data, resample_by='3M')
         # Create np.array of all_weights.
@@ -48,13 +48,13 @@ class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
         Tests ValueError if window is not an integer or less than 1.
         """
         # Initialize FCORN-K.
-        fcorn_k1 = FunctionalCorrelationDrivenNonparametricLearningK(window=2.5, rho=2, lambd=1, k=1)
+        fcorn_k1 = FCORNK(window=2.5, rho=2, lambd=1, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             fcorn_k1.allocate(self.data)
 
         # Initialize FCORN-K.
-        fcorn_k2 = FunctionalCorrelationDrivenNonparametricLearningK(window=0, rho=2, lambd=1, k=1)
+        fcorn_k2 = FCORNK(window=0, rho=2, lambd=1, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             fcorn_k2.allocate(self.data)
@@ -64,13 +64,13 @@ class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
         Tests ValueError if rho is not an integer or less than 1.
         """
         # Initialize FCORN-K.
-        fcorn_k3 = FunctionalCorrelationDrivenNonparametricLearningK(window=2, rho=2.5, lambd=1, k=1)
+        fcorn_k3 = FCORNK(window=2, rho=2.5, lambd=1, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             fcorn_k3.allocate(self.data)
 
         # Initialize FCORN-K.
-        fcorn_k4 = FunctionalCorrelationDrivenNonparametricLearningK(window=2, rho=0, lambd=1, k=1)
+        fcorn_k4 = FCORNK(window=2, rho=0, lambd=1, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             fcorn_k4.allocate(self.data)
@@ -80,13 +80,13 @@ class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
         Tests ValueError if lambd is not an integer or less than 1.
         """
         # Initialize FCORN-K.
-        fcorn_k5 = FunctionalCorrelationDrivenNonparametricLearningK(window=2, rho=2, lambd=1.5, k=1)
+        fcorn_k5 = FCORNK(window=2, rho=2, lambd=1.5, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             fcorn_k5.allocate(self.data)
 
         # Initialize FCORN-K.
-        fcorn_k6 = FunctionalCorrelationDrivenNonparametricLearningK(window=2, rho=2, lambd=0, k=1)
+        fcorn_k6 = FCORNK(window=2, rho=2, lambd=0, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             fcorn_k6.allocate(self.data)
@@ -96,7 +96,7 @@ class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
         Tests ValueError if k is greater than window * rho * lambd
         """
         # Initialize FCORN-K.
-        fcorn_k7 = FunctionalCorrelationDrivenNonparametricLearningK(window=2, rho=2, lambd=2, k=16)
+        fcorn_k7 = FCORNK(window=2, rho=2, lambd=2, k=16)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             fcorn_k7.allocate(self.data)

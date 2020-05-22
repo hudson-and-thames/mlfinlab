@@ -6,7 +6,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.online_portfolio_selection.pattern_matching.symmetric_correlation_driven_nonparametric_learning_k \
-    import SymmetricCorrelationDrivenNonparametricLearningK
+    import SCORNK
 
 
 class TestSymmetricCorrelationDrivenNonparametricLearningK(TestCase):
@@ -32,7 +32,7 @@ class TestSymmetricCorrelationDrivenNonparametricLearningK(TestCase):
         Test the calculation of SCORN-K.
         """
         # Initialize SCORN-K.
-        scorn_k = SymmetricCorrelationDrivenNonparametricLearningK(window=2, rho=2, k=1)
+        scorn_k = SCORNK(window=2, rho=2, k=1)
         # Allocates asset prices to SCORN-K.
         scorn_k.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -49,13 +49,13 @@ class TestSymmetricCorrelationDrivenNonparametricLearningK(TestCase):
         Tests ValueError if window is not an integer or less than 1.
         """
         # Initialize SCORN-K.
-        scorn_k1 = SymmetricCorrelationDrivenNonparametricLearningK(window=2.5, rho=2, k=1)
+        scorn_k1 = SCORNK(window=2.5, rho=2, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             scorn_k1.allocate(self.data)
 
         # Initialize SCORN-K.
-        scorn_k2 = SymmetricCorrelationDrivenNonparametricLearningK(window=0, rho=2, k=1)
+        scorn_k2 = SCORNK(window=0, rho=2, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             scorn_k2.allocate(self.data)
@@ -65,13 +65,13 @@ class TestSymmetricCorrelationDrivenNonparametricLearningK(TestCase):
         Tests ValueError if rho is not an integer or less than 1.
         """
         # Initialize SCORN-K.
-        scorn_k3 = SymmetricCorrelationDrivenNonparametricLearningK(window=2, rho=2.5, k=1)
+        scorn_k3 = SCORNK(window=2, rho=2.5, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             scorn_k3.allocate(self.data)
 
         # Initialize SCORN-K.
-        scorn_k4 = SymmetricCorrelationDrivenNonparametricLearningK(window=2, rho=0, k=1)
+        scorn_k4 = SCORNK(window=2, rho=0, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             scorn_k4.allocate(self.data)
@@ -81,19 +81,19 @@ class TestSymmetricCorrelationDrivenNonparametricLearningK(TestCase):
         Tests ValueError if k is greater than window * rho, greater than 1, or an integer.
         """
         # Initialize SCORN-K.
-        scorn_k5 = SymmetricCorrelationDrivenNonparametricLearningK(window=2, rho=2, k=5)
+        scorn_k5 = SCORNK(window=2, rho=2, k=5)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             scorn_k5.allocate(self.data)
 
         # Initialize SCORN-K.
-        scorn_k6 = SymmetricCorrelationDrivenNonparametricLearningK(window=2, rho=2, k=1.5)
+        scorn_k6 = SCORNK(window=2, rho=2, k=1.5)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             scorn_k6.allocate(self.data)
 
         # Initialize SCORN-K.
-        scorn_k7 = SymmetricCorrelationDrivenNonparametricLearningK(window=2, rho=2, k=0)
+        scorn_k7 = SCORNK(window=2, rho=2, k=0)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             scorn_k7.allocate(self.data)

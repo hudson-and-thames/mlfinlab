@@ -5,14 +5,14 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection import ConstantRebalancedPortfolio
+from mlfinlab.online_portfolio_selection import CRP
 
 
 class TestConstantRebalancedPortfolio(TestCase):
     # pylint: disable=too-many-public-methods
     # pylint: disable=unsubscriptable-object
     """
-    Tests different functions of the ConstantRebalancedPortfolio class.
+    Tests different functions of the CRP class.
     """
 
     def setUp(self):
@@ -31,7 +31,7 @@ class TestConstantRebalancedPortfolio(TestCase):
         Tests the calculation of CRP weights with default settings.
         """
         # Initialize CRP.
-        crp = ConstantRebalancedPortfolio()
+        crp = CRP()
         # Allocates asset prices to CRP.
         crp.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -55,7 +55,7 @@ class TestConstantRebalancedPortfolio(TestCase):
         # Set 1 on the first stock and 0 on the rest.
         weights[0] = 1
         # Initialize CRP.
-        crp = ConstantRebalancedPortfolio(weights)
+        crp = CRP(weights)
         # Allocates asset prices to CRP.
         crp.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -79,7 +79,7 @@ class TestConstantRebalancedPortfolio(TestCase):
         # Set 1 on the first stock and 0 on the rest.
         weights[0] = 1
         # Initialize CRP.
-        crp = ConstantRebalancedPortfolio()
+        crp = CRP()
         # Allocates asset prices to CRP.
         crp.allocate(self.data, weights, resample_by='M')
         # Create np.array of all_weights.

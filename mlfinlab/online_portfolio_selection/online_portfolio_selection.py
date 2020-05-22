@@ -42,9 +42,9 @@ class OLPS:
         Allocates weight according to a set of update rules.
 
         :param asset_prices: (pd.DataFrame) Historical asset prices.
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
         :param resample_by: (str) Specifies how to resample the prices. 'D' for Day, 'W' for Week,
-                            'M' for Month. The inputs are based on pandas' resample method.
+                                 'M' for Month. The inputs are based on pandas' resample method.
         :param verbose: (boolean) Prints progress bar if true.
         """
         # Check to ensure inputs are correct.
@@ -70,8 +70,9 @@ class OLPS:
         Initializes the important variables for the object.
 
         :param asset_prices: (pd.DataFrame) Historical asset prices.
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
-        :param resample_by: (str) Specifies how to resample the prices.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
+        :param resample_by: (str) Specifies how to resample the prices. 'D' for Day, 'W' for Week,
+                                 'M' for Month. The inputs are based on pandas' resample method.
         """
         # Resample asset.
         if resample_by is not None:
@@ -108,7 +109,7 @@ class OLPS:
         """
         Runs the algorithm by iterating through the given data.
 
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
         :param verbose: (boolean) Prints progress bar if true.
         """
         # Set initial weights.
@@ -135,7 +136,7 @@ class OLPS:
         uniform weights.
 
         :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
-        :return (weights): (np.array) First portfolio weight.
+        :return: (np.array) First portfolio weight.
         """
         # If no weights are given, return uniform weights.
         if weights is None:
@@ -147,7 +148,7 @@ class OLPS:
         Predicts the next time's portfolio weight.
 
         :param time: (int) Current time period.
-        :return new_weights: (np.array) Identical weights are returned for OLPS.
+        :return: (np.array) Identical weights are returned for OLPS.
         """
         # Weights do not change for this class.
         new_weights = self.all_weights[time]
@@ -181,7 +182,7 @@ class OLPS:
 
         :param optimize_array: (np.array) Relative returns of the assets for a given time period.
         :param solver: (cp.solver) Solver for cvxpy
-        :return weights.value: (np.array) Weights that maximize the returns for the given array.
+        :return: (np.array) Weights that maximize the returns for the given array.
         """
 
         # Initialize weights for the optimization problem.
@@ -219,7 +220,7 @@ class OLPS:
         """
         Returns a uniform weight of assets.
 
-        :return uni_weight: (np.array) Uniform weights (1/n, 1/n, 1/n ...).
+        :return: (np.array) Uniform weights (1/n, 1/n, 1/n ...).
         """
         # Divide by number of assets after creating numpy arrays of one.
         uni_weight = np.ones(self.number_of_assets) / self.number_of_assets
@@ -257,7 +258,7 @@ class OLPS:
         Normalize sum of weights to one.
 
         :param weights: (np.array) Pre-processed weights that have not been normalized yet.
-        :return norm_weights: (np.array) Adjusted weights that sum to 1.
+        :return: (np.array) Adjusted weights that sum to 1.
         """
         norm_weights = weights / np.sum(weights)
         return norm_weights
@@ -268,7 +269,7 @@ class OLPS:
         Calculates the relative return of a given price data.
 
         :param asset_prices: (pd.DataFrame) Dataframe of historical asset prices.
-        :return relative_return: (np.array) Relative returns of the assets.
+        :return: (np.array) Relative returns of the assets.
         """
         # First calculate the percent change of each time period.
         # First row is NaN because there is no initial change, so we replace that row with 0.
@@ -283,7 +284,7 @@ class OLPS:
         Checks if the given input values are valid.
 
         :param asset_prices: (pd.DataFrame) Dataframe of historical asset prices.
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
         """
         # If weights have been given by the user.
         if weights is not None:
@@ -308,7 +309,7 @@ class OLPS:
         https://stanford.edu/~jduchi/projects/DuchiShSiCh08.pdf
 
         :param weight: (np.array) Weight to be projected onto the simplex domain.
-        :return weights.value: (np.array) Simplex projection of the original weight.
+        :return: (np.array) Simplex projection of the original weight.
         """
         # Sort in descending order.
         _mu = np.sort(weight)[::-1]

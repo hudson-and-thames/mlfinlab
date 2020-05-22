@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.momentum.follow_the_regularized_leader import FollowTheRegularizedLeader
+from mlfinlab.online_portfolio_selection.momentum.follow_the_regularized_leader import FTRL
 
 
 class TestFollowTheRegularizedLeader(TestCase):
@@ -31,7 +31,7 @@ class TestFollowTheRegularizedLeader(TestCase):
         Test calculation of follow the regularized leader.
         """
         # Initialize FTRL.
-        ftrl = FollowTheRegularizedLeader(beta=0.2)
+        ftrl = FTRL(beta=0.2)
         # Allocate asset prices to FTRL.
         ftrl.allocate(self.data, resample_by='Y')
         all_weights = np.array(ftrl.all_weights)
@@ -46,7 +46,7 @@ class TestFollowTheRegularizedLeader(TestCase):
         Test calculation of follow the regularized leader for beta value of 0.
         """
         # Initialize FTRL.
-        ftrl = FollowTheRegularizedLeader(beta=0)
+        ftrl = FTRL(beta=0)
         # Allocate asset prices to FTRL.
         ftrl.allocate(self.data, resample_by='Y')
         all_weights = np.array(ftrl.all_weights)
@@ -61,7 +61,7 @@ class TestFollowTheRegularizedLeader(TestCase):
         Test calculation of follow the regularized leader for beta value of 1.
         """
         # Initialize FTRL.
-        ftrl = FollowTheRegularizedLeader(beta=1)
+        ftrl = FTRL(beta=1)
         # Allocate asset prices to FTRL.
         ftrl.allocate(self.data, resample_by='Y')
         all_weights = np.array(ftrl.all_weights)
@@ -76,7 +76,7 @@ class TestFollowTheRegularizedLeader(TestCase):
         Test calculation of follow the regularized leader for beta value of 10.
         """
         # Initialize FTRL.
-        ftrl = FollowTheRegularizedLeader(beta=10)
+        ftrl = FTRL(beta=10)
         # Allocate asset prices to FTRL.
         ftrl.allocate(self.data, resample_by='Y')
         all_weights = np.array(ftrl.all_weights)

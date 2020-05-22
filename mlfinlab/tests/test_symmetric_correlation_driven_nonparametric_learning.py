@@ -6,7 +6,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.online_portfolio_selection.pattern_matching.symmetric_correlation_driven_nonparametric_learning \
-    import SymmetricCorrelationDrivenNonparametricLearning
+    import SCORN
 
 
 class TestSymmetricCorrelationDrivenNonparametricLearning(TestCase):
@@ -32,7 +32,7 @@ class TestSymmetricCorrelationDrivenNonparametricLearning(TestCase):
         Test the calculation of SCORN.
         """
         # Initialize SCORN.
-        scorn = SymmetricCorrelationDrivenNonparametricLearning(window=2, rho=0.5)
+        scorn = SCORN(window=2, rho=0.5)
         # Allocates asset prices to SCORN.
         scorn.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.

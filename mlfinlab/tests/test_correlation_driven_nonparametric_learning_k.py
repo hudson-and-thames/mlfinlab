@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning_k import CorrelationDrivenNonparametricLearningK
+from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning_k import CORNK
 
 
 class TestCorrelationDrivenNonparametricLearningK(TestCase):
@@ -30,7 +30,7 @@ class TestCorrelationDrivenNonparametricLearningK(TestCase):
         Test the calculation of CORN-K.
         """
         # Initialize CORN-K.
-        corn_k = CorrelationDrivenNonparametricLearningK(window=2, rho=2, k=1)
+        corn_k = CORNK(window=2, rho=2, k=1)
         # Allocates asset prices to CORN-K.
         corn_k.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -47,13 +47,13 @@ class TestCorrelationDrivenNonparametricLearningK(TestCase):
         Tests ValueError if window is not an integer or less than 1.
         """
         # Initialize CORN-K.
-        corn_k1 = CorrelationDrivenNonparametricLearningK(window=2.5, rho=2, k=1)
+        corn_k1 = CORNK(window=2.5, rho=2, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn_k1.allocate(self.data)
 
         # Initialize CORN-K.
-        corn_k2 = CorrelationDrivenNonparametricLearningK(window=0, rho=2, k=1)
+        corn_k2 = CORNK(window=0, rho=2, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn_k2.allocate(self.data)
@@ -63,13 +63,13 @@ class TestCorrelationDrivenNonparametricLearningK(TestCase):
         Tests ValueError if rho is not an integer or less than 1.
         """
         # Initialize CORN-K.
-        corn_k3 = CorrelationDrivenNonparametricLearningK(window=2, rho=2.5, k=1)
+        corn_k3 = CORNK(window=2, rho=2.5, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn_k3.allocate(self.data)
 
         # Initialize CORN-K.
-        corn_k4 = CorrelationDrivenNonparametricLearningK(window=2, rho=0, k=1)
+        corn_k4 = CORNK(window=2, rho=0, k=1)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn_k4.allocate(self.data)
@@ -79,19 +79,19 @@ class TestCorrelationDrivenNonparametricLearningK(TestCase):
         Tests ValueError if k is greater than window * rho, greater than 1, or an integer.
         """
         # Initialize CORN-K.
-        corn_k5 = CorrelationDrivenNonparametricLearningK(window=2, rho=2, k=5)
+        corn_k5 = CORNK(window=2, rho=2, k=5)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn_k5.allocate(self.data)
 
         # Initialize CORN-K.
-        corn_k6 = CorrelationDrivenNonparametricLearningK(window=2, rho=2, k=1.5)
+        corn_k6 = CORNK(window=2, rho=2, k=1.5)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn_k6.allocate(self.data)
 
         # Initialize CORN-K.
-        corn_k7 = CorrelationDrivenNonparametricLearningK(window=2, rho=2, k=0)
+        corn_k7 = CORNK(window=2, rho=2, k=0)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             corn_k7.allocate(self.data)

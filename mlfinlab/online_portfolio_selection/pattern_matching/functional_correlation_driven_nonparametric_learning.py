@@ -2,10 +2,10 @@
 import numpy as np
 import scipy.optimize as opt
 from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import \
-    CorrelationDrivenNonparametricLearning
+    CORN
 
 
-class FunctionalCorrelationDrivenNonparametricLearning(CorrelationDrivenNonparametricLearning):
+class FCORN(CORN):
     """
     This class implements the Functional Correlation Driven Nonparametric Learning strategy. It is
     reproduced with modification from the following paper:

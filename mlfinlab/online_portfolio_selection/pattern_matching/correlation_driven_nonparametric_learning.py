@@ -4,7 +4,7 @@ import scipy.optimize as opt
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class CorrelationDrivenNonparametricLearning(OLPS):
+class CORN(OLPS):
     """
     This class implements the Correlation Driven Nonparametric Learning strategy. It is
     reproduced with modification from the following paper:
@@ -41,8 +41,8 @@ class CorrelationDrivenNonparametricLearning(OLPS):
         :param resample_by: (str) Specifies how to resample the prices. 'D' for Day, 'W' for Week,
                                  'M' for Month. The inputs are based on pandas' resample method.
         """
-        super(CorrelationDrivenNonparametricLearning, self)._initialize(asset_prices, weights,
-                                                                        resample_by)
+        super(CORN, self)._initialize(asset_prices, weights,
+                                      resample_by)
         # Check that window value is an integer.
         if not isinstance(self.window, int):
             raise ValueError("Window value must be an integer.")

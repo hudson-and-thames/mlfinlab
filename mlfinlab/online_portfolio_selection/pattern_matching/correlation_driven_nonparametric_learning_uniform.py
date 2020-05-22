@@ -1,10 +1,10 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
-from mlfinlab.online_portfolio_selection.universal_portfolio import UniversalPortfolio
-from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import CorrelationDrivenNonparametricLearning
+from mlfinlab.online_portfolio_selection.universal_portfolio import UP
+from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import CORN
 
 
-class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
+class CORNU(UP):
     """
     This class implements the Correlation Driven Nonparametric Learning - Uniform strategy. It is
     reproduced with modification from the following paper:
@@ -56,9 +56,9 @@ class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
         if self.rho < -1 or self.rho > 1:
             raise ValueError("Rho must be between -1 and 1.")
 
-        super(CorrelationDrivenNonparametricLearningUniform, self)._initialize(asset_prices,
-                                                                               weights,
-                                                                               resample_by)
+        super(CORNU, self)._initialize(asset_prices,
+                                       weights,
+                                       resample_by)
 
     def _generate_experts(self):
         """
@@ -73,4 +73,4 @@ class CorrelationDrivenNonparametricLearningUniform(UniversalPortfolio):
 
         for exp in range(self.number_of_experts):
             param = self.expert_params[exp]
-            self.experts.append(CorrelationDrivenNonparametricLearning(int(param[0]), param[1]))
+            self.experts.append(CORN(int(param[0]), param[1]))

@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection import BestConstantRebalancedPortfolio, ConstantRebalancedPortfolio
+from mlfinlab.online_portfolio_selection import BCRP, CRP
 
 
 class TestBestConstantRebalancedPortfolio(TestCase):
@@ -32,7 +32,7 @@ class TestBestConstantRebalancedPortfolio(TestCase):
         Tests the calculation of best constant rebalanced portfolio weights.
         """
         # Initialize BCRP.
-        bcrp = BestConstantRebalancedPortfolio()
+        bcrp = BCRP()
         # Allocates asset prices to BCRP.
         bcrp.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -52,7 +52,7 @@ class TestBestConstantRebalancedPortfolio(TestCase):
         Tests that BCRP returns are higher than other CRP's.
         """
         # Initialize BCRP
-        bcrp1 = BestConstantRebalancedPortfolio()
+        bcrp1 = BCRP()
         # Allocates asset prices to BCRP.
         bcrp1.allocate(self.data, resample_by='M')
         # Get final returns for bcrp1.
@@ -60,7 +60,7 @@ class TestBestConstantRebalancedPortfolio(TestCase):
         # Set an arbitray weight to test.
         weight = bcrp1._uniform_weight()
         # Initialize CRP.
-        crp = ConstantRebalancedPortfolio(weight)
+        crp = CRP(weight)
         crp.allocate(self.data, resample_by='M')
         # Get final returns for CRP.
         crp_returns = np.array(crp.portfolio_return)[-1]

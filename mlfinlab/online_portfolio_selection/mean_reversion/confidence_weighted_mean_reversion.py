@@ -4,7 +4,7 @@ from scipy.stats import norm
 from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
 
 
-class ConfidenceWeightedMeanReversion(OLPS):
+class CWMR(OLPS):
     """
     This class implements the Confidence Weighted Mean Reversion strategy. It is reproduced with
     modification from the following paper:
@@ -21,10 +21,18 @@ class ConfidenceWeightedMeanReversion(OLPS):
         """
         Initializes Confidence Weighted Mean Reversion with the given confidence, epsilon, and method.
 
-        :param confidence: (float) Confidence parameter. Must be between 0 and 1.
-        :param epsilon: (float) Mean reversion parameter. Must be between 0 and 1.
+        :param confidence: (float) Confidence parameter with range of [0, 1]. CWMR is extremely
+                                   sensitive to parameters, and it is unpredictable how the confidence
+                                   value directly affects the results. Typically the extreme values of
+                                   0 and 1 have the highest returns. A low value indicates a wider
+                                   range of selection for weights.
+        :param epsilon: (float) Mean reversion parameter with range of [0, 1]. CWMR is extremely
+                                sensitive to parameters, and it is unpredictable how the epsilon value
+                                directly affects the results. Typically the extreme values of 0 and
+                                1 have the highest returns.
         :param method: (string) Variance update method. Choose 'var' for variance and 'sd' for
-                                standard deviation
+                                standard deviation. Both methods are dependant on the confidence and
+                                epsilon parameters more than the method itself.
         """
         self.confidence = confidence
         self.theta = None
@@ -39,10 +47,11 @@ class ConfidenceWeightedMeanReversion(OLPS):
         Initializes the important variables for the object.
 
         :param asset_prices: (pd.DataFrame) Historical asset prices.
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
-        :param resample_by: (str) Specifies how to resample the prices.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
+        :param resample_by: (str) Specifies how to resample the prices. 'D' for Day, 'W' for Week,
+                                 'M' for Month. The inputs are based on pandas' resample method.
         """
-        super(ConfidenceWeightedMeanReversion, self)._initialize(asset_prices, weights, resample_by)
+        super(CWMR, self)._initialize(asset_prices, weights, resample_by)
 
         # Check that epsilon value is correct.
         if self.epsilon < 0 or self.epsilon > 1:
@@ -64,7 +73,7 @@ class ConfidenceWeightedMeanReversion(OLPS):
         Predicts the next time's portfolio weight.
 
         :param time: (int) Current time period.
-        :return new_weights: (np.array) Predicted weights.
+        :return: (np.array) Predicted weights.
         """
         # Set current relative returns.
         curr_relative_return = self.relative_return[[time]]
@@ -93,6 +102,7 @@ class ConfidenceWeightedMeanReversion(OLPS):
             sqrt_u = (-lambd * self.theta * new_v + np.sqrt(lambd ** 2 * self.theta ** 2 * new_v ** 2 + 4 * new_v)) / 2
             # Update variance.
             self.sigma = np.linalg.pinv(np.linalg.pinv(self.sigma) + lambd * self.theta / sqrt_u * np.diag(curr_relative_return) ** 2)
+
         if self.method == 'var':
             # Update variance.
             self.sigma = np.linalg.pinv(
@@ -114,8 +124,8 @@ class ConfidenceWeightedMeanReversion(OLPS):
         Returns the first weight of the given portfolio. If the first weight is not given,
         initialize weights to uniform weights.
 
-        :param weights: (list/np.array/pd.Dataframe) Initial weights set by the user.
-        :return (weights): (np.array) First portfolio weight.
+        :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
+        :return: (np.array) First portfolio weight.
         """
         # Set sigma, the variance of the portfolio distribution.
         self.sigma = np.identity(self.number_of_assets) / (self.number_of_assets ** 2)
@@ -137,7 +147,7 @@ class ConfidenceWeightedMeanReversion(OLPS):
         :param new_v: (float) The variance of current relative returns.
         :param new_w: (float) The weighted variance of relative returns.
         :param mean_x: (np.array) Weighted average of the variance.
-        :return lambd: (float) Lagrangian multiplier for the problem.
+        :return: (float) Lagrangian multiplier for the problem.
         """
         # Expression to speed up calculations.
         expn = new_v - np.dot(mean_x, new_w) + self.theta ** 2 * new_v / 2

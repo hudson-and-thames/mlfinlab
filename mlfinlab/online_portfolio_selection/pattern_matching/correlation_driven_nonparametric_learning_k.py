@@ -1,11 +1,11 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
-from mlfinlab.online_portfolio_selection.universal_portfolio import UniversalPortfolio
+from mlfinlab.online_portfolio_selection.universal_portfolio import UP
 from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import \
-    CorrelationDrivenNonparametricLearning
+    CORN
 
 
-class CorrelationDrivenNonparametricLearningK(UniversalPortfolio):
+class CORNK(UP):
     """
     This class implements the Correlation Driven Nonparametric Learning - K strategy. It is
     reproduced with modification from the following paper:
@@ -78,9 +78,9 @@ class CorrelationDrivenNonparametricLearningK(UniversalPortfolio):
         if self.k > self.number_of_experts:
             raise ValueError("K must be less than or equal to window * rho.")
 
-        super(CorrelationDrivenNonparametricLearningK, self)._initialize(asset_prices,
-                                                                         weights,
-                                                                         resample_by)
+        super(CORNK, self)._initialize(asset_prices,
+                                       weights,
+                                       resample_by)
 
     def _generate_experts(self):
         """
@@ -103,4 +103,4 @@ class CorrelationDrivenNonparametricLearningK(UniversalPortfolio):
         # Assign parameters.
         for exp in range(self.number_of_experts):
             param = self.expert_params[exp]
-            self.experts.append(CorrelationDrivenNonparametricLearning(int(param[0]), param[1]))
+            self.experts.append(CORN(int(param[0]), param[1]))

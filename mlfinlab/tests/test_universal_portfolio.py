@@ -6,7 +6,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.universal_portfolio import UniversalPortfolio
+from mlfinlab.online_portfolio_selection.universal_portfolio import UP
 
 
 class TestUniversalPortfolio(TestCase):
@@ -32,7 +32,7 @@ class TestUniversalPortfolio(TestCase):
         Test the calculation of UP weights.
         """
         # Initialize UP.
-        up1 = UniversalPortfolio(2)
+        up1 = UP(2)
         # Allocates asset prices to UP.
         up1.allocate(self.data)
         # Create np.array of all_weights.
@@ -49,7 +49,7 @@ class TestUniversalPortfolio(TestCase):
         Tests that UP prints progress bar.
         """
         # Initialize UP.
-        up2 = UniversalPortfolio(2)
+        up2 = UP(2)
         # Allocates asset prices to UP.
         up2.allocate(self.data, verbose=True)
 
@@ -58,7 +58,7 @@ class TestUniversalPortfolio(TestCase):
         Tests UP with uniform capital allocation.
         """
         # Initialize UP.
-        up3 = UniversalPortfolio(2, weighted='uniform')
+        up3 = UP(2, weighted='uniform')
         # Allocates asset prices to UP.
         up3.allocate(self.data)
         # Create np.array of all_weights.
@@ -75,7 +75,7 @@ class TestUniversalPortfolio(TestCase):
         Tests UP with top-k experts capital allocation.
         """
         # Initialize UP.
-        up4 = UniversalPortfolio(5, weighted='top-k', k=2)
+        up4 = UP(5, weighted='top-k', k=2)
         # Allocates asset prices to UP.
         up4.allocate(self.data)
         # Create np.array of all_weights.
@@ -92,7 +92,7 @@ class TestUniversalPortfolio(TestCase):
         Tests ValueError if the method is not 'hist_performance', 'uniform', or 'top-k'.
         """
         # Initialize UP.
-        up5 = UniversalPortfolio(5, weighted='random', k=2)
+        up5 = UP(5, weighted='random', k=2)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             up5.allocate(self.data)
@@ -102,7 +102,7 @@ class TestUniversalPortfolio(TestCase):
         Tests recalculate method in UP.
         """
         # Initialize UP.
-        up6 = UniversalPortfolio(3, weighted='top-k', k=2)
+        up6 = UP(3, weighted='top-k', k=2)
         # Allocates asset prices to UP.
         up6.allocate(self.data)
         # Recalculate with k=1.
@@ -121,7 +121,7 @@ class TestUniversalPortfolio(TestCase):
         Tests ValueError if k is greater number of experts for recalculate.
         """
         # Initialize UP.
-        up7 = UniversalPortfolio(3, weighted='top-k', k=2)
+        up7 = UP(3, weighted='top-k', k=2)
         # Allocates asset prices to UP.
         up7.allocate(self.data)
         with self.assertRaises(ValueError):
@@ -133,7 +133,7 @@ class TestUniversalPortfolio(TestCase):
         Tests ValueError if k is not an integer for recalculate.
         """
         # Initialize UP.
-        up8 = UniversalPortfolio(3, weighted='top-k', k=2)
+        up8 = UP(3, weighted='top-k', k=2)
         # Allocates asset prices to UP.
         up8.allocate(self.data)
         with self.assertRaises(ValueError):
@@ -145,7 +145,7 @@ class TestUniversalPortfolio(TestCase):
         Tests ValueError if k is not greater than or equal to 1.
         """
         # Initialize UP.
-        up9 = UniversalPortfolio(3, weighted='top-k', k=2)
+        up9 = UP(3, weighted='top-k', k=2)
         # Allocates asset prices to UP.
         up9.allocate(self.data)
         with self.assertRaises(ValueError):
