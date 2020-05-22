@@ -135,8 +135,8 @@ class TestCodependence(unittest.TestCase):
         gpr1_xy1 = gpr_distance(self.x, self.y_1, theta=1)
         gpr1_xy2 = gpr_distance(self.x, self.y_2, theta=1)
 
-        self.assertAlmostEqual(gpr0_xy1, 0.5586512, delta=1e-7)
-        self.assertAlmostEqual(gpr0_xy2, 0.6401989, delta=1e-7)
+        self.assertAlmostEqual(gpr0_xy1, 0.3216183, delta=1e-7)
+        self.assertAlmostEqual(gpr0_xy2, 0.3803020, delta=1e-7)
 
         self.assertAlmostEqual(gpr1_xy1, 0.7033639, delta=1e-7)
         self.assertAlmostEqual(gpr1_xy2, 0.6967954, delta=1e-7)
@@ -152,8 +152,8 @@ class TestCodependence(unittest.TestCase):
         gnpr1_xy1 = gnpr_distance(self.x, self.y_1, theta=1)
         gnpr1_xy2 = gnpr_distance(self.x, self.y_2, theta=1)
 
-        self.assertAlmostEqual(gnpr0_xy1, 18.6051476, delta=1e-7)
-        self.assertAlmostEqual(gnpr0_xy2, 18.0616596, delta=1e-7)
+        self.assertAlmostEqual(gnpr0_xy1, 0.58834643, delta=1e-7)
+        self.assertAlmostEqual(gnpr0_xy2, 0.57115983, delta=1e-7)
 
         self.assertAlmostEqual(gnpr1_xy1, 0.0032625, delta=1e-7)
         self.assertAlmostEqual(gnpr1_xy2, 0.0023459, delta=1e-7)

@@ -56,8 +56,8 @@ def gpr_distance(x: np.array, y: np.array, theta: float) -> float:
 
     # Calculating the GPR distance
     distance = theta * (1 - spearmans_rho(x, y)) / 2 + \
-               (1 - theta) * (1 - ((2 * x.std() * y.std()) /(x.std()**2 + y.std()**2)) *
-                              np.exp(- (x.mean() - y.mean())**2 / (x.std()**2 + y.std()**2)))
+               (1 - theta) * (1 - ((2 * x.std() * y.std()) / (x.std()**2 + y.std()**2))**(1/2) *
+                              np.exp(- (1 / 4) * (x.mean() - y.mean())**2 / (x.std()**2 + y.std()**2)))
 
     return distance**(1/2)
 
@@ -66,7 +66,7 @@ def gnpr_distance(x: np.array, y: np.array, theta: float, bandwidth: float = 0.0
     Calculates the empirical distance between two random variables under the Generic Non-Parametric Representation
     (GNPR) approach.
 
-    Formula for the distance is taken form https://www.researchgate.net/publication/322714557 (p.72).
+    Formula for the distance is taken from https://www.researchgate.net/publication/322714557 (p.72).
 
     Parameter theta defines what type of information dependency is being tested:
     - for theta = 0 the distribution information is tested
@@ -94,8 +94,8 @@ def gnpr_distance(x: np.array, y: np.array, theta: float, bandwidth: float = 0.0
 
     # Creating a grid and histograms
     bins = np.arange(min_val, max_val + bandwidth, bandwidth)
-    hist_x = np.histogram(x, bins)[0]
-    hist_y = np.histogram(y, bins)[0]
+    hist_x = np.histogram(x, bins)[0] / num_obs
+    hist_y = np.histogram(y, bins)[0] / num_obs
 
     # Calculating the d_0 distance
     dist_0 = np.power(hist_x**(1/2) - hist_y**(1/2), 2).sum() / 2
