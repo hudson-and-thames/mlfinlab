@@ -25,7 +25,7 @@ in the covariances of the asset returns.
 
 .. tip::
     * For a detailed explanation of how HRP works, we have written an excellent `blog post <https://hudsonthames.org/an-introduction-to-the-hierarchical-risk-parity-algorithm/>`_ about it.
-    * HRP uses the single-linkage clustering algorithm. (See the tip under the HCAA algorithm for more details.)
+    * HRP, by default, uses the single-linkage clustering algorithm. (See the tip under the HCAA algorithm for more details.)
 
 
 Implementation
@@ -55,12 +55,23 @@ Example Code
     hrp.allocate(asset_prices=stock_prices, resample_by='B')
     hrp_weights = hrp.weights.sort_values(by=0, ascending=False, axis=1)
 
+    # Building a dollar neutral Long/Short portfolio by shorting the first 4 stocks and being long the others
+    hrp = HierarchicalRiskParity()
+    side_weights = pd.Series([1]*stock_prices.shape[1], index=self.data.columns)
+    side_weights.loc[stock_prices.columns[:4]] = -1
+    hrp.allocate(asset_prices=self.data, asset_names=self.data.columns, side_weights=side_weights)
+    hrp.allocate(asset_prices=stock_prices, side_weights=side_weights, resample_by='B')
+    hrp_weights = hrp.weights.sort_values(by=0, ascending=False, axis=1)
+
 
 .. note::
 
     We provide great flexibility to the users in terms of the input data - either they can pass raw historical stock prices
     as the parameter :py:mod:`asset_prices` in which case the expected returns and covariance matrix will be calculated
     using this data. Else, they can also pass pre-calculated :py:mod:`expected_returns` and :py:mod:`covariance_matrix`.
+    Ultimately, they can pass their own :py:mod:`distance_matrix` but the :py:mod:`covariance_matrix` is still requested
+    for computing the clustered variances. The :py:mod:`linkage` method for the clustering part is also a parameter of the
+    algorithm, default being single linkage.
 
 
 Plotting
@@ -88,4 +99,4 @@ Advances in Financial Machine Learning.
 
 * `Chapter 16 Exercise Notebook`_
 
-.. _Chapter 16 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Chapter16/Chapter16.ipynb
+.. _Chapter 16 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Machine%20Learning%20Asset%20Allocation/Chapter16.ipynb

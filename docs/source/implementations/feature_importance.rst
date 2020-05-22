@@ -94,7 +94,7 @@ Research Notebook
 *****************
 * `Answering Questions on MDI, MDA, and SFI Feature Importance`_
 
-.. _Answering Questions on MDI, MDA, and SFI Feature Importance: https://github.com/hudson-and-thames/research/blob/master/Chapter8_FeatureImportance/Chapter8_Exercises_Feature_Importance.ipynb
+.. _Answering Questions on MDI, MDA, and SFI Feature Importance: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Feature%20Importance/Chapter8_Exercises_Feature_Importance.ipynb
 
 ---------------------
 
@@ -201,7 +201,7 @@ The following research notebooks can be used to better understand the Clustered 
 
 * `Clustered Feature Importance`_
 
-.. _Clustered Feature Importance: https://github.com/hudson-and-thames/research/blob/master/Chapter8_FeatureImportance/Cluster_Feature_Importance.ipynb
+.. _Clustered Feature Importance: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Feature%20Importance/Cluster_Feature_Importance.ipynb
 
 ------------------
 

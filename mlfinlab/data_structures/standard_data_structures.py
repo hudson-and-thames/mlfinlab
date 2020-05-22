@@ -34,7 +34,13 @@ class StandardBars(BaseBars):
     """
 
     def __init__(self, metric: str, threshold: int = 50000, batch_size: int = 20000000):
+        """
+        Constructor
 
+        :param metric: (str) Type of run bar to create. Example: "dollar_run"
+        :param threshold: (int) Threshold at which to sample
+        :param batch_size: (int) Number of rows to read in from the csv, per batch
+        """
         BaseBars.__init__(self, metric, batch_size)
 
         # Threshold at which to sample
@@ -53,7 +59,8 @@ class StandardBars(BaseBars):
         For loop which compiles the various bars: dollar, volume, or tick.
         We did investigate the use of trying to solve this in a vectorised manner but found that a For loop worked well.
 
-        :param data: Contains 3 columns - date_time, price, and volume.
+        :param data: (tuple) Contains 3 columns - date_time, price, and volume.
+        :return: (list) Extracted bars
         """
 
         # Iterate over rows

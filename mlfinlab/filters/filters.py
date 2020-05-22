@@ -11,7 +11,9 @@ import pandas as pd
 # Snippet 2.4, page 39, The Symmetric CUSUM Filter.
 def cusum_filter(raw_time_series, threshold, time_stamps=True):
     """
-    Snippet 2.4, page 39, The Symmetric Dynamic/Fixed CUSUM Filter.
+    Advances in Financial Machine Learning, Snippet 2.4, page 39.
+
+    The Symmetric Dynamic/Fixed CUSUM Filter.
 
     The CUSUM filter is a quality-control method, designed to detect a shift in the mean value of a measured quantity
     away from a target value. The filter is set up to identify a sequence of upside or downside divergences from any
@@ -27,11 +29,11 @@ def cusum_filter(raw_time_series, threshold, time_stamps=True):
     Note: As per the book this filter is applied to closing prices but we extended it to also work on other
     time series such as volatility.
 
-    :param raw_time_series: (series) of close prices (or other time series, e.g. volatility).
-    :param threshold: (float or pd.Series) when the abs(change) is larger than the threshold, the function captures
+    :param raw_time_series: (pd.Series) Close prices (or other time series, e.g. volatility).
+    :param threshold: (float or pd.Series) When the abs(change) is larger than the threshold, the function captures
                       it as an event, can be dynamic if threshold is pd.Series
-    :param time_stamps: (bool) default is to return a DateTimeIndex, change to false to have it return a list.
-    :return: (datetime index vector) vector of datetimes when the events occurred. This is used later to sample.
+    :param time_stamps: (bool) Default is to return a DateTimeIndex, change to false to have it return a list.
+    :return: (datetime index vector) Vector of datetimes when the events occurred. This is used later to sample.
     """
 
     t_events = []
@@ -80,12 +82,12 @@ def z_score_filter(raw_time_series, mean_window, std_window, z_score=3, time_sta
     Filter which implements z_score filter
     (https://stackoverflow.com/questions/22583391/peak-signal-detection-in-realtime-timeseries-data)
 
-    :param raw_time_series: (series) of close prices (or other time series, e.g. volatility).
-    :param mean_window: (int): rolling mean window
-    :param std_window: (int): rolling std window
-    :param z_score: (float): number of standard deviations to trigger the event
-    :param time_stamps: (bool) default is to return a DateTimeIndex, change to false to have it return a list.
-    :return: (datetime index vector) vector of datetimes when the events occurred. This is used later to sample.
+    :param raw_time_series: (pd.Series) Close prices (or other time series, e.g. volatility).
+    :param mean_window: (int): Rolling mean window
+    :param std_window: (int): Rolling std window
+    :param z_score: (float): Number of standard deviations to trigger the event
+    :param time_stamps: (bool) Default is to return a DateTimeIndex, change to false to have it return a list.
+    :return: (datetime index vector) Vector of datetimes when the events occurred. This is used later to sample.
     """
     t_events = raw_time_series[raw_time_series >= raw_time_series.rolling(window=mean_window).mean() +
                                z_score * raw_time_series.rolling(window=std_window).std()].index

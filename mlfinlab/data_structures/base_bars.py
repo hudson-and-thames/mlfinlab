@@ -17,9 +17,9 @@ def _crop_data_frame_in_batches(df: pd.DataFrame, chunksize: int) -> list:
     """
     Splits df into chunks of chunksize
 
-    :param df: (pd.DataFrame) to split
-    :param chunksize: (Int) number of rows in chunk
-    :return: (list) of chunks (pd.DataFrames)
+    :param df: (pd.DataFrame) Dataframe to split
+    :param chunksize: (int) Number of rows in chunk
+    :return: (list) Chunks (pd.DataFrames)
     """
     generator_object = []
     for _, chunk in df.groupby(np.arange(len(df)) // chunksize):
@@ -40,7 +40,7 @@ class BaseBars(ABC):
         """
         Constructor
 
-        :param metric: (str) type of imbalance bar to create. Example: dollar_imbalance.
+        :param metric: (str) Type of imbalance bar to create. Example: dollar_imbalance.
         :param batch_size: (int) Number of rows to read in from the csv, per batch.
         """
 
@@ -67,11 +67,11 @@ class BaseBars(ABC):
 
         :param file_path_or_df: (str, iterable of str, or pd.DataFrame) Path to the csv file(s) or Pandas Data Frame containing
                                 raw tick data  in the format[date_time, price, volume]
-        :param verbose: (Boolean) Flag whether to print message on each processed batch or not
-        :param to_csv: (Boolean) Flag for writing the results of bars generation to local csv file, or to in-memory DataFrame
-        :param output_path: (Boolean) Path to results file, if to_csv = True
+        :param verbose: (bool) Flag whether to print message on each processed batch or not
+        :param to_csv: (bool) Flag for writing the results of bars generation to local csv file, or to in-memory DataFrame
+        :param output_path: (bool) Path to results file, if to_csv = True
 
-        :return: (DataFrame or None) Financial data structure
+        :return: (pd.DataFrame or None) Financial data structure
         """
 
         if to_csv is True:
@@ -149,9 +149,9 @@ class BaseBars(ABC):
         Reads a List, Tuple, or Dataframe and then constructs the financial data structure in the form of a list.
         The List, Tuple, or DataFrame must have only 3 attrs: date_time, price, & volume.
 
-        :param data: (List, Tuple, or DataFrame) Dict or ndarray containing raw tick data in the format[date_time, price, volume]
+        :param data: (list, tuple, or pd.DataFrame) Dict or ndarray containing raw tick data in the format[date_time, price, volume]
 
-        :return: (List) Financial data structure
+        :return: (list) Financial data structure
         """
 
         if isinstance(data, (list, tuple)):
@@ -175,8 +175,8 @@ class BaseBars(ABC):
         """
         This method is required by all the bar types and is used to create the desired bars.
 
-        :param data: (DataFrame) Contains 3 columns - date_time, price, and volume.
-        :return: (List) of bars built using the current batch.
+        :param data: (pd.DataFrame) Contains 3 columns - date_time, price, and volume.
+        :return: (list) Bars built using the current batch.
         """
 
     @abstractmethod
@@ -192,7 +192,7 @@ class BaseBars(ABC):
         Tests that the csv file read has the format: date_time, price, and volume.
         If not then the user needs to create such a file. This format is in place to remove any unwanted overhead.
 
-        :param test_batch: (DataFrame) the first row of the dataset.
+        :param test_batch: (pd.DataFrame) The first row of the dataset.
         """
         assert test_batch.shape[1] == 3, 'Must have only 3 columns in csv: date_time, price, & volume.'
         assert isinstance(test_batch.iloc[0, 1], float), 'price column in csv not float.'
@@ -208,8 +208,8 @@ class BaseBars(ABC):
         """
         Update the high and low prices using the current price.
 
-        :param price: Current price
-        :return: Updated high and low prices
+        :param price: (float) Current price
+        :return: (tuple) Updated high and low prices
         """
         if price > self.high_price:
             high_price = price
@@ -229,11 +229,11 @@ class BaseBars(ABC):
         cum_buy_volume, cum_ticks, cum_dollar_value.
         These bars are appended to list_bars, which is later used to construct the final bars DataFrame.
 
-        :param date_time: Timestamp of the bar
-        :param price: The current price
-        :param high_price: Highest price in the period
-        :param low_price: Lowest price in the period
-        :param list_bars: List to which we append the bars
+        :param date_time: (str) Timestamp of the bar
+        :param price: (float) The current price
+        :param high_price: (float) Highest price in the period
+        :param low_price: (float) Lowest price in the period
+        :param list_bars: (list) List to which we append the bars
         """
         # Create bars
         open_price = self.open_price
@@ -253,10 +253,10 @@ class BaseBars(ABC):
 
     def _apply_tick_rule(self, price: float) -> int:
         """
-        Applies the tick rule as defined on page 29.
+        Applies the tick rule as defined on page 29 of Advances in Financial Machine Learning.
 
-        :param price: Price at time t
-        :return: The signed tick
+        :param price: (float) Price at time t
+        :return: (int) The signed tick
         """
         if self.prev_price is not None:
             tick_diff = price - self.prev_price
@@ -274,12 +274,14 @@ class BaseBars(ABC):
 
     def _get_imbalance(self, price: float, signed_tick: int, volume: float) -> float:
         """
-        Get the imbalance at a point in time, denoted as Theta_t in the book, pg 29.
+        Advances in Financial Machine Learning, page 29.
 
-        :param price: Price at t
-        :param signed_tick: signed tick, using the tick rule
-        :param volume: Volume traded at t
-        :return: Imbalance at time t
+        Get the imbalance at a point in time, denoted as Theta_t
+
+        :param price: (float) Price at t
+        :param signed_tick: (int) signed tick, using the tick rule
+        :param volume: (float) Volume traded at t
+        :return: (float) Imbalance at time t
         """
         if self.metric == 'tick_imbalance' or self.metric == 'tick_run':
             imbalance = signed_tick
@@ -303,12 +305,12 @@ class BaseImbalanceBars(BaseBars):
         """
         Constructor
 
-        :param metric: (String) type of imbalance bar to create. Example: dollar_imbalance.
-        :param batch_size: (Int) Number of rows to read in from the csv, per batch.
-        :param expected_imbalance_window: (Int) Window used to estimate expected imbalance from previous trades
-        :param exp_num_ticks_init: (Int) Initial estimate for expected number of ticks in bar.
+        :param metric: (str) Type of imbalance bar to create. Example: dollar_imbalance.
+        :param batch_size: (int) Number of rows to read in from the csv, per batch.
+        :param expected_imbalance_window: (int) Window used to estimate expected imbalance from previous trades
+        :param exp_num_ticks_init: (int) Initial estimate for expected number of ticks in bar.
                                          For Const Imbalance Bars expected number of ticks equals expected number of ticks init
-        :param analyse_thresholds: (Bool) flag to return thresholds values (theta, exp_num_ticks, exp_imbalance) in a
+        :param analyse_thresholds: (bool) Flag to return thresholds values (theta, exp_num_ticks, exp_imbalance) in a
                                           form of Pandas DataFrame
         """
         BaseBars.__init__(self, metric, batch_size)
@@ -339,8 +341,8 @@ class BaseImbalanceBars(BaseBars):
         """
         For loop which compiles the various imbalance bars: dollar, volume, or tick.
 
-        :param data: (DataFrame) Contains 3 columns - date_time, price, and volume.
-        :return: (List) of bars built using the current batch.
+        :param data: (pd.DataFrame) Contains 3 columns - date_time, price, and volume.
+        :return: (list) Bars built using the current batch.
         """
 
         # Iterate over rows
@@ -402,7 +404,7 @@ class BaseImbalanceBars(BaseBars):
         """
         Calculate the expected imbalance: 2P[b_t=1]-1, using a EWMA, pg 29
         :param window: (int) EWMA window for calculation
-        :return: expected_imbalance: 2P[b_t=1]-1, approximated using a EWMA
+        :return: expected_imbalance: (np.ndarray) 2P[b_t=1]-1, approximated using a EWMA
         """
         if len(self.imbalance_tick_statistics['imbalance_array']) < self.thresholds['exp_num_ticks']:
             # Waiting for array to fill for ewma
@@ -441,12 +443,12 @@ class BaseRunBars(BaseBars):
         """
         Constructor
 
-        :param metric: (str) type of imbalance bar to create. Example: dollar_imbalance.
+        :param metric: (str) Type of imbalance bar to create. Example: dollar_imbalance.
         :param batch_size: (int) Number of rows to read in from the csv, per batch.
-        :param expected_imbalance_window: (Int) Window used to estimate expected imbalance from previous trades
+        :param expected_imbalance_window: (int) Window used to estimate expected imbalance from previous trades
         :param exp_num_ticks_init: (int) Initial estimate for expected number of ticks in bar.
                                          For Const Imbalance Bars expected number of ticks equals expected number of ticks init
-        :param analyse_thresholds: (bool) flag to return thresholds values (thetas, exp_num_ticks, exp_runs) in Pandas DataFrame
+        :param analyse_thresholds: (bool) Flag to return thresholds values (thetas, exp_num_ticks, exp_runs) in Pandas DataFrame
         """
         BaseBars.__init__(self, metric, batch_size)
 
@@ -482,8 +484,8 @@ class BaseRunBars(BaseBars):
         """
         For loop which compiles the various run bars: dollar, volume, or tick.
 
-        :param data: (list or ndarray) Contains 3 columns - date_time, price, and volume.
-        :return: (List) of bars built using the current batch.
+        :param data: (list or np.ndarray) Contains 3 columns - date_time, price, and volume.
+        :return: (list) of bars built using the current batch.
         """
 
         # Iterate over rows
@@ -578,11 +580,14 @@ class BaseRunBars(BaseBars):
 
     def _get_expected_imbalance(self, array: list, window: int, warm_up: bool = False):
         """
-        Calculate the expected imbalance: 2P[b_t=1]-1, using a EWMA, pg 29
+        Advances in Financial Machine Learning, page 29.
+
+        Calculates the expected imbalance: 2P[b_t=1]-1, using a EWMA.
+
         :param array: (list) of imbalances
         :param window: (int) EWMA window for calculation
         :parawm warm_up: (bool) flag of whether warm up period passed
-        :return: expected_imbalance: 2P[b_t=1]-1, approximated using a EWMA
+        :return: expected_imbalance: (np.ndarray) 2P[b_t=1]-1, approximated using a EWMA
         """
         if len(array) < self.thresholds['exp_num_ticks'] and warm_up is True:
             # Waiting for array to fill for ewma
