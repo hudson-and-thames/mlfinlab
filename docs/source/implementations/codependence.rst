@@ -324,13 +324,15 @@ Codependence Matrix
 This module consists two functions that generate the following:
 
 1. **Dependence Matrix** to compute dependence of a given matrix using various codependence method like Mutual Information,
-   Variation of Information and Distance Correlation.
+   Variation of Information, Distance Correlation, Spearman's Rho, GPR distance, and GNPR distance.
 2. **Distance Matrix** can used to compute distance of a given matrix using various metrics like angular, squared
    angular and absolute angular.
 
 .. note::
 
    MlFinLab makes use of these functions in the clustered feature importance.
+
+   The Spearman's Rho, GPR distance, and GNPR distance are described in the **Codependence by Marti** section of the docs.
 
 Implementation
 **************
