@@ -6,9 +6,9 @@
     on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
     Next up, lets discuss about some of these implementations and the different parameters they require.
 
-==============================
+=================
 Follow the Leader
-==============================
+=================
 
 The biggest drawback of using Exponential Gradient is the failure to look at the changes before the latest period.
 Follow the Leader mediates this shortfall by directly tracking the Best Constant Rebalanced Portfolio; therefore, FTL
@@ -16,6 +16,11 @@ looks at the whole history of the data and calculates the portfolio weights that
 
 .. math::
     b_{t+1} = b^{\bf{\star}}_t = \underset{b \in \Delta_m}{\arg\max} \overset{t}{\underset{\tau=1}{\sum}} \: \log(b \cdot x_{\tau})
+
+.. tip::
+
+    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb>`_
+    provides a more detailed exploration of the strategies.
 
 
 Implementation
@@ -57,12 +62,3 @@ Example Code
 
     # Get portfolio returns.
     ftl.portfolio_return
-
-Research Notebooks
-##################
-
-The following research notebooks provides a more detailed exploration of the strategies.
-
-* `Momentum Notebook`_
-
-.. _Momentum Notebook: https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb

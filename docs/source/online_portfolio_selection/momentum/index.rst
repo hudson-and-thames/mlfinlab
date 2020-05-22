@@ -1,8 +1,8 @@
 .. _online_portfolio_selection-momentum-index:
 
-==========
+========
 Momentum
-==========
+========
 
 .. toctree::
     :maxdepth: 3
@@ -37,11 +37,7 @@ There are three different momentum strategies implemented in the Online Portfoli
 
 3. Follow the Regularized Leader
 
-Research Notebooks
-##################
+.. tip::
 
-The following research notebooks provides a more detailed exploration of the strategies.
-
-* `Momentum Notebook`_
-
-.. _Momentum Notebook: https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb
+    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb>`_
+    provides a more detailed exploration of the strategies.

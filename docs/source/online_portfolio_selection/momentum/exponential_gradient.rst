@@ -6,9 +6,9 @@
     on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
     Next up, lets discuss about some of these implementations and the different parameters they require.
 
-==============================
+====================
 Exponential Gradient
-==============================
+====================
 
 Exponential Gradient is a momentum strategy that focuses on the best performing asset of the last time period.
 The portfolio shifts its weights to the best performing asset of the last period with an adjustment of :math:`\eta`, the learning rate.
@@ -21,9 +21,8 @@ indicates the passiveness of the strategy to match the best performing assets.
 Exponential Gradients have an extremely efficient computational time that scales with the number of assets,
 and broadly speaking, there are three update methods to iteratively update the selection of portfolio weights.
 
-*************************
 1. Multiplicative Update
-*************************
+########################
 
 David Helmbold first proposed a regularization term that adopts relative entropy.
 
@@ -41,9 +40,8 @@ Multiplicative update algorithm can be stated as the following.
     b_{t+1} = b_t \cdot \exp \left( \eta \frac{x_t}{b_t \cdot x_t} \right) / Z
 where :math:`Z` is a normalization term to sum the weights to 1.
 
-*************************
 2. Gradient Projection
-*************************
+######################
 
 Instead of relative entropy, gradient projection adopts an L2-regularization term for the optimization equation.
 
@@ -55,9 +53,9 @@ Gradient projection can then be iteratively updated with the following equation.
 .. math::
     b_{t+1} = b_t + \eta \cdot \left( \frac{x_t}{b_t \cdot x_t} - \frac{1}{m} \sum_{j=1}^{m} \frac{x_t}{b_t \cdot x_t} \right)
 
-*************************
+
 3. Expectation Maximization
-*************************
+###########################
 
 Lastly, Expectation Maximization uses a :math:`\chi^2` regularization term.
 
@@ -69,6 +67,29 @@ Then the corresponding update rule becomes
 .. math::
     b_{t+1} = b_t \cdot \left( \eta \cdot \left( \frac{x_t}{b_t \cdot x_t} - 1 \right) + 1 \right)
 
+.. tip::
+
+    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb>`_
+    provides a more detailed exploration of the strategies.
+
+Parameters
+##########
+
+The optimal parameters depend on each dataset. For NYSE, a low value of :math:`\eta` was optimal.
+
+.. image:: momentum_images/nyse_eg_eta_0_1.png
+   :width: 49 %
+
+.. image:: momentum_images/nyse_eg_eta_1_100.png
+   :width: 49 %
+
+However, for the MSCI dataset, we see a high value of optimal :math:`\eta`.
+
+.. image:: momentum_images/msci_eg_eta_0_1.png
+   :width: 49 %
+
+.. image:: momentum_images/msci_eg_eta_1_100.png
+   :width: 49 %
 
 Implementation
 ##############
@@ -113,12 +134,3 @@ Example Code
 
     # Get portfolio returns.
     gp.portfolio_return
-
-Research Notebooks
-##################
-
-The following research notebooks provides a more detailed exploration of the strategies.
-
-* `Momentum Notebook`_
-
-.. _Momentum Notebook: https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb
