@@ -64,43 +64,50 @@ overview of how the HCAA algorithm works:
     .. image:: portfolio_optimisation_images/bisection.png
 
     As seen in the above image, at each step, the weights in HRP trickle down the tree by breaking it down the middle based on the
-    number of assets. Although, this uses the hierarchical tree identified in Step-1 to allocate weights, it does not make use of
-    the exact structure of the dendrogram while calculating the cluster contributions. This is a fundamental disadvantage of HRP
-    which is improved upon by HCAA by dividing the tree, at each step, based on the structure induced by the dendrogram.
+    number of assets. Although, this uses the hierarchical tree identified in Step-1, it does not make use of the exact structure
+    of the dendrogram while calculating the cluster contributions. This is a fundamental disadvantage of HRP which is improved
+    upon by HCAA by dividing the tree, at each step, based on the structure induced by the dendrogram.
 
     At each level of the tree, an Equal Risk Contribution allocation is used i.e. the weights are:
 
     .. math::
-        \alpha_1 = \frac{RC_1}{RC_1 + RC_2}
+        \alpha_1 = \frac{RC_1}{RC_1 + RC_2}; \alpha_2 = 1 - \alpha_1
 
-    where
+    where :math:`\alpha_1`, :math:`\alpha_2` are the weights of left and right clusters respectively and :math:`RC_1`, :math:`RC_2`
+    are the risk contributions of left and right clusters.
+
+    .. note::
+
+        |h4| Risk Contribution of Clusters |h4_|
+        While variance is a very simple and popular representation of risk used in the investing world, it is not the optimal one
+        and can underestimate the true risk of a portfolio which is why there are many other important risk metrics used by
+        investment managers that can correctly reflect the true risk of a portfolio/asset. With respect to this, the original HRP
+        algorithm can be tweaked to allocate its weights based on different risk representations of the clusters and generate
+        better weights. The HCAA method in mlfinlab provides the following risk metrics:
+
+        1. ``minimum_variance`` : Variance of the clusters is used as a risk metric.
+        2. ``minimum_standard_deviation`` : Standard deviation of the clusters is used as a risk metric.
+        3. ``sharpe_ratio`` : Sharpe ratio of the clusters is used as a risk metric.
+        4. ``equal_weighting`` : All clusters are weighed equally in terms of risk.
+        5. ``expected_shortfall`` : Expected shortfall (CVaR) of the clusters is used as a risk metric.
+        6. ``conditional_drawdown_at_risk`` : Conditional drawdown at risk (CDaR) of the clusters is used as a risk metric.
 
     |h3| **4. Naive Risk Parity** |h3_|
-    afafaf
+    Having calculated the cluster weights in the previous step, this step calculates the final asset weights. Within the same
+    cluster, an initial set of weights - :math:`W_{IVP}` - is calculated using the inverse-variance allocation. The final weights
+    are given by the following equation:
 
+    .. math::
+        W^{i}_{final} = W^{i}_{IVP} * C^{i}, \: i \in Clusters
 
-.. note::
-
-    |h4| Risk Contribution of Clusters |h4_|
-    While variance is a very simple and popular representation of risk used in the
-    investing world, it is not the optimal one and can underestimate the true risk of a portfolio which is why there are many other
-    important risk metrics used by investment managers that can correctly reflect the true risk of a portfolio/asset. With respect
-    to this, the original HRP algorithm can be tweaked to allocate its weights based on different risk representations of the
-    clusters and generate better weights.
-
-    1. ``minimum_variance`` : Variance of the clusters is used as a risk metric.
-    2. ``minimum_standard_deviation`` : Standard deviation of the clusters is used as a risk metric.
-    3. ``sharpe_ratio`` : Sharpe ratio of the clusters is used as a risk metric.
-    4. ``equal_weighting`` : All clusters are weighed equally in terms of risk.
-    5. ``expected_shortfall`` : Expected shortfall (CVaR) of the clusters is used as a risk metric.
-    6. ``conditional_drawdown_at_risk`` : Conditional drawdown at risk (CDaR) of the clusters is used as a risk metric.
-
+    where, :math:`W^{i}_{IVP}` refers to inverse-variance weights of assets in the :math:`i^{th}` cluster and :math:`C^{i}` is the
+    weight of the  :math:`i^{th}` cluster calculated in Step-3.
 
 .. tip::
     |h4| Underlying Literature |h4_|
     This implementation is based on the following two papers written by Thomas Raffinot.
-        * **Hierarchical Clustering based Asset Allocation:** `Raffinot, Thomas, The Hierarchical Equal Risk Contribution Portfolio (August 23, 2018) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3237540>`_
-        * **Hierarchical Equal Risk Contribution:**
+        * `Hierarchical Clustering based Asset Allocation <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3237540>`_
+        * `Hierarchical Equal Risk Contribution <https://ssrn.com/abstract=2840729>`_
 
 Implementation
 ##############
@@ -113,7 +120,10 @@ Implementation
         .. automethod:: __init__
 
 .. warning::
-    Hello
+    The calculation of optimal number of clusters using the Gap Index makes the algorithm run a little slower and you will notice
+    a significant speed difference for larger datasets. If you know the number of clusters for your data beforehand, it would be
+    better for you to pass that value directly to the method using the :py:mod:`optimal_num_clusters` parameter. This will bypass
+    the Gap Index method and speed up the algorithm.
 
 .. note::
     |h4| Using Custom Input |h4_|
@@ -127,34 +137,41 @@ Implementation
 
 
 .. tip::
-    **What are the differences between the 3 Linkage Algorithms?**
-
-    The following is taken directly from and we highly recommend you read:
+    |h4| Different Linkage Methods |h4_|
+    The following linkage methods are supported by the HCAA class in mlfinlab. (The following is taken directly from and we highly
+    recommend you read):
 
     `Papenbrock, J., 2011. Asset Clusters and Asset Networks in Financial Risk Management and Portfolio Optimization (Doctoral
     dissertation, Karlsruher Institut für Technologie (KIT)). <https://d-nb.info/1108447864/34>`_
 
-    **1. Single-Linkage**
+        **1. Single-Linkage**
 
-    The idea behind single-linkage is to form groups of elements, which have the smallest distance to each other (nearest
-    neighbouring clustering). This oftentimes leads to large groups/chaining.
+        The idea behind single-linkage is to form groups of elements, which have the smallest distance to each other (nearest
+        neighbouring clustering). This oftentimes leads to large groups/chaining.
 
-    The single-link algorithm oftentimes forms clusters that are chained together and leaves large clusters. It can probably
-    be best understood as a way to give a "more robust" estimation of the distance matrix and furthermore preserves the original
-    structure as much as possible. Elements departing early from the tree can be interpreted as "different" from the overall dataset.
-    In terms of application, the single-link clustering algorithm is very useful to gain insights in the correlation structure
-    between assets and separates assets that were very different from the rest. If this separation is preferred and high weights
-    should be put on "outliers" the single link certainly is a good choice.
+        The single-link algorithm oftentimes forms clusters that are chained together and leaves large clusters. It can probably
+        be best understood as a way to give a "more robust" estimation of the distance matrix and furthermore preserves the original
+        structure as much as possible. Elements departing early from the tree can be interpreted as "different" from the overall dataset.
+        In terms of application, the single-link clustering algorithm is very useful to gain insights in the correlation structure
+        between assets and separates assets that were very different from the rest. If this separation is preferred and high weights
+        should be put on "outliers" the single link certainly is a good choice.
 
-    **2. Complete-Linkage**
+        **2. Complete-Linkage**
 
-    The complete-linkage algorithm tries to avoid those large groups by considering the largest distances between elements.
-    It is thus called the farthest neighbour clustering.
+        The complete-linkage algorithm tries to avoid those large groups by considering the largest distances between elements.
+        It is thus called the farthest neighbour clustering.
 
-    The complete-link algorithm has a different idea: elements should be grouped together in a way that they are not too
-    different from each other when merged in a cluster. It thus has a much stronger definition of "similar pair of clusters".
-    The complete-link algorithm therefore seems suitable for investors interested in grouping stocks that are similar in one cluster.
+        The complete-link algorithm has a different idea: elements should be grouped together in a way that they are not too
+        different from each other when merged in a cluster. It thus has a much stronger definition of "similar pair of clusters".
+        The complete-link algorithm therefore seems suitable for investors interested in grouping stocks that are similar in one cluster.
 
-    **3. Average-Linkage**
+        **3. Average-Linkage**
 
-    The average-linkage algorithm is a compromise between the single-linkage and complete-linkage algorithm.
+        The average-linkage algorithm is a compromise between the single-linkage and complete-linkage algorithm.
+
+        **4. Ward-Linkage**
+
+        Whereas single-linkage, complete-linkage and average-linkage can be classified as graph-based clustering algorithms,
+        Ward's method has a prototype-based view in which the clusters are represented by a centroid. For this reason, the
+        proximity between clusters is usually defined as the distance between cluster centroids. The Ward method uses the increase
+        in the sum of the squares error (SSE) to determine the clusters.
