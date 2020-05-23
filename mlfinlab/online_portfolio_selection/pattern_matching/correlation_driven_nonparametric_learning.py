@@ -54,7 +54,7 @@ class CORN(OLPS):
         # Check that rho is between -1 and 1.
         if self.rho < -1 or self.rho > 1:
             raise ValueError("Rho must be between -1 and 1.")
-        self.corr_coef = self._calculate_rolling_correlation_coefficient()
+        self.corr_coef = self._calc_rolling_corr_coef()
 
     def _update_weight(self, time):
         """
@@ -114,7 +114,7 @@ class CORN(OLPS):
                                constraints=const, jac=_derivative)
         return problem.x
 
-    def _calculate_rolling_correlation_coefficient(self):
+    def _calc_rolling_corr_coef(self):
         """
         Calculates the rolling correlation coefficient for a given relative return and window
 
