@@ -108,6 +108,7 @@ overview of how the HCAA algorithm works:
     This implementation is based on the following two papers written by Thomas Raffinot.
         * `Hierarchical Clustering based Asset Allocation <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3237540>`_
         * `Hierarchical Equal Risk Contribution <https://ssrn.com/abstract=2840729>`_
+        * `Gap Index Paper <https://statweb.stanford.edu/~gwalther/gap>`_
 
 Implementation
 ##############

@@ -39,7 +39,7 @@ overview of the different steps in the algorithm:
     This step breaks down the assets in our portfolio into different hierarchical clusters using the famous Hierarchical Tree
     Clustering algorithm. The assets in the portfolio are segregated into clusters which mimic the real-life interactions between
     the assets in a portfolio - some stocks are related to each other more than others and hence can be grouped within the same
-    cluster. At the end of the step, we are left with the follow tree structure (also called a dendrogram),
+    cluster. At the end of the step, we are left with the follow tree structure (also called a dendrogram).
 
     .. image:: portfolio_optimisation_images/dendrogram.png
 
@@ -66,6 +66,7 @@ mean variance optimisation methods).
 .. tip::
     |h4| Underlying Literature |h4_|
 
+        * `Hierarchical Risk Parity Paper <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_
         * For a detailed explanation of how hierarchical risk parity works, we have written an excellent `blog post <https://hudsonthames.org/an-introduction-to-the-hierarchical-risk-parity-algorithm/>`_ about it.
 
 
