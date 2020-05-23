@@ -10,7 +10,7 @@ class CORNU(UP):
     reproduced with modification from the following paper:
     `Li, B., Hoi, S.C., & Gopalkrishnan, V. (2011). CORN: Correlation-driven nonparametric
     learning approach for portfolio selection. ACM TIST, 2,
-    21:1-21:29.<https://dl.acm.org/doi/abs/10.1145/1961189.1961193>`_
+    21:1-21:29. <https://dl.acm.org/doi/abs/10.1145/1961189.1961193>`_
 
     Correlation Driven Nonparametric Learning Uniform creates W experts that each follow the CORN
     strategy with the same rho value and different window values. After each period, the weights
@@ -26,9 +26,10 @@ class CORNU(UP):
         :param window: (int) Number of windows to look back for similarity sets. CORN-K generates
                              experts with range of [1, 2, ..., w]. The window ranges typically work well
                              with shorter terms of [1, 7].
-        :param rho: (float) Threshold for similarity. Rho should set in the range of [-1, 1].
+        :param rho: (float) Threshold for similarity with range of [-1, 1].
                             Lower rho values will classify more periods as being similar, and higher
                             values will be more strict on identifying a period as similarly correlated.
+                            Rho values between [0, 0.2] typically had higher results.
         """
         self.window = window
         self.rho = rho

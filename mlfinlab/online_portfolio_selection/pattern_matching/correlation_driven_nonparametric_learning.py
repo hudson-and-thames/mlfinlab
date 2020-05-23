@@ -10,7 +10,7 @@ class CORN(OLPS):
     reproduced with modification from the following paper:
     `Li, B., Hoi, S.C., & Gopalkrishnan, V. (2011). CORN: Correlation-driven nonparametric
     learning approach for portfolio selection. ACM TIST, 2,
-    21:1-21:29.<https://dl.acm.org/doi/abs/10.1145/1961189.1961193>`_
+    21:1-21:29. <https://dl.acm.org/doi/abs/10.1145/1961189.1961193>`_
 
     Correlation Driven Nonparametric Learning finds similar windows from the past and looks to
     create portfolio weights that will maximize returns in the similar sets.
@@ -22,10 +22,10 @@ class CORN(OLPS):
 
         :param window: (int) Number of windows to look back for similarity sets. Windows can be set
                              to any values but typically work well in a shorter term of [1, 7].
-        :param rho: (float) Threshold for similarity. Rho should set in the range of [-1, 1].
+        :param rho: (float) Threshold for similarity with range of [-1, 1].
                             Lower rho values will classify more periods as being similar, and higher
                             values will be more strict on identifying a period as similarly correlated.
-                            Rho values between [0, 0.1] typically had higher results.
+                            Rho values between [0, 0.2] typically had higher results.
         """
         self.window = window
         self.rho = rho
@@ -54,7 +54,7 @@ class CORN(OLPS):
         # Check that rho is between -1 and 1.
         if self.rho < -1 or self.rho > 1:
             raise ValueError("Rho must be between -1 and 1.")
-        self.corr_coef = self.calculate_rolling_correlation_coefficient()
+        self.corr_coef = self._calculate_rolling_correlation_coefficient()
 
     def _update_weight(self, time):
         """
@@ -114,7 +114,7 @@ class CORN(OLPS):
                                constraints=const, jac=_derivative)
         return problem.x
 
-    def calculate_rolling_correlation_coefficient(self):
+    def _calculate_rolling_correlation_coefficient(self):
         """
         Calculates the rolling correlation coefficient for a given relative return and window
 

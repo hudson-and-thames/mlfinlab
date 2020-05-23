@@ -6,32 +6,53 @@
     on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
     Next up, lets discuss about some of these implementations and the different parameters they require.
 
-==========
+================
 Pattern Matching
-==========
+================
 
-There are four different benchmarks strategies implemented in the Online Portfolio Selection module.
+.. toctree::
+    :maxdepth: 3
+    :caption: Correlation Driven Nonparametric Learning
+    :hidden:
 
-1. Correlation Driven Nonparametric Learning
+    correlation_driven_nonparametric_learning
 
-2. Correlation Driven Nonparametric Learning - Uniform
+.. toctree::
+    :maxdepth: 3
+    :caption: Symmetric Correlation Driven Nonparametric Learning
+    :hidden:
 
-3. Correlation Driven Nonparametric Learning - K
+    symmetric_correlation_driven_nonparametric_learning
 
-4. Symmetric Correlation Driven Nonparametric Learning
+.. toctree::
+    :maxdepth: 3
+    :caption: Functional Correlation Driven Nonparametric Learning
+    :hidden:
 
-5. Symmetric Correlation Driven Nonparametric Learning - K
+    functional_correlation_driven_nonparametric_learning
 
-6. Functional Correlation Driven Nonparametric Learning
+Pattern matching locates similarly acting historical market windows and make future predictions based on the similarity.
+Traditional quantitative strategies such as momentum and mean reversion focus on the directionality of the market trends.
+The underlying assumption that the immediate past trends will continue is simple but does not always perform the best in real markets.
+Pattern matching strategies combine the strengths of both by exploiting the statistical correlations of the current market window to the past.
 
-7. Functional Correlation Driven Nonparametric Learning - K
+There are seven different pattern matching strategies implemented in the Online Portfolio Selection module.
 
-Research Notebooks
-##################
+1. Correlation Driven Nonparametric Learning (CORN)
 
-The following research notebooks provides a more detailed exploration of the algorithm as outlined at the back of Ch16 in
-Advances in Financial Machine Learning.
+2. Correlation Driven Nonparametric Learning - Uniform (CORN-U)
 
-* `Chapter 16 Exercise Notebook`_
+3. Correlation Driven Nonparametric Learning - K (CORN-K)
 
-.. _Chapter 16 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Chapter16/Chapter16.ipynb
+4. Symmetric Correlation Driven Nonparametric Learning (SCORN)
+
+5. Symmetric Correlation Driven Nonparametric Learning - K (SCORN-K)
+
+6. Functional Correlation Driven Nonparametric Learning (FCORN)
+
+7. Functional Correlation Driven Nonparametric Learning - K (FCORN-K)
+
+.. tip::
+
+    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Pattern%20Matching.ipynb>`_
+    provides a more detailed exploration of the strategies.
