@@ -11,7 +11,7 @@ class CORNK(UP):
     reproduced with modification from the following paper:
     `Li, B., Hoi, S.C., & Gopalkrishnan, V. (2011). CORN: Correlation-driven nonparametric
     learning approach for portfolio selection. ACM TIST, 2,
-    21:1-21:29.<https://dl.acm.org/doi/abs/10.1145/1961189.1961193>`_
+    21:1-21:29. <https://dl.acm.org/doi/abs/10.1145/1961189.1961193>`_
 
     Correlation Driven Nonparametric Learning - K formulates a number of experts and tracks the
     experts performance over time. Each period, the strategy decides to allocate capital to

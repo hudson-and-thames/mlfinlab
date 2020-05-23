@@ -299,10 +299,6 @@ This project is licensed under an all rights reserved licence.
     :hidden:
 
     online_portfolio_selection/index
-    online_portfolio_selection/benchmarks
-    online_portfolio_selection/momentum
-    online_portfolio_selection/mean_reversion
-    online_portfolio_selection/pattern_matching
 
 .. toctree::
     :maxdepth: 2
