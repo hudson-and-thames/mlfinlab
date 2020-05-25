@@ -249,6 +249,7 @@ This project is licensed under an all rights reserved licence.
     implementations/tb_meta_labeling
     implementations/labeling_trend_scanning
     implementations/labeling_tail_sets
+    implementations/labeling_excess_median
 
 .. toctree::
     :maxdepth: 2
