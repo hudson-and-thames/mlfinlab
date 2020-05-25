@@ -1,3 +1,5 @@
+# pylint: disable=missing-module-docstring
+
 import unittest
 import os
 import numpy as np
@@ -6,7 +8,9 @@ from mlfinlab.labeling.excess_over_median import excess_over_median
 
 
 class MyTestCase(unittest.TestCase):
-
+    """
+    Tests regarding labelling excess over median
+    """
     def setUp(self):
         """
         Set the file path for the sample data.
