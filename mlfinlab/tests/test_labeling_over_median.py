@@ -44,8 +44,8 @@ class MyTestCase(unittest.TestCase):
         test4 = excess_over_median(self.data.iloc[:, 0:20])
 
         # Verify that last row is NaN
-        self.assertTrue(test3.iloc[-1].isnull())
-        self.assertTrue(test4.iloc[-1].isnull())
+        self.assertTrue(test3.iloc[-1].isnull().all())
+        self.assertTrue(test4.iloc[-1].isnull().all())
 
         # If the number of columns is odd, every row should have a 0 label for the median. If number of tickers is even,
         # no row should have a 0 label.
