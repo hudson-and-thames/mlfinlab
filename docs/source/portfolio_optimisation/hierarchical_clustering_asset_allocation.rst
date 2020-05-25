@@ -40,7 +40,7 @@ overview of how the HCAA algorithm works:
     Clustering algorithm (Agglomerative Clustering). The assets in the portfolio are segregated into clusters which mimic the
     real-life interactions between the assets in a portfolio - some stocks are related to each other more than others and hence
     can be grouped within the same cluster. At the end of the step, we are left with the follow tree structure (also called a
-    dendrogram),
+    dendrogram).
 
     .. image:: portfolio_optimisation_images/dendrogram.png
 
