@@ -4,7 +4,7 @@
     The online portfolio selection module contains different algorithms that are used for asset allocation and optimizing strategies. Each
     algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
     on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
-    Next up, lets discuss about some of these implementations and the different parameters they require.
+    Next up, let's discuss some of these implementations and the different parameters they require.
 
 =================================
 Passive Aggressive Mean Reversion
@@ -40,6 +40,10 @@ Typically :math:`\epsilon` is set at a value between 0 and 1 and closer to 1 as 
 
 We will introduce three versions of Passive Aggressive Mean Reversion: PAMR, PAMR-1, and PAMR-2.
 
+- :math:`b_t` is the portfolio vector at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`\epsilon` is the mean reversion threshold constant.
+
 1. PAMR
 #######
 
@@ -72,13 +76,17 @@ PAMR-2 contains a quadratic term to the original slack variable from PAMR-1.
 
 By increasing the slack variable at a quadratic rate, the method regularizes portfolio deviations.
 
+- :math:`C` is the aggressiveness of the strategy.
+- :math:`\xi` is the slack variable used to calculate the optimization equation.
+- :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
+
 .. tip::
 
     The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Mean%20Reversion.ipynb>`_
     provides a more detailed exploration of the strategies.
 
 Parameters
-##########
+----------
 
 The optimal parameters depend on each dataset. For NYSE, aggressiveness was not an important parameter as
 returns were primarily affected by the :math:`\epsilon` value. :math:`\epsilon` of 0 resulted as the
@@ -107,7 +115,7 @@ a hyperparameter.
    :width: 32 %
 
 Implementation
-##############
+--------------
 
 .. automodule:: mlfinlab.online_portfolio_selection.mean_reversion.passive_aggressive_mean_reversion
 
@@ -124,7 +132,7 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.online_portfolio_selection.mean_reversion.passive_aggressive_mean_reversion import PAMR
+    from mlfinlab.online_portfolio_selection import *
 
     # Read in data.
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
@@ -149,3 +157,10 @@ Example Code
 
     # Get portfolio returns.
     pamr2.portfolio_return
+
+.. tip::
+
+    Strategies were implemented with modifications from `Li, B., Zhao, P., Hoi, S.C., & Gopalkrishnan, V. (2012). PAMR: Passive aggressive mean
+    reversion strategy for portfolio selection. Machine Learning, 87, 221-258.
+    <https://link.springer.com/content/pdf/10.1007%2Fs10994-012-5281-z.pdf>`_
+

@@ -4,7 +4,7 @@
     The online portfolio selection module contains different algorithms that are used for asset allocation and optimizing strategies. Each
     algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
     on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
-    Next up, lets discuss about some of these implementations and the different parameters they require.
+    Next up, let's discuss some of these implementations and the different parameters they require.
 
 ================================
 Online Moving Average Reversion
@@ -29,10 +29,14 @@ assets only if the portfolio returns are lower than the :math:`\epsilon` value.
 .. math::
     \lambda_{t+1} = max \left\lbrace 0, \frac{\epsilon-b_t \cdot \tilde{x}_{t+1}}{\|\tilde{x}_{t+1}-\bar x_{t+1} \textbf{1}\|^2}\right\rbrace
 
-Here the problem can be interpreted as maximizing the portfolio confidence by minimizing :math:`\Sigma` given
-a confidence interval :math:`\theta` determined by the threshold, :math:`\epsilon`.
+OLMAR has two variations to solve this optimization problem with OLMAR-1 and OLMAR-2.
 
-CWMR has two variations to solve this optimization problem with CWMR-SD and CWMR-Var.
+- :math:`b_t` is the portfolio vector at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`\tilde{x}` is the projected price relative.
+- :math:`\bar x` is the mean of the projected price relative.
+- :math:`\epsilon` is the mean reversion threshold constant.
+- :math:`\lambda` is the lagrangian multiplier to change the new weights.
 
 1. OLMAR-1
 ##########
@@ -66,6 +70,10 @@ OLMAR-2 uses exponential moving average to predict prices.
 .. math::
     \: \: \: \: \: \: \: \: \: \: \: \: \:= \alpha \textbf{1} + (1 - \alpha) \frac{\tilde{x_t}}{x_t}
 
+- :math:`w` is the window value for simple moving average.
+- :math:`\alpha` is the smoothing factor for exponential moving average.
+- :math:`\bigodot` is the element-wise cumulative product. In this case, the cumulative product represents the overall change in prices.
+
 .. tip::
 
     For both OLMAR-1 and OLMAR-2, the corresponding window and alpha values are the most important parameters.
@@ -78,7 +86,7 @@ OLMAR-2 uses exponential moving average to predict prices.
     provides a more detailed exploration of the strategies.
 
 Parameters
-##########
+----------
 
 :math:`\epsilon` has minimal impact on the returns as the primary driving paramter for these strategies
 is corresponding window or alpha value.
@@ -100,7 +108,7 @@ TSE's window was similar to that of NYSE, but the optimal alpha was much higher,
    :width: 49 %
 
 Implementation
-##############
+--------------
 
 .. automodule:: mlfinlab.online_portfolio_selection.mean_reversion.online_moving_average_reversion
 
@@ -117,7 +125,7 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.online_portfolio_selection.mean_reversion.online_moving_average_reversion import OLMAR
+    from mlfinlab.online_portfolio_selection import *
 
     # Read in data.
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
@@ -138,3 +146,9 @@ Example Code
 
     # Get portfolio returns.
     olmar1.portfolio_return
+
+.. tip::
+
+    Strategies were implemented with modifications from `Li, Bin & Hoi, Steven. (2012). On-Line Portfolio
+    Selection with Moving Average Reversion. Proceedings of the 29th International Conference on
+    Machine Learning, ICML 2012. 1. <https://arxiv.org/pdf/1206.4626.pdf>`_

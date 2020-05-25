@@ -4,7 +4,7 @@
     The online portfolio selection module contains different algorithms that are used for asset allocation and optimizing strategies. Each
     algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
     on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
-    Next up, lets discuss about some of these implementations and the different parameters they require.
+    Next up, let's discuss some of these implementations and the different parameters they require.
 
 ====================================================
 Functional Correlation Driven Nonparametric Learning
@@ -35,6 +35,13 @@ If the correlation is negative, we place a negative weight that approaches 0 for
 .. math::
     \text{if} \: c < 0 \rightarrow v(j) =  \frac{1}{1 + \exp(-\lambda(c+\rho))} - 1
 
+- :math:`b_t` is the portfolio vector at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`c` is the correlation coefficient.
+- :math:`rho` is the correlation threshold.
+- :math:`v(j)` is the activation function for the given period weights.
+- :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
+
 Two different variations of the FCORN strategies are implemented in the Online Portfolio Selection module.
 
 .. tip::
@@ -59,7 +66,7 @@ SP500 has the highest returns with window of 5.
    :width: 49 %
 
 FCORN Implementation
--------------------
+--------------------
 
 .. automodule:: mlfinlab.online_portfolio_selection.pattern_matching.functional_correlation_driven_nonparametric_learning
 
@@ -103,7 +110,7 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    import mlfinlab
+    from mlfinlab.online_portfolio_selection import *
 
     # Read in data.
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
@@ -149,3 +156,9 @@ Example Code
 
     # Get capital allocation weights.
     fcornk1.weights_on_experts
+
+.. tip::
+
+    Strategies were implemented with modifications from `Wang, Y., & Wang, D. (2019). Market Symmetry and Its Application to Pattern-Matching-Based
+    Portfolio Selection. The Journal of Financial Data Science, 1(2), 78–92.
+    <https://jfds.pm-research.com/content/1/2/78>`_

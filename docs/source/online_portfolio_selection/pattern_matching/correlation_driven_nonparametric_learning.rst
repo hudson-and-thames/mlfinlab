@@ -4,7 +4,7 @@
     The online portfolio selection module contains different algorithms that are used for asset allocation and optimizing strategies. Each
     algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
     on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
-    Next up, lets discuss about some of these implementations and the different parameters they require.
+    Next up, let's discuss some of these implementations and the different parameters they require.
 
 =========================================
 Correlation Driven Nonparametric Learning
@@ -39,6 +39,14 @@ Once all the similar historical periods are identified, the strategy returns wei
 
 .. math::
     b_{t+1}(w,\rho) = \underset{b \in \Delta_m}{\arg \max} \underset{i \in C_t(w,\rho)}{\prod}(b \cdot x_i)
+
+- :math:`b_t` is the portfolio vector at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`w` is the number of windows to lookback.
+- :math:`cov` is the covariance term.
+- :math:`std` is the standard deviation term.
+- :math:`rho` is the correlation threshold.
+- :math:`C_t` is the set of similar periods.
 
 CORN Parameters
 ---------------
@@ -79,6 +87,9 @@ After gathering results for all the experts, the total portfolio weight will be 
 
 .. math::
     b_{t+1}=\frac{\sum_{w, \rho}q(w,\rho)S_t(w,\rho)b_{t+1}(w,\rho)}{\sum_{w, \rho}q(w,\rho)S_t(w,\rho)}
+
+- :math:`S(t)` is the total portfolio returns at time :math:`t`.
+- :math:`q(w, \rho)` is the weight allocation constant. For CORN-U, this is a uniform distribution.
 
 CORN-U Parameters
 -----------------
@@ -150,7 +161,7 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    import mlfinlab
+    from mlfinlab.online_portfolio_selection import *
 
     # Read in data.
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
@@ -205,3 +216,9 @@ Example Code
 
     # Get capital allocation weights.
     cornk1.weights_on_experts
+
+.. tip::
+
+    Strategies were implemented with modifications from `Li, B., Hoi, S.C., & Gopalkrishnan, V. (2011). CORN: Correlation-driven nonparametric
+    learning approach for portfolio selection. ACM TIST, 2,
+    21:1-21:29. <https://dl.acm.org/doi/abs/10.1145/1961189.1961193>`_

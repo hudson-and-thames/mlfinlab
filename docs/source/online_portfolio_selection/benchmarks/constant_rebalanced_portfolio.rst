@@ -4,7 +4,7 @@
     The online portfolio selection module contains different algorithms that are used for asset allocation and optimizing strategies. Each
     algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
     on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
-    Next up, lets discuss about some of these implementations and the different parameters they require.
+    Next up, let's discuss some of these implementations and the different parameters they require.
 
 =============================
 Constant Rebalanced Portfolio
@@ -15,12 +15,19 @@ and if there are no inputs, it will automatically allocate equal weights to all 
 taking the cumulative product of the weight and relative returns matrix.
 
 .. math::
-    S_n(CRP(b)) = \overset{n}{\underset{t=1}{\prod}} \:  b^{\top}x_t
+    S_t(CRP(b)) = \overset{t}{\underset{n=1}{\prod}} \:  b^{\top}x_n
 
 Once the initial portfolio has been determined, the final weights can be represented as buying and holding the initial weight.
 
 .. math::
-    S_n(BEST) = \underset{b \in \Delta_m}{\max} b \cdot \left(\overset{n}{\underset{t=1}{\bigodot}}  x_t \right) = S_n(BAH(b_0))
+    S_t(BEST) = \underset{b \in \Delta_m}{\max} b \cdot \left(\overset{t}{\underset{n=1}{\bigodot}}  x_n \right) = S_t(BAH(b_0))
+
+- :math:`S(t)` is the total portfolio returns at time :math:`t`.
+- :math:`b_t` is the portfolio vector at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`\bigodot` is the element-wise cumulative product. In this case, the cumulative product represents the overall change in prices.
+- :math:`\prod` is the product of all elements.
+- :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
 
 .. tip::
 
@@ -28,7 +35,7 @@ Once the initial portfolio has been determined, the final weights can be represe
     provides a more detailed exploration of the strategies.
 
 Implementation
-##############
+--------------
 
 .. automodule:: mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio
 
@@ -46,7 +53,7 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio import CRP
+    from mlfinlab.online_portfolio_selection import *
 
     # Read in data.
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
@@ -67,3 +74,8 @@ Example Code
 
     # Get portfolio returns.
     crp.portfolio_return
+
+.. tip::
+
+    Strategies were implemented with modifications from `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
+    Surv. V, N, Article A (December 2012), 33 pages. <https://arxiv.org/abs/1212.2129>`_

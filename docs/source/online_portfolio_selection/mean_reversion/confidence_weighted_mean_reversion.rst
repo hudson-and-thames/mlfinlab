@@ -4,7 +4,7 @@
     The online portfolio selection module contains different algorithms that are used for asset allocation and optimizing strategies. Each
     algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
     on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
-    Next up, lets discuss about some of these implementations and the different parameters they require.
+    Next up, let's discuss some of these implementations and the different parameters they require.
 
 ==================================
 Confidence Weighted Mean Reversion
@@ -27,6 +27,15 @@ If the returns for the period are below the threshold, :math:`\epsilon`:
 
 Here the problem can be interpreted as maximizing the portfolio confidence by minimizing :math:`\Sigma` given
 a confidence interval :math:`\theta` determined by the threshold, :math:`\epsilon`.
+
+- :math:`b_t` is the portfolio vector at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`\epsilon` is the mean reversion threshold constant.
+- :math:`\theta` is the confidence interval for the given distribution.
+- :math:`\mu_t` is the mean of the projected weights distribution at time :math:`t`.
+- :math:`\Sigma_t` is the confidence matrix in the projected weights distribution at time :math:`t`.
+- :math:`N(\mu_t, \Sigma_t)` is the normal distribution for the projected weights.
+- :math:`N_{KL}` is the Kullback-Leibler Divergence. More information of KL Divergence is available `here <https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence>`_.
 
 CWMR has two variations to solve this optimization problem with CWMR-SD and CWMR-Var.
 
@@ -53,7 +62,11 @@ The standard deviation method further assumes the PSD property of :math:`\Sigma`
 
     \text{such that }\epsilon - \mu^{\top}\cdot x_t \geq \phi || \Gamma x_t || \text{, }\Gamma \text{is a PSD, }\mu^{\top} \cdot \textbf{1} = 1\text{, and }\mu \geq 0
 
-.. tip::
+- :math:`\phi` is the inverse of the cumulative distribution function for a given confidence interval.
+- :math:`Tr` is the sum of the diagonal elements in a matrix.
+- :math:`\Gamma` is the square root of the matrix :math:`\Sigma`.
+
+.. warning::
 
     For both CWMR-Var and CWMR-SD, the calculations involve taking the inverse of a sum of another inverse matrix.
     The constant calculations of matrix inversion is extremely unstable and makes the model prone to any outliers and hyperparameters.
@@ -64,7 +77,7 @@ The standard deviation method further assumes the PSD property of :math:`\Sigma`
     provides a more detailed exploration of the strategies.
 
 Parameters
-##########
+----------
 
 CWMR in general does not have an optimal parameter. The results are extremely dependent on the
 hyperparameters as seen with the case for the NYSE and TSE dataset.
@@ -88,7 +101,7 @@ seems to indicate a congregation at 0.5.
    :width: 49 %
 
 Implementation
-##############
+--------------
 
 .. automodule:: mlfinlab.online_portfolio_selection.mean_reversion.confidence_weighted_mean_reversion
 
@@ -105,7 +118,7 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.online_portfolio_selection.mean_reversion.confidence_weighted_mean_reversion import CWMR
+    from mlfinlab.online_portfolio_selection import *
 
     # Read in data.
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
@@ -127,3 +140,10 @@ Example Code
 
     # Get portfolio returns.
     cwmr_sd.portfolio_return
+
+.. tip::
+
+    Strategies were implemented with modifications from `Li, B., Hoi, S.C., Zhao, P. & Gopalkrishnan, V.. (2011). Confidence Weighted Mean Reversion
+    Strategy for On-Line Portfolio Selection. Proceedings of the Fourteenth International
+    Conference on Artificial Intelligence and Statistics, in PMLR 15:434-442.
+    <https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=3292&context=sis_research>`_

@@ -4,7 +4,7 @@
     The online portfolio selection module contains different algorithms that are used for asset allocation and optimizing strategies. Each
     algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
     on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
-    Next up, lets discuss about some of these implementations and the different parameters they require.
+    Next up, let's discuss some of these implementations and the different parameters they require.
 
 ===================================================
 Symmetric Correlation Driven Nonparametric Learning
@@ -33,6 +33,14 @@ The strategy, therefore, maximizes the returns for periods that are considered s
     b^{\bf{\star}}_t(w,\rho) = \underset{b \in \Delta_m}{\arg\max} \underset{x \in C(x_t;w,\rho)}{\sum}\log b^{\top}x - \underset{x \in C'(x_t;w,\rho)}{\sum}\log b^{\top}x
 
 Two different variations of the SCORN strategies are implemented in the Online Portfolio Selection module.
+
+- :math:`b_t` is the portfolio vector at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`rho` is the correlation threshold.
+- :math:`R` is the correlation coefficient.
+- :math:`C_t` is the set of similar periods.
+- :math:`C'_t` is the set of similar periods.
+- :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
 
 .. tip::
 
@@ -107,7 +115,7 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    import mlfinlab
+    from mlfinlab.online_portfolio_selection import *
 
     # Read in data.
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
@@ -153,3 +161,9 @@ Example Code
 
     # Get capital allocation weights.
     scornk1.weights_on_experts
+
+.. tip::
+
+    Strategies were implemented with modifications from `Wang, Y., & Wang, D. (2019). Market Symmetry and Its Application to Pattern-Matching-Based
+    Portfolio Selection. The Journal of Financial Data Science, 1(2), 78–92.
+    <https://jfds.pm-research.com/content/1/2/78>`_
