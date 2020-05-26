@@ -7,7 +7,7 @@ import pandas as pd
 from mlfinlab.labeling.excess_over_median import excess_over_median
 
 
-class MyTestCase(unittest.TestCase):
+class TestLabellingOverMedian(unittest.TestCase):
     """
     Tests regarding labelling excess over median
     """
@@ -18,6 +18,7 @@ class MyTestCase(unittest.TestCase):
         project_path = os.path.dirname(__file__)
         self.path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(self.path, index_col='Date')
+        self.data.index = pd.to_datetime(self.data.index)
 
     def test_small_set(self):
         """
@@ -36,21 +37,14 @@ class MyTestCase(unittest.TestCase):
         pd.testing.assert_frame_equal(test1, test1_actual, check_less_precise=True)
         pd.testing.assert_frame_equal(test2, test2_actual)
 
-    def test_shape(self):
+    def test_last_row(self):
         """
         Test for a larger dataset. Verifies that the last row is correctly NaN and that 0 labels are given correctly.
         """
         test3 = excess_over_median(self.data)
-        test4 = excess_over_median(self.data.iloc[:, 0:20])
+        test4 = excess_over_median(self.data.iloc[:, 0:20], binary=True)
 
         # Verify that last row is NaN
         self.assertTrue(test3.iloc[-1].isnull().all())
         self.assertTrue(test4.iloc[-1].isnull().all())
 
-        # If the number of columns is odd, every row should have a 0 label for the median. If number of tickers is even,
-        # no row should have a 0 label.
-        for test in [test3, test4]:
-            if (test.shape[1] % 2) == 0:
-                self.assertTrue(0 not in test.values)
-            if (test.shape[1] % 2) == 1:
-                self.assertTrue(0 in test.values)
