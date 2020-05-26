@@ -35,8 +35,8 @@ The strategy, therefore, maximizes the returns for periods that are considered s
 Two different variations of the SCORN strategies are implemented in the Online Portfolio Selection module.
 
 - :math:`b_t` is the portfolio vector at time :math:`t`.
-- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
-- :math:`rho` is the correlation threshold.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
+- :math:`\rho` is the correlation threshold.
 - :math:`R` is the correlation coefficient.
 - :math:`C_t` is the set of similar periods.
 - :math:`C'_t` is the set of similar periods.
@@ -138,7 +138,7 @@ Example Code
     scornk1 = SCORNK(window=5, rho=3, k=1)
     scornk1.allocate(asset_prices=stock_prices, weights=some_weight)
 
-    # Recalculate k for cornk1 to save computational time of generating all experts.
+    # Recalculate k for scornk1 to save computational time of generating all experts.
     scornk1.recalculate_k(k=3)
 
     # Get the latest predicted weights.

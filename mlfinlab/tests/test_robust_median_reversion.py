@@ -98,7 +98,7 @@ class TestRobustMedianReversion(TestCase):
         Test the calculation of RMR with the break case in _calc_median.
         """
         # Initialize RMR.
-        rmr6 = RMR(epsilon=1.1, n_iteration=10, window=3, tau=10000)
+        rmr6 = RMR(epsilon=1.1, n_iteration=10, window=3, tau=0.9)
         # Allocates asset prices to RMR.
         rmr6.allocate(self.data, resample_by='M')
         # Create np.array of all_weights.
@@ -117,7 +117,7 @@ class TestRobustMedianReversion(TestCase):
         # pylint: disable=protected-access
         # pylint: disable=no-self-use
         # Initialize RMR.
-        rmr7 = RMR(epsilon=1.1, n_iteration=10, window=3, tau=1)
+        rmr7 = RMR(epsilon=1.1, n_iteration=10, window=3, tau=0.9)
         # Make an empty array.
         empty = np.zeros((1, 2))
         # Calculate edge case.
@@ -128,9 +128,25 @@ class TestRobustMedianReversion(TestCase):
         Tests edge case for norm2 = 0 in _transform method.
         """
         # Initialize RMR.
-        rmr8 = RMR(epsilon=2, n_iteration=2, window=2, tau=1)
+        rmr8 = RMR(epsilon=2, n_iteration=2, window=2, tau=0.9)
         # Make the data all ones.
         new_data = self.data
         new_data[:] = 1
         # Calculate edge case.
         rmr8.allocate(new_data, resample_by='M')
+
+    def test_rmr_tau_error(self):
+        """
+        Tests ValueError if tau is less than 0 or greater than or equal to 1.
+        """
+        # Initialize RMR.
+        rmr9 = RMR(epsilon=2, n_iteration=2, window=2, tau=1)
+        with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
+            rmr9.allocate(self.data)
+
+        # Initialize RMR.
+        rmr10 = RMR(epsilon=2, n_iteration=2, window=2, tau=-1)
+        with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
+            rmr10.allocate(self.data)

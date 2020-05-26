@@ -24,6 +24,26 @@ class OLPS:
     OLPS is the parent class for all resulting Online Portfolio Selection Strategies.
 
     This class broadly defines all variables and allocates a set of weights for a certain strategy.
+
+    Upon weights allocation the possible outputs are:
+
+    - self.weights: (np.array) Final portfolio weights prediction.
+
+    - self.all_weights: (pd.DataFrame) Portfolio weights for the time period.
+
+    - self.asset_name: (list) Name of assets.
+
+    - self.number_of_assets: (int) Number of assets.
+
+    - self.time: (datetime) Time index of the given data.
+
+    - self.length_of_time: (int) Number of time periods.
+
+    - self.relative_return: (np.array) Relative returns of the assets.
+
+    - self.portfolio_return: (pd.DataFrame) Cumulative portfolio returns over time.
+
+    - self.asset_prices: (pd.DataFrame) Historical asset prices (daily close).
     """
 
     def __init__(self):
@@ -46,7 +66,7 @@ class OLPS:
                                                      will default to uniform weights.
         :param resample_by: (str) Specifies how to resample the prices. 'D' for Day, 'W' for Week,
                                  'M' for Month. The inputs are based on pandas' resample method.
-        :param verbose: (boolean) Prints progress bar if true.
+        :param verbose: (bool) Prints progress bar if true.
         """
         # Check to ensure inputs are correct.
         self._check_asset(asset_prices, weights)
@@ -111,7 +131,7 @@ class OLPS:
         Runs the algorithm by iterating through the given data.
 
         :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
-        :param verbose: (boolean) Prints progress bar if true.
+        :param verbose: (bool) Prints progress bar if true.
         """
         # Set initial weights.
         self.weights = self._first_weight(weights)

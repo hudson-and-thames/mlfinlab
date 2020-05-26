@@ -24,7 +24,7 @@ Once the initial portfolio has been determined, the final weights can be represe
 
 - :math:`S(t)` is the total portfolio returns at time :math:`t`.
 - :math:`b_t` is the portfolio vector at time :math:`t`.
-- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
 - :math:`\bigodot` is the element-wise cumulative product. In this case, the cumulative product represents the overall change in prices.
 - :math:`\prod` is the product of all elements.
 - :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].

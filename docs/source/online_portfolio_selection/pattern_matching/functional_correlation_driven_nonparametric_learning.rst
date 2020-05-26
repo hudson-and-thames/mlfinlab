@@ -36,9 +36,9 @@ If the correlation is negative, we place a negative weight that approaches 0 for
     \text{if} \: c < 0 \rightarrow v(j) =  \frac{1}{1 + \exp(-\lambda(c+\rho))} - 1
 
 - :math:`b_t` is the portfolio vector at time :math:`t`.
-- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
 - :math:`c` is the correlation coefficient.
-- :math:`rho` is the correlation threshold.
+- :math:`\rho` is the correlation threshold.
 - :math:`v(j)` is the activation function for the given period weights.
 - :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
 
@@ -133,7 +133,7 @@ Example Code
     fcornk1 = FCORNK(window=5, rho=3, lambd=2, k=1)
     fcornk1.allocate(asset_prices=stock_prices, weights=some_weight)
 
-    # Recalculate k for cornk1 to save computational time of generating all experts.
+    # Recalculate k for fcornk1 to save computational time of generating all experts.
     fcornk1.recalculate_k(k=3)
 
     # Get the latest predicted weights.

@@ -93,10 +93,16 @@ class TestFunctionalCorrelationDrivenNonparametricLearningK(TestCase):
 
     def test_fcorn_k_k_error(self):
         """
-        Tests ValueError if k is greater than window * rho * lambd
+        Tests ValueError if k is not an integer of greater than window * rho * lambd
         """
         # Initialize FCORN-K.
         fcorn_k7 = FCORNK(window=2, rho=2, lambd=2, k=16)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
             fcorn_k7.allocate(self.data)
+
+        # Initialize FCORN-K.
+        fcorn_k8 = FCORNK(window=2, rho=2, lambd=2, k=1.2)
+        with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
+            fcorn_k8.allocate(self.data)

@@ -19,7 +19,7 @@ indicates the passiveness of the strategy to match the best performing assets.
     b_{t+1} = \underset{b \in \Delta_m}{\arg\max} \: \eta \log b \cdot x_t - R(b,b_t)
 
 - :math:`b_t` is the portfolio vector at time :math:`t`.
-- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
 - :math:`R(b, b_t)` is the regularization term for exponential gradient. Different update rules will use different regularization terms.
 - :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
 
@@ -29,7 +29,7 @@ and broadly speaking, there are three update methods to iteratively update the s
 1. Multiplicative Update
 ########################
 
-David Helmbold first proposed a regularization term that adopts relative entropy.
+David Helmbold first proposed a regularization term that adopts relative entropy in his `paper <https://www.cis.upenn.edu/~mkearns/finread/portfolio.pdf>`_.
 
 .. math::
     R(b,b_t) = \overset{m}{\underset{i=1}{\sum}}b_i \log \frac{b_i}{b_{t,i}}
@@ -37,7 +37,7 @@ David Helmbold first proposed a regularization term that adopts relative entropy
 Using log's first order taylor expansion of :math:`b_i`
 
 .. math::
-    \log b \cdot x_t \approx \log(b_t \cdot x_t) + \frac{x_t}{b_t \cdot x_t}(b-b_t)
+    \log b \cdot x_{t, i} \approx \log(b_t \cdot x_{t, i}) + \frac{x_{t, i}}{b_t \cdot x_{t, i}}(b-b_t)
 
 Multiplicative update algorithm can be stated as the following.
 

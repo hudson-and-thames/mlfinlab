@@ -18,7 +18,7 @@ For CWMR, we introduce :math:`\sum`, a measure of anti-confidence in the portfol
 value represents higher confidence for the corresponding portfolio weights.
 
 .. math::
-    (\mu_{t+1}, \Sigma_{t+1}) = \arg \min D_{KL}(N(\mu,\Sigma | N(\mu_t,\Sigma_t)))
+    (\mu_{t+1}, \Sigma_{t+1}) = \underset{\mu \in \Delta_m, \Sigma}{\arg\min}D_{KL}(N(\mu,\Sigma) | N(\mu_t,\Sigma_t) )
 
 If the returns for the period are below the threshold, :math:`\epsilon`:
 
@@ -29,13 +29,13 @@ Here the problem can be interpreted as maximizing the portfolio confidence by mi
 a confidence interval :math:`\theta` determined by the threshold, :math:`\epsilon`.
 
 - :math:`b_t` is the portfolio vector at time :math:`t`.
-- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
 - :math:`\epsilon` is the mean reversion threshold constant.
 - :math:`\theta` is the confidence interval for the given distribution.
 - :math:`\mu_t` is the mean of the projected weights distribution at time :math:`t`.
 - :math:`\Sigma_t` is the confidence matrix in the projected weights distribution at time :math:`t`.
 - :math:`N(\mu_t, \Sigma_t)` is the normal distribution for the projected weights.
-- :math:`N_{KL}` is the Kullback-Leibler Divergence. More information of KL Divergence is available `here <https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence>`_.
+- :math:`D_{KL}` is the Kullback-Leibler Divergence. More information of KL Divergence is available `here <https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence>`_.
 
 CWMR has two variations to solve this optimization problem with CWMR-SD and CWMR-Var.
 
@@ -60,7 +60,7 @@ The standard deviation method further assumes the PSD property of :math:`\Sigma`
 
 .. math::
 
-    \text{such that }\epsilon - \mu^{\top}\cdot x_t \geq \phi || \Gamma x_t || \text{, }\Gamma \text{is a PSD, }\mu^{\top} \cdot \textbf{1} = 1\text{, and }\mu \geq 0
+    \text{such that }\epsilon - \mu^{\top}\cdot x_t \geq \phi || \Gamma x_t || \text{, }\Gamma \text{ is a PSD, }\mu^{\top} \cdot \textbf{1} = 1\text{, and }\mu \geq 0
 
 - :math:`\phi` is the inverse of the cumulative distribution function for a given confidence interval.
 - :math:`Tr` is the sum of the diagonal elements in a matrix.

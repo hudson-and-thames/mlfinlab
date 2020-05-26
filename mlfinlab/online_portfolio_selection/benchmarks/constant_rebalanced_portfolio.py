@@ -15,7 +15,7 @@ class CRP(OLPS):
         """
         Sets the recurring weights for the Constant Rebalanced Portfolio.
 
-        :param weight: (list/np.array/pd.Dataframe) Initial weight set by the user.
+        :param weight: (list/np.array/pd.DataFrame) Initial weight set by the user.
         """
         super(CRP, self).__init__()
         self.weight = weight
@@ -24,7 +24,7 @@ class CRP(OLPS):
         """
         Sets first weight for Constant Rebalanced Portfolio
 
-        :param weights: (list/np.array/pd.Dataframe) initial weights set by the user.
+        :param weights: (list/np.array/pd.DataFrame) initial weights set by the user.
         :return: (np.array) First portfolio weight.
         """
         # Initialize with given weights.

@@ -19,6 +19,7 @@ class BAH(OLPS):
         Changes weights to adjust for underlying asset price changes.
 
         :param time: (int) Current time period.
+        :return: (np.array) Weights adjusted for the change in underlyiing asset prices.
         """
         # Adjust weights for price differences.
         # Weights will be normalized later in round_weights.

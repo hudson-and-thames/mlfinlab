@@ -71,7 +71,7 @@ class UP(OLPS):
         Runs the algorithm by iterating through the given data.
 
         :param weights: (list/np.array/pd.DataFrame) Initial weights set by the user.
-        :param verbose: (boolean) Prints progress bar if true.
+        :param verbose: (bool) Prints progress bar if true.
         """
         # Run allocate on all the experts.
         for exp in range(self.number_of_experts):

@@ -32,7 +32,7 @@ assets only if the portfolio returns are lower than the :math:`\epsilon` value.
 OLMAR has two variations to solve this optimization problem with OLMAR-1 and OLMAR-2.
 
 - :math:`b_t` is the portfolio vector at time :math:`t`.
-- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
 - :math:`\tilde{x}` is the projected price relative.
 - :math:`\bar x` is the mean of the projected price relative.
 - :math:`\epsilon` is the mean reversion threshold constant.
@@ -50,7 +50,7 @@ OLMAR-1 utilizes simple moving average to predict prices.
     \: \: \: \: \: \: \: \: \: \: \: \: \: \: = \frac{1}{w} \left(\frac{p_t}{p_t} + \frac{p_{t-1}}{p_t}+ \cdot \cdot \cdot + \frac{p_{t-w+1}}{p_t}\right)
 
 .. math::
-    \: \: \: \: \: \: \: \: \: \: \: \: \: \: = \frac{1}{w} \left( 1+ \frac{1}{x_t}+ \cdot \cdot \cdot + \frac{1}{\odot^{w-2}_{i=0}x_{t-1}} \right)
+    \: \: \: \: \: \: \: \: \: \: \: \: \: \: = \frac{1}{w} \left( 1+ \frac{1}{x_t}+ \cdot \cdot \cdot + \frac{1}{\odot^{w-2}_{i=0}x_{t-i}} \right)
 
 2. OLMAR-2
 ##########

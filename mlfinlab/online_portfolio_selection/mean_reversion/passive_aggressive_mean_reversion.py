@@ -18,7 +18,7 @@ class PAMR(OLPS):
 
     def __init__(self, optimization_method, epsilon=0.5, agg=10):
         """
-        Initializes Passive Aggressive Mean Reversionw ith the given epsilon, aggressiveness,
+        Initializes Passive Aggressive Mean Reversion with the given epsilon, aggressiveness,
         and optimzation method.
 
         :param epsilon: (float) Sensitivity to the market with range of [0, inf). Because the epsilon
@@ -52,6 +52,10 @@ class PAMR(OLPS):
         # Check that epsilon is greater than 0.
         if self.epsilon < 0:
             raise ValueError("Epsilon values must be greater than 0")
+
+        # Check that aggressiveness is greater than 0.
+        if self.agg < 0:
+            raise ValueError("Aggressiveness values must be greater than 0")
 
         # Check that optimization method is either 0, 1, or 2.
         if self.optimization_method not in [0, 1, 2]:

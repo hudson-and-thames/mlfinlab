@@ -15,7 +15,7 @@ for all time periods. However, it determines those weights by having the complet
 BCRP aims to maximize portfolio returns with the equation below.
 
 .. math::
-    b^{\bf{\star}} = \underset{b^t \in \Delta_m}{\arg\max} \: S_t(CRP(b)) = \underset{b \in \Delta_m}{\arg\max} \overset{t}{\underset{n=1}{\prod}} \:  b^{\top}x_n
+    b^{\bf{\star}} = \underset{b_t \in \Delta_m}{\arg\max} \: S_t(CRP(b)) = \underset{b \in \Delta_m}{\arg\max} \overset{t}{\underset{n=1}{\prod}} \:  b^{\top}x_n
 
 Once the optimal weight has been determined, the final returns can be calculated by using the CRP returns equation.
 
@@ -24,10 +24,15 @@ Once the optimal weight has been determined, the final returns can be calculated
 
 - :math:`S(t)` is the total portfolio returns at time :math:`t`.
 - :math:`b_t` is the portfolio vector at time :math:`t`.
-- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
 - :math:`\bigodot` is the element-wise cumulative product. In this case, the cumulative product represents the overall change in prices.
 - :math:`\prod` is the product of all elements.
 - :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
+
+.. tip::
+
+    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
+    provides a more detailed exploration of the strategies.
 
 Implementation
 --------------
@@ -38,11 +43,6 @@ Implementation
         :members:
         :show-inheritance:
         :inherited-members:
-
-.. tip::
-
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
-    provides a more detailed exploration of the strategies.
 
 Example Code
 ############

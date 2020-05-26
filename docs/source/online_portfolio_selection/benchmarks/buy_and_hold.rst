@@ -20,7 +20,7 @@ Returns for Buy and Hold can be calculated by multiplying the initial weight and
 
 - :math:`S(t)` is the total portfolio returns at time :math:`t`.
 - :math:`b_t` is the portfolio vector at time :math:`t`.
-- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
 - :math:`\bigodot` is the element-wise cumulative product. In this case, the cumulative product represents the overall change in prices.
 
 .. tip::

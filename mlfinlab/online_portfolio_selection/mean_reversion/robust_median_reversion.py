@@ -21,7 +21,7 @@ class RMR(OLPS):
         Initializes Robust Median Reversion with the given epsilon, n_iteration, window, and tau values.
 
         :param epsilon: (float) Reversion threshold with range [1, inf). Values of [15, 25] had the
-                                highest returns for the dataset provided by the original authors.
+                                highest returns for the original dataset provided by the authors.
         :param n_iteration: (int) Maximum number of iterations with range [2, inf). Iteration of 200
                                   produced a adequate balance between performance and computational
                                   time for the strategy.
@@ -69,6 +69,10 @@ class RMR(OLPS):
         if self.window < 2:
             raise ValueError("Window must be greater or equal to 2.")
 
+        # Check that tau is within range of [0, 1).
+        if self.tau < 0 or self.tau >= 1:
+            raise ValueError("Tau must be greater or equal to 0 and less than 1.")
+
         self.np_asset_prices = np.array(self.asset_prices)
 
     def _update_weight(self, time):
@@ -87,7 +91,7 @@ class RMR(OLPS):
 
         # Set the deviation from the mean of current prediction.
         predicted_deviation = current_prediction - np.ones(self.number_of_assets) * np.mean(
-            current_prediction)
+                current_prediction)
 
         # Calculate alpha, the lagrangian multiplier.
         norm2 = np.linalg.norm(predicted_deviation, ord=1) ** 2
@@ -110,10 +114,11 @@ class RMR(OLPS):
         """
         Calculates the predicted relatives using l1 median.
 
+        :param time: (int) Current time.
         :return: (np.array) Predicted relatives using l1 median.
         """
         # Calculate the L1 median of the price window.
-        price_window = self.np_asset_prices[time-self.window+1:time+1]
+        price_window = self.np_asset_prices[time - self.window + 1:time + 1]
         curr_prediction = np.median(price_window, axis=0)
 
         # Iterate until the maximum iteration allowed.
@@ -122,7 +127,8 @@ class RMR(OLPS):
             # Transform mu according the Modified Weiszfeld Algorithm
             curr_prediction = self._transform(curr_prediction, price_window)
             # If condition is satisfied, break.
-            if np.linalg.norm(prev_prediction - curr_prediction, ord=1) <= self.tau * np.linalg.norm(curr_prediction, ord=1):
+            if np.linalg.norm(prev_prediction - curr_prediction,
+                              ord=1) <= self.tau * np.linalg.norm(curr_prediction, ord=1):
                 break
 
         # Divide by the current time's price.
@@ -161,7 +167,9 @@ class RMR(OLPS):
         tilde = 1 / np.sum(1 / l1_norm) * np.sum(np.divide(non_mu.T, l1_norm), axis=1)
 
         # Calculate gamma.
-        gamma = np.linalg.norm(np.sum(np.apply_along_axis(lambda x: x / np.linalg.norm(x, ord=1), 1, non_mu), axis=0), ord=1)
+        gamma = np.linalg.norm(
+            np.sum(np.apply_along_axis(lambda x: x / np.linalg.norm(x, ord=1), 1, non_mu), axis=0),
+            ord=1)
 
         # Calculate next_mu value.
         next_mu = np.maximum(0, 1 - eta / gamma) * tilde + np.minimum(1, eta / gamma) * old_mu

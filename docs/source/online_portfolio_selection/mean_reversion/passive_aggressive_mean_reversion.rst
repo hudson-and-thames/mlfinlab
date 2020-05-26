@@ -41,7 +41,7 @@ Typically :math:`\epsilon` is set at a value between 0 and 1 and closer to 1 as 
 We will introduce three versions of Passive Aggressive Mean Reversion: PAMR, PAMR-1, and PAMR-2.
 
 - :math:`b_t` is the portfolio vector at time :math:`t`.
-- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
 - :math:`\epsilon` is the mean reversion threshold constant.
 
 1. PAMR
@@ -145,7 +145,7 @@ Example Code
     pamr1 = PAMR(optimization_method=1, epsilon=0.4, agg=20)
     pamr1.allocate(asset_prices=stock_prices, weights=some_weight)
 
-    # Compute Passive Aggressive Mean Reversion - 2 with given user weights and epsilon of 0.4.
+    # Compute Passive Aggressive Mean Reversion - 2 with given user weights and epsilon of 0.8.
     pamr2 = PAMR(optimization_method=2, epsilon=0.8, agg=1000)
     pamr2.allocate(asset_prices=stock_prices, weights=some_weight)
 

@@ -89,12 +89,22 @@ class TestPassiveAggressiveMeanReversion(TestCase):
             # Running allocate will raise ValueError.
             pamr3.allocate(self.data)
 
+    def test_pamr_agg_error(self):
+        """
+        Tests ValueError if aggressiveness is less than 0.
+        """
+        # Initialize PAMR.
+        pamr4 = PAMR(optimization_method=2, epsilon=0.5, agg=-5)
+        with self.assertRaises(ValueError):
+            # Running allocate will raise ValueError.
+            pamr4.allocate(self.data)
+
     def test_pamr_method_error(self):
         """
         Tests ValueError if optimization method is not 0, 1, or 2.
         """
         # Initialize PAMR.
-        pamr4 = PAMR(optimization_method=5, epsilon=0.5, agg=10)
+        pamr5 = PAMR(optimization_method=5, epsilon=0.5, agg=10)
         with self.assertRaises(ValueError):
             # Running allocate will raise ValueError.
-            pamr4.allocate(self.data)
+            pamr5.allocate(self.data)

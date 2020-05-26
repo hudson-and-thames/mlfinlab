@@ -67,6 +67,10 @@ class FCORNK(UP):
         if not isinstance(self.lambd, int):
             raise ValueError("Lambd value must be an integer.")
 
+        # Check that k value is an integer.
+        if not isinstance(self.k, int):
+            raise ValueError("K value must be an integer.")
+
         # Check that window value is at least 1.
         if self.window < 1:
             raise ValueError("Window value must be greater than or equal to 1.")

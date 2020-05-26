@@ -24,7 +24,7 @@ where :math:`k` is the number of historical price windows, and :math:`\mu` repre
 The calculation of L1-median is computationally inefficient, so the algorithm will be using the Modified Weiszfeld Algorithm.
 
 .. math::
-    \hat{x}_{t+1} = T(\mu) = (1 - \frac{\eta(\mu)}{\gamma(\mu)})^+ \: \tilde{T}(\mu + \min(1,\frac{\eta(\mu)}{\gamma(\mu)})\mu
+    \hat{x}_{t+1} = T(\mu) = (1 - \frac{\eta(\mu)}{\gamma(\mu)})^+ \: \tilde{T}(\mu) + \min(1,\frac{\eta(\mu)}{\gamma(\mu)})\mu
 
 .. math::
     \eta(\mu) = 1 \text{ if } \mu =\text{ any price and }0 \text{ otherwise.}
@@ -41,7 +41,7 @@ Then next portfolio weights will use the predicted price to produce the optimal 
     b_{t+1} = b_{t} - \min \left \lbrace 0, \frac{\hat{x}_{t+1} b_t-\epsilon}{||\hat{x}_{t+1}-\bar{x}_{t+1}\cdot\textbf{1}||^2}\right \rbrace \cdot (\hat{x}_{t+1}-\bar{x}_{t+1}\cdot\textbf{1})
 
 - :math:`b_t` is the portfolio vector at time :math:`t`.
-- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p(t)` is the price at time :math:`t`.
+- :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
 - :math:`\mu_t` is the projected price.
 - :math:`\hat{x}` is the projected price relative.
 - :math:`\bar{x}` is the mean of the projected price relative.

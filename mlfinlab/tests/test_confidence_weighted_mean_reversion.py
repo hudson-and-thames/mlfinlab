@@ -62,7 +62,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
 
     def test_cwmr_epsilon_error(self):
         """
-        Tests ValueError if epsilon is greater than 1.
+        Tests ValueError if epsilon is greater than 1 or less than 0.
         """
         # Initialize CWMR.
         cwmr1 = CWMR(confidence=0.5, epsilon=2)
@@ -70,10 +70,6 @@ class TestConfidenceWeightedMeanReversion(TestCase):
             # Running allocate will raise ValueError.
             cwmr1.allocate(self.data)
 
-    def test_cwmr_epsilon1_error(self):
-        """
-        Tests ValueError if epsilon is less than 0.
-        """
         # Initialize CWMR.
         cwmr2 = CWMR(confidence=0.5, epsilon=-1)
         with self.assertRaises(ValueError):
@@ -82,7 +78,7 @@ class TestConfidenceWeightedMeanReversion(TestCase):
 
     def test_cwmr_confidence_error(self):
         """
-        Tests ValueError if confidence is greater than 1.
+        Tests ValueError if confidence is greater than 1 or less than 0.
         """
         # Initialize CWMR.
         cwmr3 = CWMR(confidence=2, epsilon=0.5)
@@ -90,10 +86,6 @@ class TestConfidenceWeightedMeanReversion(TestCase):
             # Running allocate will raise ValueError.
             cwmr3.allocate(self.data)
 
-    def test_cwmr_confidence1_error(self):
-        """
-        Tests ValueError if confidence is less than 0.
-        """
         # Initialize CWMR.
         cwmr4 = CWMR(confidence=-1, epsilon=0.5)
         with self.assertRaises(ValueError):
