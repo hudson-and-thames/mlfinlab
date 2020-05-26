@@ -23,10 +23,16 @@ class TestKellyCriterion(unittest.TestCase):
         stock_prices = pd.read_csv(project_path + '/test_data/stock_prices.csv', index_col=0)
 
         spy_df = stock_prices['SPY']
-        self.spy_returns = (spy_df / spy_df.shift(1) - 1).dropna()
+        spy_log_returns = np.log(spy_df/spy_df.shift(1)).dropna()
+        spy_raw_returns = (spy_df / spy_df.shift(1) - 1).dropna()
+        self.spy_raw_returns = spy_raw_returns.to_numpy()
+        self.spy_log_returns = spy_log_returns.to_numpy()
 
         assets_df = stock_prices[["SPY", "EEM", "TLT"]]
-        self.assets_returns = (assets_df / assets_df.shift(1) - 1).dropna()
+        assets_log_returns = np.log(assets_df/assets_df.shift(1)).dropna()
+        assets_raw_returns = (assets_df / assets_df.shift(1) - 1).dropna()
+        self.assets_log_returns = assets_log_returns
+        self.assets_raw_returns = assets_raw_returns
 
         # Default parameters
         self.risk_free_rate = 0.02
@@ -49,15 +55,18 @@ class TestKellyCriterion(unittest.TestCase):
         # Testing that growth rate of the balance is right
         self.assertAlmostEqual(test_growth_rate, kelly_growth_rate, delta=1e-7)
 
-    def test_kelly_investing(self):
+    def test_kelly_investing_log_return(self):
         """
-        Tests calculating the optimal leverage from the kelly criterion.
+        Tests calculating the optimal leverage from the kelly criterion when return is log return.
         """
-        test_leverage, test_growth_rate = kelly_investing(self.spy_returns,
+        # Test when return is log return
+        test_leverage, test_growth_rate = kelly_investing(self.spy_log_returns,
                                                           risk_free_rate=self.risk_free_rate,
-                                                          annualize_factor=self.annualize_factor)
+                                                          annualize_factor=self.annualize_factor,
+                                                          raw_return=False
+                                                          )
 
-        kelly_leverage, kelly_growth_rate = 0.993942268046857, 0.04359656764182033
+        kelly_leverage, kelly_growth_rate = 0.4951060602640831, 0.025848714663153166
 
         # Testing that value of the leverage amount is right
         self.assertAlmostEqual(test_leverage, kelly_leverage, delta=1e-7)
@@ -65,16 +74,56 @@ class TestKellyCriterion(unittest.TestCase):
         # Testing that growth rate of a asset is right
         self.assertAlmostEqual(test_growth_rate, kelly_growth_rate, delta=1e-7)
 
-    def test_kelly_allocation(self):
+    def test_kelly_investing_raw_return(self):
         """
-        Tests calculating the optimal allocations from the kelly criterion.
+        Tests calculating the optimal leverage from the kelly criterion when return is raw return.
         """
-        test_weights, test_growth_rate = kelly_allocation(self.assets_returns,
+        # Test when return is raw return
+        test_leverage, test_growth_rate = kelly_investing(self.spy_raw_returns,
                                                           risk_free_rate=self.risk_free_rate,
-                                                          annualize_factor=self.annualize_factor)
+                                                          annualize_factor=self.annualize_factor,
+                                                          raw_return=True
+                                                          )
 
-        kelly_fractions = np.array([5.63723593, -2.67589204, 2.80976013])
-        kelly_growth_rate = 0.21340996597420442
+        kelly_leverage, kelly_growth_rate = 0.4951060602640831, 0.025848714663153166
+
+        # Testing that value of the leverage amount is right
+        self.assertAlmostEqual(test_leverage, kelly_leverage, delta=1e-7)
+
+        # Testing that growth rate of a asset is right
+        self.assertAlmostEqual(test_growth_rate, kelly_growth_rate, delta=1e-7)
+
+    def test_kelly_allocation_log_return(self):
+        """
+        Tests calculating the optimal allocations from the kelly criterion when return is log return.
+        """
+        test_weights, test_growth_rate = kelly_allocation(self.assets_log_returns,
+                                                          risk_free_rate=self.risk_free_rate,
+                                                          annualize_factor=self.annualize_factor,
+                                                          raw_return=False
+                                                          )
+
+        kelly_fractions = np.array([6.17034846, -3.68890982, 1.76385721])
+        kelly_growth_rate = 0.22973535914664106
+
+        # Testing that weights of portfolio is right
+        np.testing.assert_almost_equal(test_weights, kelly_fractions, decimal=7)
+
+        # Testing that growth rate of portfolio is right
+        np.testing.assert_almost_equal(test_growth_rate, kelly_growth_rate)
+
+    def test_kelly_allocation_raw_return(self):
+        """
+        Tests calculating the optimal allocations from the kelly criterion when return is raw return.
+        """
+        test_weights, test_growth_rate = kelly_allocation(self.assets_raw_returns,
+                                                          risk_free_rate=self.risk_free_rate,
+                                                          annualize_factor=self.annualize_factor,
+                                                          raw_return=True
+                                                          )
+
+        kelly_fractions = np.array([6.17034846, -3.68890982, 1.76385721])
+        kelly_growth_rate = 0.22973535914664106
 
         # Testing that weights of portfolio is right
         np.testing.assert_almost_equal(test_weights, kelly_fractions, decimal=7)
