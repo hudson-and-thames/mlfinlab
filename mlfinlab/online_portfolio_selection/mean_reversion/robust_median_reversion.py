@@ -1,6 +1,6 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
-from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
+from mlfinlab.online_portfolio_selection.base import OLPS
 
 
 class RMR(OLPS):
@@ -91,7 +91,7 @@ class RMR(OLPS):
 
         # Set the deviation from the mean of current prediction.
         predicted_deviation = current_prediction - np.ones(self.number_of_assets) * np.mean(
-                current_prediction)
+            current_prediction)
 
         # Calculate alpha, the lagrangian multiplier.
         norm2 = np.linalg.norm(predicted_deviation, ord=1) ** 2

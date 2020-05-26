@@ -1,7 +1,7 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import scipy.optimize as opt
-from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
+from mlfinlab.online_portfolio_selection.base import OLPS
 
 
 class FTL(OLPS):

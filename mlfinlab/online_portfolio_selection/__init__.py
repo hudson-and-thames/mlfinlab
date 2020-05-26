@@ -2,7 +2,7 @@
 Initialize Online Portfolio Selection Module.
 """
 # Parent Class
-from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
+from mlfinlab.online_portfolio_selection.base import OLPS
 from mlfinlab.online_portfolio_selection.universal_portfolio import UP
 
 # Benchmarks

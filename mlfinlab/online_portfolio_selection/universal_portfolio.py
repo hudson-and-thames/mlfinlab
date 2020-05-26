@@ -2,7 +2,7 @@
 # pylint: disable=too-many-instance-attributes
 import sys
 import numpy as np
-from mlfinlab.online_portfolio_selection.online_portfolio_selection import OLPS
+from mlfinlab.online_portfolio_selection.base import OLPS
 from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio import CRP
 
 
