@@ -323,7 +323,7 @@ Codependence Matrix
 
 This module consists two functions that generate the following:
 
-1. **Dependence Matrix** to compute dependence of a given matrix using various codependence method like Mutual Information,
+1. **Dependence Matrix** to compute dependence of a given matrix using various codependence methods like Mutual Information,
    Variation of Information, Distance Correlation, Spearman's Rho, GPR distance, and GNPR distance.
 2. **Distance Matrix** can used to compute distance of a given matrix using various metrics like angular, squared
    angular and absolute angular.

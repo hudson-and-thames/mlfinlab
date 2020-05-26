@@ -10,7 +10,7 @@ Codependence by Marti
 
 The work mentioned above introduces a new approach of representing the random variables that splits apart dependency and
 distribution without losing any information. It also contains a distance metric between two financial time series based
-on the novel approach.
+on a novel approach.
 
 According to the author's classification:
 
