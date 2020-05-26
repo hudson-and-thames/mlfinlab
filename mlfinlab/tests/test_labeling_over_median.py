@@ -47,5 +47,4 @@ class TestLabellingOverMedian(unittest.TestCase):
         # Verify that last row is NaN
         self.assertTrue(test3.iloc[-1].isnull().all())
         self.assertTrue(test4.iloc[-1].isnull().all())
-        
 
