@@ -7,3 +7,4 @@ from mlfinlab.bet_sizing.bet_sizing import (bet_size_probability, bet_size_dynam
                                             confirm_and_cast_to_df, get_concurrent_sides, cdf_mixture,
                                             single_bet_size_mixed)
 from mlfinlab.bet_sizing.ef3m import M2N, centered_moment, raw_moment, most_likely_parameters
+from mlfinlab.bet_sizing.kelly import kelly_betting, kelly_investing, kelly_allocation
