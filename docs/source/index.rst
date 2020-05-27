@@ -298,7 +298,12 @@ This project is licensed under an all rights reserved licence.
     :caption: Online Portfolio Selection
     :hidden:
 
-    online_portfolio_selection/index
+    online_portfolio_selection/introduction
+    online_portfolio_selection/benchmarks
+    online_portfolio_selection/momentum
+    online_portfolio_selection/mean_reversion
+    online_portfolio_selection/pattern_matching
+    online_portfolio_selection/universal_portfolio
 
 .. toctree::
     :maxdepth: 2

@@ -27,23 +27,23 @@ class OLPS:
 
     Upon weights allocation the possible outputs are:
 
-    - self.weights: (np.array) Final portfolio weights prediction.
+    - ``self.weights`` (np.array) Final portfolio weights prediction.
 
-    - self.all_weights: (pd.DataFrame) Portfolio weights for the time period.
+    - ``self.all_weights`` (pd.DataFrame) Portfolio weights for the time period.
 
-    - self.asset_name: (list) Name of assets.
+    - ``self.asset_name`` (list) Name of assets.
 
-    - self.number_of_assets: (int) Number of assets.
+    - ``self.number_of_assets`` (int) Number of assets.
 
-    - self.time: (datetime) Time index of the given data.
+    - ``self.time`` (datetime) Time index of the given data.
 
-    - self.length_of_time: (int) Number of time periods.
+    - ``self.length_of_time`` (int) Number of time periods.
 
-    - self.relative_return: (np.array) Relative returns of the assets.
+    - ``self.relative_return`` (np.array) Relative returns of the assets.
 
-    - self.portfolio_return: (pd.DataFrame) Cumulative portfolio returns over time.
+    - ``self.portfolio_return`` (pd.DataFrame) Cumulative portfolio returns over time.
 
-    - self.asset_prices: (pd.DataFrame) Historical asset prices (daily close).
+    - ``self.asset_prices`` (pd.DataFrame) Historical asset prices (daily close).
     """
 
     def __init__(self):
