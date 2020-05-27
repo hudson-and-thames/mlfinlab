@@ -33,7 +33,7 @@ portfolio. Because the capital growth theory primarily relies on the Kelly crite
 Sharpe ratios and maximum drawdowns are more so less useful. The primary metric in this situation becomes the log
 of final wealth, which in turn indicates the maximum of final wealth.
 
-.. image:: images/diagram.png
+.. image:: images/introduction/diagram.png
    :width: 99 %
 
 Four different strategies are currently implemented in the Online Portfolio Selection module with the
@@ -125,7 +125,7 @@ Three additional options are available for the ``allocate`` method.
 
     .. automethod:: OLPS.allocate
 
-.. image:: images/allocate.png
+.. image:: images/introduction/allocate.png
    :width: 99 %
 
 Result
@@ -157,5 +157,135 @@ Upon weights allocation the possible outputs are:
     # Portfolio returns.
     bah.portfolio_return
 
-.. image:: images/portfolio_return.png
+.. image:: images/introduction/portfolio_return.png
    :width: 33 %
+
+Data
+====
+
+Data selection is one of the hardest problems in research. With numerous test sets and a vast amount of resources
+available to the public, it is tempting to overfit and choose the data that best represent your hypothesis.
+However, conclusions that are reached from these weak models are more prone to outliers and can have a narrow
+scope for applications. Online portfolio selection also deals with the same issues as it is heavily dependent
+on the data available.
+
+Traditional papers for online portfolio selection have consistently used the same datasets and developed their
+arguments to improve on the performance of the prior papers. Thomas Cover first used a NYSE dataset that
+contained 36 stocks from 1962 to 1984. Allan Borodin collected three datasets: 88 stocks from the Toronto
+Stock Exchange from 1994 to 1998, the largest 25 stocks by market capitalization on S&P500 from 1998 to 2003,
+and 30 stocks from DJIA from 2001 to 2003. Bin Li and Steven Hoi introduced the MSCI World Index from 2006
+to 2010 to add an additional perspective to the problem.
+
+All of these datasets have different characteristics as Cover’s NYSE dataset all increased in value whereas
+most assets in DJIA lost value. The S&P 500 data contains both a bull and bear market environment, and the
+stocks from TSE originate from a less liquid market and a long bear run. However, these mediations do not
+seem enough to justify the applications and practicality of the newest module.
+
+To offset these older datasets in my research, I’ll expand the MSCI world index to look back from 1993
+to 2020 and also include 44 largest US stocks by market capitalization from 2011 to 2020. Through a different
+lens of selection, I hope to introduce the readers to a more practical and familiar set of stocks to
+understand the module in a more intuitive way.
+
+NYSE 1962-1984
+**************
+
+This is the original NYSE data that Thomas Cover used for his papers. Although it covers a lot of sectors
+and should have been useful when the paper was published, it is difficult to gauge if this dataset adds
+much value now because of the time difference.
+
+Strategies that worked a year ago could quickly lose their value as the paradigm shifts. This data is
+collected almost 60 years ago, and markets nowadays have many complex movements that cannot be comprehended
+with data from a long time ago. Results from this data should be approached with a grain of salt.
+
+.. image:: images/data/nyse_price.png
+   :width: 99 %
+
+Generally, most assets in this dataset increased by a significant amount. The notable outperforming companies
+are American Brands and Commercial Metals, and the least performing stock, DuPont, still ended with 2.9 times
+returns as no stocks in this list decreased in value.
+
+DJIA 2001-2003
+**************
+
+This is a more recent dataset that involves companies that are still well known to us. 2001 to 2003 covers
+a bear market run that should be useful to see how our strategies are affected in times of general downturn.
+Most of these assets lost in value.
+
+.. image:: images/data/djia_price.png
+   :width: 99 %
+
+DJIA from 2001 to 2003 provides strikingly different patterns compared to the previous NYSE data.
+Only 5 companies increased in price as most declined at a steady rate.
+
+TSE 1994-1998
+*************
+
+The Toronto Stock Exchange data includes a collection that may be unfamiliar to most researchers. It is an
+interesting universe with half of the stocks decreasing in value. With a combination of both overperforming
+and underperforming stocks, selection strategies will need to identify the ups and downs to have profitable returns.
+
+.. image:: images/data/tse_price.png
+   :width: 99 %
+
+Half of the stocks decreasing in value. With a combination of both overperforming and underperforming stocks,
+selection strategies need to identify the ups and downs to have profitable returns.
+
+SP500 1998-2003
+***************
+
+This dataset also includes the bear and bull run during turbulent times. It is longer than the DJIA data by
+3 more years and includes many companies that are familiar to us. This will be a good comparison to our new
+US Equity dataset which looks at more recent history for most of these companies.
+
+.. image:: images/data/sp500_price.png
+   :width: 99 %
+
+This dataset also includes the bear and bull run during turbulent times. It is longer than the DJIA data by 3 years
+and includes many companies that are familiar to us. SP500 during this time goes through the bear market in 2000,
+and in the long run, all but 5 companies increase in value.
+
+MSCI 1993-2020
+**************
+
+I used the MSCI Developed Markets Index from 1993/01/01, which includes 23 countries:
+
+- Americas: USA, Canada
+- Europe & Middle East: Austria, Belgium, Denmark, Finland, France, Germany, Ireland, Israel, Italy, Netherlands, Norway, Portugal, Spain, Sweden, Switzerland, United Kingdom
+- Pacific: Australia, Hong Kong, Japan, New Zealand, Singapore
+
+Different from traditional assets, the world indexes capture much more than just the price changes of individual
+companies. With an overarching representation of the countries' market states, these market indexes will present a
+different idea for applications of OLPS strategies.
+
+.. image:: images/data/msci_price.png
+   :width: 99 %
+
+Finland is not the first country to come in mind with metrics like these, but the rise and fall of Finland
+around the 2000s puts every other country aside. Most countries show movements that are strongly correlated with each other.
+
+US Equity 2011-2020
+*******************
+
+For a more recent dataset, I collected the 44 largest US stocks based on market capitalization according to a
+Financial Times `report <http://media.ft.com/cms/253867ca-1a60-11e0-b003-00144feab49a.pdf>`_.
+
+Although included in the original report, I did not include United Technologies and Kraft Foods due to M&A
+and also excluded Hewlett-Packard because of the company split in 2015.
+
+This dataset will be particularly interesting because it also includes the recent market impact by the coronavirus
+as well. With 10 years of continuous bull run after the financial crisis in 2008, we can examine which strategy
+was the most robust to the rapidly changing market paradigm in the last month.
+
+The companies included are:
+
+Exxon Mobil, Apple, Microsoft, Berkshire Hathaway, General Electric, Walmart, Chevron, IBM, PG, ATT, Johnson and Johnson,
+JP Morgan, Wells Fargo, Oracle, Coca-Cola, Google, Pfizer, Citi, Bank of America, Intel, Schlumberger, Cisco, Merck,
+Philip Morris, PepsiCo, ConocoPhillips, Goldman Sachs, McDonald’s, Amazon, Qualcomm, Occidental Petroleum, Abbott Laboratories,
+Walt Disney, 3M, Comcast, Caterpillar, General Motors, Home Depot, Ford, Freeport-McMoran Copper & Gold, United Parcel Service,
+Amgen, US Bancorp, American Express
+
+.. image:: images/data/equity_price.png
+   :width: 99 %
+
+Amazon has been the clear winner for the past 10 years with Microsoft and Home Depot being a close second.
+One key note for this data will be to see how our strategies fared during the downturn caused by the coronavirus.

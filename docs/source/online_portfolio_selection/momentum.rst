@@ -62,7 +62,6 @@ Gradient projection can then be iteratively updated with the following equation.
 .. math::
     b_{t+1} = b_t + \eta \cdot \left( \frac{x_t}{b_t \cdot x_t} - \frac{1}{m} \sum_{j=1}^{m} \frac{x_t}{b_t \cdot x_t} \right)
 
-
 3. Expectation Maximization
 ###########################
 
@@ -76,12 +75,14 @@ Then the corresponding update rule becomes
 .. math::
     b_{t+1} = b_t \cdot \left( \eta \cdot \left( \frac{x_t}{b_t \cdot x_t} - 1 \right) + 1 \right)
 
+.. tip::
+    The three update methods have similar returns for the same set of parameters.
+
 Parameters
 ----------
 
-Using optuna
-The optimal parameters depend on each dataset. For NYSE, a low value of :math:`\eta` was optimal, which
-indicates a lack of a clear momentum strategy.
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to see how each strategy is affected.
+For NYSE, a low value of :math:`\eta` was optimal, which indicates a lack of a clear momentum strategy.
 
 .. image:: images/momentum/nyse_eg_eta_0_1.png
    :width: 49 %
@@ -89,7 +90,7 @@ indicates a lack of a clear momentum strategy.
 .. image:: images/momentum/nyse_eg_eta_1_100.png
    :width: 49 %
 
-However, for the MSCI dataset, we see a high value of optimal :math:`\eta`, which indicates a presence
+However, for the MSCI dataset, we see a high value of optimal :math:`\eta`, indicating a possible presence
 of a momentum strategy.
 
 .. image:: images/momentum/msci_eg_eta_0_1.png
@@ -98,6 +99,10 @@ of a momentum strategy.
 .. image:: images/momentum/msci_eg_eta_1_100.png
    :width: 49 %
 
+.. tip::
+    - High :math:`\eta` : Directly follow the best performing asset.
+    - Low :math:`\eta` : Less li
+
 Implementation
 --------------
 
@@ -105,7 +110,6 @@ Implementation
 
     .. autoclass:: EG
         :members:
-        :show-inheritance:
         :inherited-members:
 
         .. automethod:: __init__

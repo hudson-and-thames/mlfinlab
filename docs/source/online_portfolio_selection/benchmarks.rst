@@ -33,6 +33,9 @@ Returns for Buy and Hold can be calculated by multiplying the initial weight and
 - :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
 - :math:`\bigodot` is the element-wise cumulative product. In this case, the cumulative product represents the overall change in prices.
 
+.. tip::
+    If no weights are given for the ``allocate`` method for Buy and Hold, uniform weights will be used.
+
 Implementation
 --------------
 
@@ -93,6 +96,10 @@ Once the initial portfolio has been determined, the final weights can be represe
 - :math:`\bigodot` is the element-wise cumulative product. In this case, the cumulative product represents the overall change in prices.
 - :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
 
+.. tip::
+    Weights given for the Best Stock's ``allocate`` method will not change initial weights because best stock
+    inherently decides the weights for all time period by choosing the best performing asset.
+
 Implementation
 --------------
 
@@ -151,8 +158,10 @@ Once the initial portfolio has been determined, the final weights can be represe
 
 .. tip::
 
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
-    provides a more detailed exploration of the strategies.
+    - If only initial parameters are given, CRP will use the parameters as initial weights.
+    - If weights are only given through ``allocate`` method, CRP will use the given weights.
+    - If both initial parameters and weights are given, CRP will override the ``allocate`` weights and use the initial parameters.
+    - If neither parameters or weights are given, CRP will use uniform weights.
 
 Implementation
 --------------
@@ -177,13 +186,22 @@ Example Code
     # Read in data.
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
 
-    # Compute Constant Rebalanced Portfolio weights with no weights given.
+    # Compute Constant Rebalanced Portfolio with unniform weights as no parameters or weights are given.
     crp = CRP()
     crp.allocate(asset_prices=stock_prices, resample_by='W', verbose=True)
 
-    # Compute Constant Rebalanced Portfolio weights with given weights.
+    # Compute Constant Rebalanced Portfolio with given weights.
     crp = CRP()
     crp.allocate(asset_prices=stock_prices, weights=some_weight)
+
+    # Compute Constant Rebalanced Portfolio with initialized parameters.
+    crp = CRP(some_weight)
+    crp.allocate(asset_prices=stock_prices)
+
+    # Compute Constant Rebalanced Portfolio with parameters and given weights.
+    # In this case, CRP will override the given weights with the parameters.
+    crp = CRP(used_weight)
+    crp.allocate(asset_prices=stock_prices, weights=ignored_weight)
 
     # Get the latest predicted weights.
     crp.weights
@@ -215,6 +233,10 @@ Once the optimal weight has been determined, the final returns can be calculated
 - :math:`\bigodot` is the element-wise cumulative product. In this case, the cumulative product represents the overall change in prices.
 - :math:`\prod` is the product of all elements.
 - :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
+
+.. tip::
+    Weights given for the Best Constant Rebalanced Portfolio's ``allocate`` method will not change initial
+    weights because BCRP inherently decides the weights for all time period by choosing the weights.
 
 Implementation
 --------------

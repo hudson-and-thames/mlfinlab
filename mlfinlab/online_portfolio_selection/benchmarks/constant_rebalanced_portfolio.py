@@ -13,7 +13,8 @@ class CRP(OLPS):
     """
     def __init__(self, weight=None):
         """
-        Sets the recurring weights for the Constant Rebalanced Portfolio.
+        Sets the recurring weights for the Constant Rebalanced Portfolio. If weight is given,
+        this will override any given weights inputted by the user through ``allocate``.
 
         :param weight: (list/np.array/pd.DataFrame) Initial weight set by the user.
         """

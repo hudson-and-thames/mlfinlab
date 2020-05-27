@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('./../..'))
 # -- Project information -----------------------------------------------------
 
 project = 'mlfinlab'
-copyright = '2019, Hudson & Thames,'
+copyright = '2020, Hudson & Thames,'
 author = 'Hudson & Thames'
 
 # The full version, including alpha/beta/rc tags
@@ -34,6 +34,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.viewcode'
 ]
 
 
