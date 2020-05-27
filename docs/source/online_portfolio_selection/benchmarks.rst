@@ -1,5 +1,10 @@
 .. _online_portfolio_selection-benchmarks:
 
+.. note::
+
+    Strategies were implemented with modifications from `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
+    Surv. V, N, Article A (December 2012), 33 pages. <https://arxiv.org/abs/1212.2129>`_
+
 ==========
 Benchmarks
 ==========
@@ -11,11 +16,6 @@ Typically these are implemented in hindsight, so future data is often incorporat
 applications, we do not have access to future data from the present, so strategies here should be taken with a grain of salt.
 
 There are four benchmarks strategies implemented in the Online Portfolio Selection module.
-
-.. tip::
-
-    The following `benchmarks <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
-    notebook provides a more detailed exploration of the strategies.
 
 Buy and Hold
 ============
@@ -33,11 +33,6 @@ Returns for Buy and Hold can be calculated by multiplying the initial weight and
 - :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
 - :math:`\bigodot` is the element-wise cumulative product. In this case, the cumulative product represents the overall change in prices.
 
-.. tip::
-
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
-    provides a more detailed exploration of the strategies.
-
 Implementation
 --------------
 
@@ -45,12 +40,11 @@ Implementation
 
     .. autoclass:: BAH
         :members:
-        :show-inheritance:
         :inherited-members:
 
 
 Example Code
-############
+------------
 
 .. code-block::
 
@@ -77,11 +71,6 @@ Example Code
     # Get portfolio returns.
     bah.portfolio_return
 
-.. tip::
-
-    Strategies were implemented with modifications from `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
-    Surv. V, N, Article A (December 2012), 33 pages. <https://arxiv.org/abs/1212.2129>`_
-
 Best Stock
 ==========
 
@@ -104,11 +93,6 @@ Once the initial portfolio has been determined, the final weights can be represe
 - :math:`\bigodot` is the element-wise cumulative product. In this case, the cumulative product represents the overall change in prices.
 - :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
 
-.. tip::
-
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
-    provides a more detailed exploration of the strategies.
-
 Implementation
 --------------
 
@@ -116,12 +100,11 @@ Implementation
 
     .. autoclass:: BestStock
         :members:
-        :show-inheritance:
         :inherited-members:
 
 
 Example Code
-############
+------------
 
 .. code-block::
 
@@ -143,11 +126,6 @@ Example Code
 
     # Get portfolio returns.
     beststock.portfolio_return
-
-.. tip::
-
-    Strategies were implemented with modifications from `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
-    Surv. V, N, Article A (December 2012), 33 pages. <https://arxiv.org/abs/1212.2129>`_
 
 Constant Rebalanced Portfolio
 =============================
@@ -183,14 +161,13 @@ Implementation
 
     .. autoclass:: CRP
         :members:
-        :show-inheritance:
         :inherited-members:
 
         .. automethod:: __init__
 
 
 Example Code
-############
+------------
 
 .. code-block::
 
@@ -217,12 +194,6 @@ Example Code
     # Get portfolio returns.
     crp.portfolio_return
 
-.. tip::
-
-    Strategies were implemented with modifications from `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
-    Surv. V, N, Article A (December 2012), 33 pages. <https://arxiv.org/abs/1212.2129>`_
-
-
 Best Constant Rebalanced Portfolio
 ==================================
 
@@ -245,11 +216,6 @@ Once the optimal weight has been determined, the final returns can be calculated
 - :math:`\prod` is the product of all elements.
 - :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
 
-.. tip::
-
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
-    provides a more detailed exploration of the strategies.
-
 Implementation
 --------------
 
@@ -257,11 +223,10 @@ Implementation
 
     .. autoclass:: BCRP
         :members:
-        :show-inheritance:
         :inherited-members:
 
 Example Code
-############
+------------
 
 .. code-block::
 
@@ -284,8 +249,8 @@ Example Code
     # Get portfolio returns.
     bcrp.portfolio_return
 
-.. tip::
+Research Notebook
+=================
 
-    Strategies were implemented with modifications from `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
-    Surv. V, N, Article A (December 2012), 33 pages. <https://arxiv.org/abs/1212.2129>`_
-
+The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
+provides a more detailed exploration of the strategies.
