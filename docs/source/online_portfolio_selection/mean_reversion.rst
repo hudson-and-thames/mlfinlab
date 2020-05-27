@@ -1,5 +1,14 @@
 .. _online_portfolio_selection-mean_reversion:
 
+.. note::
+
+    Strategies were implemented with modifications from
+
+    - `Li, B., Zhao, P., Hoi, S.C. and Gopalkrishnan, V., 2012. PAMR: Passive aggressive mean reversion strategy for portfolio selection. Machine learning, 87(2), pp.221-258. <https://link.springer.com/content/pdf/10.1007/s10994-012-5281-z.pdf>`_
+    - `Li, B., Hoi, S.C., Zhao, P. and Gopalkrishnan, V., 2013. Confidence weighted mean reversion strategy for online portfolio selection. ACM Transactions on Knowledge Discovery from Data (TKDD), 7(1), pp.1-38. <https://dl.acm.org/doi/pdf/10.1145/2435209.2435213>`_
+    - `Li, B. and Hoi, S.C., 2012. On-line portfolio selection with moving average reversion. arXiv preprint arXiv:1206.4626. <https://arxiv.org/pdf/1206.4626.pdf>`_
+    - `Huang, D., Zhou, J., Li, B., Hoi, S.C. and Zhou, S., 2016. Robust median reversion strategy for online portfolio selection. IEEE Transactions on Knowledge and Data Engineering, 28(9), pp.2480-2493. <https://core.ac.uk/download/pdf/35455615.pdf>`_
+
 ==============
 Mean Reversion
 ==============
@@ -320,8 +329,7 @@ the portfolio iteratively updates its new weights.
     b_{t+1} = b_t + \lambda_{t+1}(\tilde{x}_{t+1}-\bar x_{t+1}\textbf{1})
 
 - :math:`\lambda` is the constant multiplier to the new weights, and it is determined by the deviation from
-- :math:`\epsilon`, the reversion threshold. The portfolio will look to rebalance itself to the underperforming
-assets only if the portfolio returns are lower than the :math:`\epsilon` value.
+- :math:`\epsilon`, the reversion threshold. The portfolio will look to rebalance itself to the underperforming assets only if the portfolio returns are lower than the :math:`\epsilon` value.
 
 .. math::
     \lambda_{t+1} = max \left\lbrace 0, \frac{\epsilon-b_t \cdot \tilde{x}_{t+1}}{\|\tilde{x}_{t+1}-\bar x_{t+1} \textbf{1}\|^2}\right\rbrace

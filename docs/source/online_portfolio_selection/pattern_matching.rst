@@ -1,5 +1,12 @@
 .. _online_portfolio_selection-pattern_matching:
 
+.. note::
+
+    Strategies were implemented with modifications from
+
+    - `Li, B., Hoi, S.C. and Gopalkrishnan, V., 2011. Corn: Correlation-driven nonparametric learning approach for portfolio selection. ACM Transactions on Intelligent Systems and Technology (TIST), 2(3), pp.1-29. <https://dl.acm.org/doi/pdf/10.1145/1961189.1961193>`_
+    - `Wang, Y. and Wang, D., 2019. Market Symmetry and Its Application to Pattern-Matching-Based Portfolio Selection. The Journal of Financial Data Science, 1(2), pp.78-93. <https://jfds.pm-research.com/content/1/2/78.short>`_
+
 ================
 Pattern Matching
 ================
@@ -22,13 +29,8 @@ distances to capture the whole market direction.
 
 Three different variations of the CORN strategies are implemented in the Online Portfolio Selection module.
 
-.. tip::
-
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Pattern%20Matching.ipynb>`_
-    provides a more detailed exploration of the strategies.
-
-1. Correlation Driven Nonparametric Learning (CORN)
-###################################################
+Correlation Driven Nonparametric Learning (CORN)
+################################################
 
 CORN formally defines a similar set to be one that satisfies the following equation:
 
@@ -49,13 +51,14 @@ Once all the similar historical periods are identified, the strategy returns wei
 - :math:`w` is the number of windows to lookback.
 - :math:`cov` is the covariance term.
 - :math:`std` is the standard deviation term.
-- :math:`rho` is the correlation threshold.
+- :math:`\rho` is the correlation threshold.
 - :math:`C_t` is the set of similar periods.
 
 CORN Parameters
 ---------------
 
-The optimal parameters for CORN are dependant on each dataset. For NYSE, :math:`\rho` of 0.3 and window of 1 had the highest returns.
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
+for the users. For NYSE, :math:`\rho` of 0.3 and window of 1 had the highest returns.
 SP500 images indicate an optimal rho of 0 and window of 6. Most of the times the window values should be less than 7 with a strong
 inclination to 0 with rho values being on the lower end from 0 to 0.4.
 
@@ -65,6 +68,11 @@ inclination to 0 with rho values being on the lower end from 0 to 0.4.
 .. image:: images/pattern_matching/sp500_corn.png
    :width: 49 %
 
+.. tip::
+
+    - :math:`\rho` between 0 and 0.2 is optimal
+    - Optimal window ranges are different, but are typically in between 1 and 7 and most likely 1.
+
 CORN Implementation
 -------------------
 
@@ -72,14 +80,13 @@ CORN Implementation
 
     .. autoclass:: CORN
         :members:
-        :show-inheritance:
         :inherited-members:
 
         .. automethod:: __init__
 
 
-2. Correlation Driven Nonparametric Learning - Uniform (CORN-U)
-###############################################################
+Correlation Driven Nonparametric Learning - Uniform (CORN-U)
+############################################################
 
 Because the CORN strategies are dependent on the parameters, we propose a more generic one that takes an
 ensemble approach to reduce variability. One possible CORN ensemble is the CORN-U method.
@@ -98,15 +105,21 @@ After gathering results for all the experts, the total portfolio weight will be 
 CORN-U Parameters
 -----------------
 
-The optimal parameters for CORN-U follow the best parameters for parent class CORN. The most important parameter that affects
-returns tend to be the :math:`\rho` value and a range between 0 and 0.4 works for most datasets. Window ranges
-are trickier as they tend to be either just 1 or a much larger value.
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
+for the users. The best parameters for CORN-U were similar to the parameters for parent class CORN. The most important
+parameter that affects returns tend to be the :math:`\rho` value and a range between 0 and 0.4 works for most datasets.
+Window ranges are trickier as they tend to be either just 1 or a much larger value.
 
 .. image:: images/pattern_matching/nyse_cornu.png
    :width: 49 %
 
 .. image:: images/pattern_matching/sp500_cornu.png
    :width: 49 %
+
+.. tip::
+
+    - :math:`\rho` between 0 and 0.2 is optimal
+    - Optimal window ranges are different, but are typically in between 1 and 7 and most likely 1.
 
 CORN-U Implementation
 ---------------------
@@ -115,13 +128,12 @@ CORN-U Implementation
 
     .. autoclass:: CORNU
         :members:
-        :show-inheritance:
         :inherited-members:
 
         .. automethod:: __init__
 
-3. Correlation Driven Nonparametric Learning - K (CORN-K)
-#########################################################
+Correlation Driven Nonparametric Learning - K (CORN-K)
+######################################################
 
 CORN-K further improves the CORN-U by generating more parameters of experts. There is more variability as
 different ranges of window and :math:`\rho` value are considered to create more options.
@@ -130,12 +142,13 @@ The most important part of the CORN-K, however, is the capital allocation method
 distributes capital among all the experts, CORN-K selects the top-k best performing experts until the last period
 and equally allocate capital among them. This prunes the experts that have less optimal returns and puts more weight on the performing ones.
 
-CORN-K takes in 3 parameters: window, rho, and k.
+CORN-K takes in 3 parameters: window, :math:`rho`, and :math:`k`.
 
 CORN-K Parameters
 -----------------
 
-The most important parameter for CORN-K is k, and most of the times this should always be set at 1 or 2 for the highest returns. A low
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
+for the users. The most important parameter for CORN-K is k, and most of the times this should always be set at 1 or 2 for the highest returns. A low
 value of k effectively prunes the less performing experts. Rho of 1 is good for datasets that have optimal CORN rho value of 0,
 but if the optimal CORN rho is slightly above that rho should be changed to a value higher then 3 to capture the range. Typically,
 range of [3, 5] worked for preliminary datasets. Window values also depend on each dataset, but the best
@@ -147,6 +160,12 @@ guess would be on the lower range of 1 or higher value of 7.
 .. image:: images/pattern_matching/sp500_cornk.png
    :width: 49 %
 
+.. tip::
+
+    - :math:`k` should be either 1 or 2 in most cases.
+    - :math:`\rho` between 1 and 7 is optimal
+    - Optimal window ranges are different, but are typically in between 1 and 7.
+
 CORN-K Implementation
 ---------------------
 
@@ -154,7 +173,6 @@ CORN-K Implementation
 
     .. autoclass:: CORNK
         :members:
-        :show-inheritance:
         :inherited-members:
 
         .. automethod:: __init__
@@ -224,9 +242,10 @@ Example Code
 Symmetric Correlation Driven Nonparametric Learning
 ===================================================
 
-Market symmetry is a concept that the markets have mirrored price movements. Increasing price trends represents a mirror of a decreasing trend.
-This gives us an intuitional understanding that if the price movements are strongly negatively correlated, the optimal portfolio weights
-should minimize the returns or the losses from those periods as it is most likely that the optimal portfolio weights would be the inverse.
+Symmetric CORN utilizes the concept of Market symmetry which states that markets have mirrored price movements. Increasing price trends
+represents a mirror of a decreasing trend. This gives us an intuitional understanding that if the price movements are strongly negatively
+correlated, the optimal portfolio weights should minimize the returns or the losses from those periods as it is most likely that the optimal
+portfolio weights would be the inverse.
 
 Introduced recently in a Journal of Financial Data Science paper by Yang Wang and Dong Wang in 2019, SCORN identifies positively
 correlated windows and negatively correlated windows.
@@ -256,18 +275,14 @@ Two different variations of the SCORN strategies are implemented in the Online P
 - :math:`C'_t` is the set of similar periods.
 - :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
 
-.. tip::
-
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Pattern%20Matching.ipynb>`_
-    provides a more detailed exploration of the strategies.
-
-1. Symmetric Correlation Driven Nonparametric Learning (SCORN)
-##############################################################
+Symmetric Correlation Driven Nonparametric Learning (SCORN)
+###########################################################
 
 SCORN Parameters
 ----------------
 
-The optimal :math:`\rho` for SCORN is between 0 and 0.2. Most cases :math:`\rho` would be 0 to indicate a
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
+for the users. The optimal :math:`\rho` for SCORN is between 0 and 0.2. Most cases :math:`\rho` would be 0 to indicate a
 binary classification regarding the similarity sets; however, there are some instances where a value of 0.2
 is more optimal. The optimal window value more or less varies with a tendency for a shorter value of 1 or 2.
 Although, there are cases where a window of 21 had the highest returns.
@@ -278,6 +293,11 @@ Although, there are cases where a window of 21 had the highest returns.
 .. image:: images/pattern_matching/msci_scorn.png
    :width: 49 %
 
+.. tip::
+
+    - :math:`\rho` between 0 and 0.2 is optimal. In most cases, 0 had the highest returns.
+    - Optimal window ranges are different and will vary dependant on the data.
+
 SCORN Implementation
 --------------------
 
@@ -285,14 +305,13 @@ SCORN Implementation
 
     .. autoclass:: SCORN
         :members:
-        :show-inheritance:
         :inherited-members:
 
         .. automethod:: __init__
 
 
-2. Symmetric Correlation Driven Nonparametric Learning - K (SCORN-K)
-####################################################################
+Symmetric Correlation Driven Nonparametric Learning - K (SCORN-K)
+#################################################################
 
 .. tip::
 
@@ -301,7 +320,8 @@ SCORN Implementation
 SCORN-K Parameters
 ------------------
 
-In general, :math:`\rho` of 1 is sufficient as most of the time the ideal :math:`\rho` is 0. For cases with
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
+for the users. In general, :math:`\rho` of 1 is sufficient as most of the time the ideal :math:`\rho` is 0. For cases with
 datasets that have optimal SCORN of 0.2, :math:`\rho` should be increased to 3. Window values are also dependent
 on each data, but in most cases, value of 2 was sufficient.
 
@@ -311,6 +331,12 @@ on each data, but in most cases, value of 2 was sufficient.
 .. image:: images/pattern_matching/msci_scornk.png
    :width: 49 %
 
+.. tip::
+
+    - :math:`k` should be either 1 or 2 in most cases.
+    - :math:`\rho` between 1 and 7 is optimal
+    - Optimal window ranges are different, but are typically in between 1 and 7.
+
 SCORN-K Implementation
 ----------------------
 
@@ -318,7 +344,6 @@ SCORN-K Implementation
 
     .. autoclass:: SCORNK
         :members:
-        :show-inheritance:
         :inherited-members:
 
         .. automethod:: __init__
@@ -413,18 +438,14 @@ If the correlation is negative, we place a negative weight that approaches 0 for
 
 Two different variations of the FCORN strategies are implemented in the Online Portfolio Selection module.
 
-.. tip::
-
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Pattern%20Matching.ipynb>`_
-    provides a more detailed exploration of the strategies.
-
-1. Functional Correlation Driven Nonparametric Learning (FCORN)
-###############################################################
+Functional Correlation Driven Nonparametric Learning (FCORN)
+############################################################
 
 FCORN Parameters
 ----------------
 
-The optimal :math:`\rho` for FCORN is between 0.4 and 0.8 with best lambd value at 1.
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
+for the users. The optimal :math:`\rho` for FCORN is between 0.4 and 0.8 with best lambd value at 1.
 In most cases, window should be in the smaller range with 1 or 2 as seen with the case for the NYSE dataset; however,
 SP500 has the highest returns with window of 5.
 
@@ -433,6 +454,12 @@ SP500 has the highest returns with window of 5.
 
 .. image:: images/pattern_matching/sp500_fcorn.png
    :width: 49 %
+
+.. tip::
+
+    - :math:`\rho` between 0.4 and 0.8 is optimal
+    - Optimal window ranges are different, but are typically in between 1 and 7.
+    - Lambd of 1 to 5 typically had high returns.
 
 FCORN Implementation
 --------------------
@@ -447,8 +474,8 @@ FCORN Implementation
         .. automethod:: __init__
 
 
-2. Functional Correlation Driven Nonparametric Learning - K (FCORN-K)
-#####################################################################
+Functional Correlation Driven Nonparametric Learning - K (FCORN-K)
+##################################################################
 
 .. tip::
 
@@ -457,7 +484,8 @@ FCORN Implementation
 FCORN-K Parameters
 ------------------
 
-:math:`\rho` should be at least 5 to capture the range between 0.4 and 0.8, with lambd of 1 sufficient
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
+for the users. :math:`\rho` should be at least 5 to capture the range between 0.4 and 0.8, with lambd of 1 sufficient
 to get the highest returns. Window values vary with each dataset, but a value of 1 or 2 typically
 had the highest returns.
 
@@ -526,7 +554,8 @@ Example Code
     # Get capital allocation weights.
     fcornk1.weights_on_experts
 
-.. tip::
+Research Notebook
+=================
 
-    The following `pattern matching <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Pattern%20Matching.ipynb>`_
-    notebook provides a more detailed exploration of the strategies.
+The following `pattern matching <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Pattern%20Matching.ipynb>`_
+notebook provides a more detailed exploration of the strategies.
