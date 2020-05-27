@@ -274,5 +274,5 @@ Example Code
 Research Notebook
 =================
 
-The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
-provides a more detailed exploration of the strategies.
+The following `benchmarks <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
+notebook provides a more detailed exploration of the strategies.

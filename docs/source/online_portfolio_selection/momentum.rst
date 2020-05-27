@@ -81,7 +81,7 @@ Then the corresponding update rule becomes
 Parameters
 ##########
 
-Using `optuna <https://optuna.org/>`_, we experimented with different parameters to give a general guideline
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
 for the users. For NYSE, a low value of :math:`\eta` was optimal, which indicates a lack of a clear momentum strategy.
 
 .. image:: images/momentum/nyse_eg_eta_0_1.png
@@ -226,7 +226,7 @@ Follow the Regularized Leader adds an additional regularization term to the obje
 Parameters
 ##########
 
-Using `optuna <https://optuna.org/>`_, we experimented with different parameters to give a general guideline
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
 for the users. For NYSE, a high regularization was an effective method to generate high returns
 as :math:`\beta` of 20 was optimal.
 
@@ -291,5 +291,5 @@ Example Code
 Research Notebook
 =================
 
-The following research `momentum <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb>`_
+The following `momentum <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb>`_
 notebook provides a more detailed exploration of the strategies.

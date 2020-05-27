@@ -51,8 +51,8 @@ We will introduce three versions of Passive Aggressive Mean Reversion: PAMR, PAM
 - :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
 - :math:`\epsilon` is the mean reversion threshold constant.
 
-1. PAMR
-#######
+PAMR
+####
 
 The first method is described as the following optimization problem:
 
@@ -61,8 +61,8 @@ The first method is described as the following optimization problem:
 
 With the original problem formulation and :math:`\epsilon` parameters, PAMR is the most basic implementation.
 
-2. PAMR-1
-#########
+PAMR-1
+######
 
 PAMR-1 introduces a slack variable to PAMR.
 
@@ -73,8 +73,8 @@ PAMR-1 introduces a slack variable to PAMR.
 
 A higher :math:`C` value indicates the affinity to a more aggressive approach.
 
-2. PAMR-2
-#########
+PAMR-2
+######
 
 PAMR-2 contains a quadratic term to the original slack variable from PAMR-1.
 
@@ -89,14 +89,14 @@ By increasing the slack variable at a quadratic rate, the method regularizes por
 
 .. tip::
 
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Mean%20Reversion.ipynb>`_
-    provides a more detailed exploration of the strategies.
+    PAMR-1 and PAMR-2 tends to have higher returns compared to a normal PAMR.
 
 Parameters
-----------
+##########
 
-The optimal parameters depend on each dataset. For NYSE, aggressiveness was not an important parameter as
-returns were primarily affected by the :math:`\epsilon` value. :math:`\epsilon` of 0 resulted as the
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
+for the users. For NYSE, aggressiveness was not an important parameter as returns were primarily affected by
+the :math:`\epsilon` value. :math:`\epsilon` of 0 resulted as the
 highest returns.
 
 .. image:: images/mean_reversion/nyse_pamr.png
@@ -121,14 +121,19 @@ a hyperparameter.
 .. image:: images/mean_reversion/equity_pamr2.png
    :width: 32 %
 
+.. tip::
+
+    - High :math:`\epsilon`: passive mean reversion.
+    - Low :math:`\epsilon`: aggressive mean reversion.
+    - Aggressiveness (Agg) has minimal impact on returns, but a value between 10 and 100 typically worked well.
+
 Implementation
---------------
+##############
 
 .. automodule:: mlfinlab.online_portfolio_selection.mean_reversion.passive_aggressive_mean_reversion
 
     .. autoclass:: PAMR
         :members:
-        :show-inheritance:
         :inherited-members:
 
         .. automethod:: __init__
@@ -197,8 +202,8 @@ a confidence interval :math:`\theta` determined by the threshold, :math:`\epsilo
 
 CWMR has two variations to solve this optimization problem with CWMR-SD and CWMR-Var.
 
-1. CWMR-SD
-##########
+CWMR-SD
+#######
 
 CWMR uses the Kullback-Leibler divergence to further formulate the optimization problem as following:
 
@@ -208,8 +213,8 @@ CWMR uses the Kullback-Leibler divergence to further formulate the optimization 
 .. math::
     \text{such that } \epsilon - \mu^{\top}\cdot x_t \geq \phi x_t^{\top} \Sigma x_t\text{, } \mu^{\top} \cdot \textbf{1} = 1 \text{, and } \mu \geq 0
 
-2. CWMR-Var
-###########
+CWMR-Var
+########
 
 The standard deviation method further assumes the PSD property of :math:`\Sigma` to refactor the equations as the following:
 
@@ -229,15 +234,11 @@ The standard deviation method further assumes the PSD property of :math:`\Sigma`
     For both CWMR-Var and CWMR-SD, the calculations involve taking the inverse of a sum of another inverse matrix.
     The constant calculations of matrix inversion is extremely unstable and makes the model prone to any outliers and hyperparameters.
 
-.. tip::
-
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Mean%20Reversion.ipynb>`_
-    provides a more detailed exploration of the strategies.
-
 Parameters
-----------
+##########
 
-CWMR in general does not have an optimal parameter. The results are extremely dependent on the
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
+for the users. CWMR in general does not have an optimal parameter. The results are extremely dependent on the
 hyperparameters as seen with the case for the NYSE and TSE dataset.
 
 For NYSE, a :math:`\epsilon` of 1 and confidence of 1 had the highest returns.
@@ -258,14 +259,18 @@ seems to indicate a congregation at 0.5.
 .. image:: images/mean_reversion/tse_cwmrvar.png
    :width: 49 %
 
+.. tip::
+
+    It is difficult to gauge the optimal :math:`\epsilon` and confidence for any dataset. We recommend
+    using other mean reversion strategies for implementations.
+
 Implementation
---------------
+##############
 
 .. automodule:: mlfinlab.online_portfolio_selection.mean_reversion.confidence_weighted_mean_reversion
 
     .. autoclass:: CWMR
         :members:
-        :show-inheritance:
         :inherited-members:
 
         .. automethod:: __init__
@@ -314,8 +319,8 @@ the portfolio iteratively updates its new weights.
 .. math::
     b_{t+1} = b_t + \lambda_{t+1}(\tilde{x}_{t+1}-\bar x_{t+1}\textbf{1})
 
-:math:`\lambda` is the constant multiplier to the new weights, and it is determined by the deviation from
-:math:`\epsilon`, the reversion threshold. The portfolio will look to rebalance itself to the underperforming
+- :math:`\lambda` is the constant multiplier to the new weights, and it is determined by the deviation from
+- :math:`\epsilon`, the reversion threshold. The portfolio will look to rebalance itself to the underperforming
 assets only if the portfolio returns are lower than the :math:`\epsilon` value.
 
 .. math::
@@ -330,8 +335,8 @@ OLMAR has two variations to solve this optimization problem with OLMAR-1 and OLM
 - :math:`\epsilon` is the mean reversion threshold constant.
 - :math:`\lambda` is the lagrangian multiplier to change the new weights.
 
-1. OLMAR-1
-##########
+OLMAR-1
+#######
 
 OLMAR-1 utilizes simple moving average to predict prices.
 
@@ -344,8 +349,8 @@ OLMAR-1 utilizes simple moving average to predict prices.
 .. math::
     \: \: \: \: \: \: \: \: \: \: \: \: \: \: = \frac{1}{w} \left( 1+ \frac{1}{x_t}+ \cdot \cdot \cdot + \frac{1}{\odot^{w-2}_{i=0}x_{t-i}} \right)
 
-2. OLMAR-2
-##########
+OLMAR-2
+#######
 
 OLMAR-2 uses exponential moving average to predict prices.
 
@@ -372,15 +377,11 @@ OLMAR-2 uses exponential moving average to predict prices.
     Every market has a different mean reversion pattern, and it is important to identify the exact parameter to apply this
     strategy in a real trading environment.
 
-.. tip::
-
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Mean%20Reversion.ipynb>`_
-    provides a more detailed exploration of the strategies.
-
 Parameters
-----------
+##########
 
-:math:`\epsilon` has minimal impact on the returns as the primary driving paramter for these strategies
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
+for the users. :math:`\epsilon` has minimal impact on the returns as the primary driving paramter for these strategies
 is corresponding window or alpha value.
 
 For NYSE, optimal window for OLMAR-1 was 23, whereas optimal alpha was 0.4.
@@ -399,14 +400,18 @@ TSE's window was similar to that of NYSE, but the optimal alpha was much higher,
 .. image:: images/mean_reversion/tse_olmar2.png
    :width: 49 %
 
+.. tip::
+
+    - OLMAR-2 tends to have much higher returns compared to OLMAR-1, but this is also dependent on each dataset.
+    - :math:`\epsilon` has minimal effect on returns.
+
 Implementation
---------------
+##############
 
 .. automodule:: mlfinlab.online_portfolio_selection.mean_reversion.online_moving_average_reversion
 
     .. autoclass:: OLMAR
         :members:
-        :show-inheritance:
         :inherited-members:
 
         .. automethod:: __init__
@@ -478,16 +483,11 @@ Then next portfolio weights will use the predicted price to produce the optimal 
 - :math:`\hat{x}` is the projected price relative.
 - :math:`\bar{x}` is the mean of the projected price relative.
 
-
-.. tip::
-
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Mean%20Reversion.ipynb>`_
-    provides a more detailed exploration of the strategies.
-
 Parameters
-----------
+##########
 
-Similarly to OLMAR, the parameters primarily depend on the window value. N_iteration of 200 typically had
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
+for the users. Similarly to OLMAR, the parameters primarily depend on the window value. N_iteration of 200 typically had
 the highest results with a :math:`\epsilon` range of 15 to 25. Ultimately, the window range that decides
 the period of mean reversion was the most influential parameter to affect the portfolio's results.
 
@@ -500,14 +500,20 @@ the period of mean reversion was the most influential parameter to affect the po
 .. image:: images/mean_reversion/msci_rmr.png
    :width: 32 %
 
+.. tip::
+
+    - Window values tended to be more experimental and is the most important parameter for RMR.
+    - N_iteration of 200 typically had higher results.
+    - :math:`\epsilon` range of 15 to 25 worked for many datasets.
+    - It is recommended to leave the :math:`\tau` at 0.001 for computational issues.
+
 Implementation
---------------
+##############
 
 .. automodule:: mlfinlab.online_portfolio_selection.mean_reversion.robust_median_reversion
 
     .. autoclass:: RMR
         :members:
-        :show-inheritance:
         :inherited-members:
 
         .. automethod:: __init__
@@ -540,7 +546,8 @@ Example Code
     # Get portfolio returns.
     rmr1.portfolio_return
 
-.. tip::
+Research Notebook
+=================
 
     The following `mean reversion <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Mean%20Reversion.ipynb>`_
     notebook provides a more detailed exploration of the strategies.
