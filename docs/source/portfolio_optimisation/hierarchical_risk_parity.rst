@@ -1,5 +1,3 @@
-.. _portfolio_optimisation-hierarchical_risk_parity:
-
 .. |br| raw:: html
 
     <br>
@@ -19,6 +17,9 @@
 .. |h4_| raw:: html
 
     </h4>
+
+.. _portfolio_optimisation-hierarchical_risk_parity:
+
 
 .. note::
     The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies.

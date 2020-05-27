@@ -1,5 +1,3 @@
-.. _portfolio_optimisation-hierarchical_clustering_asset_allocation:
-
 .. |br| raw:: html
 
     <br>
@@ -20,11 +18,14 @@
 
     </h4>
 
+.. _portfolio_optimisation-hierarchical_clustering_asset_allocation:
+
+
 .. note::
-    The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies. Each
-    algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
-    on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
-    Next up, lets discuss about some of these implementations and the different parameters they require.
+    The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies.
+    Each algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight
+    allocations on the specific user data. This way, each implementation can be called in the same way and this makes it simple
+    for users to use them.
 
 ===============================================
 Hierarchical Clustering Asset Allocation (HCAA)
