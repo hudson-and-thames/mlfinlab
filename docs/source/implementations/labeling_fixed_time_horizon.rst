@@ -84,4 +84,4 @@ The following research notebook can be used to better understand the Fixed Horiz
 
 * `Fixed Horizon Example`_
 
-.. _`Fixed Horizon Example`: https://github.com/hudson-and-thames/research/tree/master/Labelling/Labels%20Fixed%20Horizon/Fixed_Time_Horizon.ipynb
+.. _`Fixed Horizon Example`: https://github.com/hudson-and-thames/research/blob/master/Labelling/Labels%20Fixed%20Horizon/Fixed%20Time%20Horizon.ipynb
