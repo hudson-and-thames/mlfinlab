@@ -76,14 +76,10 @@ Then the corresponding update rule becomes
 .. math::
     b_{t+1} = b_t \cdot \left( \eta \cdot \left( \frac{x_t}{b_t \cdot x_t} - 1 \right) + 1 \right)
 
-.. tip::
-
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb>`_
-    provides a more detailed exploration of the strategies.
-
 Parameters
 ----------
 
+Using optuna
 The optimal parameters depend on each dataset. For NYSE, a low value of :math:`\eta` was optimal, which
 indicates a lack of a clear momentum strategy.
 
