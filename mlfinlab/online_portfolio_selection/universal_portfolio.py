@@ -16,7 +16,9 @@ class UP(OLPS):
     Universal Portfolio acts as a fund of funds, generating a number of experts with unique
     strategies. Cover's original universal portfolio integrates over the total simplex domain,
     but because it is not possible for us to calculate all possibilties, we generate a random
-    distribution of points. The allocation method to each experts can be changed. If no
+    distribution of points.
+
+    The allocation method to each experts can be changed. If no
     allocation method is given, Universal Portfolio will not rebalance among the experts. Other
     allocation methods include uniform allocation among experts and top-k experts, which allocate
     capital based on the top-k performing experts until the last period.
