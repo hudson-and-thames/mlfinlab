@@ -37,7 +37,7 @@ Returns for Buy and Hold can be calculated by multiplying the initial weight and
     If no weights are given for the ``allocate`` method for Buy and Hold, uniform weights will be used.
 
 Implementation
---------------
+##############
 
 .. automodule:: mlfinlab.online_portfolio_selection.benchmarks.buy_and_hold
 
@@ -47,7 +47,7 @@ Implementation
 
 
 Example Code
-------------
+############
 
 .. code-block::
 
@@ -101,7 +101,7 @@ Once the initial portfolio has been determined, the final weights can be represe
     inherently decides the weights for all time period by choosing the best performing asset.
 
 Implementation
---------------
+##############
 
 .. automodule:: mlfinlab.online_portfolio_selection.benchmarks.best_stock
 
@@ -111,7 +111,7 @@ Implementation
 
 
 Example Code
-------------
+############
 
 .. code-block::
 
@@ -164,7 +164,7 @@ Once the initial portfolio has been determined, the final weights can be represe
     - If neither parameters or weights are given, CRP will use uniform weights.
 
 Implementation
---------------
+##############
 
 .. automodule:: mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio
 
@@ -176,7 +176,7 @@ Implementation
 
 
 Example Code
-------------
+############
 
 .. code-block::
 
@@ -239,7 +239,7 @@ Once the optimal weight has been determined, the final returns can be calculated
     weights because BCRP inherently decides the weights for all time period by choosing the weights.
 
 Implementation
---------------
+##############
 
 .. automodule:: mlfinlab.online_portfolio_selection.benchmarks.best_constant_rebalanced_portfolio
 
@@ -248,7 +248,7 @@ Implementation
         :inherited-members:
 
 Example Code
-------------
+############
 
 .. code-block::
 

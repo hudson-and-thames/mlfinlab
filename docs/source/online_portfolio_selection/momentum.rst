@@ -29,8 +29,8 @@ indicates the passiveness of the strategy to match the best performing assets.
 Exponential Gradients have an extremely efficient computational time that scales with the number of assets,
 and broadly speaking, there are three update methods to iteratively update the selection of portfolio weights.
 
-1. Multiplicative Update
-########################
+Multiplicative Update
+#####################
 
 David Helmbold first proposed a regularization term that adopts relative entropy in his `paper <https://www.cis.upenn.edu/~mkearns/finread/portfolio.pdf>`_.
 
@@ -49,8 +49,8 @@ Multiplicative update algorithm can be stated as the following.
 
 where :math:`Z` is a normalization term to sum the weights to 1.
 
-2. Gradient Projection
-######################
+Gradient Projection
+###################
 
 Instead of relative entropy, gradient projection adopts an :math:`L_2`-regularization term for the optimization equation.
 
@@ -62,8 +62,8 @@ Gradient projection can then be iteratively updated with the following equation.
 .. math::
     b_{t+1} = b_t + \eta \cdot \left( \frac{x_t}{b_t \cdot x_t} - \frac{1}{m} \sum_{j=1}^{m} \frac{x_t}{b_t \cdot x_t} \right)
 
-3. Expectation Maximization
-###########################
+Expectation Maximization
+########################
 
 Lastly, Expectation Maximization uses a :math:`\chi^2` regularization term.
 
@@ -79,10 +79,10 @@ Then the corresponding update rule becomes
     The three update methods have similar returns for the same set of parameters.
 
 Parameters
-----------
+##########
 
-Using `optuna <https://optuna.org/>`_, we experimented with different parameters to see how each strategy is affected.
-For NYSE, a low value of :math:`\eta` was optimal, which indicates a lack of a clear momentum strategy.
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to give a general guideline
+for the users. For NYSE, a low value of :math:`\eta` was optimal, which indicates a lack of a clear momentum strategy.
 
 .. image:: images/momentum/nyse_eg_eta_0_1.png
    :width: 49 %
@@ -100,11 +100,11 @@ of a momentum strategy.
    :width: 49 %
 
 .. tip::
-    - High :math:`\eta` : Directly follow the best performing asset.
-    - Low :math:`\eta` : Less li
+    - High :math:`\eta` : Aggressively follow the best performing asset.
+    - Low :math:`\eta` : Passively follow the best performing asset.
 
 Implementation
---------------
+##############
 
 .. automodule:: mlfinlab.online_portfolio_selection.momentum.exponential_gradient
 
@@ -160,20 +160,18 @@ looks at the whole history of the data and calculates the portfolio weights that
 - :math:`x_t` is the price relative change at time :math:`t`. It is calculated by :math:`\frac{p_t}{p_{t-1}}`, where :math:`p_t` is the price at time :math:`t`.
 - :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
 
-.. tip::
+.. warning::
 
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb>`_
-    provides a more detailed exploration of the strategies.
-
+    It is recommended to change ``verbose=True`` to follow the progress. Because the update algorithm optimizes for
+    every data point, the time complexity quadratically scales with the number of points.
 
 Implementation
---------------
+##############
 
 .. automodule:: mlfinlab.online_portfolio_selection.momentum.follow_the_leader
 
     .. autoclass:: FTL
         :members:
-        :show-inheritance:
         :inherited-members:
 
         .. automethod:: __init__
@@ -220,15 +218,16 @@ Follow the Regularized Leader adds an additional regularization term to the obje
 - :math:`R(b)` is the regularization term for follow the regularized leader.
 - :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
 
-.. tip::
+.. warning::
 
-    The following research `notebook <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb>`_
-    provides a more detailed exploration of the strategies.
+    It is recommended to change ``verbose=True`` to follow the progress. Because the update algorithm optimizes for
+    every data point, the time complexity quadratically scales with the number of points.
 
 Parameters
-----------
+##########
 
-The optimal parameters depend on each dataset. For NYSE, a high regularization was an effective method to generate high returns
+Using `optuna <https://optuna.org/>`_, we experimented with different parameters to give a general guideline
+for the users. For NYSE, a high regularization was an effective method to generate high returns
 as :math:`\beta` of 20 was optimal.
 
 .. image:: images/momentum/nyse_ftrl_beta_0_1.png
@@ -246,14 +245,17 @@ The highest returns are results with :math:`\beta` of 0.2. Lower values of beta 
 .. image:: images/momentum/msci_ftrl_beta_1_100.png
    :width: 49 %
 
+.. tip::
+    - High :math:`\beta` : Aggressively follow the best performing asset.
+    - Low :math:`\beta` : Passively follow the best performing asset. Strategy becomes a CRP with the given user weights and CRP-Uniform if no weights are given.
+
 Implementation
---------------
+##############
 
 .. automodule:: mlfinlab.online_portfolio_selection.momentum.follow_the_regularized_leader
 
     .. autoclass:: FTRL
         :members:
-        :show-inheritance:
         :inherited-members:
 
         .. automethod:: __init__
@@ -286,7 +288,8 @@ Example Code
     # Get portfolio returns.
     ftrl.portfolio_return
 
-.. tip::
+Research Notebook
+=================
 
-    The following research `momentum <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb>`_
-    notebook provides a more detailed exploration of the strategies.
+The following research `momentum <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb>`_
+notebook provides a more detailed exploration of the strategies.
