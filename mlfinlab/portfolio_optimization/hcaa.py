@@ -144,7 +144,8 @@ class HierarchicalClusteringAssetAllocation:
         inertia = np.log(np.sum(inertia))
         return inertia
 
-    def _get_optimal_number_of_clusters(self, original_distance_matrix, asset_returns, linkage_method, num_reference_datasets=5):
+    def _get_optimal_number_of_clusters(self, original_distance_matrix, asset_returns, linkage_method,
+                                        num_reference_datasets=5):
         """
         Find the optimal number of clusters for hierarchical clustering using the Gap statistic.
 
@@ -237,34 +238,19 @@ class HierarchicalClusteringAssetAllocation:
 
         return (self._quasi_diagnalization(num_assets, left) + self._quasi_diagnalization(num_assets, right))
 
-    def _recursive_bisection(self, expected_asset_returns, asset_returns, covariance_matrix, assets, allocation_metric,
-                             side_weights, optimal_num_clusters):
+    def _get_cluster_weights(self, clusters_contribution: np.array, clusters_variance: np.array,
+                             optimal_num_clusters: int, allocation_metric: str, num_assets: int) -> np.array:
         """
-        Recursively assign weights to the clusters - ultimately assigning weights to the individual assets.
-
-        :param expected_asset_returns: (list) A list of mean asset returns (mu).
-        :param asset_returns: (pd.DataFrame) Historical asset returns.
-        :param covariance_matrix: (pd.DataFrame) The covariance matrix.
-        :param assets: (list) List of asset names in the portfolio.
-        :param allocation_metric: (str) The metric used for calculating weight allocations.
-        :param side_weights: (pd.Series/numpy matrix) with asset_names in index and value 1 for Buy, -1 for Sell
-        :param optimal_num_clusters: (int) Optimal number of clusters for hierarchical tree clustering.
+        Based on clusters variance contribution, allocation metric get clusters weights
+        :param clusters_contribution: (np.array) of clusters contrubution
+        :param clusters_variance: (np.array) of clusters variance
+        :param optimal_num_clusters: (int) optimal number of clusters
+        :param allocation_metric: (str) allocation metric
+        :param num_assets: (int) number of assets in a portfolio
+        :return: (np.array) of cluster weights
         """
 
-        num_assets = len(assets)
-        self.weights = np.ones(shape=num_assets)
-        clusters_contribution = np.ones(shape=optimal_num_clusters)
         clusters_weights = np.ones(shape=optimal_num_clusters)
-        clusters_variance = np.ones(shape=optimal_num_clusters)
-
-        # Calculate the corresponding risk measure for the clusters
-        self._calculate_risk_contribution_of_clusters(clusters_contribution,
-                                                      clusters_variance,
-                                                      allocation_metric,
-                                                      optimal_num_clusters,
-                                                      covariance_matrix,
-                                                      expected_asset_returns,
-                                                      asset_returns)
 
         # Recursive bisection taking into account the dendrogram structure
         for cluster_index in range(optimal_num_clusters - 1):
@@ -294,6 +280,37 @@ class HierarchicalClusteringAssetAllocation:
             # Assign weights to each sub-cluster
             clusters_weights[left_cluster_ids] *= alloc_factor
             clusters_weights[right_cluster_ids] *= 1 - alloc_factor
+        return clusters_weights
+
+    def _recursive_bisection(self, expected_asset_returns, asset_returns, covariance_matrix, assets, allocation_metric,
+                             side_weights, optimal_num_clusters):
+        """
+        Recursively assign weights to the clusters - ultimately assigning weights to the individual assets.
+
+        :param expected_asset_returns: (list) A list of mean asset returns (mu).
+        :param asset_returns: (pd.DataFrame) Historical asset returns.
+        :param covariance_matrix: (pd.DataFrame) The covariance matrix.
+        :param assets: (list) List of asset names in the portfolio.
+        :param allocation_metric: (str) The metric used for calculating weight allocations.
+        :param side_weights: (pd.Series/numpy matrix) with asset_names in index and value 1 for Buy, -1 for Sell
+        :param optimal_num_clusters: (int) Optimal number of clusters for hierarchical tree clustering.
+        """
+
+        self.weights = np.ones(shape=len(assets))
+        clusters_contribution = np.ones(shape=optimal_num_clusters)
+        clusters_variance = np.ones(shape=optimal_num_clusters)
+
+        # Calculate the corresponding risk measure for the clusters
+        self._calculate_risk_contribution_of_clusters(clusters_contribution,
+                                                      clusters_variance,
+                                                      allocation_metric,
+                                                      optimal_num_clusters,
+                                                      covariance_matrix,
+                                                      expected_asset_returns,
+                                                      asset_returns)
+
+        clusters_weights = self._get_cluster_weights(clusters_contribution, clusters_variance, optimal_num_clusters,
+                                                     allocation_metric, len(assets))
 
         # Compute the final weights
         self._calculate_final_portfolio_weights(clusters_weights, covariance_matrix, optimal_num_clusters)
