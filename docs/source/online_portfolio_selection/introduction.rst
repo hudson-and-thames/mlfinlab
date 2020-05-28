@@ -5,6 +5,8 @@
     algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
     on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
 
+----
+
 ============
 Introduction
 ============
@@ -63,7 +65,7 @@ Strategies can be imported by using variations of the following lines.
     from mlfinlab.online_portfolio_selection.benchmarks import *
 
     # Import all momentum strategies.
-    from mlfinlab.online_portfolio_selection.benchmarks import *
+    from mlfinlab.online_portfolio_selection.momentum import *
 
     # Import all mean reversion strategies.
     from mlfinlab.online_portfolio_selection.mean_reversion import *

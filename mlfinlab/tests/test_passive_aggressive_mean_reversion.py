@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.mean_reversion.passive_aggressive_mean_reversion import \
+from mlfinlab.online_portfolio_selection.pamr import \
     PAMR
 
 

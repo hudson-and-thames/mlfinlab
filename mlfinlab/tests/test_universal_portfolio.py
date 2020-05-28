@@ -6,7 +6,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.universal_portfolio import UP
+from mlfinlab.online_portfolio_selection.up import UP
 
 
 class TestUniversalPortfolio(TestCase):

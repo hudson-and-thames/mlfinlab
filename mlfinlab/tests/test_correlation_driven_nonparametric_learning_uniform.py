@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning_uniform import CORNU
+from mlfinlab.online_portfolio_selection.cornu import CORNU
 
 
 class TestCorrelationDrivenNonparametricLearningUniform(TestCase):

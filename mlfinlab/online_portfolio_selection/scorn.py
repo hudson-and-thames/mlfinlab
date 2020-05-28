@@ -1,7 +1,7 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import scipy.optimize as opt
-from mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning import CORN
+from mlfinlab.online_portfolio_selection.corn import CORN
 
 
 class SCORN(CORN):

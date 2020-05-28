@@ -4,8 +4,8 @@
 
     Strategies were implemented with modifications from:
 
-    - `Li, B., Hoi, S.C. and Gopalkrishnan, V., 2011. Corn: Correlation-driven nonparametric learning approach for portfolio selection. ACM Transactions on Intelligent Systems and Technology (TIST), 2(3), pp.1-29. <https://dl.acm.org/doi/pdf/10.1145/1961189.1961193>`_
-    - `Wang, Y. and Wang, D., 2019. Market Symmetry and Its Application to Pattern-Matching-Based Portfolio Selection. The Journal of Financial Data Science, 1(2), pp.78-93. <https://jfds.pm-research.com/content/1/2/78.short>`_
+    1. `Li, B., Hoi, S.C. and Gopalkrishnan, V., 2011. Corn: Correlation-driven nonparametric learning approach for portfolio selection. ACM Transactions on Intelligent Systems and Technology (TIST), 2(3), pp.1-29. <https://dl.acm.org/doi/pdf/10.1145/1961189.1961193>`_
+    2. `Wang, Y. and Wang, D., 2019. Market Symmetry and Its Application to Pattern-Matching-Based Portfolio Selection. The Journal of Financial Data Science, 1(2), pp.78-93. <https://jfds.pm-research.com/content/1/2/78.short>`_
 
 ================
 Pattern Matching
@@ -18,6 +18,8 @@ Pattern matching strategies combine the strengths of both by exploiting the stat
 
 There are three pattern matching strategies implemented in the Online Portfolio Selection module.
 
+----
+
 Correlation Driven Nonparametric Learning
 =========================================
 
@@ -28,6 +30,8 @@ windows does not effectively capture the linear relation. CORN utilizes the Pear
 distances to capture the whole market direction.
 
 Three different variations of the CORN strategies are implemented in the Online Portfolio Selection module.
+
+----
 
 Correlation Driven Nonparametric Learning (CORN)
 ################################################
@@ -76,7 +80,7 @@ inclination to 0 with rho values being on the lower end from 0 to 0.4.
 CORN Implementation
 -------------------
 
-.. automodule:: mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning
+.. automodule:: mlfinlab.online_portfolio_selection.corn
 
     .. autoclass:: CORN
         :members:
@@ -84,6 +88,7 @@ CORN Implementation
 
         .. automethod:: __init__
 
+----
 
 Correlation Driven Nonparametric Learning - Uniform (CORN-U)
 ############################################################
@@ -124,13 +129,15 @@ Window ranges are trickier as they tend to be either just 1 or a much larger val
 CORN-U Implementation
 ---------------------
 
-.. automodule:: mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning_uniform
+.. automodule:: mlfinlab.online_portfolio_selection.cornu
 
     .. autoclass:: CORNU
         :members:
         :inherited-members:
 
         .. automethod:: __init__
+
+----
 
 Correlation Driven Nonparametric Learning - K (CORN-K)
 ######################################################
@@ -169,7 +176,7 @@ guess would be on the lower range of 1 or higher value of 7.
 CORN-K Implementation
 ---------------------
 
-.. automodule:: mlfinlab.online_portfolio_selection.pattern_matching.correlation_driven_nonparametric_learning_k
+.. automodule:: mlfinlab.online_portfolio_selection.cornk
 
     .. autoclass:: CORNK
         :members:
@@ -239,6 +246,8 @@ Example Code
     # Get capital allocation weights.
     cornk1.weights_on_experts
 
+----
+
 Symmetric Correlation Driven Nonparametric Learning
 ===================================================
 
@@ -275,6 +284,8 @@ Two different variations of the SCORN strategies are implemented in the Online P
 - :math:`C'_t` is the set of similar periods.
 - :math:`\Delta_m` is the simplex domain. The sum of all elements is 1, and each element is in the range of [0, 1].
 
+----
+
 Symmetric Correlation Driven Nonparametric Learning (SCORN)
 ###########################################################
 
@@ -301,7 +312,7 @@ Although, there are cases where a window of 21 had the highest returns.
 SCORN Implementation
 --------------------
 
-.. automodule:: mlfinlab.online_portfolio_selection.pattern_matching.symmetric_correlation_driven_nonparametric_learning
+.. automodule:: mlfinlab.online_portfolio_selection.scorn
 
     .. autoclass:: SCORN
         :members:
@@ -309,6 +320,7 @@ SCORN Implementation
 
         .. automethod:: __init__
 
+----
 
 Symmetric Correlation Driven Nonparametric Learning - K (SCORN-K)
 #################################################################
@@ -340,7 +352,7 @@ on each data, but in most cases, value of 2 was sufficient.
 SCORN-K Implementation
 ----------------------
 
-.. automodule:: mlfinlab.online_portfolio_selection.pattern_matching.symmetric_correlation_driven_nonparametric_learning_k
+.. automodule:: mlfinlab.online_portfolio_selection.scornk
 
     .. autoclass:: SCORNK
         :members:
@@ -401,6 +413,8 @@ Example Code
     # Get capital allocation weights.
     scornk1.weights_on_experts
 
+----
+
 Functional Correlation Driven Nonparametric Learning
 ====================================================
 
@@ -438,6 +452,8 @@ If the correlation is negative, we place a negative weight that approaches 0 for
 
 Two different variations of the FCORN strategies are implemented in the Online Portfolio Selection module.
 
+----
+
 Functional Correlation Driven Nonparametric Learning (FCORN)
 ############################################################
 
@@ -464,7 +480,7 @@ SP500 has the highest returns with window of 5.
 FCORN Implementation
 --------------------
 
-.. automodule:: mlfinlab.online_portfolio_selection.pattern_matching.functional_correlation_driven_nonparametric_learning
+.. automodule:: mlfinlab.online_portfolio_selection.fcorn
 
     .. autoclass:: FCORN
         :members:
@@ -473,6 +489,8 @@ FCORN Implementation
 
         .. automethod:: __init__
 
+
+----
 
 Functional Correlation Driven Nonparametric Learning - K (FCORN-K)
 ##################################################################
@@ -492,7 +510,7 @@ had the highest returns.
 FCORN-K Implementation
 ----------------------
 
-.. automodule:: mlfinlab.online_portfolio_selection.pattern_matching.functional_correlation_driven_nonparametric_learning_k
+.. automodule:: mlfinlab.online_portfolio_selection.fcornk
 
     .. autoclass:: FCORNK
         :members:
@@ -553,6 +571,8 @@ Example Code
 
     # Get capital allocation weights.
     fcornk1.weights_on_experts
+
+----
 
 Research Notebook
 =================

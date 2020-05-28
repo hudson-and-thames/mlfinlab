@@ -21,6 +21,8 @@ class PAMR(OLPS):
         Initializes Passive Aggressive Mean Reversion with the given epsilon, aggressiveness,
         and optimzation method.
 
+        :param optimization_method: (int) 0 for PAMR, 1 for PAMR-1, 2 for PAMR-2. All three methods
+                                          tend to return similar values.
         :param epsilon: (float) Sensitivity to the market with range of [0, inf). Because the epsilon
                                 is considered a threshold and daily returns typically are around 1.
                                 It is suggested to keep the range of [0, 1.5]. Typically, the returns
@@ -30,8 +32,6 @@ class PAMR(OLPS):
         :param agg: (float) Aggressiveness to mean reversion with range [0, inf). Aggressiveness
                             does not have much of an impact as epsilon. Typically, 100 has the highest
                             returns for PAMR-1 and 10000 has the highest returns for PAMR-2.
-        :param optimization_method: (int) 0 for PAMR, 1 for PAMR-1, 2 for PAMR-2. All three methods
-                                          tend to return similar values.
         """
         self.epsilon = epsilon
         self.agg = agg

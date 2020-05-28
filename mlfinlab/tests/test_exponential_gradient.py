@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.momentum.exponential_gradient import EG
+from mlfinlab.online_portfolio_selection.eg import EG
 
 
 class TestExponentialGradient(TestCase):

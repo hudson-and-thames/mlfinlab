@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.momentum.follow_the_leader import FTL
+from mlfinlab.online_portfolio_selection.ftl import FTL
 
 
 class TestFollowTheLeader(TestCase):

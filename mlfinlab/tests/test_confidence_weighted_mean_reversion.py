@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.mean_reversion.confidence_weighted_mean_reversion import CWMR
+from mlfinlab.online_portfolio_selection.cwmr import CWMR
 
 
 class TestConfidenceWeightedMeanReversion(TestCase):

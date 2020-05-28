@@ -2,8 +2,9 @@
 
 .. note::
 
-    Strategies were implemented with modifications from `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
-    Surv. V, N, Article A (December 2012), 33 pages. <https://arxiv.org/abs/1212.2129>`_
+    Strategies were implemented with modifications from:
+
+    1. `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December 2012), 33 pages. <https://arxiv.org/abs/1212.2129>`_
 
 ========
 Momentum
@@ -14,6 +15,8 @@ allows investors to exponentially increase their returns. This module will imple
 following the best-performing assets in the last period and the other following the Best Constant Rebalanced Portfolio until the last period.
 
 There are three momentum strategies implemented in the Online Portfolio Selection module.
+
+----
 
 Exponential Gradient
 ====================
@@ -111,7 +114,7 @@ of a momentum strategy.
 Implementation
 ##############
 
-.. automodule:: mlfinlab.online_portfolio_selection.momentum.exponential_gradient
+.. automodule:: mlfinlab.online_portfolio_selection.eg
 
     .. autoclass:: EG
         :members:
@@ -151,6 +154,8 @@ Example Code
     # Get portfolio returns.
     gp.portfolio_return
 
+----
+
 Follow the Leader
 =================
 
@@ -173,13 +178,11 @@ looks at the whole history of the data and calculates the portfolio weights that
 Implementation
 ##############
 
-.. automodule:: mlfinlab.online_portfolio_selection.momentum.follow_the_leader
+.. automodule:: mlfinlab.online_portfolio_selection.ftl
 
     .. autoclass:: FTL
         :members:
         :inherited-members:
-
-        .. automethod:: __init__
 
 Example Code
 ############
@@ -208,6 +211,8 @@ Example Code
 
     # Get portfolio returns.
     ftl.portfolio_return
+
+----
 
 Follow the Regularized Leader
 =============================
@@ -257,7 +262,7 @@ The highest returns are results with :math:`\beta` of 0.2. Lower values of beta 
 Implementation
 ##############
 
-.. automodule:: mlfinlab.online_portfolio_selection.momentum.follow_the_regularized_leader
+.. automodule:: mlfinlab.online_portfolio_selection.ftrl
 
     .. autoclass:: FTRL
         :members:
@@ -292,6 +297,8 @@ Example Code
 
     # Get portfolio returns.
     ftrl.portfolio_return
+
+----
 
 Research Notebook
 =================

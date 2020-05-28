@@ -1,7 +1,7 @@
 """
 Initialize Mean Reversion Module.
 """
-from mlfinlab.online_portfolio_selection.mean_reversion.robust_median_reversion import RMR
-from mlfinlab.online_portfolio_selection.mean_reversion.passive_aggressive_mean_reversion import PAMR
-from mlfinlab.online_portfolio_selection.mean_reversion.confidence_weighted_mean_reversion import CWMR
-from mlfinlab.online_portfolio_selection.mean_reversion.online_moving_average_reversion import OLMAR
+from mlfinlab.online_portfolio_selection.rmr import RMR
+from mlfinlab.online_portfolio_selection.pamr import PAMR
+from mlfinlab.online_portfolio_selection.cwmr import CWMR
+from mlfinlab.online_portfolio_selection.olmar import OLMAR

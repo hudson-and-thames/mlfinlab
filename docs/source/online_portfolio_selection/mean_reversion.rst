@@ -2,12 +2,12 @@
 
 .. note::
 
-    Strategies were implemented with modifications from
+    Strategies were implemented with modifications from:
 
-    - `Li, B., Zhao, P., Hoi, S.C. and Gopalkrishnan, V., 2012. PAMR: Passive aggressive mean reversion strategy for portfolio selection. Machine learning, 87(2), pp.221-258. <https://link.springer.com/content/pdf/10.1007/s10994-012-5281-z.pdf>`_
-    - `Li, B., Hoi, S.C., Zhao, P. and Gopalkrishnan, V., 2013. Confidence weighted mean reversion strategy for online portfolio selection. ACM Transactions on Knowledge Discovery from Data (TKDD), 7(1), pp.1-38. <https://dl.acm.org/doi/pdf/10.1145/2435209.2435213>`_
-    - `Li, B. and Hoi, S.C., 2012. On-line portfolio selection with moving average reversion. arXiv preprint arXiv:1206.4626. <https://arxiv.org/pdf/1206.4626.pdf>`_
-    - `Huang, D., Zhou, J., Li, B., Hoi, S.C. and Zhou, S., 2016. Robust median reversion strategy for online portfolio selection. IEEE Transactions on Knowledge and Data Engineering, 28(9), pp.2480-2493. <https://core.ac.uk/download/pdf/35455615.pdf>`_
+    1. `Li, B., Zhao, P., Hoi, S.C. and Gopalkrishnan, V., 2012. PAMR: Passive aggressive mean reversion strategy for portfolio selection. Machine learning, 87(2), pp.221-258. <https://link.springer.com/content/pdf/10.1007/s10994-012-5281-z.pdf>`_
+    2. `Li, B., Hoi, S.C., Zhao, P. and Gopalkrishnan, V., 2013. Confidence weighted mean reversion strategy for online portfolio selection. ACM Transactions on Knowledge Discovery from Data (TKDD), 7(1), pp.1-38. <https://dl.acm.org/doi/pdf/10.1145/2435209.2435213>`_
+    3. `Li, B. and Hoi, S.C., 2012. On-line portfolio selection with moving average reversion. arXiv preprint arXiv:1206.4626. <https://arxiv.org/pdf/1206.4626.pdf>`_
+    4. `Huang, D., Zhou, J., Li, B., Hoi, S.C. and Zhou, S., 2016. Robust median reversion strategy for online portfolio selection. IEEE Transactions on Knowledge and Data Engineering, 28(9), pp.2480-2493. <https://core.ac.uk/download/pdf/35455615.pdf>`_
 
 ==============
 Mean Reversion
@@ -22,6 +22,8 @@ A lot of the hyperparameters for traditional research has been chosen by looking
 of each dataset and market structure is required to profitably implement this strategy in a real-time market scenario.
 
 There are four mean reversion strategies implemented in the Online Portfolio Selection module.
+
+----
 
 Passive Aggressive Mean Reversion
 =================================
@@ -139,7 +141,7 @@ a hyperparameter.
 Implementation
 ##############
 
-.. automodule:: mlfinlab.online_portfolio_selection.mean_reversion.passive_aggressive_mean_reversion
+.. automodule:: mlfinlab.online_portfolio_selection.pamr
 
     .. autoclass:: PAMR
         :members:
@@ -178,6 +180,8 @@ Example Code
 
     # Get portfolio returns.
     pamr2.portfolio_return
+
+----
 
 Confidence Weighted Mean Reversion
 ==================================
@@ -276,7 +280,7 @@ seems to indicate a congregation at 0.5.
 Implementation
 ##############
 
-.. automodule:: mlfinlab.online_portfolio_selection.mean_reversion.confidence_weighted_mean_reversion
+.. automodule:: mlfinlab.online_portfolio_selection.cwmr
 
     .. autoclass:: CWMR
         :members:
@@ -303,7 +307,6 @@ Example Code
     cwmr_var = CWMR(confidence=1, epsilon=1, method='var')
     cwmr_var.allocate(asset_prices=stock_prices, weights=some_weight)
 
-
     # Get the latest predicted weights.
     cwmr_sd.weights
 
@@ -312,6 +315,8 @@ Example Code
 
     # Get portfolio returns.
     cwmr_sd.portfolio_return
+
+----
 
 Online Moving Average Reversion
 ================================
@@ -416,7 +421,7 @@ TSE's window was similar to that of NYSE, but the optimal alpha was much higher,
 Implementation
 ##############
 
-.. automodule:: mlfinlab.online_portfolio_selection.mean_reversion.online_moving_average_reversion
+.. automodule:: mlfinlab.online_portfolio_selection.olmar
 
     .. autoclass:: OLMAR
         :members:
@@ -451,6 +456,8 @@ Example Code
 
     # Get portfolio returns.
     olmar1.portfolio_return
+
+----
 
 Robust Median Reversion
 =======================
@@ -518,7 +525,7 @@ the period of mean reversion was the most influential parameter to affect the po
 Implementation
 ##############
 
-.. automodule:: mlfinlab.online_portfolio_selection.mean_reversion.robust_median_reversion
+.. automodule:: mlfinlab.online_portfolio_selection.rmr
 
     .. autoclass:: RMR
         :members:
@@ -553,6 +560,8 @@ Example Code
 
     # Get portfolio returns.
     rmr1.portfolio_return
+
+----
 
 Research Notebook
 =================

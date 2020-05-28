@@ -3,7 +3,7 @@
 import sys
 import numpy as np
 from mlfinlab.online_portfolio_selection.base import OLPS
-from mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio import CRP
+from mlfinlab.online_portfolio_selection.crp import CRP
 
 
 class UP(OLPS):

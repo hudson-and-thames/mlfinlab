@@ -2,8 +2,9 @@
 
 .. note::
 
-    Strategies were implemented with modifications from `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput.
-    Surv. V, N, Article A (December 2012), 33 pages. <https://arxiv.org/abs/1212.2129>`_
+    Strategies were implemented with modifications from:
+
+    1. `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December 2012), 33 pages. <https://arxiv.org/abs/1212.2129>`_
 
 ==========
 Benchmarks
@@ -16,6 +17,8 @@ Typically these are implemented in hindsight, so future data is often incorporat
 applications, we do not have access to future data from the present, so strategies here should be taken with a grain of salt.
 
 There are four benchmarks strategies implemented in the Online Portfolio Selection module.
+
+----
 
 Buy and Hold
 ============
@@ -39,7 +42,7 @@ Returns for Buy and Hold can be calculated by multiplying the initial weight and
 Implementation
 ##############
 
-.. automodule:: mlfinlab.online_portfolio_selection.benchmarks.buy_and_hold
+.. automodule:: mlfinlab.online_portfolio_selection.bah
 
     .. autoclass:: BAH
         :members:
@@ -74,6 +77,8 @@ Example Code
     # Get portfolio returns.
     bah.portfolio_return
 
+----
+
 Best Stock
 ==========
 
@@ -103,7 +108,7 @@ Once the initial portfolio has been determined, the final weights can be represe
 Implementation
 ##############
 
-.. automodule:: mlfinlab.online_portfolio_selection.benchmarks.best_stock
+.. automodule:: mlfinlab.online_portfolio_selection.best_stock
 
     .. autoclass:: BestStock
         :members:
@@ -133,6 +138,8 @@ Example Code
 
     # Get portfolio returns.
     beststock.portfolio_return
+
+----
 
 Constant Rebalanced Portfolio
 =============================
@@ -166,7 +173,7 @@ Once the initial portfolio has been determined, the final weights can be represe
 Implementation
 ##############
 
-.. automodule:: mlfinlab.online_portfolio_selection.benchmarks.constant_rebalanced_portfolio
+.. automodule:: mlfinlab.online_portfolio_selection.crp
 
     .. autoclass:: CRP
         :members:
@@ -212,6 +219,8 @@ Example Code
     # Get portfolio returns.
     crp.portfolio_return
 
+----
+
 Best Constant Rebalanced Portfolio
 ==================================
 
@@ -241,7 +250,7 @@ Once the optimal weight has been determined, the final returns can be calculated
 Implementation
 ##############
 
-.. automodule:: mlfinlab.online_portfolio_selection.benchmarks.best_constant_rebalanced_portfolio
+.. automodule:: mlfinlab.online_portfolio_selection.bcrp
 
     .. autoclass:: BCRP
         :members:
@@ -270,6 +279,8 @@ Example Code
 
     # Get portfolio returns.
     bcrp.portfolio_return
+
+----
 
 Research Notebook
 =================

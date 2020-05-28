@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.online_portfolio_selection.mean_reversion.online_moving_average_reversion import OLMAR
+from mlfinlab.online_portfolio_selection.olmar import OLMAR
 
 
 class TestOnlineMovingAverageReversion(TestCase):

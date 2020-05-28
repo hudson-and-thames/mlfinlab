@@ -3,8 +3,8 @@
 .. note::
     Strategies were implemented with modifications from:
 
-    - `Cover, T.M., 1996. Universal Portfolios. <http://web.mit.edu/6.962/www/www_fall_2001/shaas/universal_portfolios.pdf>`_
-    - `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December 2012), 33 pages. <https://arxiv.org/abs/1212.2129>`_
+    1. `Cover, T.M., 1996. Universal Portfolios. <http://web.mit.edu/6.962/www/www_fall_2001/shaas/universal_portfolios.pdf>`_
+    2. `Li, B., Hoi, S. C.H., 2012. OnLine Portfolio Selection: A Survey. ACM Comput. Surv. V, N, Article A (December 2012), 33 pages. <https://arxiv.org/abs/1212.2129>`_
 
 ===================
 Universal Portfolio
@@ -13,22 +13,6 @@ Universal Portfolio
 The default universal portfolio acts as a fund of funds. With the given number of inputs as experts,
 the ensemble portfolio will generate a random set of weighted CRP’s to aggregated based on the given
 algorithm. This class also acts as a parent class for the other strategies’ ensemble methods.
-
-.. automodule:: mlfinlab.online_portfolio_selection.universal_portfolio
-
-    .. autoclass:: UP
-        :members:
-        :inherited-members:
-
-        .. automethod:: __init__
-
-.. note::
-    For the universal portfolio to represent the studies by Thomas Cover, it would have to generate an infinite
-    number of portfolios to cover all possible parameters. This is more or less possible with a low number of assets
-    as for a two-asset market we can generate 100 weights from (0.01, 0.99) to (0.99 to 0.01). However, as the number
-    of assets increase, the number of points require to represent the same dimensionality exponentially increases as
-    well. Due to the `curse of dimensionality <https://en.wikipedia.org/wiki/Curse_of_dimensionality>`_, it is
-    difficult for us to exactly approximate a portfolio.
 
 Three different capital allocation methods have been implemented.
 
@@ -56,6 +40,22 @@ Top-K was introduced in the Pattern Matching strategies, where it chooses portfo
 on each experts’ performance. In this case, each expert is defined as an independent portfolio
 with predetermined parameters. The next period’s total weights are based on the previous period’s k
 best-performing experts. Through this method, we can reduce our overfitting and make our models more robust.
+
+.. automodule:: mlfinlab.online_portfolio_selection.up
+
+    .. autoclass:: UP
+        :members:
+        :inherited-members:
+
+        .. automethod:: __init__
+
+.. note::
+    For the universal portfolio to represent the studies by Thomas Cover, it would have to generate an infinite
+    number of portfolios to cover all possible parameters. This is more or less possible with a low number of assets
+    as for a two-asset market we can generate 100 weights from (0.01, 0.99) to (0.99 to 0.01). However, as the number
+    of assets increase, the number of points require to represent the same dimensionality exponentially increases as
+    well. Due to the `curse of dimensionality <https://en.wikipedia.org/wiki/Curse_of_dimensionality>`_, it is
+    difficult for us to exactly approximate a portfolio.
 
 Results
 =======
