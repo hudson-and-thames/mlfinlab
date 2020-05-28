@@ -17,9 +17,9 @@ At time :math:`t`:
 
 .. math::
 
-    X_t = \{x_{t,0}, x_{t,1}, x_{t,2} ...\}
+    X_t = \{x_{t,0}, x_{t,1}, ... x_{t,n}\}
     \\m = median(X_t)
-    \\excess\_over\_median(X_t) = \{x_{t,0} - m, x_{t,1} - m, x_{t,2} - m ...\}
+    \\excess\_over\_median(X_t) = \{x_{t,0} - m, x_{t,1} - m, ... x_{t,n} - m\}
 
 
 If categorical rather than numerical labels are desired:
