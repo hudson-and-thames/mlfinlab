@@ -66,6 +66,7 @@ Below is an example on how to create labels of excess over median from real data
     tickers = "AAPL MSFT AMZN GOOG"
     data = yf.download(tickers, start="2019-01-01", end="2020-05-01", group_by="ticker")
     data = data.loc[:, (slice(None), 'Adj Close')]
+    data.columns = data.columns.droplevel(1)
 
     # Get returns over median numerically
     excess_over_median(data)
