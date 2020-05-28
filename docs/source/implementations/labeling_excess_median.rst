@@ -17,11 +17,11 @@ At time :math:`t`:
 
 .. math::
 
-    X_t &= \{x_{t,0}, x_{t,1}, ... x_{t,n}\}
+    P_t &= \{p_{t,0}, p_{t,1}, ... p_{t,n}\}
 
-    m &= median(X_t)
+    m &= median(P_t)
 
-    excess\_over\_median(X_t) &= \{x_{t,0} - m, x_{t,1} - m, ... x_{t,n} - m\}
+    L(P_t) &= \{p_{t,0} - m, p_{t,1} - m, ... p_{t,n} - m\}
 
 
 If categorical rather than numerical labels are desired:
@@ -29,10 +29,10 @@ If categorical rather than numerical labels are desired:
 .. math::
      \begin{equation}
      \begin{split}
-       excess\_over\_median(x_{t,n}) = \begin{cases}
-       -1 &\ \text{if} \ \ x_{t,n} - m < 0\\
-       0 &\ \text{if} \ \ x_{t,n} - m = 0\\
-       1 &\ \text{if} \ \ x_{t,n} - m > 0\\
+       L(p_{t,n}) = \begin{cases}
+       -1 &\ \text{if} \ \ p_{t,n} - m < 0\\
+       0 &\ \text{if} \ \ p_{t,n} - m = 0\\
+       1 &\ \text{if} \ \ p_{t,n} - m > 0\\
        \end{cases}
      \end{split}
      \end{equation}
