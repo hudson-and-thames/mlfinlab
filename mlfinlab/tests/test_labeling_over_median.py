@@ -59,4 +59,3 @@ class TestLabellingOverMedian(unittest.TestCase):
         num_negative_ones = test5.stack().value_counts()[-1]
         num_positive_ones = test5.stack().value_counts()[1]
         self.assertTrue(0.98 * num_negative_ones < num_positive_ones < 1.02 * num_negative_ones)
-
