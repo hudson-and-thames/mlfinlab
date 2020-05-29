@@ -250,6 +250,7 @@ This project is licensed under an all rights reserved licence.
     implementations/tb_meta_labeling
     implementations/labeling_trend_scanning
     implementations/labeling_tail_sets
+    implementations/labeling_fixed_time_horizon
 
 .. toctree::
     :maxdepth: 2
