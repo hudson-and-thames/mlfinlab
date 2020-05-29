@@ -26,7 +26,7 @@ class HierarchicalClusteringAssetAllocation:
         Initialise.
 
         :param calculate_expected_returns: (str) The method to use for calculation of expected returns.
-                                        Currently supports "mean" and "exponential"
+                                                 Currently supports: ``mean``, ``exponential``.
         :param confidence_level: (float) The confidence level (alpha) used for calculating expected shortfall and conditional
                                          drawdown at risk.
         """
@@ -53,11 +53,11 @@ class HierarchicalClusteringAssetAllocation:
         :param asset_returns: (pd.DataFrame/numpy matrix) User supplied matrix of asset returns.
         :param covariance_matrix: (pd.DataFrame/numpy matrix) User supplied covariance matrix of asset returns.
         :param expected_asset_returns: (list) A list of mean asset returns (mu).
-        :param allocation_metric: (str) The metric used for calculating weight allocations. Supported strings - "equal_weighting",
-                                        "minimum_variance", "minimum_standard_deviation", "sharpe_ratio", "expected_shortfall",
-                                        "conditional_drawdown_risk".
-        :param linkage: (str) The type of linkage method to use for clustering. Supported strings - "single", "average", "complete"
-                              and "ward".
+        :param allocation_metric: (str) The metric used for calculating weight allocations. Supported strings - ``equal_weighting``,
+                                        ``minimum_variance``, ``minimum_standard_deviation``, ``sharpe_ratio``,
+                                        ``expected_shortfall``, ``conditional_drawdown_risk``.
+        :param linkage: (str) The type of linkage method to use for clustering. Supported strings - ``single``, ``average``,
+                              ``complete``, ``ward``.
         :param optimal_num_clusters: (int) Optimal number of clusters for hierarchical clustering.
         """
 
