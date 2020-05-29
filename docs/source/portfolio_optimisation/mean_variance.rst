@@ -212,6 +212,20 @@ where :math:`\sigma^{2}_t` is the target portfolio risk set by the investor and 
 Maximum Return - Minimum Volatility
 ********************************************
 
+This is often referred to as *quadratic risk utility.* If you look at the objective function,  
+
+.. math::
+
+    \begin{equation*}
+        \begin{aligned}
+            & \underset{\mathbf{w}}{\text{min}} & &  \lambda * w^T\sum w - \mu^Tw\\
+            & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+            &&& w_{j} \geq 0, j=1,..,N \\
+        \end{aligned}
+    \end{equation*}
+
+**Solution String:** ``max_return_min_volatility``
+
 Maximum Diversification
 ***********************
 
