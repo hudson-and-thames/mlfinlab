@@ -43,6 +43,7 @@ class HierarchicalClusteringAssetAllocation:
     def allocate(self, asset_names=None, asset_prices=None, asset_returns=None, covariance_matrix=None,
                  expected_asset_returns=None, allocation_metric='equal_weighting', linkage='ward',
                  optimal_num_clusters=None):
+        # pylint: disable=too-many-branches
         """
         Calculate asset allocations using the HCAA algorithm.
 
