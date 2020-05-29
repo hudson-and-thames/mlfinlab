@@ -529,7 +529,7 @@ class TestMVO(unittest.TestCase):
             'num_assets': self.data.shape[1],
             'covariance': self.data.cov(),
             'expected_returns': ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
-                                                                                     resample_by='W')
+                                                                                      resample_by='W')
         }
         cvxpy_variables = [
             'risk = cp.quad_form(weights, covariance)',
@@ -572,8 +572,8 @@ class TestMVO(unittest.TestCase):
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         assert list(mvo.asset_names) == list(self.data.columns)
-        assert mvo.portfolio_return == None
-        assert mvo.portfolio_risk == None
+        assert mvo.portfolio_return is None
+        assert mvo.portfolio_risk is None
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_value_error_for_custom_obj_optimal_weights(self):

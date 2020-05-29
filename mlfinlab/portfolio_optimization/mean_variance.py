@@ -76,8 +76,8 @@ class MeanVarianceOptimisation:
 
         # Calculate the expected asset returns and covariance matrix if not given by the user
         expected_asset_returns, covariance = self._calculate_estimators(asset_prices,
-                                                                 expected_asset_returns,
-                                                                 covariance_matrix)
+                                                                        expected_asset_returns,
+                                                                        covariance_matrix)
 
         if solution == 'inverse_variance':
             self._inverse_variance(covariance=covariance, expected_returns=expected_asset_returns)
@@ -113,7 +113,7 @@ class MeanVarianceOptimisation:
         self._post_process_weights()
 
     def allocate_custom_objective(self, non_cvxpy_variables, cvxpy_variables, objective_function, constraints=None):
-        # pylint: disable=eval-used
+        # pylint: disable=eval-used, exec-used
         """
         Create a portfolio using custom objective and constraints.
 
