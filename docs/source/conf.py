@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('./../..'))
 # -- Project information -----------------------------------------------------
 
 project = 'mlfinlab'
-copyright = '2020, Hudson & Thames,'
+copyright = '2019, Hudson & Thames,'
 author = 'Hudson & Thames'
 
 # The full version, including alpha/beta/rc tags

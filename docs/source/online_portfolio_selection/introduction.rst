@@ -1,6 +1,11 @@
 .. _online_portfolio_selection-introduction:
 
 .. note::
+    Special thanks to Li and Hoi's `OLPS <https://github.com/OLPS/OLPS>`_ toolbox and
+    Marigold's `Universal Portfolio <https://github.com/Marigold/universal-portfolios>`_ for the implementation
+    of the Online Portfolio Selection module.
+
+.. note::
     The online portfolio selection module contains different algorithms that are used for asset allocation and optimizing strategies. Each
     algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
     on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
