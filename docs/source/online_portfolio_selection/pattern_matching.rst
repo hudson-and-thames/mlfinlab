@@ -262,12 +262,12 @@ correlated windows and negatively correlated windows.
 The positiviely correlated windows are identified similar to the process for CORN.
 
 .. math::
-    C(x_t;w,\rho) = \lbrace x_j \vert R(X^{j-1}_{j-2},X^{t-1}_{t-w})  > \rho)
+    C(x_t;w,\rho) = \lbrace x_j \vert R(X^{j-1}_{j-w},X^{t-1}_{t-w})  > \rho)
 
 And the negatively correlated windows are identified as any period with a correlation value below the negative of the threshold.
 
 .. math::
-    C'(x_t;w,\rho) = \lbrace x_j \vert R(X^{j-1}_{j-2},X^{t-1}_{t-w})  < -\rho)
+    C'(x_t;w,\rho) = \lbrace x_j \vert R(X^{j-1}_{j-w},X^{t-1}_{t-w})  < -\rho)
 
 The strategy, therefore, maximizes the returns for periods that are considered similar and minimize the losses over periods that are considered the opposite.
 
