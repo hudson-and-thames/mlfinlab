@@ -523,14 +523,57 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        custom_obj = {
-            'objective': 'cp.Minimize(risk)',
-            'constraints': ['cp.sum(weights) == 1', 'weights >= 0', 'weights <= 1']
+        custom_obj = 'cp.Minimize(risk)'
+        constraints = ['cp.sum(weights) == 1', 'weights >= 0', 'weights <= 1']
+        non_cvxpy_variables = {
+            'num_assets': self.data.shape[1],
+            'covariance': self.data.cov(),
+            'expected_returns': ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+                                                                                     resample_by='W')
         }
-        mvo.allocate_custom_objective(custom_objective=custom_obj, asset_prices=self.data)
+        cvxpy_variables = [
+            'risk = cp.quad_form(weights, covariance)',
+            'portfolio_return = cp.matmul(weights, expected_returns)'
+        ]
+        mvo.allocate_custom_objective(non_cvxpy_variables=non_cvxpy_variables,
+                                      cvxpy_variables=cvxpy_variables,
+                                      objective_function=custom_obj,
+                                      constraints=constraints)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
+        assert mvo.asset_names == list(range(mvo.num_assets))
+        assert mvo.portfolio_return == 0.012854555899642236
+        assert  mvo.portfolio_risk == 3.0340907720046832
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_custom_objective_with_asset_names(self):
+        """
+        Test custom portfolio objective and constraints while providing a list of asset names.
+        """
+
+        mvo = MeanVarianceOptimisation()
+        custom_obj = 'cp.Minimize(kappa)'
+        constraints = ['cp.sum(weights) == 1', 'weights >= 0', 'weights <= 1']
+        non_cvxpy_variables = {
+            'num_assets': self.data.shape[1],
+            'covariance': self.data.cov(),
+            'asset_names': self.data.columns
+        }
+        cvxpy_variables = [
+            'kappa = cp.quad_form(weights, covariance)',
+        ]
+        mvo.allocate_custom_objective(
+            non_cvxpy_variables=non_cvxpy_variables,
+            cvxpy_variables=cvxpy_variables,
+            objective_function=custom_obj,
+            constraints=constraints)
+        weights = mvo.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        assert list(mvo.asset_names) == list(self.data.columns)
+        assert mvo.portfolio_return == None
+        assert mvo.portfolio_risk == None
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_value_error_for_custom_obj_optimal_weights(self):
@@ -541,8 +584,20 @@ class TestMVO(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             mvo = MeanVarianceOptimisation()
-            custom_obj = {
-                'objective': 'cp.Minimize(risk)',
-                'constraints': ['cp.sum(weights) == 1', 'weights >= 0', 'weights <= 1', 'weights[4] <= -1']
+            custom_obj = 'cp.Minimize(risk - kappa)'
+            constraints = ['cp.sum(weights) == 1', 'weights >= 0', 'weights <= 1']
+            non_cvxpy_variables = {
+                'num_assets': self.data.shape[1],
+                'covariance': self.data.cov(),
+                'expected_returns': ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+                                                                                          resample_by='W')
             }
-            mvo.allocate_custom_objective(custom_objective=custom_obj, asset_prices=self.data)
+            cvxpy_variables = [
+                'risk = cp.quad_form(weights, covariance)',
+                'portfolio_return = cp.matmul(weights, expected_returns)',
+                'kappa = cp.Variable(1)'
+            ]
+            mvo.allocate_custom_objective(non_cvxpy_variables=non_cvxpy_variables,
+                                          cvxpy_variables=cvxpy_variables,
+                                          objective_function=custom_obj,
+                                          constraints=constraints)

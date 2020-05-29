@@ -81,141 +81,145 @@ specified.
     frequently used `scipy.optimize <https://docs.scipy.org/doc/scipy/reference/optimize.html>`_. This was a design choice for the
     following reasons:
 
-    * the documentation of cvxpy is better than that of scipy.
+    * The documentation of cvxpy is better than that of scipy, escpecially the parts related to optimisation.
     * cvxpy's code is much more readable and easier to understand.
-    * scipy.optimise
+    * **Note that cvxpy only supports convex optimisation problems as opposed to scipy.optimise which can also tackle concave problems**. Although this might seem as a downside, cvxpy raises clear error notifications if the problem is not convex and the required conditions are not met. This is very important for us as it ensures the solvability of an objective function - if there is no error from cvxpy's side, the objective function is correct and is guaranteed to run till completion by the optimiser.
 
-Solutions
-#########
+Supported Portfolio Allocation Solutions
+########################################
 
-The MVO class
+The MVO class provide some common portfolio optimisation problems out-of-the-box. In this section we go over a quick overview of
+these:
 
-    |h5| 1. Inverse Variance |h5_|
+Inverse Variance
+*****************
 
-    With this solution string, only the main diagonal of the covariance matrix is used for weights allocation:
+For this solution, the diagonal of the covariance matrix is used for weights allocation.
 
-    .. math::
+.. math::
 
-          W_{i} = \frac{\frac{1}{Cov_{i,i}}}{\sum_{j=1}^{N}{\frac{1}{Cov_{j,j}}}}
+      w_{i} = \frac{\sum^{-1}}{\sum_{j=1}^{N}(\sum_{j,j})^{-1}}
 
-    Where :math:`W_{i}` is the weight allocated to the :math:`i` -th element in a portfolio, :math:`Cov_{i,i}` is the :math:`i`-th
-    element on the main diagonal of the covariance matrix of elements in a portfolio, :math:`N` is the number of elements in a
-    portfolio.
+where :math:`w_{i}` is the weight allocated to the :math:`i^{th}` asset in a portfolio, :math:`\sum_{i,i}` is the :math:`i^{th}`
+element on the main diagonal of the covariance matrix of elements in a portfolio and :math:`N` is the number of elements in a
+portfolio.
 
-    |h5| 2. Minimum Volatility |h5_|
+**Solution String:** ``inverse_variance``
 
-    With this solution string, the entire covariance matrix is used for weights allocation.
+Minimum Volatility
+**********************
 
-    The following optimisation problem is being solved:
+For this solution, the objective is to generate a portfolio with the least variance. The following optimisation problem is
+being solved.
 
-    .. math::
+.. math::
 
-          minimise: W^{T} * Cov * W
+    \begin{equation*}
+        \begin{aligned}
+            & \underset{\mathbf{w}}{\text{minimise}} & & w^T\sum w \\
+            & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+            &&& w_{j} \geq 0, j=1,..,N
+        \end{aligned}
+    \end{equation*}
 
-          s.t.: \sum_{j=1}^{N}{W_{j}} = 1
+**Solution String:** ``min_volatility``
 
-    Where :math:`W` is the vector of weights, :math:`Cov` is the covariance matrix of elements in a portfolio,
-    :math:`N` is the number of elements in a portfolio.
+Maximum Sharpe Ratio
+**********************
 
-    |h5| 3. Maximum Sharpe Ratio |h5_|
+For this solution, the objective is (as the name suggests) to maximise the Sharpe Ratio of your portfolio.
 
-    With this solution string, the entire covariance matrix, the vector of mean returns, and the risk-free ratio are used
-    for weights allocation.
+.. math::
 
-    The standard problem of maximum Sharpe ratio portfolio optimization, formulated as:
+    \begin{equation*}
+        \begin{aligned}
+            & \underset{\mathbf{w}}{\text{maximise}} & & \frac{\mu^{T}w - R_{f}}{(w^{T}\sum w)^{1/2}} \\
+            & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+            &&& w_{j} \geq 0, j=1,..,N
+        \end{aligned}
+    \end{equation*}
 
-    .. math::
-          :nowrap:
+A major problem with the above formulation is that the objective function is not convex and this presents a problem for cvxpy
+which only accepts convex optimisation problems. As a result, the problem can be transformed into an equivalent one, but with
+a convex quadratic objective function.
 
-          \begin{align*}
-          maximise: \frac{MeanRet_{j} * W^{T} - R_{f}}{(W^{T} * Cov * W)^{1/2}}
-          \end{align*}
+.. math::
 
-          \begin{align*}
-          s.t.: \sum_{j=1}^{N}{W_{j}} = 1
-          \end{align*}
+    \begin{equation*}
+        \begin{aligned}
+            & \underset{\mathbf{w}}{\text{minimise}} & & y^T\sum y \\
+            & \text{s.t.} & & (\mu^{T}w - R_{f})^{T}y = 1 \\
+            &&& \sum_{j=1}^{N}y_{j} = \kappa, \\
+            &&& \kappa \geq 0, \\
+            &&& w_{j} = \frac{y_j}{\kappa}, j=1,..,N
+        \end{aligned}
+    \end{equation*}
 
-          \begin{align*}
-          W_{j} \ge 0, j=1,..,N
-          \end{align*}
+where :math:`y` refer to the set of unscaled weights, :math:`\kappa` is the scaling factor and the other symbols refer to
+their usual meanings.
 
-    has the objective function being possibly non-concave. Therefore, it's not a convex optimization problem.
+**Solution String:** ``max_sharpe``
 
-    However, the problem can be transformed into an equivalent one, but with a convex quadratic objective function:
+.. tip::
+    |h4| Underlying Literature |h4_|
+    The process of deriving this optimisation problem from the standard maximising Sharpe ratio problem is described
+    in the notes `IEOR 4500 Maximizing the Sharpe ratio <http://people.stat.sc.edu/sshen/events/backtesting/reference/maximizing%20the%20sharpe%20ratio.pdf>`_  from Columbia University.
 
-    .. math::
-          :nowrap:
+Efficient Risk
+**********************
 
-          \begin{align*}
-          minimise: Y^{T} * Cov * Y
-          \end{align*}
+For this solution, the objective is to minimise risk given a target return value by the investor. Note that the risk value for
+such a portfolio will not be the minimum, which is achieved by the minimum-variance solution. However, the optimiser will find
+the set of weights which efficiently allocate risk constrained by the provided target return, hence the name "efficient risk".
 
-          \begin{align*}
-          s.t.: \sum_{j=1}^{N}{(MeanRet_{j} - R_{f}) * Y_{j}} = 1
-          \end{align*}
+.. math::
 
-          \begin{align*}
-          \sum_{j=1}^{N}{Y_{j}} = \kappa
-          \end{align*}
+    \begin{equation*}
+        \begin{aligned}
+            & \underset{\mathbf{w}}{\text{min}} & & w^T\sum w \\
+            & \text{s.t.} & & \mu^Tw = \mu_t\\
+            &&& \sum_{j=1}^{n}w_{j} = 1 \\
+            &&& w_{j} \geq 0, j=1,..,N \\
+        \end{aligned}
+    \end{equation*}
 
-          \begin{align*}
-          \kappa \ge 0
-          \end{align*}
+where :math:`\mu_t` is the target portfolio return set by the investor and the other symbols refer to their usual meanings.
 
-    After the optimisation: :math:`W_{j} = Y_{j} / \kappa`
+**Solution String:** ``efficient_risk``
 
-    Where :math:`W` is the vector of weights, :math:`Y` is the vector of unscaled weights, :math:`\kappa` is the scaling factor,
-    :math:`Cov` is the covariance matrix of elements in a portfolio, :math:`MeanRet` is the vector of mean returns,
-    :math:`R_{f}` is the risk-free rate, :math:`N` is the number of elements in a portfolio.
+Efficient Return
+**********************
 
-    .. tip::
+For this solution, the objective is to maximise the portfolio return given a target risk value by the investor. This is very
+similar to the *efficient_risk* solution. The optimiser will find the set of weights which efficiently try to maximise return
+constrained by the provided target risk, hence the name "efficient return".
 
-        The process of deriving this optimisation problem from the standard maximising Sharpe ratio problem is described
-        in the notes `IEOR 4500 Maximizing the Sharpe ratio <http://people.stat.sc.edu/sshen/events/backtesting/reference/maximizing%20the%20sharpe%20ratio.pdf>`_  from Columbia University.
+.. math::
 
-    |h5| 4. Efficient Risk |h5_|
+    \begin{equation*}
+        \begin{aligned}
+            & \underset{\mathbf{w}}{\text{max}} & & \mu^Tw \\
+            & \text{s.t.} & & w^T\sum w = \sigma^{2}_t\\
+            &&& \sum_{j=1}^{n}w_{j} = 1 \\
+            &&& w_{j} \geq 0, j=1,..,N \\
+        \end{aligned}
+    \end{equation*}
 
-    With this solution string, the entire covariance matrix, the vector of mean returns, and the target return are used
-    for weights allocation.
+where :math:`\sigma^{2}_t` is the target portfolio risk set by the investor and the other symbols refer to their usual meanings.
 
-    The following optimisation problem is being solved:
+**Solution String:** ``efficient_return``
 
-    .. math::
-          :nowrap:
+Maximum Return - Minimum Volatility
+********************************************
 
-          \begin{align*}
-          minimise : W^{T} * Cov * W
-          \end{align*}
+Maximum Diversification
+***********************
 
-          \begin{align*}
-          s.t.: \sum_{j=1}^{N}{MeanRet_{j} * W_{j}} = TrgetRet
-          \end{align*}
+Maximum Decorrelation
+**********************
 
-          \begin{align*}
-          \sum_{j=1}^{N}{W_{j}} = 1
-          \end{align*}
-
-    Where :math:`W` is the vector of weights, :math:`Cov` is the covariance matrix of elements in a portfolio,
-    :math:`MeanRet` is the vector of mean returns, :math:`TrgetRet` is the target return, :math:`N` is the number of elements in a portfolio.
-
-    .. tip::
-
-        Note that users can also specify upper and lower bounds for asset weights:
-
-        - Either a single upper and lower bound value can be applied for to all the asset weights in which case a single
-          tuple needs to be passed: (low, high). By default a bound of (0, 1) is applied.
-        - If individual bounds are required, then a dictionary needs to be passed with the key being the asset index and
-          the value being the tuple of lower and higher bound values. Something like this: ``{asset_index : (low_i, high_i)}``
-
-    |h5| 4. Maximum Return - Minimum Volatility |h5_|
-
-    |h5| 5. Efficient Return |h5_|
-
-    |h5| 6. Maximum Diversification |h5_|
-
-    |h5| 7. Maximum Decorrelation |h5_|
-
-    |h5| 8. Custom Objective Function |h5_|
+Custom Objective Function
+********************************************
 
 Implementation
 ##############
@@ -276,11 +280,6 @@ Basic example
                  solution='inverse_variance', resample_by='B
     ivp_weights = mvo.weights.sort_values(by=0, ascending=False, axis=1)
 
-.. note::
-
-    We provide great flexibility to the users in terms of the input data - either they can pass raw historical stock prices
-    as the parameter :py:mod:`asset_prices` in which case the expected returns and covariance matrix will be calculated
-    using this data. Else, they can also pass pre-calculated :py:mod:`expected_returns` and :py:mod:`covariance_matrix`.
 
 Different solutions
 *******************
