@@ -97,11 +97,15 @@ class HierarchicalClusteringAssetAllocation:
         # Calculate correlation from covariance matrix
         corr = self._cov2corr(covariance=cov)
 
-        # Calculate the optimal number of clusters using the Gap statistic
+        # Calculate the optimal number of clusters
         if not optimal_num_clusters:
             optimal_num_clusters = self._get_optimal_number_of_clusters(correlation=corr,
                                                                         linkage=linkage,
                                                                         asset_returns=asset_returns)
+        else:
+            optimal_num_clusters = self._check_max_number_of_clusters(num_clusters=optimal_num_clusters,
+                                                                      linkage=linkage,
+                                                                      correlation=corr)
 
         # Tree Clustering
         self.clusters, self.cluster_children = self._tree_clustering(correlation=corr,
@@ -134,6 +138,26 @@ class HierarchicalClusteringAssetAllocation:
         inertia = [np.mean(pairwise_distances(asset_returns[:, labels == label])) for label in unique_labels]
         inertia = np.log(np.sum(inertia))
         return inertia
+
+    @staticmethod
+    def _check_max_number_of_clusters(num_clusters, linkage, correlation):
+        """
+        In some cases, the optimal number of clusters value given by the users is greater than the maximum number of clusters
+        possible with the given data. This function checks this and assigns the proper value to the number of clusters when the
+        given value exceeds maximum possible clusters.
+
+        :param num_clusters: (int) The number of clusters.
+        :param linkage (str): The type of linkage method to use for clustering.
+        :param correlation: (np.array) Matrix of asset correlations.
+        :return: (int) New value for number of clusters.
+        """
+
+        distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
+        clusters = scipy_linkage(squareform(distance_matrix.values), method=linkage)
+        clustering_inds = fcluster(clusters, num_clusters, criterion='maxclust')
+        max_number_of_clusters_possible = max(clustering_inds)
+        num_clusters = min(max_number_of_clusters_possible, num_clusters)
+        return num_clusters
 
     def _get_optimal_number_of_clusters(self, correlation, asset_returns, linkage, num_reference_datasets=5):
         """
