@@ -19,7 +19,7 @@ At time :math:`t`:
     :nowrap:
 
     \begin{gather*}
-    P_t = \{p_{t,0}, p_{t,1}, ... p_{t,n}\} \\
+    P_t = \{p_{t,0}, p_{t,1}, ..., p_{t,n}\} \\
 
     m_t = median(P_t) \\
 
