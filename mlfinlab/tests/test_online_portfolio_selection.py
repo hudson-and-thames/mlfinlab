@@ -45,9 +45,10 @@ class TestOLPS(TestCase):
             assert len(weights) == self.data.shape[1]
             np.testing.assert_almost_equal(np.sum(weights), 1)
 
-    def test_olps_weight_mismatch(self):
+    def test_olps_weight(self):
         """
-        Tests that the user inputted weights have matching dimensions as the data's dimensions.
+        Tests that the user inputted weights have matching dimensions as the data's dimensions
+        and ValueError if the user inputted weights do not sum to one.
         """
         # Initialize OLPS.
         olps1 = OLPS()
@@ -55,10 +56,6 @@ class TestOLPS(TestCase):
         with self.assertRaises(ValueError):
             olps1.allocate(self.data, weights=[1])
 
-    def test_olps_weight_incorrect_sum(self):
-        """
-        Tests ValueError if the user inputted weights do not sum to one.
-        """
         with self.assertRaises(AssertionError):
             # Initialize OLPS.
             olps2 = OLPS()
@@ -173,3 +170,24 @@ class TestOLPS(TestCase):
         # Negative weights.
         neg_weight = np.array([-10e20, -10e20])
         np.testing.assert_almost_equal(olps10._simplex_projection(neg_weight), np.array([0.5, 0.5]))
+
+    def test_null_zero_date(self):
+        """
+        Tests ValueError for data with values of null or zero.
+        """
+        # Create null data.
+        null_data = self.data.copy()
+        null_data[:] = np.nan
+
+        # Create zero data.
+        zero_data = self.data.copy()
+        zero_data[:] = 0
+
+        # Initialize OLPS.
+        olps11 = OLPS()
+        olps12 = OLPS()
+        with self.assertRaises(ValueError):
+            olps11.allocate(null_data)
+
+        with self.assertRaises(ValueError):
+            olps12.allocate(zero_data)

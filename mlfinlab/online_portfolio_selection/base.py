@@ -311,17 +311,27 @@ class OLPS:
         if weights is not None:
             # Check if the number of assets match.
             if len(weights) != asset_prices.shape[1]:
-                raise ValueError("Given portfolio weights do not match data shape")
+                raise ValueError("Given portfolio weights do not match data shape.")
             # Check if the weights sum to 1.
             np.testing.assert_almost_equal(np.sum(weights), 1)
 
         # Check if given data is in dataframe format.
         if not isinstance(asset_prices, pd.DataFrame):
-            raise ValueError("Asset prices matrix must be a dataframe")
+            raise ValueError("Asset prices matrix must be a dataframe. Please change the data.")
 
         # Check if index of dataframe is indexed by date.
         if not isinstance(asset_prices.index, pd.DatetimeIndex):
-            raise ValueError("Asset prices dataframe must be indexed by date.")
+            raise ValueError("Asset prices dataframe must be indexed by date. Please parse dates "
+                             "and set the index as dates.")
+
+        # Check that the given data has no null value.
+        if asset_prices.isnull().any().sum() != 0:
+            raise ValueError("The given dataframe contains values of null. Please remove the null "
+                             "values.")
+
+        # Check that the given data has no values of 0.
+        if (asset_prices == 0).any().sum() != 0:
+            raise ValueError("The given dataset contains values of 0. Please remove the 0 values.")
 
     @staticmethod
     def _simplex_projection(weight):
