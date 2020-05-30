@@ -56,6 +56,13 @@ above diagram available for a general overview of some of the strategies.
 
 All of the online portfolio selection strategies will be built on top of the base constructor class ``OLPS``.
 
+.. warning::
+    Online Portfolio Selection module does not support:
+
+    1. Transaction costs
+    2. Short selling
+    3. Data points with null or 0 value.
+
 Import
 ======
 
