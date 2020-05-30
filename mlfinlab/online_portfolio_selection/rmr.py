@@ -1,6 +1,5 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
-import warnings
 from mlfinlab.online_portfolio_selection.base import OLPS
 
 
