@@ -63,6 +63,7 @@ CPCV algorithm:
     4. Fit classifiers ( N ) on the N−k training sets, and produce forecasts on the respective N−k testing sets.
     5. Compute the φ [N, k] backtest paths. You can calculate one Sharpe ratio from each path, and from that derive the empirical distribution of the strategy’s
        Sharpe ratio (rather than a single Sharpe ratio, like WF or CV).
+    6. When combinatorial splits were generated, CombinatorialPurgedKFold class contains backtest paths formed from train/test splits.
 
 .. figure:: cross_validation_images/combinatorial_cv.png
    :scale: 100 %
@@ -82,4 +83,4 @@ Implementation
 Research Notebooks
 ##################
 
-* `Answering Chapter 7: Cross-Validation Questions <https://github.com/hudson-and-thames/research/blob/master/Chapter7_CrossValidation/Chapter7_Exercises_CrossValidation.ipynb>`_
+* `Answering Chapter 7: Cross-Validation Questions <https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Cross-Validation%20in%20Finance/Chapter7_Exercises_CrossValidation.ipynb>`_

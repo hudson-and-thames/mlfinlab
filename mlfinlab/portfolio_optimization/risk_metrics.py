@@ -71,6 +71,6 @@ class RiskMetrics:
         max_drawdown = drawdown.expanding().max()
 
         # Use (1-confidence_level) because the worst drawdowns are the biggest positive values
-        max_drawdown_at_confidence_level = max_drawdown.quantile(1-confidence_level, interpolation='higher')
+        max_drawdown_at_confidence_level = max_drawdown.quantile(1 - confidence_level, interpolation='higher')
         conditional_drawdown = np.nanmean(max_drawdown[max_drawdown >= max_drawdown_at_confidence_level])
         return conditional_drawdown

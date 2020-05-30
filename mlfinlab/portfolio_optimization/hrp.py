@@ -44,18 +44,19 @@ class HierarchicalRiskParity:
         # pylint: disable=invalid-name, too-many-branches
         """
         Calculate asset allocations using HRP algorithm.
-        :param asset_names: (list) a list of strings containing the asset names
-        :param asset_prices: (pd.Dataframe) a dataframe of historical asset prices (daily close)
+
+        :param asset_names: (list) A list of strings containing the asset names
+        :param asset_prices: (pd.Dataframe) A dataframe of historical asset prices (daily close)
                                             indexed by date
-        :param asset_returns: (pd.Dataframe/numpy matrix) user supplied matrix of asset returns
-        :param covariance_matrix: (pd.Dataframe/numpy matrix) user supplied covariance matrix of asset returns
-        :param distance_matrix: (pd.Dataframe/numpy matrix) user supplied distance matrix
-        :param side_weights: (pd.Series/numpy matrix) with asset_names in index and value 1 for Buy, -1 for Sell
-                                (default 1 for all)
-        :param linkage: (string) type of linkage used for Hierarchical Clustering ex: single, average, complete...
-        :param resample_by: (str) specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
+        :param asset_returns: (pd.Dataframe/numpy matrix) User supplied matrix of asset returns
+        :param covariance_matrix: (pd.Dataframe/numpy matrix) User supplied covariance matrix of asset returns
+        :param distance_matrix: (pd.Dataframe/numpy matrix) User supplied distance matrix
+        :param side_weights: (pd.Series/numpy matrix) With asset_names in index and value 1 for Buy, -1 for Sell
+                                                      (default 1 for all)
+        :param linkage: (string) Type of linkage used for Hierarchical Clustering ex: single, average, complete...
+        :param resample_by: (str) Specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
-        :param use_shrinkage: (Boolean) specifies whether to shrink the covariances
+        :param use_shrinkage: (bool) Specifies whether to shrink the covariances
         """
 
         if asset_prices is None and asset_returns is None and covariance_matrix is None:
@@ -116,9 +117,10 @@ class HierarchicalRiskParity:
     def _tree_clustering(distance, method='single'):
         """
         Perform the traditional heirarchical tree clustering.
-        :param correlation: (np.array) correlation matrix of the assets
-        :param method: (str) the type of clustering to be done
-        :return: distance matrix and clusters
+
+        :param correlation: (np.array) Correlation matrix of the assets
+        :param method: (str) The type of clustering to be done
+        :return: (np.array) Distance matrix and clusters
         """
         clusters = linkage(squareform(distance.values), method=method)
         return clusters
@@ -126,9 +128,10 @@ class HierarchicalRiskParity:
     def _quasi_diagnalization(self, num_assets, curr_index):
         """
         Rearrange the assets to reorder them according to hierarchical tree clustering order.
-        :param num_assets: (int) the total number of assets
-        :param curr_index: (int) current index
-        :return: (list) the assets rearranged according to hierarchical clustering
+
+        :param num_assets: (int) The total number of assets
+        :param curr_index: (int) Current index
+        :return: (list) The assets rearranged according to hierarchical clustering
         """
 
         if curr_index < num_assets:
@@ -143,10 +146,11 @@ class HierarchicalRiskParity:
         """
         Based on the quasi-diagnalization, reorder the original distance matrix, so that assets within
         the same cluster are grouped together.
-        :param assets: (list) list of asset names in the portfolio
-        :param distance: (pd.Dataframe) distance values between asset returns
-        :param correlation: (pd.Dataframe) correlations between asset returns
-        :return: (np.array) re-arranged distance matrix based on tree clusters
+
+        :param assets: (list) Asset names in the portfolio
+        :param distance: (pd.Dataframe) Distance values between asset returns
+        :param correlation: (pd.Dataframe) Correlations between asset returns
+        :return: (np.array) Re-arranged distance matrix based on tree clusters
         """
 
         ordering = assets[self.ordered_indices]
@@ -158,8 +162,9 @@ class HierarchicalRiskParity:
     def _get_inverse_variance_weights(covariance):
         """
         Calculate the inverse variance weight allocations.
-        :param covariance: (pd.Dataframe) covariance matrix of assets
-        :return: (list) inverse variance weight values
+
+        :param covariance: (pd.Dataframe) Covariance matrix of assets
+        :return: (list) Inverse variance weight values
         """
 
         inv_diag = 1 / np.diag(covariance.values)
@@ -169,9 +174,10 @@ class HierarchicalRiskParity:
     def _get_cluster_variance(self, covariance, cluster_indices):
         """
         Calculate cluster variance.
-        :param covariance: (pd.Dataframe) covariance matrix of assets
-        :param cluster_indices: (list) list of asset indices for the cluster
-        :return: (float) variance of the cluster
+
+        :param covariance: (pd.Dataframe) Covariance matrix of assets
+        :param cluster_indices: (list) Asset indices for the cluster
+        :return: (float) Variance of the cluster
         """
 
         cluster_covariance = covariance.iloc[cluster_indices, cluster_indices]
@@ -181,9 +187,10 @@ class HierarchicalRiskParity:
 
     def _recursive_bisection(self, covariance, assets, side_weights):
         """
-        Recursively assign weights to the clusters - ultimately assigning weights to the inidividual assets.
-        :param covariance: (pd.Dataframe) the covariance matrix
-        :param assets: (list) list of asset names in the portfolio
+        Recursively assign weights to the clusters - ultimately assigning weights to the individual assets.
+
+        :param covariance: (pd.Dataframe) The covariance matrix
+        :param assets: (list) Asset names in the portfolio
         """
         self.weights = pd.Series(1, index=self.ordered_indices)
         clustered_alphas = [self.ordered_indices]
@@ -218,6 +225,7 @@ class HierarchicalRiskParity:
             # Short half size
             self.weights.loc[short_ptf] /= self.weights.loc[short_ptf].sum().values[0]
             self.weights.loc[short_ptf] *= -0.5
+
             # Buy other half
             self.weights.loc[buy_ptf] /= self.weights.loc[buy_ptf].sum().values[0]
             self.weights.loc[buy_ptf] *= 0.5
@@ -226,7 +234,9 @@ class HierarchicalRiskParity:
     def plot_clusters(self, assets):
         """
         Plot a dendrogram of the hierarchical clusters.
-        :param assets: (list) list of asset names in the portfolio
+
+        :param assets: (list) Asset names in the portfolio
+        :return: (dict) Dendrogram
         """
 
         dendrogram_plot = dendrogram(self.clusters, labels=assets)
@@ -236,8 +246,9 @@ class HierarchicalRiskParity:
     def _shrink_covariance(asset_returns):
         """
         Regularise/Shrink the asset covariances.
-        :param asset_returns: (pd.Dataframe) asset returns
-        :return: (pd.Dataframe) shrinked asset returns covariances
+
+        :param asset_returns: (pd.Dataframe) Asset returns
+        :return: (pd.Dataframe) Shrinked asset returns covariances
         """
 
         oas = OAS()
@@ -249,8 +260,9 @@ class HierarchicalRiskParity:
     def _cov2corr(covariance):
         """
         Calculate the correlations from asset returns covariance matrix.
-        :param covariance: (pd.Dataframe) asset returns covariances
-        :return: (pd.Dataframe) correlations between asset returns
+
+        :param covariance: (pd.Dataframe) Asset returns covariances
+        :return: (pd.Dataframe) Correlations between asset returns
         """
 
         d_matrix = np.zeros_like(covariance)

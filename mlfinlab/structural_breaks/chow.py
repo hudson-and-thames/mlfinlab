@@ -13,9 +13,9 @@ def _get_dfc_for_t(series: pd.Series, molecule: list) -> pd.Series:
     """
     Get Chow-Type Dickey-Fuller Test statistics for each index in molecule
 
-    :param series: (pd.Series) series to test
-    :param molecule: (list) of dates to test
-    :return: (pd.Series) fo statistics for each index from molecule
+    :param series: (pd.Series) Series to test
+    :param molecule: (list) Dates to test
+    :return: (pd.Series) Statistics for each index from molecule
     """
 
     dfc_series = pd.Series(index=molecule)
@@ -38,10 +38,10 @@ def get_chow_type_stat(series: pd.Series, min_length: int = 20, num_threads: int
     """
     Multithread implementation of Chow-Type Dickey-Fuller Test, p.251-252
 
-    :param series: (pd.Series) series to test
-    :param min_length: (int) minimum sample length used to estimate statistics
-    :param num_threads: (int): number of cores to use
-    :return: (pd.Series) of Chow-Type Dickey-Fuller Test statistics
+    :param series: (pd.Series) Series to test
+    :param min_length: (int) Minimum sample length used to estimate statistics
+    :param num_threads: (int): Number of cores to use
+    :return: (pd.Series) Chow-Type Dickey-Fuller Test statistics
     """
     # Indices to test. We drop min_length first and last values
     molecule = series.index[min_length:series.shape[0] - min_length]

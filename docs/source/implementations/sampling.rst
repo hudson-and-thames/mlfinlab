@@ -314,7 +314,7 @@ This function can be utilized as shown below assuming we have already found our 
 
     import pandas as pd
     import numpy as np
-    from mlfinlab.sampling.attribution import get_weights_by_return
+    from mlfinlab.sample_weights.attribution import get_weights_by_return
 
     barrier_events = pd.read_csv('FILE_PATH', index_col=0, parse_dates=[0,2])
     close_prices = pd.read_csv('FILE_PATH', index_col=0, parse_dates=[0,2])
@@ -336,7 +336,7 @@ This function can be utilized as shown below assuming we have already found our 
 
     import pandas as pd
     import numpy as np
-    from mlfinlab.sampling.attribution import get_weights_by_time_decay
+    from mlfinlab.sample_weights.attribution import get_weights_by_time_decay
 
 
     barrier_events = pd.read_csv('FILE_PATH', index_col=0, parse_dates=[0,2])
@@ -357,11 +357,11 @@ Sample Uniqueness and Weights
 
 * `Sample Uniqueness and Weights`_
 
-.. _Sample Uniqueness and Weights: https://github.com/hudson-and-thames/research/blob/master/Chapter4/Chapter4_Exercises.ipynb
+.. _Sample Uniqueness and Weights: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Sample%20Weights/Chapter4_Exercises.ipynb
 
 Sequential Bootstrapping
 ************************
 
 * `Sequential Bootstrapping`_
 
-.. _Sequential Bootstrapping: https://github.com/hudson-and-thames/research/blob/master/Chapter4/Sequential_Bootstrapping.ipynb
+.. _Sequential Bootstrapping: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Sample%20Weights/Sequential_Bootstrapping.ipynb

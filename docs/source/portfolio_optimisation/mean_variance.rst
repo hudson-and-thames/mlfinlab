@@ -60,7 +60,26 @@ Maximum Sharpe Ratio
 With this solution string, the entire covariance matrix, the vector of mean returns, and the risk-free ratio are used
 for weights allocation.
 
-The following optimisation problem is being solved:
+The standard problem of maximum Sharpe ratio portfolio optimization, formulated as:
+
+.. math::
+      :nowrap:
+
+      \begin{align*}
+      maximise: \frac{MeanRet_{j} * W^{T} - R_{f}}{(W^{T} * Cov * W)^{1/2}}
+      \end{align*}
+
+      \begin{align*}
+      s.t.: \sum_{j=1}^{N}{W_{j}} = 1
+      \end{align*}
+
+      \begin{align*}
+      W_{j} \ge 0, j=1,..,N
+      \end{align*}
+
+has the objective function being possibly non-concave. Therefore, it's not a convex optimization problem.
+
+However, the problem can be transformed into an equivalent one, but with a convex quadratic objective function:
 
 .. math::
       :nowrap:
@@ -90,7 +109,7 @@ Where :math:`W` is the vector of weights, :math:`Y` is the vector of unscaled we
 .. tip::
 
     The process of deriving this optimisation problem from the standard maximising Sharpe ratio problem is described
-    in the notes `IEOR 4500 Maximizing the Sharpe ratio <https://www.coursehero.com/file/7013169/maximizing-the-sharpe-ratio/>`_  from Columbia University.
+    in the notes `IEOR 4500 Maximizing the Sharpe ratio <http://people.stat.sc.edu/sshen/events/backtesting/reference/maximizing%20the%20sharpe%20ratio.pdf>`_  from Columbia University.
 
 Efficient Risk
 **************
@@ -216,4 +235,4 @@ Advances in Financial Machine Learning.
 
 * `Chapter 16 Exercise Notebook`_
 
-.. _Chapter 16 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Chapter16/Chapter16.ipynb
+.. _Chapter 16 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Machine%20Learning%20Asset%20Allocation/Chapter16.ipynb
