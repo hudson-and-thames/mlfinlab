@@ -16,12 +16,15 @@ the excess return. The labels can then be used in training regression and decisi
 At time :math:`t`:
 
 .. math::
+    :nowrap:
 
-    P_t &= \{p_{t,0}, p_{t,1}, ... p_{t,n}\}
+    \begin{gather*}
+    P_t = \{p_{t,0}, p_{t,1}, ... p_{t,n}\} \\
 
-    m &= median(P_t)
+    m_t = median(P_t) \\
 
-    L(P_t) &= \{p_{t,0} - m, p_{t,1} - m, ... p_{t,n} - m\}
+    L(P_t) = \{p_{t,0} - m_t, p_{t,1} - m_t, ..., p_{t,n} - m_t\}
+    \end{gather*}
 
 
 If categorical rather than numerical labels are desired:
@@ -30,9 +33,9 @@ If categorical rather than numerical labels are desired:
      \begin{equation}
      \begin{split}
        L(p_{t,n}) = \begin{cases}
-       -1 &\ \text{if} \ \ p_{t,n} - m < 0\\
-       0 &\ \text{if} \ \ p_{t,n} - m = 0\\
-       1 &\ \text{if} \ \ p_{t,n} - m > 0\\
+       -1 &\ \text{if} \ \ p_{t,n} - m_t < 0\\
+       0 &\ \text{if} \ \ p_{t,n} - m_t = 0\\
+       1 &\ \text{if} \ \ p_{t,n} - m_t > 0\\
        \end{cases}
      \end{split}
      \end{equation}
