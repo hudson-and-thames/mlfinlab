@@ -212,7 +212,7 @@ where :math:`\sigma^{2}_t` is the target portfolio risk set by the investor and 
 Maximum Return - Minimum Volatility
 ********************************************
 
-This is often referred to as *quadratic risk utility.* If you look at the objective function,  
+This is often referred to as *quadratic risk utility.*
 
 .. math::
 
@@ -273,52 +273,6 @@ Plotting
 
 .. image:: portfolio_optimisation_images/efficient_frontier.png
 
-
-Example Code
-############
-
-Basic example
-*************
-
-.. code-block::
-
-    import pandas as pd
-    from mlfinlab.portfolio_optimization.mean_variance import MeanVarianceOptimisation
-
-    # Read in data
-    stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
-
-    # Compute IVP weights
-    mvo = MeanVarianceOptimisation()
-    mvo.allocate(asset_names=stock_prices.columns, asset_prices=stock_prices,
-                 solution='inverse_variance', resample_by='B
-    ivp_weights = mvo.weights.sort_values(by=0, ascending=False, axis=1)
-
-
-Different solutions
-*******************
-
-.. code-block::
-
-    # Compute different mean-variance solutions using MVO
-    mvo = MeanVarianceOptimisation()
-
-    # Maximum Sharpe Solution
-    mvo.allocate(asset_prices=stock_prices, solution='max_sharpe')
-    mvo_weights = mvo.weights.sort_values(by=0, ascending=False, axis=1)
-
-    # Minimum Variance Solution
-    mvo.allocate(asset_prices=stock_prices, solution='min_volatility')
-    mvo_weights = mvo.weights.sort_values(by=0, ascending=False, axis=1)
-
-    # Efficient Risk Solution
-    mvo.allocate(asset_prices=stock_prices, solution='efficient_risk', target_return=0.4)
-    mvo_weights = mvo.weights
-
-    # Portfolio Characteristics
-    portfolio_return = mvo.portfolio_return
-    sharpe_ratio = mvo.portfolio_sharpe_ratio
-    risk = mvo.portfolio_risk
 
 
 Research Notebooks
