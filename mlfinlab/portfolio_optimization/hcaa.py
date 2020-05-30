@@ -43,6 +43,7 @@ class HierarchicalClusteringAssetAllocation:
     def allocate(self, asset_names=None, asset_prices=None, asset_returns=None, covariance_matrix=None,
                  expected_asset_returns=None, allocation_metric='equal_weighting', linkage='ward',
                  optimal_num_clusters=None):
+        # pylint: disable=too-many-branches
         """
         Calculate asset allocations using the HCAA algorithm.
 
@@ -97,11 +98,15 @@ class HierarchicalClusteringAssetAllocation:
         # Calculate correlation from covariance matrix
         corr = self._cov2corr(covariance=cov)
 
-        # Calculate the optimal number of clusters using the Gap statistic
+        # Calculate the optimal number of clusters
         if not optimal_num_clusters:
             optimal_num_clusters = self._get_optimal_number_of_clusters(correlation=corr,
                                                                         linkage=linkage,
                                                                         asset_returns=asset_returns)
+        else:
+            optimal_num_clusters = self._check_max_number_of_clusters(num_clusters=optimal_num_clusters,
+                                                                      linkage=linkage,
+                                                                      correlation=corr)
 
         # Tree Clustering
         self.clusters, self.cluster_children = self._tree_clustering(correlation=corr,
@@ -135,6 +140,26 @@ class HierarchicalClusteringAssetAllocation:
         inertia = np.log(np.sum(inertia))
         return inertia
 
+    @staticmethod
+    def _check_max_number_of_clusters(num_clusters, linkage, correlation):
+        """
+        In some cases, the optimal number of clusters value given by the users is greater than the maximum number of clusters
+        possible with the given data. This function checks this and assigns the proper value to the number of clusters when the
+        given value exceeds maximum possible clusters.
+
+        :param num_clusters: (int) The number of clusters.
+        :param linkage (str): The type of linkage method to use for clustering.
+        :param correlation: (np.array) Matrix of asset correlations.
+        :return: (int) New value for number of clusters.
+        """
+
+        distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
+        clusters = scipy_linkage(squareform(distance_matrix.values), method=linkage)
+        clustering_inds = fcluster(clusters, num_clusters, criterion='maxclust')
+        max_number_of_clusters_possible = max(clustering_inds)
+        num_clusters = min(max_number_of_clusters_possible, num_clusters)
+        return num_clusters
+
     def _get_optimal_number_of_clusters(self, correlation, asset_returns, linkage, num_reference_datasets=5):
         """
         Find the optimal number of clusters for hierarchical clustering using the Gap statistic.
@@ -146,23 +171,27 @@ class HierarchicalClusteringAssetAllocation:
         :return: (int) The optimal number of clusters.
         """
 
-        max_number_of_clusters = min(10, asset_returns.shape[1])
         original_distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
         gap_values = []
-        for num_clusters in range(1, max_number_of_clusters + 1):
-
-            # Calculate expected inertia from reference datasets
-            expected_inertia = self._calculate_expected_inertia(num_reference_datasets, asset_returns, num_clusters, linkage)
+        num_clusters = 1
+        max_number_of_clusters = float("-inf")
+        while True:
 
             # Calculate inertia from original data
             original_clusters = scipy_linkage(squareform(original_distance_matrix), method=linkage)
             original_cluster_assignments = fcluster(original_clusters, num_clusters, criterion='maxclust')
+            if max(original_cluster_assignments) == max_number_of_clusters or max(original_cluster_assignments) > 10:
+                break
+            max_number_of_clusters = max(original_cluster_assignments)
             inertia = self._compute_cluster_inertia(original_cluster_assignments, asset_returns.values)
+
+            # Calculate expected inertia from reference datasets
+            expected_inertia = self._calculate_expected_inertia(num_reference_datasets, asset_returns, num_clusters, linkage)
 
             # Calculate the gap statistic
             gap = expected_inertia - inertia
             gap_values.append(gap)
-
+            num_clusters += 1
         return 1 + np.argmax(gap_values)
 
     def _calculate_expected_inertia(self, num_reference_datasets, asset_returns, num_clusters, linkage):
