@@ -19,8 +19,14 @@ def accumulation_distribution(price):
                 https://www.investopedia.com/terms/a/accumulationdistribution.asp for a detailed explanation.
     """
     # Current money flow volume (CMFV)
-    cmfv = price['Volume'] * ((price['Close'] - price['Low']) - (price['High'] - price['Close'])) / (
-            price['High'] - price['Low'])
+    cmfv = price['Volume'] * ((price['Close'] - price['Low']) - (price['High'] - price['Close'])) / \
+        (price['High'] - price['Low'])
+
+    # In the highly unlikely circumstance that the price does not change at all, i.e. high = low = close, the above
+    # calculation will return NaN as a response to the divide by 0. We'll replace NaN values with 0.
+    cmfv = cmfv.fillna(0)
+
+    # Get cumulative CMFV for A/D indicator
     cmfv_cumsum = cmfv.cumsum()
 
     return cmfv_cumsum
