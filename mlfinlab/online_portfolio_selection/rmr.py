@@ -1,5 +1,6 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
+import warnings
 from mlfinlab.online_portfolio_selection.base import OLPS
 
 
@@ -126,13 +127,16 @@ class RMR(OLPS):
             prev_prediction = curr_prediction
             # Transform mu according the Modified Weiszfeld Algorithm
             curr_prediction = self._transform(curr_prediction, price_window)
-            # If condition is satisfied, break.
-            if np.linalg.norm(prev_prediction - curr_prediction,
-                              ord=1) <= self.tau * np.linalg.norm(curr_prediction, ord=1):
+
+            # If null value or condition is satisfied, break.
+            if curr_prediction.size == 0 or np.linalg.norm(prev_prediction - curr_prediction, ord=1) \
+                    <= self.tau * np.linalg.norm(curr_prediction, ord=1):
+                curr_prediction = prev_prediction
                 break
 
         # Divide by the current time's price.
         predicted_relatives = curr_prediction / price_window[-1]
+
         return predicted_relatives
 
     @staticmethod
@@ -172,5 +176,6 @@ class RMR(OLPS):
             ord=1)
 
         # Calculate next_mu value.
-        next_mu = np.maximum(0, 1 - eta / gamma) * tilde + np.minimum(1, eta / gamma) * old_mu
-        return next_mu
+        with np.errstate(invalid='ignore'):
+            next_mu = np.maximum(0, 1 - eta / gamma) * tilde + np.minimum(1, eta / gamma) * old_mu
+        return tilde if eta == 0 else next_mu

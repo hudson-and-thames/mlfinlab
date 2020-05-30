@@ -119,7 +119,7 @@ class OLMAR(OLPS):
         # MAR-1 reversion method: Simple Moving Average.
         if self.reversion_method == 1:
             rolling_ma = np.array(self.asset_prices.rolling(self.window).apply(
-                lambda x: np.sum(x) / x[0] / self.window))
+                lambda x: np.sum(x) / x[0] / self.window, raw=True))
         # MAR-2 reversion method: Exponential Moving Average.
         else:
             rolling_ma = np.array(

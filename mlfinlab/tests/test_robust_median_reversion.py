@@ -55,7 +55,7 @@ class TestRobustMedianReversion(TestCase):
 
     def test_rmr_n_iteration_error(self):
         """
-        Tests ValueError if n_iteration is not an integer.
+        Tests ValueError if n_iteration is not an integer or less than 2.
         """
         # Initialize RMR.
         rmr2 = RMR(epsilon=1.2, n_iteration=1.5, window=3, tau=0.001)
@@ -63,10 +63,6 @@ class TestRobustMedianReversion(TestCase):
             # Running allocate will raise ValueError.
             rmr2.allocate(self.data)
 
-    def test_rmr_n_iteration1_error(self):
-        """
-        Tests ValueError if n_iteration is less than 2.
-        """
         # Initialize RMR.
         rmr3 = RMR(epsilon=1.2, n_iteration=1, window=3, tau=0.001)
         with self.assertRaises(ValueError):
@@ -75,7 +71,7 @@ class TestRobustMedianReversion(TestCase):
 
     def test_rmr_window_error(self):
         """
-        Tests ValueError if window is not an integer.
+        Tests ValueError if window is not an integer or less than 2.
         """
         # Initialize RMR.
         rmr4 = RMR(epsilon=1.2, n_iteration=4, window=3.5, tau=0.001)
@@ -83,10 +79,6 @@ class TestRobustMedianReversion(TestCase):
             # Running allocate will raise ValueError.
             rmr4.allocate(self.data)
 
-    def test_rmr_window1_error(self):
-        """
-        Tests ValueError if window is less than 2.
-        """
         # Initialize RMR.
         rmr5 = RMR(epsilon=1.2, n_iteration=4, window=1, tau=0.001)
         with self.assertRaises(ValueError):
