@@ -92,7 +92,7 @@ Benefits include:
 </div>
 <div align="center">
    <a href="https://hudsonthames.org/sponsors/">
-   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/docs/source/logo/gold_sponsors.png" height="200"><br>
+   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/docs/source/logo/ali_saif.jpg" height="200"><br>
 </div>
 
 * [E.P. Chan & Associates](https://www.epchan.com/)
