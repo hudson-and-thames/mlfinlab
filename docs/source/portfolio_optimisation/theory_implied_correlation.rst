@@ -170,5 +170,5 @@ The following research notebook can be used to better understand how the algorit
 
 * `Theory-Implied Correlation Notebook`_
 
-.. _Theory-Implied Correlation Notebook: https://github.com/hudson-and-thames/research/blob/master/TIC/TIC.ipynb
+.. _Theory-Implied Correlation Notebook: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Theory%20Implied%20Correlation%20(TIC)/TIC.ipynb
 
