@@ -4,6 +4,7 @@ import unittest
 import os
 import numpy as np
 import pandas as pd
+
 from mlfinlab.labeling.raw_return import raw_return
 
 
@@ -20,12 +21,29 @@ class TestLabelingRawReturns(unittest.TestCase):
         self.path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(self.path, index_col='Date')
         self.idx5 = self.data[:5].index
+        self.col5 = self.data.iloc[:, 0:5].columns
+
+    def test_dataframe(self):
+        """
+        Verifies raw returns for a DataFrame.
+        """
+        price = self.data.iloc[0:5, 0:5]
+        test1 = raw_return(price)
+        test1_actual = pd.DataFrame([(np.nan, np.nan, np.nan, np.nan, np.nan), (0.008997, -0.002826, 0.0033758,
+                                                                                0.003779, 0.001662),
+                                     (-0.030037, -0.019552, -0.0002804, -0.025602, -0.022719), (0.007327, 0.000867,
+                                                                                                -0.000187, -0.006182,
+                                                                                                0.001045),
+                                     (-0.007754, -0.006930, 0.000748, -0.002333, -0.005610)], columns=self.col5,
+                                    index=self.idx5)
+        pd.testing.assert_frame_equal(test1, test1_actual, check_less_precise=True)
 
     def test_series(self):
         """
         Verifies raw returns for a series for percentage/logarithmic returns, with numerical/binary labels.
         """
         # Takes series of 10 imaginary prices
+        print('test1')
         price = pd.Series([100, 101, 102, 102, 102, 99, 19, 2000, 100, 105])
 
         test1 = raw_return(price)
@@ -49,10 +67,10 @@ class TestLabelingRawReturns(unittest.TestCase):
         pd.testing.assert_series_equal(test5, test5_actual, check_less_precise=True)
         pd.testing.assert_series_equal(test6, test6_actual, check_less_precise=True)
 
-    def test_dataframe(self):
+    def test_warning(self):
         """
-        Verifies raw returns for a DataFrame.
+        Test for warning when lookback is greater than number of rows.
         """
-        price = self.data.iloc[0:5, 0:5]
-        print(price)
-        self.assertTrue(4==4)
+        price = self.data[:10]
+        with self.assertWarns(UserWarning):
+            labels = raw_return(price, lookback=999)

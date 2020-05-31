@@ -34,4 +34,5 @@ def raw_return(price, binary=False, logarithmic=False, lookback=1):
     if binary:
         raw_returns = np.sign(raw_returns)
 
-    return raw_returns
+    return raw_return
+
