@@ -35,6 +35,7 @@ This package has its foundations in the two graduate level textbooks:
    <a href="https://mlfinlab.readthedocs.io/en/latest/">
    <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/docs/source/logo/journals.png"><br>
 </div>
+.
 
 ## Praise for MlFinLab
 >"Those who doubt open source libraries just need to look at the impact of Pandas, Scikit-learn, and the like. MIFinLab 
