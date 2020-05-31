@@ -60,6 +60,13 @@ level textbooks:
    :alt: Academic Journals
    :target: https://www.pm-research.com/
 
+Praise for MlFinLab
+###################
+
+"Those who doubt open-source libraries just need to look at the impact of Pandas, Scikit-learn, and the like. MIFinLab
+is doing to financial machine learning what Tensorflow and PyTorch are doing to deep learning."
+
+\- `Dr. Ernest Chan <https://www.linkedin.com/in/epchan/>`_, Hedge Fund Manager at QTS & Author.
 
 Unlocking the Commons
 #####################
