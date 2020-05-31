@@ -41,7 +41,8 @@ This package has its foundations in the two graduate level textbooks:
 >"Those who doubt open source libraries just need to look at the impact of Pandas, Scikit-learn, and the like. MIFinLab 
 is doing to financial machine learning what Tensorflow and PyTorch are doing to deep learning."
 >
-> [Dr. Ernest Chan (Hedge Fund Manager at QTS & Author.)](https://www.linkedin.com/in/epchan/)
+> \- [Dr. Ernest Chan](https://www.linkedin.com/in/epchan/), Hedge Fund Manager at QTS & Author.
+
 
 ## Unlocking the Commons
 We are currently running a sponsorship model of “Unlocking the Commmons”. Our code base, online documentation, 
