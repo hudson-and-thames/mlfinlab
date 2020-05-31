@@ -1,12 +1,13 @@
 .. _implementations-labeling_raw_return:
 
-====================
-Labeling Raw Returns
-====================
+===========
+Raw Returns
+===========
 
 Labeling data by raw returns is the most simple and basic method of labeling financial data for machine learning. Raw returns can
-be calculated either as a percentage or logarithmic basis. Using returns rather than raw prices is usually preferred for financial data
-analysis due to returns being automatically scaled with respect to the underlying. The percentage raw return for an observation with
+be calculated either on a percentage or logarithmic basis. Using returns rather than raw prices is usually preferred for financial data
+analysis due to returns being automatically scaled with respect to the underlying. Unlike raw prices, returns are better suited for
+mathematical analysis due to the possibility of negative returns. The percentage raw return for an observation with
 price :math:`p_t` at time :math:`t` relative to its price at time :math:`t-1` is as follows:
 
 .. math::
@@ -31,10 +32,12 @@ can be given as a sign of the return, rather than the magnitude. In this case:
      \end{split}
      \end{equation}
 
-The following
+The following shows the distribution of logarithmic daily returns on Microsoft stock during the time period between January
+2010 and May 2020.
 
-INSTER IMAGE
-
+.. image:: labeling_images/Raw_returns_distribution.png
+   :scale: 100 %
+   :align: center
 
 Implementation
 ##############
@@ -62,15 +65,11 @@ Below is an example on how to use the raw returns labeling method.
     # Create labels categorically based on logarithmic returns
     returns = raw_returns(data[ticker], binary=True, logarithmic=True)
 
+Research Notebook
+#################
 
+The following research notebook can be used to better understand the raw return labeling technique.
 
+* `Raw Return Example`_
 
-
-
-
-
-
-
-
-
-
+.. _`Raw Return Example`: https://github.com/hudson-and-thames/research/blob/master/Labelling/Labels%20Raw%20Return/Raw%20Return.ipynb
