@@ -36,6 +36,12 @@ This package has its foundations in the two graduate level textbooks:
    <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/docs/source/logo/journals.png"><br>
 </div>
 
+## Praise for MlFinLab
+>"Those who doubt open source libraries just need to look at the impact of Pandas, Scikit-learn, and the like. MIFinLab 
+is doing to financial machine learning what Tensorflow and PyTorch are doing to deep learning."
+>
+> [Dr. Ernest Chan (Hedge Fund Manager at QTS & Author.)](https://www.linkedin.com/in/epchan/)
+
 ## Unlocking the Commons
 We are currently running a sponsorship model of “Unlocking the Commmons”. Our code base, online documentation, 
 tutorial notebooks and presentations will remain open to everyone for so long as we can meet our minimum sponsorship 
