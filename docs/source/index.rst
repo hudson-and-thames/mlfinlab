@@ -131,6 +131,13 @@ Gold Sponsors:
    :alt: Gold Sponsors
    :target: https://hudsonthames.org/sponsors/
 
+.. figure:: logo/ali_saif.jpg
+   :scale: 100 %
+   :align: center
+   :figclass: align-center
+   :alt: Gold Sponsors
+   :target: https://hudsonthames.org/sponsors/
+
 Contact us
 ##########
 
@@ -206,7 +213,7 @@ Early Adopters:
 .. _`Shawn Unger`: https://www.linkedin.com/in/shawnunger1/
 .. _`Ruifan Pei`: https://www.linkedin.com/in/ruifan-pei-b994b177/
 .. _`Sritanu Chakraborty`: https://www.linkedin.com/in/sritanuchakraborty/
-.. _`Kofi Glove`: https://www.linkedin.com/in/kofiglover/
+.. _`Kofi Glover`: https://www.linkedin.com/in/kofiglover/
 
 License
 #######

@@ -90,12 +90,16 @@ Benefits include:
    <a href="https://hudsonthames.org/sponsors/">
    <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/docs/source/logo/gold_sponsors.png" height="200"><br>
 </div>
-
+<div align="center">
+   <a href="https://hudsonthames.org/sponsors/">
+   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/docs/source/logo/gold_sponsors.png" height="200"><br>
+</div>
 
 * [E.P. Chan & Associates](https://www.epchan.com/)
 * [Markov Capital](http://www.markovcapital.se/)
 * [Consilium Crypto](https://consiliumcrypto.ai)
 * [3Jane Capital](https://3jane.com/)
+* [Ali Saif](https://www.linkedin.com/in/ali-saif/)
 
 ---
 
