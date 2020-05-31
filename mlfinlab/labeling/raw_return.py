@@ -1,14 +1,20 @@
 """
-Labeling based on raw return of each observation relative to its previous value. User can specify how many steps back
-to calculate the raw return from.
+Most basic form of labeling based on raw return of each observation relative to its previous value. User can specify
+percentage or logarithmic, numerical or categorical labels, and number of steps back to calculate the raw return from.
 """
 
-import numpy as np
 import warnings
+import numpy as np
 
 
 def raw_return(price, binary=False, logarithmic=False, lookback=1):
     """
+    Raw returns labeling method.
+
+    This is the most basic and ubiquitous labeling method used as a precursor to almost any kind of financial data analysis
+    or machine learning. User can specify percentage/logarithmic returns, numerical/binary labels, and lookback period to
+    calculate the return from.
+
     :param price: (pd.Series or pd.DataFrame) Price data for one (Series) or multiple tickers (DataFrame).
     :param binary: (bool) If False, will return numerical returns. If True, will return the sign of the raw return.
                     False by default.
@@ -34,5 +40,4 @@ def raw_return(price, binary=False, logarithmic=False, lookback=1):
     if binary:
         raw_returns = np.sign(raw_returns)
 
-    return raw_return
-
+    return raw_returns

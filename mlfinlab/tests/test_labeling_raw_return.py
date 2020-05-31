@@ -36,6 +36,7 @@ class TestLabelingRawReturns(unittest.TestCase):
                                                                                                 0.001045),
                                      (-0.007754, -0.006930, 0.000748, -0.002333, -0.005610)], columns=self.col5,
                                     index=self.idx5)
+
         pd.testing.assert_frame_equal(test1, test1_actual, check_less_precise=True)
 
     def test_series(self):
@@ -43,7 +44,6 @@ class TestLabelingRawReturns(unittest.TestCase):
         Verifies raw returns for a series for percentage/logarithmic returns, with numerical/binary labels.
         """
         # Takes series of 10 imaginary prices
-        print('test1')
         price = pd.Series([100, 101, 102, 102, 102, 99, 19, 2000, 100, 105])
 
         test1 = raw_return(price)
@@ -73,4 +73,4 @@ class TestLabelingRawReturns(unittest.TestCase):
         """
         price = self.data[:10]
         with self.assertWarns(UserWarning):
-            labels = raw_return(price, lookback=999)
+            raw_return(price, lookback=999)
