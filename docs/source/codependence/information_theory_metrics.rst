@@ -1,139 +1,12 @@
-.. _implementations-codependence:
+.. _codependence-information_theory_metrics:
 
 .. note::
    The following implementations and documentation, closely follows the lecture notes notes from Cornell University, by Marcos Lopez de Prado:
    `Codependence (Presentation Slides) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_.
 
-
-============
-Codependence
-============
-
-Pearson correlation coefficient is the most famous and widely used measure of codependence, however, there are some drawbacks.
-
-.. warning::
-
-    Pearson correlation suffers from 3 major drawbacks:
-
-    1) It captures linear effects, but if two variables have strong non-linear dependency (squared or abs for example) Pearson correlation won't find any pattern between them.
-    2) Correlation is not a distance metric: it does not satisfy non-negativity and subadditivity conditions.
-    3) Financial market have non-linear patterns and correlations fails to capture them.
-
-However, Pearson correlation is not the only way of measuring codependence. There are alternative and more modern measures of codependence, such
-such as those introduced in information theory.
-
-
-Correlation-Based Metrics
-###########################
-
-Distance Correlation
-********************
-
-**Distance Correlation** can capture not only linear association but also non-linear variable dependencies which Pearson correlation can not.
-It was introduced in 2005 by Gábor J. Szekely. (`wikipedia <https://en.wikipedia.org/wiki/Distance_correlation>`_)
-
-.. math::
-    \rho_{dist}[X, Y] = \frac{dCov[X, Y]}{\sqrt{dCov[X, X]dCov[Y,Y}}
-
-Where :math:`dCov[X, Y]` can be interpreted as the average Hadamard product of the doubly-centered Euclidean distance matrices of
-:math:`X, Y`. (`Cornell lecture slides, p.7 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_)
-
-Then
-
-.. math::
-    0 \leq \rho_{dist}[X, Y] \leq 1
-
-
-| Unlike Pearson's correlation, when the value is zero, we can say the two variables are independent.
-
-.. math::
-    \rho_{dist}[X, Y] = 0 \Leftrightarrow X \perp Y
-
-
-| As shown in the figure below, Distance Correlation captures the nonlinear relationship.
-
-.. image:: codependence_images/distance_correlation.png
-   :scale: 70 %
-   :align: center
-
-
-The numbers in the first line are Pearson correlation values and the values in the second line are Distance correlation values.
-This figure is from `Introducing the discussion paper by Székely and Rizzo <https://www.researchgate.net/publication/238879872_Introducing_the_discussion_paper_by_Szekely_and_Rizzo>`_
-by Michale A. Newton. It provides a great overview for readers.
-
-Implementation
-==============
-
-.. py:currentmodule:: mlfinlab.codependence.correlation
-
-.. autofunction:: distance_correlation
-
-
-Angular Distance
-*****************
-
-**Angular Distance** is a slight modification of the correlation coefficient which satisfies all distance metric conditions.
-This measure is known as the angular distance because when we use *covariance* as *inner product*, we can interpret correlation as :math:`cos\theta`.
-
-It is a metric, because it is a linear multiple of the Euclidean distance between the vectors :math:`X, Y` (after standardization)
-(`Cornell lecture slides, p.10 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_).
-
-There are three types of angular distance: standard, absolute and squared.
-
-Standard
-========
-
-.. figure:: codependence_images/angular_distance.png
-   :scale: 70 %
-   :align: center
-   :figclass: align-center
-   :alt: Angular Distance
-
-   The angular distance satisfies all the conditions of a true metric, (Lopez de Prado, 2020.)
-
-
-.. autofunction:: angular_distance
-
-.. math::
-    d_\rho[X, Y] = \sqrt{\frac{1}{2}(1-\rho[X,Y])}
-
-.. math::
-    d_\rho \in [0, 1]
-
-
-Absolute and Squared
-====================
-
-.. figure:: codependence_images/modified_angular_distance.png
-   :scale: 70 %
-   :align: center
-   :figclass: align-center
-   :alt: Modified Angular Distance
-
-   In some financial applications, it makes more sense to apply a modified definition of angular distance, such that the
-   sign of the correlation is ignored, (Lopez de Prado, 2020)
-
-**Absolute**
-
-.. math::
-    d_{|\rho|}[X, Y] = \sqrt{1-|\rho[X,Y]|}
-
-.. autofunction:: absolute_angular_distance
-
-|
-
-**Squared**
-
-.. math::
-    d_{\rho^2}[X, Y] = \sqrt{1-{\rho[X,Y]}^2}
-
-.. autofunction:: squared_angular_distance
-
-
-----
-
+==========================
 Information Theory Metrics
-##########################
+==========================
 
 We can gauge the codependence from the information theory perspective. In information theory, (Shannon’s) entropy is a
 measure of information (uncertainty).
@@ -159,7 +32,7 @@ Here, we have two ways of measuring correspondence:
 The following figure highlights how we can view the relationships of various information measures associated with correlated variables
 :math:`X` and :math:`Y` through below figure. (`Cornell lecture slides, p.24 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_)
 
-.. figure:: codependence_images/entropy_relation_diagram.png
+.. figure:: images/entropy_relation_diagram.png
    :scale: 70 %
    :align: center
    :figclass: align-center
@@ -285,7 +158,7 @@ The following example highlights how the various metrics behave under various va
         plt.savefig('{}.png'.format(dependency))
 
 
-.. figure:: codependence_images/linear.png
+.. figure:: images/linear.png
    :scale: 70 %
    :align: center
    :figclass: align-center
@@ -293,7 +166,7 @@ The following example highlights how the various metrics behave under various va
 
    Linear
 
-.. figure:: codependence_images/squared.png
+.. figure:: images/squared.png
    :scale: 70 %
    :align: center
    :figclass: align-center
@@ -301,7 +174,7 @@ The following example highlights how the various metrics behave under various va
 
    Squared
 
-.. figure:: codependence_images/abs.png
+.. figure:: images/abs.png
    :scale: 70 %
    :align: center
    :figclass: align-center
@@ -309,49 +182,10 @@ The following example highlights how the various metrics behave under various va
 
    Absolute
 
-.. figure:: codependence_images/independent.png
+.. figure:: images/independent.png
    :scale: 70 %
    :align: center
    :figclass: align-center
    :alt: No Relationship
     
    Indepedent
-    
-
-Codependence Matrix
-###################
-
-This module consists two functions that generate the following:
-
-1. **Dependence Matrix** to compute dependence of a given matrix using various codependence methods like Mutual Information,
-   Variation of Information, Distance Correlation, Spearman's Rho, GPR distance, and GNPR distance.
-2. **Distance Matrix** can used to compute distance of a given matrix using various metrics like angular, squared
-   angular and absolute angular.
-
-.. note::
-
-   MlFinLab makes use of these functions in the clustered feature importance.
-
-   The Spearman's Rho, GPR distance, and GNPR distance are described in the **Codependence by Marti** section of the docs.
-
-Implementation
-**************
-
-.. py:currentmodule:: mlfinlab.codependence.codependence_matrix
-.. autofunction:: get_dependence_matrix
-.. autofunction:: get_distance_matrix
-
-
-Example
-*******
-
-.. code-block::
-
-   import pandas as pd
-   from mlfinlab.codependence.codependence_matrix import (get_dependence_matrix,
-                                                          get_distance_matrix)
-
-   X = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
-
-   dep_matrix = get_dependence_matrix(X, dependence_method='distance_correlation')
-   dist_matrix = get_distance_matrix(dep_matrix, distance_metric='angular')
