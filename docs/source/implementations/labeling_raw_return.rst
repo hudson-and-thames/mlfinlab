@@ -39,6 +39,8 @@ The following shows the distribution of logarithmic daily returns on Microsoft s
    :scale: 100 %
    :align: center
 
+
+
 Implementation
 ##############
 
