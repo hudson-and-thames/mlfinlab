@@ -11,9 +11,9 @@ def raw_return(price, binary=False, logarithmic=False, lookback=1):
     """
     Raw returns labeling method.
 
-    This is the most basic and ubiquitous labeling method used as a precursor to almost any kind of financial data analysis
-    or machine learning. User can specify percentage/logarithmic returns, numerical/binary labels, and lookback period to
-    calculate the return from.
+    This is the most basic and ubiquitous labeling method used as a precursor to almost any kind of financial data
+    analysis or machine learning. User can specify percentage/logarithmic returns, numerical/binary labels, and
+    lookback period to calculate the return from.
 
     :param price: (pd.Series or pd.DataFrame) Price data for one (Series) or multiple tickers (DataFrame).
     :param binary: (bool) If False, will return numerical returns. If True, will return the sign of the raw return.
@@ -22,7 +22,7 @@ def raw_return(price, binary=False, logarithmic=False, lookback=1):
                         False by default.
     :param lookback: (int) Number of ticks back to calculate each observation's return from. 1 by default. The first
                     lookback number of rows in the output will be NaN.
-    :return:(pd.Series or pd.DataFrame) Raw returns on market data. User can specify whether returns will be based on
+    :return:  (pd.Series or pd.DataFrame) Raw returns on market data. User can specify whether returns will be based on
                 percentage or logarithmic return, and whether the output will be numerical or categorical.
     """
     # Warning if lookback is greater than the number of rows
