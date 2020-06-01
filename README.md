@@ -40,8 +40,8 @@ This package has its foundations in the two graduate level textbooks:
 ## Praise for MlFinLab
 >"Those who doubt open source libraries just need to look at the impact of Pandas, Scikit-learn, and the like. MIFinLab 
 is doing to financial machine learning what Tensorflow and PyTorch are doing to deep learning."
->
-> \- [Dr. Ernest Chan](https://www.linkedin.com/in/epchan/), Hedge Fund Manager at QTS & Author.
+
+[Dr. Ernest Chan](https://www.linkedin.com/in/epchan/), Hedge Fund Manager at QTS & Author.
 
 >"For many decades, finance has relied on overly simplistic statistical techniques to identify patterns in data. 
 >Machine learning promises to change that by allowing researchers to use modern nonlinear and highly dimensional 
@@ -50,8 +50,8 @@ is doing to financial machine learning what Tensorflow and PyTorch are doing to 
 >
 > MlFinLab provides access to the latest cutting edges methods. MlFinLab is thus essential for quants who want to be 
 >ahead of the technology rather than being replaced by it."
->
-> \- [Dr. Thomas Raffinot](https://www.linkedin.com/in/thomas-raffinot-b75734b/), Financial Data Scientist at ENGIE Global Markets
+
+[Dr. Thomas Raffinot](https://www.linkedin.com/in/thomas-raffinot-b75734b/), Financial Data Scientist at ENGIE Global Markets
 
 ## Unlocking the Commons
 We are currently running a sponsorship model of “Unlocking the Commmons”. Our code base, online documentation, 
