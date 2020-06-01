@@ -23,9 +23,19 @@ Pearson correlation is not the only way of measuring codependence. There are alt
 which are described in the parts of this module.
 
 .. note::
-   In tis module it's discussed whether a particular metric is a true metric.
-   According Arkhangel'skii, A. V. and Pontryagin, L. S. (1990), **General Topology I**:
+   For some methods in this module, it’s discussed whether they are true metrics.
+   According to Arkhangel'skii, A. V. and Pontryagin, L. S. (1990), **General Topology I**:
    A metric on a set :math:`X` is a function (called a distance)
 
    .. math::
-      d: XxX -> [0,+\infin)
+      d: X \times X -> [0,+ \infty) ; x, y, z \in X
+
+   for which the following three axioms are satisfied:
+
+   1. :math:`d(x, y) = 0 \iff x = y` — identity of indiscernibles
+
+   2. :math:`d(x,y) = d(y,x)` — symmetry
+
+   3. :math:`d(x,y) \le d(x,z) + d(z,y)` — triangle inequality
+
+   and these imply :math:`d(x,y) \ge 0` — non-negativity
