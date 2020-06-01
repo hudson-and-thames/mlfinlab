@@ -68,6 +68,19 @@ is doing to financial machine learning what Tensorflow and PyTorch are doing to 
 
 \- `Dr. Ernest Chan <https://www.linkedin.com/in/epchan/>`_, Hedge Fund Manager at QTS & Author.
 
+|
+
+"For many decades, finance has relied on overly simplistic statistical techniques to identify patterns in data.
+Machine learning promises to change that by allowing researchers to use modern nonlinear and highly dimensional
+techniques. Yet, applying those machine learning algorithms to model financial problems is easier said than done:
+finance is not a plug-and-play subject as it relates to machine learning.
+
+MlFinLab provides access to the latest cutting edges methods. MlFinLab is thus essential for quants who want to be
+ahead of the technology rather than being replaced by it."
+
+\- `Dr. Thomas Raffinot <https://www.linkedin.com/in/thomas-raffinot-b75734b/>`_, Financial Data Scientist at ENGIE Global Markets
+
+
 Unlocking the Commons
 #####################
 
