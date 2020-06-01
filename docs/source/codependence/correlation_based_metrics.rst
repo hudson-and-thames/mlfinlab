@@ -22,11 +22,10 @@ It is calculated as:
 Where :math:`dCov[X, Y]` can be interpreted as the average Hadamard product of the doubly-centered Euclidean distance matrices of
 :math:`X, Y`. (`Cornell lecture slides, p.7 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_)
 
-Values of distance correlation fall in range:
+Values of distance correlation fall in the range:
 
 .. math::
     0 \leq \rho_{dist}[X, Y] \leq 1
-
 
 Distance correlation is equal to zero if and only if the two variables are independent (in contrast to Pearson correlation
 that can be zero even if the variables are dependant).
@@ -40,32 +39,48 @@ As shown in the figure below, distance correlation captures the nonlinear relati
    :scale: 70 %
    :align: center
 
-
 The numbers in the first line are Pearson correlation values and the values in the second line are Distance correlation values.
 This figure is from `"Introducing the discussion paper by Székely and Rizzo" <https://www.researchgate.net/publication/238879872_Introducing_the_discussion_paper_by_Szekely_and_Rizzo>`_
 by Michale A. Newton. It provides a great overview for readers.
 
 Implementation
-==============
+##############
 
 .. py:currentmodule:: mlfinlab.codependence.correlation
 
 .. autofunction:: distance_correlation
 
+Standard Angular Distance
+=========================
 
-Angular Distance
-================
+**Angular distance** is a slight modification of the Pearson correlation coefficient which satisfies all distance metric conditions.
+This measure is known as the angular distance because when we use *covariance* as an *inner product*, we can interpret correlation as :math:`cos\theta`.
 
-**Angular distance** is a slight modification of the correlation coefficient which satisfies all distance metric conditions.
-This measure is known as the angular distance because when we use *covariance* as *inner product*, we can interpret correlation as :math:`cos\theta`.
+A proof that angular distance is a true metric can be found in the work by Lopez de Prado
+`Building Diversified Portfolios that Outperform Out-of-Sample: <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_
 
-It is a metric, because it is a linear multiple of the Euclidean distance between the vectors :math:`X, Y` (after standardization)
-(`Cornell lecture slides, p.10 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_).
+"Angular distance is a linear multiple of the Euclidean distance between the vectors :math:`\{X, Y\}` after z-standardization,
+hence it inherits the true-metric properties of the Euclidean distance."
 
-There are three types of angular distance: standard, absolute and squared.
+According to Lopez de Prado:
 
-Standard
-========
+"The [standard angular distance] metric deems more distant two random variables with negative correlation than two random
+variables with positive correlation".
+
+"This property makes sense in many applications. For example, we may wish to build a **long-only portfolio**, where holdings
+in negative-correlated securities can only offset risk, and therefore should be treated as different for diversification purposes".
+
+Formula used to calculate standard angular distance:
+
+.. math::
+    d_\rho[X, Y] = \sqrt{\frac{1}{2}(1-\rho[X,Y])}
+
+where :math:`\rho[X,Y]` is Pearson correlation between the vectors :math:`\{X, Y\}` .
+
+Values of standard angular distance fall in the range:
+
+.. math::
+    d_\rho[X, Y] \in [0, 1]
 
 .. figure:: images/angular_distance.png
    :scale: 70 %
@@ -75,18 +90,31 @@ Standard
 
    The angular distance satisfies all the conditions of a true metric, (Lopez de Prado, 2020.)
 
+Implementation
+##############
 
 .. autofunction:: angular_distance
 
-.. math::
-    d_\rho[X, Y] = \sqrt{\frac{1}{2}(1-\rho[X,Y])}
+Absolute Angular Distance
+=========================
+
+This modification of angular distance uses an absolute value of Pearson correlation in the formula.
+
+This property assigns small distance to elements that have a high negative correlation. According to Lopez de Prado, this
+is useful because "in **long-short portfolios**, we often prefer to consider highly negatively-correlated securities as similar,
+because the position sign can override the sign of the correlation".
+
+Formula used to calculate absolute angular distance:
 
 .. math::
-    d_\rho \in [0, 1]
+    d_{|\rho|}[X, Y] = \sqrt{1-|\rho[X,Y]|}
 
+where :math:`\rho[X,Y]` is Pearson correlation between the vectors :math:`\{X, Y\}` .
 
-Absolute and Squared
-====================
+Values of absolute angular distance fall in the range:
+
+.. math::
+    d_{|\rho|}[X, Y] \in [0, 1]
 
 .. figure:: images/modified_angular_distance.png
    :scale: 70 %
@@ -97,18 +125,36 @@ Absolute and Squared
    In some financial applications, it makes more sense to apply a modified definition of angular distance, such that the
    sign of the correlation is ignored, (Lopez de Prado, 2020)
 
-**Absolute**
-
-.. math::
-    d_{|\rho|}[X, Y] = \sqrt{1-|\rho[X,Y]|}
+Implementation
+##############
 
 .. autofunction:: absolute_angular_distance
 
-|
+Squared Angular Distance
+=========================
 
-**Squared**
+Squared angular distance uses the squared value of Pearson correlation in the formula and has similar properties to absolute
+angular distance. The only difference is that a higher distance is assigned to the elements that have a small absolute correlation.
+
+Formula used to calculate squared angular distance:
 
 .. math::
     d_{\rho^2}[X, Y] = \sqrt{1-{\rho[X,Y]}^2}
+
+where :math:`\rho[X,Y]` is Pearson correlation between the vectors :math:`\{X, Y\}` .
+
+Values of squared angular distance fall in the range:
+
+.. math::
+    d_{\rho^2}[X, Y] \in [0, 1]
+
+.. figure:: images/modified_angular_distance.png
+   :scale: 70 %
+   :align: center
+   :figclass: align-center
+   :alt: Modified Angular Distance
+
+Implementation
+##############
 
 .. autofunction:: squared_angular_distance
