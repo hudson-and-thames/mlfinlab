@@ -235,12 +235,18 @@ This project is licensed under an all rights reserved licence.
 
     implementations/data_structures
     implementations/filters
-    implementations/codependence
-    implementations/codependence_marti
     implementations/frac_diff
     implementations/structural_breaks
     implementations/microstructural_features
 
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Codependence
+    :hidden:
+
+    implementations/codependence
+    implementations/codependence_marti
 
 .. toctree::
     :maxdepth: 2
