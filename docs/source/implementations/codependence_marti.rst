@@ -42,20 +42,20 @@ Following the work of Marti:
 - it is not robust to noise
 - it may be undefined if the distribution of one of these variables have infinite second moment.
 
-More robust correlation coefficients are copula-based dependence measures such as Spearman’s rho":
+More robust correlation coefficients are copula-based dependence measures such as Spearman’s rho:
 
 .. math::
     \rho_{S}(X, Y) &= 12 E[F_{X}(X), F_{Y}(Y)] - 3 \\
     &= \rho(F_{X}(X), F_{Y}(Y))
 
-"and its statistical estimate":
+and its statistical estimate:
 
 .. math::
     \hat{\rho}_{S}(X, Y) = 1 - \frac{6}{T(T^2-1)}\sum_{t=1}^{T}(X^{(t)}- Y^{(t)})^2
 
 where :math:`X` and :math:`Y` are univariate random variables, :math:`F_{X}(X)` is the cumulative distribution
 function of :math:`X` , :math:`X^{(t)}` is the :math:`t` -th sorted observation of :math:`X` , and :math:`T` is the
-total number of observations.
+total number of observations".
 
 Our method is a wrapper for the scipy spearmanr function. For more details about the function and its parameters,
 please visit `scipy documentation <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.spearmanr.html>`_.
@@ -88,7 +88,7 @@ and
 
 .. math::
     d_{0}^{2}(G_{X}, G_{Y}) = \frac{1}{2} \int_{R} (\sqrt{\frac{d G_{X}}{d \lambda}} -
-    \sqrt{\frac{d G_{Y}}{d \lambda}})^{2} d \lambda \text{"}
+    \sqrt{\frac{d G_{Y}}{d \lambda}})^{2} d \lambda  "
 
 For two Gaussian random variables, the distance :math:`d_{\Theta}` is therefore defined by Marti as:
 
@@ -98,7 +98,7 @@ For two Gaussian random variables, the distance :math:`d_{\Theta}` is therefore 
 .. math::
     d_{\Theta}^{2}(X, Y) = \Theta \frac{1 - \rho_{S}}{2} + (1 - \Theta) (1 -
     \sqrt{\frac{2 \sigma_{X} \sigma_{Y}}{\sigma_{X}^{2} + \sigma_{Y}^{2}}} e^{ -
-    \frac{1}{4} \frac{(\mu_{X} - \mu_{Y})^{2}}{\sigma_{X}^{2} + \sigma_{Y}^{2}}}) \text{"}
+    \frac{1}{4} \frac{(\mu_{X} - \mu_{Y})^{2}}{\sigma_{X}^{2} + \sigma_{Y}^{2}}})  "
 
 The use of this distance is referenced as the generic parametric representation (GPR) approach.
 
@@ -106,7 +106,7 @@ From the paper:
 
 "GPR distance is a fast and good proxy for distance :math:`d_{\Theta}` when the first two moments :math:`\mu`
 and :math:`{\sigma}` predominate. Nonetheless, for datasets which contain heavy-tailed distributions,
-GPR fails to capture this information."
+GPR fails to capture this information".
 
 .. Tip::
    The process of deriving this definition as well as a proof that :math:`d_{\Theta}` is a metric is present in the work:
@@ -144,7 +144,7 @@ and
 :math:`h` being here a suitable bandwidth, and
 :math:`g_{X}^{h}(x) = \frac{1}{T} \sum_{t = 1}^{T} \mathbf{1}(\lfloor \frac{x}{h} \rfloor h \le X^{t} <
 (\lfloor \frac{x}{h} \rfloor + 1)h)` being a density histogram estimating dpf :math:`g_{X}` from
-:math:`(X^{t})_{t=1}^{T}` , :math:`T` realization of random variable :math:`X \in \nu` ."
+:math:`(X^{t})_{t=1}^{T}` , :math:`T` realization of random variable :math:`X \in \nu` ".
 
 Use of this distance is referenced as the generic non-parametric representation (GNPR) approach.
 
@@ -157,12 +157,12 @@ As written in the paper:
 
     (ii) dependence information (θ = 1), and
 
-    (iii) a mix of both information (θ = 0:5).
+    (iii) a mix of both information (θ = 0,5).
 
 Ideally, :math:`\Theta` should reflect the balance of dependence and distribution information in the data.
 In a supervised setting, one could select an estimate :math:`\hat{\Theta}` of the right balance :math:`\Theta^{*}`
 optimizing some loss function by techniques such as cross-validation. Yet, the lack of a clear loss function makes
-the estimation of :math:`\Theta^{*}` difficult in an unsupervised setting"
+the estimation of :math:`\Theta^{*}` difficult in an unsupervised setting".
 
 Implementation
 ==============
