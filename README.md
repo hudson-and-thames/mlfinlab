@@ -38,10 +38,17 @@ This package has its foundations in the two graduate level textbooks:
 </div>
 
 ## Praise for MlFinLab
+> “Financial markets are complex systems like no other. Extracting signal from financial data requires specialized tools
+> that are distinct from those used in general machine learning. The MlFinLab package compiles important algorithms 
+>that every quant should know and use.”
+
+[Dr. Marcos Lopez de Prado](https://www.linkedin.com/in/lopezdeprado/), Co-founder and CIO at True Positive Technologies; Professor of Practice at Cornell University
+
+
 >"Those who doubt open source libraries just need to look at the impact of Pandas, Scikit-learn, and the like. MIFinLab 
 is doing to financial machine learning what Tensorflow and PyTorch are doing to deep learning."
 
-[Dr. Ernest Chan](https://www.linkedin.com/in/epchan/), Hedge Fund Manager at QTS & Author.
+[Dr. Ernest Chan](https://www.linkedin.com/in/epchan/), Hedge Fund Manager at QTS & Author
 
 >"For many decades, finance has relied on overly simplistic statistical techniques to identify patterns in data. 
 >Machine learning promises to change that by allowing researchers to use modern nonlinear and highly dimensional 
