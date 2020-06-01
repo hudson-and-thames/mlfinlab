@@ -9,10 +9,12 @@ Correlation-Based Metrics
 =========================
 
 Distance Correlation
-********************
+====================
 
-**Distance Correlation** can capture not only linear association but also non-linear variable dependencies which Pearson correlation can not.
-It was introduced in 2005 by Gábor J. Szekely. (`wikipedia <https://en.wikipedia.org/wiki/Distance_correlation>`_)
+**Distance correlation** can capture not only linear association but also non-linear variable dependencies which Pearson correlation can not.
+It was introduced in 2005 by Gábor J. Szekely and is described in the work
+`"Measuring and testing independence by correlation of distances". <https://projecteuclid.org/download/pdfview_1/euclid.aos/1201012979>`_
+It is calculated as:
 
 .. math::
     \rho_{dist}[X, Y] = \frac{dCov[X, Y]}{\sqrt{dCov[X, X]dCov[Y,Y}}
@@ -20,19 +22,19 @@ It was introduced in 2005 by Gábor J. Szekely. (`wikipedia <https://en.wikipedi
 Where :math:`dCov[X, Y]` can be interpreted as the average Hadamard product of the doubly-centered Euclidean distance matrices of
 :math:`X, Y`. (`Cornell lecture slides, p.7 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_)
 
-Then
+Values of distance correlation fall in range:
 
 .. math::
     0 \leq \rho_{dist}[X, Y] \leq 1
 
 
-| Unlike Pearson's correlation, when the value is zero, we can say the two variables are independent.
+Distance correlation is equal to zero if and only if the two variables are independent (in contrast to Pearson correlation
+that can be zero even if the variables are dependant).
 
 .. math::
     \rho_{dist}[X, Y] = 0 \Leftrightarrow X \perp Y
 
-
-| As shown in the figure below, Distance Correlation captures the nonlinear relationship.
+As shown in the figure below, distance correlation captures the nonlinear relationship.
 
 .. image:: images/distance_correlation.png
    :scale: 70 %
@@ -40,7 +42,7 @@ Then
 
 
 The numbers in the first line are Pearson correlation values and the values in the second line are Distance correlation values.
-This figure is from `Introducing the discussion paper by Székely and Rizzo <https://www.researchgate.net/publication/238879872_Introducing_the_discussion_paper_by_Szekely_and_Rizzo>`_
+This figure is from `"Introducing the discussion paper by Székely and Rizzo" <https://www.researchgate.net/publication/238879872_Introducing_the_discussion_paper_by_Szekely_and_Rizzo>`_
 by Michale A. Newton. It provides a great overview for readers.
 
 Implementation
@@ -52,9 +54,9 @@ Implementation
 
 
 Angular Distance
-*****************
+================
 
-**Angular Distance** is a slight modification of the correlation coefficient which satisfies all distance metric conditions.
+**Angular distance** is a slight modification of the correlation coefficient which satisfies all distance metric conditions.
 This measure is known as the angular distance because when we use *covariance* as *inner product*, we can interpret correlation as :math:`cos\theta`.
 
 It is a metric, because it is a linear multiple of the Euclidean distance between the vectors :math:`X, Y` (after standardization)
