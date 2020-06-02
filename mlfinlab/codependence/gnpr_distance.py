@@ -35,7 +35,7 @@ def spearmans_rho(x: np.array, y: np.array) -> float:
 
 def gpr_distance(x: np.array, y: np.array, theta: float) -> float:
     """
-    Calculates the distance between to Gaussians under the Generic Parametric Representation (GPR) approach.
+    Calculates the distance between two Gaussians under the Generic Parametric Representation (GPR) approach.
 
     According to the original work https://www.researchgate.net/publication/322714557 (p.70):
     "This is a fast and good proxy for distance d_theta when the first two moments ... predominate". But it's not
@@ -48,10 +48,10 @@ def gpr_distance(x: np.array, y: np.array, theta: float) -> float:
 
     With theta in [0, 1] the distance lies in range [0, 1] and is a metric. (See original work for proof, p.71)
 
-    :param x: (np.array) X vector
-    :param y: (np.array) Y vector (same number of observations as X)
-    :param theta: (float) Type of information being tested. Falls in range [0, 1]
-    :return: (float) Distance under GPR approach
+    :param x: (np.array) X vector.
+    :param y: (np.array) Y vector (same number of observations as X).
+    :param theta: (float) Type of information being tested. Falls in range [0, 1].
+    :return: (float) Distance under GPR approach.
     """
 
     # Calculating the GPR distance
@@ -75,11 +75,11 @@ def gnpr_distance(x: np.array, y: np.array, theta: float, bandwidth: float = 0.0
 
     With theta in [0, 1] the distance lies in range [0, 1] and is a metric. (See original work for proof, p.71)
 
-    :param x: (np.array) X vector
-    :param y: (np.array) Y vector (same number of observations as X)
-    :param theta: (float) Type of information being tested. Falls in range [0, 1]
-    :param bandwidth: (float) Bandwidth to use for splitting the X and Y vector observations (0.01 by default)
-    :return: (float) Distance under GNPR approach
+    :param x: (np.array) X vector.
+    :param y: (np.array) Y vector (same number of observations as X).
+    :param theta: (float) Type of information being tested. Falls in range [0, 1].
+    :param bandwidth: (float) Bandwidth to use for splitting the X and Y vector observations. (0.01 by default)
+    :return: (float) Distance under GNPR approach.
     """
 
     # Number of observations
