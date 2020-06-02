@@ -335,7 +335,7 @@ variables - :py:mod:`covariance` and :py:mod:`expected_returns` - declared in th
     this same variable name whenever you want to include it in one of your custom variable declarations. Refer to the above code
     snippet for an example.
 
-    |h4| Calling cvxpy |h4_|
+    |h4| Calling CVXPY |h4_|
 
     Internally, cvxpy is imported as follows:
 
