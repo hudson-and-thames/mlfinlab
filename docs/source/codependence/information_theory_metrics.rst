@@ -19,7 +19,7 @@ Where :math:`X` is a discrete random variable that takes a value :math:`x` from 
 :math:`p[x]` .
 
 In short, we can say that entropy is the expectation of the amount of information when we sample from a particular probability
-distribution or the number of bits to transmit to the target. So, if there is correspondence between random variables,
+distribution or the number of bits to transmit to the target. So, if there is a correspondence between random variables,
 the correspondence will be reflected in entropy. For example, if two random variables are associated, the amount of
 information in the joint probability distribution of the two random variables will be less than the sum of the information
 in each random variable. This is because knowing a correspondence means knowing one random variable can reduce uncertainty
@@ -87,7 +87,7 @@ Variation of Information
 ========================
 
 According to Lopez de Prado: "**Variation of Information** can be interpreted as the uncertainty we expect in one variable
-if we are told the value of another". Variation of information is a metric and satisfies the axioms from the introduction.
+if we are told the value of another". The variation of information is a true metric and satisfies the axioms from the introduction.
 
 .. math::
    \begin{align*}
@@ -97,7 +97,7 @@ if we are told the value of another". Variation of information is a metric and s
    \end{align*}
 
 The upper bound of Variation of information is not firm as it depends on the sizes of the population which is problematic
-when comparing variations of informatiion acriss different population sizes, as described in
+when comparing variations of information across different population sizes, as described in
 `Cornell lecture slides, p.21 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_
 
 Implementation
