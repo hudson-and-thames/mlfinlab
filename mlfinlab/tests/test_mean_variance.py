@@ -149,6 +149,7 @@ class TestMVO(unittest.TestCase):
                                                                                  resample_by='W')
         covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
         plot = mvo.plot_efficient_frontier(covariance=covariance,
+                                           max_return=1.0,
                                            expected_asset_returns=expected_returns)
         assert plot.axes.xaxis.label._text == 'Volatility'
         assert plot.axes.yaxis.label._text == 'Return'

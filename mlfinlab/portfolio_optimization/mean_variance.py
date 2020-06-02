@@ -206,7 +206,7 @@ class MeanVarianceOptimisation:
                               expected_asset_returns=expected_returns,
                               solution='efficient_risk',
                               target_return=portfolio_return)
-                volatilities.append(self.portfolio_risk)
+                volatilities.append(self.portfolio_risk ** 0.5)
                 returns.append(portfolio_return)
                 sharpe_ratios.append((portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5 + 1e-16))
             except Exception:

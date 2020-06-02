@@ -212,7 +212,11 @@ where :math:`\sigma^{2}_t` is the target portfolio risk set by the investor and 
 Maximum Return - Minimum Volatility
 ********************************************
 
-This is often referred to as *quadratic risk utility.*
+This is often referred to as *quadratic risk utility.* The objective function consists of both the portfolio return and the risk.
+Thus, minimising the objective relates to minimising the risk and correspondingly maximising the return. Here, :math:`\lambda` is
+the risk-aversion parameter which models the amount of risk the user is willing to take. A higher value means the investor will
+have high defense against risk at the expense of lower returns while a lower value would prefer maximimum returns, neglecting the
+risk associated with it.
 
 .. math::
 
@@ -229,11 +233,186 @@ This is often referred to as *quadratic risk utility.*
 Maximum Diversification
 ***********************
 
+Maximum diversification portfolio tries to diversify the holdings across as many assets as possible. In the 2008 paper, `Toward Maximum Diversification <https://blog.thinknewfound.com/2018/12/maximizing-diversification/#easy-footnote-bottom-1-6608>`_, the diversification ratio, :math:`D`, of a portfolio, is defined as:
+
+.. math::
+
+    \begin{equation*}
+        \begin{aligned}
+            & D = \frac{w^{T}\sigma}{\sqrt{w^{T}\sum w}}\\
+        \end{aligned}
+    \end{equation*}
+
+where :math:`\sigma` is the vector of volatilities and :math:`\sum` is the covariance matrix. The term in the denominator is the
+volatility of the portfolio and the term in the numerator is the weighted average volatility of the assets. More diversification
+within a portfolio decreases the denominator and leads to a higher diversification ratio. The corresponding objective function and
+the constraints are:
+
+.. math::
+
+    \begin{equation*}
+        \begin{aligned}
+            & \underset{\mathbf{w}}{\text{max}} & &  D\\
+            & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+            &&& w_{j} \geq 0, j=1,..,N \\
+        \end{aligned}
+    \end{equation*}
+
+**Solution String:** ``max_diversification``
+
+.. tip::
+    |h4| Underlying Literature |h4_|
+    You can read more about maximum diversification portfolio in the following blog post on the website *Flirting with Models:* `Maximizing Diversification <https://blog.thinknewfound.com/2018/12/maximizing-diversification/>`_.
+
 Maximum Decorrelation
 **********************
 
+For this solution, the objective is to minimise the correlation between the assets of a portfolio
+
+.. math::
+
+    \begin{equation*}
+        \begin{aligned}
+            & \underset{\mathbf{w}}{\text{min}} & &  w^TA w\\
+            & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+            &&& w_{j} \geq 0, j=1,..,N \\
+        \end{aligned}
+    \end{equation*}
+
+where :math:`A` is the correlation matrix of assets. The Maximum Decorrelation portfolio is closely related to Minimum Variance and Maximum Diversification, but applies to the case where an investor believes all assets have similar returns and volatility, but heterogeneous correlations. It is a Minimum Variance optimization that is performed on the correlation matrix rather than the covariance matrix, :math:`\sum`.
+
+**Solution String:** ``max_decorrelation``
+
+.. tip::
+    |h4| Underlying Literature |h4_|
+    You can read more on maximum decorrelation portfolio in the following blog post: `Max Decorrelation Portfolio <https://systematicedge.wordpress.com/2013/05/12/max-decorrelation-portfolio/>`_.
+
+Creating a Custom Portfolio Allocation
+######################################
+
+For most of the users, the above solutions will be enough for their use-cases. However, we also provide a way for users to create
+their custom portfolio problem. **This includes complete flexibility to specify the input, optimisation variables, objective function and the corresponding constraints**. Let us go through the step-by-step process of formulating your own allocation problem:
+
+Non-CVXPY Variables
+**********************
+
+The first step is to specify input variables not related to cvxpy (i.e. not defined as cvxpy variable objects, :py:mod:`cvxpy.Variable`). This can include anything ranging from raw asset prices data to historical returns to integer or string variables. All data types are supported - ``int``, ``float``, ``str``, ``Numpy matrices/lists``, ``Python lists``, ``dataframe``.
+
+.. code-block::
+
+    data = pd.read_csv('stock_prices.csv', parse_dates=True, index_col="Date")
+    non_cvxpy_variables = {
+            'asset_prices': data,
+            'num_assets': data.shape[1],
+            'covariance': data.cov(),
+            'asset_names': data.columns,
+            'expected_returns': ReturnsEstimation().calculate_mean_historical_returns(asset_prices=data, resample_by='W')
+    }
+
+In the above code example, we initialise a dataframe of historical stock prices and then define the dictionary containing all user
+required input variables. **The key of the dictionary is the variable name and the value is the Pythonic value you want to assign that variable.**
+
+CVXPY Variables
+**********************
+
+The second step is to specify the cvxpy specific variables which are declared in the syntax required by cvxpy. You can include as
+many new variables as you need by initialising a simple Python list with each declaration being a string. **Each of these variables should be a** :py:mod:`cvxpy.Variable` **object.**
+
+.. code-block::
+
+    cvxpy_variables = [
+            'risk = cp.quad_form(weights, covariance)',
+            'portfolio_return = cp.matmul(weights, expected_returns)'
+    ]
+
+Here, we are declaring two new cvxpy variables - :py:mod:`risk` and :py:mod:`portfolio_return`. Note that we are using non-cvxpy
+variables - :py:mod:`covariance` and :py:mod:`expected_returns` - declared in the previous step to initialise the new ones.
+
+.. note::
+    |h4| Variable for Portfolio Weights |h4_|
+
+    Internally, the code declares a Python variable - :py:mod:`weights` - for the final portfolio weights. We request you to use
+    this same variable name whenever you want to include it in one of your custom variable declarations. Refer to the above code
+    snippet for an example.
+
+    |h4| Calling cvxpy |h4_|
+
+    Internally, cvxpy is imported as follows:
+
+    .. code-block::
+
+        import cvxpy as cp
+
+    For creating any cvxpy specific variables, you need to reference the library as :py:mod:`cp` otherwise the code will fail to
+    run and give you an error.
+
 Custom Objective Function
-********************************************
+**************************
+
+The third step is to specify the objective function for our portfolio optimisation problem. You need to simply pass a string form
+of the Python code for the objective function.
+
+.. code-block::
+
+    custom_obj = 'cp.Minimize(risk)'
+
+
+Optimisation Constraints
+**************************
+
+This is an optional step which requires you to specify the constraints for your optimisation problem. Similar to how we specified
+cvxpy variables, the constraints need to be specified as a Python list with each constraint being a string representation.
+
+.. code-block::
+
+    constraints = ['cp.sum(weights) == 1', 'weights >= 0', 'weights <= 1']
+
+**Please note that cvxpy does not support strict inequality constraints -** ``>`` **or** ``<`` **- and will fail to solve your problem if you do specify one.**
+
+Bringing it all together, the code looks like this:
+
+.. code-block::
+
+    mvo = MeanVarianceOptimisation()
+    custom_obj = 'cp.Minimize(risk)'
+    constraints = ['cp.sum(weights) == 1', 'weights >= 0', 'weights <= 1']
+    non_cvxpy_variables = {
+        'num_assets': self.data.shape[1],
+        'covariance': self.data.cov(),
+        'expected_returns': ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+                                                                                  resample_by='W')
+    }
+    cvxpy_variables = [
+        'risk = cp.quad_form(weights, covariance)',
+        'portfolio_return = cp.matmul(weights, expected_returns)'
+    ]
+    mvo.allocate_custom_objective(non_cvxpy_variables=non_cvxpy_variables,
+                                  cvxpy_variables=cvxpy_variables,
+                                  objective_function=custom_obj,
+                                  constraints=constraints)
+    print(mvo.weights)
+
+.. note::
+    |h4| Some Important Miscellaneous Points |h4_|
+
+    * The custom allocation feature still uses cvxpy as the quadratic optimiser. Hence, only convex objective functions are accepted since cvxpy currently does not support non-convex functions. We plan on adding support for non-linear and non-convex objective solutions soon!
+
+    * The order of declaring variables also matters here. All non-cvxpy and cvxpy variables are initialised in a linear order, i.e. traversing dictionary from top to bottom and the list from left to right, hence you need to specify them in the order you want it to. For e.g. the following code is wrong and will give an error,
+
+        .. code-block::
+
+            cvxpy_variables = [
+                'x = cp.quad_form(weights, y)',
+                'y = cp.Variable(1)'
+            ]
+
+      The formula for :py:mod:`x` uses :py:mod:`y`, but due to the order of the list, :py:mod:`y` will be initialised after
+      :py:mod:`x` and give an error.
+
+
+.. warning::
+    Although we have written extensive unittests, the custom allocation code is still in an experimental stage and you may
+    encounter errors which we may have failed to incorporate. We request you to raise an issue `here <https://github.com/hudson-and-thames/mlfinlab/issues>`_ and we will promptly push a fix for this.
 
 Implementation
 ##############
@@ -259,17 +438,18 @@ Implementation
 Plotting
 ########
 
-``plot_efficient_frontier()`` : Plots the efficient frontier. The red dot corresponds to the Maximum Sharpe portfolio.
+``plot_efficient_frontier()`` : Plots the efficient frontier. You can specify the minimum and maximum return till which you want
+the frontier to be displayed.
 
-.. code-block::::
+.. code-block::
 
     mvo = MeanVarianceOptimisation()
-    mvo.allocate(asset_prices=stock_prices, resample_by='B')
-
-    # Assuming there is a stock_returns dataframe
-    mvo.plot_efficient_frontier(covariance=stock_returns.cov(),
-                                expected_asset_returns=stock_returns.mean()*252,
-                                num_assets=len(stock_returns.columns))
+    expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+                                                                             resample_by='W')
+    covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
+    plot = mvo.plot_efficient_frontier(covariance=covariance,
+                                       max_return=1.0,
+                                       expected_asset_returns=expected_returns)
 
 .. image:: portfolio_optimisation_images/efficient_frontier.png
 
