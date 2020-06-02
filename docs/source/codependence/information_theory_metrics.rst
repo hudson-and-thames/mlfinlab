@@ -9,7 +9,7 @@ Information Theory Metrics
 ==========================
 
 We can gauge the codependence from the information theory perspective. In information theory, (Shannon’s) entropy is a
-measure of information (uncertainty). As described in the `Codependence <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_
+measure of information (uncertainty). As described in the `Cornell lecture slides, p.13 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_
 , entropy is calculated as:
 
 .. math::
@@ -19,7 +19,7 @@ Where :math:`X` is a discrete random variable that takes a value :math:`x` from 
 :math:`p[x]` .
 
 In short, we can say that entropy is the expectation of the amount of information when we sample from a particular probability
-distribution or the number of bits to transmit to the target. So, If there is correspondence between random variables,
+distribution or the number of bits to transmit to the target. So, if there is correspondence between random variables,
 the correspondence will be reflected in entropy. For example, if two random variables are associated, the amount of
 information in the joint probability distribution of the two random variables will be less than the sum of the information
 in each random variable. This is because knowing a correspondence means knowing one random variable can reduce uncertainty
@@ -49,17 +49,31 @@ The following figure highlights how we can view the relationships of various inf
 Mutual Information
 ==================
 
-Mutual Information is defined as the decrease in uncertainty (or informational gain) in :math:`X` that results from knowing
-the value of :math:`Y`. Mutual information is not a metric and needs to be normalized. (`Cornell lecture slides, p.18 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_)
+According to Lopez de Prado: "**Mutual Information** is defined as the decrease in uncertainty (or informational gain)
+in :math:`X` that results from knowing the value of :math:`Y`. Mutual information is not a metric as it doesn't satisfy
+the triangle inequality". The properties of non-negativity and symmetry are satisfied. Mutual information is calculated as:
+
 
 .. math::
     \begin{align*}
     I[X, Y]=& H[X] - H[X|Y]\\
-           =& H[X]+H[Y]-H[X,Y]\\
+           =& H[X] + H[Y] - H[X,Y]\\
            =& \sum\limits_{x \in S_{X}} \sum\limits_{y \in S_{Y}}p[x,y]log[\frac{p[x,y]}{p[x]p[y]}]\\
     \end{align*}
 
-* Add about the normalization
+Mutual information has a grouping property:
+
+.. math::
+
+    I[X, Y, Z] = I[X, Y] + I[(X, Y), Z]
+
+where :math:`(X, Y)` is a joint distribution of :math:`X` and :math:`Y` .
+
+It can also be normalized using a known upper boundary:
+
+.. math::
+
+    I[X, Y] \le min\{H[X] + H[Y]\}
 
 Implementation
 ##############
@@ -72,8 +86,8 @@ Implementation
 Variation of Information
 ========================
 
-Variation of Information can be interpreted as the uncertainty we expect in one variable if we are told the value of another.
-Variation of information is a metric because it satisfies non-negativity, symmetry, and triangle inequality axioms.
+According to Lopez de Prado: "**Variation of Information** can be interpreted as the uncertainty we expect in one variable
+if we are told the value of another". Variation of information is a metric and satisfies the axioms from the introduction.
 
 .. math::
    \begin{align*}
@@ -81,6 +95,10 @@ Variation of information is a metric because it satisfies non-negativity, symmet
            =& H[X] + H[Y]-2I[X,Y]\\
            =& 2H[X,Y]-H[X]-H[Y]\\
    \end{align*}
+
+The upper bound of Variation of information is not firm as it depends on the sizes of the population which is problematic
+when comparing variations of informatiion acriss different population sizes, as described in
+`Cornell lecture slides, p.21 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_
 
 Implementation
 ##############
@@ -91,24 +109,37 @@ Implementation
 Discretization
 ==============
 
-Throughout the above section, we have assumed that random variables were discrete.
+Both mutual information and variation of information are using random variables that are discrete. To use these tools for
+continuous random variables the discretization approach can be used.
 
-For the continuous case, we can quantize the values and estimate :math:`H[X]`, and apply the same concepts on the binned observations.
-(`Cornell lecture slides, p.26 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_)
+For the continuous case, we can quantize the values to estimate :math:`H[X]`. Following the `Cornell lecture slides, p.26 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_ :
 
 .. math::
     \begin{align*}
-    H[X] =& \int_{\infty}^{\infty}f_{X}[x_{i}]logf_{X}[x]dx\\
-    \:    &\approx-\sum\limits_{i=1}^{B_{X}}f_{X}[x_{i}]logf_{X}[x_{i}]\\
+    H[X] =& \int_{\infty}^{\infty}f_{X}[x]log[f_{X}[x]]dx\\
+    \:    \approx& -\sum\limits_{i=1}^{B_{X}}f_{X}[x_{i}]log[f_{X}[x_{i}]]\Delta_{x}\\
     \end{align*}
 
-.. math::
-    \hat{H}[X]=-\sum\limits_{i=1}^{B_{X}}\frac{N_{i}}{N}log[\frac{N_{i}}{N}]log[\Delta_{x}]
+where the observed values :math:`\{x\}` are divided into :math:`B_{X}` bins of equal size :math:`\Delta_{X}`,
+:math:`\Delta_{X} = \frac{max\{x\} - min\{x\}}{B_{X}}` , and :math:`f_{X}[x_{i}]` is the frequency of observations
+within the i-th bin.
 
-As you can see from these equations, we need to choose the binning carefully because results may be biased.
-There are optimal binning  depends on entropy case(marginal, joint).
-You can optimal number of bins for discretization through below method.
-This function is need for using methods for getting information based codependence.
+So, the discretized estimator of entropy is:
+
+.. math::
+    \hat{H}[X]=-\sum\limits_{i=1}^{B_{X}}\frac{N_{i}}{N}log[\frac{N_{i}}{N}]log[\Delta_{X}]
+
+where :math:`N_{i}` is the number of observations within the i-th bin, :math:`N = \sum_{i=1}^{B_{X}}N_{i}` .
+
+From the above equations, the size of bins should be chosen. The results of the entropy estimation will depend on the
+binning. The works by `Hacine-Gharbi et al. (2012) <https://www.researchgate.net/publication/257014935>`_  and
+`Hacine-Gharbi and Ravier (2018) <https://www.researchgate.net/publication/320887281>`_  present optimal binning
+for marginal and joint entropy.
+
+This optimal binning method is used in the mutual information and variation of information functions.
+
+Implementation
+##############
 
 .. autofunction:: get_optimal_number_of_bins
 
@@ -120,7 +151,7 @@ The following example highlights how the various metrics behave under various va
 
 1. Linear
 2. Squared
-3.  Y = abs(X)
+3. :math:`Y = abs(X)`
 4. Independent variables
 
 .. code-block::
