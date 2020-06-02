@@ -1,15 +1,15 @@
 """
 Return in excess of mean method
 
-Chapter 5.5, Machine Learning for Factor Investing, by Coqueret and Guida, (2020).
+Chapter 5, Machine Learning for Factor Investing, by Coqueret and Guida, (2020).
 """
 import numpy as np
 
 
 def excess_over_mean(prices, binary=False):
     """
-    Return in excess of mean labelling method. Sourced from "The benefits of tree-based models for stock selection"
-    Zhu et al. (2012).
+    Return in excess of mean labeling method. Sourced from Chapter 5.5.1 of Machine Learning for Factor Investing,
+    by Coqueret, G. and Guida, T. (2020).
 
     Returns a DataFrame containing returns of stocks over the mean of all stocks in the portfolio. Returns a DataFrame
     of signs of the returns if binary is True. In this case, an observation may be labelled as 0 if it itself is the
