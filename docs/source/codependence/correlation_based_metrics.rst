@@ -160,6 +160,30 @@ Implementation
 .. autofunction:: squared_angular_distance
 
 Examples
-########
+========
 
-Add
+The following examples show how the described above correlation-based metrics can be used on real data:
+
+
+.. code-block::
+
+    import pandas as pd
+    from mlfinlab.codependece import distance_correlation, angular_distance, absolute_angular_distance, squared_angular_distance
+
+    # Import dataframe of returns for assets in a portfolio
+    asset_returns = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)
+
+    asset1 = 'SPY'
+    asset2 = 'TLT'
+
+    # Calculate distance correlation between chosen assets
+    distance_corr = distance_correlation(asset_returns[asset1], asset_returns[assets2])
+
+    # Calculate angular distance between chosen assets
+    angular_dist = angular_distance(asset_returns[asset1], asset_returns[assets2])
+
+    # Calculate absolute angular distance between chosen assets
+    angular_dist = absolute_angular_distance(asset_returns[asset1], asset_returns[assets2])
+
+    # Calculate squared angular distance between chosen assets
+    angular_dist = squared_angular_distance(asset_returns[asset1], asset_returns[assets2])
