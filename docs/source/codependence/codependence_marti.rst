@@ -33,7 +33,7 @@ From risk perspective, the answer is no [...], hence the propounded distance of 
    papers that prove the above statements.
 
 Spearman’s Rho
-##############
+==============
 
 Following the work of Marti:
 
@@ -61,14 +61,14 @@ Our method is a wrapper for the scipy spearmanr function. For more details about
 please visit `scipy documentation <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.spearmanr.html>`_.
 
 Implementation
-==============
+##############
 
 .. py:currentmodule:: mlfinlab.codependence.gnpr_distance
 
 .. autofunction:: spearmans_rho
 
 Generic Parametric Representation (GPR) distance
-################################################
+================================================
 
 Theoretically, Marty defines the distance :math:`d_{\Theta}` between two random variables as:
 
@@ -114,12 +114,12 @@ GPR fails to capture this information".
 
 
 Implementation
-==============
+##############
 
 .. autofunction:: gpr_distance
 
 Generic Non-Parametric Representation (GNPR) distance
-#####################################################
+=====================================================
 
 The statistical estimate of the distance :math:`\tilde{d}_{\Theta}` working on realizations of the i.i.d. random variables
 is defined by the author as:
@@ -165,12 +165,12 @@ optimizing some loss function by techniques such as cross-validation. Yet, the l
 the estimation of :math:`\Theta^{*}` difficult in an unsupervised setting".
 
 Implementation
-==============
+##############
 
 .. autofunction:: gnpr_distance
 
-Example
-*******
+Examples
+========
 
 The following example shows how the above functions can be used:
 
@@ -181,6 +181,7 @@ The following example shows how the above functions can be used:
 
    # Getting the dataframe with time series of returns
    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+
    element_x = 'SPY'
    element_y = 'TLT'
 

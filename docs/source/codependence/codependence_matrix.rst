@@ -1,28 +1,25 @@
 .. _codependence-codependence_matrix:
 
-.. note::
-   The following implementations and documentation, closely follows the lecture notes notes from Cornell University, by Marcos Lopez de Prado:
-   `Codependence (Presentation Slides) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_.
-
 ===================
 Codependence Matrix
 ===================
 
-This module consists two functions that generate the following:
+The functions in this part of the module are used to generate dependence and distance matrices using the codependency and
+distance metrics described previously.
 
-1. **Dependence Matrix** to compute dependence of a given matrix using various codependence methods like Mutual Information,
-   Variation of Information, Distance Correlation, Spearman's Rho, GPR distance, and GNPR distance.
-2. **Distance Matrix** can used to compute distance of a given matrix using various metrics like angular, squared
-   angular and absolute angular.
+1. **Dependence Matrix** function is used to compute dependence of a given dataframe of elements using various codependence
+   methods like Mutual Information, Variation of Information, Distance Correlation, Spearman's Rho, GPR distance,
+   and GNPR distance.
+
+2. **Distance Matrix** function can be used to compute distance of a given codependency matrix using distances like
+   angular, squared angular and absolute angular.
 
 .. note::
 
-   MlFinLab makes use of these functions in the clustered feature importance.
-
-   The Spearman's Rho, GPR distance, and GNPR distance are described in the **Codependence by Marti** section of the docs.
+   MlFinLab makes use of these functions in the clustered feature importance and portfolio optimization modules.
 
 Implementation
-**************
+==============
 
 .. py:currentmodule:: mlfinlab.codependence.codependence_matrix
 .. autofunction:: get_dependence_matrix
@@ -30,7 +27,7 @@ Implementation
 
 
 Example
-*******
+=======
 
 .. code-block::
 
@@ -38,7 +35,14 @@ Example
    from mlfinlab.codependence.codependence_matrix import (get_dependence_matrix,
                                                           get_distance_matrix)
 
-   X = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+    # Import dataframe of returns for assets in a portfolio
+    asset_returns = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)
 
-   dep_matrix = get_dependence_matrix(X, dependence_method='distance_correlation')
-   dist_matrix = get_distance_matrix(dep_matrix, distance_metric='angular')
+    # Calculate distance correlation matrix
+    distance_corr = get_dependence_matrix(asset_returns, dependence_method='distance_correlation')
+
+    # Calculate Pearson correlation matrix
+    pearson_corr = asset_returns.corr()
+
+    # Calculate absolute angular distance from a Pearson correlation matrix
+    abs_angular_dist = absolute_angular_distance(pearson_corr)
