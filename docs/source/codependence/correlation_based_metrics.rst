@@ -158,3 +158,8 @@ Implementation
 ##############
 
 .. autofunction:: squared_angular_distance
+
+Examples
+########
+
+Add

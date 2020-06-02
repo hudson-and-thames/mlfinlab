@@ -9,21 +9,27 @@ Information Theory Metrics
 ==========================
 
 We can gauge the codependence from the information theory perspective. In information theory, (Shannon’s) entropy is a
-measure of information (uncertainty).
+measure of information (uncertainty). As described in the `Codependence <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_
+, entropy is calculated as:
 
 .. math::
     H[X] = -\sum\limits_{x \in S_{X}}p[x]log[p[x]]
 
-In short, we can say that entropy is the expectation of the amount of information when we sample from a particular probability distribution or the number of bits to transmit to the target.
-So, If there is correspondence between random variables, the correspondence will be reflected in entropy. For example, if two random variables are associated,
-the amount of information in the joint probability distribution of the two random variables will be less than the sum of the information in each random variable.
-This is because knowing a correspondence means knowing one random variable can reduce uncertainty about the other random variable.
+Where :math:`X` is a discrete random variable that takes a value :math:`x` from the set :math:`S_{X}` with probability
+:math:`p[x]` .
+
+In short, we can say that entropy is the expectation of the amount of information when we sample from a particular probability
+distribution or the number of bits to transmit to the target. So, If there is correspondence between random variables,
+the correspondence will be reflected in entropy. For example, if two random variables are associated, the amount of
+information in the joint probability distribution of the two random variables will be less than the sum of the information
+in each random variable. This is because knowing a correspondence means knowing one random variable can reduce uncertainty
+about the other random variable.
 
 .. math::
     H[X+Y] = H[X] + H[Y],  X \bot Y
 
 
-Here, we have two ways of measuring correspondence:
+This module presents two ways of measuring correspondence:
 
 1. Mutual Information
 2. Variation of Information
@@ -41,10 +47,10 @@ The following figure highlights how we can view the relationships of various inf
    The correspondence between joint entropy, marginal entropies, conditional entropies, mutual information and variation of information (Lopez de Prado, 2020)
 
 Mutual Information
-******************
+==================
 
-Mutual Information is defined as the decrease in uncertainty (or informational gain) in X that results from knowing the value of Y.
-Mutual information is not a metric and needs to be normalized. (`Cornell lecture slides, p.18 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_)
+Mutual Information is defined as the decrease in uncertainty (or informational gain) in :math:`X` that results from knowing
+the value of :math:`Y`. Mutual information is not a metric and needs to be normalized. (`Cornell lecture slides, p.18 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_)
 
 .. math::
     \begin{align*}
@@ -53,13 +59,18 @@ Mutual information is not a metric and needs to be normalized. (`Cornell lecture
            =& \sum\limits_{x \in S_{X}} \sum\limits_{y \in S_{Y}}p[x,y]log[\frac{p[x,y]}{p[x]p[y]}]\\
     \end{align*}
 
+* Add about the normalization
+
+Implementation
+##############
+
 .. py:currentmodule:: mlfinlab.codependence.information
 
 .. autofunction:: get_mutual_info
 
 
 Variation of Information
-************************
+========================
 
 Variation of Information can be interpreted as the uncertainty we expect in one variable if we are told the value of another.
 Variation of information is a metric because it satisfies non-negativity, symmetry, and triangle inequality axioms.
@@ -71,11 +82,14 @@ Variation of information is a metric because it satisfies non-negativity, symmet
            =& 2H[X,Y]-H[X]-H[Y]\\
    \end{align*}
 
+Implementation
+##############
+
 .. autofunction::  variation_of_information_score
 
 
 Discretization
-**************
+==============
 
 Throughout the above section, we have assumed that random variables were discrete.
 
@@ -100,7 +114,7 @@ This function is need for using methods for getting information based codependen
 
 
 Examples
-########
+========
 
 The following example highlights how the various metrics behave under various variable dependencies:
 
