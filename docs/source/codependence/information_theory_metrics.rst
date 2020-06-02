@@ -1,7 +1,7 @@
 .. _codependence-information_theory_metrics:
 
 .. note::
-   The following implementations and documentation, closely follows the lecture notes notes from Cornell University, by Marcos Lopez de Prado:
+   The following implementations and documentation, closely follows the lecture notes from Cornell University, by Marcos Lopez de Prado:
    `Codependence (Presentation Slides) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_.
 
 ==========================
@@ -36,7 +36,7 @@ This module presents two ways of measuring correspondence:
 
 
 The following figure highlights how we can view the relationships of various information measures associated with correlated variables
-:math:`X` and :math:`Y` through below figure. (`Cornell lecture slides, p.24 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_)
+:math:`X` and :math:`Y` through the below figure. (`Cornell lecture slides, p.24 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_)
 
 .. figure:: images/entropy_relation_diagram.png
    :scale: 70 %
@@ -131,7 +131,7 @@ So, the discretized estimator of entropy is:
 
 where :math:`N_{i}` is the number of observations within the i-th bin, :math:`N = \sum_{i=1}^{B_{X}}N_{i}` .
 
-From the above equations, the size of bins should be chosen. The results of the entropy estimation will depend on the
+From the above equations, the size of the bins should be chosen. The results of the entropy estimation will depend on the
 binning. The works by `Hacine-Gharbi et al. (2012) <https://www.researchgate.net/publication/257014935>`_  and
 `Hacine-Gharbi and Ravier (2018) <https://www.researchgate.net/publication/320887281>`_  present optimal binning
 for marginal and joint entropy.

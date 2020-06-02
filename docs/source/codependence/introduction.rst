@@ -7,7 +7,7 @@ Introduction
 This module includes implementations of codependence metrics. According to Lopez de Prado:
 
 "Two random variables are codependent when knowing the value of one helps us determine the value of the other.
-This should not me confounded with the notion of causality."
+This should not be confounded with the notion of causality."
 
 Pearson correlation coefficient is the most famous and widely used measure of codependence, however, it has some drawbacks.
 
@@ -25,17 +25,17 @@ which are described in the parts of this module.
 .. note::
    For some methods in this module, it’s discussed whether they are true metrics.
    According to Arkhangel'skii, A. V. and Pontryagin, L. S. (1990), **General Topology I**:
-   A metric on a set :math:`X` is a function (called a distance)
+   A metric on a set :math:`X` is a function (called a distance):
 
    .. math::
-      d: X \times X -> [0,+ \infty) ; x, y, z \in X
+      d: X \times X \rightarrow [0,+ \infty) ;   x, y, z \in X
 
    for which the following three axioms are satisfied:
 
-   1. :math:`d(x, y) = 0 \iff x = y` — identity of indiscernibles
+   1. :math:`d(x, y) = 0 \iff x = y` — identity of indiscernibles;
 
-   2. :math:`d(x,y) = d(y,x)` — symmetry
+   2. :math:`d(x,y) = d(y,x)` — symmetry;
 
-   3. :math:`d(x,y) \le d(x,z) + d(z,y)` — triangle inequality
+   3. :math:`d(x,y) \le d(x,z) + d(z,y)` — triangle inequality;
 
-   and these imply :math:`d(x,y) \ge 0` — non-negativity
+   and these imply :math:`d(x,y) \ge 0` — non-negativity.

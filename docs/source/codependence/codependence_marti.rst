@@ -1,7 +1,7 @@
 .. _implementations-codependence_marti:
 
 .. note::
-   The following implementations and documentation closely follows the work of Gautier Marti:
+   The following implementations and documentation closely follow the work of Gautier Marti:
    `Some contributions to the clustering of financial time series and applications to credit default swaps <https://www.researchgate.net/publication/322714557>`_.
 
 =====================
@@ -144,9 +144,9 @@ and
 :math:`h` being here a suitable bandwidth, and
 :math:`g_{X}^{h}(x) = \frac{1}{T} \sum_{t = 1}^{T} \mathbf{1}(\lfloor \frac{x}{h} \rfloor h \le X^{t} <
 (\lfloor \frac{x}{h} \rfloor + 1)h)` being a density histogram estimating dpf :math:`g_{X}` from
-:math:`(X^{t})_{t=1}^{T}` , :math:`T` realization of random variable :math:`X \in \nu` ".
+:math:`(X^{t})_{t=1}^{T}` , :math:`T` realization of a random variable :math:`X \in \nu` ".
 
-Use of this distance is referenced as the generic non-parametric representation (GNPR) approach.
+The use of this distance is referenced as the generic non-parametric representation (GNPR) approach.
 
 As written in the paper:
 
@@ -194,3 +194,12 @@ The following example shows how the above functions can be used:
 
    # Calculating the GNPR distance between two time series with dependence information only
    gnpr_dist = gnpr_distance(data[element_x], data[element_y], theta=1)
+
+Research Notebooks
+##################
+
+The following research notebook can be used to better understand the codependence metrics described above.
+
+* `Codependence by Marti`_
+
+.. _`Codependence by Marti`: https://github.com/hudson-and-thames/research/blob/master/Codependence/Codependence%20by%20Marti/codependence_by_marti.ipynb

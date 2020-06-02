@@ -33,8 +33,8 @@ def angular_distance(x: np.array, y: np.array) -> float:
 
 def absolute_angular_distance(x: np.array, y: np.array) -> float:
     """
-    Returns absolute angular distance between two vectors. It is a modification of angular distance where absolute value
-    of Pearson correlation coefficient is used.
+    Returns absolute angular distance between two vectors. It is a modification of angular distance where the absolute
+    value of the Pearson correlation coefficient is used.
 
     Formula used for calculation:
 

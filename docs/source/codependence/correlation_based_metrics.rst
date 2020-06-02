@@ -1,7 +1,7 @@
 .. _codependence-correlation_based_metrics:
 
 .. note::
-   The following implementations and documentation, closely follows the lecture notes notes from Cornell University, by Marcos Lopez de Prado:
+   The following implementations and documentation, closely follows the lecture notes from Cornell University, by Marcos Lopez de Prado:
    `Codependence (Presentation Slides) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_.
 
 =========================

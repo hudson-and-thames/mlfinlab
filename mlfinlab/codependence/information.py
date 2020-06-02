@@ -38,10 +38,10 @@ def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: boo
     """
     Returns mutual information (I) between two vectors.
 
-    This function uses the discretization using optimal bins algorithm proposed in the works of
+    This function uses the discretization with the optimal bins algorithm proposed in the works of
     Hacine-Gharbi et al. (2012) and Hacine-Gharbi and Ravier (2018).
 
-    Read Cornell lecture notes for more information about mutual information:
+    Read Cornell lecture notes for more information about the mutual information:
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes.
 
     :param x: (np.array) X vector.
@@ -72,7 +72,7 @@ def variation_of_information_score(x: np.array, y: np.array, n_bins: int = None,
     This function uses the discretization using optimal bins algorithm proposed in the works of
     Hacine-Gharbi et al. (2012) and Hacine-Gharbi and Ravier (2018).
 
-    Read Cornell lecture notes for more information about variation of information:
+    Read Cornell lecture notes for more information about the variation of information:
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes.
 
     :param x: (np.array) X vector.

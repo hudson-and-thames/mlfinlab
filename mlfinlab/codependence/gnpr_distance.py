@@ -73,7 +73,7 @@ def gnpr_distance(x: np.array, y: np.array, theta: float, bandwidth: float = 0.0
     - for theta = 1 the dependence information is tested
     - for theta = 0.5 a mix of both information types is tested
 
-    With theta in [0, 1] the distance lies in range [0, 1] and is a metric. (See original work for proof, p.71)
+    With theta in [0, 1] the distance lies in the range [0, 1] and is a metric. (See original work for proof, p.71)
 
     :param x: (np.array) X vector.
     :param y: (np.array) Y vector (same number of observations as X).
