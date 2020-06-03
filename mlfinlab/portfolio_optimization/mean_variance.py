@@ -394,7 +394,7 @@ class MeanVarianceOptimisation:
 
         :param covariance: (pd.DataFrame) Covariance dataframe of asset returns.
         :param expected_returns: (list/np.array/pd.dataframe) A list of mean stock returns (mu).
-        :param risk_aversion: (float) Quantifies the risk averse nature of the investor - a higher value means
+        :param risk_aversion: (float) Quantifies the risk-averse nature of the investor - a higher value means
                            more risk averse and vice-versa.
         """
 

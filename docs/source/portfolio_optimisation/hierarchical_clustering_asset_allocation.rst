@@ -37,11 +37,11 @@ clustering and machine learning to allocate their weights, there are some subtle
 overview of how the HCAA algorithm works:
 
 Overview of the Algorithm
-########################################
+#########################
 
 
 Hierarchical Tree Clustering
-********************************************
+****************************
 
 This step breaks down the assets in our portfolio into different hierarchical clusters using the famous Hierarchical Tree
 Clustering algorithm (Agglomerative Clustering). The assets in the portfolio are segregated into clusters which mimic the
@@ -54,7 +54,7 @@ dendrogram).
 |br|
 
 Calculate Optimal Number of Clusters
-********************************************
+************************************
 
 This step is where HCAA deviates from the traditional HRP algorithm. The hierarchical risk parity method uses single linkage
 and grows the tree to maximum depth. However, the number of clusters identified by growing the tree maximally may not be the
@@ -66,7 +66,7 @@ calculating the required number of clusters.
 |br|
 
 Top-Down Recursive Bisection
-********************************************
+****************************
 
 This is the step where weights for the clusters are calculated. If you are familiar with how the hierarchical risk parity
 algorithm works, then you know this is similar to how HRP also allocates its weights. However, there is a fundamental
@@ -104,7 +104,7 @@ are the risk contributions of left and right clusters.
     6. ``conditional_drawdown_at_risk`` : Conditional drawdown at risk (CDaR) of the clusters is used as a risk metric.
 
 Naive Risk Parity
-********************************************
+*****************
 
 Having calculated the cluster weights in the previous step, this step calculates the final asset weights. Within the same
 cluster, an initial set of weights - :math:`W_{IVP}` - is calculated using the inverse-variance allocation. The final weights

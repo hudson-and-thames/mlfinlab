@@ -153,7 +153,7 @@ class TestMVO(unittest.TestCase):
                                            expected_asset_returns=expected_returns)
         assert plot.axes.xaxis.label._text == 'Volatility'
         assert plot.axes.yaxis.label._text == 'Return'
-        assert len(plot._A) == 100
+        assert len(plot._A) == 41
 
     def test_exception_in_plotting_efficient_frontier(self):
         # pylint: disable=invalid-name, protected-access

@@ -38,11 +38,11 @@ portfolio optimisation. Although, it is a simple algorithm, it has been found to
 counterparts (the traditional mean variance optimisation methods).
 
 Overview of the Algorithm
-########################################
+#########################
 
 
 Hierarchical Tree Clustering
-********************************************
+****************************
 This step breaks down the assets in our portfolio into different hierarchical clusters using the famous Hierarchical Tree
 Clustering algorithm. The assets in the portfolio are segregated into clusters which mimic the real-life interactions between
 the assets in a portfolio - some stocks are related to each other more than others and hence can be grouped within the same
@@ -53,7 +53,7 @@ cluster. At the end of the step, we are left with the follow tree structure (als
 |br|
 
 Matrix Seriation
-**********************
+****************
 Matrix seriation is a very old statistical technique which is used to rearrange the data to show the inherent clusters
 clearly. Using the order of hierarchical clusters from the previous step, we rearrange the rows and columns of the covariance
 matrix of stocks so that similar investments are placed together and dissimilar investments are placed far apart
@@ -63,7 +63,7 @@ matrix of stocks so that similar investments are placed together and dissimilar 
 |br|
 
 Recursive Bisection
-**********************
+*******************
 This is the final and the most important step of this algorithm where the actual weights are assigned to the assets in a
 top-down recursive manner. Based on the hierarchical tree dendrogram formed in the first step, the weights trickle down the
 tree and get assigned to the portfolio assets.
