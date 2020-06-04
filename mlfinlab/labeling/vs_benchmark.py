@@ -22,8 +22,8 @@ def return_over_benchmark(returns, benchmark=0, binary=False):
                 constant value, or a Series matching the index of prices. If no benchmark is given, then it is assumed
                 to have a constant value of 0.
     :param binary: (bool) If False, labels are given by their numerical value of return over benchmark. If True,
-                labels are given according to the sign of their excess return.
-    :return: (pd.Series or pd.DataFrame) of excess returns over benchmark labels. If binary, the labels are -1 if the
+                labels are given according to the sign of their excess return. (False by default)
+    :return: (pd.Series or pd.DataFrame) Excess returns over benchmark labels. If binary, the labels are -1 if the
             return is below the benchmark, 1 if above, and 0 if it exactly matches the benchmark.
     """
     # Check that index of benchmark matches index of prices, if benchmark is a pd.Series
