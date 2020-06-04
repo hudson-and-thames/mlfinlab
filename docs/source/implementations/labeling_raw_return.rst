@@ -13,12 +13,14 @@ price :math:`p_t` at time :math:`t` relative to its price at time :math:`t-1` is
 .. math::
     r_t = \frac{p_{t}}{p_{t-1}} - 1
 
-In the logarithmic case:
+And the logarithmic return is:
 
 .. math::
     r_t = \log \frac{p_{t}}{p_{t-1}}
 
-Returns can also be calculated relative to multiple ticks prior to the observation, instead of just one. If desired, the labels
+The label :math:`L_t` is simply equal to :math:`r_t`.
+
+Returns can also be calculated relative to multiple observations prior to the observation, instead of just one. If desired, the labels
 can be given as a sign of the return, rather than the magnitude. In this case:
 
  .. math::
