@@ -4,7 +4,7 @@ import unittest
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.labeling.vs_benchmark import return_over_benchmark
+from mlfinlab.labeling.return_vs_benchmark import return_over_benchmark
 
 
 class TestReturnOverBenchmark(unittest.TestCase):
@@ -35,8 +35,8 @@ class TestReturnOverBenchmark(unittest.TestCase):
         # Constant benchmark, on multiple columns
         test3 = return_over_benchmark(data3[:10], 0.005)
 
-        test1_actual = pd.Series([np.nan, -0.00052716, -0.02452523,  0.00729918, -0.00778307, 0.0029754, 0.00242709,
-                                  -0.0191014,  0.02057049, -0.02983071], index=self.idx10)
+        test1_actual = pd.Series([np.nan, -0.00052716, -0.02452523, 0.00729918, -0.00778307, 0.0029754, 0.00242709,
+                                  -0.0191014, 0.02057049, -0.02983071], index=self.idx10)
         test3_actual = pd.DataFrame([[np.nan, np.nan], [0.001281, 0.013160], [-0.028720, -0.035202],
                                      [-0.002016, -0.018732], [-0.019025, -0.020415], [-0.004569, 0.001313],
                                      [-0.010170, 0.008551], [-0.026221, -0.015151], [0.006947, 0.028517],
@@ -55,7 +55,7 @@ class TestReturnOverBenchmark(unittest.TestCase):
         test4 = return_over_benchmark(data4[:10], benchmark4)
         test5 = return_over_benchmark(data4[:10], benchmark4, binary=True)
         test4_actual = pd.Series([np.nan, -8.70736203e-03, 1.11619412e-02, -1.97421452e-02, 6.03135015e-03,
-                                  -6.01159098e-01, -1.00000387e+02,  9.00030955e+01, 2.01285921e-01,
+                                  -6.01159098e-01, -1.00000387e+02, 9.00030955e+01, 2.01285921e-01,
                                   -4.40427932e-03], index=self.idx10)
 
         # Using SPY as a benchmark
