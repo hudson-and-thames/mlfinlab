@@ -29,13 +29,12 @@ class TestLabelingRawReturns(unittest.TestCase):
         """
         price = self.data.iloc[0:5, 0:5]
         test1 = raw_return(price)
-        test1_actual = pd.DataFrame([(np.nan, np.nan, np.nan, np.nan, np.nan), (0.008997, -0.002826, 0.0033758,
-                                                                                0.003779, 0.001662),
-                                     (-0.030037, -0.019552, -0.0002804, -0.025602, -0.022719), (0.007327, 0.000867,
-                                                                                                -0.000187, -0.006182,
-                                                                                                0.001045),
-                                     (-0.007754, -0.006930, 0.000748, -0.002333, -0.005610)], columns=self.col5,
-                                    index=self.idx5)
+        test1_actual = pd.DataFrame([(np.nan, np.nan, np.nan, np.nan, np.nan),
+                                     (0.008997, -0.002826, 0.0033758, 0.003779, 0.001662),
+                                     (-0.030037, -0.019552, -0.0002804, -0.025602, -0.022719),
+                                     (0.007327, 0.000867, -0.000187, -0.006182, 0.001045),
+                                     (-0.007754, -0.006930, 0.000748, -0.002333, -0.005610)],
+                                    columns=self.col5, index=self.idx5)
 
         pd.testing.assert_frame_equal(test1, test1_actual, check_less_precise=True)
 
