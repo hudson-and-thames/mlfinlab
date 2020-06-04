@@ -1,10 +1,38 @@
+.. |br| raw:: html
+
+    <br>
+
+.. |h3| raw:: html
+
+    <h3>
+
+.. |h3_| raw:: html
+
+    </h3>
+
+.. |h4| raw:: html
+
+    <h4>
+
+.. |h4_| raw:: html
+
+    </h4>
+
+.. |h5| raw:: html
+
+    <h5>
+
+.. |h5_| raw:: html
+
+    </h5>
+
 .. _portfolio_optimisation-critical_line_algorithm:
 
 .. note::
-    The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies. Each
-    algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
-    on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
-    Next up, lets discuss about some of these implementations and the different parameters they require.
+    The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies.
+    Each algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight
+    allocations on the specific user data. This way, each implementation can be called in the same way and this makes it simple
+    for users to use them.
 
 
 =================================
@@ -12,8 +40,8 @@ The Critical Line Algorithm (CLA)
 =================================
 
 This is a robust alternative to the quadratic optimisation used to find mean-variance optimal portfolios. The major difference
-between classic Mean-Variance and CLA is the type of optimisation problem solved. A typical mean-variance optimisation problem
-looks something like this:
+between classic mean-variance optimisation and CLA are the optimisation constraints involved. A typical mean-variance optimisation
+problem looks something like this:
 
 .. math::
 
@@ -25,7 +53,7 @@ constraint changes to - :math:`l_{i} <= w_{i} <= u_{i}`. Each weight in the allo
 the number of constraints to be solved.
 
 .. tip::
-   **Underlying Literature**
+   |h4| Underlying Literature |h4_|
 
    The following sources elaborate extensively on the topic:
 
@@ -115,17 +143,20 @@ Example Code
     means, sigma = cla.efficient_frontier_means, cla.efficient_frontier_sigma
 
 .. note::
-
-    We provide great flexibility to the users in terms of the input data - either they can pass raw historical stock prices
-    as the parameter :py:mod:`asset_prices` in which case the expected returns and covariance matrix will be calculated
-    using this data. Else, they can also pass pre-calculated :py:mod:`expected_returns` and :py:mod:`covariance_matrix`.
+    |h4| Using Custom Input |h4_|
+    We provide great flexibility to the users in terms of the input data - they can either pass their own pre-calculated input
+    matrices/dataframes or leave it to us to calculate them. A quick reference on common input parameters which you will encounter
+    throughout the portfolio optimization module:
+        * :py:mod:`asset_prices`: Dataframe/matrix of historical raw asset prices **indexed by date**.
+        * :py:mod:`asset_returns`: Dataframe/matrix of historical asset returns. This will be a :math:`TxN` matrix where :math:`T` is the time-series and :math:`N` refers to the number of assets in the portfolio.
+        * :py:mod:`expected_asset_returns`: List of expected returns per asset i.e. the mean of historical asset returns. This refers to the parameter :math:`\mu` used in portfolio optimization literature. For a portfolio of 5 assets, ``expected_asset_returns = [0.45, 0.56, 0.89, 1.34, 2.4]``.
+        * :py:mod:`covariance_matrix`: The covariance matrix of asset returns.
 
 
 Research Notebooks
 ##################
 
-The following research notebooks provides a more detailed exploration of the algorithm as outlined at the back of Ch16 in
-Advances in Financial Machine Learning.
+The following research notebooks provide a more detailed exploration of the algorithm.
 
 * `Chapter 16 Exercise Notebook`_
 

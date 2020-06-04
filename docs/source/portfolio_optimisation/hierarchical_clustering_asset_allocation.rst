@@ -189,3 +189,12 @@ Implementation
         Ward's method has a prototype-based view in which the clusters are represented by a centroid. For this reason, the
         proximity between clusters is usually defined as the distance between cluster centroids. The Ward method uses the increase
         in the sum of the squares error (SSE) to determine the clusters.
+
+Research Notebooks
+##################
+
+The following research notebooks provide a more detailed exploration of the algorithm.
+
+* `How to use mlfinlab's HierarchicalClusteringAssetAllocation class`_
+
+.. _How to use mlfinlab's HierarchicalClusteringAssetAllocation class: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Hierarchical%20Clustering%20Asset%20Allocation%20(HCAA)/HCAA%20Tutorial%20Notebook.ipynb

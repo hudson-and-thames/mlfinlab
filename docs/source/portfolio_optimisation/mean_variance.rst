@@ -460,8 +460,7 @@ the frontier to be displayed.
 Research Notebooks
 ##################
 
-The following research notebooks provides a more detailed exploration of the algorithm as outlined at the back of Ch16 in
-Advances in Financial Machine Learning.
+The following research notebooks provide a more detailed exploration of the algorithm.
 
 * `Chapter 16 Exercise Notebook`_
 
