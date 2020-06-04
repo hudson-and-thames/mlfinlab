@@ -13,7 +13,7 @@ def excess_over_mean(prices, binary=False):
 
     Returns a DataFrame containing returns of stocks over the mean of all stocks in the portfolio. Returns a DataFrame
     of signs of the returns if binary is True. In this case, an observation may be labelled as 0 if it itself is the
-    mean.
+    mean. 
 
     :param prices: (pd.DataFrame) Close prices of all tickers in the market that are used to establish the mean. NaN
                     values are ok. Returns on each ticker are then compared to the mean for the given timestamp.
