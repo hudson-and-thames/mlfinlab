@@ -24,11 +24,11 @@ At time :math:`t`:
     :nowrap:
 
     \begin{gather*}
-    P_t = \{p_{t,0}, p_{t,1}, ..., p_{t,n}\} \\
+    R_t = \{r_{t,0}, r_{t,1}, ..., r_{t,n}\} \\
 
-    \mu_t = mean(P_t) \\
+    \mu_t = mean(R_t) \\
 
-    L(P_t) = \{p_{t,0} - \mu_t, p_{t,1} - \mu_t, ..., p_{t,n} - \mu_t\}
+    L(R_t) = \{r_{t,0} - \mu_t, r_{t,1} - \mu_t, ..., r_{t,n} - \mu_t\}
     \end{gather*}
 
 
@@ -37,10 +37,10 @@ If categorical rather than numerical labels are desired:
 .. math::
      \begin{equation}
      \begin{split}
-       L(p_{t,n}) = \begin{cases}
-       -1 &\ \text{if} \ \ p_{t,n} - \mu_t < 0\\
-       0 &\ \text{if} \ \ p_{t,n} - \mu_t = 0\\
-       1 &\ \text{if} \ \ p_{t,n} - \mu_t > 0\\
+       L(r_{t,n}) = \begin{cases}
+       -1 &\ \text{if} \ \ r_{t,n} - \mu_t < 0\\
+       0 &\ \text{if} \ \ r_{t,n} - \mu_t = 0\\
+       1 &\ \text{if} \ \ r_{t,n} - \mu_t > 0\\
        \end{cases}
      \end{split}
      \end{equation}
