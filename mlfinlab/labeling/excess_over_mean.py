@@ -19,7 +19,7 @@ def excess_over_mean(prices, binary=False):
                     values are ok. Returns on each ticker are then compared to the mean for the given timestamp.
     :param binary: (bool) If False, the numerical value of excess returns over mean will be given. If True, then only
                     the sign of the excess return over mean will be given (-1 or 1). A label of 0 will be given if
-                    the observation itself equal to the mean.  Note: if there are any 0 labels (as a result of an
+                    the observation itself equal to the mean. Note: if there are any 0 labels (as a result of an
                     observation being exactly equal to the mean for a given time index), np.sign will return a warning,
                     but the function runs fine.
     :return: (pd.DataFrame) Numerical returns in excess of the market mean return, or sign of return depending on
