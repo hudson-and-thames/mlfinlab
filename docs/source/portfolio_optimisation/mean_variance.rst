@@ -88,7 +88,7 @@ specified.
 Supported Portfolio Allocation Solutions
 ########################################
 
-The MVO class provide some common portfolio optimization problems out-of-the-box. In this section we go over a quick overview of
+MlFinLab's :py:mod:`MeanVarianceOptimisation` class provide some common portfolio optimization problems out-of-the-box. In this section we go over a quick overview of
 these:
 
 Inverse Variance
