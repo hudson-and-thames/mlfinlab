@@ -126,8 +126,8 @@ Implementation
 
         .. automethod:: __init__
 
-Example
-########
+Example Code
+############
 Below is an example of how to use the package functions to calculate risk metrics for a portfolio.
 
 .. code-block::
@@ -166,6 +166,6 @@ Research Notebooks
 
 The following research notebooks provide a more detailed exploration of the algorithm.
 
-* `NCO Notebook`_
+* `Nested Clustered Optimisation Notebook`_
 
-.. _NCO Notebook: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Nested%20Clustered%20Optimisation%20(NCO)/NCO.ipynb
+.. _Nested Clustered Optimisation Notebook: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Nested%20Clustered%20Optimisation%20(NCO)/NCO.ipynb
