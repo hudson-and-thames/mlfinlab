@@ -135,7 +135,7 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
 
     # 2) Get vertical barrier (max holding period)
     if vertical_barrier_times is False:
-        vertical_barrier_times = pd.Series(pd.NaT, index=t_events)
+        vertical_barrier_times = pd.Series(pd.NaT, index=t_events, dtype=t_events.dtype)
 
     # 3) Form events object, apply stop loss on vertical barrier
     if side_prediction is None:
