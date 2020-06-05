@@ -62,7 +62,7 @@ def _cluster_kmeans_base(corr_mat: pd.DataFrame, max_num_clusters: int = 10, rep
     # Get optimal num clusters
     for _ in range(repeat):
         for num_clusters in range(2, max_num_clusters + 1):
-            kmeans_ = KMeans(n_clusters=num_clusters, n_jobs=1, n_init=1)
+            kmeans_ = KMeans(n_clusters=num_clusters, n_init=1)
             kmeans_ = kmeans_.fit(distance)
             silh_ = silhouette_samples(distance, kmeans_.labels_)
             stat = (silh_.mean() / silh_.std(), silh.mean() / silh.std())

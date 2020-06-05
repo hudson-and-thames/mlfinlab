@@ -265,7 +265,7 @@ class NCO:
             # Iterating through every number of clusters
             for num_clusters in range(2, max_num_clusters + 1):
                 # Computing k-means clustering
-                kmeans = KMeans(n_clusters=num_clusters, n_jobs=1, n_init=init)
+                kmeans = KMeans(n_clusters=num_clusters, n_init=init)
                 kmeans = kmeans.fit(dist_matrix)
 
                 # Computing a Silhouette Coefficient - cluster fit measure
