@@ -4,19 +4,16 @@
 Labelling Excess Over Mean
 ==========================
 
-Labelling according to excess over mean is a labelling method mentioned in Chapter 5.5.1 of the book
-Machine Learning For Factor Investing, by Coqueret, G. and Guida, T., 2020.
-
 Using cross-sectional data on returns of many different stocks, each observation is labeled according to whether (or how much)
-its return exceeds the mean return. When using binary labels, it is common to simply label based on whether the return is positive
-or negative. However, this may produce unbalanced classes, as during market booms stocks will overwhelmingly return positively, and
-during market crashes they will return negatively (Coqueret and Guida, 2020). Labeling according to a benchmark such as mean return
+its return exceeds the mean return. It is a common practice to label observations based on whether the return is positive or negative.
+However, this may produce unbalanced classes, as during market booms the probability of a positive return is much higher, and
+during market crashes they are lower (Coqueret and Guida, 2020). Labeling according to a benchmark such as mean return
 alleviates this issue.
 
 A dataframe containing forward total stock returns is calculated from close prices. The mean return of all companies at time  :math:`t`  in the
 dataframe is used to represent the market return, and excess returns are calculated by subtracting the mean return from each stock's return
-over the time period  :math:`t`. The numerical returns can then be used as is (for regression analysis), or can be relabeled to its sign
-for classification analysis).
+over the time period  :math:`t`. The numerical returns can then be used as-is (for regression analysis), or can be relabeled to
+represent their sign (for classification analysis).
 
 At time :math:`t`:
 
@@ -52,6 +49,12 @@ and May 2020.
 .. image:: labeling_images/distribution_over_mean.png
    :scale: 100 %
    :align: center
+
+.. tip::
+   **Underlying Literature**
+
+    Labeling according to excess over mean is a labeling method mentioned in Chapter 5.5.1 of the book
+    Machine Learning For Factor Investing, by Coqueret, G. and Guida, T., 2020.
 
 
 Implementation
