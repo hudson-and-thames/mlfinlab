@@ -7,9 +7,8 @@ Returns Estimators
 
 Accurate estimation of historical asset returns is one of the most important aspects of portfolio optimisation. However, it is
 also one of the most difficult to calculate since estimated returns do not correctly reflect the true underlying
-returns of a portfolio/asset. Given this, there is still significant research work being published that deals with novel methods to
-estimate returns. MlFinLab's :py:mod:`ReturnsEstimators` class provides functions to estimate mean asset returns. Currently, it is still in active development and we
-will keep adding new methods to it.
+returns of a portfolio/asset. MlFinLab's :py:mod:`ReturnsEstimators` class provides functions to estimate mean asset returns.
+Currently, it is still in active development and we will keep adding new methods to it.
 
 Supported Estimators
 ####################

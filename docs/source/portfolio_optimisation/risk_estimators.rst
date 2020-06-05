@@ -32,7 +32,10 @@
 ===============
 Risk Estimators
 ===============
-This class includes functions for calculating different types of covariance matrices, de-noising, and other helpful methods.
+Risk is a very important part of finance and the performance of large number of investment strategies are dependent on the
+efficient estimation of underlying portfolio risk. There are different ways of representing risk but the most widely used is a
+covariance matrix. This means that an accurate calculation of the covariances is essential for an accurate representation of risk.
+This class provides functions for calculating different types of covariance matrices, de-noising, and other helpful methods.
 
 .. tip::
    |h4| Underlying Literature |h4_|
@@ -154,7 +157,7 @@ Each element is calculated as follows:
       :nowrap:
 
       \begin{align*}
-      Covar_{i,j}^{t} = (R_{i}^{t} - Mean(R_{i})) * (R_{j}^{t} - Mean(R_{j}))
+      \sum_{i,j}^{t} = (R_{i}^{t} - Mean(R_{i})) * (R_{j}^{t} - Mean(R_{j}))
       \end{align*}
 
       \begin{align*}
@@ -162,17 +165,17 @@ Each element is calculated as follows:
       \end{align*}
 
       \begin{align*}
-      EWMA(Covar_{i,j})_{t} = ((Covar_{i,j}^{t} - Covar_{i,j}^{t-1}) * Decay) + Covar_{i,j}^{t-1}
+      EWMA(\sum_{i,j})_{t} = ((\sum_{i,j}^{t} - \sum_{i,j}^{t-1}) * Decay) + \sum_{i,j}^{t-1}
       \end{align*}
 
       \begin{align*}
-      ExponentialCovariance_{i,j (Decay)} = EWMA(Covar)_{T}
+      ExponentialCovariance_{i,j (Decay)} = EWMA(\sum)_{T}
       \end{align*}
 
-Where :math:`R_{i}^{t}` is the return of :math:`i` -th asset for :math:`t` -th observation,
-:math:`T` is the total number of observations, :math:`Covar_{i,j}` is the series of correlations between :math:`i` -th
-and :math:`j` -th asset, :math:`EWMA(Covar)_{t}` is the :math:`t` -th observation of exponentially-weighted
-moving average of :math:`Covar` .
+Where :math:`R_{i}^{t}` is the return of :math:`i^{th}` asset for :math:`t^{th}` observation,
+:math:`T` is the total number of observations, :math:`\sum_{i,j}` is the series of covariances between :math:`i^{th}`
+and :math:`j^{th}` asset, :math:`EWMA(\sum)_{t}` is the :math:`t^{th}` observation of exponentially-weighted
+moving average of :math:`\sum`.
 
 
 De-noising Covariance/Correlation Matrix
