@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.portfolio_optimization.cla import CriticalLineAlgorithm
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
 class TestCLA(unittest.TestCase):
@@ -286,8 +286,8 @@ class TestCLA(unittest.TestCase):
         """
 
         cla = CriticalLineAlgorithm()
-        expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data)
-        covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data).cov()
+        expected_returns = ReturnsEstimators().calculate_mean_historical_returns(asset_prices=self.data)
+        covariance = ReturnsEstimators().calculate_returns(asset_prices=self.data).cov()
         cla.allocate(covariance_matrix=covariance,
                      expected_asset_returns=expected_returns,
                      asset_names=self.data.columns)
@@ -317,7 +317,7 @@ class TestCLA(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             cla = CriticalLineAlgorithm()
-            expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+            expected_returns = ReturnsEstimators().calculate_mean_historical_returns(asset_prices=self.data,
                                                                                      resample_by='W')
-            covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
+            covariance = ReturnsEstimators().calculate_returns(asset_prices=self.data, resample_by='W').cov()
             cla.allocate(expected_asset_returns=expected_returns, covariance_matrix=covariance)

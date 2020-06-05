@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.portfolio_optimization.hrp import HierarchicalRiskParity
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
 class TestHRP(unittest.TestCase):
@@ -132,7 +132,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         hrp.allocate(asset_returns=returns, asset_names=self.data.columns)
         weights = hrp.weights.values[0]
         assert (weights >= 0).all()
@@ -145,7 +145,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         hrp.allocate(asset_names=self.data.columns, covariance_matrix=returns.cov())
         weights = hrp.weights.values[0]
         assert (weights >= 0).all()
@@ -158,7 +158,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         covariance = returns.cov()
         d_matrix = np.zeros_like(covariance)
         diagnoal_sqrt = np.sqrt(np.diag(covariance))
@@ -205,7 +205,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         hrp.allocate(asset_returns=returns)
         weights = hrp.weights.values[0]
         assert (weights >= 0).all()
@@ -219,5 +219,5 @@ class TestHRP(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             hrp = HierarchicalRiskParity()
-            returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+            returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
             hrp.allocate(asset_returns=returns.values)

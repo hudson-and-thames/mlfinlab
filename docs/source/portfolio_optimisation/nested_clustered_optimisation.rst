@@ -1,3 +1,31 @@
+.. |br| raw:: html
+
+    <br>
+
+.. |h3| raw:: html
+
+    <h3>
+
+.. |h3_| raw:: html
+
+    </h3>
+
+.. |h4| raw:: html
+
+    <h4>
+
+.. |h4_| raw:: html
+
+    </h4>
+
+.. |h5| raw:: html
+
+    <h5>
+
+.. |h5_| raw:: html
+
+    </h5>
+
 .. _portfolio_optimisation-nested_clustered_optimisation:
 
 ===================================
@@ -12,7 +40,7 @@ The NCO class includes functions related to:
 - Sample data generation to use in the above functions.
 
 .. tip::
-   **Underlying Literature**
+   |h4| Underlying Literature |h4_|
 
    The following sources elaborate extensively on the topic:
 

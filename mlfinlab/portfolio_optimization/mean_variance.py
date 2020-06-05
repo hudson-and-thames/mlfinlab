@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import cvxpy as cp
 import matplotlib.pyplot as plt
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
 
 
@@ -39,7 +39,7 @@ class MeanVarianceOptimisation:
         self.portfolio_return = None
         self.portfolio_sharpe_ratio = None
         self.calculate_expected_returns = calculate_expected_returns
-        self.returns_estimator = ReturnsEstimation()
+        self.returns_estimator = ReturnsEstimators()
         self.risk_estimators = RiskEstimators()
         self.weight_bounds = (0, 1)
         self.risk_free_rate = risk_free_rate

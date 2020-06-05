@@ -9,7 +9,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.portfolio_optimization.mean_variance import MeanVarianceOptimisation
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
 class TestMVO(unittest.TestCase):
@@ -145,9 +145,9 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+        expected_returns = ReturnsEstimators().calculate_mean_historical_returns(asset_prices=self.data,
                                                                                  resample_by='W')
-        covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
+        covariance = ReturnsEstimators().calculate_returns(asset_prices=self.data, resample_by='W').cov()
         plot = mvo.plot_efficient_frontier(covariance=covariance,
                                            max_return=1.0,
                                            expected_asset_returns=expected_returns)
@@ -162,9 +162,9 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+        expected_returns = ReturnsEstimators().calculate_mean_historical_returns(asset_prices=self.data,
                                                                                  resample_by='W')
-        covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
+        covariance = ReturnsEstimators().calculate_returns(asset_prices=self.data, resample_by='W').cov()
         plot = mvo.plot_efficient_frontier(covariance=covariance,
                                            max_return=1.0,
                                            expected_asset_returns=expected_returns)
@@ -177,8 +177,8 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data, resample_by='W')
-        covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
+        expected_returns = ReturnsEstimators().calculate_mean_historical_returns(asset_prices=self.data, resample_by='W')
+        covariance = ReturnsEstimators().calculate_returns(asset_prices=self.data, resample_by='W').cov()
         mvo.allocate(covariance_matrix=covariance,
                      expected_asset_returns=expected_returns,
                      asset_names=self.data.columns)
@@ -483,9 +483,9 @@ class TestMVO(unittest.TestCase):
         """
 
         mvo = MeanVarianceOptimisation()
-        expected_returns = ReturnsEstimation().calculate_exponential_historical_returns(asset_prices=self.data,
+        expected_returns = ReturnsEstimators().calculate_exponential_historical_returns(asset_prices=self.data,
                                                                                         resample_by='W')
-        covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
+        covariance = ReturnsEstimators().calculate_returns(asset_prices=self.data, resample_by='W').cov()
         mvo.allocate(expected_asset_returns=expected_returns, covariance_matrix=covariance)
         weights = mvo.weights.values[0]
         assert (weights >= 0).all()
@@ -499,9 +499,9 @@ class TestMVO(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             mvo = MeanVarianceOptimisation()
-            expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+            expected_returns = ReturnsEstimators().calculate_mean_historical_returns(asset_prices=self.data,
                                                                                      resample_by='W')
-            covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
+            covariance = ReturnsEstimators().calculate_returns(asset_prices=self.data, resample_by='W').cov()
             mvo.allocate(expected_asset_returns=expected_returns, covariance_matrix=covariance.values)
 
     def test_portfolio_metrics(self):
@@ -529,7 +529,7 @@ class TestMVO(unittest.TestCase):
         non_cvxpy_variables = {
             'num_assets': self.data.shape[1],
             'covariance': self.data.cov(),
-            'expected_returns': ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+            'expected_returns': ReturnsEstimators().calculate_mean_historical_returns(asset_prices=self.data,
                                                                                       resample_by='W')
         }
         cvxpy_variables = [
@@ -590,7 +590,7 @@ class TestMVO(unittest.TestCase):
             non_cvxpy_variables = {
                 'num_assets': self.data.shape[1],
                 'covariance': self.data.cov(),
-                'expected_returns': ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+                'expected_returns': ReturnsEstimators().calculate_mean_historical_returns(asset_prices=self.data,
                                                                                           resample_by='W')
             }
             cvxpy_variables = [

@@ -4,7 +4,7 @@ from math import log, ceil
 import numpy as np
 import pandas as pd
 
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
 class CriticalLineAlgorithm:
@@ -48,7 +48,7 @@ class CriticalLineAlgorithm:
         self.min_var = None
         self.efficient_frontier_means = None
         self.efficient_frontier_sigma = None
-        self.returns_estimator = ReturnsEstimation()
+        self.returns_estimator = ReturnsEstimators()
 
     def allocate(self,
                  asset_names=None,
@@ -525,7 +525,6 @@ class CriticalLineAlgorithm:
             self.lower_bounds = np.ones(self.expected_returns.shape) * self.weight_bounds[0]
         else:
             self.lower_bounds = np.array(self.weight_bounds[0]).astype(float).reshape(self.expected_returns.shape)
-        print(self.lower_bounds)
 
         # Intialise upper bounds
         if isinstance(self.weight_bounds[1], numbers.Real):
