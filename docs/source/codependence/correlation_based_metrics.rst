@@ -168,7 +168,8 @@ The following examples show how the described above correlation-based metrics ca
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.codependece import distance_correlation, angular_distance, absolute_angular_distance, squared_angular_distance
+    from mlfinlab.codependence import distance_correlation, angular_distance,
+                                      absolute_angular_distance, squared_angular_distance
 
     # Import dataframe of returns for assets in a portfolio
     asset_returns = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)
