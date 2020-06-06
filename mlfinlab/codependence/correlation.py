@@ -22,8 +22,8 @@ def angular_distance(x: np.array, y: np.array) -> float:
     Read Cornell lecture notes for more information about angular distance:
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes.
 
-    :param x: (np.array) X vector.
-    :param y: (np.array) Y vector.
+    :param x: (np.array/pd.Series) X vector.
+    :param y: (np.array/pd.Series) Y vector.
     :return: (float) Angular distance.
     """
 
@@ -43,8 +43,8 @@ def absolute_angular_distance(x: np.array, y: np.array) -> float:
     Read Cornell lecture notes for more information about absolute angular distance:
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes.
 
-    :param x: (np.array) X vector.
-    :param y: (np.array) Y vector.
+    :param x: (np.array/pd.Series) X vector.
+    :param y: (np.array/pd.Series) Y vector.
     :return: (float) Absolute angular distance.
     """
 
@@ -64,8 +64,8 @@ def squared_angular_distance(x: np.array, y: np.array) -> float:
     Read Cornell lecture notes for more information about squared angular distance:
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes.
 
-    :param x: (np.array) X vector.
-    :param y: (np.array) Y vector.
+    :param x: (np.array/pd.Series) X vector.
+    :param y: (np.array/pd.Series) Y vector.
     :return: (float) Squared angular distance.
     """
 
@@ -87,8 +87,8 @@ def distance_correlation(x: np.array, y: np.array) -> float:
     Read Cornell lecture notes for more information about distance correlation:
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes.
 
-    :param x: (np.array) X vector.
-    :param y: (np.array) Y vector.
+    :param x: (np.array/pd.Series) X vector.
+    :param y: (np.array/pd.Series) Y vector.
     :return: (float) Distance correlation coefficient.
     """
 
