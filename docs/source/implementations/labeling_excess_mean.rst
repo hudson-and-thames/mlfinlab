@@ -1,7 +1,7 @@
 .. _implementations-labeling_excess_mean:
 
 ==========================
-Labelling Excess Over Mean
+Labeling Excess Over Mean
 ==========================
 
 Using cross-sectional data on returns of many different stocks, each observation is labeled according to whether (or how much)
@@ -10,7 +10,7 @@ However, this may produce unbalanced classes, as during market booms the probabi
 during market crashes they are lower (Coqueret and Guida, 2020). Labeling according to a benchmark such as mean return
 alleviates this issue.
 
-A dataframe containing forward total stock returns is calculated from close prices. The mean return of all companies at time  :math:`t`  in the
+A dataframe containing forward returns is calculated from close prices. The mean return of all companies at time  :math:`t`  in the
 dataframe is used to represent the market return, and excess returns are calculated by subtracting the mean return from each stock's return
 over the time period  :math:`t`. The numerical returns can then be used as-is (for regression analysis), or can be relabeled to
 represent their sign (for classification analysis).
@@ -91,7 +91,7 @@ Below is an example on how to create labels of excess over mean.
 Research Notebooks
 ##################
 
-The following research notebooks can be used to better understand labelling excess over mean.
+The following research notebooks can be used to better understand labeling excess over mean.
 
 * `Excess Over Mean Example`_
 

@@ -8,7 +8,7 @@ import pandas as pd
 from mlfinlab.labeling.excess_over_mean import excess_over_mean
 
 
-class TestLabellingOverMean(unittest.TestCase):
+class TestLabelingOverMean(unittest.TestCase):
     """
     Tests regarding labelling excess over median.
     """
@@ -30,10 +30,10 @@ class TestLabellingOverMean(unittest.TestCase):
         subset = self.data[cols].iloc[0:5]
         test1 = excess_over_mean(subset)
         test2 = excess_over_mean(subset, binary=True)
-        test1_actual = pd.DataFrame([(0.005666, -0.006157, 0.00004411, 0.0004476), (-0.011169, -0.000684, 0.018588,
-                                                                                    -0.006734),
-                                     (0.006871, 0.000411, -0.000643, -0.006639), (-0.003687, -0.002863, 0.004815,
-                                                                                  0.001735),
+        test1_actual = pd.DataFrame([(0.005666, -0.006157, 0.00004411, 0.0004476),
+                                     (-0.011169, -0.000684, 0.018588, -0.006734),
+                                     (0.006871, 0.000411, -0.000643, -0.006639),
+                                     (-0.003687, -0.002863, 0.004815, 0.001735),
                                      (np.nan, np.nan, np.nan, np.nan), ], columns=self.data[cols].iloc[0:5].columns,
                                     index=self.data[cols].iloc[0:5].index)
         test2_actual = np.sign(test1_actual)
