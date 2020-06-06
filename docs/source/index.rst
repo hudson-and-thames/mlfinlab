@@ -60,6 +60,35 @@ level textbooks:
    :alt: Academic Journals
    :target: https://www.pm-research.com/
 
+Praise for MlFinLab
+###################
+
+“Financial markets are complex systems like no other. Extracting signal from financial data requires specialized tools
+that are distinct from those used in general machine learning. The MlFinLab package compiles important algorithms
+that every quant should know and use.”
+
+\- `Dr. Marcos Lopez de Prado <https://www.linkedin.com/in/lopezdeprado/>`_, Co-founder and CIO at True Positive Technologies; Professor of Practice at Cornell University
+
+----
+
+"Those who doubt open-source libraries just need to look at the impact of Pandas, Scikit-learn, and the like. MIFinLab
+is doing to financial machine learning what Tensorflow and PyTorch are doing to deep learning."
+
+\- `Dr. Ernest Chan <https://www.linkedin.com/in/epchan/>`_, Hedge Fund Manager at QTS & Author
+
+----
+
+"For many decades, finance has relied on overly simplistic statistical techniques to identify patterns in data.
+Machine learning promises to change that by allowing researchers to use modern nonlinear and highly dimensional
+techniques. Yet, applying those machine learning algorithms to model financial problems is easier said than done:
+finance is not a plug-and-play subject as it relates to machine learning.
+
+MlFinLab provides access to the latest cutting edges methods. MlFinLab is thus essential for quants who want to be
+ahead of the technology rather than being replaced by it."
+
+\- `Dr. Thomas Raffinot <https://www.linkedin.com/in/thomas-raffinot-b75734b/>`_, Financial Data Scientist at ENGIE Global Markets
+
+----
 
 Unlocking the Commons
 #####################
@@ -125,6 +154,13 @@ Gold Sponsors:
 **************
 
 .. figure:: logo/gold_sponsors.png
+   :scale: 100 %
+   :align: center
+   :figclass: align-center
+   :alt: Gold Sponsors
+   :target: https://hudsonthames.org/sponsors/
+
+.. figure:: logo/ali_saif.jpg
    :scale: 100 %
    :align: center
    :figclass: align-center
@@ -206,7 +242,7 @@ Early Adopters:
 .. _`Shawn Unger`: https://www.linkedin.com/in/shawnunger1/
 .. _`Ruifan Pei`: https://www.linkedin.com/in/ruifan-pei-b994b177/
 .. _`Sritanu Chakraborty`: https://www.linkedin.com/in/sritanuchakraborty/
-.. _`Kofi Glove`: https://www.linkedin.com/in/kofiglover/
+.. _`Kofi Glover`: https://www.linkedin.com/in/kofiglover/
 
 License
 #######
