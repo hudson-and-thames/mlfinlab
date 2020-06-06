@@ -8,6 +8,7 @@ import warnings
 import numpy as np
 import pandas as pd
 
+
 def forward_return(prices, lookforward=1):
     """
     Future returns labeling method.
