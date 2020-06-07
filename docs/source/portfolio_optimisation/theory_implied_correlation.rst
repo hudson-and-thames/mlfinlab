@@ -28,14 +28,13 @@
 
     </h5>
 
-
 ================================
 Theory-Implied Correlation (TIC)
 ================================
 This TIC class includes an algorithm to calculate the Theory-Implied Correlation and a method to calculate the correlation matrix distance proposed by Herdin and Bonek. This distance may be used to measure to which extent the TIC matrix has blended theory-implied views (tree structure of the elements) with empirical evidence (correlation matrix).
 
 .. tip::
-   |h4| Underlying Literature |h4_|
+   **Underlying Literature**
 
    The following sources elaborate extensively on the topic:
 
