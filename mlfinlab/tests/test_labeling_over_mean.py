@@ -10,7 +10,7 @@ from mlfinlab.labeling.excess_over_mean import excess_over_mean
 
 class TestLabelingOverMean(unittest.TestCase):
     """
-    Tests regarding labelling excess over median.
+    Tests regarding labeling excess over median.
     """
 
     def setUp(self):
