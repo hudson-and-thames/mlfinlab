@@ -43,26 +43,22 @@ Traditionally, portfolio optimization is nothing more than a simple mathematical
 achieve optimal portfolio allocation bounded by some constraints. It can be mathematically expressed as follows:
 
 .. math::
-        \begin{equation*}
-            \begin{aligned}
-                & \underset{\mathbf{x}}{\text{max}} & & f(\mathbf{x}) \\
-                & \text{s.t.} & & g(\mathbf{x}) \leq 0 \\
-                &&& h(\mathbf{x}) = 0 \\
-            \end{aligned}
-        \end{equation*}
+        \begin{align*}
+            & \underset{\mathbf{x}}{\text{max}} & & f(\mathbf{x}) \\
+            & \text{s.t.} & & g(\mathbf{x}) \leq 0 \\
+            &&& h(\mathbf{x}) = 0 \\
+        \end{align*}
 
 where :math:`x \in R^n` and :math:`h(x), g(x)` represent convex functions correlating to the equality and inequality constraints
 respectively. Based on the mean-variance framework first developed by Harry Markowitz, a portfolio optimization problem can be
 formulated as follows,
 
 .. math::
-        \begin{equation*}
-            \begin{aligned}
-                & \underset{\mathbf{w}}{\text{min}} & & w^T\sum w \\
-                & \text{s.t.} & & \sum_{i=1}^{n}w_{i} = 1 \\
-                &&& \mu^Tw = \mu_t \\
-            \end{aligned}
-        \end{equation*}
+        \begin{align*}
+            & \underset{\mathbf{w}}{\text{min}} & & w^T\sum w \\
+            & \text{s.t.} & & \sum_{i=1}^{n}w_{i} = 1 \\
+            &&& \mu^Tw = \mu_t \\
+        \end{align*}
 where :math:`w` refers to the set of weights for the portfolio assets, :math:`\sum` is the covariance matrix of the assets,
 :math:`\mu` is the expected asset returns and :math:`\mu_t` represents the target portfolio return of the investor. Note that this
 represents a very basic (and a specific) use-case of portfolio allocation where the investor wants to minimse the portfolio risk
@@ -114,13 +110,11 @@ being solved.
 
 .. math::
 
-    \begin{equation*}
-        \begin{aligned}
-            & \underset{\mathbf{w}}{\text{minimise}} & & w^T\sum w \\
-            & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
-            &&& w_{j} \geq 0, j=1,..,N
-        \end{aligned}
-    \end{equation*}
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{minimise}} & & w^T\sum w \\
+        & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N
+    \end{align*}
 
 **Solution String:** ``min_volatility``
 
@@ -131,13 +125,11 @@ For this solution, the objective is (as the name suggests) to maximise the Sharp
 
 .. math::
 
-    \begin{equation*}
-        \begin{aligned}
-            & \underset{\mathbf{w}}{\text{maximise}} & & \frac{\mu^{T}w - R_{f}}{(w^{T}\sum w)^{1/2}} \\
-            & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
-            &&& w_{j} \geq 0, j=1,..,N
-        \end{aligned}
-    \end{equation*}
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{maximise}} & & \frac{\mu^{T}w - R_{f}}{(w^{T}\sum w)^{1/2}} \\
+        & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N
+    \end{align*}
 
 A major problem with the above formulation is that the objective function is not convex and this presents a problem for cvxpy
 which only accepts convex optimization problems. As a result, the problem can be transformed into an equivalent one, but with
@@ -145,15 +137,13 @@ a convex quadratic objective function.
 
 .. math::
 
-    \begin{equation*}
-        \begin{aligned}
-            & \underset{\mathbf{w}}{\text{minimise}} & & y^T\sum y \\
-            & \text{s.t.} & & (\mu^{T}w - R_{f})^{T}y = 1 \\
-            &&& \sum_{j=1}^{N}y_{j} = \kappa, \\
-            &&& \kappa \geq 0, \\
-            &&& w_{j} = \frac{y_j}{\kappa}, j=1,..,N
-        \end{aligned}
-    \end{equation*}
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{minimise}} & & y^T\sum y \\
+        & \text{s.t.} & & (\mu^{T}w - R_{f})^{T}y = 1 \\
+        &&& \sum_{j=1}^{N}y_{j} = \kappa, \\
+        &&& \kappa \geq 0, \\
+        &&& w_{j} = \frac{y_j}{\kappa}, j=1,..,N
+    \end{align*}
 
 where :math:`y` refer to the set of unscaled weights, :math:`\kappa` is the scaling factor and the other symbols refer to
 their usual meanings.
@@ -174,14 +164,12 @@ the set of weights which efficiently allocate risk constrained by the provided t
 
 .. math::
 
-    \begin{equation*}
-        \begin{aligned}
-            & \underset{\mathbf{w}}{\text{min}} & & w^T\sum w \\
-            & \text{s.t.} & & \mu^Tw = \mu_t\\
-            &&& \sum_{j=1}^{n}w_{j} = 1 \\
-            &&& w_{j} \geq 0, j=1,..,N \\
-        \end{aligned}
-    \end{equation*}
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{min}} & & w^T\sum w \\
+        & \text{s.t.} & & \mu^Tw = \mu_t\\
+        &&& \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N \\
+    \end{align*}
 
 where :math:`\mu_t` is the target portfolio return set by the investor and the other symbols refer to their usual meanings.
 
@@ -196,14 +184,12 @@ constrained by the provided target risk, hence the name "efficient return".
 
 .. math::
 
-    \begin{equation*}
-        \begin{aligned}
-            & \underset{\mathbf{w}}{\text{max}} & & \mu^Tw \\
-            & \text{s.t.} & & w^T\sum w = \sigma^{2}_t\\
-            &&& \sum_{j=1}^{n}w_{j} = 1 \\
-            &&& w_{j} \geq 0, j=1,..,N \\
-        \end{aligned}
-    \end{equation*}
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{max}} & & \mu^Tw \\
+        & \text{s.t.} & & w^T\sum w = \sigma^{2}_t\\
+        &&& \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N \\
+    \end{align*}
 
 where :math:`\sigma^{2}_t` is the target portfolio risk set by the investor and the other symbols refer to their usual meanings.
 
@@ -220,13 +206,11 @@ returns, neglecting the risk associated with it.
 
 .. math::
 
-    \begin{equation*}
-        \begin{aligned}
-            & \underset{\mathbf{w}}{\text{min}} & &  \lambda * w^T\sum w - \mu^Tw\\
-            & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
-            &&& w_{j} \geq 0, j=1,..,N \\
-        \end{aligned}
-    \end{equation*}
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{min}} & &  \lambda * w^T\sum w - \mu^Tw\\
+        & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N \\
+    \end{align*}
 
 **Solution String:** ``max_return_min_volatility``
 
@@ -237,11 +221,7 @@ Maximum diversification portfolio tries to diversify the holdings across as many
 
 .. math::
 
-    \begin{equation*}
-        \begin{aligned}
-            & D = \frac{w^{T}\sigma}{\sqrt{w^{T}\sum w}}\\
-        \end{aligned}
-    \end{equation*}
+        D = \frac{w^{T}\sigma}{\sqrt{w^{T}\sum w}}
 
 where :math:`\sigma` is the vector of volatilities and :math:`\sum` is the covariance matrix. The term in the denominator is the
 volatility of the portfolio and the term in the numerator is the weighted average volatility of the assets. More diversification
@@ -250,13 +230,11 @@ the constraints are:
 
 .. math::
 
-    \begin{equation*}
-        \begin{aligned}
-            & \underset{\mathbf{w}}{\text{max}} & &  D\\
-            & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
-            &&& w_{j} \geq 0, j=1,..,N \\
-        \end{aligned}
-    \end{equation*}
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{max}} & &  D\\
+        & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N \\
+    \end{align*}
 
 **Solution String:** ``max_diversification``
 
@@ -271,13 +249,11 @@ For this solution, the objective is to minimise the correlation between the asse
 
 .. math::
 
-    \begin{equation*}
-        \begin{aligned}
-            & \underset{\mathbf{w}}{\text{min}} & &  w^TA w\\
-            & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
-            &&& w_{j} \geq 0, j=1,..,N \\
-        \end{aligned}
-    \end{equation*}
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{min}} & &  w^TA w\\
+        & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N \\
+    \end{align*}
 
 where :math:`A` is the correlation matrix of assets. The Maximum Decorrelation portfolio is closely related to Minimum Variance and Maximum Diversification, but applies to the case where an investor believes all assets have similar returns and volatility, but heterogeneous correlations. It is a Minimum Variance optimization that is performed on the correlation matrix rather than the covariance matrix, :math:`\sum`.
 

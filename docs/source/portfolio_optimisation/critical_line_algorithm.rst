@@ -43,12 +43,10 @@ between classic mean-variance optimisation and the critical line algorithm (CLA)
 typical mean-variance optimisation problem looks something like this:
 
 .. math::
-        \begin{equation*}
-            \begin{aligned}
-                & \underset{\mathbf{w}}{\text{min}} & & w^T\sum w \\
-                & \text{s.t.} & & \sum_{i=1}^{n}w_{i} = 1 \\
-            \end{aligned}
-        \end{equation*}
+        \begin{align*}
+            & \underset{\mathbf{w}}{\text{min}} & & w^T\sum w \\
+            & \text{s.t.} & & \sum_{i=1}^{n}w_{i} = 1 \\
+        \end{align*}
 
 where :math:`w` refers to the set of weights for the portfolio assets, :math:`\sum` is the covariance matrix of the assets
 and :math:`\mu` is the expected asset returns. CLA also solves the same problem but with some added constraints - each weight
@@ -56,14 +54,12 @@ of an asset in the portfolio can have different lower and upper bounds. The opti
 the new constraints on the weights, the problem looks like this:
 
 .. math::
-        \begin{equation*}
-            \begin{aligned}
-                & \underset{\mathbf{w}}{\text{min}} & & w^T\sum w \\
-                & \text{s.t.} & & \sum_{i=1}^{n}w_{i} = 1 \\
-                &&& w_{i} <= u_{i} \\
-                &&& w_{i} >= l_{i} \\
-            \end{aligned}
-        \end{equation*}
+        \begin{align*}
+            & \underset{\mathbf{w}}{\text{min}} & & w^T\sum w \\
+            & \text{s.t.} & & \sum_{i=1}^{n}w_{i} = 1 \\
+            &&& w_{i} <= u_{i} \\
+            &&& w_{i} >= l_{i} \\
+        \end{align*}
 
 Each weight in the allocation has an upper and a lower bound, which increases the number of constraints to be solved.
 
