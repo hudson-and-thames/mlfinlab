@@ -4,13 +4,12 @@ Test Stationarity
 
 import unittest
 import os
-import numpy as np
 import pandas as pd
 
 from mlfinlab.statistical_arbitrage import calc_stationarity
 
 
-class TesStationarity(unittest.TestCase):
+class TestStationarity(unittest.TestCase):
     """
     Test Stationarity.
     """
@@ -35,10 +34,13 @@ class TesStationarity(unittest.TestCase):
         # 6 items in the result.
         self.assertEqual(len(res), 6)
 
+        # Check all values.
         self.assertAlmostEqual(res[0], -2.37269, delta=1e-3)
         self.assertAlmostEqual(res[1], 0.149591, delta=1e-3)
         self.assertEqual(res[2], 20)
         self.assertEqual(res[3], 2120)
+
+        # Check confidence range.
         self.assertEqual(len(res[4]), 3)
         self.assertAlmostEqual(res[4].get('1%'), -3.433438, delta=1e-3)
         self.assertAlmostEqual(res[4].get('5%'), -2.86290, delta=1e-3)
