@@ -34,7 +34,6 @@
     allocations on the specific user data. This way, each implementation can be called in the same way and this makes it simple
     for users to use them.
 
-
 =================================
 The Critical Line Algorithm (CLA)
 =================================
