@@ -1,3 +1,5 @@
+.. _portfolio_optimisation-nested_clustered_optimisation:
+
 .. |br| raw:: html
 
     <br>
@@ -25,8 +27,6 @@
 .. |h5_| raw:: html
 
     </h5>
-
-.. _portfolio_optimisation-nested_clustered_optimisation:
 
 ===================================
 Nested Clustered Optimization (NCO)

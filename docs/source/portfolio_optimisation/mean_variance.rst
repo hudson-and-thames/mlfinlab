@@ -1,3 +1,5 @@
+.. _portfolio_optimisation-mean_variance:
+
 .. |br| raw:: html
 
     <br>
@@ -25,8 +27,6 @@
 .. |h5_| raw:: html
 
     </h5>
-
-.. _portfolio_optimisation-mean_variance:
 
 .. note::
     The portfolio optimization module contains different algorithms that are used for asset allocation and optimising strategies.
