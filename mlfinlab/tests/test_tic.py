@@ -7,7 +7,7 @@ import unittest
 import os
 import numpy as np
 import pandas as pd
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 from mlfinlab.portfolio_optimization.tic import TIC
 
 
@@ -28,7 +28,7 @@ class TestTIC(unittest.TestCase):
         self.price_data = pd.read_csv(price_data_path, parse_dates=True, index_col="Date")
 
         # Transforming series of prices to series of returns
-        ret_est = ReturnsEstimation()
+        ret_est = ReturnsEstimators()
         self.returns_data = ret_est.calculate_returns(self.price_data)
 
         # Loading the classification tree of ETFs
