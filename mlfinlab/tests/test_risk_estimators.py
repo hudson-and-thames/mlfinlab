@@ -8,7 +8,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
 class TestRiskEstimators(unittest.TestCase):
@@ -27,7 +27,7 @@ class TestRiskEstimators(unittest.TestCase):
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
         # And series of returns
-        ret_est = ReturnsEstimation()
+        ret_est = ReturnsEstimators()
         self.returns = ret_est.calculate_returns(self.data)
 
     def test_mp_pdf(self):
