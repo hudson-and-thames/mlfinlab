@@ -25,3 +25,4 @@ import mlfinlab.microstructural_features as microstructural_features
 import mlfinlab.backtest_statistics.backtests as backtests
 import mlfinlab.backtest_statistics.statistics as backtest_statistics
 import mlfinlab.online_portfolio_selection as online_portfolio_selection
+import mlfinlab.statistical_arbitrage as statistical_arbitrage
