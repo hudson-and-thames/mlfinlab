@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import pairwise_distances
 from scipy.cluster.hierarchy import fcluster
-from scipy.cluster.hierarchy import linkage as scipy_linkage
+from scipy.cluster.hierarchy import linkage as scipy_linkage, dendrogram
 from scipy.spatial.distance import squareform
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
@@ -100,17 +100,16 @@ class HierarchicalClusteringAssetAllocation:
 
         # Calculate the optimal number of clusters
         if not optimal_num_clusters:
-            optimal_num_clusters = self._get_optimal_number_of_clusters(correlation=corr,
-                                                                        linkage=linkage,
-                                                                        asset_returns=asset_returns)
+            self.optimal_num_clusters = self._get_optimal_number_of_clusters(correlation=corr,
+                                                                             linkage=linkage,
+                                                                             asset_returns=asset_returns)
         else:
-            optimal_num_clusters = self._check_max_number_of_clusters(num_clusters=optimal_num_clusters,
-                                                                      linkage=linkage,
-                                                                      correlation=corr)
+            self.optimal_num_clusters = self._check_max_number_of_clusters(num_clusters=optimal_num_clusters,
+                                                                           linkage=linkage,
+                                                                           correlation=corr)
 
         # Tree Clustering
         self.clusters, self.cluster_children = self._tree_clustering(correlation=corr,
-                                                                     num_clusters=optimal_num_clusters,
                                                                      linkage=linkage)
 
         # Get the flattened order of assets in hierarchical clustering tree
@@ -122,8 +121,18 @@ class HierarchicalClusteringAssetAllocation:
                                   asset_returns=asset_returns,
                                   covariance_matrix=cov,
                                   assets=asset_names,
-                                  allocation_metric=allocation_metric,
-                                  optimal_num_clusters=optimal_num_clusters)
+                                  allocation_metric=allocation_metric)
+
+    def plot_clusters(self, assets):
+        """
+        Plot a dendrogram of the hierarchical clusters.
+
+        :param assets: (list) Asset names in the portfolio
+        :return: (dict) Dendrogram
+        """
+
+        dendrogram_plot = dendrogram(self.clusters, labels=assets, )
+        return dendrogram_plot
 
     @staticmethod
     def _compute_cluster_inertia(labels, asset_returns):
@@ -219,19 +228,18 @@ class HierarchicalClusteringAssetAllocation:
         return np.mean(reference_inertias)
 
     @staticmethod
-    def _tree_clustering(correlation, num_clusters, linkage):
+    def _tree_clustering(correlation, linkage):
         """
         Perform agglomerative clustering on the current portfolio.
 
         :param correlation: (np.array) Matrix of asset correlations.
-        :param num_clusters: (int) The number of clusters.
         :param linkage (str): The type of linkage method to use for clustering.
         :return: (list) Structure of hierarchical tree.
         """
 
         distance_matrix = np.sqrt(2 * (1 - correlation).round(5))
         clusters = scipy_linkage(squareform(distance_matrix.values), method=linkage)
-        clustering_inds = fcluster(clusters, num_clusters, criterion='maxclust')
+        clustering_inds = fcluster(clusters, self.optimal_num_clusters, criterion='maxclust')
         cluster_children = {index - 1: [] for index in range(min(clustering_inds), max(clustering_inds) + 1)}
         for index, cluster_index in enumerate(clustering_inds):
             cluster_children[cluster_index - 1].append(index)
@@ -254,8 +262,7 @@ class HierarchicalClusteringAssetAllocation:
 
         return (self._quasi_diagnalization(num_assets, left) + self._quasi_diagnalization(num_assets, right))
 
-    def _recursive_bisection(self, expected_asset_returns, asset_returns, covariance_matrix, assets, allocation_metric,
-                             optimal_num_clusters):
+    def _recursive_bisection(self, expected_asset_returns, asset_returns, covariance_matrix, assets, allocation_metric):
         """
         Recursively assign weights to the clusters - ultimately assigning weights to the individual assets.
 
@@ -264,26 +271,24 @@ class HierarchicalClusteringAssetAllocation:
         :param covariance_matrix: (pd.DataFrame) The covariance matrix.
         :param assets: (list) List of asset names in the portfolio.
         :param allocation_metric: (str) The metric used for calculating weight allocations.
-        :param optimal_num_clusters: (int) Optimal number of clusters for hierarchical tree clustering.
         """
 
         num_assets = len(assets)
         self.weights = np.ones(shape=num_assets)
-        clusters_contribution = np.ones(shape=optimal_num_clusters)
-        clusters_weights = np.ones(shape=optimal_num_clusters)
-        clusters_variance = np.ones(shape=optimal_num_clusters)
+        clusters_contribution = np.ones(shape=self.optimal_num_clusters)
+        clusters_weights = np.ones(shape=self.optimal_num_clusters)
+        clusters_variance = np.ones(shape=self.optimal_num_clusters)
 
         # Calculate the corresponding risk measure for the clusters
         self._calculate_risk_contribution_of_clusters(clusters_contribution,
                                                       clusters_variance,
                                                       allocation_metric,
-                                                      optimal_num_clusters,
                                                       covariance_matrix,
                                                       expected_asset_returns,
                                                       asset_returns)
 
         # Recursive bisection taking into account the dendrogram structure
-        for cluster_index in range(optimal_num_clusters - 1):
+        for cluster_index in range(self.optimal_num_clusters - 1):
 
             # Get the left and right cluster ids
             left_cluster_ids, right_cluster_ids = self._get_children_cluster_ids(num_assets=num_assets,
@@ -312,30 +317,29 @@ class HierarchicalClusteringAssetAllocation:
             clusters_weights[right_cluster_ids] *= 1 - alloc_factor
 
         # Compute the final weights
-        self._calculate_final_portfolio_weights(clusters_weights, covariance_matrix, optimal_num_clusters)
+        self._calculate_final_portfolio_weights(clusters_weights, covariance_matrix)
 
         # Assign actual asset names to weight index
         self.weights = pd.DataFrame(self.weights)
         self.weights.index = assets[self.ordered_indices]
         self.weights = self.weights.T
 
-    def _calculate_final_portfolio_weights(self, clusters_weights, covariance_matrix, optimal_num_clusters):
+    def _calculate_final_portfolio_weights(self, clusters_weights, covariance_matrix):
         """
         Calculate the final asset weights.
 
         :param clusters_weights: (np.array) The cluster weights calculated using recursive bisection.
         :param covariance_matrix: (pd.DataFrame) The covariance matrix.
-        :param optimal_num_clusters: (int) Optimal number of clusters for hierarchical tree clustering.
         """
 
-        for cluster_index in range(optimal_num_clusters):
+        for cluster_index in range(self.optimal_num_clusters):
             cluster_asset_indices = self.cluster_children[cluster_index]
             cluster_covariance = covariance_matrix.iloc[cluster_asset_indices, cluster_asset_indices]
             ivp_weights = self._get_inverse_variance_weights(cluster_covariance)
             self.weights[cluster_asset_indices] = ivp_weights * clusters_weights[cluster_index]
 
     def _calculate_risk_contribution_of_clusters(self, clusters_contribution, clusters_variance, allocation_metric,
-                                                 optimal_num_clusters, covariance_matrix, expected_asset_returns,
+                                                 covariance_matrix, expected_asset_returns,
                                                  asset_returns):
         """
         Calculate the risk contribution of clusters based on the allocation metric.
@@ -343,13 +347,12 @@ class HierarchicalClusteringAssetAllocation:
         :param clusters_contribution: (np.array) The risk contribution value of the clusters.
         :param clusters_variance: (np.array) The variance of the clusters.
         :param allocation_metric: (str) The metric used for calculating weight allocations.
-        :param optimal_num_clusters: (int) Optimal number of clusters for hierarchical tree clustering.
         :param covariance_matrix: (pd.DataFrame) The covariance matrix.
         :param expected_asset_returns: (list) A list of mean asset returns (mu).
         :param asset_returns: (pd.DataFrame) Historical asset returns.
         """
 
-        for cluster_index in range(optimal_num_clusters):
+        for cluster_index in range(self.optimal_num_clusters):
             cluster_asset_indices = self.cluster_children[cluster_index]
 
             if allocation_metric == 'minimum_variance':

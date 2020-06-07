@@ -114,6 +114,17 @@ class HierarchicalRiskParity:
         # Step-3: Recursive Bisection
         self._recursive_bisection(covariance=covariance_matrix, assets=asset_names, side_weights=side_weights)
 
+    def plot_clusters(self, assets):
+        """
+        Plot a dendrogram of the hierarchical clusters.
+
+        :param assets: (list) Asset names in the portfolio
+        :return: (dict) Dendrogram
+        """
+
+        dendrogram_plot = dendrogram(self.clusters, labels=assets)
+        return dendrogram_plot
+
     @staticmethod
     def _tree_clustering(distance, method='single'):
         """
@@ -231,17 +242,6 @@ class HierarchicalRiskParity:
             self.weights.loc[buy_ptf] /= self.weights.loc[buy_ptf].sum().values[0]
             self.weights.loc[buy_ptf] *= 0.5
         self.weights = self.weights.T
-
-    def plot_clusters(self, assets):
-        """
-        Plot a dendrogram of the hierarchical clusters.
-
-        :param assets: (list) Asset names in the portfolio
-        :return: (dict) Dendrogram
-        """
-
-        dendrogram_plot = dendrogram(self.clusters, labels=assets)
-        return dendrogram_plot
 
     @staticmethod
     def _shrink_covariance(asset_returns):
