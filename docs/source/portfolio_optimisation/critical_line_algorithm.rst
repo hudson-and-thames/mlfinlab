@@ -1,3 +1,5 @@
+.. _portfolio_optimisation-critical_line_algorithm:
+
 .. |br| raw:: html
 
     <br>
@@ -25,8 +27,6 @@
 .. |h5_| raw:: html
 
     </h5>
-
-.. _portfolio_optimisation-critical_line_algorithm:
 
 .. note::
     The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies.

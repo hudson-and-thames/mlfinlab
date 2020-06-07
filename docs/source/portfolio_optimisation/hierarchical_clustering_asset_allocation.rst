@@ -1,3 +1,5 @@
+.. _portfolio_optimisation-hierarchical_clustering_asset_allocation:
+
 .. |br| raw:: html
 
     <br>
@@ -17,8 +19,6 @@
 .. |h4_| raw:: html
 
     </h4>
-
-.. _portfolio_optimisation-hierarchical_clustering_asset_allocation:
 
 
 .. note::
