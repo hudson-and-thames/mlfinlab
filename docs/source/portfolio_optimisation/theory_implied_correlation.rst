@@ -1,31 +1,3 @@
-.. |br| raw:: html
-
-    <br>
-
-.. |h3| raw:: html
-
-    <h3>
-
-.. |h3_| raw:: html
-
-    </h3>
-
-.. |h4| raw:: html
-
-    <h4>
-
-.. |h4_| raw:: html
-
-    </h4>
-
-.. |h5| raw:: html
-
-    <h5>
-
-.. |h5_| raw:: html
-
-    </h5>
-
 .. _portfolio_optimisation-theory_implied_correlation:
 
 
@@ -35,7 +7,7 @@ Theory-Implied Correlation (TIC)
 This TIC class includes an algorithm to calculate the Theory-Implied Correlation and a method to calculate the correlation matrix distance proposed by Herdin and Bonek. This distance may be used to measure to which extent the TIC matrix has blended theory-implied views (tree structure of the elements) with empirical evidence (correlation matrix).
 
 .. tip::
-   |h4| Underlying Literature |h4_|
+   **Underlying Literature**
 
    The following sources elaborate extensively on the topic:
 
