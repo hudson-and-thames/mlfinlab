@@ -1,20 +1,20 @@
 .. _portfolio_optimisation-returns_estimation:
 
 
-=====================
-Estimation of Returns
-=====================
+==================
+Returns Estimators
+==================
 
-Accurate estimation of historical asset returns is one of the most important aspects of portfolio optimisation. At the same, it is
-also one of the most difficult to calculate since most of the times, estimated returns do not correctly reflect the true underlying
-returns of a portfolio/asset. Given this, there is still significant research work being published dealing with novel methods to
-estimate returns and we wanted to share some of these methods with the users of mlfinlab.
+Accurate estimation of historical asset returns is one of the most important aspects of portfolio optimisation. However, it is
+also one of the most difficult to calculate since estimated returns do not correctly reflect the true underlying
+returns of a portfolio/asset. MlFinLab's :py:mod:`ReturnsEstimators` class provides functions to estimate mean asset returns.
+Currently, it is still in active development and we will keep adding new methods to it.
 
-This class provides functions to estimate mean asset returns. Currently, it is still in active development and we
-will keep adding new methods to it.
+Supported Estimators
+####################
 
 Simple returns
-##############
+**************
 
 The `calculate_returns` function allows calculating a dataframe of returns from a dataframe of prices.
 The calculation is done in the following way:
@@ -26,7 +26,7 @@ The calculation is done in the following way:
 Where :math:`R_{t}` is the return for :math:`t` -th observation, and :math:`P_{t}` is the price for :math:`t` -th observation.
 
 Annualized mean historical returns
-##################################
+**********************************
 
 The `calculate_mean_historical_returns` function allows calculating a mean annual return for every element in a dataframe of prices.
 The calculation is done in the following way:
@@ -46,7 +46,7 @@ Where :math:`R_{t}` is the return for :math:`t` -th observation, and :math:`P_{t
 :math:`T` is the total number of observations, :math:`N` is an average number of observations in a year.
 
 Exponentially-weighted annualized mean of historical returns
-############################################################
+************************************************************
 
 The `calculate_exponential_historical_returns` function allows calculating the exponentially-weighted mean annual return for every element in a dataframe of prices.
 The calculation is done in the following way:
@@ -80,25 +80,25 @@ Implementation
 
 .. automodule:: mlfinlab.portfolio_optimization.returns_estimators
 
-    .. autoclass:: ReturnsEstimation
+    .. autoclass:: ReturnsEstimators
         :members:
 
         .. automethod:: __init__
 
-Example
-########
+Example Code
+############
 Below is an example of how to use the package functions to calculate various estimators of returns for a portfolio.
 
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.portfolio_optimization import ReturnsEstimation
+    from mlfinlab.portfolio_optimization import ReturnsEstimators
 
     # Import dataframe of prices for assets in a portfolio
     asset_prices = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)
 
     # Class that contains needed functions
-    ret_est = ReturnsEstimation()
+    ret_est = ReturnsEstimators()
 
     # Calculate simple returns
     assets_returns = ret_est.calculate_returns(asset_prices)
