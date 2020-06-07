@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.neighbors import KernelDensity
 from sklearn.covariance import MinCovDet, EmpiricalCovariance, ShrunkCovariance, LedoitWolf, OAS
 from scipy.optimize import minimize
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
 class RiskEstimators:
@@ -283,7 +283,7 @@ class RiskEstimators:
         <https://scikit-learn.org/stable/modules/generated/sklearn.covariance.MinCovDet.html>`_
 
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
-        the calculate_returns method from the ReturnsEstimation class.
+        the calculate_returns method from the ReturnsEstimators class.
 
         :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
@@ -298,7 +298,7 @@ class RiskEstimators:
         # Calculating the series of returns from series of prices
         if price_data:
             # Class with returns calculation function
-            ret_est = ReturnsEstimation()
+            ret_est = ReturnsEstimators()
 
             # Calculating returns
             returns = ret_est.calculate_returns(returns)
@@ -326,7 +326,7 @@ class RiskEstimators:
         <https://scikit-learn.org/stable/modules/generated/sklearn.covariance.EmpiricalCovariance.html>`_
 
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
-        the calculate_returns method from the ReturnsEstimation class.
+        the calculate_returns method from the ReturnsEstimators class.
 
         :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
@@ -338,7 +338,7 @@ class RiskEstimators:
         # Calculating the series of returns from series of prices
         if price_data:
             # Class with returns calculation function
-            ret_est = ReturnsEstimation()
+            ret_est = ReturnsEstimators()
 
             # Calculating returns
             returns = ret_est.calculate_returns(returns)
@@ -367,7 +367,7 @@ class RiskEstimators:
         <https://scikit-learn.org/stable/modules/covariance.html>`_
 
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
-        the calculate_returns method from the ReturnsEstimation class.
+        the calculate_returns method from the ReturnsEstimators class.
 
         :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
@@ -381,7 +381,7 @@ class RiskEstimators:
         # Calculating the series of returns from series of prices
         if price_data:
             # Class with returns calculation function
-            ret_est = ReturnsEstimation()
+            ret_est = ReturnsEstimators()
 
             # Calculating returns
             returns = ret_est.calculate_returns(returns)
@@ -413,7 +413,7 @@ class RiskEstimators:
         measure for returns below this threshold.
 
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
-        the calculate_returns method from the ReturnsEstimation class.
+        the calculate_returns method from the ReturnsEstimators class.
 
         :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
@@ -425,7 +425,7 @@ class RiskEstimators:
         # Calculating the series of returns from series of prices
         if price_data:
             # Class with returns calculation function
-            ret_est = ReturnsEstimation()
+            ret_est = ReturnsEstimators()
 
             # Calculating returns
             returns = ret_est.calculate_returns(returns)
@@ -466,7 +466,7 @@ class RiskEstimators:
         weighted moving average series from covariance series as an element in matrix.
 
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
-        the calculate_returns method from the ReturnsEstimation class.
+        the calculate_returns method from the ReturnsEstimators class.
 
         :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
@@ -477,7 +477,7 @@ class RiskEstimators:
         # Calculating the series of returns from series of prices
         if price_data:
             # Class with returns calculation function
-            ret_est = ReturnsEstimation()
+            ret_est = ReturnsEstimators()
 
             # Calculating returns
             returns = ret_est.calculate_returns(returns)
