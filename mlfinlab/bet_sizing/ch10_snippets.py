@@ -27,7 +27,7 @@ def get_signal(prob, num_classes, pred=None):
     """
     # Get signals from predictions.
     if prob.shape[0] == 0:
-        return pd.Series()
+        return pd.Series(dtype='float64')
 
     # 1) Generate signals from multinomial classification (one-vs-rest).
     bet_sizes = (prob - 1/num_classes) / (prob * (1 - prob))**0.5
