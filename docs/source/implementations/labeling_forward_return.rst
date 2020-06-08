@@ -23,9 +23,10 @@ This labeling method is used in in the paper `Kim, K., 2003. Financial time seri
 <https://www.sciencedirect.com/science/article/abs/pii/S0925231203003722>`_. The author labels data in this way, and uses
 the labels to train and test SVMs used to predict future price movements.
 
-IMAGEIMAGE
+Below is a visualization of the labels. Five tech stocks are labelled based on their forward returns. Darker green indicates that
+more of those stocks had a positive forward return on a given day,
 
-.. image:: labeling_images/
+.. image:: labeling_images/forward_return_heatmap.png
    :scale: 100 %
    :align: center
 
