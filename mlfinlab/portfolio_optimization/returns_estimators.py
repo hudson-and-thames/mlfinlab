@@ -1,7 +1,7 @@
 
 
 # pylint: disable=missing-module-docstring
-class ReturnsEstimation:
+class ReturnsEstimators:
     """
     This class contains methods for estimating expected returns. A good estimation of the asset expected returns is very important
     for portfolio optimisation problems and so it is necessary to use good estimates of returns and not just rely on
