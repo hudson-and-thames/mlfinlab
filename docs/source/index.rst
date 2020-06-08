@@ -343,6 +343,13 @@ This project is licensed under an all rights reserved licence.
     online_portfolio_selection/universal_portfolio
 
 .. toctree::
+    :maxdepth: 3
+    :caption: Statistical Arbitrage
+    :hidden:
+
+    statistical_arbitrage/stationarity
+
+.. toctree::
     :maxdepth: 2
     :caption: Additional Information
     :hidden:
