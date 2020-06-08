@@ -20,6 +20,88 @@ class TIC:
 
         return
 
+    def tic_correlation(self, tree_struct, corr_matrix, tn_relation, kde_bwidth=0.01):
+        """
+        Calculates the Theory-Implied Correlation (TIC) matrix.
+
+        Includes three steps.
+
+        In the first step, the theoretical tree graph structure of the assets is fit on the evidence
+        presented by the empirical correlation matrix.
+
+        The result of the first step is a binary tree (dendrogram) that sequentially clusters two elements
+        together, while measuring how closely together the two elements are, until all elements are
+        subsumed within the same cluster.
+
+        In the second step, a correlation matrix is derived from the linkage object.
+
+        Each cluster in the global linkage object is decomposed into two elements,
+        which can be either atoms or other clusters. Then the off-diagonal correlation between two
+        elements is calculated based on the distances between them.
+
+        In the third step, the correlation matrix is de-noised.
+
+        This is done by fitting the Marcenko-Pastur distribution to the eigenvalues of the matrix, calculating the
+        maximum theoretical eigenvalue as a threshold and shrinking the eigenvalues higher than a set threshold.
+        This algorithm is implemented in the RiskEstimators class.
+
+        :param tree_struct: (pd.dataframe) The tree graph that represents the structure of the assets
+        :param corr_matrix: (pd.dataframe) The empirical correlation matrix of the assets
+        :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
+                                    correlation matrix
+        :param kde_bwidth: (float) The bandwidth of the kernel to fit KDE for de-noising the correlation matrix
+                                   (0.01 by default)
+        :return: (np.array) Theory-Implied Correlation matrix
+        """
+
+        # Getting the linkage object that characterizes the dendrogram
+        lnkage_object = self._get_linkage_corr(tree_struct, corr_matrix)
+
+        # Calculating the correlation matrix from the dendrogram
+        ti_correlation = self._link2corr(lnkage_object, corr_matrix.index)
+
+        # Class with function for de-noising the correlation matrix
+        risk_estim = RiskEstimators()
+
+        # De-noising the obtained Theory-Implies Correlation matrix
+        ti_correlation_denoised = risk_estim.denoise_covariance(ti_correlation, tn_relation=tn_relation,
+                                                                kde_bwidth=kde_bwidth)
+
+        return ti_correlation_denoised
+
+    @staticmethod
+    def corr_dist(corr0, corr1):
+        """
+        Calculates the correlation matrix distance proposed by Herdin and Bonek.
+
+        The distance obtained measures the orthogonality between the considered
+        correlation matrices. If the matrices are equal up to a scaling factor,
+        the distance becomes zero and one if they are different to a maximum
+        extent.
+
+        This can be used to measure to which extent the TIC matrix has blended
+        theory-implied views (tree structure of the elements) with empirical
+        evidence (correlation matrix).
+
+        :param corr0: (pd.dataframe) First correlation matrix
+        :param corr1: (pd.dataframe) Second correlation matrix
+        :return: (float) Correlation matrix distance
+        """
+
+        # Trace of the product of correlation matrices
+        prod_trace = np.trace(np.dot(corr0, corr1))
+
+        # Frobenius norm of the first correlation matrix
+        frob_product = np.linalg.norm(corr0, ord='fro')
+
+        # Frobenius norm of the second correlation matrix
+        frob_product *= np.linalg.norm(corr1, ord='fro')
+
+        # Distance calculation
+        distance = 1 - prod_trace / frob_product
+
+        return distance
+
     def _get_linkage_corr(self, tree_struct, corr_matrix):
         """
         Fits the theoretical tree graph structure of the assets in a portfolio on the evidence
@@ -338,85 +420,3 @@ class TIC:
             corr_matrix.loc[element_index[el_y], element_index[el_x]] = 1 - 2 * linkage['dist'][link]**2
 
         return corr_matrix
-
-    def tic_correlation(self, tree_struct, corr_matrix, tn_relation, kde_bwidth=0.01):
-        """
-        Calculates the Theory-Implied Correlation (TIC) matrix.
-
-        Includes three steps.
-
-        In the first step, the theoretical tree graph structure of the assets is fit on the evidence
-        presented by the empirical correlation matrix.
-
-        The result of the first step is a binary tree (dendrogram) that sequentially clusters two elements
-        together, while measuring how closely together the two elements are, until all elements are
-        subsumed within the same cluster.
-
-        In the second step, a correlation matrix is derived from the linkage object.
-
-        Each cluster in the global linkage object is decomposed into two elements,
-        which can be either atoms or other clusters. Then the off-diagonal correlation between two
-        elements is calculated based on the distances between them.
-
-        In the third step, the correlation matrix is de-noised.
-
-        This is done by fitting the Marcenko-Pastur distribution to the eigenvalues of the matrix, calculating the
-        maximum theoretical eigenvalue as a threshold and shrinking the eigenvalues higher than a set threshold.
-        This algorithm is implemented in the RiskEstimators class.
-
-        :param tree_struct: (pd.dataframe) The tree graph that represents the structure of the assets
-        :param corr_matrix: (pd.dataframe) The empirical correlation matrix of the assets
-        :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
-                                    correlation matrix
-        :param kde_bwidth: (float) The bandwidth of the kernel to fit KDE for de-noising the correlation matrix
-                                   (0.01 by default)
-        :return: (np.array) Theory-Implied Correlation matrix
-        """
-
-        # Getting the linkage object that characterizes the dendrogram
-        lnkage_object = self._get_linkage_corr(tree_struct, corr_matrix)
-
-        # Calculating the correlation matrix from the dendrogram
-        ti_correlation = self._link2corr(lnkage_object, corr_matrix.index)
-
-        # Class with function for de-noising the correlation matrix
-        risk_estim = RiskEstimators()
-
-        # De-noising the obtained Theory-Implies Correlation matrix
-        ti_correlation_denoised = risk_estim.denoise_covariance(ti_correlation, tn_relation=tn_relation,
-                                                                kde_bwidth=kde_bwidth)
-
-        return ti_correlation_denoised
-
-    @staticmethod
-    def corr_dist(corr0, corr1):
-        """
-        Calculates the correlation matrix distance proposed by Herdin and Bonek.
-
-        The distance obtained measures the orthogonality between the considered
-        correlation matrices. If the matrices are equal up to a scaling factor,
-        the distance becomes zero and one if they are different to a maximum
-        extent.
-
-        This can be used to measure to which extent the TIC matrix has blended
-        theory-implied views (tree structure of the elements) with empirical
-        evidence (correlation matrix).
-
-        :param corr0: (pd.dataframe) First correlation matrix
-        :param corr1: (pd.dataframe) Second correlation matrix
-        :return: (float) Correlation matrix distance
-        """
-
-        # Trace of the product of correlation matrices
-        prod_trace = np.trace(np.dot(corr0, corr1))
-
-        # Frobenius norm of the first correlation matrix
-        frob_product = np.linalg.norm(corr0, ord='fro')
-
-        # Frobenius norm of the second correlation matrix
-        frob_product *= np.linalg.norm(corr1, ord='fro')
-
-        # Distance calculation
-        distance = 1 - prod_trace / frob_product
-
-        return distance
