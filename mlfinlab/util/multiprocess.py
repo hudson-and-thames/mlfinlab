@@ -128,7 +128,7 @@ def mp_pandas_obj(func, pd_obj, num_threads=24, mp_batches=1, lin_mols=True, **k
     if isinstance(out[0], pd.DataFrame):
         df0 = pd.DataFrame()
     elif isinstance(out[0], pd.Series):
-        df0 = pd.Series()
+        df0 = pd.Series(dtype='float64')
     else:
         return out
 
