@@ -36,7 +36,7 @@ class TestFeatureImportance(unittest.TestCase):
         self.bag_clf = BaggingClassifier(base_estimator=self.clf_base, max_features=1.0, n_estimators=100,
                                          oob_score=True, random_state=1)
         self.fit_clf = self.bag_clf.fit(self.X, self.y)
-        self.cv_gen = KFold(n_splits=3, random_state=0)
+        self.cv_gen = KFold(n_splits=3)
 
     def test_orthogonal_features(self):
         """
