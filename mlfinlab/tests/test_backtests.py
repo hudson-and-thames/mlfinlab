@@ -40,8 +40,6 @@ class TestCampbellBacktesting(unittest.TestCase):
         self.assertAlmostEqual(haircuts[0][2], 0.174, delta=1e-2)
         self.assertAlmostEqual(haircuts[0][3], 0.348, delta=1e-2)
 
-        print(haircuts[0][2])
-
     def test_profit_hurdle(self):
         """
         Test the calculation of haircuts with simple inputs
