@@ -34,6 +34,5 @@ def excess_over_mean(prices, binary=False):
 
     # If binary is true, returns sign of the return over mean instead of the value
     if binary:
-        to_sign = returns_over_mean.notna()
-        returns_over_mean[to_sign] = np.sign(returns_over_mean[to_sign])
+        returns_over_mean = returns_over_mean.apply(np.sign)
     return returns_over_mean

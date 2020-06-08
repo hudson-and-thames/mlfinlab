@@ -36,7 +36,7 @@ class TestLabelingOverMean(unittest.TestCase):
                                      (-0.003687, -0.002863, 0.004815, 0.001735),
                                      (np.nan, np.nan, np.nan, np.nan), ], columns=self.data[cols].iloc[0:5].columns,
                                     index=self.data[cols].iloc[0:5].index)
-        test2_actual = np.sign(test1_actual)
+        test2_actual = test1_actual.apply(np.sign)
 
         # Check less precise because calculated numbers have more decimal places than inputted ones
         pd.testing.assert_frame_equal(test1, test1_actual, check_less_precise=True)
