@@ -60,9 +60,9 @@ class TestLabelingRawReturns(unittest.TestCase):
 
         # Check less precise for slight rounding differences between calculated and manually inputted values
         pd.testing.assert_series_equal(test1, test1_actual, check_less_precise=True)
-        self.assertEqual(test2.all(), np.sign(test1).all())
+        self.assertEqual(test2.all(), test1.apply(np.sign).all())
         pd.testing.assert_series_equal(test3, test3_actual, check_less_precise=True)
-        self.assertEqual(test4.all(), np.sign(test4).all())
+        self.assertEqual(test4.all(), test3.apply(np.sign).all())
         pd.testing.assert_series_equal(test5, test5_actual, check_less_precise=True)
         pd.testing.assert_series_equal(test6, test6_actual, check_less_precise=True)
 

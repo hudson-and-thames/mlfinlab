@@ -38,6 +38,6 @@ def raw_return(price, binary=False, logarithmic=False, lookback=1):
 
     # Return sign only if categorical labels desired
     if binary:
-        raw_returns = np.sign(raw_returns)
+        raw_returns = raw_returns.apply(np.sign)
 
     return raw_returns
