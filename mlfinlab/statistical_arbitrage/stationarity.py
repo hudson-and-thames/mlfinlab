@@ -5,7 +5,7 @@ Calculate Stationarity.
 from statsmodels.tsa.stattools import adfuller
 
 
-def calc_stationarity(x, maxlag=None, regression="c", autolag="AIC", store=False, regresults=False):
+def calc_stationarity(data, maxlag=None, regression="c", autolag="AIC", store=False, regresults=False):
     """
     Wrapper function for Augmented Dickey-Fuller unit root test, directly forked from
     `statsmodels.tsa.stattools.adfuller
@@ -25,7 +25,7 @@ def calc_stationarity(x, maxlag=None, regression="c", autolag="AIC", store=False
 
     The autolag option and maxlag for it are described in Greene.
 
-    :param x: (pd.Sereis) The data series to test.
+    :param data: (pd.Sereis) The data series to test.
     :param maxlag: (int) Maximum lag which is included in test, default 12*(nobs/100)^{1/4}.
     :param regression: (str) {"c","ct","ctt","nc"} Constant and trend order to include in
         regression.
@@ -56,5 +56,5 @@ def calc_stationarity(x, maxlag=None, regression="c", autolag="AIC", store=False
         - icbest: (float) The maximized information criterion if autolag is not None.
         - resstore: (ResultStore) This is optional. A dummy class with results attached as attributes.
     """
-    return adfuller(x, maxlag=maxlag, regression=regression, autolag=autolag, store=store,
+    return adfuller(data, maxlag=maxlag, regression=regression, autolag=autolag, store=store,
                     regresults=regresults)

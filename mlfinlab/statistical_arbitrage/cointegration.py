@@ -5,7 +5,7 @@ Calculate Cointegration.
 from statsmodels.tsa.stattools import coint
 
 
-def calc_cointegration(y0, y1, trend="c", method="aeg", maxlag=None, autolag="aic",
+def calc_cointegration(data1, data2, trend="c", method="aeg", maxlag=None, autolag="aic",
                        return_results=None):
     """
     Wrapper function for augmented Engle-Granger two-step cointegration test, directly forked
@@ -34,8 +34,8 @@ def calc_cointegration(y0, y1, trend="c", method="aeg", maxlag=None, autolag="ai
     under the maintained assumption that they are integrated. In this case
     the t-statistic will be set to -inf and the pvalue to zero.
 
-    :param y0: (pd.Series) The first element in cointegrated system. Must be 1-d.
-    :param y1: (pd.Series) The remaining elements in cointegrated system.
+    :param data1: (pd.Series) The first element in cointegrated system. Must be 1-d.
+    :param data2: (pd.Series) The remaining elements in cointegrated system.
     :param trend: (str) {"c","ct","ctt","nc"} Constant and trend order to include in
         regression.
         - "c" : constant only (default).
@@ -62,5 +62,5 @@ def calc_cointegration(y0, y1, trend="c", method="aeg", maxlag=None, autolag="ai
     - crit_value: (dict) Critical values for the test statistic at the 1 %, 5 %, and 10 %
     levels based on regression curve. This depends on the number of observations.
     """
-    return coint(y0, y1, trend=trend, method=method, maxlag=maxlag, autolag=autolag,
+    return coint(data1, data2, trend=trend, method=method, maxlag=maxlag, autolag=autolag,
                  return_results=return_results)
