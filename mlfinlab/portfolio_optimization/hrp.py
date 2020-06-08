@@ -4,7 +4,7 @@ import pandas as pd
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 from sklearn.covariance import OAS
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
 
 
@@ -28,7 +28,7 @@ class HierarchicalRiskParity:
         self.seriated_correlations = None
         self.ordered_indices = None
         self.clusters = None
-        self.returns_estimator = ReturnsEstimation()
+        self.returns_estimator = ReturnsEstimators()
         self.risk_metrics = RiskMetrics()
 
     def allocate(self,
@@ -53,7 +53,8 @@ class HierarchicalRiskParity:
         :param distance_matrix: (pd.Dataframe/numpy matrix) User supplied distance matrix
         :param side_weights: (pd.Series/numpy matrix) With asset_names in index and value 1 for Buy, -1 for Sell
                                                       (default 1 for all)
-        :param linkage: (string) Type of linkage used for Hierarchical Clustering ex: single, average, complete...
+        :param linkage: (string) Type of linkage used for Hierarchical Clustering. Supported strings - ``single``,
+                                 ``average``, ``complete``, ``ward``.
         :param resample_by: (str) Specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         :param use_shrinkage: (bool) Specifies whether to shrink the covariances
