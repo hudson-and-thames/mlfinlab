@@ -1,10 +1,10 @@
 .. _implementations-labeling_excess_median:
 
 ============================
-Labelling Excess Over Median
+Labeling Excess Over Median
 ============================
 
-Labelling according to excess over median is a binary labelling method used in the following paper `Zhu, M., Philpotts, F. and
+Labeling according to excess over median is a binary labeling method used in the following paper `Zhu, M., Philpotts, F. and
 Stevenson, M., 2012. The benefits of tree-based models for stock selection.
 Journal of Asset Management, 13(6), pp.437-448. <https://link.springer.com/article/10.1057/jam.2012.17>`_
 
@@ -16,12 +16,15 @@ the excess return. The labels can then be used in training regression and classi
 At time :math:`t`:
 
 .. math::
+    :nowrap:
 
-    P_t &= \{p_{t,0}, p_{t,1}, \dots, p_{t,n}\}
+    \begin{gather*}
+    P_t = \{p_{t,0}, p_{t,1}, \dots, p_{t,n}\} \\
 
-    m_t &= median(P_t)
+    m_t = median(P_t) \\
 
-    L(P_t) &= \{p_{t,0} - m_t, p_{t,1} - m_t, \dots, p_{t,n} - m_t\}
+    L(P_t) = \{p_{t,0} - m_t, p_{t,1} - m_t, \dots, p_{t,n} - m_t\}
+    \end{gather*}
 
 
 If categorical rather than numerical labels are desired:
@@ -80,7 +83,7 @@ Below is an example on how to create labels of excess over median from real data
 Research Notebooks
 ##################
 
-The following research notebooks can be used to better understand labelling excess over median.
+The following research notebooks can be used to better understand labeling excess over median.
 
 * `Excess Over Median Example`_
 

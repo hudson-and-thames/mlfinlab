@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.portfolio_optimization.hcaa import HierarchicalClusteringAssetAllocation
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
 class TestHCAA(unittest.TestCase):
@@ -96,7 +96,7 @@ class TestHCAA(unittest.TestCase):
         """
 
         hcaa = HierarchicalClusteringAssetAllocation()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         expected_returns = returns.mean()
         expected_returns[0] = -10000
         hcaa.allocate(expected_asset_returns=expected_returns,
@@ -242,7 +242,7 @@ class TestHCAA(unittest.TestCase):
         """
 
         hcaa = HierarchicalClusteringAssetAllocation()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         hcaa.allocate(asset_returns=returns, asset_names=self.data.columns)
         weights = hcaa.weights.values[0]
         assert (weights >= 0).all()
@@ -255,7 +255,7 @@ class TestHCAA(unittest.TestCase):
         """
 
         hcaa = HierarchicalClusteringAssetAllocation()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         hcaa.allocate(asset_names=self.data.columns,
                       covariance_matrix=returns.cov(),
                       optimal_num_clusters=6,
@@ -293,7 +293,7 @@ class TestHCAA(unittest.TestCase):
         """
 
         hcaa = HierarchicalClusteringAssetAllocation()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         hcaa.allocate(asset_returns=returns,
                       optimal_num_clusters=6)
         weights = hcaa.weights.values[0]
@@ -308,6 +308,6 @@ class TestHCAA(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             hcaa = HierarchicalClusteringAssetAllocation()
-            returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+            returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
             hcaa.allocate(asset_returns=returns.values,
                           optimal_num_clusters=6)
