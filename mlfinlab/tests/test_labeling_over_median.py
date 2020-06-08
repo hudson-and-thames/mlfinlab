@@ -8,9 +8,9 @@ import pandas as pd
 from mlfinlab.labeling.excess_over_median import excess_over_median
 
 
-class TestLabellingOverMedian(unittest.TestCase):
+class TestLabelingOverMedian(unittest.TestCase):
     """
-    Tests regarding labelling excess over median.
+    Tests regarding labeling excess over median.
     """
     def setUp(self):
         """
@@ -32,7 +32,7 @@ class TestLabellingOverMedian(unittest.TestCase):
         test1_actual = pd.DataFrame([(0.005622, -0.006201, 0), (-0.010485, 0, 0.019272), (0.006460, 0, -0.001054),
                                      (-0.000824, 0, 0.007678), (np.nan, np.nan, np.nan), ], columns=self.data[cols].
                                     iloc[0:5].columns, index=self.data[cols].iloc[0:5].index)
-        test2_actual = np.sign(test1_actual)
+        test2_actual = test1_actual.apply(np.sign)
 
         # Check less precise because calculated numbers have more decimal places than inputted ones
         pd.testing.assert_frame_equal(test1, test1_actual, check_less_precise=True)
