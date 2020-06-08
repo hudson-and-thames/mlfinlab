@@ -57,12 +57,12 @@ def _cluster_kmeans_base(corr_mat: pd.DataFrame, max_num_clusters: int = 10, rep
 
     # Distance matrix
     distance = ((1 - corr_mat.fillna(0)) / 2.0) ** 0.5
-    silh = pd.Series()
+    silh = pd.Series(dtype='float64')
 
     # Get optimal num clusters
     for _ in range(repeat):
         for num_clusters in range(2, max_num_clusters + 1):
-            kmeans_ = KMeans(n_clusters=num_clusters, n_jobs=1, n_init=1)
+            kmeans_ = KMeans(n_clusters=num_clusters, n_init=1)
             kmeans_ = kmeans_.fit(distance)
             silh_ = silhouette_samples(distance, kmeans_.labels_)
             stat = (silh_.mean() / silh_.std(), silh.mean() / silh.std())
@@ -115,7 +115,7 @@ def cluster_kmeans_top(corr_mat: pd.DataFrame, repeat: int = 10) -> Union[pd.Dat
     """
     # pylint: disable=no-else-return
 
-    max_num_clusters = corr_mat.shape[1] - 1
+    max_num_clusters = min(corr_mat.drop_duplicates().shape[0], corr_mat.drop_duplicates().shape[1]) - 1
     corr1, clusters, silh = _cluster_kmeans_base(corr_mat, max_num_clusters=max_num_clusters, repeat=repeat)
 
     # Get cluster quality scores
