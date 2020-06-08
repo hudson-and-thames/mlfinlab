@@ -18,7 +18,7 @@ At time :math:`t`, given that price is :math:`p_t`, benchmark is :math:`B_t` and
 .. math::
     r_t = \frac{p_t}{p_{t-1}} - 1
 
-The labels are give by:
+The labels are:
 
 .. math::
     L(r_t) = r_t - B_t
@@ -43,6 +43,14 @@ SPY.
 .. image:: labeling_images/MSFT_return_vs_benchmark.png
    :scale: 100 %
    :align: center
+
+
+.. tip::
+   **Underlying Literature**
+
+   This labeling method is sourced from the following:
+   - Chapter 5.5.1 of **Machine Learning for Factor Investing**, *by* Coqueret, G. and Guida, T. (2020).
+
 
 Implementation
 ##############

@@ -25,8 +25,8 @@ class TestReturnOverBenchmark(unittest.TestCase):
         """
         Tests for the basic case where the benchmark is a constant.
         """
-        data1 = self.data['EWQ'].pct_change(periods=1)
-        data3 = self.data[['EWU', 'XLB']].pct_change(periods=1)
+        data1 = self.data['EWQ']
+        data3 = self.data[['EWU', 'XLB']]
 
         # No benchmark given, assumed to be 0
         test1 = return_over_benchmark(data1[:10])
@@ -42,7 +42,7 @@ class TestReturnOverBenchmark(unittest.TestCase):
                                      [-0.010170, 0.008551], [-0.026221, -0.015151], [0.006947, 0.028517],
                                      [-0.029924, -0.032348]], index=self.idx10, columns=data3.columns)
         pd.testing.assert_series_equal(test1, test1_actual, check_names=False)
-        pd.testing.assert_series_equal(test2, np.sign(test1_actual), check_names=False)
+        pd.testing.assert_series_equal(test2, test1_actual.apply(np.sign), check_names=False)
         pd.testing.assert_frame_equal(test3, test3_actual, check_names=False, check_less_precise=True)
 
     def test_given_benchmark(self):
@@ -51,7 +51,7 @@ class TestReturnOverBenchmark(unittest.TestCase):
         """
         # User inputted benchmark
         benchmark4 = pd.Series([0, 0.01, -0.01, 0.02, -0.005, 0.6, 100, -90, -0.2, 0.008], index=self.idx10)
-        data4 = self.data['BND'].pct_change(periods=1)
+        data4 = self.data['BND']
         test4 = return_over_benchmark(data4[:10], benchmark4)
         test5 = return_over_benchmark(data4[:10], benchmark4, binary=True)
         test4_actual = pd.Series([np.nan, -8.70736203e-03, 1.11619412e-02, -1.97421452e-02, 6.03135015e-03,
@@ -65,7 +65,7 @@ class TestReturnOverBenchmark(unittest.TestCase):
                                   0.01116406, -0.0067769, 0.02560875], index=self.idx10)
 
         pd.testing.assert_series_equal(test4, test4_actual)
-        pd.testing.assert_series_equal(test5, np.sign(test4_actual))
+        pd.testing.assert_series_equal(test5, test4_actual.apply(np.sign))
         pd.testing.assert_series_equal(test6, test6_actual)
 
     def test_warning(self):
