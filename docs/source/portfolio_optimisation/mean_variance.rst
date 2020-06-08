@@ -192,7 +192,7 @@ Basic example
     # Compute IVP weights
     mvo = MeanVarianceOptimisation()
     mvo.allocate(asset_names=stock_prices.columns, asset_prices=stock_prices,
-                 solution='inverse_variance', resample_by='B
+                 solution='inverse_variance', resample_by='B')
     ivp_weights = mvo.weights.sort_values(by=0, ascending=False, axis=1)
 
 .. note::
