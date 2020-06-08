@@ -28,10 +28,13 @@ def forward_return(prices, lookforward=1):
     returns = prices.pct_change(lookforward).shift(-lookforward)
 
     # Get sign of returns
-    returns_sign = np.sign(returns)
+    to_sign = returns.notna()
+    print(to_sign)
+    print(returns[to_sign])
+    returns[to_sign] = np.sign(returns[to_sign])
 
     # Apply labeling conditions
-    conditions = [returns_sign > 0, returns_sign <= 0]
+    conditions = [returns > 0, returns <= 0]
     choices = [1, 0]
     labels = np.select(conditions, choices, default=np.nan)
 

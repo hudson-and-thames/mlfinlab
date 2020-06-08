@@ -1,8 +1,8 @@
 .. _implementations-labeling_forward_return:
 
-========================
-Labeling Forward Returns
-========================
+===============
+Forward Returns
+===============
 
 Labeling forward returns is a simple method of labeling financial data that is similar to labeling raw returns, except instead
 of looking at the return from the previous timestamp, the price of each observation is compared to the price at :math:`h` timestamps
@@ -54,5 +54,13 @@ Below is an example on how to use the forward return labeling technique on real 
     # Create labels on a Series with a different lookforward period
     labels = forward_return(data['SPY'], lookforward=3)
 
+Research Notebook
+#################
+
+The following research notebook can be used to better understand the Forward Return labeling technique,
+
+* `Forward Return Example`_
+
+.. _`Forward Return Example`: https://github.com/hudson-and-thames/research/blob/master/Labelling/Labels%20Fixed%20Horizon/Fixed%20Time%20Horizon.ipynb
 
 
