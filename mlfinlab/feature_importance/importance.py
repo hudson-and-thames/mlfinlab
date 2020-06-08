@@ -139,7 +139,7 @@ def mean_decrease_accuracy(model, X, y, cv_gen, clustered_subsets=None, sample_w
     if sample_weight_score is None:
         sample_weight_score = np.ones((X.shape[0],))
 
-    fold_metrics_values, features_metrics_values = pd.Series(), pd.DataFrame(columns=X.columns)
+    fold_metrics_values, features_metrics_values = pd.Series(dtype='float64'), pd.DataFrame(columns=X.columns)
     # Generating a numpy random state object for the given random_state
     rs_obj = np.random.RandomState(seed=random_state)
     # Clustered feature subsets will be used for CFI if clustered_subsets exists else will operate on the single column as MDA

@@ -119,7 +119,8 @@ def cluster_kmeans_top(corr_mat: pd.DataFrame, repeat: int = 10) -> Union[pd.Dat
     corr1, clusters, silh = _cluster_kmeans_base(corr_mat, max_num_clusters=max_num_clusters, repeat=repeat)
 
     # Get cluster quality scores
-    cluster_quality = {i: np.mean(silh[clusters[i]]) / np.std(silh[clusters[i]]) for i in clusters.keys()}
+    cluster_quality = {i: float('Inf') if np.std(silh[clusters[i]]) == 0 else np.mean(silh[clusters[i]]) /
+                       np.std(silh[clusters[i]]) for i in clusters.keys()}
     avg_quality = np.mean(list(cluster_quality.values()))
     redo_clusters = [i for i in cluster_quality.keys() if cluster_quality[i] < avg_quality]
 
