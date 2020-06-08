@@ -1,13 +1,44 @@
 .. _portfolio_optimisation-risk_estimators:
 
+.. |br| raw:: html
+
+    <br>
+
+.. |h3| raw:: html
+
+    <h3>
+
+.. |h3_| raw:: html
+
+    </h3>
+
+.. |h4| raw:: html
+
+    <h4>
+
+.. |h4_| raw:: html
+
+    </h4>
+
+.. |h5| raw:: html
+
+    <h5>
+
+.. |h5_| raw:: html
+
+    </h5>
+
 
 ===============
 Risk Estimators
 ===============
-This class includes functions for calculating different types of covariance matrices, de-noising, and other helpful methods.
+Risk is a very important part of finance and the performance of large number of investment strategies are dependent on the
+efficient estimation of underlying portfolio risk. There are different ways of representing risk but the most widely used is a
+covariance matrix. This means that an accurate calculation of the covariances is essential for an accurate representation of risk.
+This class provides functions for calculating different types of covariance matrices, de-noising, and other helpful methods.
 
 .. tip::
-   **Underlying Literature**
+   |h4| Underlying Literature |h4_|
 
    The following sources elaborate extensively on the topic:
 
@@ -19,8 +50,11 @@ This class includes functions for calculating different types of covariance matr
    - **Financial applications of random matrix theory: Old laces and new pieces** *by* Potter M., J.P. Bouchaud, L. Laloux `available here <https://arxiv.org/abs/physics/0507111>`__. *Describes the process of de-noising of the covariance matrix.*
    - **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/sol3/abstract_id=3469961>`__. *Describes the De-noising Covariance/Correlation Matrix algorithm.*
 
+Supported Estimators
+####################
+
 Minimum Covariance Determinant
-##############################
+******************************
 
 Minimum Covariance Determinant (MCD) is a robust estimator of covariance that was introduced by P.J. Rousseeuw.
 
@@ -36,7 +70,7 @@ Our method is a wrapper for the sklearn MinCovDet class. For more details about 
 visit `sklearn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.covariance.MinCovDet.html>`__.
 
 Maximum Likelihood Covariance Estimator (Empirical Covariance)
-##############################################################
+**************************************************************
 
 Maximum Likelihood Estimator of a sample is an unbiased estimator of the corresponding population’s covariance matrix.
 
@@ -45,7 +79,7 @@ please visit `sklearn documentation <https://scikit-learn.org/stable/modules/gen
 
 
 Covariance Estimator with Shrinkage
-###################################
+***********************************
 
 Shrinkage allows one to avoid the inability to invert the covariance matrix due to numerical reasons. Shrinkage consists
 of reducing the ratio between the smallest and the largest eigenvalues of the empirical covariance matrix.
@@ -90,7 +124,7 @@ For more details about the function and its parameters, please visit `sklearn do
 
 
 Semi-Covariance Matrix
-#######################
+**********************
 
 Semi-Covariance matrix is used to measure the downside volatility of a portfolio and can be used as a measure to minimize it.
 This metric also allows measuring the volatility of returns below a specific threshold.
@@ -111,7 +145,7 @@ If the :math:`B` is set to zero, the volatility of negative returns is measured.
       An example of Semi-Covariance usage can be found `here <https://www.solactive.com/wp-content/uploads/2018/04/Solactive_Minimum-Downside-Volatility-Indices.pdf>`__.
 
 Exponentially-Weighted Covariance Matrix
-########################################
+****************************************
 
 Each element in the Exponentially-weighted Covariance matrix is the last element from an exponentially weighted moving average
 series based on series of covariances between returns of the corresponding assets. It's used to give greater weight to most
@@ -123,7 +157,7 @@ Each element is calculated as follows:
       :nowrap:
 
       \begin{align*}
-      Covar_{i,j}^{t} = (R_{i}^{t} - Mean(R_{i})) * (R_{j}^{t} - Mean(R_{j}))
+      \sum_{i,j}^{t} = (R_{i}^{t} - Mean(R_{i})) * (R_{j}^{t} - Mean(R_{j}))
       \end{align*}
 
       \begin{align*}
@@ -131,21 +165,21 @@ Each element is calculated as follows:
       \end{align*}
 
       \begin{align*}
-      EWMA(Covar_{i,j})_{t} = ((Covar_{i,j}^{t} - Covar_{i,j}^{t-1}) * Decay) + Covar_{i,j}^{t-1}
+      EWMA(\sum_{i,j})_{t} = ((\sum_{i,j}^{t} - \sum_{i,j}^{t-1}) * Decay) + \sum_{i,j}^{t-1}
       \end{align*}
 
       \begin{align*}
-      ExponentialCovariance_{i,j (Decay)} = EWMA(Covar)_{T}
+      ExponentialCovariance_{i,j (Decay)} = EWMA(\sum)_{T}
       \end{align*}
 
-Where :math:`R_{i}^{t}` is the return of :math:`i` -th asset for :math:`t` -th observation,
-:math:`T` is the total number of observations, :math:`Covar_{i,j}` is the series of correlations between :math:`i` -th
-and :math:`j` -th asset, :math:`EWMA(Covar)_{t}` is the :math:`t` -th observation of exponentially-weighted
-moving average of :math:`Covar` .
+Where :math:`R_{i}^{t}` is the return of :math:`i^{th}` asset for :math:`t^{th}` observation,
+:math:`T` is the total number of observations, :math:`\sum_{i,j}` is the series of covariances between :math:`i^{th}`
+and :math:`j^{th}` asset, :math:`EWMA(\sum)_{t}` is the :math:`t^{th}` observation of exponentially-weighted
+moving average of :math:`\sum`.
 
 
 De-noising Covariance/Correlation Matrix
-########################################
+****************************************
 
 The main idea behind de-noising is to separate the noise-related eigenvalues from the signal-related ones. This is achieved
 through fitting the Marcenko-Pastur distribution of the empirical distribution of eigenvalues using a Kernel Density Estimate (KDE).
@@ -174,11 +208,6 @@ The de-noising function works as follows:
 
     The de-noising algorithm is described in more detail in the work **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3469961>`_.
 
-Transforming Covariance to Correlation and Back
-#############################################################
-
-Helper methods for transforming the covariance matrix to the correlation matrix and back to the covariance matrix.
-
 .. tip::
     This and above the methods are described in more detail in the Risk Estimators Notebook.
 
@@ -193,8 +222,9 @@ Implementation
         .. automethod:: __init__
 
 
-Example
-########
+Example Code
+############
+
 Below is an example of using the functions from the Risk Estimators module.
 
 .. code-block::
@@ -244,4 +274,3 @@ The following research notebook can be used to better understand how the algorit
 * `Risk Estimators Notebook`_
 
 .. _Risk Estimators Notebook: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Risk%20Estimators/RiskEstimators.ipynb
-
