@@ -75,6 +75,7 @@ def calc_engle_granger(data1, data2, trend="c", method="aeg", maxlag=None, autol
     return coint(data1, data2, trend=trend, method=method, maxlag=maxlag, autolag=autolag,
                  return_results=return_results)
 
+
 def calc_johansen(data, det_order, k_ar_diff):
     """
     Wrapper function for Johansen test, directly forked
@@ -113,8 +114,10 @@ def calc_johansen(data, det_order, k_ar_diff):
     - trace_stat_crit_vals: (np.array) Critical values (90%, 95%, 99%) of trace statistic.
     """
     res = coint_johansen(data, det_order, k_ar_diff)
-    cvm, cvt, eig, evec, ind, lr1, lr2= res.cvm, res.cvt, res.eig, res.evec, res.ind, res.lr1, res.lr2
+    cvm, cvt, eig, evec, ind, lr1, lr2 = res.cvm, res.cvt, res.eig, res.evec, res.ind, res.lr1, res.lr2
     max_eig_stat, max_eig_stat_crit_vals, meth = res.max_eig_stat, res.max_eig_stat_crit_vals, res.meth
     r0t, rkt, trace_stat, trace_stat_crit_vals = res.r0t, res.rkt, res.trace_stat, res.trace_stat_crit_vals
 
-    return (cvm, cvt, eig, evec, ind, lr1, lr2, max_eig_stat, max_eig_stat_crit_vals, meth, r0t, rkt, trace_stat, trace_stat_crit_vals)
+    return (
+    cvm, cvt, eig, evec, ind, lr1, lr2, max_eig_stat, max_eig_stat_crit_vals, meth, r0t, rkt,
+    trace_stat, trace_stat_crit_vals)
