@@ -347,7 +347,7 @@ This project is licensed under an all rights reserved licence.
     :caption: Statistical Arbitrage
     :hidden:
 
-    statistical_arbitrage/stationarity
+    implementations/statistical_arbitrage
 
 .. toctree::
     :maxdepth: 2
