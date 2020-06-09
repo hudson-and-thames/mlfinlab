@@ -5,7 +5,7 @@ Calculate Stationarity.
 from statsmodels.tsa.stattools import adfuller
 
 
-def calc_stationarity(data, maxlag=None, regression="c", autolag="AIC", store=False, regresults=False):
+def calc_adfuller(data, maxlag=None, regression="c", autolag="AIC", store=False, regresults=False):
     """
     Wrapper function for Augmented Dickey-Fuller unit root test, directly forked from
     `statsmodels.tsa.stattools.adfuller

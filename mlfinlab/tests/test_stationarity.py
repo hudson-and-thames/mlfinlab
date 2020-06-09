@@ -6,7 +6,7 @@ import unittest
 import os
 import pandas as pd
 
-from mlfinlab.statistical_arbitrage import calc_stationarity
+from mlfinlab.statistical_arbitrage import calc_adfuller
 
 
 class TestStationarity(unittest.TestCase):
@@ -29,7 +29,7 @@ class TestStationarity(unittest.TestCase):
         """
         Test stationarity.
         """
-        res = calc_stationarity(self.data.iloc[:, 0])
+        res = calc_adfuller(self.data.iloc[:, 0])
 
         # 6 items in the result.
         self.assertEqual(len(res), 6)

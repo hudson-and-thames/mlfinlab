@@ -3,9 +3,10 @@ Calculate Cointegration.
 """
 
 from statsmodels.tsa.stattools import coint
+from statsmodels.tsa.vector_ar.vecm import coint_johansen
 
 
-def calc_cointegration(data1, data2, trend="c", method="aeg", maxlag=None, autolag="aic",
+def calc_engle_granger(data1, data2, trend="c", method="aeg", maxlag=None, autolag="aic",
                        return_results=None):
     """
     Wrapper function for augmented Engle-Granger two-step cointegration test, directly forked
@@ -73,3 +74,47 @@ def calc_cointegration(data1, data2, trend="c", method="aeg", maxlag=None, autol
     """
     return coint(data1, data2, trend=trend, method=method, maxlag=maxlag, autolag=autolag,
                  return_results=return_results)
+
+def calc_johansen(data, det_order, k_ar_diff):
+    """
+    Wrapper function for Johansen test, directly forked
+    from `statsmodels.tsa.vector_ar.vecm.coint_johansen
+    <https://www.statsmodels.org/dev/generated/statsmodels.tsa.vector_ar.vecm.coint_johansen.html>`.
+
+    .. warnings:
+        Critical values are only available for time series with 12 variables at most.
+
+    Johansen cointegration test of the cointegration rank of a VECM.
+
+    :param data: (pd.Series) (nobs_tot x neqs) Data to test
+    :param det_order: (int)
+
+        - -1: no deterministic terms
+        - 0: constant term
+        - 1: linear trend
+    :param k_ar_diff: (int) Nonnegative, Number of lagged differences in the model.
+
+    :return: (tuple) (cvm, cvt, eig, evec, ind, lr1, lr2, max_eig_stat, max_eig_stat_crit_vals, meth,
+    r0t, rkt, trace_stat, trace_stat_crit_vals)
+
+    - cvm: (np.array) Critical values (90%, 95%, 99%) of maximum eigenvalue statistic.
+    - cvt: (np.array) Critical values (90%, 95%, 99%) of trace statistic
+    - eig: (np.array) Eigenvalues of VECM coefficient matrix.
+    - evec: (np.array) Eigenvectors of VECM coefficient matrix.
+    - ind: (np.array) Order of eigenvalues.
+    - lr1: (np.array) Trace statistic.
+    - lr2: (np.array) Maximum eigenvalue statistic.
+    - max_eig_stat: (np.array) Maximum eigenvalue statistic.
+    - max_eig_stat_crit_vals: (np.array)
+    - meth: (str) Test method.
+    - r0t: (np.array) Residuals for :math:`\delta Y`
+    - rkt: (np.array) Residuals for :math:`Y_{-1}`.
+    - trace_stat: (np.array) Trace statistic.
+    - trace_stat_crit_vals: (np.array) Critical values (90%, 95%, 99%) of trace statistic.
+    """
+    res = coint_johansen(data, det_order, k_ar_diff)
+    cvm, cvt, eig, evec, ind, lr1, lr2= res.cvm, res.cvt, res.eig, res.evec, res.ind, res.lr1, res.lr2
+    max_eig_stat, max_eig_stat_crit_vals, meth = res.max_eig_stat, res.max_eig_stat_crit_vals, res.meth
+    r0t, rkt, trace_stat, trace_stat_crit_vals = res.r0t, res.rkt, res.trace_stat, res.trace_stat_crit_vals
+
+    return (cvm, cvt, eig, evec, ind, lr1, lr2, max_eig_stat, max_eig_stat_crit_vals, meth, r0t, rkt, trace_stat, trace_stat_crit_vals)
