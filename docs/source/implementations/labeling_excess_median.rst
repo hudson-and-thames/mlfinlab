@@ -8,10 +8,10 @@ Labeling according to excess over median is a binary labeling method used in the
 Stevenson, M., 2012. The benefits of tree-based models for stock selection.
 Journal of Asset Management, 13(6), pp.437-448. <https://link.springer.com/article/10.1057/jam.2012.17>`_
 
-In this method, a cross-sectional dataset of close prices of many different tickers is used. The median return at each time index
+In this method, a cross-sectional dataset of close prices of many different stocks are used. The median return at each time index
 is calculated and used as a proxy for market return. The median return is then subtracted from each observation's return to find the
 numerical excess return over median. If desired, the numerical values can be converted to categorical values according to the sign of
-the excess return. The labels can then be used in training regression and decision tree models.
+the excess return. The labels can then be used in training regression and classification models.
 
 At time :math:`t`:
 
@@ -19,11 +19,11 @@ At time :math:`t`:
     :nowrap:
 
     \begin{gather*}
-    P_t = \{p_{t,0}, p_{t,1}, ..., p_{t,n}\} \\
+    P_t = \{p_{t,0}, p_{t,1}, \dots, p_{t,n}\} \\
 
     m_t = median(P_t) \\
 
-    L(P_t) = \{p_{t,0} - m_t, p_{t,1} - m_t, ..., p_{t,n} - m_t\}
+    L(P_t) = \{p_{t,0} - m_t, p_{t,1} - m_t, \dots, p_{t,n} - m_t\}
     \end{gather*}
 
 
@@ -77,10 +77,11 @@ Below is an example on how to create labels of excess over median from real data
     data.columns = data.columns.droplevel(1)
 
     # Get returns over median numerically
-    excess_over_median(prices=data)
+    numerical = excess_over_median(data)
 
     # Get returns over median as a categorical label
-    excess_over_median(prices=data, binary=True)
+    binary = excess_over_median(data, binary=True)
+
 
 
 Research Notebooks
