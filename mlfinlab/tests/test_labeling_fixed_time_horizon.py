@@ -85,8 +85,9 @@ class TestLabellingFixedTime(unittest.TestCase):
         Checks warning when look_forward is greater than the length of the data series
         """
         close = self.data['SPY'][:10]
-        with self.assertRaises(Exception):
-            fixed_time_horizon(close, 0.01, look_forward=50, standardized=True)
+        with self.assertWarns(UserWarning):
+            self.assertRaises(AssertionError, fixed_time_horizon,
+                              close, 0.01, look_forward=50, standardized=True)
         with self.assertWarns(UserWarning):
             labels = fixed_time_horizon(close, 0.01, look_forward=50, standardized=True, window=50)
         np.testing.assert_allclose(labels, [np.nan]*len(self.data['SPY'][:10]))
