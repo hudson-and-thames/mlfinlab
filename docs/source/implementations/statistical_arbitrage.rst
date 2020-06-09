@@ -3,7 +3,9 @@
 
     References
 
-    1. `Gatev, E., Goetzmann, W.N. and Rouwenhorst, K.G., 2006. Pairs trading: Performance of a relative-value arbitrage rule. The Review of Financial Studies, 19(3), pp.797-827. <https://academic.oup.com/rfs/article/19/3/797/1646694>`_
+    1. `Gatev, E., Goetzmann, W.N. and Rouwenhorst, K.G., 2006. Pairs trading: Performance of a
+    relative-value arbitrage rule. The Review of Financial Studies, 19(3), pp.797-827.
+    <https://academic.oup.com/rfs/article/19/3/797/1646694>`_
 
 
 =====================
@@ -27,7 +29,6 @@ is a contrarian strategy to harness the mean-reverting behavior of the pair rati
 strongly reliant on cointegration and mean-reversion to exploit the mispricing of the assets.
 
 
-
 Pairs Trading
 =============
 
@@ -44,17 +45,76 @@ and short the other.
 Filtering
 =========
 
+There are multiple ways to filter the data. For a pairs trading example, the number of pairs grows
+quadratically with :math:`n`. The number of total pairs is
+
+.. math::
+    \frac{n(n-1)}{2}
+
+If we only have 10 assets that we want to test for, the total number of pairs is 45. However, once
+we start scanning for a universe of stocks with over 5000 options, the numbers quickly add up.
+Therefore, it is important to have an effective method to test before we start the initial process.
+The filtering method that will be employed for this module will be the cointegration test. Using the
+cointegration test, we will see which pairs of assets pass the threshold to reject the null hypothesis.
+More information on *Cointegration* is available two headings below.
+
+Not implemented in the module yet, but other options for filtering include:
+
+1. Principal Component Analysis
+
+    - Transforms data matrix to a set of principal components to reduce the dimensions.
+    - `Avellaneda, M. and Lee, J.H., 2010. Statistical arbitrage in the US equities market. Quantitative Finance, 10(7), pp.761-782. <https://www.tandfonline.com/doi/pdf/10.1080/14697680903124632>`_
+
+2. Clustering
+
+    - Fundamental values
+    - K-means
+
+3. Heuristics
+
+4. Distance
+
 Stationarity
 ============
+
+A time series is defined to be stationary if its joint probability distribution is invariant
+under translations in time or space. In other words, the mean and variance of the time series
+do not change.
+
+It is important to test for the spread for stationarity as statistical arbitrage typically
+shows the strongest and most robust results that follow stationarity and cointegration for
+the tested pairs.
 
 Augmented Dickey-Fuller Test
 ****************************
 
+Augmented Dickey-Fuller or the ADF tests the null hypothesis that a unit root is present
+in a time series sample. If the time series does have a mean-reverting trend, then the next
+price will be proportional to the current. The original Dickey-Fuller test only tested for
+lag 1, whereas the augmented version can test for lag up to :math:`p`.
+
+.. math::
+	\Delta y_t = \alpha + \beta t + \gamma y_{t-1} + \delta_1 \Delta y_{t-1} + \cdots + \delta_{p-1} \Delta y_{t-p+1} + \epsilon_t
+
+- :math:`\alpha`: constant variable
+- :math:`\beta`: coefficient of temporal trend
+- :math:`\delta`: change of :math`y`
+
+For the purpose of this module, we will empirically set :math:`p` to be :math:`1`.
+
+.. py:currentmodule:: mlfinlab.statistical_arbitrage.stationarity
+
+.. autofunction:: calc_stationarity
+
 Phillips-Perron Test
 ********************
 
+To Be Implemented.
+
 Phillips-Ouliaris Test
 **********************
+
+To Be Implemented.
 
 Cointegration
 =============
@@ -62,17 +122,31 @@ Cointegration
 Engle-Granger Test
 ******************
 
+.. py:currentmodule:: mlfinlab.statistical_arbitrage.cointegration
+
+.. autofunction:: calc_cointegration
+
 Johansen Test
 **************
+
+To Be Implemented.
 
 Optimal Trading Strategy
 ========================
 
+To Be Implemented.
+
 Kalman Filtering
 ****************
+
+To Be Implemented.
 
 Ornstein-Uhlenbeck Process
 **************************
 
+To Be Implemented.
+
 Hurst Exponent
 **************
+
+To Be Implemented.
