@@ -454,9 +454,9 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
                  "This probably means too few estimators were used "
                  "to compute any reliable oob estimates.")
 
-        oob_decision_function =np.divide(predictions, predictions.sum(axis=1)[:, np.newaxis],
-                                         out=np.zeros_like(predictions),
-                                         where=predictions.sum(axis=1)[:, np.newaxis] != 0)
+        oob_decision_function = np.divide(predictions, predictions.sum(axis=1)[:, np.newaxis],
+                                          out=np.zeros_like(predictions),
+                                          where=predictions.sum(axis=1)[:, np.newaxis] != 0)
         oob_score = accuracy_score(y, np.argmax(predictions, axis=1))
 
         self.oob_decision_function_ = oob_decision_function

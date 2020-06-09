@@ -202,7 +202,7 @@ class BaseBars(ABC):
             pd.to_datetime(test_batch.iloc[0, 0])
         except ValueError:
             raise ValueError('csv file, column 0, not a date time format:',
-                  test_batch.iloc[0, 0])
+                             test_batch.iloc[0, 0])
 
     def _update_high_low(self, price: float) -> Union[float, float]:
         """
