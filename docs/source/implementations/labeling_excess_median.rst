@@ -1,8 +1,8 @@
 .. _implementations-labeling_excess_median:
 
-============================
-Labeling Excess Over Median
-============================
+==================
+Excess Over Median
+==================
 
 Labeling according to excess over median is a binary labeling method used in the following paper `Zhu, M., Philpotts, F. and
 Stevenson, M., 2012. The benefits of tree-based models for stock selection.
@@ -44,10 +44,13 @@ If categorical rather than numerical labels are desired:
 The following shows the distribution of numerical excess over median for a set of 22 stock for the time period between Jan 2019
 and May 2020.
 
-.. image:: labeling_images/distribution_over_median.png
+.. figure:: labeling_images/distribution_over_median.png
    :scale: 100 %
    :align: center
+   :figclass: align-center
+   :alt: Distribution Over Median
 
+   Distribution of Return Over Median
 
 Implementation
 ##############
@@ -74,10 +77,10 @@ Below is an example on how to create labels of excess over median from real data
     data.columns = data.columns.droplevel(1)
 
     # Get returns over median numerically
-    excess_over_median(data)
+    excess_over_median(prices=data)
 
     # Get returns over median as a categorical label
-    excess_over_median(data, binary=True)
+    excess_over_median(prices=data, binary=True)
 
 
 Research Notebooks
