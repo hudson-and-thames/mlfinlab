@@ -82,8 +82,7 @@ def get_ind_mat_label_uniqueness(ind_mat):
     :return: (np.matrix) Element uniqueness
     """
     concurrency = ind_mat.sum(axis=1)
-    uniqueness = ind_mat.T / concurrency
-
+    uniqueness = np.divide(ind_mat.T, concurrency, out=np.zeros_like(ind_mat.T), where=concurrency != 0)
     return uniqueness
 
 
