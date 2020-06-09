@@ -9,9 +9,10 @@ import pandas as pd
 import numpy as np
 
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.ensemble.bagging import BaseBagging, BaggingClassifier, BaggingRegressor
+from sklearn.ensemble import BaggingClassifier, BaggingRegressor
+from sklearn.ensemble._bagging import BaseBagging
+from sklearn.ensemble._base import _partition_estimators
 from sklearn.base import ClassifierMixin, RegressorMixin
-from sklearn.ensemble.base import _partition_estimators
 from sklearn.utils.random import sample_without_replacement
 from sklearn.utils import indices_to_mask
 from sklearn.metrics import accuracy_score, r2_score
