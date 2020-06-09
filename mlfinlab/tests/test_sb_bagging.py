@@ -171,7 +171,7 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
                                                            samples_info_sets=self.samples_info_sets,
                                                            price_bars=self.price_bars_trim, oob_score=True,
                                                            random_state=1, bootstrap_features=True,
-                                                           max_samples=30, verbose=2)
+                                                           max_samples=30)
         with self.assertWarns(UserWarning):
             sb_clf.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)))
         self.assertTrue((sb_clf.predict(self.X_train)[:10] == np.array([0, 0, 0, 0, 0, 0, 1, 1, 1, 0])).all)
