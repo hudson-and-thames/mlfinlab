@@ -24,7 +24,7 @@ At time :math:`t`:
 
     R_t = \{r_{t,0}, r_{t,1}, \dots, r_{t,n}\} \\
 
-    m_t = median(T_t) \\
+    m_t = median(R_t) \\
 
     L(R_t) = \{r_{t,0} - m_t, r_{t,1} - m_t, \dots, r_{t,n} - m_t\}
     \end{gather*}

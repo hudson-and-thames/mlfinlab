@@ -13,7 +13,7 @@ def excess_over_median(prices, binary=False, resample_by=None, forward=False):
     Zhu et al. (2012).
 
     Returns a DataFrame containing returns of stocks over the median of all stocks in the portfolio, or returns a
-    DataFrame contains signs of those returns. In the latter case, an observation may be labeled as 0 if it itself is
+    DataFrame containing signs of those returns. In the latter case, an observation may be labeled as 0 if it itself is
     the median.
 
     :param prices: (pd.DataFrame) Close prices of all stocks in the market that are used to establish the median.
@@ -30,7 +30,7 @@ def excess_over_median(prices, binary=False, resample_by=None, forward=False):
                         return at time t+1 relative to price at time t. If False, it would be the return relative to
                         price at time t-1.
     :return: (pd.DataFrame) Numerical returns in excess of the market median return, or sign of return depending on
-                        whether binary is False or True respectively.
+                    whether binary is False or True respectively.
     """
     # Apply resample, if applicable.
     if resample_by is not None:
