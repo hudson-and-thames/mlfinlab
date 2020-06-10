@@ -20,9 +20,11 @@ At time :math:`t`:
     :nowrap:
 
     \begin{gather*}
+    P_t = \{p_{t,0}, p_{t,1}, \dots, p_{t,n}\} \\
+
     R_t = \{r_{t,0}, r_{t,1}, \dots, r_{t,n}\} \\
 
-    m_t = median(P_t) \\
+    m_t = median(T_t) \\
 
     L(R_t) = \{r_{t,0} - m_t, r_{t,1} - m_t, \dots, r_{t,n} - m_t\}
     \end{gather*}
@@ -42,19 +44,18 @@ If categorical rather than numerical labels are desired:
      \end{equation}
 
 If desired, the user can specify a resampling period to apply to the price data prior to calculating returns. User can also
-choose to label with forward-looking returns rather than return from the previous time tick. In the paper by Zhu et al., the authors
+choose to label with forward-looking returns rather than returns relative to the previous price. In the paper by Zhu et al., the authors
 use monthly forward-looking labels.
 
-The following shows the distribution of numerical excess over median for a set of 22 stock for the time period between Jan 2019
-and May 2020.
+The following shows a visualization of monthly forward returns over median for 22 stocks from January 2019 to May 2020.
 
-.. figure:: labeling_images/distribution_over_median.png
+.. figure:: labeling_images/distribution_over_median_monthly_forward.png
    :scale: 100 %
    :align: center
    :figclass: align-center
    :alt: Distribution Over Median
 
-   Distribution of Return Over Median
+   Distribution of monthly forward stock returns. This is the labeling method used in the paper by Zhu et al.
 
 Implementation
 ##############
