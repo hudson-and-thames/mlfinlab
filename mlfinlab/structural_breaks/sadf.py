@@ -91,8 +91,8 @@ def _get_y_x(series: pd.Series, model: str, lags: Union[int, list],
         y = np.log(series.loc[y.index])
         x = pd.DataFrame(index=y.index)
         x['const'] = 1
-        range = np.array(np.arange(x.shape[0]), dtype='float')
-        x['log_trend'] = np.log(range, out=np.zeros_like(range), where=(range != 0))
+        float_range = np.array(np.arange(x.shape[0]), dtype='float')
+        x['log_trend'] = np.log(float_range, out=np.zeros_like(float_range), where=(float_range != 0))
         beta_column = 'log_trend'
     else:
         raise ValueError('Unknown model')

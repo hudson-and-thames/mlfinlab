@@ -437,7 +437,7 @@ class TestDataStructures(unittest.TestCase):
 
         # pylint: disable=protected-access
         self.assertRaises(ValueError, ds.BaseRunBars._assert_csv,
-            pd.DataFrame(wrong_date).T)
+                          pd.DataFrame(wrong_date).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
                           ds.BaseRunBars._assert_csv,
