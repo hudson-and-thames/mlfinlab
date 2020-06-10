@@ -2,9 +2,10 @@
 
 import unittest
 import os
+from datetime import datetime
 import numpy as np
 import pandas as pd
-from datetime import datetime
+
 
 from mlfinlab.labeling.excess_over_median import excess_over_median
 
@@ -70,7 +71,7 @@ class TestLabelingOverMedian(unittest.TestCase):
                                      (-0.019975, 0.002612, 0.044291, -0.002612)],
                                     columns=cols, index=weekly_index)
         test5_actual = pd.DataFrame([(np.nan, np.nan, np.nan, np.nan),
-                                     (0.018951, -0.008043,0.008043, -0.015929),
+                                     (0.018951, -0.008043, 0.008043, -0.015929),
                                      (-0.028116, 0.026522, 0.003355, -0.003355),
                                      (0.036035, -0.018217, -0.080735, 0.018217),
                                      (0.000479, 0.006833, -0.000479, -0.010351)],
