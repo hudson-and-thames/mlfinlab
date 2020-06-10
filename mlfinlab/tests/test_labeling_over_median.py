@@ -37,7 +37,7 @@ class TestLabelingOverMedian(unittest.TestCase):
                                     columns=cols, index=self.data[cols].iloc[0:5].index)
         test2_actual = test1_actual.apply(np.sign)
 
-        # Check less precise because calculated numbers have more decimal places than inputted ones
+        # Check less precise because calculated numbers have more decimal places than inputted ones.
         pd.testing.assert_frame_equal(test1, test1_actual, check_less_precise=True)
         pd.testing.assert_frame_equal(test2, test2_actual)
 

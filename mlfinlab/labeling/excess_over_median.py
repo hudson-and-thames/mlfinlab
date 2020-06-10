@@ -16,7 +16,7 @@ def excess_over_median(prices, binary=False, resample_by=None, forward=False):
     DataFrame contains signs of those returns. In the latter case, an observation may be labeled as 0 if it itself is
     the median.
 
-    :param prices: (pd.DataFrame) Close prices of all tickers in the market that are used to establish the median.
+    :param prices: (pd.DataFrame) Close prices of all stocks in the market that are used to establish the median.
                    Returns on each stock are then compared to the median for the given timestamp.
     :param binary: (bool) If False, the numerical value of excess returns over median will be given. If True, then only
                     the sign of the excess return over median will be given (-1 or 1). A label of 0 will be given if
@@ -24,8 +24,8 @@ def excess_over_median(prices, binary=False, resample_by=None, forward=False):
                     issues with extreme outliers present with numerical labels.
     :param resample_by: (str) If not None, the resampling period for price data prior to calculating returns. 'B' = per
                         business day, 'W' = week, 'M' = month, etc. Will take the last observation for each period.
-                        For full details see:
-                        <https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects>
+                        For full details see `here.
+                        <https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects>`_
     :param forward: (bool) Whether forward-looking returns are desired. I.e. if True, the label at time t would be the
                         return at time t+1 relative to price at time t. If False, it would be the return relative to
                         price at time t-1.
