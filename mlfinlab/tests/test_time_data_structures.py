@@ -182,8 +182,8 @@ class TestTimeDataStructures(unittest.TestCase):
         too_many_cols = ['2019-01-30', 200.00, np.int64(5), 'Limit order', 'B23']
 
         # pylint: disable=protected-access
-        self.assertRaises(ValueError,
-                          ds.TimeBars._assert_csv(pd.DataFrame(wrong_date).T))
+        self.assertRaises(ValueError, ds.TimeBars._assert_csv,
+                          pd.DataFrame(wrong_date).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
                           ds.TimeBars._assert_csv,

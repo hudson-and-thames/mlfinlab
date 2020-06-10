@@ -78,7 +78,7 @@ def trend_scanning_labels(price_series: pd.Series, t_events: list = None, look_f
             t_values_array.append(None)
 
     labels = pd.DataFrame({'t1': t1_array, 't_value': t_values_array}, index=t_events)
-    labels.loc[:, 'ret'] = price_series.loc[labels.t1].values / price_series.loc[labels.index].values - 1
-    labels['bin'] = np.sign(labels.t_value)
+    labels.loc[:, 'ret'] = price_series.reindex(labels.t1).values / price_series.reindex(labels.index).values - 1
+    labels['bin'] = labels.t_value.apply(np.sign)
 
     return labels
