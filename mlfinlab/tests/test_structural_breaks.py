@@ -152,7 +152,7 @@ class TesStructuralBreaks(unittest.TestCase):
         trivial_sadf = get_sadf(ones_series, model='sm_power', add_const=True, min_length=min_length, lags=lags_int,
                                 phi=0.5)
         # Below test value was changed from [-np.inf]to [0] due to error fix in sadf.py line 94
-        self.assertTrue((trivial_sadf.unique() == [0]).all())  # All values should be -np.inf
+        self.assertTrue((trivial_sadf.unique() == [0]).all())  # All values should be 0
 
         # Test rubbish model argument.
         self.assertRaises(ValueError, get_sadf, series=log_prices, model='rubbish_string', add_const=True,
