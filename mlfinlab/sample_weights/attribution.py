@@ -26,7 +26,7 @@ def _apply_weight_by_return(label_endtime, num_conc_events, close_series, molecu
     """
 
     ret = np.log(close_series).diff()  # Log-returns, so that they are additive
-    weights = pd.Series(index=molecule)
+    weights = pd.Series(index=molecule, dtype='float64')
 
     for t_in, t_out in label_endtime.loc[weights.index].iteritems():
         # Weights depend on returns and label concurrency

@@ -50,7 +50,7 @@ def _get_average_uniqueness(label_endtime, num_conc_events, molecule):
     :return: (pd.Series) Average uniqueness over event's lifespan.
     """
     # Derive average uniqueness over the event's lifespan
-    wght = pd.Series(index=molecule)
+    wght = pd.Series(index=molecule, dtype='float64')
     for t_in, t_out in label_endtime.loc[wght.index].iteritems():
         wght.loc[t_in] = (1. / num_conc_events.loc[t_in:t_out]).mean()
     return wght

@@ -18,7 +18,7 @@ def _get_dfc_for_t(series: pd.Series, molecule: list) -> pd.Series:
     :return: (pd.Series) Statistics for each index from molecule
     """
 
-    dfc_series = pd.Series(index=molecule)
+    dfc_series = pd.Series(index=molecule, dtype='float64')
 
     for index in molecule:
         series_diff = series.diff().dropna()
