@@ -165,7 +165,7 @@ def _sadf_outer_loop(X: pd.DataFrame, y: pd.DataFrame, min_length: int, model: s
     :param molecule: (list) Indices to get SADF
     :return: (pd.Series) SADF statistics
     """
-    sadf_series = pd.Series(index=molecule)
+    sadf_series = pd.Series(index=molecule, dtype='float64')
     for index in molecule:
         X_subset = X.loc[:index].values
         y_subset = y.loc[:index].values.reshape(-1, 1)
