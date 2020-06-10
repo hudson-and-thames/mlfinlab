@@ -118,7 +118,8 @@ class TesStructuralBreaks(unittest.TestCase):
         self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_exp_sadf.shape[0])
         self.assertEqual(log_prices.shape[0] - min_length - lags_int - 1, sm_exp_sadf_phi.shape[0])
 
-        self.assertAlmostEqual(sm_power_sadf.mean(), 28.954, delta=1e-3)
+        # Below test value was changed from  28.954 to 28.997 due to error fix in sadf.py line 94
+        self.assertAlmostEqual(sm_power_sadf.mean(), 28.997, delta=1e-3)
         self.assertAlmostEqual(sm_power_sadf.iloc[29], 17.369, delta=1e-3)
 
         self.assertAlmostEqual(linear_sadf.mean(), -0.669, delta=1e-3)
@@ -139,7 +140,8 @@ class TesStructuralBreaks(unittest.TestCase):
         self.assertAlmostEqual(sm_exp_sadf.mean(), 28.916, delta=1e-3)
         self.assertAlmostEqual(sm_exp_sadf[29], 17.100, delta=1e-3)
 
-        self.assertAlmostEqual(sm_power_sadf_phi.mean(), 1.4874, delta=1e-3)
+        # Below test value was changed from 1.4874 to 1.4947 due to error fix in sadf.py line 94
+        self.assertAlmostEqual(sm_power_sadf_phi.mean(), 1.4947, delta=1e-3)
         self.assertAlmostEqual(sm_power_sadf_phi.iloc[29], 2.4564, delta=1e-3)
 
         self.assertAlmostEqual(sm_exp_sadf_phi.mean(), 1.4787, delta=1e-3)
@@ -149,7 +151,8 @@ class TesStructuralBreaks(unittest.TestCase):
         ones_series = pd.Series(index=log_prices.index, data=np.ones(shape=log_prices.shape[0]))
         trivial_sadf = get_sadf(ones_series, model='sm_power', add_const=True, min_length=min_length, lags=lags_int,
                                 phi=0.5)
-        self.assertTrue((trivial_sadf.unique() == [-np.inf]).all())  # All values should be -np.inf
+        # Below test value was changed from [-np.inf]to [0] due to error fix in sadf.py line 94
+        self.assertTrue((trivial_sadf.unique() == [0]).all())  # All values should be -np.inf
 
         # Test rubbish model argument.
         self.assertRaises(ValueError, get_sadf, series=log_prices, model='rubbish_string', add_const=True,
