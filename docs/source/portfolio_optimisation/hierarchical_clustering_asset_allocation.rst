@@ -107,13 +107,14 @@ Naive Risk Parity
 *****************
 
 Having calculated the cluster weights in the previous step, this step calculates the final asset weights. Within the same
-cluster, an initial set of weights - :math:`W_{IVP}` - is calculated using the inverse-variance allocation. The final weights
-are given by the following equation:
+cluster, an initial set of weights - :math:`w_{NRP}` - is calculated using the naive risk parity allocation. In this approach, assets are allocated weights in proportion to the inverse of their respective risk; higher risk assets will receive lower portfolio weights, and lower risk assets will receive higher weights. Here the risk can be quantified in different ways - variance, CVaR, CDaR, max daily loss etc...
+
+The final weights are given by the following equation:
 
 .. math::
-    W^{i}_{final} = W^{i}_{IVP} * C^{i}, \: i \in Clusters
+    w^{i}_{final} = w^{i}_{NRP} * C^{i}, \: i \in Clusters
 
-where, :math:`W^{i}_{IVP}` refers to inverse-variance weights of assets in the :math:`i^{th}` cluster and :math:`C^{i}` is the
+where, :math:`w^{i}_{NRP}` refers to naive risk parity weights of assets in the :math:`i^{th}` cluster and :math:`C^{i}` is the
 weight of the  :math:`i^{th}` cluster calculated in Step-3.
 
 .. tip::

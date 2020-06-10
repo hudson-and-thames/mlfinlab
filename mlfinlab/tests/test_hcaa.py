@@ -301,7 +301,7 @@ class TestHCAA(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
-    def test_valu_error_with_no_asset_names(self):
+    def test_value_error_with_no_asset_names(self):
         """
         Test ValueError when not supplying a list of asset names and no other input
         """
@@ -311,3 +311,17 @@ class TestHCAA(unittest.TestCase):
             returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
             hcaa.allocate(asset_returns=returns.values,
                           optimal_num_clusters=6)
+
+    def test_dendrogram_plot(self):
+        """
+        Test if dendrogram plot object is correctly rendered.
+        """
+
+        hcaa = HierarchicalClusteringAssetAllocation()
+        hcaa.allocate(asset_prices=self.data, optimal_num_clusters=5)
+        dendrogram = hcaa.plot_clusters(assets=self.data.columns)
+        assert dendrogram.get('icoord')
+        assert dendrogram.get('dcoord')
+        assert dendrogram.get('ivl')
+        assert dendrogram.get('leaves')
+        assert dendrogram.get('color_list')
