@@ -7,7 +7,7 @@ used in regression and classification models to predict stock returns over marke
 import numpy as np
 
 
-def excess_over_median(prices, binary=False, resample_by=None, forward=False):
+def excess_over_median(prices, binary=False, resample_by=None, lag=False):
     """
     Return in excess of median labeling method. Sourced from "The benefits of tree-based models for stock selection"
     Zhu et al. (2012).
@@ -26,9 +26,7 @@ def excess_over_median(prices, binary=False, resample_by=None, forward=False):
                         business day, 'W' = week, 'M' = month, etc. Will take the last observation for each period.
                         For full details see `here.
                         <https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects>`_
-    :param forward: (bool) Whether forward-looking returns are desired. I.e. if True, the label at time t would be the
-                        return at time t+1 relative to price at time t. If False, it would be the return relative to
-                        price at time t-1.
+    :param lag: (bool) If True, returns will be lagged to make them forward-looking.
     :return: (pd.DataFrame) Numerical returns in excess of the market median return, or sign of return depending on
                     whether binary is False or True respectively.
     """
@@ -37,7 +35,7 @@ def excess_over_median(prices, binary=False, resample_by=None, forward=False):
         prices = prices.resample(resample_by).last()
 
     # Get return per period.
-    if forward:
+    if lag:
         returns = prices.pct_change(periods=1).shift(-1)
     else:
         returns = prices.pct_change(periods=1)

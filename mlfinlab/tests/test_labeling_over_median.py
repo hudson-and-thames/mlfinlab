@@ -83,17 +83,17 @@ class TestLabelingOverMedian(unittest.TestCase):
 
     def test_forward(self):
         """
-        Tests for when forward looking returns are desired.
+        Tests with lagged returns.
         """
         cols = ['EEM', 'EWG', 'TIP']
         subset = self.data[cols].iloc[0:5]
         subset2 = self.data[cols].iloc[0:100]
         monthly_index = subset2.resample('M').last().index
 
-        test7 = excess_over_median(subset, forward=True)
-        test8 = excess_over_median(subset, binary=True, forward=True)
-        test9 = excess_over_median(subset2, resample_by='M', forward=True)
-        test10 = excess_over_median(subset2, resample_by='M', binary=True, forward=True)
+        test7 = excess_over_median(subset, lag=True)
+        test8 = excess_over_median(subset, binary=True, lag=True)
+        test9 = excess_over_median(subset2, resample_by='M', lag=True)
+        test10 = excess_over_median(subset2, resample_by='M', binary=True, lag=True)
 
         test7_actual = pd.DataFrame([(0.0056216, -0.006201, 0), (-0.010485, 0, 0.019272), (0.006460, 0, -0.001054),
                                      (-0.000824, 0, 0.007678), (np.nan, np.nan, np.nan)],

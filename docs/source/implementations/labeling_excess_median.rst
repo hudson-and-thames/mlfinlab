@@ -43,11 +43,9 @@ If categorical rather than numerical labels are desired:
      \end{split}
      \end{equation}
 
-If desired, the user can specify a resampling period to apply to the price data prior to calculating returns. User can also
-choose to label with forward-looking returns rather than returns relative to the previous price. In the paper by Zhu et al., the authors
-use monthly forward-looking labels.
+If desired, the user can specify a resampling period to apply to the price data prior to calculating returns. The user can
+also lag the returns to make them forward-looking. In the paper by Zhu et al., the authors use monthly forward-looking labels.
 
-The following shows a visualization of monthly forward returns over median for 22 stocks from January 2019 to May 2020.
 
 .. figure:: labeling_images/distribution_over_median_monthly_forward.png
    :scale: 100 %
