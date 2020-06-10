@@ -15,19 +15,36 @@ Statistical Arbitrage
 Introduction
 ============
 
-Statistical Arbitrage exploits the pricing inefficiency between two groups of assets. It was
-first developed and used in the mid-1980s by Nunzio Tartaglia’s quantitative group at Morgan
-Stanley. Later, David Shaw, the founder of D.E Shaw & Co, left Morgan Stanley and started his
-own quantitative trading firm in the late 1980s dealing mainly in pair trading.
+Statistical Arbitrage exploits the pricing inefficiency between two groups of assets. First
+developed and used in the mid-1980s by Nunzio Tartaglia’s quantitative group at Morgan Stanley,
+the classical strategy utilizes systematic trading signals and a market-neutral approach to
+generate positive returns.
 
 The strategy can be explained in a two-step process. First, two baskets of assets that have
 historically moved similarly are identified. Then, the spread between the two is carefully
 measured to look for signals of divergence. If the spread becomes wider than the value suggested
-by historical data, the trader longs the losing basket and shorts the winning one. As the
-spread reverts back to the mean, the positions will gain in value. Statistical arbitrage
-is a contrarian strategy to harness the mean-reverting behavior of the pair ratio and is
-strongly reliant on cointegration and mean-reversion to exploit the mispricing of the assets.
+by historical data, the trader longs the losing basket and shorts the winning one. As the spread
+reverts back to the mean, the positions will gain in value.
 
+Most strategies involving statistical arbitrage can be expressed with the following equation:
+
+.. math::
+    \frac{dP_t}{P_t} = /alpha dt + /beta dQ_t Q_t + dX_t
+
+- P_t: Price of the first group of assets.
+- Q_t: Price of the second group of assets.
+- \alpha: For the most parts, we will assume that this value is 0.
+- \beta: Regression coefficient between the change in returns.
+- \X_t: Cointegration residual.
+
+This can be interpreted as going long 1 unit of :math:`P_t` and short :math:`/beta` unit of
+:math:`Q_t` if :math:`X_t` is a significant positive value and vice versa for a significant
+negative value of :math:`X_t`. Here we assume that :math:`X_t` is a stationary process with
+mean-reverting tendencies. :math:`X_t` will be described much more in detail in the section
+that describes the Ornstein-Uhlenbeck process.
+
+We can, therefore, interpret statistical arbitrage as a contrarian strategy to harness the
+mean-reverting behavior of the pair ratio to exploit the mispricing of the assets.
 
 Pairs Trading
 =============
@@ -150,3 +167,13 @@ Hurst Exponent
 **************
 
 To Be Implemented.
+
+Labelling
+=========
+
+Optimal Trading Rules
+*********************
+
+
+Optimal Portfolio Allocation
+****************************
