@@ -21,17 +21,17 @@ At time :math:`t`, given that price is :math:`p_t`, benchmark is :math:`B_t` and
 The labels are:
 
 .. math::
-    L(r_t) = r_t - B_t
+    L(r_{t, n}) = r_{t, n} - B_t
 
 If categorical labels are desired:
 
  .. math::
      \begin{equation}
      \begin{split}
-       L_(r_t) = \begin{cases}
-       -1 &\ \text{if} \ \ r_t < B_t\\
-       0 &\ \text{if} \ \ r_t = B_t\\
-       1 &\ \text{if} \ \ r_t > B_t\\
+       L(r_{t, n}) = \begin{cases}
+       -1 &\ \text{if} \ \ r_{t, n} < B_t\\
+       0 &\ \text{if} \ \ r_{t, n} = B_t\\
+       1 &\ \text{if} \ \ r_{t, n} > B_t\\
        \end{cases}
      \end{split}
      \end{equation}
