@@ -190,6 +190,24 @@ Implementation
         proximity between clusters is usually defined as the distance between cluster centroids. The Ward method uses the increase
         in the sum of the squares error (SSE) to determine the clusters.
 
+Plotting
+########
+
+``plot_clusters()`` : Plots the hierarchical clusters formed during the clustering step. This is visualised in the form of dendrograms - a very common way of visualising the hierarchical tree clusters.
+
+.. code-block::
+
+    # Instantiate HCAA Class
+    hcaa = HierarchicalClusteringAssetAllocation()
+    hcaa.allocate(asset_prices=stock_prices, risk_measure='equal_weighting')
+
+    # Plot Dendrogram
+    hcaa.plot_clusters(assets=stock_prices.columns)
+
+.. image:: portfolio_optimisation_images/dendrogram_hcaa.png
+
+In the above image, the colors of assets corresponds to the cluster to which that asset belongs. Assets in the same cluster have the same color. Note that this coloring scheme may change based on the optimal number of clusters identified by the algorithm (or specified by the user).
+
 Research Notebooks
 ##################
 
