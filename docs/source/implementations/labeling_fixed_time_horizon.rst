@@ -28,6 +28,7 @@ are prices at times :math:`t_0, t_1`. This method assigns a label based on compa
      \end{equation}
 
 
+
 The following shows the distribution of labels for standardized returns on closing prices of SPY in the time period from Jan 2008 to July 2016
 using a 20 day rolling window for the standard deviation.
 
