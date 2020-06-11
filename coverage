@@ -3,7 +3,6 @@
 echo "----Running Code Coverage----"
 
 # Remove multiprocessing coverage files in case a previous combine wasn't performed
-rm .coverage.*
 rm -fR cover/
 # Remove the main coverage file (.coverage)
 coverage erase
