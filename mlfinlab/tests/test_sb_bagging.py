@@ -192,12 +192,11 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
 
         sb_clf.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
 
-        # WARNING: This part of the test was present in version 0.11.2, but didn't affect the testing
-        # it also caused a UserWarning: Warm-start fitting without increasing n_estimators does not fit new trees.
-        #sb_clf.n_estimators += 0
-        #sb_clf.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
-        #sb_clf.n_estimators += 2
-        #sb_clf.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
+        sb_clf.n_estimators += 0
+        with self.assertWarns(UserWarning):
+            sb_clf.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
+        sb_clf.n_estimators += 2
+        sb_clf.fit(self.X_train, self.y_train_clf, sample_weight=np.ones((self.X_train.shape[0],)), )
 
         self.assertTrue((sb_clf.predict(self.X_train)[:10] == np.array([0, 0, 0, 0, 0, 0, 1, 1, 1, 0])).all)
 
