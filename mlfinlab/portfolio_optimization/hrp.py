@@ -1,9 +1,8 @@
 # pylint: disable=missing-module-docstring
 import numpy as np
 import pandas as pd
-from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.cluster.hierarchy import linkage as scipy_linkage, dendrogram
 from scipy.spatial.distance import squareform
-from sklearn.covariance import OAS
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
 from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
@@ -95,7 +94,7 @@ class HierarchicalRiskParity:
                                                                                         correlation=correlation_matrix)
 
         # Step-3: Recursive Bisection
-        self._recursive_bisection(covariance=covariance_matrix, assets=asset_names, side_weights=side_weights)
+        self._recursive_bisection(covariance=covariance_matrix, assets=asset_names)
 
         # Build Long/Short portfolio
         if side_weights is None:
@@ -124,7 +123,7 @@ class HierarchicalRiskParity:
         :return: (np.array) Distance matrix and clusters
         """
 
-        clusters = linkage(squareform(distance.values), method=method)
+        clusters = scipy_linkage(squareform(distance.values), method=method)
         return clusters
 
     def _quasi_diagnalization(self, num_assets, curr_index):
@@ -207,7 +206,7 @@ class HierarchicalRiskParity:
         cluster_variance = self.risk_metrics.calculate_variance(covariance=cluster_covariance, weights=parity_w)
         return cluster_variance
 
-    def _recursive_bisection(self, covariance, assets, side_weights):
+    def _recursive_bisection(self, covariance, assets):
         """
         Recursively assign weights to the clusters - ultimately assigning weights to the individual assets.
 
