@@ -74,8 +74,8 @@ class HierarchicalClusteringAssetAllocation:
                 raise ValueError("Please provide a list of asset names")
 
         # Calculate the returns if the user does not supply a returns dataframe
-        if asset_returns is None and (risk_measure in {'expected_shortfall', 'conditional_drawdown_risk'} or
-                    covariance_matrix is None or not optimal_num_clusters):
+        if asset_returns is None and (risk_measure in {'expected_shortfall', 'conditional_drawdown_risk'} or covariance_matrix is
+                                      None or not optimal_num_clusters):
             asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices)
         asset_returns = pd.DataFrame(asset_returns, columns=asset_names)
 
