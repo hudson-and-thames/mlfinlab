@@ -40,6 +40,7 @@ class HierarchicalClusteringAssetAllocation:
         self.clusters = None
         self.ordered_indices = None
         self.cluster_children = None
+        self.optimal_num_clusters = None
         self.returns_estimator = ReturnsEstimators()
         self.risk_estimator = RiskEstimators()
         self.risk_metrics = RiskMetrics()
@@ -60,7 +61,7 @@ class HierarchicalClusteringAssetAllocation:
         :param covariance_matrix: (pd.DataFrame/numpy matrix) User supplied covariance matrix of asset returns.
         :param expected_asset_returns: (list) A list of mean asset returns (mu).
         :param allocation_metric: (str) The metric used for calculating weight allocations. Supported strings - ``equal_weighting``,
-                                        ``minimum_variance``, ``minimum_standard_deviation``, ``sharpe_ratio``,
+                                        ``variance``, ``standard_deviation``, ``sharpe_ratio``,
                                         ``expected_shortfall``, ``conditional_drawdown_risk``.
         :param linkage: (str) The type of linkage method to use for clustering. Supported strings - ``single``, ``average``,
                               ``complete``, ``ward``.
@@ -144,8 +145,8 @@ class HierarchicalClusteringAssetAllocation:
             for child in children:
                 colors[assets[child]] = color
         dendrogram_plot = dendrogram(self.clusters, labels=assets, link_color_func=lambda k: self.UnclusteredColor)
-        ax = plt.gca()
-        xlbls = ax.get_xmajorticklabels()
+        plot_axis = plt.gca()
+        xlbls = plot_axis.get_xmajorticklabels()
         for lbl in xlbls:
             lbl.set_color(colors[lbl.get_text()])
         return dendrogram_plot
@@ -312,15 +313,16 @@ class HierarchicalClusteringAssetAllocation:
             # Compute alpha
             left_cluster_contribution = np.sum(clusters_contribution[left_cluster_ids])
             right_cluster_contribution = np.sum(clusters_contribution[right_cluster_ids])
-            if allocation_metric in {'minimum_variance', 'minimum_standard_deviation', 'expected_shortfall',
-                                     'conditional_drawdown_risk'}:
+            if allocation_metric in {'variance', 'standard_deviation', 'expected_shortfall', 'conditional_drawdown_risk'}:
                 alloc_factor = 1 - left_cluster_contribution / (left_cluster_contribution + right_cluster_contribution)
             elif allocation_metric == 'sharpe_ratio':
+                print(left_cluster_contribution, right_cluster_contribution)
                 alloc_factor = left_cluster_contribution / (left_cluster_contribution + right_cluster_contribution)
 
                 # If sharp ratio allocation factor is not within limits, then calculate normal cluster variance allocation
                 # factor
                 if alloc_factor < 0 or alloc_factor > 1:
+                    print('HELLO')
                     left_cluster_variance = np.sum(clusters_variance[left_cluster_ids])
                     right_cluster_variance = np.sum(clusters_variance[right_cluster_ids])
                     alloc_factor = 1 - left_cluster_variance / (left_cluster_variance + right_cluster_variance)
@@ -392,14 +394,13 @@ class HierarchicalClusteringAssetAllocation:
         if allocation_metric == 'equal_weighting':
             num_assets_in_cluster = len(self.cluster_children[cluster_index])
             return np.ones(num_assets_in_cluster) * 1/num_assets_in_cluster
-        elif allocation_metric in {'minimum_variance', 'minimum_standard_deviation'}:
+        elif allocation_metric in {'variance', 'standard_deviation'}:
             return self._get_inverse_variance_weights(covariance)
         elif allocation_metric == 'expected_shortfall':
             return self._get_inverse_CVaR_weights(asset_returns)
         elif allocation_metric == 'conditional_drawdown_risk':
             return self._get_inverse_CDaR_weights(asset_returns)
-        else:
-            return self._get_sharpe_ratio_weights(covariance, expected_asset_returns)
+        return self._get_sharpe_ratio_weights(covariance, expected_asset_returns)
 
     def _calculate_risk_contribution_of_clusters(self, clusters_contribution, clusters_variance, allocation_metric,
                                                  covariance_matrix, expected_asset_returns,
@@ -418,10 +419,10 @@ class HierarchicalClusteringAssetAllocation:
         for cluster_index in range(self.optimal_num_clusters):
             cluster_asset_indices = self.cluster_children[cluster_index]
 
-            if allocation_metric == 'minimum_variance':
+            if allocation_metric == 'variance':
                 clusters_contribution[cluster_index] = self._get_cluster_variance(covariance_matrix,
                                                                                   cluster_asset_indices)
-            elif allocation_metric == 'minimum_standard_deviation':
+            elif allocation_metric == 'standard_deviation':
                 clusters_contribution[cluster_index] = np.sqrt(
                     self._get_cluster_variance(covariance_matrix, cluster_asset_indices))
             elif allocation_metric == 'sharpe_ratio':
@@ -475,6 +476,7 @@ class HierarchicalClusteringAssetAllocation:
         return parity_weights
 
     def _get_inverse_CVaR_weights(self, asset_returns):
+        # pylint: disable=invalid-name
         """
         Calculate inverse CVaR weight allocations.
 
@@ -495,6 +497,7 @@ class HierarchicalClusteringAssetAllocation:
         return parity_weights
 
     def _get_inverse_CDaR_weights(self, asset_returns):
+        # pylint: disable=invalid-name
         """
         Calculate inverse CDaR weight allocations.
 
@@ -632,10 +635,10 @@ class HierarchicalClusteringAssetAllocation:
                 raise ValueError("Asset prices dataframe must be indexed by date.")
 
         if allocation_metric not in \
-                {'minimum_variance', 'minimum_standard_deviation', 'sharpe_ratio',
+                {'variance', 'standard_deviation', 'sharpe_ratio',
                  'equal_weighting', 'expected_shortfall', 'conditional_drawdown_risk'}:
-            raise ValueError("Unknown allocation metric specified. Supported metrics are - minimum_variance, "
-                             "minimum_standard_deviation, sharpe_ratio, equal_weighting, expected_shortfall, "
+            raise ValueError("Unknown allocation metric specified. Supported metrics are - variance, "
+                             "standard_deviation, sharpe_ratio, equal_weighting, expected_shortfall, "
                              "conditional_drawdown_risk")
 
         if allocation_metric == 'sharpe_ratio' and expected_asset_returns is None and asset_prices is None:
