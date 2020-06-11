@@ -42,10 +42,10 @@ def calc_engle_granger(data1, data2, trend="c", method="aeg", maxlag=None, autol
     :param trend: (str) {"c","ct","ctt","nc"} Constant and trend order to include in
         regression.
 
-        - "c" : constant only (default).
-        - "ct" : constant and trend.
-        - "ctt" : constant, and linear and quadratic trend.
-        - "nc" : no constant, no trend.
+    - "c" : constant only (default).
+    - "ct" : constant and trend.
+    - "ctt" : constant, and linear and quadratic trend.
+    - "nc" : no constant, no trend.
 
     :param method: (str) {"aeg"} Only "aeg" (augmented Engle-Granger) is available.
 
@@ -53,24 +53,25 @@ def calc_engle_granger(data1, data2, trend="c", method="aeg", maxlag=None, autol
 
     :param autolag: (str) Argument for `adfuller`, lag selection criterion.
 
-        - If None, then maxlag lags are used without lag search.
-        - If "AIC" (default) or "BIC", then the number of lags is chosen
-          to minimize the corresponding information criterion.
-        - "t-stat" based choice of maxlag.  Starts with maxlag and drops a
-          lag until the t-statistic on the last lag length is significant
-          using a 5%-sized test.
+    - If None, then maxlag lags are used without lag search.
+    - If "AIC" (default) or "BIC", then the number of lags is chosen
+        to minimize the corresponding information criterion.
+    - "t-stat" based choice of maxlag.  Starts with maxlag and drops a
+        lag until the t-statistic on the last lag length is significant
+        using a 5%-sized test.
 
     :param return_results: (bool) For future compatibility, currently only tuple available.
-            If True, then a results instance is returned. Otherwise, a tuple
-            with the test outcome is returned. Set `return_results=False` to
-            avoid future changes in return.
+        If True, then a results instance is returned. Otherwise, a tuple
+        with the test outcome is returned. Set `return_results=False` to
+        avoid future changes in return.
 
     :return: (tuple) Coint_t, Pvalue, Crit_value
 
     - coint_t: (float) The t-statistic of unit-root test on residuals.
     - pvalue: (float) MacKinnon"s approximate, asymptotic p-value based on MacKinnon (1994).
     - crit_value: (dict) Critical values for the test statistic at the 1 %, 5 %, and 10 %
-    levels based on regression curve. This depends on the number of observations.
+        levels based on regression curve. This depends on the number of observations.
+
     """
     return coint(data1, data2, trend=trend, method=method, maxlag=maxlag, autolag=autolag,
                  return_results=return_results)
@@ -88,15 +89,17 @@ def calc_johansen(data, det_order, k_ar_diff):
     Johansen cointegration test of the cointegration rank of a VECM.
 
     :param data: (pd.Series) (nobs_tot x neqs) Data to test
+
     :param det_order: (int)
 
-        - -1: no deterministic terms
-        - 0: constant term
-        - 1: linear trend
+    - -1: no deterministic terms
+    - 0: constant term
+    - 1: linear trend
+
     :param k_ar_diff: (int) Nonnegative, Number of lagged differences in the model.
 
     :return: (tuple) (cvm, cvt, eig, evec, ind, lr1, lr2, max_eig_stat, max_eig_stat_crit_vals, meth,
-    r0t, rkt, trace_stat, trace_stat_crit_vals)
+        r0t, rkt, trace_stat, trace_stat_crit_vals)
 
     - cvm: (np.array) Critical values (90%, 95%, 99%) of maximum eigenvalue statistic.
     - cvt: (np.array) Critical values (90%, 95%, 99%) of trace statistic
@@ -112,6 +115,7 @@ def calc_johansen(data, det_order, k_ar_diff):
     - rkt: (np.array) Residuals for :math:`Y_{-1}`.
     - trace_stat: (np.array) Trace statistic.
     - trace_stat_crit_vals: (np.array) Critical values (90%, 95%, 99%) of trace statistic.
+
     """
     res = coint_johansen(data, det_order, k_ar_diff)
     cvm, cvt, eig, evec, ind, lr1, lr2 = res.cvm, res.cvt, res.eig, res.evec, res.ind, res.lr1, res.lr2

@@ -123,7 +123,7 @@ For the purpose of this module, we will empirically set :math:`p` to be :math:`1
 
 .. py:currentmodule:: mlfinlab.statistical_arbitrage.stationarity
 
-.. autofunction:: calc_stationarity
+.. autofunction:: calc_adfuller
 
 Phillips-Perron Test
 ********************
@@ -143,12 +143,14 @@ Engle-Granger Test
 
 .. py:currentmodule:: mlfinlab.statistical_arbitrage.cointegration
 
-.. autofunction:: calc_cointegration
+.. autofunction:: calc_engle_granger
 
 Johansen Test
 **************
 
-To Be Implemented.
+.. py:currentmodule:: mlfinlab.statistical_arbitrage.cointegration
+
+.. autofunction:: calc_johansen
 
 Optimal Trading Strategy
 ========================
@@ -162,6 +164,10 @@ To Be Implemented.
 
 Ornstein-Uhlenbeck Process
 **************************
+
+.. note::
+    `Bertram, W.K., 2010. Analytic solutions for optimal statistical arbitrage trading. Physica A: Statistical mechanics and its applications, 389(11), pp.2234-2243.
+    <http://www.stagirit.org/sites/default/files/articles/a_0340_ssrn-id1505073.pdf>`_
 
 The Ornstein-Uhlenbeck process is a stochastic mean-reverting process with the following equation:
 

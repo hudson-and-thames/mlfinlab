@@ -32,44 +32,38 @@ def calc_adfuller(data, maxlag=None, regression="c", autolag="AIC", store=False,
     :param regression: (str) ("c","ct","ctt","nc") Constant and trend order to include in
         regression.
 
-        - "c" : constant only (default).
-        - "ct" : constant and trend.
-        - "ctt" : constant, and linear and quadratic trend.
-        - "nc" : no constant, no trend.
+    - "c" : constant only (default).
+    - "ct" : constant and trend.
+    - "ctt" : constant, and linear and quadratic trend.
+    - "nc" : no constant, no trend.
 
     :param autolag: (str) ("AIC", "BIC", "t-stat", None) Method to use when automatically
         determining the lag.
 
-        - If None, then maxlag lags are used.
-        - If "AIC" (default) or "BIC", then the number of lags is chosen
-          to minimize the corresponding information criterion.
-        - "If t-stat" based choice of maxlag, it starts with maxlag and drops a
-          lag until the t-statistic on the last lag length is significant
-          using a 5%-sized test.
+    - If None, then maxlag lags are used.
+    - If "AIC" (default) or "BIC", then the number of lags is chosen
+      to minimize the corresponding information criterion.
+    - "If t-stat" based choice of maxlag, it starts with maxlag and drops a
+      lag until the t-statistic on the last lag length is significant
+      using a 5%-sized test.
 
     :param store: (bool) If True, then a result instance is returned additionally to the
-            adf statistic. Default is False.
+        adf statistic. Default is False.
 
     :param regresults: (bool) This is optional, and if True, the full regression results are returned.
-            Default is False.
+        Default is False.
 
-    :return: (tuple) ADF, P-value, Usedlag, Nobs, Critical Values, Icbest, Resstore
+    :return: (tuple) ADF, P-value, Usedlag, Nobs, Critical Values, Icbest, Resstore.
 
-        - adf: (float) The test statistic.
-
-        - pvalue: (float) MacKinnon"s approximate p-value based on MacKinnon (1994, 2010).
-
-        - usedlag: (int) The number of lags used.
-
-        - nobs: (int) The number of observations used for the ADF regression and calculation of
+    - adf: (float) The test statistic.
+    - pvalue: (float) MacKinnon"s approximate p-value based on MacKinnon (1994, 2010).
+    - usedlag: (int) The number of lags used.
+    - nobs: (int) The number of observations used for the ADF regression and calculation of
         the critical values.
-
-        - critical values: (dict) Critical values for the test statistic at the 1 %, 5 %, and 10 %
+    - critical values: (dict) Critical values for the test statistic at the 1 %, 5 %, and 10 %
         levels. Based on MacKinnon (2010).
-
-        - icbest: (float) The maximized information criterion if autolag is not None.
-
-        - resstore: (ResultStore) This is optional. A dummy class with results attached as attributes.
+    - icbest: (float) The maximized information criterion if autolag is not None.
+    - resstore: (ResultStore) This is optional. A dummy class with results attached as attributes.
 
     """
     return adfuller(data, maxlag=maxlag, regression=regression, autolag=autolag, store=store,
