@@ -19,8 +19,8 @@ class HierarchicalClusteringAssetAllocation:
     <https://ssrn.com/abstract=2840729>`_;
 
     While the vanilla Hierarchical Risk Parity algorithm uses only the variance as a risk measure for assigning weights, the HERC
-    algorithm proposed by Raffinot, allows investors to use other risk metrics like Expected Shortfall, Sharpe Ratio and
-    Conditional Drawdown. Furthermore, it is flexible enough to be easily extended to include custom risk measures of our own.
+    algorithm proposed by Raffinot, allows investors to use other risk metrics like Standard Deviation, Expected Shortfall and
+    Conditional Drawdown at Risk.
     """
 
     UniqueColors = ['darkred', 'deepskyblue', 'springgreen', 'darkorange', 'deeppink', 'slateblue', 'navy', 'blueviolet',
@@ -30,8 +30,6 @@ class HierarchicalClusteringAssetAllocation:
         """
         Initialise.
 
-        :param calculate_expected_returns: (str) The method to use for calculation of expected returns.
-                                                 Currently supports: ``mean``, ``exponential``.
         :param confidence_level: (float) The confidence level (alpha) used for calculating expected shortfall and conditional
                                          drawdown at risk.
         """
@@ -321,7 +319,7 @@ class HierarchicalClusteringAssetAllocation:
         :param risk_measure: (str) The metric used for calculating weight allocations.
         :param clusters_weights: (np.array) The cluster weights calculated using recursive bisection.
         :param covariance_matrix: (pd.DataFrame) The covariance matrix.
-        :param asset_returns: (pd.DataFrame)
+        :param asset_returns: (pd.DataFrame) Historical asset returns.
         """
 
         for cluster_index in range(self.optimal_num_clusters):
@@ -348,7 +346,7 @@ class HierarchicalClusteringAssetAllocation:
         :param cluster_index: (int) Index of the current cluster.
         :param risk_measure: (str) The metric used for calculating weight allocations.
         :param covariance: (pd.DataFrame) The covariance matrix of asset returns.
-        :param asset_returns: (pd.DataFrame)
+        :param asset_returns: (pd.DataFrame) Historical asset returns.
         :return: (np.array) list of risk parity weights for assets in current cluster.
         """
 
