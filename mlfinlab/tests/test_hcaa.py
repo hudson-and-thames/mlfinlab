@@ -170,6 +170,22 @@ class TestHCAA(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
+    def test_hcaa_with_asset_returns_as_none(self):
+        """
+        Test HCAA when asset returns are not required for calculating the weights.
+        """
+
+        hcaa = HierarchicalClusteringAssetAllocation()
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
+        hcaa.allocate(asset_names=self.data.columns,
+                      covariance_matrix=returns.cov(),
+                      optimal_num_clusters=5,
+                      risk_measure='equal_weighting')
+        weights = hcaa.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
     def test_hcaa_with_input_as_covariance_matrix(self):
         """
         Test HCAA when passing a covariance matrix as input.

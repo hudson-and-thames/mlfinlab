@@ -63,7 +63,7 @@ class HierarchicalClusteringAssetAllocation:
         """
 
         # Perform error checks
-        self._error_checks(asset_prices, asset_returns, risk_measure)
+        self._error_checks(asset_prices, asset_returns, risk_measure, covariance_matrix)
 
         if asset_names is None:
             if asset_prices is not None:
@@ -74,10 +74,9 @@ class HierarchicalClusteringAssetAllocation:
                 raise ValueError("Please provide a list of asset names")
 
         # Calculate the returns if the user does not supply a returns dataframe
-        if asset_returns is None:
-            if risk_measure in {'expected_shortfall', 'conditional_drawdown_risk'} or \
-                    covariance_matrix is None or not optimal_num_clusters:
-                asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices)
+        if asset_returns is None and (risk_measure in {'expected_shortfall', 'conditional_drawdown_risk'} or
+                    covariance_matrix is None or not optimal_num_clusters):
+            asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices)
         asset_returns = pd.DataFrame(asset_returns, columns=asset_names)
 
         # Calculate covariance of returns or use the user specified covariance matrix
@@ -330,7 +329,7 @@ class HierarchicalClusteringAssetAllocation:
 
             # Historical returns of assets in this cluster
             cluster_asset_returns = None
-            if asset_returns is not None:
+            if not asset_returns.empty:
                 cluster_asset_returns = asset_returns.iloc[:, cluster_asset_indices]
 
             parity_weights = self._calculate_naive_risk_parity(cluster_index=cluster_index,
@@ -526,7 +525,7 @@ class HierarchicalClusteringAssetAllocation:
         return list(set(list1) & set(list2))
 
     @staticmethod
-    def _error_checks(asset_prices, asset_returns, risk_measure):
+    def _error_checks(asset_prices, asset_returns, risk_measure, covariance_matrix):
         """
         Perform initial warning checks.
 
@@ -534,10 +533,11 @@ class HierarchicalClusteringAssetAllocation:
                                             indexed by date.
         :param asset_returns: (pd.DataFrame/numpy matrix) User supplied matrix of asset returns.
         :param risk_measure: (str) The metric used for calculating weight allocations.
+        :param covariance_matrix: (pd.DataFrame/numpy matrix) User supplied covariance matrix of asset returns.
         """
 
-        if asset_prices is None and asset_returns is None:
-            raise ValueError("You need to supply either raw prices or returns.")
+        if asset_prices is None and asset_returns is None and covariance_matrix is None:
+            raise ValueError("You need to supply either raw prices or returns or covariance matrix")
 
         if asset_prices is not None:
             if not isinstance(asset_prices, pd.DataFrame):
