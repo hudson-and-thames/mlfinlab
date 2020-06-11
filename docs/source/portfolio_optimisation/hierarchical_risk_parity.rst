@@ -143,7 +143,7 @@ Example Code
     side_weights = pd.Series([1]*stock_prices.shape[1], index=self.data.columns)
     side_weights.loc[stock_prices.columns[:4]] = -1
     hrp.allocate(asset_prices=self.data, asset_names=self.data.columns, side_weights=side_weights)
-    hrp.allocate(asset_prices=stock_prices, side_weights=side_weights, resample_by='B')
+    hrp.allocate(asset_prices=stock_prices, side_weights=side_weights)
     hrp_weights = hrp.weights.sort_values(by=0, ascending=False, axis=1)
 
 
