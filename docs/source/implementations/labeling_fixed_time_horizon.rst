@@ -7,7 +7,7 @@ Fixed Horizon Method
 Fixed horizon labels is a classification labeling technique used in the following paper: `Dixon, M., Klabjan, D. and
 Bang, J., 2016. Classification-based Financial Markets Prediction using Deep Neural Networks. <https://arxiv.org/abs/1603.08604>`_
 
-Fixed time horizon is a common method used in labeling financial data, usually applied on time bars. The forward rate of return relative
+Fixed time horizon is a common method used in labeling financial data, usually applied on time bars. The rate of return relative
 to :math:`t_0` over time horizon :math:`h`, assuming that returns are lagged, is calculated as follows (M.L. de Prado, Advances in Financial Machine Learning, 2018):
 
 .. math::
@@ -28,8 +28,10 @@ are prices at times :math:`t_0, t_1`. This method assigns a label based on compa
      \end{equation}
 
 To avoid overlapping return windows, rather than specifying :math:`h`, the user is given the option of resampling the returns to
-get the desired return period. Optionally, returns can be standardized by scaling by the mean and standard deviation of a rolling
-window. If threshold is a pd.Series, **threshold.index and prices.index must match**; otherwise labels will fail to be returned. If resampling
+get the desired return period. Possible inputs for the resample period can be found `here.
+<https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects>`_.
+Optionally, returns can be standardized by scaling by the mean and standard deviation of a rolling window. If threshold is a pd.Series,
+**threshold.index and prices.index must match**; otherwise labels will fail to be returned. If resampling
 is used, the threshold must match the index of prices after resampling. This is to avoid the user being forced to fill in meaningless
 thresholds.
 
@@ -74,17 +76,25 @@ Below is an example on how to use the Fixed Horizon labeling technique on real d
 .. code-block::
 
     import pandas as pd
+    import numpy as np
+
     from mlfinlab.labeling import fixed_time_horizon
 
-    # Import price data
+    # Import price data.
     data = pd.read_csv('../Sample-Data/stock_prices.csv', index_col='Date', parse_dates=True)
-    ticker = 'SPY'
+    custom_threshold = pd.Series(np.random.random(len(data)), index = data.index)
 
-    # Create labels
-    labels = fixed_time_horizon(close=data[ticker], threshold=0.01, look_forward=1)
+    # Create labels.
+    labels = fixed_time_horizon(prices=data, threshold=0.01, lag=True)
 
-    # Create labels with standardization
-    labels = fixed_time_horizon(close=data[ticker], threshold=1, look_forward=1, standardized=True, window=5)
+    # Create labels with a dynamic threshold.
+    labels = fixed_time_horizon(prices=data, threshold=custom_threshold)
+
+    # Create labels with standardization.
+    labels = fixed_time_horizon(prices=data, threshold=1, lag=True, standardized=True, window=5)
+
+    # Create labels after resampling weekly with standardization.
+    labels = fixed_time_horizon(prices=data, threshold=1, resample_by='W', lag=True, standardized=True, window=4)
 
 
 Research Notebook

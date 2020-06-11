@@ -6,7 +6,6 @@ labeling data this way can be used in training deep neural networks to predict p
 """
 
 import warnings
-import numpy as np
 import pandas as pd
 
 
