@@ -6,6 +6,7 @@ from scipy.spatial.distance import squareform
 from sklearn.covariance import OAS
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
+from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
 
 
 class HierarchicalRiskParity:
@@ -30,6 +31,7 @@ class HierarchicalRiskParity:
         self.clusters = None
         self.returns_estimator = ReturnsEstimators()
         self.risk_metrics = RiskMetrics()
+        self.risk_estimator = RiskEstimators()
 
     def allocate(self,
                  asset_names=None,
@@ -38,9 +40,7 @@ class HierarchicalRiskParity:
                  covariance_matrix=None,
                  distance_matrix=None,
                  side_weights=None,
-                 linkage_method='single',
-                 resample_by=None,
-                 use_shrinkage=False):
+                 linkage='single'):
         # pylint: disable=invalid-name, too-many-branches
         """
         Calculate asset allocations using HRP algorithm.
@@ -55,20 +55,10 @@ class HierarchicalRiskParity:
                                                       (default 1 for all)
         :param linkage: (string) Type of linkage used for Hierarchical Clustering. Supported strings - ``single``,
                                  ``average``, ``complete``, ``ward``.
-        :param resample_by: (str) Specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
-                                  None for no resampling
-        :param use_shrinkage: (bool) Specifies whether to shrink the covariances
         """
 
-        if asset_prices is None and asset_returns is None and covariance_matrix is None:
-            raise ValueError(
-                "You need to supply either raw prices or returns or a covariance matrix of asset returns")
-
-        if asset_prices is not None:
-            if not isinstance(asset_prices, pd.DataFrame):
-                raise ValueError("Asset prices matrix must be a dataframe")
-            if not isinstance(asset_prices.index, pd.DatetimeIndex):
-                raise ValueError("Asset prices dataframe must be indexed by date.")
+        # Perform error checks
+        self._error_checks(asset_prices, asset_returns, covariance_matrix)
 
         if asset_names is None:
             if asset_prices is not None:
@@ -80,25 +70,22 @@ class HierarchicalRiskParity:
 
         # Calculate the returns if the user does not supply a returns dataframe
         if asset_returns is None and covariance_matrix is None:
-            asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices, resample_by=resample_by)
+            asset_returns = self.returns_estimator.calculate_returns(asset_prices=asset_prices)
         asset_returns = pd.DataFrame(asset_returns, columns=asset_names)
 
         # Calculate covariance of returns or use the user specified covariance matrix
         if covariance_matrix is None:
-            if use_shrinkage:
-                covariance_matrix = self._shrink_covariance(asset_returns=asset_returns)
-            else:
-                covariance_matrix = asset_returns.cov()
+            covariance_matrix = asset_returns.cov()
         covariance_matrix = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
 
         # Calculate correlation and distance from covariance matrix
-        correlation_matrix = self._cov2corr(covariance=covariance_matrix)
+        correlation_matrix = self.risk_estimator.cov_to_corr(covariance_matrix)
         if distance_matrix is None:
             distance_matrix = np.sqrt((1 - correlation_matrix).round(5) / 2)
         distance_matrix = pd.DataFrame(distance_matrix, index=asset_names, columns=asset_names)
 
         # Step-1: Tree Clustering
-        self.clusters = self._tree_clustering(distance=distance_matrix, method=linkage_method)
+        self.clusters = self._tree_clustering(distance=distance_matrix, method=linkage)
 
         # Step-2: Quasi Diagnalization
         num_assets = len(asset_names)
@@ -107,12 +94,14 @@ class HierarchicalRiskParity:
                                                                                         distance=distance_matrix,
                                                                                         correlation=correlation_matrix)
 
+        # Step-3: Recursive Bisection
+        self._recursive_bisection(covariance=covariance_matrix, assets=asset_names, side_weights=side_weights)
+
+        # Build Long/Short portfolio
         if side_weights is None:
             side_weights = pd.Series([1] * num_assets, index=asset_names)
         side_weights = pd.Series(side_weights, index=asset_names)
-
-        # Step-3: Recursive Bisection
-        self._recursive_bisection(covariance=covariance_matrix, assets=asset_names, side_weights=side_weights)
+        self._build_long_short_portfolio(side_weights)
 
     def plot_clusters(self, assets):
         """
@@ -134,6 +123,7 @@ class HierarchicalRiskParity:
         :param method: (str) The type of clustering to be done
         :return: (np.array) Distance matrix and clusters
         """
+
         clusters = linkage(squareform(distance.values), method=method)
         return clusters
 
@@ -169,6 +159,26 @@ class HierarchicalRiskParity:
         seriated_distances = distance.loc[ordering, ordering]
         seriated_correlations = correlation.loc[ordering, ordering]
         return seriated_distances, seriated_correlations
+
+    def _build_long_short_portfolio(self, side_weights):
+        """
+        Adjust weights according the shorting constraints specified.
+
+        :param side_weights: (pd.Series/numpy matrix) With asset_names in index and value 1 for Buy, -1 for Sell
+                                                      (default 1 for all)
+        """
+
+        short_ptf = side_weights[side_weights == -1].index
+        buy_ptf = side_weights[side_weights == 1].index
+        if not short_ptf.empty:
+            # Short half size
+            self.weights.loc[short_ptf] /= self.weights.loc[short_ptf].sum().values[0]
+            self.weights.loc[short_ptf] *= -0.5
+
+            # Buy other half
+            self.weights.loc[buy_ptf] /= self.weights.loc[buy_ptf].sum().values[0]
+            self.weights.loc[buy_ptf] *= 0.5
+        self.weights = self.weights.T
 
     @staticmethod
     def _get_inverse_variance_weights(covariance):
@@ -230,46 +240,24 @@ class HierarchicalRiskParity:
         self.weights.index = assets[self.ordered_indices]
         self.weights = pd.DataFrame(self.weights)
 
-        # Build Long/Short portfolio if needed
-        short_ptf = side_weights[side_weights == -1].index
-        buy_ptf = side_weights[side_weights == 1].index
-        if not short_ptf.empty:
-            # Short half size
-            self.weights.loc[short_ptf] /= self.weights.loc[short_ptf].sum().values[0]
-            self.weights.loc[short_ptf] *= -0.5
-
-            # Buy other half
-            self.weights.loc[buy_ptf] /= self.weights.loc[buy_ptf].sum().values[0]
-            self.weights.loc[buy_ptf] *= 0.5
-        self.weights = self.weights.T
-
     @staticmethod
-    def _shrink_covariance(asset_returns):
+    def _error_checks(asset_prices, asset_returns, covariance_matrix):
         """
-        Regularise/Shrink the asset covariances.
+        Perform initial warning checks.
 
-        :param asset_returns: (pd.Dataframe) Asset returns
-        :return: (pd.Dataframe) Shrinked asset returns covariances
-        """
-
-        oas = OAS()
-        oas.fit(asset_returns)
-        shrinked_covariance = oas.covariance_
-        return shrinked_covariance
-
-    @staticmethod
-    def _cov2corr(covariance):
-        """
-        Calculate the correlations from asset returns covariance matrix.
-
-        :param covariance: (pd.Dataframe) Asset returns covariances
-        :return: (pd.Dataframe) Correlations between asset returns
+        :param asset_prices: (pd.DataFrame) A dataframe of historical asset prices (daily close)
+                                            indexed by date.
+        :param asset_returns: (pd.DataFrame/numpy matrix) User supplied matrix of asset returns.
+        :param covariance_matrix: (pd.Dataframe/numpy matrix) User supplied covariance matrix of asset returns
         """
 
-        d_matrix = np.zeros_like(covariance)
-        diagnoal_sqrt = np.sqrt(np.diag(covariance))
-        np.fill_diagonal(d_matrix, diagnoal_sqrt)
-        d_inv = np.linalg.inv(d_matrix)
-        corr = np.dot(np.dot(d_inv, covariance), d_inv)
-        corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
-        return corr
+
+        if asset_prices is None and asset_returns is None and covariance_matrix is None:
+            raise ValueError(
+                "You need to supply either raw prices or returns or a covariance matrix of asset returns")
+
+        if asset_prices is not None:
+            if not isinstance(asset_prices, pd.DataFrame):
+                raise ValueError("Asset prices matrix must be a dataframe")
+            if not isinstance(asset_prices.index, pd.DatetimeIndex):
+                raise ValueError("Asset prices dataframe must be indexed by date.")

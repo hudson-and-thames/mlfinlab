@@ -62,8 +62,8 @@ class HierarchicalClusteringAssetAllocation:
         :param optimal_num_clusters: (int) Optimal number of clusters for hierarchical clustering.
         """
 
-        # Perform initial checks
-        self._perform_checks(asset_prices, asset_returns, risk_measure)
+        # Perform error checks
+        self._error_checks(asset_prices, asset_returns, risk_measure)
 
         if asset_names is None:
             if asset_prices is not None:
@@ -525,7 +525,7 @@ class HierarchicalClusteringAssetAllocation:
         return list(set(list1) & set(list2))
 
     @staticmethod
-    def _perform_checks(asset_prices, asset_returns, risk_measure):
+    def _error_checks(asset_prices, asset_returns, risk_measure):
         """
         Perform initial warning checks.
 
