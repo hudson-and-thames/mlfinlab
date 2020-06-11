@@ -50,7 +50,7 @@ class TestHCAA(unittest.TestCase):
         hcaa.allocate(asset_prices=self.data,
                       asset_names=self.data.columns,
                       optimal_num_clusters=5,
-                      allocation_metric='minimum_variance')
+                      allocation_metric='variance')
         weights = hcaa.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -66,7 +66,7 @@ class TestHCAA(unittest.TestCase):
         hcaa.allocate(asset_prices=self.data,
                       asset_names=self.data.columns,
                       optimal_num_clusters=4,
-                      allocation_metric='minimum_standard_deviation')
+                      allocation_metric='standard_deviation')
         weights = hcaa.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -98,7 +98,7 @@ class TestHCAA(unittest.TestCase):
         hcaa = HierarchicalClusteringAssetAllocation()
         returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         expected_returns = returns.mean()
-        expected_returns[0] = -10000
+        expected_returns = expected_returns * -1
         hcaa.allocate(expected_asset_returns=expected_returns,
                       asset_names=self.data.columns,
                       covariance_matrix=returns.corr(),

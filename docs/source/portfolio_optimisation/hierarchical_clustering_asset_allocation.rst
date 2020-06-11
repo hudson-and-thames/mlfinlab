@@ -96,8 +96,8 @@ are the risk contributions of left and right clusters.
     algorithm can be tweaked to allocate its weights based on different risk representations of the clusters and generate
     better weights. The HCAA method in mlfinlab provides the following risk metrics:
 
-    1. ``minimum_variance`` : Variance of the clusters is used as a risk metric.
-    2. ``minimum_standard_deviation`` : Standard deviation of the clusters is used as a risk metric.
+    1. ``variance`` : Variance of the clusters is used as a risk metric.
+    2. ``standard_deviation`` : Standard deviation of the clusters is used as a risk metric.
     3. ``sharpe_ratio`` : Sharpe ratio of the clusters is used as a risk metric.
     4. ``equal_weighting`` : All clusters are weighed equally in terms of risk.
     5. ``expected_shortfall`` : Expected shortfall (CVaR) of the clusters is used as a risk metric.
