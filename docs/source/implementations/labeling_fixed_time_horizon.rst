@@ -94,7 +94,8 @@ Below is an example on how to use the Fixed Horizon labeling technique on real d
     labels = fixed_time_horizon(prices=data, threshold=1, lag=True, standardized=True, window=5)
 
     # Create labels after resampling weekly with standardization.
-    labels = fixed_time_horizon(prices=data, threshold=1, resample_by='W', lag=True, standardized=True, window=4)
+    labels = fixed_time_horizon(prices=data, threshold=1, resample_by='W', lag=True,
+                                standardized=True, window=4)
 
 
 Research Notebook
