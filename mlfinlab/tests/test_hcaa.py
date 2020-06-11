@@ -34,7 +34,7 @@ class TestHCAA(unittest.TestCase):
         hcaa.allocate(asset_prices=self.data,
                       asset_names=self.data.columns,
                       optimal_num_clusters=5,
-                      allocation_metric='equal_weighting')
+                      risk_measure='equal_weighting')
         weights = hcaa.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -50,7 +50,7 @@ class TestHCAA(unittest.TestCase):
         hcaa.allocate(asset_prices=self.data,
                       asset_names=self.data.columns,
                       optimal_num_clusters=5,
-                      allocation_metric='variance')
+                      risk_measure='variance')
         weights = hcaa.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -66,90 +66,11 @@ class TestHCAA(unittest.TestCase):
         hcaa.allocate(asset_prices=self.data,
                       asset_names=self.data.columns,
                       optimal_num_clusters=4,
-                      allocation_metric='standard_deviation')
+                      risk_measure='standard_deviation')
         weights = hcaa.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
-
-    def test_hcaa_sharpe_ratio(self):
-        """
-        Test the weights calculated by the HCAA algorithm - if all the weights are positive and
-        their sum is equal to 1.
-        """
-
-        hcaa = HierarchicalClusteringAssetAllocation(calculate_expected_returns='mean')
-        hcaa.allocate(asset_prices=self.data,
-                      asset_names=self.data.columns,
-                      optimal_num_clusters=5,
-                      allocation_metric='sharpe_ratio')
-        weights = hcaa.weights.values[0]
-        assert (weights >= 0).all()
-        assert len(weights) == self.data.shape[1]
-        np.testing.assert_almost_equal(np.sum(weights), 1)
-
-    def test_hcaa_sharpe_ratio_alloc_factor_less_than_one(self):
-        # pylint: disable=invalid-name
-        """
-        Test the condition when allocation factor calculated for sharpe ratio metric is less than 0
-        or greater than 1 (in which case the variance is used as the metric).
-        """
-
-        hcaa = HierarchicalClusteringAssetAllocation()
-        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
-        expected_returns = returns.mean()
-        expected_returns = expected_returns * -1
-        hcaa.allocate(expected_asset_returns=expected_returns,
-                      asset_names=self.data.columns,
-                      covariance_matrix=returns.corr(),
-                      optimal_num_clusters=5,
-                      allocation_metric='sharpe_ratio')
-        weights = hcaa.weights.values[0]
-        assert (weights >= 0).all()
-        assert len(weights) == self.data.shape[1]
-        np.testing.assert_almost_equal(np.sum(weights), 1)
-
-    def test_hcaa_sharpe_ratio_with_exponential_returns(self):
-        # pylint: disable=invalid-name
-        """
-        Test the weights calculated by the HCAA algorithm - if all the weights are positive and
-        their sum is equal to 1.
-        """
-
-        hcaa = HierarchicalClusteringAssetAllocation(calculate_expected_returns='exponential')
-        hcaa.allocate(asset_prices=self.data,
-                      asset_names=self.data.columns,
-                      optimal_num_clusters=5,
-                      allocation_metric='sharpe_ratio')
-        weights = hcaa.weights.values[0]
-        assert (weights >= 0).all()
-        assert len(weights) == self.data.shape[1]
-        np.testing.assert_almost_equal(np.sum(weights), 1)
-
-    def test_value_error_for_unknown_returns(self):
-        """
-        Test ValueError when unknown expected returns are specified.
-        """
-
-        with self.assertRaises(ValueError):
-            hcaa = HierarchicalClusteringAssetAllocation(calculate_expected_returns='unknown_returns')
-            hcaa.allocate(asset_prices=self.data,
-                          asset_names=self.data.columns,
-                          optimal_num_clusters=5,
-                          allocation_metric='sharpe_ratio')
-
-    def test_value_error_for_sharpe_ratio(self):
-        """
-        Test ValueError when sharpe-ratio is the allocation metric, no expected_returns dataframe
-        is given and no asset_prices dataframe is passed.
-        """
-
-        with self.assertRaises(ValueError):
-            hcaa = HierarchicalClusteringAssetAllocation()
-            hcaa.allocate(asset_returns=self.data,
-                          asset_names=self.data.columns,
-                          optimal_num_clusters=5,
-                          allocation_metric='sharpe_ratio')
 
     def test_value_error_for_expected_shortfall(self):
         """
@@ -161,7 +82,7 @@ class TestHCAA(unittest.TestCase):
             hcaa = HierarchicalClusteringAssetAllocation()
             hcaa.allocate(asset_names=self.data.columns,
                           optimal_num_clusters=5,
-                          allocation_metric='expected_shortfall')
+                          risk_measure='expected_shortfall')
 
     def test_hcaa_expected_shortfall(self):
         """
@@ -173,7 +94,7 @@ class TestHCAA(unittest.TestCase):
         hcaa.allocate(asset_prices=self.data,
                       asset_names=self.data.columns,
                       optimal_num_clusters=5,
-                      allocation_metric='expected_shortfall')
+                      risk_measure='expected_shortfall')
         weights = hcaa.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -189,7 +110,7 @@ class TestHCAA(unittest.TestCase):
         hcaa.allocate(asset_prices=self.data,
                       asset_names=self.data.columns,
                       optimal_num_clusters=5,
-                      allocation_metric='conditional_drawdown_risk')
+                      risk_measure='conditional_drawdown_risk')
         weights = hcaa.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
@@ -265,14 +186,14 @@ class TestHCAA(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
-    def test_value_error_for_allocation_metric(self):
+    def test_value_error_for_risk_measure(self):
         """
         Test HCAA when a different allocation metric string is used.
         """
 
         with self.assertRaises(ValueError):
             hcaa = HierarchicalClusteringAssetAllocation()
-            hcaa.allocate(asset_names=self.data.columns, asset_prices=self.data, allocation_metric='random_metric')
+            hcaa.allocate(asset_names=self.data.columns, asset_prices=self.data, risk_measure='random_metric')
 
     def test_no_asset_names(self):
         """
