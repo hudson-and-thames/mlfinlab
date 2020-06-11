@@ -98,10 +98,9 @@ are the risk contributions of left and right clusters.
 
     1. ``variance`` : Variance of the clusters is used as a risk metric.
     2. ``standard_deviation`` : Standard deviation of the clusters is used as a risk metric.
-    3. ``sharpe_ratio`` : Sharpe ratio of the clusters is used as a risk metric.
-    4. ``equal_weighting`` : All clusters are weighed equally in terms of risk.
-    5. ``expected_shortfall`` : Expected shortfall (CVaR) of the clusters is used as a risk metric.
-    6. ``conditional_drawdown_at_risk`` : Conditional drawdown at risk (CDaR) of the clusters is used as a risk metric.
+    3. ``equal_weighting`` : All clusters are weighed equally in terms of risk.
+    4. ``expected_shortfall`` : Expected shortfall (CVaR) of the clusters is used as a risk metric.
+    5. ``conditional_drawdown_at_risk`` : Conditional drawdown at risk (CDaR) of the clusters is used as a risk metric.
 
 Naive Risk Parity
 *****************
