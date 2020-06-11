@@ -16,7 +16,7 @@ def fixed_time_horizon(prices, threshold=0, resample_by=None, lag=False, standar
 
     Originally described in the book Advances in Financial Machine Learning, Chapter 3.2, p.43-44.
 
-    Returns 1 if return for a period is greater than the threshold, -1 if less, and 0 if in between. If no threshold is
+    Returns 1 if return is greater than the threshold, -1 if less, and 0 if in between. If no threshold is
     provided then it will simply take the sign of the return.
 
     :param prices: (pd.Series or pd.DataFrame) Time-indexed stock prices used to calculate returns.
@@ -25,7 +25,7 @@ def fixed_time_horizon(prices, threshold=0, resample_by=None, lag=False, standar
                     Can be dynamic if threshold is inputted as a pd.Series, and threshold.index must match prices.index.
                     If resampling is used, the index of threshold must match the index of prices after resampling.
                     If threshold is negative, then the directionality of the labels will be reversed. If no threshold
-                    is provided, it is assumed to be 0 and the sign of the observation is returned.
+                    is provided, it is assumed to be 0 and the sign of the return is returned.
     :param resample_by: (str) If not None, the resampling period for price data prior to calculating returns. 'B' = per
                         business day, 'W' = week, 'M' = month, etc. Will take the last observation for each period.
                         For full details see `here.
@@ -49,7 +49,9 @@ def fixed_time_horizon(prices, threshold=0, resample_by=None, lag=False, standar
 
     # If threshold is pd.Series, its index must patch prices.index; otherwise labels will fail to return.
     if isinstance(threshold, pd.Series):
-        assert threshold.index.equals(prices.index), "prices.index and threshold.index must match!"
+        assert threshold.index.equals(prices.index), "prices.index and threshold.index must match! If prices are " \
+                                                     "resampled, the threshold index must match the resampled prices " \
+                                                     "index."
 
     # Adjust by mean and stdev, if desired. Assert that window must exist if standardization is on. Warning if window
     # is too large.
@@ -58,7 +60,7 @@ def fixed_time_horizon(prices, threshold=0, resample_by=None, lag=False, standar
         if window >= len(returns):
             warnings.warn('window is greater than the length of the Series. All labels will be NaN.', UserWarning)
 
-        # Apply standardisation.
+        # Apply standardization.
         mean = returns.rolling(window=window).mean()
         stdev = returns.rolling(window=window).std()
         returns -= mean
