@@ -340,6 +340,7 @@ class HierarchicalClusteringAssetAllocation:
             self.weights[cluster_asset_indices] = parity_weights * clusters_weights[cluster_index]
 
     def _calculate_naive_risk_parity(self, cluster_index, risk_measure, covariance, asset_returns):
+        # pylint: disable=no-else-return
         """
         Calculate the naive risk parity weights.
 
