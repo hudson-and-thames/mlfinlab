@@ -29,8 +29,9 @@ def _get_sadf_at_t(X: pd.DataFrame, y: pd.DataFrame, min_length: int, model: str
         b_mean_, b_std_ = get_betas(X_, y_)
         if not np.isnan(b_mean_[0]):
             b_mean_, b_std_ = b_mean_[0, 0], b_std_[0, 0] ** 0.5
-            all_adf = np.divide(b_mean_, b_std_, out=np.zeros_like(b_mean_), where=b_std_ != 0)
-            #all_adf = b_mean_ / b_std_
+            # TODO: Rewrite logic of this module to avoid division by zero
+            with np.errstate(invalid='ignore'):
+                all_adf = b_mean_ / b_std_
             if model[:2] == 'sm':
                 all_adf = np.abs(all_adf) / (y.shape[0]**phi)
             if all_adf > bsadf:
@@ -91,8 +92,9 @@ def _get_y_x(series: pd.Series, model: str, lags: Union[int, list],
         y = np.log(series.loc[y.index])
         x = pd.DataFrame(index=y.index)
         x['const'] = 1
-        float_range = np.array(np.arange(x.shape[0]), dtype='float')
-        x['log_trend'] = np.log(float_range, out=np.zeros_like(float_range).fill(np.nan), where=(float_range != 0))
+        # TODO: Rewrite logic of this module to avoid division by zero
+        with np.errstate(divide='ignore'):
+            x['log_trend'] = np.log(np.arange(x.shape[0]))
         beta_column = 'log_trend'
     else:
         raise ValueError('Unknown model')
