@@ -42,7 +42,7 @@ However, that data may not always be available, and sometimes the user might wis
 returns against. Note that these benchmarks are unidirectional only. If the user would like a benchmark that captures the absolute value of the
 returns, then the fixed horizon method should be used instead.
 
-If desired, the user can specify a `resampling period<https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects>`_
+If desired, the user can specify a `resampling period <https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects>`_
 to apply to the price data prior to calculating returns. The user can also lag the returns to make them forward-looking.
 In the paper by Ballings et al., the authors use yearly forward returns, and compare them to benchmark values
 of 15%, 25%, and 35%.
@@ -95,7 +95,8 @@ Below is an example on how to use the return over benchmark labeling technique o
     binary_labels = return_vs_benchmark(prices=data, benchmark=spy_returns, binary=True)
 
     # Label yearly forward returns, with the benchmark being an 25% increase in price.
-    yearly_labels = return_vs_benchmark(prices=data, benchmark=0.25, binary=True, resample_by='Y', lag=True)
+    yearly_labels = return_vs_benchmark(prices=data, benchmark=0.25, binary=True, resample_by='Y',
+                                        lag=True)
 
 Research Notebook
 #################
