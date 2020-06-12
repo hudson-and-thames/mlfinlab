@@ -8,7 +8,7 @@ rm -fR cover/
 coverage erase
 
 # Discover and run all tests
-coverage run --concurrency=multiprocessing -m unittest discover -b
+coverage run --concurrency=multiprocessing -m unittest discover
 
 coverage combine
 res_combine=$?
