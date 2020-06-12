@@ -1,8 +1,7 @@
 """
 Labeling Raw Returns.
 
-Most basic form of labeling based on raw return of each observation relative to its previous value. User can specify
-simple or logarithmic returns, numerical or categorical labels, resampling periods, and whether to lag returns.
+Most basic form of labeling based on raw return of each observation relative to its previous value.
 """
 
 import warnings
@@ -19,7 +18,7 @@ def raw_return(prices, binary=False, logarithmic=False, resample_by=None, lag=Fa
 
     :param prices: (pd.Series or pd.DataFrame) Time-indexed price data on stocks with which to calculate return.
     :param binary: (bool) If False, will return numerical returns. If True, will return the sign of the raw return.
-    :param logarithmic: (bool) If False, will calculate percentage returns. If True, will calculate logarithmic returns.
+    :param logarithmic: (bool) If False, will calculate simple returns. If True, will calculate logarithmic returns.
     :param resample_by: (str) If not None, the resampling period for price data prior to calculating returns. 'B' = per
                         business day, 'W' = week, 'M' = month, etc. Will take the last observation for each period.
                         For full details see `here.
@@ -35,9 +34,9 @@ def raw_return(prices, binary=False, logarithmic=False, resample_by=None, lag=Fa
     # Get return per period.
     if logarithmic:  # Log returns
         if lag:
-            returns = (np.log(prices) - np.log(prices.shift(1))).shift(-1)
+            returns = np.log(prices).diff().shift(-1)
         else:
-            returns = np.log(prices) - np.log(prices.shift(1))
+            returns = np.log(prices).diff()
     else:  # Simple returns
         if lag:
             returns = prices.pct_change(periods=1).shift(-1)
