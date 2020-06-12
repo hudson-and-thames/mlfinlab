@@ -1,8 +1,10 @@
+# pylint: disable=anomalous-backslash-in-string
 """
 Calculate Stationarity.
 """
 
 from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.stattools import kpss
 
 
 def calc_adfuller(data, maxlag=None, regression="c", autolag="AIC", store=False, regresults=False):
@@ -70,3 +72,56 @@ def calc_adfuller(data, maxlag=None, regression="c", autolag="AIC", store=False,
     """
     return adfuller(data, maxlag=maxlag, regression=regression, autolag=autolag, store=store,
                     regresults=regresults)
+
+
+def calc_kpss(data, regression='c', nlags=None, store=False):
+    """
+    Wrapper function for Kwiatkowski-Phillips-Schmidt-Shin unit root test, directly forked from
+    `statsmodels.tsa.stattools.kpss
+    <https://www.statsmodels.org/stable/_modules/statsmodels/tsa/stattools.html#kpss>`_.
+
+    Kwiatkowski-Phillips-Schmidt-Shin test for stationarity.
+
+    Computes the Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test for the null
+    hypothesis that x is level or trend stationary.
+
+    :param data: (pd.Series) The data series to test.
+
+    :param regression: (str) {``c``, ``ct``} The null hypothesis for the KPSS test.
+        - ``c`` : (Default) The data is stationary around a constant.
+        - ``ct`` : The data is stationary around a trend.
+
+    :param nlags: (str) {``None``, ``str``, ``int``}, (optional) Indicates the number of lags to be
+        used.
+
+        - If ``None`` (default), lags is calculated using the legacy method.
+        - If ``auto``, lags is calculated using the data-dependent method of Hobijn et al.
+        - If ``legacy``,  uses :math:`\int (12 * (n / 100)^{0.25})`, as outlined in Schwert (1989).
+
+    :param store: (bool) If ``True``, then a result instance is returned additionally to
+        the KPSS statistic (default is False).
+
+    :return: (tuple) kpss_stat, p-value, lags, crit, resstore.
+
+        - kpss_stat: (float) The KPSS test statistic.
+        - p_value: (float) The p-value of the test. The p-value is interpolated from Table 1 in
+          Kwiatkowski et al. (1992), and a boundary point is returned if the test statistic is
+          outside the table of critical values, that is, if the p-value is outside the
+          interval (0.01, 0.1).
+        - lags: (int) The truncation lag parameter.
+        - crit: (dict) The critical values at 10%, 5%, 2.5% and 1%. Based on Kwiatkowski et al.
+          (1992).
+        - resstore: (optional) instance of ResultStore. An instance of a dummy class with results
+          attached as attributes.
+
+    .. note::
+        To estimate sigma^2 the Newey-West estimator is used. If lags is None,
+        the truncation lag parameter is set to int(12 * (n / 100) ** (1 / 4)),
+        as outlined in Schwert (1989). The p-values are interpolated from
+        Table 1 of Kwiatkowski et al. (1992). If the computed statistic is
+        outside the table of critical values, then a warning message is
+        generated.
+
+    Missing values are not handled.
+    """
+    return kpss(data, regression=regression, nlags=nlags, store=store)

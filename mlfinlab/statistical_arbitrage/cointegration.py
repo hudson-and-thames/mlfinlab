@@ -77,6 +77,7 @@ def calc_engle_granger(data1, data2, trend="c", method="aeg", maxlag=None, autol
 
 
 def calc_johansen(data, det_order, k_ar_diff):
+    # pylint: disable=anomalous-backslash-in-string
     """
     Wrapper function for Johansen test, directly forked
     from `statsmodels.tsa.vector_ar.vecm.coint_johansen
@@ -121,6 +122,5 @@ def calc_johansen(data, det_order, k_ar_diff):
     max_eig_stat, max_eig_stat_crit_vals, meth = res.max_eig_stat, res.max_eig_stat_crit_vals, res.meth
     r0t, rkt, trace_stat, trace_stat_crit_vals = res.r0t, res.rkt, res.trace_stat, res.trace_stat_crit_vals
 
-    return (
-    cvm, cvt, eig, evec, ind, lr1, lr2, max_eig_stat, max_eig_stat_crit_vals, meth, r0t, rkt,
-    trace_stat, trace_stat_crit_vals)
+    return (cvm, cvt, eig, evec, ind, lr1, lr2, max_eig_stat, max_eig_stat_crit_vals, meth, r0t,
+            rkt, trace_stat, trace_stat_crit_vals)

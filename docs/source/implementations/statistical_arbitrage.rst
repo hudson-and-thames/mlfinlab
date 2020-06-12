@@ -136,6 +136,13 @@ be ``ct`` instead of just ``c``, which is a constant residual.
 
 .. autofunction:: calc_adfuller
 
+Kwiatkowski-Phillips-Schmidt-Shin
+*********************************
+
+.. py:currentmodule:: mlfinlab.statistical_arbitrage.stationarity
+
+.. autofunction:: calc_kpss
+
 Phillips-Perron Test
 ********************
 
