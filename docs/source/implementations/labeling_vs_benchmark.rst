@@ -13,15 +13,15 @@ whether they exceed a set value. The benchmark can be either a constant value, o
 that of the returns. The labels can be the numerical value of how much each observation's return exceeds the benchmark, or the sign
 of the excess.
 
-At time :math:`t`, given that price is :math:`p_t`, benchmark is :math:`B_t` and rate of return is:
+At time :math:`t`, given that price of a stock is :math:`p_{t, n}`, benchmark is :math:`B_t` and return is:
 
 .. math::
-    r_t = \frac{p_t}{p_{t-1}} - 1
+    r_{t,n} = \frac{p_{t,n}}{p_{t-1,n}} - 1
 
 The labels are:
 
 .. math::
-    L(r_{t, n}) = r_{t, n} - B_t
+    L(r_{t,n}) = r_{t,n} - B_t
 
 If categorical labels are desired:
 
@@ -29,9 +29,9 @@ If categorical labels are desired:
      \begin{equation}
      \begin{split}
        L(r_{t, n}) = \begin{cases}
-       -1 &\ \text{if} \ \ r_{t, n} < B_t\\
-       0 &\ \text{if} \ \ r_{t, n} = B_t\\
-       1 &\ \text{if} \ \ r_{t, n} > B_t\\
+       -1 &\ \text{if} \ \ r_{t,n} < B_t\\
+       0 &\ \text{if} \ \ r_{t,n} = B_t\\
+       1 &\ \text{if} \ \ r_{t,n} > B_t\\
        \end{cases}
      \end{split}
      \end{equation}
@@ -42,8 +42,9 @@ However, that data may not always be available, and sometimes the user might wis
 returns against. Note that these benchmarks are unidirectional only. If the user would like a benchmark that captures the absolute value of the
 returns, then the fixed horizon method should be used instead.
 
-If desired, the user can specify a resampling period to apply to the price data prior to calculating returns. The user can also lag the returns
-to make them forward-looking. In the paper by Ballings et al., the authors use yearly forward returns, and compare them to benchmark values
+If desired, the user can specify a `resampling period<https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects>`_
+to apply to the price data prior to calculating returns. The user can also lag the returns to make them forward-looking.
+In the paper by Ballings et al., the authors use yearly forward returns, and compare them to benchmark values
 of 15%, 25%, and 35%.
 
 The following shows the returns for MSFT stock during March-April 2020, compared to the return of SPY as a benchmark during
