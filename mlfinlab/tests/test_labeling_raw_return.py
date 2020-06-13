@@ -1,4 +1,5 @@
 # pylint: disable=missing-module-docstring
+# pylint: disable=no-self-use
 
 import unittest
 import os
@@ -56,7 +57,6 @@ class TestLabelingRawReturns(unittest.TestCase):
         Verifies raw returns for a series for percentage/logarithmic returns, with numerical/binary labels.
         """
         # Takes series of 10 imaginary prices.
-        fake_price = self.data  # To get rid of pylint error
         price = pd.Series([100, 101, 102, 102, 102, 99, 19, 2000, 100, 105])
 
         test4 = raw_return(price, lag=True)
