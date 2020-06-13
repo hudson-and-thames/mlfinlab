@@ -1,5 +1,5 @@
 # pylint: disable=missing-module-docstring
-
+# pylint: disable=no-self-use
 
 import unittest
 import os
@@ -52,7 +52,7 @@ class TestLabelingRawReturns(unittest.TestCase):
         pd.testing.assert_frame_equal(test3, test3_actual, check_less_precise=True)
         pd.testing.assert_frame_equal(test4, test3_actual.apply(np.sign))
 
-    def test_series():
+    def test_series(self):
         """
         Verifies raw returns for a series for percentage/logarithmic returns, with numerical/binary labels.
         """
