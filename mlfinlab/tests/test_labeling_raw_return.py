@@ -56,14 +56,15 @@ class TestLabelingRawReturns(unittest.TestCase):
         Verifies raw returns for a series for percentage/logarithmic returns, with numerical/binary labels.
         """
         # Takes series of 10 imaginary prices.
+        fake_price = self.data  # To get rid of pylint error
         price = pd.Series([100, 101, 102, 102, 102, 99, 19, 2000, 100, 105])
 
-        test4 = raw_return(price)
-        test5 = raw_return(price, logarithmic=True, lag=True)
-        test6 = raw_return(price, binary=True, logarithmic=True, lag=True)
-        test4_actual = pd.Series([np.nan, 0.01, 0.009901, 0, 0, -0.029412, -0.808081, 104.263158, -0.95, 0.05])
-        test5_actual = pd.Series([0.00995033, 0.0098523, 0, 0, -0.02985296, -1.65068087, 4.65646348, -2.99573227,
-                                  0.04879016, np.nan])
+        test4 = raw_return(price, lag=True)
+        test5 = raw_return(price, logarithmic=True, lag=False)
+        test6 = raw_return(price, binary=True, logarithmic=True, lag=False)
+        test4_actual = pd.Series([0.01, 0.009901, 0, 0, -0.029412, -0.808081, 104.263158, -0.95, 0.05, np.nan])
+        test5_actual = pd.Series([np.nan, 0.00995033, 0.0098523, 0, 0, -0.02985296, -1.65068087, 4.65646348,
+                                  -2.99573227, 0.04879016])
         pd.testing.assert_series_equal(test4, test4_actual, check_less_precise=True)
         pd.testing.assert_series_equal(test5, test5_actual, check_less_precise=True)
         pd.testing.assert_series_equal(test6, test5_actual.apply(np.sign))
@@ -95,9 +96,3 @@ class TestLabelingRawReturns(unittest.TestCase):
         pd.testing.assert_frame_equal(test6, test6_actual, check_less_precise=True)
         pd.testing.assert_frame_equal(test7, test7_actual, check_less_precise=True)
         pd.testing.assert_frame_equal(test8, test7_actual.apply(np.sign))
-
-
-
-
-
-

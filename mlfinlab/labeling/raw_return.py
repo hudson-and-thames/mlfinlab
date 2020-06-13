@@ -4,7 +4,6 @@ Labeling Raw Returns.
 Most basic form of labeling based on raw return of each observation relative to its previous value.
 """
 
-import warnings
 import numpy as np
 
 
