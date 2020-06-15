@@ -9,7 +9,7 @@ import warnings
 import pandas as pd
 
 
-def fixed_time_horizon(prices, threshold=0, resample_by=None, lag=False, standardized=False, window=None):
+def fixed_time_horizon(prices, threshold=0, resample_by=None, lag=True, standardized=False, window=None):
     """
     Fixed-Time Horizon Labeling Method.
 

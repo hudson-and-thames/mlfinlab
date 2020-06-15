@@ -27,11 +27,11 @@ class TestLabelingFixedTime(unittest.TestCase):
         Tests for basic case, constant threshold and no standardization, lag.
         """
         close = self.data[['SPY', 'EPP', 'FXI']][:10]
-        test1 = fixed_time_horizon(close['SPY'])
-        test2 = fixed_time_horizon(close)
+        test1 = fixed_time_horizon(close['SPY'], lag=False)
+        test2 = fixed_time_horizon(close, lag=False)
         test3 = fixed_time_horizon(close, lag=True)
         test4 = fixed_time_horizon(close, threshold=0.01, lag=True)
-        test5 = fixed_time_horizon(close['SPY'], threshold=0.99)
+        test5 = fixed_time_horizon(close['SPY'], threshold=0.99, lag=False)
         test1_actual = pd.Series([np.nan, -1, -1, -1, -1, 1, 1, -1, 1, -1], index=self.idx10)
         test2_actual = pd.DataFrame({'SPY': [np.nan, -1, -1, -1, -1, 1, 1, -1, 1, -1],
                                      'EPP': [np.nan, 1, -1, 1, -1, 1, 1, -1, 1, -1],
@@ -57,7 +57,7 @@ class TestLabelingFixedTime(unittest.TestCase):
         close = self.data[['SPY', 'EPP', 'FXI']][:10]
         threshold1 = pd.Series([0.01, 0.005, 0, 0.01, 0.02, 0.03, 0.1, -1, 0.99, 0], index=self.idx10)
         test6 = fixed_time_horizon(close, threshold=threshold1, lag=True)
-        test7 = fixed_time_horizon(close['SPY'], threshold=threshold1)
+        test7 = fixed_time_horizon(close['SPY'], threshold=threshold1, lag=False)
         test6_actual = pd.DataFrame({'SPY': [0, -1, -1, -1, 0, 0, 0, 1, 0, np.nan],
                                      'EPP': [0, -1, 1, -1, 0, 0, 0, 1, 0, np.nan],
                                      'FXI': [0, -1, 1, -1, 1, 0, 0, 1, 0, np.nan]}, index=self.idx10)
@@ -73,7 +73,7 @@ class TestLabelingFixedTime(unittest.TestCase):
         close = self.data[['SPY', 'EPP', 'FXI']][:10]
         threshold2 = pd.Series([1, 2, 0, 0.2, 0.02, 1.5, 10, -1, 500, 1], index=self.idx10)
 
-        test8 = fixed_time_horizon(close, threshold=1, standardized=True, window=4)
+        test8 = fixed_time_horizon(close, threshold=1, lag=False, standardized=True, window=4)
         test9 = fixed_time_horizon(close, threshold=0.1, lag=True, standardized=True, window=5)
         test10 = fixed_time_horizon(close, threshold=threshold2, lag=True, standardized=True, window=3)
         test8_actual = pd.DataFrame({'SPY': [np.nan, np.nan, np.nan, np.nan, 0, 1, 0, 0, 0, -1],

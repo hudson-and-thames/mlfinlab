@@ -88,7 +88,7 @@ Below is an example on how to use the Fixed Horizon labeling technique on real d
     labels = fixed_time_horizon(prices=data, threshold=0.01, lag=True)
 
     # Create labels with a dynamic threshold.
-    labels = fixed_time_horizon(prices=data, threshold=custom_threshold)
+    labels = fixed_time_horizon(prices=data, threshold=custom_threshold, lag=True)
 
     # Create labels with standardization.
     labels = fixed_time_horizon(prices=data, threshold=1, lag=True, standardized=True, window=5)
