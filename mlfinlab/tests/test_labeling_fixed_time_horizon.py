@@ -110,7 +110,7 @@ class TestLabelingFixedTime(unittest.TestCase):
                                       'EPP': [0, -1, 0, 1, -1, 0, np.nan],
                                       'FXI': [1, -1, -1, 0, -1, 1, np.nan]},
                                      index=week_index)
-        test12_actual = pd.DataFrame({'SPY': [np.nan, np.nan, 1, 0, -1, 0, 0, np.nan,],
+        test12_actual = pd.DataFrame({'SPY': [np.nan, np.nan, 1, 0, -1, 0, 0, np.nan],
                                       'EPP': [np.nan, np.nan, 1, 0, -1, 0, 0, np.nan],
                                       'FXI': [np.nan, np.nan, 1, 0, -1, 1, 0, np.nan]},
                                      index=month_index)
@@ -123,10 +123,10 @@ class TestLabelingFixedTime(unittest.TestCase):
         Tests the exceptions and warning that can be raised.
         """
         close = self.data[['SPY', 'EWG']][:10]
-        threshold = pd.Series([0.01]*10)  # No index
-        with self.assertRaises(Exception):
+        threshold = pd.Series([0.01]*10)
+        with self.assertRaises(Exception):  # Threshold index doesn't match.
             fixed_time_horizon(close, threshold)
-        with self.assertRaises(Exception):
+        with self.assertRaises(Exception):  # Standardized but no window.
             fixed_time_horizon(close, 0.01, standardized=True)
-        with self.assertWarns(UserWarning):
+        with self.assertWarns(UserWarning):  # Window too long.
             fixed_time_horizon(close, 0.01, standardized=True, window=50)

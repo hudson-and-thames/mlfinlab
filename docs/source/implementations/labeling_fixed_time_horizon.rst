@@ -32,11 +32,11 @@ get the desired return period. Possible inputs for the resample period can be fo
 <https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects>`_.
 Optionally, returns can be standardized by scaling by the mean and standard deviation of a rolling window. If threshold is a pd.Series,
 **threshold.index and prices.index must match**; otherwise labels will fail to be returned. If resampling
-is used, the threshold must match the index of prices after resampling. This is to avoid the user being forced to fill in meaningless
-thresholds.
+is used, the threshold must match the index of prices after resampling. This is to avoid the user being forced to manually fill
+in thresholds.
 
 The following shows the distribution of labels for standardized returns on closing prices of SPY in the time period from Jan 2008 to July 2016
-using a 20 day rolling window for the standard deviation.
+using a 20-day rolling window for the standard deviation.
 
 .. figure:: labeling_images/fixed_horizon_labels_example.png
    :scale: 100 %
@@ -51,12 +51,12 @@ bars exhibit high seasonality, as trading behavior may be quite different at the
 informative to apply the same threshold on a non-uniform distribution. Solutions include applying the fixed horizon method to tick or
 volume bars instead of time bars, using data sampled at the same time every day (e.g. closing prices) or inputting a dynamic threshold
 as a pd.Series corresponding to the timestamps in the dataset. However, the fixed horizon method will always fail to capture information
-about the path of the prices [Lopez de Prado, 2020].
+about the path of the prices [Lopez de Prado, 2018].
 
 .. tip::
    **Underlying Literature**
 
-   The following sources describes this method in more detail:
+   The following sources describe this method in more detail:
 
    - **Advances in Financial Machine Learning, Chapter 3.2** *by* Marcos Lopez de Prado (p. 43-44).
    - **Machine Learning for Asset Managers, Chapter 5.2** *by* Marcos Lopez de Prado (p. 65-66).
@@ -105,4 +105,4 @@ The following research notebook can be used to better understand the Fixed Horiz
 
 * `Fixed Horizon Example`_
 
-.. _`Fixed Horizon Example`: https://github.com/hudson-and-thames/research/blob/master/Labelling/Labels%20Fixed%20Horizon/Fixed%20Time%20Horizon.ipynb
+.. _`Fixed Horizon Example`: https://github.com/hudson-and-thames/research/blob/master/Labeling/Labels%20Fixed%20Horizon/Fixed%20Time%20Horizon.ipynb

@@ -34,7 +34,8 @@ def fixed_time_horizon(prices, threshold=0, resample_by=None, lag=False, standar
     :param window: (int) If standardized is True, the rolling window period for calculating the mean and standard
                     deviation of returns.
     :return: (pd.Series or pd.DataFrame) -1, 0, or 1 denoting whether the return for each observation is
-                    less/between/greater than the threshold at each corresponding time index.
+                    less/between/greater than the threshold at each corresponding time index. First or last row will be
+                    NaN, depending on lag.
     """
     # Apply resample period, if applicable.
     if resample_by is not None:
