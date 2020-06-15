@@ -31,8 +31,8 @@ class TestLabelingOverMedian(unittest.TestCase):
         """
         cols = ['EEM', 'EWG', 'TIP']
         subset = self.data[cols].iloc[0:5]
-        test1 = excess_over_median(subset)
-        test2 = excess_over_median(subset, binary=True)
+        test1 = excess_over_median(subset, lag=False)
+        test2 = excess_over_median(subset, binary=True, lag=False)
         test1_actual = pd.DataFrame([(np.nan, np.nan, np.nan), (0.0056216, -0.006201, 0), (-0.010485, 0, 0.019272),
                                      (0.006460, 0, -0.001054), (-0.000824, 0, 0.007678)],
                                     columns=cols, index=self.data[cols].iloc[0:5].index)
@@ -52,16 +52,16 @@ class TestLabelingOverMedian(unittest.TestCase):
 
         # Resample per business day. Should be same as no resampling at all (after removing Jan 21, since Python
         # considers that a business day even though it was MLK day during the year of the data, so no trading occurred).
-        test3 = excess_over_median(subset1, resample_by='B')
+        test3 = excess_over_median(subset1, resample_by='B', lag=False)
         test3.drop(datetime.strptime('2008-01-21', '%Y-%m-%d'), inplace=True)  # MLK day, 2008
-        pd.testing.assert_frame_equal(test3, excess_over_median(subset1))
+        pd.testing.assert_frame_equal(test3, excess_over_median(subset1, lag=False))
 
         # Resample per week and month.
-        test4 = excess_over_median(subset1, resample_by='W')
+        test4 = excess_over_median(subset1, resample_by='W', lag=False)
         weekly_index = subset1.resample('W').last().index
-        test5 = excess_over_median(subset2, resample_by='M')
+        test5 = excess_over_median(subset2, resample_by='M', lag=False)
         monthly_index = subset2.resample('M').last().index
-        test6 = excess_over_median(subset2, binary=True, resample_by='M')  # Binary by month
+        test6 = excess_over_median(subset2, binary=True, resample_by='M', lag=False)  # Binary by month
 
         test4_actual = pd.DataFrame([(np.nan, np.nan, np.nan, np.nan),
                                      (0.019896, -0.009335, 0.007538, -0.007538),

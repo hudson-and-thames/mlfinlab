@@ -80,7 +80,7 @@ Below is an example on how to create labels of excess over median from real data
     data.columns = data.columns.droplevel(1)
 
     # Get returns over median numerically
-    numerical = excess_over_median(prices=data, binary=git bFalse, resample_by=None, lag=False)
+    numerical = excess_over_median(prices=data, binary=False, resample_by=None, lag=False)
 
     # Get returns over median as a categorical label
     binary = excess_over_median((prices=data, binary=True, resample_by=None, lag=False)
