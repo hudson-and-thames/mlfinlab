@@ -210,12 +210,20 @@ Rolling Regression
 
 .. autofunction:: calc_rolling_regression
 
+
+.. image:: statistical_arbitrage_images/rolling_regression.png
+   :width: 49 %
+
 All Regression
 **************
 
 .. py:currentmodule:: mlfinlab.statistical_arbitrage.regression
 
 .. autofunction:: calc_all_regression
+
+
+.. image:: statistical_arbitrage_images/all_regression.png
+   :width: 49 %
 
 Example Code
 ************
@@ -287,11 +295,6 @@ Hurst Exponent
 **************
 
 To Be Implemented.
-
-Labelling
-=========
-
-
 
 Optimal Trading Rules
 *********************

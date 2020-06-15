@@ -100,7 +100,10 @@ def _calc_rolling_params(data):
     np_y = data[:, [2]]
 
     # Calculate beta, the slope and intercept.
-    beta = np.linalg.inv(np_x.T.dot(np_x)).dot(np_x.T).dot(np_y)
+    try:
+        beta = np.linalg.inv(np_x.T.dot(np_x)).dot(np_x.T).dot(np_y)
+    except:
+        beta = np.linalg.pinv(np_x.T.dot(np_x)).dot(np_x.T).dot(np_y)
 
     # Calculate spread.
     spread = np_y - np_x.dot(beta)

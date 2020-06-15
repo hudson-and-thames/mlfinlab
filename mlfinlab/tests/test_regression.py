@@ -47,6 +47,11 @@ class TestRegression(unittest.TestCase):
         """
         Test rolling regression.
         """
+
+        # Singular matrix problem within window of 2.
+        res = calc_rolling_regression(self.data.iloc[:, 3], self.data.iloc[:, 4], window=2)
+
+        # Calculated results.
         res = calc_rolling_regression(self.data.iloc[:, 3], self.data.iloc[:, 4], window=5)
 
         # Check shape.
