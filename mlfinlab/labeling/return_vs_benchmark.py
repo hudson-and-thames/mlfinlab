@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 
 
-def return_over_benchmark(prices, benchmark=0, binary=False, resample_by=None, lag=False):
+def return_over_benchmark(prices, benchmark=0, binary=False, resample_by=None, lag=True):
     """
     Return over benchmark labeling method. Sourced from Chapter 5.5.1 of Machine Learning for Factor Investing,
     by Coqueret, G. and Guida, T. (2020).
@@ -39,8 +39,8 @@ def return_over_benchmark(prices, benchmark=0, binary=False, resample_by=None, l
 
     # Check that index of benchmark matches index of prices, if benchmark is a pd.Series.
     if isinstance(benchmark, pd.Series):
-        if not prices.index.equals(benchmark.index):
-            warnings.warn("Index of returns and benchmark do not match. May result in NaN labels.", UserWarning)
+        assert prices.index.equals(benchmark.index),  "Index of returns and benchmark do not match. If resampling is " \
+                                                      "used, index of benchmark must match index of resampled data./" \
 
     # Get returns from prices.
     if lag:

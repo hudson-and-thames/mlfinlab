@@ -18,7 +18,8 @@ At time :math:`t`, given that price of a stock is :math:`p_{t, n}`, benchmark is
 .. math::
     r_{t,n} = \frac{p_{t,n}}{p_{t-1,n}} - 1
 
-The labels are:
+Note that :math:`B_t` is a scalar value corresponding to the benchmark at time :math:`t`, while :math:`B` is the vector of all benchmarks
+across all timestamps. The labels are:
 
 .. math::
     L(r_{t,n}) = r_{t,n} - B_t
@@ -105,4 +106,4 @@ The following research notebook can be used to better understand the return agai
 
 * `Return Over Benchmark Example`_
 
-.. _`Return Over Benchmark Example`: https://github.com/hudson-and-thames/research/blob/master/Labeling/Labeling%20vs%20Benchmark/Labeling%20vs%20Benchmark.ipynb
+.. _`Return Over Benchmark Example`: https://github.com/hudson-and-thames/research/blob/master/Labelling/Labeling%20vs%20Benchmark/Labeling%20vs%20Benchmark.ipynb
