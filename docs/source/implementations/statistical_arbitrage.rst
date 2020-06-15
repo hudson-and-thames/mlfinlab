@@ -170,10 +170,58 @@ Johansen Test
 
 .. autofunction:: calc_johansen
 
-Optimal Trading Strategy
-========================
+Regression
+==========
 
-To Be Implemented.
+Pairs Trading
+*************
+
+There are currently two tools available for a pairs trading strategy. One calculates a rolling
+z-score and regression over the given data, and the other calculates the z-score and regression
+over the entire data. The first method removes data snooping bias and allows the user to backtest
+and trade with the available information on that day; however, if the user wants to test for the
+entire horizon, they can use the second method to calculate the scores for the entire time frame.
+
+Rolling Regression
+******************
+
+.. py:currentmodule:: mlfinlab.statistical_arbitrage.regression
+
+.. autofunction:: calc_rolling_regression
+
+All Regression
+**************
+
+.. py:currentmodule:: mlfinlab.statistical_arbitrage.regression
+
+.. autofunction:: calc_all_regression
+
+Example Code
+************
+
+.. code-block::
+
+    import pandas as pd
+    import numpy as np
+    from mlfinlab.statistical_arbitrage import calc_rolling_regression, calc_all_regression
+
+    # Read in data.
+    stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
+
+    # Change to log prices data.
+    stock_prices = np.log(stock_prices)
+
+    # Calculate rolling regression with second and third column and window of 6.
+    roll_reg = calc_rolling_regression(stock_prices.iloc[:, 2], stock_prices.iloc[:, 3], window=6)
+
+    # Calculate all regression with fifth and sixth column.
+    all_reg = calc_all_regression(stock_prices.iloc[:, 5], stock_prices.iloc[:, 6])
+
+Trading Strategy
+================
+
+There are many methods to implement statistical arbitrage, and thorough investigation for each
+procedure is needed before applying these tools to a real live trading environment.
 
 Kalman Filtering
 ****************
@@ -222,9 +270,14 @@ To Be Implemented.
 Labelling
 =========
 
+
+
 Optimal Trading Rules
 *********************
 
+To Be Implemented.
 
 Optimal Portfolio Allocation
 ****************************
+
+To Be Implemented.
