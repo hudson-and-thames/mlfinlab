@@ -11,7 +11,7 @@ def calc_engle_granger(data1, data2, trend="c", method="aeg", maxlag=None, autol
     """
     Wrapper function for augmented Engle-Granger two-step cointegration test, directly forked
     from `statsmodels.tsa.stattools.coint
-    <https://www.statsmodels.org/stable/generated/statsmodels.tsa.stattools.coint.html>`.
+    <https://www.statsmodels.org/stable/generated/statsmodels.tsa.stattools.coint.html>`_.
 
     Test for no-cointegration of a univariate equation.
 
@@ -81,9 +81,9 @@ def calc_johansen(data, det_order, k_ar_diff):
     """
     Wrapper function for Johansen test, directly forked
     from `statsmodels.tsa.vector_ar.vecm.coint_johansen
-    <https://www.statsmodels.org/dev/generated/statsmodels.tsa.vector_ar.vecm.coint_johansen.html>`.
+    <https://www.statsmodels.org/dev/generated/statsmodels.tsa.vector_ar.vecm.coint_johansen.html>`_.
 
-    .. warnings:
+    .. warning:
         Critical values are only available for time series with 12 variables at most.
 
     Johansen cointegration test of the cointegration rank of a VECM.

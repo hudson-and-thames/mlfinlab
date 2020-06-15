@@ -87,6 +87,7 @@ def calc_rolling_regression(data_x, data_y, window):
 
 
 def _calc_rolling_params(data):
+    # pylint: disable=bare-except
     """
     Helper function to calculate rolling parameters
 

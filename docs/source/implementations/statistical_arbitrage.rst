@@ -26,7 +26,7 @@ reverts back to the mean, the positions will gain in value.
 Most strategies involving statistical arbitrage can be expressed with the following equation:
 
 .. math::
-    \frac{dP_t}{P_t} = \alpha dt + \beta dQ_t Q_t + dX_t
+    \frac{dP_t}{P_t} = \alpha dt + \beta \frac{dQ_t}{Q_t} + dX_t
 
 - :math:`P_t`: Price of the first group of assets.
 - :math:`Q_t`: Price of the second group of assets.
@@ -67,14 +67,14 @@ grows quadratically with :math:`n`. The number of total pairs is:
 .. math::
     \frac{n(n-1)}{2}
 
-If we only have 10 assets that we want to test for, the total number of pairs is 45. However, once
-we start scanning for a universe of stocks with over 5000 options, the numbers quickly add up.
-Therefore, it is important to have an effective method to test before we start the initial process.
+If we only have 10 assets that we want to test for, the total number of pairs is :math:`\frac{10 * 9}{2} = 45`.
+However, once we start scanning for a universe of stocks with over 5000 options, the numbers quickly
+add up. Therefore, it is important to have an effective method to test before we start the initial process.
 The most commonly used filtering method is the cointegration test. Using the cointegration test, we
 can see which pairs of assets pass the threshold to reject the null hypothesis. More information on
 **Cointegration** is available two headings below.
 
-Not implemented in the module yet, but other options for filtering include:
+Not implemented in the module yet, but options for filtering include:
 
 1. Principal Component Analysis
 
@@ -84,11 +84,12 @@ Not implemented in the module yet, but other options for filtering include:
 2. Clustering
 
     - Fundamental values
+    - Sector/Industry
     - K-means
 
 3. Heuristics
 
-4. Distance
+4. Distance/Correlation Matrix
 
 Stationarity
 ============
@@ -153,6 +154,27 @@ Phillips-Ouliaris Test
 
 To Be Implemented.
 
+Example Code
+************
+
+.. code-block::
+
+    import pandas as pd
+    import numpy as np
+    from mlfinlab.statistical_arbitrage import calc_engle_granger, calc_johansen
+
+    # Read in data.
+    stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
+
+    # Change to log prices data.
+    stock_prices = np.log(stock_prices)
+
+    # Calculate ADF test on the first column with maxlag of 1.
+    adf = calc_adfuller(stock_prices.iloc[:,0], maxlag=1)
+
+    # Calculate KPSS test on the first column with nlags of 1.
+    kpss = calc_kpss(stock_prices.iloc[:,0], nlags=1)
+
 Cointegration
 =============
 
@@ -189,7 +211,7 @@ Example Code
     engle_granger = calc_engle_granger(stock_prices.iloc[:, 2], stock_prices.iloc[:, 3])
 
     # Calculate johansen test with the first two columns, constant trend, and lag of 1.
-    johansen = calc_johansen(stock_prices.iloc[:,0:2], 0, 1)
+    johansen = calc_johansen(stock_prices.iloc[:, 0:2], 0, 1)
 
 Regression
 ==========
