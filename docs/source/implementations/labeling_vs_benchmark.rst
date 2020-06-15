@@ -51,7 +51,7 @@ The following shows the returns for MSFT stock during March-April 2020, compared
 the same time period. Green dots represent days when MSFT outperformed SPY, and red dots represent days when MSFT underperformed
 SPY.
 
-.. figure:: labeling_images/MSFT_return_vs_benchmark.png
+.. figure:: ./labeling_images/MSFT_Return_vs_Benchmark.png
    :scale: 90 %
    :align: center
    :figclass: align-center
