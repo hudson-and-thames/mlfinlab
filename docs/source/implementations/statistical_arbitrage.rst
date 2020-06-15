@@ -272,13 +272,13 @@ The Ornstein-Uhlenbeck process is a stochastic mean-reverting process with the f
 - :math:`X_t`: Residual from the spread.
 - :math:`\kappa`: Rate of mean reversion.
 - :math:`\mu`: Mean of the process.
-- :math:`sigma` Variance or volatility of the process.
+- :math:`\sigma` Variance or volatility of the process.
 - :math:`W_t`: Wiener process or Brownian motion.
 
 This can be changed into an AR(1) model with the following properties:
 
 .. math::
-    X_{n+1} = a + b X_n + /zeta_{n+1}
+    X_{n+1} = a + b X_n + \zeta_{n+1}
 
 - :math:`b = e^{-\kappa \Delta_t}`
 - :math:`a = \mu(1 - b)`
@@ -288,7 +288,7 @@ We will primarily use the OU-process to generate trading signals for statistical
 The trading signals will be defined as:
 
 .. math::
-    s = X_t - \frac{E(X_t)}{\var(X_t)} = \frac{/mu/sqrt{2/kappa}}{\sigma}
+    s = X_t - \frac{E(X_t)}{var(X_t)} = \frac{\mu\sqrt{2\kappa}}{\sigma}
 
 
 Hurst Exponent
