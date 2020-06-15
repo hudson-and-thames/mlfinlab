@@ -55,7 +55,7 @@ SPY.
    :scale: 90 %
    :align: center
    :figclass: align-center
-   :alt: purging image
+   :alt: labeling vs benchmark
 
    Comparison of MSFT return to SPY return.
 
