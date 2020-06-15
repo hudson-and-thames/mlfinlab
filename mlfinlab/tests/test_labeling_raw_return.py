@@ -30,7 +30,7 @@ class TestLabelingRawReturns(unittest.TestCase):
         """
         prices = self.data.iloc[0:5, 0:5]
         test1 = raw_return(prices)
-        test2 = raw_return(prices, binary=True)
+        test2 = raw_return(prices, binary=True, lag=False)
         test3 = raw_return(prices, logarithmic=True, lag=True)
         test4 = raw_return(prices, binary=True, logarithmic=True, lag=True)
         test1_actual = pd.DataFrame([(np.nan, np.nan, np.nan, np.nan, np.nan),

@@ -68,10 +68,10 @@ Below is an example on how to use the raw returns labeling method.
     data = pd.read_csv('../Sample-Data/stock_prices.csv', index_col='Date', parse_dates=True)
 
     # Create labels numerically based on simple returns
-    returns = raw_returns(prices=data)
+    returns = raw_returns(prices=data, lag=True)
 
     # Create labels categorically based on logarithmic returns
-    returns = raw_returns(prices=data, binary=True, logarithmic=True)
+    returns = raw_returns(prices=data, binary=True, logarithmic=True, lag=True)
 
     # Create labels categorically on weekly data with forward looking log returns.
     returns = raw_returns(prices=data, binary=True, logarithmic=True, resample_by='W', lag=True)
@@ -83,4 +83,4 @@ The following research notebook can be used to better understand the raw return 
 
 * `Raw Return Example`_
 
-.. _`Raw Return Example`: https://github.com/hudson-and-thames/research/blob/master/Labeling/Labels%20Raw%20Return/Raw%20Return.ipynb
+.. _`Raw Return Example`: https://github.com/hudson-and-thames/research/blob/master/Labelling/Labels%20Raw%20Return/Raw%20Return.ipynb

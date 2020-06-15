@@ -7,7 +7,7 @@ Most basic form of labeling based on raw return of each observation relative to 
 import numpy as np
 
 
-def raw_return(prices, binary=False, logarithmic=False, resample_by=None, lag=False):
+def raw_return(prices, binary=False, logarithmic=False, resample_by=None, lag=True):
     """
     Raw returns labeling method.
 
