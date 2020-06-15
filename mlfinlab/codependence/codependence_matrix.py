@@ -18,8 +18,8 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float
     """
     This function returns a dependence matrix for elements given in the dataframe using the chosen dependence method.
 
-    List of supported algorithms to use for generating the dependence matrix: 'information_variation',
-    'mutual_information', 'distance_correlation', 'spearmans_rho', 'gpr_distance', 'gnpr_distance'
+    List of supported algorithms to use for generating the dependence matrix: ``information_variation``,
+    ``mutual_information``, ``distance_correlation``, ``spearmans_rho``, ``gpr_distance``, ``gnpr_distance``.
 
     :param df: (pd.DataFrame) Features.
     :param dependence_method: (str) Algorithm to be use for generating dependence_matrix.
@@ -79,9 +79,11 @@ def get_distance_matrix(X: pd.DataFrame, distance_metric: str = 'angular') -> pd
 
     This allows to turn a correlation matrix into a distance matrix. Distances used are true metrics.
 
+    List of supported distance metrics to use for generating the distance matrix: ``angular``, ``squared_angular``,
+    and ``absolute_angular``.
+
     :param X: (pd.DataFrame) Dataframe to which distance operator to be applied.
-    :param distance_metric: (str) The distance operator to be used for generating the distance matrix.
-                                  Supported methods are: 'angular', 'squared_angular' and 'absolute_angular'.
+    :param distance_metric: (str) The distance metric to be used for generating the distance matrix.
     :return: (pd.DataFrame) Distance matrix.
     """
     if distance_metric == 'angular':
