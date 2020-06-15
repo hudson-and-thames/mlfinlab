@@ -64,11 +64,11 @@ def calc_engle_granger(data1, data2, trend="c", method="aeg", maxlag=None, autol
         with the test outcome is returned. Set `return_results=False` to
         avoid future changes in return.
 
-    :return: (tuple) Coint_t, Pvalue, Crit_value
+    :return: (tuple) ``Coint_t``, ``Pvalue``, ``Crit_value``
 
-        - coint_t: (float) The t-statistic of unit-root test on residuals.
-        - pvalue: (float) MacKinnon"s approximate, asymptotic p-value based on MacKinnon (1994).
-        - crit_value: (dict) Critical values for the test statistic at the 1 %, 5 %, and 10 %
+        - ``coint_t``: (float) The t-statistic of unit-root test on residuals.
+        - ``pvalue``: (float) MacKinnon"s approximate, asymptotic p-value based on MacKinnon (1994).
+        - ``crit_value``: (dict) Critical values for the test statistic at the 1 %, 5 %, and 10 %
           levels based on regression curve. This depends on the number of observations.
 
     """
@@ -98,23 +98,24 @@ def calc_johansen(data, det_order, k_ar_diff):
 
     :param k_ar_diff: (int) Nonnegative, Number of lagged differences in the model.
 
-    :return: (tuple) (cvm, cvt, eig, evec, ind, lr1, lr2, max_eig_stat, max_eig_stat_crit_vals, meth,
-        r0t, rkt, trace_stat, trace_stat_crit_vals)
+    :return: (tuple) (``cvm``, ``cvt``, ``eig``, ``evec``, ``ind``, ``lr1``, ``lr2``,
+        ``max_eig_stat``, ``max_eig_stat_crit_vals``, ``meth``, ``r0t``, ``rkt``, ``trace_stat``,
+        ``trace_stat_crit_vals``)
 
-    - cvm: (np.array) Critical values (90%, 95%, 99%) of maximum eigenvalue statistic.
-    - cvt: (np.array) Critical values (90%, 95%, 99%) of trace statistic
-    - eig: (np.array) Eigenvalues of VECM coefficient matrix.
-    - evec: (np.array) Eigenvectors of VECM coefficient matrix.
-    - ind: (np.array) Order of eigenvalues.
-    - lr1: (np.array) Trace statistic.
-    - lr2: (np.array) Maximum eigenvalue statistic.
-    - max_eig_stat: (np.array) Maximum eigenvalue statistic.
-    - max_eig_stat_crit_vals: (np.array)
-    - meth: (str) Test method.
-    - r0t: (np.array) Residuals for :math:`\delta Y`
-    - rkt: (np.array) Residuals for :math:`Y_{-1}`.
-    - trace_stat: (np.array) Trace statistic.
-    - trace_stat_crit_vals: (np.array) Critical values (90%, 95%, 99%) of trace statistic.
+    - ``cvm``: (np.array) Critical values (90%, 95%, 99%) of maximum eigenvalue statistic.
+    - ``cvt``: (np.array) Critical values (90%, 95%, 99%) of trace statistic
+    - ``eig``: (np.array) Eigenvalues of VECM coefficient matrix.
+    - ``evec``: (np.array) Eigenvectors of VECM coefficient matrix.
+    - ``ind``: (np.array) Order of eigenvalues.
+    - ``lr1``: (np.array) Trace statistic.
+    - ``lr2``: (np.array) Maximum eigenvalue statistic.
+    - ``max_eig_stat``: (np.array) Maximum eigenvalue statistic.
+    - ``max_eig_stat_crit_vals``: (np.array)
+    - ``meth``: (str) Test method.
+    - ``r0t``: (np.array) Residuals for :math:`\delta Y`
+    - ``rkt``: (np.array) Residuals for :math:`Y_{-1}`.
+    - ``trace_stat``: (np.array) Trace statistic.
+    - ``trace_stat_crit_vals``: (np.array) Critical values (90%, 95%, 99%) of trace statistic.
 
     """
     res = coint_johansen(data, det_order, k_ar_diff)
