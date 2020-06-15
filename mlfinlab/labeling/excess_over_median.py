@@ -7,7 +7,7 @@ used in regression and classification models to predict stock returns over marke
 import numpy as np
 
 
-def excess_over_median(prices, binary=False, resample_by=None, lag=False):
+def excess_over_median(prices, binary=False, resample_by=None, lag=True):
     """
     Return in excess of median labeling method. Sourced from "The benefits of tree-based models for stock selection"
     Zhu et al. (2012).
