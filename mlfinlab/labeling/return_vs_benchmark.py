@@ -20,9 +20,9 @@ def return_over_benchmark(prices, benchmark=0, binary=False, resample_by=None, l
     benchmark must match those of the price observations.
 
     :param prices: (pd.Series or pd.DataFrame) Time indexed prices to compare returns against a benchmark.
-    :param benchmark: (pd.Series or float) Benchmark prices to compare the given prices against for labeling. Can be a
-                constant value, or a Series matching the index of prices. If no benchmark is given, then it is assumed
-                to have a constant value of 0.
+    :param benchmark: (pd.Series or float) Benchmark of returns to compare the returns from prices against for labeling.
+                    Can be a constant value, or a Series matching the index of prices. If no benchmark is given, then it
+                    is assumed to have a constant value of 0.
     :param binary: (bool) If False, labels are given by their numerical value of return over benchmark. If True,
                 labels are given according to the sign of their excess return.
     :param resample_by: (str) If not None, the resampling period for price data prior to calculating returns. 'B' = per
