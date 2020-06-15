@@ -83,4 +83,4 @@ The following research notebook can be used to better understand the raw return 
 
 * `Raw Return Example`_
 
-.. _`Raw Return Example`: https://github.com/hudson-and-thames/research/blob/master/Labelling/Labels%20Raw%20Return/Raw%20Return.ipynb
+.. _`Raw Return Example`: https://github.com/hudson-and-thames/research/blob/master/Labeling/Labels%20Raw%20Return/Raw%20Return.ipynb

@@ -54,7 +54,7 @@ class TestLabelingRawReturns(unittest.TestCase):
 
     def test_series(self):
         """
-        Verifies raw returns for a series for percentage/logarithmic returns, with numerical/binary labels.
+        Verifies raw returns for a series for simple/logarithmic returns, with numerical/binary labels.
         """
         # Takes series of 10 imaginary prices.
         price = pd.Series([100, 101, 102, 102, 102, 99, 19, 2000, 100, 105])
