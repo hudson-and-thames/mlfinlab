@@ -220,8 +220,8 @@ class RiskEstimators:
         of the first eigenvalue that is below the maximum theoretical eigenvalue.
 
         De-noising is done by shrinking the eigenvalues associated with noise (the eigenvalues lower than
-        the maximum theoretical eigenvalue are set to a constant eigenvalue, preserving the trace of the correlation
-        matrix).
+        the maximum theoretical eigenvalue are set to a constant eigenvalue, preserving the trace of the
+        correlation matrix).
 
         The result is the de-noised correlation calculated from the de-noised covariance matrix.
 
@@ -248,7 +248,7 @@ class RiskEstimators:
 
         return corr
 
-    def _denoised_corr2(self, eigenvalues, eigenvectors, num_facts, alpha=0):
+    def _denoised_corr_targ_shrink(self, eigenvalues, eigenvectors, num_facts, alpha=0):
         """
         De-noises the correlation matrix using the Targeted Shrinkage method.
 
@@ -302,7 +302,7 @@ class RiskEstimators:
         :param eigenvectors: (float) Eigenvectors array
         :param num_facts: (float) Threshold for eigenvalues to be fixed
         :param market_component: (int) Number of fist eigevectors related to a market component
-        :return: (np.array)
+        :return: (np.array) De-toned correlation matrix
         """
 
         # Getting the de-noised correlation matrix
@@ -345,7 +345,7 @@ class RiskEstimators:
         the maximum theoretical eigenvalue are set to their average value. This is how the eigenvalues
         associated with noise are shrinked. The de-noised covariance matrix is then calculated back
         from new eigenvalues and eigenvectors.
-        
+
         This algorithm is reproduced with minor modifications from the following paper:
         `Marcos Lopez de Prado “A Robust Estimator of the Efficient Frontier”, (2019).
         <https://papers.ssrn.com/abstract_id=3469961>`_.
