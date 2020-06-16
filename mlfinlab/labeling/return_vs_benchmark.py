@@ -6,7 +6,6 @@ Chapter 5, Machine Learning for Factor Investing, by Coqueret and Guida, (2020).
 Work "Evaluating multiple classifiers for stock price direction prediction" by Ballings et al. (2015) uses this method
 to label yearly returns over a predetermined value to compare the performance of several machine learning algorithms.
 """
-import warnings
 import numpy as np
 import pandas as pd
 
@@ -39,7 +38,7 @@ def return_over_benchmark(prices, benchmark=0, binary=False, resample_by=None, l
 
     # Check that index of benchmark matches index of prices, if benchmark is a pd.Series.
     if isinstance(benchmark, pd.Series):
-        assert prices.index.equals(benchmark.index),  "Index of returns and benchmark do not match. If resampling is " \
+        assert prices.index.equals(benchmark.index), "Index of returns and benchmark do not match. If resampling is " \
                                                       "used, index of benchmark must match index of resampled data./" \
 
     # Get returns from prices.
