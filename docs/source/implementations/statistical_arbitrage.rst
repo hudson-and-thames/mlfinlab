@@ -30,7 +30,7 @@ Most strategies involving statistical arbitrage can be expressed with the follow
 
 - :math:`P_t`: Price of the first group of assets.
 - :math:`Q_t`: Price of the second group of assets.
-- :math:`\alpha`: Drift term. For the most parts, we will assume that this value is 0.
+- :math:`\alpha`: Drift term. For the most part, we will assume that this value is 0.
 - :math:`\beta`: Regression coefficient between the change in returns.
 - :math:`X_t`: Cointegration residual.
 
@@ -74,22 +74,56 @@ The most commonly used filtering method is the cointegration test. Using the coi
 can see which pairs of assets pass the threshold to reject the null hypothesis. More information on
 **Cointegration** is available two headings below.
 
+Principal Component Analysis
+****************************
+
+.. notes::
+
+    This section is implemented with modifications from `Avellaneda, M. and Lee, J.H., 2010. Statistical
+    arbitrage in the US equities market. Quantitative Finance, 10(7), pp.761-782. <https://www.tandfonline.com/doi/pdf/10.1080/14697680903124632>`_
+
+Principal Component Analysis (PCA) is often used as a tool for dimensional reduction. The formulation,
+based on Linear Algebra, effectively identifies the directions with the largest variations with the
+corresponding eigenvectors and eigenvalues.
+
+We can calculate the principal components and the projection of the original dataset by decomposing
+the covariance matrix of the original data. Because PCA is sensitive to outliers and noise, we will
+normalize the data. The covariance matrix of the normalized data will then be:
+
+.. math::
+    \frac{1}{n} X^T * X
+
+Singular Value Decomposition can also be applied to this by stating:
+
+.. math::
+    \frac{1}{n} X^T * X = U * \Sigma * V^T
+
+:math:`U` is the left principal component, each :math:`s` in :math:`\Sigma` is the singular value, and
+:math:`V^T` is the right principal componenet.
+
+For this module, we will focus on the first method and perform an eigendecomposition to obtain the
+eigenvector and eigenvalue of the data's covariance matrix. Avellaneda and Lee suggested an extremely
+important concept of eigenportfolios as interpreting PCA on returns data.
+
+They stated that the eigenvector corresponding to the largest eigenvalue of the covariance matrix
+is the general market direction. The subsequent eigenvectors are considered as market-neutral to the
+entire universe as these vectors are inherently orthogonal to the first eigenvector. All eigenvectors
+are orthogonal to each other, and because the eigenvectors stem from the covariance matrix of the
+price data, we can also interpret it as an uncorrelated variance in returns.
+
+
+
 Not implemented in the module yet, but options for filtering include:
 
-1. Principal Component Analysis
-
-    - Transforms data matrix to a set of principal components to reduce the dimensions.
-    - `Avellaneda, M. and Lee, J.H., 2010. Statistical arbitrage in the US equities market. Quantitative Finance, 10(7), pp.761-782. <https://www.tandfonline.com/doi/pdf/10.1080/14697680903124632>`_
-
-2. Clustering
+1. Clustering
 
     - Fundamental values
     - Sector/Industry
     - K-means
 
-3. Heuristics
+2. Heuristics
 
-4. Distance/Correlation Matrix
+3. Distance/Correlation Matrix
 
 Stationarity
 ============
@@ -294,10 +328,10 @@ The Ornstein-Uhlenbeck process is a stochastic mean-reverting process with the f
 - :math:`X_t`: Residual from the spread.
 - :math:`\kappa`: Rate of mean reversion.
 - :math:`\mu`: Mean of the process.
-- :math:`\sigma` Variance or volatility of the process.
+- :math:`\sigma`: Variance or volatility of the process.
 - :math:`W_t`: Wiener process or Brownian motion.
 
-This can be changed into an AR(1) model with the following properties:
+This can be changed into an :math:`AR(1)` model with the following properties:
 
 .. math::
     X_{n+1} = a + b X_n + \zeta_{n+1}
