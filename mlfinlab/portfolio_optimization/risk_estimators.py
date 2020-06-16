@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.neighbors import KernelDensity
 from sklearn.covariance import MinCovDet, EmpiricalCovariance, ShrunkCovariance, LedoitWolf, OAS
 from scipy.optimize import minimize
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
 class RiskEstimators:
@@ -23,7 +23,7 @@ class RiskEstimators:
         return
 
     @staticmethod
-    def _fit_kde(observations, kde_bwidth=0.25, kde_kernel='gaussian', eval_points=None):
+    def _fit_kde(observations, kde_bwidth=0.01, kde_kernel='gaussian', eval_points=None):
         """
         Fits kernel to a series of observations (in out case eigenvalues), and derives the
         probability density function of observations.
@@ -34,8 +34,8 @@ class RiskEstimators:
         :param observations: (np.array) Array of observations (eigenvalues) eigenvalues to fit kernel to
         :param kde_bwidth: (float) The bandwidth of the kernel
         :param kde_kernel: (str) Kernel to use [‘gaussian’|’tophat’|’epanechnikov’|’exponential’|’linear’|’cosine’]
-        :param eval_points: (np.array) Array of values on which the fit of the KDE will be evaluated
-                                       If not provided, the unique values of observations are used
+        :param eval_points: (np.array) Array of values on which the fit of the KDE will be evaluated.
+                                       If None, the unique values of observations are used
         :return: (pd.Series) Series with estimated pdf values in the eval_points
         """
 
@@ -345,15 +345,20 @@ class RiskEstimators:
         the maximum theoretical eigenvalue are set to their average value. This is how the eigenvalues
         associated with noise are shrinked. The de-noised covariance matrix is then calculated back
         from new eigenvalues and eigenvectors.
+        
+        This algorithm is reproduced with minor modifications from the following paper:
+        `Marcos Lopez de Prado “A Robust Estimator of the Efficient Frontier”, (2019).
+        <https://papers.ssrn.com/abstract_id=3469961>`_.
 
         :param cov: (np.array) Covariance matrix or correlation matrix
         :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
                                     covariance matrix.
         :param kde_bwidth: (float) The bandwidth of the kernel to fit KDE
         :return: (np.array) De-noised covariance matrix or correlation matrix
+
         """
 
-        # Correlation matrix computation
+        # Correlation matrix computation (if correlation matrix given, nothing changes)
         corr = self.cov_to_corr(cov)
 
         # Calculating eigenvalues and eigenvectors
@@ -391,9 +396,9 @@ class RiskEstimators:
         <https://scikit-learn.org/stable/modules/generated/sklearn.covariance.MinCovDet.html>`_
 
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
-        the calculate_returns method from the ReturnsEstimation class.
+        the calculate_returns method from the ReturnsEstimators class.
 
-        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
         :param assume_centered: (bool) Flag for data with mean significantly equal to zero
                                        (Read the documentation for MinCovDet class).
@@ -406,7 +411,7 @@ class RiskEstimators:
         # Calculating the series of returns from series of prices
         if price_data:
             # Class with returns calculation function
-            ret_est = ReturnsEstimation()
+            ret_est = ReturnsEstimators()
 
             # Calculating returns
             returns = ret_est.calculate_returns(returns)
@@ -434,9 +439,9 @@ class RiskEstimators:
         <https://scikit-learn.org/stable/modules/generated/sklearn.covariance.EmpiricalCovariance.html>`_
 
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
-        the calculate_returns method from the ReturnsEstimation class.
+        the calculate_returns method from the ReturnsEstimators class.
 
-        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
         :param assume_centered: (bool) Flag for data with mean almost, but not exactly zero
                                        (Read documentation for EmpiricalCovariance class).
@@ -446,7 +451,7 @@ class RiskEstimators:
         # Calculating the series of returns from series of prices
         if price_data:
             # Class with returns calculation function
-            ret_est = ReturnsEstimation()
+            ret_est = ReturnsEstimators()
 
             # Calculating returns
             returns = ret_est.calculate_returns(returns)
@@ -475,9 +480,9 @@ class RiskEstimators:
         <https://scikit-learn.org/stable/modules/covariance.html>`_
 
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
-        the calculate_returns method from the ReturnsEstimation class.
+        the calculate_returns method from the ReturnsEstimators class.
 
-        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
         :param shrinkage_type: (str) Type of shrinkage to use ('basic','lw','oas','all').
         :param assume_centered: (bool) Flag for data with mean almost, but not exactly zero
@@ -489,7 +494,7 @@ class RiskEstimators:
         # Calculating the series of returns from series of prices
         if price_data:
             # Class with returns calculation function
-            ret_est = ReturnsEstimation()
+            ret_est = ReturnsEstimators()
 
             # Calculating returns
             returns = ret_est.calculate_returns(returns)
@@ -521,9 +526,9 @@ class RiskEstimators:
         measure for returns below this threshold.
 
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
-        the calculate_returns method from the ReturnsEstimation class.
+        the calculate_returns method from the ReturnsEstimators class.
 
-        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
         :param threshold_return: (float) Required return for each period in the frequency of the input data
                                          (If the input data is daily, it's a daily threshold return).
@@ -533,7 +538,7 @@ class RiskEstimators:
         # Calculating the series of returns from series of prices
         if price_data:
             # Class with returns calculation function
-            ret_est = ReturnsEstimation()
+            ret_est = ReturnsEstimators()
 
             # Calculating returns
             returns = ret_est.calculate_returns(returns)
@@ -574,9 +579,9 @@ class RiskEstimators:
         weighted moving average series from covariance series as an element in matrix.
 
         If a dataframe of prices is given, it is transformed into a dataframe of returns using
-        the calculate_returns method from the ReturnsEstimation class.
+        the calculate_returns method from the ReturnsEstimators class.
 
-        :param returns: (pd.dataframe) Dataframe where each column is a series of returns or prices for an asset.
+        :param returns: (pd.DataFrame) Dataframe where each column is a series of returns or prices for an asset.
         :param price_data: (bool) Flag if prices of assets are used and not returns.
         :param window_span: (int) Used to specify decay in terms of span for the exponentially-weighted series.
         :return: (np.array) Exponentially-weighted Covariance matrix.
@@ -585,7 +590,7 @@ class RiskEstimators:
         # Calculating the series of returns from series of prices
         if price_data:
             # Class with returns calculation function
-            ret_est = ReturnsEstimation()
+            ret_est = ReturnsEstimators()
 
             # Calculating returns
             returns = ret_est.calculate_returns(returns)

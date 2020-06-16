@@ -9,14 +9,17 @@ from mlfinlab.util.multiprocess import mp_pandas_obj
 
 def num_concurrent_events(close_series_index, label_endtime, molecule):
     """
-    Snippet 4.1, page 60, Estimating the Uniqueness of a Label
+    Advances in Financial Machine Learning, Snippet 4.1, page 60.
+
+    Estimating the Uniqueness of a Label
+
     This function uses close series prices and label endtime (when the first barrier is touched) to compute the number
     of concurrent events per bar.
 
-    :param close_series_index: (pd.Series) close prices index
-    :param label_endtime: (pd.Series) label endtime series (t1 for triple barrier events)
-    :param molecule: (an array) a set of datetime index values for processing
-    :return: (pd.Series) number concurrent labels for each datetime index
+    :param close_series_index: (pd.Series) Close prices index
+    :param label_endtime: (pd.Series) Label endtime series (t1 for triple barrier events)
+    :param molecule: (an array) A set of datetime index values for processing
+    :return: (pd.Series) Number concurrent labels for each datetime index
     """
     # Find events that span the period [molecule[0], molecule[1]]
     label_endtime = label_endtime.fillna(close_series_index[-1])  # Unclosed events still must impact other weights
@@ -34,14 +37,17 @@ def num_concurrent_events(close_series_index, label_endtime, molecule):
 
 def _get_average_uniqueness(label_endtime, num_conc_events, molecule):
     """
-    Snippet 4.2, page 62, Estimating the Average Uniqueness of a Label
+    Advances in Financial Machine Learning, Snippet 4.2, page 62.
+
+    Estimating the Average Uniqueness of a Label
+
     This function uses close series prices and label endtime (when the first barrier is touched) to compute the number
     of concurrent events per bar.
 
-    :param label_endtime: (pd.Series) label endtime series (t1 for triple barrier events)
-    :param num_conc_events: (pd.Series) number of concurrent labels (output from num_concurrent_events function).
-    :param molecule: (an array) a set of datetime index values for processing.
-    :return: (pd.Series) average uniqueness over event's lifespan.
+    :param label_endtime: (pd.Series) Label endtime series (t1 for triple barrier events)
+    :param num_conc_events: (pd.Series) Number of concurrent labels (output from num_concurrent_events function).
+    :param molecule: (an array) A set of datetime index values for processing.
+    :return: (pd.Series) Average uniqueness over event's lifespan.
     """
     # Derive average uniqueness over the event's lifespan
     wght = pd.Series(index=molecule)
@@ -55,10 +61,10 @@ def get_av_uniqueness_from_triple_barrier(triple_barrier_events, close_series, n
     This function is the orchestrator to derive average sample uniqueness from a dataset labeled by the triple barrier
     method.
 
-    :param triple_barrier_events: (data frame) of events from labeling.get_events()
-    :param close_series: (pd.Series) close prices.
+    :param triple_barrier_events: (pd.DataFrame) Events from labeling.get_events()
+    :param close_series: (pd.Series) Close prices.
     :param num_threads: (int) The number of threads concurrently used by the function.
-    :return: (pd.Series) average uniqueness over event's lifespan for each index in triple_barrier_events
+    :return: (pd.Series) Average uniqueness over event's lifespan for each index in triple_barrier_events
     """
     out = pd.DataFrame()
     num_conc_events = mp_pandas_obj(num_concurrent_events, ('molecule', triple_barrier_events.index), num_threads,
