@@ -218,7 +218,7 @@ class TestRiskEstimators(unittest.TestCase):
         np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
 
     @staticmethod
-    def test_denoised_corr2():
+    def test_denoised_corr_targ_shrink():
         """
         Test the second method of shrinkage of the eigenvalues associated with noise.
         """
@@ -239,7 +239,7 @@ class TestRiskEstimators(unittest.TestCase):
                                   [-0.32892949, -0.58573558, 1]])
 
         # Finding the de-noised correlation matrix
-        corr_matrix = risk_estimators._denoised_corr2(eigenvalues, eigenvectors, 1)
+        corr_matrix = risk_estimators._denoised_corr_targ_shrink(eigenvalues, eigenvectors, 1)
 
         # Testing if the de-noised correlation matrix is right
         np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
@@ -285,17 +285,32 @@ class TestRiskEstimators(unittest.TestCase):
                                [-0.001, -0.006, 0.01]])
         tn_relation = 50
         kde_bwidth = 0.25
+        alpha = 0.2
+        denoise_method = 'const_resid_eigen'
+        denoise_method_alt = 'target_shrink'
 
         # Expected de-noised covariance matrix
         expected_cov = np.array([[0.01, 0.00267029, -0.00133514],
                                  [0.00267029, 0.04, -0.00438387],
                                  [-0.00133514, -0.00438387, 0.01]])
 
+        expected_cov_alt = np.array([[0.01, 0.0057, -0.0028],
+                                     [0.0057, 0.04, -0.0106],
+                                     [-0.0028, -0.0106, 0.01]])
+
         # Finding the de-noised covariance matrix
-        cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation, kde_bwidth)
+        cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation,
+                                                                 denoise_method, kde_bwidth)
+
+        # Using the alternative de-noising method
+        cov_matrix_denoised_alt = risk_estimators.denoise_covariance(cov_matrix, tn_relation,
+                                                                     denoise_method_alt, kde_bwidth, alpha)
 
         # Testing if the de-noised covariance matrix is right
         np.testing.assert_almost_equal(cov_matrix_denoised, expected_cov, decimal=4)
+
+        # Testing if the de-noised covariance matrix is right
+        np.testing.assert_almost_equal(cov_matrix_denoised_alt, expected_cov_alt, decimal=4)
 
     def test_minimum_covariance_determinant(self):
         """

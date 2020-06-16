@@ -323,11 +323,15 @@ class RiskEstimators:
 
         return corr
 
-    def denoise_covariance(self, cov, tn_relation, kde_bwidth=0.01):
+    def denoise_covariance(self, cov, tn_relation, denoise_method='const_resid_eigen', kde_bwidth=0.01, alpha=0):
         """
         De-noises the covariance matrix or the correlation matrix.
 
-        The de-noising algorithm works as follows:
+        Two denoising methods are supported:
+        1. Constant Residual Eigenvalue Method ('const_resid_eigen')
+        2. Targeted Shrinkage Method ('target_shrink')
+
+        The Constant Residual Eigenvalue Method works as follows:
 
         First, a correlation is calculated from the covariance matrix (if the input is the covariance matrix).
 
@@ -346,6 +350,19 @@ class RiskEstimators:
         associated with noise are shrinked. The de-noised covariance matrix is then calculated back
         from new eigenvalues and eigenvectors.
 
+        The Targeted Shrinkage Method works as follows:
+
+        First, a correlation is calculated from the covariance matrix (if the input is the covariance matrix).
+
+        Second, eigenvalues and eigenvectors of the correlation matrix are calculated using the linalg.eigh
+        function from numpy package.
+
+        Third, the correlation matrix composed from eigenvectors and eigenvalues related to noise is
+        shrunk using the alpha variable. The shrinkage is done by summing the noise correlation matrix
+        multiplied by alpha to the diagonal of noise correlation matrix bultiplied by (1-alpha).
+
+        Fourth, the shrinked noise correlation matrix is summed to the information correlation matrix.
+
         This algorithm is reproduced with minor modifications from the following paper:
         `Marcos Lopez de Prado “A Robust Estimator of the Efficient Frontier”, (2019).
         <https://papers.ssrn.com/abstract_id=3469961>`_.
@@ -353,7 +370,10 @@ class RiskEstimators:
         :param cov: (np.array) Covariance matrix or correlation matrix
         :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
                                     covariance matrix.
+        :param denoise_method: (str) Denoising methos to use ('const_resid_eigen' - by default, 'target_shrink')
         :param kde_bwidth: (float) The bandwidth of the kernel to fit KDE
+        :param alpha: (float) In range (0 to 1) - shrinkage of the noise correlation matrix to use in the
+                              Targeted Shrinkage Method (0 by default)
         :return: (np.array) De-noised covariance matrix or correlation matrix
 
         """
@@ -371,8 +391,12 @@ class RiskEstimators:
         # from our set of eigenvalues
         num_facts = eigenval.shape[0] - np.diag(eigenval)[::-1].searchsorted(maximum_eigen)
 
-        # Based on the threshold, de-noising the correlation matrix
-        corr = self._denoised_corr(eigenval, eigenvec, num_facts)
+        if denoise_method == 'target_shrink':
+            # Based on the threshold, de-noising the correlation matrix
+            corr = self._denoised_corr_targ_shrink(eigenval, eigenvec, num_facts, alpha)
+        else:
+            # Based on the threshold, de-noising the correlation matrix
+            corr = self._denoised_corr(eigenval, eigenvec, num_facts)
 
         # Calculating the covariance matrix from the de-noised correlation matrix
         cov_denoised = self.corr_to_cov(corr, np.diag(cov) ** (1 / 2))
