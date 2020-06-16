@@ -17,12 +17,13 @@ def calc_adfuller(data, maxlag=None, regression="c", autolag="AIC", store=False,
     univariate process in the presence of serial correlation.
 
     .. math::
-        H_0 : \delta = 1
+        H_0: \delta = 1
 
-        H_1 : \delta < 1
+        H_1: \delta < 1
+
 
     The null hypothesis of the Augmented Dickey-Fuller is that there is a unit
-    root, with the alternative that there is no unit root. If the pvalue is
+    root, with the alternative that there is no unit root. If the p-value is
     above a critical size, then we cannot reject that there is a unit root.
 
     The p-values are obtained through regression surface approximation from
@@ -32,10 +33,10 @@ def calc_adfuller(data, maxlag=None, regression="c", autolag="AIC", store=False,
 
     :param data: (pd.Series) The data series to test.
 
-    :param maxlag: (int) Maximum lag which is included in test, default :math:`\frac{12 * nobs}{100}^{1/4}`.
+    :param maxlag: (int) Maximum lag which is included in test, default :math:`\\frac{12 * nobs}{
+        100}^{\\frac{1}{4}}`.
 
-    :param regression: (str) (``c``, ``ct``, ``ctt``, ``nc``) Constant and trend order to include in
-        regression.
+    :param regression: (str) (``c``, ``ct``, ``ctt``, ``nc``) Constant/Trend order to include in regression.
 
         - ``c`` : constant only (default).
         - ``ct`` : constant and trend.
@@ -60,7 +61,9 @@ def calc_adfuller(data, maxlag=None, regression="c", autolag="AIC", store=False,
     :return: (tuple) ``ADF``, ``P-value``, ``Usedlag``, ``Nobs``, ``Critical Values``, ``Icbest``, ``Resstore``.
 
         - ``adf``: (float) The test statistic.
-        - ``pvalue``: (float) MacKinnon"s approximate p-value based on MacKinnon (1994, 2010).
+        - ``pvalue``: (float) MacKinnon"s approximate p-value based on MacKinnon
+          (`1994 <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.894.8429&rep=rep1&type=pdf>`_,
+          `2010 <https://www.econstor.eu/bitstream/10419/67744/1/616664753.pdf>`_).
         - ``usedlag``: (int) The number of lags used.
         - ``nobs``: (int) The number of observations used for the ADF regression and calculation of
           the critical values.
@@ -88,6 +91,7 @@ def calc_kpss(data, regression='c', nlags=None, store=False):
     :param data: (pd.Series) The data series to test.
 
     :param regression: (str) {``c``, ``ct``} The null hypothesis for the KPSS test.
+
         - ``c`` : (Default) The data is stationary around a constant.
         - ``ct`` : The data is stationary around a trend.
 
@@ -96,7 +100,8 @@ def calc_kpss(data, regression='c', nlags=None, store=False):
 
         - If ``None`` (default), lags is calculated using the legacy method.
         - If ``auto``, lags is calculated using the data-dependent method of Hobijn et al.
-        - If ``legacy``,  uses :math:`\int (12 * (n / 100)^{0.25})`, as outlined in Schwert (1989).
+        - If ``legacy``,  uses :math:`\\frac{12*n}{100}^{.25}` , as outlined in
+          `Schwert (1989) <https://ideas.repec.org/p/nbr/nberte/0073.html>`_.
 
     :param store: (bool) If ``True``, then a result instance is returned additionally to
         the KPSS statistic (default is False).
@@ -116,10 +121,10 @@ def calc_kpss(data, regression='c', nlags=None, store=False):
 
     .. note::
         To estimate :math:`\sigma^2` the Newey-West estimator is used. If lags is None,
-        the truncation lag parameter is set to :math:`int \frac{12 * n}{100}^{0.25}`,
+        the truncation lag parameter is set to :math:`\\frac{12 * n}{100}^{\\frac{1}{4}}`,
         as outlined in Schwert (1989). The p-values are interpolated from
-        Table 1 of Kwiatkowski et al. (1992). If the computed statistic is
-        outside the table of critical values, then a warning message is
+        Table 1 of `Kwiatkowski et al. (1992) <http://debis.deu.edu.tr/userweb/onder.hanedar/dosyalar/kpss.pdf>`_.
+        If the computed statistic is outside the table of critical values, then a warning message is
         generated.
 
     Missing values are not handled.
