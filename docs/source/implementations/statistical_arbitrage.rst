@@ -30,7 +30,7 @@ Most strategies involving statistical arbitrage can be expressed with the follow
 
 - :math:`P_t`: Price of the first group of assets.
 - :math:`Q_t`: Price of the second group of assets.
-- :math:`\alpha`: Drift term. For the most parts, we will assume that this value is 0.
+- :math:`\alpha`: Drift term. For the most part, we will assume that this value is 0.
 - :math:`\beta`: Regression coefficient between the change in returns.
 - :math:`X_t`: Cointegration residual.
 
