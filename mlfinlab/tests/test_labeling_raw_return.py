@@ -29,7 +29,7 @@ class TestLabelingRawReturns(unittest.TestCase):
         Verifies raw returns for a DataFrame.
         """
         prices = self.data.iloc[0:5, 0:5]
-        test1 = raw_return(prices)
+        test1 = raw_return(prices, lag=False)
         test2 = raw_return(prices, binary=True, lag=False)
         test3 = raw_return(prices, logarithmic=True, lag=True)
         test4 = raw_return(prices, binary=True, logarithmic=True, lag=True)
