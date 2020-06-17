@@ -135,7 +135,7 @@ Example Code
 
     # Compute HRP weights
     hrp = HierarchicalRiskParity()
-    hrp.allocate(asset_prices=stock_prices, resample_by='B')
+    hrp.allocate(asset_prices=stock_prices)
     hrp_weights = hrp.weights.sort_values(by=0, ascending=False, axis=1)
 
     # Building a dollar neutral Long/Short portfolio by shorting the first 4 stocks and being long the others
@@ -143,7 +143,7 @@ Example Code
     side_weights = pd.Series([1]*stock_prices.shape[1], index=self.data.columns)
     side_weights.loc[stock_prices.columns[:4]] = -1
     hrp.allocate(asset_prices=self.data, asset_names=self.data.columns, side_weights=side_weights)
-    hrp.allocate(asset_prices=stock_prices, side_weights=side_weights, resample_by='B')
+    hrp.allocate(asset_prices=stock_prices, side_weights=side_weights)
     hrp_weights = hrp.weights.sort_values(by=0, ascending=False, axis=1)
 
 
@@ -157,7 +157,7 @@ Plotting
 
     # Instantiate HRP Class
     hrp = HierarchicalRiskParity()
-    hrp.allocate(asset_prices=stock_prices, resample_by='B')
+    hrp.allocate(asset_prices=stock_prices)
 
     # Plot Dendrogram
     hrp.plot_clusters(assets=stock_prices.columns)
