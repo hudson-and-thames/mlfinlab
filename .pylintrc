@@ -49,6 +49,11 @@ disable=I,
         RP0801,
         RP0101
 
+# Disabled messages:
+# RP0401 - External dependencies tree
+# RP0801 - Duplication table
+# RP0101 - Statistics by type table
+
 # Notes:
 # abstract-class-not-used: see http://www.logilab.org/ticket/111138
 
