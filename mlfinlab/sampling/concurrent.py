@@ -56,7 +56,7 @@ def _get_average_uniqueness(label_endtime, num_conc_events, molecule):
     return wght
 
 
-def get_av_uniqueness_from_triple_barrier(triple_barrier_events, close_series, num_threads):
+def get_av_uniqueness_from_triple_barrier(triple_barrier_events, close_series, num_threads, verbose=True):
     """
     This function is the orchestrator to derive average sample uniqueness from a dataset labeled by the triple barrier
     method.
@@ -64,13 +64,16 @@ def get_av_uniqueness_from_triple_barrier(triple_barrier_events, close_series, n
     :param triple_barrier_events: (pd.DataFrame) Events from labeling.get_events()
     :param close_series: (pd.Series) Close prices.
     :param num_threads: (int) The number of threads concurrently used by the function.
+    :param verbose: (bool) Flag to report progress on asynch jobs
     :return: (pd.Series) Average uniqueness over event's lifespan for each index in triple_barrier_events
     """
     out = pd.DataFrame()
     num_conc_events = mp_pandas_obj(num_concurrent_events, ('molecule', triple_barrier_events.index), num_threads,
-                                    close_series_index=close_series.index, label_endtime=triple_barrier_events['t1'])
+                                    close_series_index=close_series.index, label_endtime=triple_barrier_events['t1'],
+                                    verbose=verbose)
     num_conc_events = num_conc_events.loc[~num_conc_events.index.duplicated(keep='last')]
     num_conc_events = num_conc_events.reindex(close_series.index).fillna(0)
     out['tW'] = mp_pandas_obj(_get_average_uniqueness, ('molecule', triple_barrier_events.index), num_threads,
-                              label_endtime=triple_barrier_events['t1'], num_conc_events=num_conc_events)
+                              label_endtime=triple_barrier_events['t1'], num_conc_events=num_conc_events,
+                              verbose=verbose)
     return out
