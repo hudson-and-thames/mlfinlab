@@ -47,12 +47,15 @@ def apply_pt_sl_on_t1(close, events, pt_sl, molecule):  # pragma: no cover
     else:
         stop_loss = pd.Series(index=events.index)  # NaNs
 
+    out['pt'] = pd.Series(dtype=events.index.dtype)
+    out['sl'] = pd.Series(dtype=events.index.dtype)
+
     # Get events
     for loc, vertical_barrier in events_['t1'].fillna(close.index[-1]).iteritems():
         closing_prices = close[loc: vertical_barrier]  # Path prices for a given trade
         cum_returns = (closing_prices / close[loc] - 1) * events_.at[loc, 'side']  # Path returns
-        out.loc[loc, 'sl'] = cum_returns[cum_returns < stop_loss[loc]].index.min()  # Earliest stop loss date
-        out.loc[loc, 'pt'] = cum_returns[cum_returns > profit_taking[loc]].index.min()  # Earliest profit taking date
+        out.at[loc, 'sl'] = cum_returns[cum_returns < stop_loss[loc]].index.min()  # Earliest stop loss date
+        out.at[loc, 'pt'] = cum_returns[cum_returns > profit_taking[loc]].index.min()  # Earliest profit taking date
 
     return out
 
@@ -132,7 +135,7 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
 
     # 2) Get vertical barrier (max holding period)
     if vertical_barrier_times is False:
-        vertical_barrier_times = pd.Series(pd.NaT, index=t_events)
+        vertical_barrier_times = pd.Series(pd.NaT, index=t_events, dtype=t_events.dtype)
 
     # 3) Form events object, apply stop loss on vertical barrier
     if side_prediction is None:
@@ -155,7 +158,7 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
                                       pt_sl=pt_sl_)
 
     for ind in events.index:
-        events.loc[ind, 't1'] = first_touch_dates.loc[ind, :].dropna().min()
+        events.at[ind, 't1'] = first_touch_dates.loc[ind, :].dropna().min()
 
     if side_prediction is None:
         events = events.drop('side', axis=1)
