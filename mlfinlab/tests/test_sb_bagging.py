@@ -91,7 +91,8 @@ class TestSequentiallyBootstrappedBagging(unittest.TestCase):
                                          min_ret=5e-5,
                                          num_threads=3,
                                          vertical_barrier_times=vertical_barriers,
-                                         side_prediction=self.data['side'])
+                                         side_prediction=self.data['side'],
+                                         verbose=False)
         meta_labeled_events.dropna(inplace=True)
         labels = get_bins(meta_labeled_events, self.data['close'])
 
