@@ -296,6 +296,7 @@ This project is licensed under an all rights reserved licence.
     implementations/labeling_trend_scanning
     implementations/labeling_tail_sets
     implementations/labeling_fixed_time_horizon
+    implementations/labeling_vs_benchmark
 
 .. toctree::
     :maxdepth: 2
