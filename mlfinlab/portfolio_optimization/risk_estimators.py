@@ -384,8 +384,6 @@ class RiskEstimators:
 
         """
 
-        # TODO: Need to sort eigenvalues and eigenvectors!
-
         # Correlation matrix computation (if correlation matrix given, nothing changes)
         corr = self.cov_to_corr(cov)
 

@@ -254,8 +254,8 @@ class TestRiskEstimators(unittest.TestCase):
 
         # Correlation matrix to use
         corr = np.array([[1, 0.1, -0.1],
-                        [0.1, 1, -0.3],
-                        [-0.1, -0.3, 1]])
+                         [0.1, 1, -0.3],
+                         [-0.1, -0.3, 1]])
 
         # Eigenvalues and eigenvectors to use
         eigenvalues = np.array([[1.3562, 0, 0],
@@ -294,6 +294,7 @@ class TestRiskEstimators(unittest.TestCase):
         denoise_method = 'const_resid_eigen'
         denoise_method_alt = 'target_shrink'
         detone = False
+        detone_alt = True
         market_component = 1
 
         # Expected de-noised covariance matrix
@@ -305,6 +306,10 @@ class TestRiskEstimators(unittest.TestCase):
                                      [0.0057, 0.04, -0.0106],
                                      [-0.0028, -0.0106, 0.01]])
 
+        expected_cov_detoned = np.array([[0.01, -0.00672445, 0.00336222],
+                                         [-0.00672445, 0.04, 0.01769514],
+                                         [0.00336222, 0.01769514, 0.01]])
+
         # Finding the de-noised covariance matrix
         cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method, detone,
                                                                  market_component, kde_bwidth)
@@ -313,11 +318,18 @@ class TestRiskEstimators(unittest.TestCase):
         cov_matrix_denoised_alt = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method_alt,
                                                                      detone, market_component, kde_bwidth, alpha)
 
+        # Finding the de-toned covariance matrix
+        cov_matrix_detoned = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method, detone_alt,
+                                                                market_component, kde_bwidth)
+
         # Testing if the de-noised covariance matrix is right
         np.testing.assert_almost_equal(cov_matrix_denoised, expected_cov, decimal=4)
 
         # Testing if the de-noised covariance matrix is right
         np.testing.assert_almost_equal(cov_matrix_denoised_alt, expected_cov_alt, decimal=4)
+
+        # Testing if the de-toned covariance matrix is right
+        np.testing.assert_almost_equal(cov_matrix_detoned, expected_cov_detoned, decimal=4)
 
     def test_minimum_covariance_determinant(self):
         """
