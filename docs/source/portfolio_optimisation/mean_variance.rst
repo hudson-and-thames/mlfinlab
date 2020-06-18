@@ -59,6 +59,7 @@ formulated as follows,
             & \text{s.t.} & & \sum_{i=1}^{n}w_{i} = 1 \\
             &&& \mu^Tw = \mu_t \\
         \end{align*}
+
 where :math:`w` refers to the set of weights for the portfolio assets, :math:`\sum` is the covariance matrix of the assets,
 :math:`\mu` is the expected asset returns and :math:`\mu_t` represents the target portfolio return of the investor. Note that this
 represents a very basic (and a specific) use-case of portfolio allocation where the investor wants to minimse the portfolio risk
@@ -407,6 +408,7 @@ Implementation
     We provide great flexibility to the users in terms of the input data - they can either pass their own pre-calculated input
     matrices/dataframes or leave it to us to calculate them. A quick reference on common input parameters which you will encounter
     throughout the portfolio optimization module:
+
         * :py:mod:`asset_prices`: Dataframe/matrix of historical raw asset prices **indexed by date**.
         * :py:mod:`asset_returns`: Dataframe/matrix of historical asset returns. This will be a :math:`TxN` matrix where :math:`T` is the time-series and :math:`N` refers to the number of assets in the portfolio.
         * :py:mod:`expected_asset_returns`: List of expected returns per asset i.e. the mean of historical asset returns. This refers to the parameter :math:`\mu` used in portfolio optimization literature. For a portfolio of 5 assets, ``expected_asset_returns = [0.45, 0.56, 0.89, 1.34, 2.4]``.

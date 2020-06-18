@@ -42,7 +42,7 @@ ETF prices
 ##########
 
 .. py:currentmodule:: mlfinlab.datasets.load_datasets
-.. autofunction:: load_dollar_bar_sample
+.. autofunction:: load_stock_prices
 
 The data set consists of close prices for: EEM, EWG, TIP, EWJ, EFA, IEF, EWQ, EWU, XLB, XLE, XLF, LQD, XLK, XLU, EPP,
 FXI, VGK, VPL, SPY, TLT, BND, CSJ, DIA starting from 2008 till 2016. It can be used to test and validate portfolio
