@@ -7,7 +7,7 @@ import os
 import pandas as pd
 import numpy as np
 
-from mlfinlab.statistical_arbitrage import calc_pca, calc_all_pca
+from mlfinlab.statistical_arbitrage import calc_pca, calc_all_eigenportfolio
 
 
 class TestPCA(unittest.TestCase):
@@ -57,7 +57,7 @@ class TestPCA(unittest.TestCase):
         Test Eigenportfolio and PCA calculation.
         """
         # Calculate PCA for given data with 1 principal component.
-        res = calc_all_pca(np.log(self.data), 1)
+        res = calc_all_eigenportfolio(np.log(self.data), 1)
 
         # There are two items in the tuple.
         self.assertEqual(res.shape[0], 2143)

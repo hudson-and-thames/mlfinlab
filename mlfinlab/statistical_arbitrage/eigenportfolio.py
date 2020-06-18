@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 
-def calc_all_pca(data, num):
+def calc_all_eigenportfolio(data, num):
     """
     Calculate the residuals and eigenportfolio given a date and number of principal components.
 
