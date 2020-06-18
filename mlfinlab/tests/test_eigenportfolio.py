@@ -60,14 +60,14 @@ class TestEigenportfolio(unittest.TestCase):
         res = calc_all_eigenportfolio(np.log(self.data), 1)
 
         # There are two items in the tuple.
-        self.assertEqual(res.shape[0], 2143)
+        self.assertEqual(res.shape[0], 4284)
         self.assertEqual(res.shape[1], 23)
 
         # Length of projection is the same as data.
-        self.assertEqual(res.index[0][0], 'Spread')
-        self.assertEqual(res.index[-1][1], 'Constants')
+        self.assertEqual(res.index[0][0], 'spread')
+        self.assertEqual(res.index[-1][1], 'constants')
 
-        # Check the values for residuals.
+        # Check the values for spreads.
         self.assertAlmostEqual(res.iloc[5, 10], 0.186152852268, delta=1e-3)
         self.assertAlmostEqual(res.iloc[37, 5], -0.146775127, delta=1e-3)
         self.assertAlmostEqual(res.iloc[586, 0], 0.135358564, delta=1e-3)
@@ -75,11 +75,11 @@ class TestEigenportfolio(unittest.TestCase):
         self.assertAlmostEqual(res.iloc[-5, -3], 0.03036983904, delta=1e-3)
 
         # There are two terms: Eigenportfolio 0 and Constants.
-        self.assertEqual(len(res.loc['Eigenportfolio']), 2)
+        self.assertEqual(len(res.loc['eigenportfolio']), 2)
 
         # Check some values for the first principal component.
-        self.assertAlmostEqual(res.loc['Eigenportfolio'].iloc[0, 6], -0.0301915332, delta=1e-3)
-        self.assertAlmostEqual(res.loc['Eigenportfolio'].iloc[1, 3], 3.75083698, delta=1e-3)
-        self.assertAlmostEqual(res.loc['Eigenportfolio'].iloc[1, 10], 2.6658233048, delta=1e-3)
-        self.assertAlmostEqual(res.loc['Eigenportfolio'].iloc[0, 20], -0.00400423, delta=1e-3)
-        self.assertAlmostEqual(res.loc['Eigenportfolio'].iloc[-1, -1], 4.86810379, delta=1e-3)
+        self.assertAlmostEqual(res.loc['eigenportfolio'].iloc[0, 6], -0.0301915332, delta=1e-3)
+        self.assertAlmostEqual(res.loc['eigenportfolio'].iloc[1, 3], 3.75083698, delta=1e-3)
+        self.assertAlmostEqual(res.loc['eigenportfolio'].iloc[1, 10], 2.6658233048, delta=1e-3)
+        self.assertAlmostEqual(res.loc['eigenportfolio'].iloc[0, 20], -0.00400423, delta=1e-3)
+        self.assertAlmostEqual(res.loc['eigenportfolio'].iloc[-1, -1], 4.86810379, delta=1e-3)

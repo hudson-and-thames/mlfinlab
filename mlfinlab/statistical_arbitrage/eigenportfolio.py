@@ -9,11 +9,12 @@ from .regression import _calc_rolling_params, _rolling_window
 
 def calc_all_eigenportfolio(data, num):
     """
-    Calculate the residuals and eigenportfolio for the number of principal components.
+    Calculate the spread, z_score, and eigenportfolio for the number of principal components.
 
     :param data: (pd.DataFrame) User given data.
     :param num: (int) Number of top-principal components.
-    :return: (pd.DataFrame) The residuals and eigenportfolio of the given data and principal components.
+    :return: (pd.DataFrame) The spread, z-score, and eigenportfolio of the given data and principal
+        components.
     """
     # Calculate the projection and eigenvector from the PCA of data.
     data_proj, data_eigvec = calc_pca(data, num)
@@ -24,20 +25,21 @@ def calc_all_eigenportfolio(data, num):
     # Linear regression by matrix multiplication.
     beta = np.linalg.inv(data_proj.T.dot(data_proj)).dot(data_proj.T).dot(np.array(data))
 
-    # Calculate residuals.
-    resid = data - data_proj.dot(beta)
+    # Calculate spread.
+    spread = data - data_proj.dot(beta)
 
-    # Convert residuals to pd.DataFrame.
-    resid = pd.DataFrame(resid, index=data.index, columns=data.columns)
+    # Calcualte the z_scores.
+    z_score = (spread - spread.mean()) / spread.std()
 
     # Convert beta, the eigenportfolio and constant ratio, to pd.DataFrame.
     idx = []
     for i in range(beta.shape[0] - 1):
-        idx.append('Eigenportfolio {}'.format(i))
-    idx.append('Constants')
+        idx.append('eigenportfolio {}'.format(i))
+    idx.append('constants')
     beta = pd.DataFrame(beta, index=idx, columns=data.columns)
 
-    combined_df = pd.concat([resid, beta], axis=0, keys=['Spread', 'Eigenportfolio'])
+    combined_df = pd.concat([spread, z_score, beta], axis=0,
+                            keys=['spread', 'z_score', 'eigenportfolio'])
     return combined_df
 
 
