@@ -201,8 +201,8 @@ class BaseBars(ABC):
         try:
             pd.to_datetime(test_batch.iloc[0, 0])
         except ValueError:
-            print('csv file, column 0, not a date time format:',
-                  test_batch.iloc[0, 0])
+            raise ValueError('csv file, column 0, not a date time format:',
+                             test_batch.iloc[0, 0])
 
     def _update_high_low(self, price: float) -> Union[float, float]:
         """
@@ -384,8 +384,8 @@ class BaseImbalanceBars(BaseBars):
                 self.bars_thresholds.append(dict(self.thresholds))
 
             # Check expression for possible bar generation
-            if np.abs(self.thresholds['cum_theta']) > self.thresholds['exp_num_ticks'] * np.abs(
-                    self.thresholds['expected_imbalance']):
+            if (np.abs(self.thresholds['cum_theta']) > self.thresholds['exp_num_ticks'] * np.abs(
+                    self.thresholds['expected_imbalance']) if ~np.isnan(self.thresholds['expected_imbalance']) else False):
                 self._create_bars(date_time, price,
                                   self.high_price, self.low_price, list_bars)
 

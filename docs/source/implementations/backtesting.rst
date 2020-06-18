@@ -142,6 +142,7 @@ The method returns np.array of minimum average monthly returns by the method as 
 method is [Bonferroni, Holm, BHY, Average].
 
 .. autoclass:: CampbellBacktesting
+   :noindex:
    :members: __init__, profit_hurdle
 
 Example

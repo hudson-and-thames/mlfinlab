@@ -271,11 +271,21 @@ This project is licensed under an all rights reserved licence.
 
     implementations/data_structures
     implementations/filters
-    implementations/codependence
     implementations/frac_diff
     implementations/structural_breaks
     implementations/microstructural_features
 
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Codependence
+    :hidden:
+
+    codependence/introduction
+    codependence/correlation_based_metrics
+    codependence/information_theory_metrics
+    codependence/codependence_marti
+    codependence/codependence_matrix
 
 .. toctree::
     :maxdepth: 2
@@ -286,6 +296,9 @@ This project is licensed under an all rights reserved licence.
     implementations/labeling_trend_scanning
     implementations/labeling_tail_sets
     implementations/labeling_fixed_time_horizon
+    implementations/labeling_excess_median
+    implementations/labeling_raw_return
+    implementations/labeling_vs_benchmark
 
 .. toctree::
     :maxdepth: 2

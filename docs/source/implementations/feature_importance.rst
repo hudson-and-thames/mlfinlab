@@ -36,42 +36,41 @@ An example showing how to use various feature importance functions:
 
 .. code-block::
 
-  import pandas as pd
-  from sklearn.ensemble import RandomForestClassifier
-  from sklearn.metrics import accuracy_score, log_loss
+    import pandas as pd
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.metrics import accuracy_score, log_loss
 
-  from mlfinlab.ensemble import SequentiallyBootstrappedBaggingClassifier
-  from mlfinlab.feature_importance import (mean_decrease_impurity, mean_decrease_accuracy, single_feature_importance, plot_feature_importance)
-  from mlfinlab.cross_validation import PurgedKFold, ml_cross_val_score
+    from mlfinlab.ensemble import SequentiallyBootstrappedBaggingClassifier
+    from mlfinlab.feature_importance import (mean_decrease_impurity, mean_decrease_accuracy, single_feature_importance, plot_feature_importance)
+    from mlfinlab.cross_validation import PurgedKFold, ml_cross_val_score
 
-  X_train = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
-  y_train = pd.read_csv('y_FILE_PATH.csv', index_col=0, parse_dates = [0])
-  triple_barrier_events = pd.read_csv('BARRIER_FILE_PATH', index_col=0, parse_dates = [0, 2])
-  price_bars = pd.read_csv('PRICE_BARS_FILE_PATH', index_col=0, parse_dates = [0, 2])
+    X_train = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates=[0])
+    y_train = pd.read_csv('y_FILE_PATH.csv', index_col=0, parse_dates=[0])
+    triple_barrier_events = pd.read_csv('BARRIER_FILE_PATH', index_col=0, parse_dates=[0, 2])
+    price_bars = pd.read_csv('PRICE_BARS_FILE_PATH', index_col=0, parse_dates=[0, 2])
 
-  triple_barrier_events = triple_barrier_events.loc[X.index, :] # Take only train part
-  price_events = price_events[(price_events.index >= X.index.min()) & (price_events.index <= X.index.max())]
+    triple_barrier_events = triple_barrier_events.loc[X_train.index, :] # Take only train part
 
-  cv_gen = PurgedKFold(n_splits=4, samples_info_sets=triple_barrier_events.t1)
+    cv_gen = PurgedKFold(n_splits=4, samples_info_sets=triple_barrier_events.t1)
 
-  base_est = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
-                                   class_weight='balanced_subsample')
-  clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=base_est, samples_info_sets=triple_barrier_events.t1,
-                                                  price_bars=price_bars, oob_score=True)
-  clf.fit(X_train, y_train)
+    base_est = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
+                                      class_weight='balanced_subsample')
+    clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=base_est, samples_info_sets=triple_barrier_events.t1,
+                                                    price_bars=price_bars, oob_score=True)
+    clf.fit(X_train, y_train)
 
-  oos_score = ml_cross_val_score(clf, X_train, y_train, cv_gen=cv_gen, sample_weight_train=None, scoring=accuracy_score).mean()
+    oos_score = ml_cross_val_score(clf, X_train, y_train, cv_gen=cv_gen, sample_weight_train=None, scoring=accuracy_score).mean()
 
-  mdi_feature_imp = mean_decrease_impurity(clf, X_train.columns)
-  mda_feature_imp = mean_decrease_accuracy(clf, X_train, y_train, cv_gen, scoring=log_loss)
-  sfi_feature_imp = single_feature_importance(clf, X_train, y_train, cv_gen, scoring=accuracy_score)
+    mdi_feature_imp = mean_decrease_impurity(clf, X_train.columns)
+    mda_feature_imp = mean_decrease_accuracy(clf, X_train, y_train, cv_gen, scoring=log_loss)
+    sfi_feature_imp = single_feature_importance(clf, X_train, y_train, cv_gen, scoring=accuracy_score)
 
-  plot_feature_importance(mdi_feat_imp, oob_score=clf.oob_score_, oos_score=oos_score,
-                                save_fig=True, output_path='mdi_feat_imp.png')
-  plot_feature_importance(mda_feat_imp, oob_score=clf.oob_score_, oos_score=oos_score,
-                                save_fig=True, output_path='mda_feat_imp.png')
-  plot_feature_importance(sfi_feat_imp, oob_score=clf.oob_score_, oos_score=oos_score,
-                                save_fig=True, output_path='sfi_feat_imp.png')
+    plot_feature_importance(mdi_feature_imp, oob_score=clf.oob_score_, oos_score=oos_score,
+                            save_fig=True, output_path='mdi_feat_imp.png')
+    plot_feature_importance(mda_feature_imp, oob_score=clf.oob_score_, oos_score=oos_score,
+                            save_fig=True, output_path='mda_feat_imp.png')
+    plot_feature_importance(sfi_feature_imp, oob_score=clf.oob_score_, oos_score=oos_score,
+                            save_fig=True, output_path='sfi_feat_imp.png')
 
 
 The following are the resulting images from the MDI, MDA, and SFI feature importances respectively:
@@ -135,46 +134,45 @@ Example
 *******
 .. code-block::
 
-   import pandas as pd
-   from sklearn.tree import DecisionTreeClassifier
-   from sklearn.ensemble import BaggingClassifier
-   from sklearn.metrics import accuracy_score, log_loss
-   from sklearn.model_selection._split import KFold
+    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.ensemble import BaggingClassifier
+    from sklearn.metrics import accuracy_score, log_loss
+    from sklearn.model_selection._split import KFold
 
-   from mlfinlab.util.generate_dataset import get_classification_data
-   from mlfinlab.feature_importance import (mean_decrease_impurity, mean_decrease_accuracy,
-                                           plot_feature_importance)
-   from mlfinlab.cross_validation import  ml_cross_val_score
-   from mlfinlab.clustering.feature_clusters import get_feature_clusters
+    from mlfinlab.util.generate_dataset import get_classification_data
+    from mlfinlab.feature_importance import (mean_decrease_impurity, mean_decrease_accuracy,
+                                             plot_feature_importance)
+    from mlfinlab.cross_validation import  ml_cross_val_score
+    from mlfinlab.clustering.feature_clusters import get_feature_clusters
 
-   # Create Clusters
-   X, y = get_classification_data(n_features=40, n_informative=5, n_redundant=30,
-                                  n_samples=1000, sigmaStd=.1)
-   feature_clusters = get_feature_clusters(X, dependence_metric='linear', n_clusters=None)
+    # Create Clusters
+    X, y = get_classification_data(n_features=40, n_informative=5, n_redundant=30,
+                                   n_samples=1000, sigma=.1)
+    feature_clusters = get_feature_clusters(X, dependence_metric='linear', n_clusters=None)
 
-   # Fit model
-   clf_base=DecisionTreeClassifier(criterion='entropy', max_features=1, class_weight='balanced',
-                                   min_weight_fraction_leaf=0)
-   clf=BaggingClassifier(base_estimator=clf_base, n_estimators=1000, max_features=1.0,
-                         max_samples=1.0, oob_score=True)
-   fit=clf.fit(X,y)
+    # Fit model
+    clf_base = DecisionTreeClassifier(criterion='entropy', max_features=1, class_weight='balanced',
+                                      min_weight_fraction_leaf=0)
+    clf = BaggingClassifier(base_estimator=clf_base, n_estimators=1000, max_features=1.0,
+                            max_samples=1.0, oob_score=True)
+    fit = clf.fit(X, y)
 
-   # Score model
-   cvGen = KFold(n_splits=10)
-   oos_score = ml_cross_val_score(clf, X, y, cv_gen=cv_gen, sample_weight_train=None,
-                                  scoring=accuracy_score).mean()
+    # Score model
+    cv_gen = KFold(n_splits=10)
+    oos_score = ml_cross_val_score(clf, X, y, cv_gen=cv_gen, sample_weight_train=None,
+                                   scoring=accuracy_score).mean()
 
-   # Feature Importance
-   clustered_mdi = mean_decrease_impurity(clf, X_train.columns,
-                                          clustered_subsets=feature_clusters)
-   clustered_mda = mean_decrease_accuracy(clf, X_train, y_train, cv_gen,
-                                          clustered_subsets=feature_clusters, scoring=log_loss)
+    # Feature Importance
+    clustered_mdi = mean_decrease_impurity(clf, X.columns,
+                                           clustered_subsets=feature_clusters)
+    clustered_mda = mean_decrease_accuracy(clf, X, y, cv_gen,
+                                           clustered_subsets=feature_clusters, scoring=log_loss)
 
-   # Plot
-   plot_feature_importance(clustered_mdi, oob_score=clf.oob_score_, oos_score=oos_score,
-                           save_fig=True, output_path='clustered_mdi.png')
-   plot_feature_importance(clustered_mda, oob_score=clf.oob_score_, oos_score=oos_score,
-                           save_fig=True, output_path='clustered_mda.png')
+    # Plot
+    plot_feature_importance(clustered_mdi, oob_score=clf.oob_score_, oos_score=oos_score,
+                            save_fig=True, output_path='clustered_mdi.png')
+    plot_feature_importance(clustered_mda, oob_score=clf.oob_score_, oos_score=oos_score,
+                            save_fig=True, output_path='clustered_mda.png')
 
 The following are the resulting images from the Clustered MDI & Clustered MDA feature importances respectively:
 
@@ -243,6 +241,7 @@ Example
 
 .. code-block::
 
+    import pandas as pd
     from sklearn.datasets import load_boston
     from sklearn.ensemble import RandomForestRegressor
     from mlfinlab.feature_importance import RegressionModelFingerprint
@@ -255,17 +254,17 @@ Example
     reg = RandomForestRegressor(n_estimators=10, random_state=42)
     reg.fit(X, y)
 
-    reg_fingerpint = RegressionModelFingerprint()
+    reg_fingerprint = RegressionModelFingerprint()
     reg_fingerprint.fit(reg, X, num_values=20, pairwise_combinations=[('CRIM', 'ZN'),
                                                                       ('RM', 'AGE'),
                                                                       ('LSTAT', 'DIS')])
-    reg_fingerpint.fit() # Fit the model
+    reg_fingerprint.fit() # Fit the model
 
     # Get linear non-linear effects and pairwise effects
-    linear_effect, non_linear_effect, pair_wise_effect = reg_fingerpint.get_effects()
+    linear_effect, non_linear_effect, pair_wise_effect = reg_fingerprint.get_effects()
 
     # Plot the results
-    fig = reg_fingerpint.plot_effects()
+    fig = reg_fingerprint.plot_effects()
     fig.show()
 
 

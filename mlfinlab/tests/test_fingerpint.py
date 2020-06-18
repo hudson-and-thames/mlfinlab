@@ -44,7 +44,10 @@ class TestModelFingerprint(unittest.TestCase):
 
         # Test the most informative feature effects for reg_rf
         informative_features_1 = [0, 5, 6, 12]
-        for feature, effect_value in zip(informative_features_1, [0.0577, 0.5102, 0.136, 0.2139]):
+        # Values in the below test was changed after v.0.11.3 from [0.0577, 0.5102, 0.136, 0.2139]
+        #                                                     to   [0.0688, 0.5292, 0.125, 0.2117]
+        # due to scikit-learn changing RandomForestRegressor, and RandomForestClassifier outputs
+        for feature, effect_value in zip(informative_features_1, [0.0688, 0.5292, 0.125, 0.2117]):
             self.assertAlmostEqual(linear_effect['norm'][feature], effect_value, delta=1e-3)
 
         self.reg_fingerprint.fit(self.reg_linear, self.X, num_values=20)
@@ -74,7 +77,10 @@ class TestModelFingerprint(unittest.TestCase):
 
         # Test the most informative feature effects for reg_rf
         informative_features_1 = [0, 5, 6, 12]
-        for feature, effect_value in zip(informative_features_1, [0.0758, 0.3848, 0.1, 0.28]):
+        # Values in the below test was changed after v.0.11.3 from [0.0758, 0.3848, 0.1, 0.28]
+        #                                                     to   [0.0858, 0.3972, 0.0857, 0.2663]
+        # due to scikit-learn changing RandomForestRegressor, and RandomForestClassifier outputs
+        for feature, effect_value in zip(informative_features_1, [0.0858, 0.3972, 0.0857, 0.2663]):
             self.assertAlmostEqual(non_linear_effect['norm'][feature], effect_value, delta=1e-3)
 
         self.reg_fingerprint.fit(self.reg_linear, self.X, num_values=20)
@@ -101,7 +107,10 @@ class TestModelFingerprint(unittest.TestCase):
         self.reg_fingerprint.fit(self.reg_rf, self.X, num_values=20, pairwise_combinations=combinations)
         _, _, pair_wise_effect = self.reg_fingerprint.get_effects()
 
-        for pair, effect_value in zip(combinations, [0.203, 0.17327, 0.005, 0.032, 0, 0.00004]):
+        # Values in the below test was changed after v.0.11.3 from [0.203, 0.17327, 0.005, 0.032, 0, 0.00004]
+        #                                                     to   [0.188, 0.15792, 0.005, 0.0299, 0, 0.00162]
+        # due to scikit-learn changing RandomForestRegressor, and RandomForestClassifier outputs
+        for pair, effect_value in zip(combinations, [0.188, 0.15792, 0.005, 0.0299, 0, 0.00162]):
             self.assertAlmostEqual(pair_wise_effect['raw'][str(pair)], effect_value, delta=1e-3)
 
         combinations = [(0, 5), (0, 12), (1, 2), (5, 7), (3, 6), (4, 9)]

@@ -29,7 +29,9 @@ def _get_sadf_at_t(X: pd.DataFrame, y: pd.DataFrame, min_length: int, model: str
         b_mean_, b_std_ = get_betas(X_, y_)
         if not np.isnan(b_mean_[0]):
             b_mean_, b_std_ = b_mean_[0, 0], b_std_[0, 0] ** 0.5
-            all_adf = b_mean_ / b_std_
+            # TODO: Rewrite logic of this module to avoid division by zero
+            with np.errstate(invalid='ignore'):
+                all_adf = b_mean_ / b_std_
             if model[:2] == 'sm':
                 all_adf = np.abs(all_adf) / (y.shape[0]**phi)
             if all_adf > bsadf:
@@ -90,7 +92,9 @@ def _get_y_x(series: pd.Series, model: str, lags: Union[int, list],
         y = np.log(series.loc[y.index])
         x = pd.DataFrame(index=y.index)
         x['const'] = 1
-        x['log_trend'] = np.log(np.arange(x.shape[0]))
+        # TODO: Rewrite logic of this module to avoid division by zero
+        with np.errstate(divide='ignore'):
+            x['log_trend'] = np.log(np.arange(x.shape[0]))
         beta_column = 'log_trend'
     else:
         raise ValueError('Unknown model')
@@ -163,7 +167,7 @@ def _sadf_outer_loop(X: pd.DataFrame, y: pd.DataFrame, min_length: int, model: s
     :param molecule: (list) Indices to get SADF
     :return: (pd.Series) SADF statistics
     """
-    sadf_series = pd.Series(index=molecule)
+    sadf_series = pd.Series(index=molecule, dtype='float64')
     for index in molecule:
         X_subset = X.loc[:index].values
         y_subset = y.loc[:index].values.reshape(-1, 1)
@@ -173,7 +177,7 @@ def _sadf_outer_loop(X: pd.DataFrame, y: pd.DataFrame, min_length: int, model: s
 
 
 def get_sadf(series: pd.Series, model: str, lags: Union[int, list], min_length: int, add_const: bool = False,
-             phi: float = 0, num_threads: int = 8) -> pd.Series:
+             phi: float = 0, num_threads: int = 8, verbose: bool = True) -> pd.Series:
     """
     Advances in Financial Machine Learning, p. 258-259.
 
@@ -196,6 +200,7 @@ def get_sadf(series: pd.Series, model: str, lags: Union[int, list], min_length: 
     :param add_const: (bool) Flag to add constant
     :param phi: (float) Coefficient to penalize large sample lengths when computing SMT, in [0, 1]
     :param num_threads: (int) Number of cores to use
+    :param verbose: (bool) Flag to report progress on asynch jobs
     :return: (pd.Series) SADF statistics
     """
     X, y = _get_y_x(series, model, lags, add_const)
@@ -209,5 +214,6 @@ def get_sadf(series: pd.Series, model: str, lags: Union[int, list], min_length: 
                                 model=model,
                                 phi=phi,
                                 num_threads=num_threads,
+                                verbose=verbose,
                                 )
     return sadf_series
