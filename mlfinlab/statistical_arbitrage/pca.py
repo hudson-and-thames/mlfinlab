@@ -7,20 +7,36 @@ import numpy as np
 
 def calc_all_pca(data, num):
     """
-    Calculate the
+    Calculate the residuals and eigenportfolio given a date and number of principal components.
 
     :param data: (pd.DataFrame) User given data.
     :param num: (int) Number of top-principal components.
-    :return:
+    :return: (pd.DataFrame) The residuals and eigenportfolio of the given data and principal components.
     """
     # Calculate the projection and eigenvector from the PCA of data.
     data_proj, data_eigvec = calc_pca(data, num)
 
+    # Add a constant of 1 on the right side for data_proj to account for intercepts.
+    data_proj = np.hstack((data_proj, np.ones((data_proj.shape[0], 1))))
+
     # Linear regression by matrix multiplication.
     beta = np.linalg.inv(data_proj.T.dot(data_proj)).dot(data_proj.T).dot(np.array(data))
 
-    
-    return
+    # Calculate residuals.
+    resid = data - data_proj.dot(beta)
+
+    # Convert residuals to pd.DataFrame.
+    resid = pd.DataFrame(resid, index=data.index, columns=data.columns)
+
+    # Convert beta, the eigenportfolio and constant ratio, to pd.DataFrame.
+    idx = []
+    for i in range(beta.shape[0] - 1):
+        idx.append('Eigenportfolio {}'.format(i))
+    idx.append('Constants')
+    beta = pd.DataFrame(beta, index=idx, columns=data.columns)
+
+    combined_df = pd.concat([resid, beta], axis=0, keys=['Residuals', 'Eigenportfolio'])
+    return combined_df
 
 
 def calc_pca(data, num):
@@ -38,7 +54,7 @@ def calc_pca(data, num):
     cov = data.T.dot(data) / data.shape[0]
 
     # Calculate the eigenvalue and eigenvector.
-    eigval, eigvec = np.linalg.eigh(cov.T.dot(cov))
+    eigval, eigvec = np.linalg.eigh(cov)
 
     # Get the index by sorting eigenvalue in descending order.
     idx = np.argsort(eigval)[::-1]
@@ -46,5 +62,5 @@ def calc_pca(data, num):
     # Sort eigenvector according to principal components.
     eigvec = eigvec[:, idx[:num]]
 
-    # Projected data and eigenvector
+    # Projected data and eigenvector.
     return eigvec.T.dot(data.T).T, eigvec
