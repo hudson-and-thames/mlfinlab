@@ -4,10 +4,12 @@ Principal Component Analysis applied for Statistical Arbitrage.
 import pandas as pd
 import numpy as np
 
+from .regression import _calc_rolling_params, _rolling_window
+
 
 def calc_all_eigenportfolio(data, num):
     """
-    Calculate the residuals and eigenportfolio given a date and number of principal components.
+    Calculate the residuals and eigenportfolio for the number of principal components.
 
     :param data: (pd.DataFrame) User given data.
     :param num: (int) Number of top-principal components.
@@ -35,8 +37,27 @@ def calc_all_eigenportfolio(data, num):
     idx.append('Constants')
     beta = pd.DataFrame(beta, index=idx, columns=data.columns)
 
-    combined_df = pd.concat([resid, beta], axis=0, keys=['Residuals', 'Eigenportfolio'])
+    combined_df = pd.concat([resid, beta], axis=0, keys=['Spread', 'Eigenportfolio'])
     return combined_df
+
+
+def calc_rolling_eigenportfolio(data, num, window):
+    """
+    Calculate the rolling residuals and eigenportfolio for the number of principal components and
+    number of rolling windows.
+
+    :param data: (pd.DataFrame) User given data.
+    :param num: (int) Number of top-principal components.
+    :param window: (int) Number of rolling window.
+    :return: (pd.DataFrame) The residuals and eigenportfolio of the given data and principal components.
+    """
+    # Convert to np.array.
+    np_data = np.array(data)
+
+    # Rolled data.
+    np_data = _rolling_window(np_data, window)
+
+    return
 
 
 def calc_pca(data, num):

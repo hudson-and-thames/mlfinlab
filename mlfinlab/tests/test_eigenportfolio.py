@@ -1,5 +1,5 @@
 """
-Test PCA for Statistical Arbitrage module.
+Test Eigenportfolio for Statistical Arbitrage module.
 """
 
 import unittest
@@ -10,9 +10,9 @@ import numpy as np
 from mlfinlab.statistical_arbitrage import calc_pca, calc_all_eigenportfolio
 
 
-class TestPCA(unittest.TestCase):
+class TestEigenportfolio(unittest.TestCase):
     """
-    Test PCA.
+    Test Eigenportfolio.
     """
 
     def setUp(self):
@@ -64,7 +64,7 @@ class TestPCA(unittest.TestCase):
         self.assertEqual(res.shape[1], 23)
 
         # Length of projection is the same as data.
-        self.assertEqual(res.index[0][0], 'Residuals')
+        self.assertEqual(res.index[0][0], 'Spread')
         self.assertEqual(res.index[-1][1], 'Constants')
 
         # Check the values for residuals.

@@ -125,7 +125,7 @@ def _rolling_window(data, window):
     Helper function to generate a rolled window.
 
     :param data: (np.array) Original data given by user.
-    :param window: (int) Number of rolled window.
+    :param window: (int) Number of rolling window.
     :return: (np.array) All generated windows.
     """
     shape = (data.shape[0] - window + 1, window) + data.shape[1:]
