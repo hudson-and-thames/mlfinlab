@@ -18,7 +18,7 @@ def _get_dfc_for_t(series: pd.Series, molecule: list) -> pd.Series:
     :return: (pd.Series) Statistics for each index from molecule
     """
 
-    dfc_series = pd.Series(index=molecule)
+    dfc_series = pd.Series(index=molecule, dtype='float64')
 
     for index in molecule:
         series_diff = series.diff().dropna()
@@ -34,13 +34,14 @@ def _get_dfc_for_t(series: pd.Series, molecule: list) -> pd.Series:
     return dfc_series
 
 
-def get_chow_type_stat(series: pd.Series, min_length: int = 20, num_threads: int = 8) -> pd.Series:
+def get_chow_type_stat(series: pd.Series, min_length: int = 20, num_threads: int = 8, verbose: bool = True) -> pd.Series:
     """
     Multithread implementation of Chow-Type Dickey-Fuller Test, p.251-252
 
     :param series: (pd.Series) Series to test
     :param min_length: (int) Minimum sample length used to estimate statistics
     :param num_threads: (int): Number of cores to use
+    :param verbose: (bool) Flag to report progress on asynch jobs
     :return: (pd.Series) Chow-Type Dickey-Fuller Test statistics
     """
     # Indices to test. We drop min_length first and last values
@@ -49,5 +50,6 @@ def get_chow_type_stat(series: pd.Series, min_length: int = 20, num_threads: int
                                pd_obj=('molecule', molecule),
                                series=series,
                                num_threads=num_threads,
+                               verbose=verbose,
                                )
     return dfc_series

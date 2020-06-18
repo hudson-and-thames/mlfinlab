@@ -21,7 +21,7 @@ def get_bar_based_kyle_lambda(close: pd.Series, volume: pd.Series, window: int =
     :return: (pd.Series) Kyle lambdas
     """
     close_diff = close.diff()
-    close_diff_sign = np.sign(close_diff)
+    close_diff_sign = close_diff.apply(np.sign)
     close_diff_sign.replace(0, method='pad', inplace=True)  # Replace 0 values with previous
     volume_mult_trade_signs = volume * close_diff_sign  # bt * Vt
     return (close_diff / volume_mult_trade_signs).rolling(window=window).mean()
@@ -54,7 +54,7 @@ def get_bar_based_hasbrouck_lambda(close: pd.Series, dollar_volume: pd.Series, w
     :return: (pd.Series) Hasbrouck lambda
     """
     log_ret = np.log(close / close.shift(1))
-    log_ret_sign = np.sign(log_ret).replace(0, method='pad')
+    log_ret_sign = log_ret.apply(np.sign).replace(0, method='pad')
 
     signed_dollar_volume_sqrt = log_ret_sign * np.sqrt(dollar_volume)
     return (log_ret / signed_dollar_volume_sqrt).rolling(window=window).mean()
@@ -75,7 +75,7 @@ def get_trades_based_kyle_lambda(price_diff: list, volume: list, aggressor_flags
     X = np.array(signed_volume).reshape(-1, 1)
     y = np.array(price_diff)
     coef, std = get_betas(X, y)
-    t_value = coef[0] / std[0]
+    t_value = coef[0] / std[0] if std[0] > 0 else np.array([0])
     return [coef[0], t_value[0]]
 
 
@@ -92,7 +92,7 @@ def get_trades_based_amihud_lambda(log_ret: list, dollar_volume: list) -> List[f
     X = np.array(dollar_volume).reshape(-1, 1)
     y = np.abs(np.array(log_ret))
     coef, std = get_betas(X, y)
-    t_value = coef[0] / std[0]
+    t_value = coef[0] / std[0] if std[0] > 0 else np.array([0])
     return [coef[0], t_value[0]]
 
 
@@ -110,5 +110,5 @@ def get_trades_based_hasbrouck_lambda(log_ret: list, dollar_volume: list, aggres
     X = (np.sqrt(np.array(dollar_volume)) * np.array(aggressor_flags)).reshape(-1, 1)
     y = np.abs(np.array(log_ret))
     coef, std = get_betas(X, y)
-    t_value = coef[0] / std[0]
+    t_value = coef[0] / std[0] if std[0] > 0 else np.array([0])
     return [coef[0], t_value[0]]

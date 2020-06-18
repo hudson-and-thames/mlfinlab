@@ -211,7 +211,7 @@ class OLPS:
 
         # Use cp.log and cp.sum to make the cost function a convex function.
         # Multiplying continuous returns equates to summing over the log returns.
-        portfolio_return = cp.sum(cp.log(optimize_array * weights))
+        portfolio_return = cp.sum(cp.log(optimize_array @ weights))
 
         # Optimization objective and constraints.
         allocation_objective = cp.Maximize(portfolio_return)

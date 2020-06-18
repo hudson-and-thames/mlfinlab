@@ -120,6 +120,7 @@ class TIC:
 
         # If the top level of the tree contains multiple elements, creating a level with just one element (tree root)
         if len(np.unique(tree_struct.iloc[:, -1])) > 1:
+            tree_struct = tree_struct.copy(deep=True)
             tree_struct['All'] = 0
 
         # Creating a linkage object (matrix with link elements).

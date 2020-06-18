@@ -86,7 +86,7 @@ class FractionalDifferentiation:
         output_df = {}
         for name in series.columns:
             series_f = series[[name]].fillna(method='ffill').dropna()
-            output_df_ = pd.Series(index=series.index)
+            output_df_ = pd.Series(index=series.index, dtype='float64')
 
             for iloc in range(skip, series_f.shape[0]):
                 loc = series_f.index[iloc]
@@ -182,7 +182,7 @@ class FractionalDifferentiation:
         # 2.2) compute fractionally differenced series for each stock
         for name in series.columns:
             series_f = series[[name]].fillna(method='ffill').dropna()
-            temp_df_ = pd.Series(index=series.index)
+            temp_df_ = pd.Series(index=series.index, dtype='float64')
             for iloc1 in range(width, series_f.shape[0]):
                 loc0 = series_f.index[iloc1 - width]
                 loc1 = series.index[iloc1]

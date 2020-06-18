@@ -98,7 +98,7 @@ def add_vertical_barrier(t_events, close, num_days=0, num_hours=0, num_minutes=0
 
 # Snippet 3.3 -> 3.6 page 50, Getting the Time of the First Touch, with Meta Labels
 def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_barrier_times=False,
-               side_prediction=None):
+               side_prediction=None, verbose=True):
     """
     Advances in Financial Machine Learning, Snippet 3.6 page 50.
 
@@ -120,6 +120,7 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
     :param vertical_barrier_times: (pd.Series) A pandas series with the timestamps of the vertical barriers.
         We pass a False when we want to disable vertical barriers.
     :param side_prediction: (pd.Series) Side of the bet (long/short) as decided by the primary model
+    :param verbose: (bool) Flag to report progress on asynch jobs
     :return: (pd.DataFrame) Events
             -events.index is event's starttime
             -events['t1'] is event's endtime
@@ -155,7 +156,8 @@ def get_events(close, t_events, pt_sl, target, min_ret, num_threads, vertical_ba
                                       num_threads=num_threads,
                                       close=close,
                                       events=events,
-                                      pt_sl=pt_sl_)
+                                      pt_sl=pt_sl_,
+                                      verbose=verbose)
 
     for ind in events.index:
         events.at[ind, 't1'] = first_touch_dates.loc[ind, :].dropna().min()
