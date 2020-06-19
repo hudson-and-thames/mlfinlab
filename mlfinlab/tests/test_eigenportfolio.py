@@ -31,7 +31,7 @@ class TestEigenportfolio(unittest.TestCase):
         Test PCA calculation.
         """
         # Calculate PCA for given data with 1 principal component.
-        res = calc_pca(np.log(self.data), 1)
+        res = calc_pca(np.array(np.log(self.data)), 1)
 
         # There are two items in the tuple.
         self.assertEqual(len(res), 2)
@@ -63,26 +63,56 @@ class TestEigenportfolio(unittest.TestCase):
         self.assertEqual(res.shape[0], 8575)
         self.assertEqual(res.shape[1], 23)
 
-        # Length of projection is the same as data.
-        self.assertEqual(res.index[0][0], 'log_ret')
-        self.assertEqual(res.index[2300][1], 'ret_spread')
-        self.assertEqual(res.index[4600][1], 'cum_spread')
-        self.assertEqual(res.index[-6][1], 'eigenportfolio')
-        self.assertEqual(res.index[-1][1], 'z_score')
+        # Check log_ret.
+        checking = res.loc['log_ret']
+        self.assertEqual(checking.shape[0], 2141)
+        self.assertEqual(checking.shape[1], 23)
+        self.assertAlmostEqual(checking.iloc[5, 10], 0.0187271, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[286, 20], 0.0018205386, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[1020, -1], 0.00436869, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[-7, -5], 0.012938479, delta=1e-3)
 
-        # Check the values for spreads.
-        self.assertAlmostEqual(res.iloc[5, 10], 0.186152852268, delta=1e-3)
-        self.assertAlmostEqual(res.iloc[37, 5], -0.146775127, delta=1e-3)
-        self.assertAlmostEqual(res.iloc[586, 0], 0.135358564, delta=1e-3)
-        self.assertAlmostEqual(res.iloc[1023, 10], -0.163594463, delta=1e-3)
-        self.assertAlmostEqual(res.iloc[-5, -3], 0.03036983904, delta=1e-3)
+        # Check eigenportfolio.
+        checking = res.loc['eigenportfolio']
+        self.assertEqual(checking.shape[0], 5)
+        self.assertEqual(checking.shape[1], 23)
+        self.assertAlmostEqual(checking.iloc[2, 2], -0.21104666, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[3, 5], -0.0429993, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[-1, -1], -0.19957352, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[-3, -5], -0.024271028, delta=1e-3)
 
-        # There are two terms: Eigenportfolio 0 and Constants.
-        self.assertEqual(len(res.loc['eigenportfolio']), 2)
+        # Check beta.
+        checking = res.loc['beta']
+        self.assertEqual(checking.shape[0], 6)
+        self.assertEqual(checking.shape[1], 23)
+        self.assertAlmostEqual(checking.iloc[5, 10], -0.000103154, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[3, 5], -0.000201566, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[-1, -1], 0.0001479435, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[-3, -5], 0.00122519692, delta=1e-3)
 
-        # Check some values for the first principal component.
-        self.assertAlmostEqual(res.loc['eigenportfolio'].iloc[0, 6], -0.0301915332, delta=1e-3)
-        self.assertAlmostEqual(res.loc['eigenportfolio'].iloc[1, 3], 3.75083698, delta=1e-3)
-        self.assertAlmostEqual(res.loc['eigenportfolio'].iloc[1, 10], 2.6658233048, delta=1e-3)
-        self.assertAlmostEqual(res.loc['eigenportfolio'].iloc[0, 20], -0.00400423, delta=1e-3)
-        self.assertAlmostEqual(res.loc['eigenportfolio'].iloc[-1, -1], 4.86810379, delta=1e-3)
+        # Check ret_spread.
+        checking = res.loc['ret_spread']
+        self.assertEqual(checking.shape[0], 2141)
+        self.assertEqual(checking.shape[1], 23)
+        self.assertAlmostEqual(checking.iloc[5, 10], 0.0009046264, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[286, 20], 0.0006582330, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[1020, -1], 0.001412272, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[-7, -5], -0.0011325141, delta=1e-3)
+
+        # Check cum_resid.
+        checking = res.loc['cum_resid']
+        self.assertEqual(checking.shape[0], 2141)
+        self.assertEqual(checking.shape[1], 23)
+        self.assertAlmostEqual(checking.iloc[5, 10], -0.027034045, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[286, 20], 0.0143180950, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[1020, -1], 0.0229146139, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[-7, -5], -0.00209802, delta=1e-3)
+
+        # Check z_score.
+        checking = res.loc['z_score']
+        self.assertEqual(checking.shape[0], 2141)
+        self.assertEqual(checking.shape[1], 23)
+        self.assertAlmostEqual(checking.iloc[5, 10], 0.780354221, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[286, 20], 0.1498292811, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[1020, -1], 1.01987316572, delta=1e-3)
+        self.assertAlmostEqual(checking.iloc[-7, -5], 0.737870045, delta=1e-3)
