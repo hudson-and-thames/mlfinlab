@@ -86,4 +86,4 @@ def calc_pca(data, num):
     eigvec = eigvec[:, idx[:num]]
 
     # Projected data and eigenvector.
-    return eigvec.T.dot(data.T).T, eigvec
+    return data.dot(eigvec), eigvec
