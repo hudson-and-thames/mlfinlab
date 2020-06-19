@@ -16,6 +16,9 @@ def calc_all_eigenportfolio(data, num):
     :return: (pd.DataFrame) The spread, z-score, and eigenportfolio of the given data and principal
         components.
     """
+    # Change data into log returns.
+    data = np.log(data).diff().fillna(0)
+
     # Calculate the projection and eigenvector from the PCA of data.
     data_proj, data_eigvec = calc_pca(data, num)
 
@@ -28,18 +31,32 @@ def calc_all_eigenportfolio(data, num):
     # Calculate spread.
     spread = data - data_proj.dot(beta)
 
-    # Calcualte the z_scores.
-    z_score = (spread - spread.mean()) / spread.std()
+    # Calculate cumulative sum of spread of returns.
+    cum_spread = spread.cumsum()
 
-    # Convert beta, the eigenportfolio and constant ratio, to pd.DataFrame.
-    idx = []
+    # Calculate z-score.
+    z_score = (cum_spread - np.mean(cum_spread)) / np.std(cum_spread)
+
+    # Index name for beta.
+    beta_idx = []
+
+    # Index name for eigenportfolio.
+    eigenp_idx = []
+
+    # Set index name.
     for i in range(beta.shape[0] - 1):
-        idx.append('eigenportfolio {}'.format(i))
-    idx.append('constants')
-    beta = pd.DataFrame(beta, index=idx, columns=data.columns)
+        beta_idx.append('weight {}'.format(i))
+        eigenp_idx.append('eigenportfolio {}'.format(i))
+    beta_idx.append('constants')
 
-    combined_df = pd.concat([spread, z_score, beta], axis=0,
-                            keys=['spread', 'z_score', 'eigenportfolio'])
+    # Conver to pd.DataFrame.
+    beta = pd.DataFrame(beta, index=beta_idx, columns=data.columns)
+    data_eigvec = pd.DataFrame(data_eigvec.T, index=eigenp_idx, columns=data.columns)
+
+    # Combine all dataframes.
+    combined_df = pd.concat([data, data_eigvec, beta, spread, cum_spread, z_score], axis=0,
+                            keys=['log_ret', 'eigenportfolio', 'beta', 'ret_spread', 'cum_spread',
+                                  'z_score'])
     return combined_df
 
 
@@ -64,7 +81,7 @@ def calc_rolling_eigenportfolio(data, num, window):
 
 def calc_pca(data, num):
     """
-    Calculates the PCA projection of the data onto the num-top components.
+    Calculates the PCA projection of the data onto the n-top components.
 
     :param data: (np.array) Data to be projected.
     :param num: (int) Number of top-principal components.

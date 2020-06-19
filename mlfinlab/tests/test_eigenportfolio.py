@@ -52,9 +52,9 @@ class TestEigenportfolio(unittest.TestCase):
         self.assertAlmostEqual(res[1][9][0], -0.233308519, delta=1e-3)
         self.assertAlmostEqual(res[1][22][0], -0.2389528258, delta=1e-3)
 
-    def test_calc_all_pca(self):
+    def test_calc_all_eigenportfolio(self):
         """
-        Test Eigenportfolio and PCA calculation.
+        Test Eigenportfolio.
         """
         # Calculate PCA for given data with 1 principal component.
         res = calc_all_eigenportfolio(np.log(self.data), 1)
