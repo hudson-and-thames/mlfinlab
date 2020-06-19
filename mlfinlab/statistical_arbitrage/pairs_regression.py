@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 
-def calc_all_regression(data_x, data_y):
+def calc_all_pairs_regression(data_x, data_y):
     """
     Calculate data_x log returns, data_y log returns, beta, constant, ret_spread, and z-score for
     time series of data_x and data_y.
@@ -15,7 +15,7 @@ def calc_all_regression(data_x, data_y):
     :param data_x: (pd.Series) Time series of price of x (DO NOT adjust for log).
     :param data_y: (pd.Series) Time series of price of y (DO NOT adjust for log).
     :return: (pd.DataFrame) DataFrame of given data_x, data_y, logret_x, logret_y, beta, constant,
-        ret_spread, and z-score.
+        ret_spread, cum_spread, and z-score.
     """
     # Change to log returns and conver to np.array.
     np_x = np.array(np.log(data_x).diff().fillna(0))
@@ -52,7 +52,7 @@ def calc_all_regression(data_x, data_y):
     return pd.DataFrame(res, columns=col_name, index=data_x.index)
 
 
-def calc_rolling_regression(data_x, data_y, window):
+def calc_rolling_pairs_regression(data_x, data_y, window):
     """
     Calculate data_x log returns, data_y log returns, beta, constant, ret_spread, and z-score for
     time series of data_x and data_y with the given window.
@@ -77,8 +77,9 @@ def calc_rolling_regression(data_x, data_y, window):
     data = _rolling_window(data, window)
 
     # Initialize result.
-    res = np.zeros((np_x.shape[0], 4))
+    res = np.zeros((np_x.shape[0], 5))
 
+    # Fill in the array.
     for i in range(data.shape[0]):
         res[i + window - 1] = _calc_rolling_params(data[i])
 
@@ -86,20 +87,21 @@ def calc_rolling_regression(data_x, data_y, window):
     res[:window - 1] = np.nan
 
     # Stack original data and log returns with the results.
-    res = np.hstack((np.array([data_x]).T, np.array([data_y]).T, np_x[:, [0]], np_y.T))
+    res = np.hstack((np.array([data_x]).T, np.array([data_y]).T, np_x[:, [0]], np_y.T, res))
     # Columns name.
-    col_name = ['data_x', 'data_y', 'beta', 'constant', 'spread', 'z_score']
+    col_name = [data_x.name, data_y.name, 'logret_x', 'logret_y', 'beta', 'constant', 'ret_spread',
+                'cum_spread', 'z_score']
     return pd.DataFrame(res, index=data_x.index, columns=col_name)
 
 
 def _calc_rolling_params(data):
     """
-    Helper function to calculate rolling parameters
+    Helper function to calculate rolling parameters.
 
     :param data: (np.array) Rolling window of original data.
     :return: (np.array) Data_x, data_y, beta, constant, spread, and z-score.
     """
-    # Split data to np_x
+    # Split data to np_x.
     np_x = data[:, [0, 1]]
 
     # Split data to np_y.
@@ -120,7 +122,8 @@ def _calc_rolling_params(data):
     # Calculate z-score.
     z_score = (cum_spread[-1] - np.mean(cum_spread)) / np.std(cum_spread)
 
-    res = np.array([beta[0][0], beta[1][0], spread[-1][0], z_score])
+    # Separate the resulting array.
+    res = np.array([beta[0][0], beta[1][0], spread[-1][0], cum_spread[-1], z_score])
 
     return res
 
