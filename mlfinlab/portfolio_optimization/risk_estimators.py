@@ -299,7 +299,7 @@ class RiskEstimators:
 
         Third, the correlation matrix composed from eigenvectors and eigenvalues related to noise is
         shrunk using the alpha variable. The shrinkage is done by summing the noise correlation matrix
-        multiplied by alpha to the diagonal of noise correlation matrix bultiplied by (1-alpha).
+        multiplied by alpha to the diagonal of the noise correlation matrix multiplied by (1-alpha).
 
         Fourth, the shrinked noise correlation matrix is summed to the information correlation matrix.
 
