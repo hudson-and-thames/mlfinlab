@@ -225,7 +225,7 @@ Implementation
 De-noising and De-toning Covariance/Correlation Matrix
 ======================================================
 
-Two methods for de-noising are implemented in the module:
+Two methods for de-noising are implemented in this module:
 
 - Constant Residual Eigenvalue Method
 - Targeted Shrinkage
@@ -258,7 +258,7 @@ The de-noising function works as follows:
 
     \lambda_3^{NEW} = \lambda_4^{NEW} = \lambda_5^{NEW} = \frac{\lambda_3^{OLD} + \lambda_4^{OLD} + \lambda_5^{OLD}}{3}
 
-- Eigenvalues above the maximum theoretical value are left intact
+- Eigenvalues above the maximum theoretical value are left intact.
 
 .. math::
 
@@ -268,13 +268,14 @@ The de-noising function works as follows:
 
 - The new set of eigenvalues with the set of eigenvectors is used to obtain the new de-noised correlation matrix.
   :math:`\tilde{C}` is the de-noised correlation matrix, :math:`W` is the eigenvectors matrix,
-  and:math:`\Lambda` is the diagonal matrix with new eigenvalues.
+  and :math:`\Lambda` is the diagonal matrix with new eigenvalues.
 
 .. math::
 
     \tilde{C} = W \Lambda W'
 
-- To rescale :math:`\tilde{C}` so that the main diagonal consists of 1s the followng transformation is made
+- To rescale :math:`\tilde{C}` so that the main diagonal consists of 1s the following transformation is made.
+  This is how the final :math:`C_{denoised}` is obtained.
 
 .. math::
 
@@ -285,16 +286,17 @@ The de-noising function works as follows:
 (If the correlation matrix is given as an input, the first and the last steps of the algorithm are omitted)
 
 .. tip::
-    The Constant Residual Eigenvalue de-noising method is described in more detail in the work **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3469961>`_.
+    The Constant Residual Eigenvalue de-noising method is described in more detail in the work
+    **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3469961>`_.
 
-    Lopez de Prado suggests that tihis algorithm is preferable as it removes the noise while preserving the signal
+    Lopez de Prado suggests that this de-noising algorithm is preferable as it removes the noise while preserving the signal.
 
 Targeted Shrinkage De-noising
 #############################
 
-The main idea behind the Targeted Shrinkage de-noising method is to shrink the eigenvecrots and eigenvalues that are
-nise-related. This is done by shrinking the correlation matrix composed from nise-related eigenvecrots and eigenvalues
-and then adding the correlation matrix composed from signal-related eigenvecrots and eigenvalues.
+The main idea behind the Targeted Shrinkage de-noising method is to shrink the eigenvectors/eigenvalues that are
+noise-related. This is done by shrinking the correlation matrix calculated from noise-related eigenvectors/eigenvalues
+and then adding the correlation matrix composed from signal-related eigenvectors/eigenvalues.
 
 The de-noising function works as follows:
 
@@ -331,7 +333,7 @@ The de-noising function works as follows:
 De-toning
 #########
 
-De-noised correlation matrix from the previous mathods can also be detoned by excluding a number of first
+De-noised correlation matrix from the previous methods can also be de-toned by excluding a number of first
 eigenvectors representing the market component.
 
 According to Lopez de Prado:
@@ -353,9 +355,9 @@ of the correlation matrix. Still, **a detoned correlation matrix** :math:`C_{det
 
 The de-toning function works as follows:
 
-- De-toning is apllied on the de-noised correlation matrix.
+- De-toning is applied on the de-noised correlation matrix.
 
-- The correlation matrix representing the market component is calcualetrd from market component eigenvectors and eigenvalues
+- The correlation matrix representing the market component is calculated from market component eigenvectors and eigenvalues
   and then subtracted from the de-noised correlation matrix. This way the de-toned correlation matrix is obtained.
 
 .. math::

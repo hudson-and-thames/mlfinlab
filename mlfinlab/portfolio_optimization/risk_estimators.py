@@ -306,9 +306,8 @@ class RiskEstimators:
         Correlation matrix can also be detoned by excluding a number of first eigenvectors representing
         the market component.
 
-        This algorithm is reproduced with minor modifications from the following paper:
-        `Marcos Lopez de Prado “A Robust Estimator of the Efficient Frontier”, (2019).
-        <https://papers.ssrn.com/abstract_id=3469961>`_.
+        These algorithms are reproduced with minor modifications from the following book:
+        Marcos Lopez de Prado “Machine Learning for Asset Managers”, (2020).
 
         :param cov: (np.array) Covariance matrix or correlation matrix.
         :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
