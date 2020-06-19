@@ -97,7 +97,7 @@ Implementation
 
 .. autoclass:: RiskEstimators
    :noindex:
-   :members: __init__, empirical_covariance
+   :members: empirical_covariance
 
 
 Covariance Estimator with Shrinkage
@@ -149,7 +149,7 @@ Implementation
 
 .. autoclass:: RiskEstimators
    :noindex:
-   :members: __init__, shrinked_covariance
+   :members: shrinked_covariance
 
 
 Semi-Covariance Matrix
@@ -178,7 +178,7 @@ Implementation
 
 .. autoclass:: RiskEstimators
    :noindex:
-   :members: __init__, semi_covariance
+   :members: semi_covariance
 
 
 Exponentially-Weighted Covariance Matrix
@@ -219,35 +219,22 @@ Implementation
 
 .. autoclass:: RiskEstimators
    :noindex:
-   :members: __init__, exponential_covariance
+   :members: exponential_covariance
 
 
-De-noising Covariance/Correlation Matrix
-========================================
+De-noising and De-toning Covariance/Correlation Matrix
+======================================================
 
 Two methods for de-noising are implemented in the module:
 
 - Constant Residual Eigenvalue Method
 - Targeted Shrinkage
 
+**Constant Residual Eigenvalue Method**
+
 The main idea behind the Constant Residual Eigenvalue de-noising method is to separate the noise-related eigenvalues from
 the signal-related ones. This is achieved by fitting the Marcenko-Pastur distribution of the empirical distribution of
 eigenvalues using a Kernel Density Estimate (KDE).
-
-The de-noising algorithm works as follows:
-
-1. A correlation is calculated from the covariance matrix (if the input is the covariance matrix).
-
-2. Eigenvalues and eigenvectors of the correlation matrix are calculated.
-
-3. A maximum theoretical eigenvalue is found by fitting Marcenko-Pastur distribution to the empirical distribution of
-   the correlation matrix eigenvalues. The empirical distribution is obtained through kernel density estimation.
-   The fit of the M-P distribution is done by minimizing the Sum of Squared estimate of Errors between the theoretical
-   pdf and the kernel. The minimization is done by adjusting the variation of the M-P distribution.
-
-4. The eigenvalues of the correlation matrix are sorted and the eigenvalues higher than the maximum theoretical
-   eigenvalue are set to their average value. This is how the eigenvalues associated with noise are shrinked.
-   The de-noised covariance matrix is then calculated back from new eigenvalues and eigenvectors.
 
 The de-noising function works as follows:
 
@@ -259,28 +246,124 @@ The de-noising function works as follows:
 
 - The Marcenko-Pastur pdf is fitted to the KDE estimate using the variance as the parameter for the optimization.
 
-- From the obtained Marcenko-Pastur distribution, the maximum theoretical eigenvalue is calculated using the formula from the "Instability caused by noise" part.
+- From the obtained Marcenko-Pastur distribution, the maximum theoretical eigenvalue is calculated using the formula
+  from the **Instability caused by noise** part of `A Robust Estimator of the Efficient Frontier <https://papers.ssrn.com/sol3/abstract_id=3469961>`__.
 
-- The eigenvalues in the set that are above the theoretical value are all set to their average value. For example, we have a set of 5 sorted eigenvalues ( :math:`\lambda_1` ... :math:`\lambda_5` ), 2 of which are above the maximum theoretical value, then we set :math:`\lambda_4^{NEW} = \lambda_5^{NEW} = \frac{\lambda_4^{OLD} + \lambda_5^{OLD}}{2}`
+- The eigenvalues in the set that are below the theoretical value are all set to their average value.
+  For example, we have a set of 5 eigenvalues sorted in the descending order ( :math:`\lambda_1` ... :math:`\lambda_5` ),
+  3 of which are below the maximum theoretical value, then we set
 
-- The new set of eigenvalues with the set of eigenvectors is used to obtain the new de-noised correlation matrix.
+.. math::
+
+    \lambda_3^{NEW} = \lambda_4^{NEW} = \lambda_5^{NEW} = \frac{\lambda_3^{OLD} + \lambda_4^{OLD} + \lambda_5^{OLD}}{3}
+
+- Eigenvalues above the meximum theoretical value are left intact
+
+.. math::
+
+    \lambda_1^{NEW} = \lambda_1^{OLD}
+
+    \lambda_2^{NEW} = \lambda_2^{OLD}
+
+- The new set of eigenvalues with the set of eigenvectors is used to obtain the new de-noised correlation matrix
+  where :math:`\hat{C}` is the de-noised correlation matrix, :math:`W` is the eigenvectors matrix,
+  and:math:`\Lambda` is the diagonal matrix with new eigenvalues.
+
+.. math::
+
+    \hat{C} = W \Lambda W
+
+- To rescale :math:`\hat{C}` so that the main diagonal consists of 1s the followng mtransformation is made
+
+.. math::
+    C = \hat{C} [(diag[\hat{C}])^\frac{1}{2}(diag[\hat{C}])^{\frac{1}{2}'}]^{-1}
 
 - The new correlation matrix is then transformed back to the new de-noised covariance matrix.
 
 (If the correlation matrix is given as an input, the first and the last steps of the algorithm are omitted)
 
 .. tip::
-    The de-noising algorithm is described in more detail in the work **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3469961>`_.
+    The Constant Residual Eigenvalue de-noising method is described in more detail in the work **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3469961>`_.
+
+    Lopez de Prado suggests that tihis algorithm is preferable as it removes the noise while preserving the signal
+
+**Targeted Shrinkage**
+
+The main idea behind the Targeted Shrinkage de-noising method is to shrink the eigenvecrots and eigenvalues that are
+nise-related. This is done by shrinking the correlation matrix composed from nise-related eigenvecrots and eigenvalues
+and then adding the correlation matrix composed from signal-related eigenvecrots and eigenvalues.
+
+The de-noising function works as follows:
+
+- The given covariance matrix is transformed to the correlation matrix.
+
+- The eigenvalues and eigenvectors of the correlation matrix are calculated and sorted in the descending order.
+
+- Using the Kernel Density Estimate algorithm a kernel of the eigenvalues is estimated.
+
+- The Marcenko-Pastur pdf is fitted to the KDE estimate using the variance as the parameter for the optimization.
+
+- From the obtained Marcenko-Pastur distribution, the maximum theoretical eigenvalue is calculated using the formula
+  from the **Instability caused by noise** part of `A Robust Estimator of the Efficient Frontier <https://papers.ssrn.com/sol3/abstract_id=3469961>`__.
+
+- The correlation matrix composed from eigenvectors and eigenvalues related to noise is shrunk using the alpha variable.
+  :math:`C_n = \alpha W_n \Lambda_n W_n' + (1 - \alpha) diag[W_n \Lambda_n W_n']`
+
+- The shrinked noise correlation matrix is summed to the information correlation matrix.
+  :math:`C_i = W_i \Lambda_i W_i'`
+  :math:`C = C_n + C_i`
+
+- The new correlation matrix is then transformed back to the new de-noised covariance matrix.
+
+(If the correlation matrix is given as an input, the first and the last steps of the algorithm are omitted)
+
+**De-toning**
+
+Correlation matrix can also be detoned by excluding a number of first eigenvectors representing
+the market component.
+
+According to Lopez de Prado:
+
+"Financial correlation matrices usually incorporate a market component. The market component is characterized by the
+first eigenvector, with loadings :math:`W_{n,1} \approx N^{-\frac{1}{2}}, n = 1, ..., N.`
+Accordingly, a market component affects every item of the covariance matrix. In the context of clustering
+applications, it is useful to remove the market component, if it exists (a hypothesis that can be
+tested statistically)."
+
+"By removing the market component, we allow a greater portion of the correlation to be explained
+by components that affect specific subsets of the securities. It is similar to removing a loud tone
+that prevents us from hearing other sounds"
+
+"The detoned correlation matrix is singular, as a result of eliminating (at least) one eigenvector.
+This is not a problem for clustering applications, as most approaches do not require the invertibility
+of the correlation matrix. Still, a detoned correlation matrix C2 cannot be used directly for
+mean-variance portfolio optimization.
+
+The de-toning function works as follows:
+
+- De-toning is apllied on the de-noised correlation matrix.
+
+- The correlation matrix representing the market component and calcualetrd from market component eigenvectors and eigenvalues
+  is subtracted from the denoised correlation matrix.
+
+- De-toned correlation matrix :math:`\hat{C}` is then rescaled so that the main diagonal consists of 1s
+
+.. math::
+    C = \hat{C} [(diag[\hat{C}])^\frac{1}{2}(diag[\hat{C}])^{\frac{1}{2}'}]^{-1}
+
+.. tip::
+    For a deeper description of de-noising and de-toning, please read Chapter 2 **Machine Learning for Asset Managers** *by* Marcos Lopez de Prado
 
 .. tip::
     This and above the methods are described in more detail in the Risk Estimators Notebook.
+
 
 Implementation
 ##############
 
 .. autoclass:: RiskEstimators
    :noindex:
-   :members: __init__, denoise_covariance
+   :members: denoise_covariance
 
 
 Example Code
@@ -289,7 +372,7 @@ Example Code
 .. code-block::
 
     import pandas as pd
-	import numpy as np
+    import numpy as np
     from mlfinlab.portfolio_optimization import RiskEstimators, ReturnsEstimators
 
     # Import price data
@@ -297,12 +380,12 @@ Example Code
 
     # Class that have needed functions
     risk_estimators = RiskEstimators()
-	returns_estimators = ReturnsEstimators()
+    returns_estimators = ReturnsEstimators()
 
-	# Finding the MCD estimator on price data
+    # Finding the MCD estimator on price data
     min_cov_det = risk_estimators.minimum_covariance_determinant(stock_prices, price_data=True)
 	
-	# Finding the Empirical Covariance on price data
+    # Finding the Empirical Covariance on price data
     empirical_cov = risk_estimators.empirical_covariance(stock_prices, price_data=True)
 
     # Finding the Shrinked Covariances on price data with every method
@@ -322,11 +405,11 @@ Example Code
     # The bandwidth of the KDE kernel
     kde_bwidth = 0.01
 
-	# Series of returns from series of prices
-	stock_returns = ret_est.calculate_returns(stock_prices)
+    # Series of returns from series of prices
+    stock_returns = ret_est.calculate_returns(stock_prices)
 	
-	# Finding the simple covariance matrix from a series of returns
-	cov_matrix = stock_returns.cov()
+    # Finding the simple covariance matrix from a series of returns
+    cov_matrix = stock_returns.cov()
 
     # Finding the De-noised Сovariance matrix
     cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation,
