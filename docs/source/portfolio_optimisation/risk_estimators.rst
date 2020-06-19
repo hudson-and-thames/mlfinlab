@@ -230,7 +230,8 @@ Two methods for de-noising are implemented in the module:
 - Constant Residual Eigenvalue Method
 - Targeted Shrinkage
 
-**Constant Residual Eigenvalue Method**
+Constant Residual Eigenvalue De-noising Method
+##############################################
 
 The main idea behind the Constant Residual Eigenvalue de-noising method is to separate the noise-related eigenvalues from
 the signal-related ones. This is achieved by fitting the Marcenko-Pastur distribution of the empirical distribution of
@@ -247,7 +248,7 @@ The de-noising function works as follows:
 - The Marcenko-Pastur pdf is fitted to the KDE estimate using the variance as the parameter for the optimization.
 
 - From the obtained Marcenko-Pastur distribution, the maximum theoretical eigenvalue is calculated using the formula
-  from the **Instability caused by noise** part of `A Robust Estimator of the Efficient Frontier <https://papers.ssrn.com/sol3/abstract_id=3469961>`__.
+  from the **Instability caused by noise** part of `A Robust Estimator of the Efficient Frontier paper <https://papers.ssrn.com/sol3/abstract_id=3469961>`__.
 
 - The eigenvalues in the set that are below the theoretical value are all set to their average value.
   For example, we have a set of 5 eigenvalues sorted in the descending order ( :math:`\lambda_1` ... :math:`\lambda_5` ),
@@ -257,7 +258,7 @@ The de-noising function works as follows:
 
     \lambda_3^{NEW} = \lambda_4^{NEW} = \lambda_5^{NEW} = \frac{\lambda_3^{OLD} + \lambda_4^{OLD} + \lambda_5^{OLD}}{3}
 
-- Eigenvalues above the meximum theoretical value are left intact
+- Eigenvalues above the maximum theoretical value are left intact
 
 .. math::
 
@@ -265,18 +266,19 @@ The de-noising function works as follows:
 
     \lambda_2^{NEW} = \lambda_2^{OLD}
 
-- The new set of eigenvalues with the set of eigenvectors is used to obtain the new de-noised correlation matrix
-  where :math:`\hat{C}` is the de-noised correlation matrix, :math:`W` is the eigenvectors matrix,
+- The new set of eigenvalues with the set of eigenvectors is used to obtain the new de-noised correlation matrix.
+  :math:`\tilde{C}` is the de-noised correlation matrix, :math:`W` is the eigenvectors matrix,
   and:math:`\Lambda` is the diagonal matrix with new eigenvalues.
 
 .. math::
 
-    \hat{C} = W \Lambda W
+    \tilde{C} = W \Lambda W'
 
-- To rescale :math:`\hat{C}` so that the main diagonal consists of 1s the followng mtransformation is made
+- To rescale :math:`\tilde{C}` so that the main diagonal consists of 1s the followng transformation is made
 
 .. math::
-    C = \hat{C} [(diag[\hat{C}])^\frac{1}{2}(diag[\hat{C}])^{\frac{1}{2}'}]^{-1}
+
+    C_{denoised} = \tilde{C} [(diag[\tilde{C}])^\frac{1}{2}(diag[\tilde{C}])^{\frac{1}{2}'}]^{-1}
 
 - The new correlation matrix is then transformed back to the new de-noised covariance matrix.
 
@@ -287,7 +289,8 @@ The de-noising function works as follows:
 
     Lopez de Prado suggests that tihis algorithm is preferable as it removes the noise while preserving the signal
 
-**Targeted Shrinkage**
+Targeted Shrinkage De-noising
+#############################
 
 The main idea behind the Targeted Shrinkage de-noising method is to shrink the eigenvecrots and eigenvalues that are
 nise-related. This is done by shrinking the correlation matrix composed from nise-related eigenvecrots and eigenvalues
@@ -306,21 +309,30 @@ The de-noising function works as follows:
 - From the obtained Marcenko-Pastur distribution, the maximum theoretical eigenvalue is calculated using the formula
   from the **Instability caused by noise** part of `A Robust Estimator of the Efficient Frontier <https://papers.ssrn.com/sol3/abstract_id=3469961>`__.
 
-- The correlation matrix composed from eigenvectors and eigenvalues related to noise is shrunk using the alpha variable.
-  :math:`C_n = \alpha W_n \Lambda_n W_n' + (1 - \alpha) diag[W_n \Lambda_n W_n']`
+- The correlation matrix composed from eigenvectors and eigenvalues related to noise (eigenvalues below the maximum
+  theoretical eigenvalue) is shrunk using the :math:`\alpha` variable.
+
+.. math::
+
+    C_n = \alpha W_n \Lambda_n W_n' + (1 - \alpha) diag[W_n \Lambda_n W_n']
 
 - The shrinked noise correlation matrix is summed to the information correlation matrix.
-  :math:`C_i = W_i \Lambda_i W_i'`
-  :math:`C = C_n + C_i`
+
+.. math::
+
+    C_i = W_i \Lambda_i W_i'
+
+    C_{denoised} = C_n + C_i
 
 - The new correlation matrix is then transformed back to the new de-noised covariance matrix.
 
 (If the correlation matrix is given as an input, the first and the last steps of the algorithm are omitted)
 
-**De-toning**
+De-toning
+#########
 
-Correlation matrix can also be detoned by excluding a number of first eigenvectors representing
-the market component.
+De-noised correlation matrix from the previous mathods can also be detoned by excluding a number of first
+eigenvectors representing the market component.
 
 According to Lopez de Prado:
 
@@ -336,23 +348,29 @@ that prevents us from hearing other sounds"
 
 "The detoned correlation matrix is singular, as a result of eliminating (at least) one eigenvector.
 This is not a problem for clustering applications, as most approaches do not require the invertibility
-of the correlation matrix. Still, a detoned correlation matrix C2 cannot be used directly for
-mean-variance portfolio optimization.
+of the correlation matrix. Still, **a detoned correlation matrix** :math:`C_{detoned}` **cannot be used directly for**
+**mean-variance portfolio optimization**."
 
 The de-toning function works as follows:
 
 - De-toning is apllied on the de-noised correlation matrix.
 
-- The correlation matrix representing the market component and calcualetrd from market component eigenvectors and eigenvalues
-  is subtracted from the denoised correlation matrix.
+- The correlation matrix representing the market component is calcualetrd from market component eigenvectors and eigenvalues
+  and then subtracted from the de-noised correlation matrix. This way the de-toned correlation matrix is obtained.
+
+.. math::
+
+    \hat{C} = C_{denoised} - W_m \Lambda_m W_m'
 
 - De-toned correlation matrix :math:`\hat{C}` is then rescaled so that the main diagonal consists of 1s
 
 .. math::
-    C = \hat{C} [(diag[\hat{C}])^\frac{1}{2}(diag[\hat{C}])^{\frac{1}{2}'}]^{-1}
+
+    C_{detoned} = \hat{C} [(diag[\hat{C}])^\frac{1}{2}(diag[\hat{C}])^{\frac{1}{2}'}]^{-1}
 
 .. tip::
-    For a deeper description of de-noising and de-toning, please read Chapter 2 **Machine Learning for Asset Managers** *by* Marcos Lopez de Prado
+    For a more detailed description of de-noising and de-toning, please read Chapter 2 of the book
+    **Machine Learning for Asset Managers** *by* Marcos Lopez de Prado.
 
 .. tip::
     This and above the methods are described in more detail in the Risk Estimators Notebook.
@@ -411,10 +429,21 @@ Example Code
     # Finding the simple covariance matrix from a series of returns
     cov_matrix = stock_returns.cov()
 
-    # Finding the De-noised Сovariance matrix
-    cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation,
-                                                             kde_bwidth)
+    # Finding the Constant Residual Eigenvalue De-noised Сovariance matrix
+    const_resid_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation,
+                                                              denoise_method='const_resid_eigen',
+                                                              detone=False, kde_bwidth=kde_bwidth)
 
+    # Finding the Targeted Shrinkage De-noised Сovariance matrix
+    targ_shrink_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation,
+                                                              denoise_method='target_shrink',
+                                                              detone=False, kde_bwidth=kde_bwidth)
+
+    # Finding the Constant Residual Eigenvalue De-noised and De-toned Сovariance matrix
+    const_resid_detoned = risk_estimators.denoise_covariance(cov_matrix, tn_relation,
+                                                             denoise_method='const_resid_eigen',
+                                                             detone=True, market_component=1,
+                                                             kde_bwidth=kde_bwidth)
 
 Research Notebooks
 ##################
