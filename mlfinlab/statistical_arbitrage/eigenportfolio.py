@@ -4,7 +4,7 @@ Principal Component Analysis applied for Statistical Arbitrage.
 import pandas as pd
 import numpy as np
 
-from .regression import _calc_rolling_params, _rolling_window
+from .pairs_regression import _calc_rolling_params, _rolling_window
 
 
 def calc_all_eigenportfolio(data, num):

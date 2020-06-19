@@ -1,5 +1,6 @@
+# pylint: disable=bare-except
 """
-Calculate regression.
+Calculate pairs regression.
 """
 
 import numpy as np
@@ -8,41 +9,46 @@ import pandas as pd
 
 def calc_all_regression(data_x, data_y):
     """
-    Calculate beta, constant, spread, and z-score for time series data_x and data_y.
+    Calculate data_x log returns, data_y log returns, beta, constant, ret_spread, and z-score for
+    time series of data_x and data_y.
 
-    :param data_x: (pd.Series) Time series x.
-    :param data_y: (pd.Series) Time series y.
-    :return: (pd.DataFrame) DataFrame of given data_x, data_y, beta, constant, spread, and z-score.
+    :param data_x: (pd.Series) Time series of price of x (DO NOT adjust for log).
+    :param data_y: (pd.Series) Time series of price of y (DO NOT adjust for log).
+    :return: (pd.DataFrame) DataFrame of given data_x, data_y, logret_x, logret_y, beta, constant,
+        ret_spread, and z-score.
     """
-    # Convert data_x to np.array.
-    np_x = np.array(data_x)
+    # Change to log returns and conver to np.array.
+    np_x = np.array(np.log(data_x).diff().fillna(0))
+    np_y = np.array([np.log(data_y).diff().fillna(0)])
 
     # Add 1 to all values to account for intercept.
     np_x = np.vstack((np_x, np.ones(np_x.shape))).T
 
-    # Convert data_y to np.array.
-    np_y = np.array([data_y]).T
-
     # Calculate beta, the slope and intercept.
-    beta = np.linalg.inv(np_x.T.dot(np_x)).dot(np_x.T).dot(np_y)
+    try:
+        beta = np.linalg.inv(np_x.T.dot(np_x)).dot(np_x.T).dot(np_y.T)
+    except:
+        beta = np.linalg.pinv(np_x.T.dot(np_x)).dot(np_x.T).dot(np_y.T)
 
-    # Calculate spread.
-    spread = np_y - np_x.dot(beta)
+    # Calculate spread of returns.
+    spread = np_y.T - np_x.dot(beta)
 
-    # Calculate standard deviation.
-    st_dev = np.std(spread)
+    # Calculate cumulative sum of spread of returns.
+    cum_spread = spread.cumsum()
 
     # Calculate z-score.
-    z_score = spread - np.mean(spread) / st_dev
+    z_score = (cum_spread - np.mean(cum_spread)) / np.std(cum_spread)
 
     # Column of slope and intercept.
     beta = np.repeat(beta, np_x.shape[0], axis=1).T
 
     # Stack all values.
-    res = np.hstack((np_x[:, [0]], np_y, beta, spread, z_score))
+    res = np.hstack((np.array([data_x]).T, np.array([data_y]).T, np_x[:, [0]], np_y.T, beta, spread,
+                     np.vstack((cum_spread, z_score)).T))
 
     # Columns name.
-    col_name = ['data_x', 'data_y', 'beta', 'constant', 'spread', 'z_score']
+    col_name = [data_x.name, data_y.name, 'logret_x', 'logret_y', 'beta', 'constant', 'ret_spread',
+                'cum_spread', 'z_score']
     return pd.DataFrame(res, columns=col_name, index=data_x.index)
 
 
@@ -87,7 +93,6 @@ def calc_rolling_regression(data_x, data_y, window):
 
 
 def _calc_rolling_params(data):
-    # pylint: disable=bare-except
     """
     Helper function to calculate rolling parameters
 
