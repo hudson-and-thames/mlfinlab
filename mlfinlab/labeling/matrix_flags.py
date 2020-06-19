@@ -1,5 +1,5 @@
 """
-HEADER MENTION PAPER HERE
+Matrix Flag labeling method.
 """
 
 import pandas as pd
@@ -7,12 +7,36 @@ import numpy as np
 
 
 class MatrixFlagLabels:
+    """
+    The Matrix Flag labeling method is featured in the paper: Cervelló-Royo, R., Guijarro, F. and Michniuk, K., 2015.
+    Stock market trading rule based on pattern recognition and technical analysis: Forecasting the DJIA index with
+    intraday data.
+
+    The method of applying a matrix template was first introduced, and explained in greater detail, in the paper:
+    Leigh, W., Modani, N., Purvis, R. and Roberts, T., 2002. Stock market trading rule discovery using technical
+    charting heuristics.
+
+    Cervelló-Royo et al. expand on Leigh et al.'s work by proposing a new bull flag pattern which ameliorates some
+    weaknesses in Leigh's original template. Additionally, he applies this bull flag labeling method to intraday
+    candlestick data, rather than just closing prices.
+
+    To find the total weight for a given day (or tick), the current price as well as the preceding window days (or
+    ticks) number of prices is used. The data window is split into 10 buckets each containing a chronological tenth of
+    the data window. Each point in 1 bucket is put into a decile corresponding to a position in a column based
+    on percentile relative to the entire data window. Bottom 10% on lowest row, next 10% on second  lowest row etc.
+    The proportion of points in each decile is reported to finalize the column. The first tenth of the data is
+    transformed to the leftmost column, the next tenth to the next column on the right and so on until finally a 10 by
+    10 matrix is achieved. This matrix is then multiplied element-wise with the 10 by 10 template, and the sum of all
+    columns is the total weight for the day. If desired, the user can specify a threshold to determine positive and
+    negative classes. The value of the threshold depends on how strict of a classifier the user desires, and the
+    allowable values based on the template matrix.
+    """
 
     def __init__(self, data, window):
         # PUT ASSERTIONS THAT LEN OF DATA AND WINDOW MUST BE AT LEAST 10 #
         self.data = data
         self.window = window
-        self.template = pd.DataFrame([[.5, 0, -1, -1, -1, -1, -1, -1, -1, 0],  # Bull flag template
+        self.template = pd.DataFrame([[.5, 0, -1, -1, -1, -1, -1, -1, -1, 0],  # Leigh's template
                                       [1, 0.5, 0, -0.5, -1, -1, -1, -1, -0.5, 0],
                                       [1, 1, 0.5, 0, -0.5, -0.5, -0.5, -0.5, 0, 0.5],
                                       [0.5, 1, 1, 0.5, 0, -0.5, -0.5, -0.5, 0, 1],
@@ -26,21 +50,20 @@ class MatrixFlagLabels:
     def set_template(self, template):
         """
         :param template: (pd.DataFrame) Template to override the default template. Must be a 10 by 10 pd.DataFrame.
+                            NaN values not allowed, as they will not automatically be treated as zeros.
         """
+        assert template.shape == (10, 10), "Template must be 10 by 10."
         self.template = template
 
-    def transform_data(self, row_num, window=30):
+    def _transform_data(self, row_num, window=30):
         """
         :param row_num: (int) Row number to use for the "current" data point to apply the window to. The data window
                         contains the row corresponding to row_num, as well as the (self.window-1) preceding rows.
         :param window: (int) The number of rows preceding the current one to use for window. Override with
                         self.window in most cases.
-        :return: (pd.DataFrame) The data window is split into 10 buckets each containing a chronological tenth of the
-                        data window. Each point in 1 bucket is put into a decile corresponding to a position in a column based
-                        on percentile relative to the entire data window. Bottom 10% on lowest row, next 10% on second
-                        lowest row etc. THe proportion of points in each decile is reported to finalize the column.
-                        The first tenth of the data is transformed to the leftmost column, the next
-                        tenth to the next column on the right and so on until finally a 10 by 10 matrix is achieved.
+        :return: (pd.DataFrame) Transformed 10 by 10 matrix, in which each column corresponds to a chronological tenth
+                    of the data window, and each row corresponds to a price decile relative to the entire data window.
+                    The template matrix is then applied to this output matrix.
         """
         # The relevant data to create matrix for current day consists of the day's return and the window number of days
         # preceding.
@@ -48,9 +71,8 @@ class MatrixFlagLabels:
 
         # Find values for cutoff percentiles (deciles) over the entire data window. percentile_cutoffs is a list of
         # cutoffs for the 10th, 20th, 30th etc. percentiles in the data window.
-        percentile_cutoffs = []
-        for i in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
-            percentile_cutoffs.append(np.percentile(data_window, i))
+        percentiles = np.linspace(10, 100, num=10)
+        percentile_cutoffs = np.percentile(data_window, percentiles)
 
         # Each value in bins corresponds to the value of the same index in data_window. If bin is 0, the corresponding
         # point in data_window is in the 0-10th percentile, if 1 then 10-20th percentile, ..., if 9 then 90-100th
@@ -73,17 +95,15 @@ class MatrixFlagLabels:
             # Apply the dictionary to data to get the bins each data point belongs to.
             tenth_bins = np.vectorize(value_to_bin.get)(tenth)
             # We count the number of times each bin appears in each tenth of data, starting from the highest decile.
-            column = [np.count_nonzero(tenth_bins == 9), np.count_nonzero(tenth_bins == 8),
-                      np.count_nonzero(tenth_bins == 7), np.count_nonzero(tenth_bins == 6),
-                      np.count_nonzero(tenth_bins == 5), np.count_nonzero(tenth_bins == 4),
-                      np.count_nonzero(tenth_bins == 3), np.count_nonzero(tenth_bins == 2),
-                      np.count_nonzero(tenth_bins == 1), np.count_nonzero(tenth_bins == 0)]
-            matrix[col_num] = column
+            column, _ = np.histogram(tenth_bins, bins=[i for i in range(11)])
+            # Convert the count in the column to proportion.
+            column = [i/len(tenth) for i in column]
+            matrix[col_num] = column[::-1]  # Reverse so that highest decile is on top of the column.
             col_num += 1
 
         return matrix
 
-    def apply_template_to_matrix(self, matrix, template):
+    def _apply_template_to_matrix(self, matrix, template):
         """
         :param matrix: (pd.DataFrame) Processed 10 by 10 matrix, where each column represents a chronological tenth
                         of the data, and each row represents a decile relative to the entire data window.
@@ -95,16 +115,24 @@ class MatrixFlagLabels:
         total_fit = sum(new_mat.sum(axis=0))
         return total_fit
 
-    def apply_labeling_matrix(self):
+    def apply_labeling_matrix(self, threshold=None):
         """
+        :param threshold: (float) If None, labels will be returned numerically as the score for the day. If not None,
+                        then labels are returned categorically, with the positive category for labels which exceed
+                        the threshold.
         :return: (pd.Series) Flag scores for the data series on each eligible day (meaning for indices self.window and
                     onwards).
         """
         labels = []
         idx = self.data[self.window:len(self.data)].index
+
+        # Apply the data transformation and template.
         for row_num in range(self.window, len(self.data)):
-            weights_matrix = self.transform_data(row_num=row_num, window=self.window)
-            label = self.apply_template_to_matrix(weights_matrix, self.template)
+            weights_matrix = self._transform_data(row_num=row_num, window=self.window)
+            label = self._apply_template_to_matrix(weights_matrix, self.template)
             labels.append(label)
 
+        # If threshold is given, replace fit values by whether they exceed the threshold.
+        if threshold is not None:
+            labels = [1 if i >= threshold else -1 for i in labels]
         return pd.Series(data=labels, index=idx)
