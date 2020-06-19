@@ -10,9 +10,9 @@ from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 class RiskEstimators:
     """
     This class contains the implementations for different ways to calculate and adjust Covariance matrices.
-    The functions related to de-noising the Covariance matrix are reproduced with modification from the following paper:
-    `Marcos Lopez de Prado “A Robust Estimator of the Efficient Frontier”, (2019).
-    <https://papers.ssrn.com/abstract_id=3469961>`_.
+    The functions related to de-noising and de-toning the Covariance matrix are reproduced with modification
+    from Chapter 2 of the the following book:
+    Marcos Lopez de Prado “Machine Learning for Asset Managers”, (2020).
     """
 
     def __init__(self):
@@ -278,14 +278,14 @@ class RiskEstimators:
         Second, eigenvalues and eigenvectors of the correlation matrix are calculated using the linalg.eigh
         function from numpy package.
 
-        Third, a maximum theoretical eigenvalue is found by fitting Marcenko-Pastur distribution
+        Third, a maximum theoretical eigenvalue is found by fitting Marcenko-Pastur (M-P) distribution
         to the empirical distribution of the correlation matrix eigenvalues. The empirical distribution
         is obtained through kernel density estimation using the KernelDensity class from sklearn.
         The fit of the M-P distribution is done by minimizing the Sum of Squared estimate of Errors
         between the theoretical pdf and the kernel. The minimization is done by adjusting the variation
         of the M-P distribution.
 
-        Fourth, the eigenvalues of the correlation matrix are sorted and the eigenvalues higher than
+        Fourth, the eigenvalues of the correlation matrix are sorted and the eigenvalues lower than
         the maximum theoretical eigenvalue are set to their average value. This is how the eigenvalues
         associated with noise are shrinked. The de-noised covariance matrix is then calculated back
         from new eigenvalues and eigenvectors.
@@ -339,7 +339,7 @@ class RiskEstimators:
         if denoise_method == 'target_shrink':
             # Based on the threshold, de-noising the correlation matrix
             corr = self._denoised_corr_targ_shrink(eigenval, eigenvec, num_facts, alpha)
-        else:
+        else: # Default const_resid_eigen method
             # Based on the threshold, de-noising the correlation matrix
             corr = self._denoised_corr(eigenval, eigenvec, num_facts)
 
