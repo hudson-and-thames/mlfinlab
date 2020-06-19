@@ -41,7 +41,7 @@ if the silhouette scores clearly indicate that features belong to their respecti
 Implementation
 **************
 
-This module creates clustered subsets of features described in the presentation slides: `Clustered Feature Importance <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595>`_
+This module creates clustered subsets of features described in the presentation slides: `Clustered Feature Importance <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3517595>`__
 by Marcos Lopez de Prado.
 
 .. py:currentmodule:: mlfinlab.clustering.feature_clusters
@@ -65,8 +65,10 @@ The example will generate 4 clusters by Hierarchical Clustering for given specif
     feat_subs = get_feature_clusters(X, dependence_metric='information_variation',
                                      distance_metric='angular', linkage_method='singular',
                                      n_clusters=4)
+
 Research Notebook
 *****************
+
 The for better understanding of its implementations see the notebook on Clustered Feature Importance.
 
 .. _Clustered Feature Importance: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Feature%20Importance/Cluster_Feature_Importance.ipynb

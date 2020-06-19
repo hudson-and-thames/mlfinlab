@@ -92,6 +92,7 @@ Implementation
     We provide great flexibility to the users in terms of the input data - they can either pass their own pre-calculated input
     matrices/dataframes or leave it to us to calculate them. A quick reference on common input parameters which you will encounter
     throughout the portfolio optimisation module:
+
         * :py:mod:`asset_prices`: Dataframe/matrix of historical raw asset prices **indexed by date**.
         * :py:mod:`asset_returns`: Dataframe/matrix of historical asset returns. This will be a :math:`TxN` matrix where :math:`T` is the time-series and :math:`N` refers to the number of assets in the portfolio.
         * :py:mod:`expected_asset_returns`: List of expected returns per asset i.e. the mean of historical asset returns. This refers to the parameter :math:`\mu` used in portfolio optimisation literature. For a portfolio of 5 assets, ``expected_asset_returns = [0.45, 0.56, 0.89, 1.34, 2.4]``.

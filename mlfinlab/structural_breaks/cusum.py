@@ -63,13 +63,14 @@ def _get_s_n_for_t(series: pd.Series, test_type: str, molecule: list) -> pd.Seri
 
 
 def get_chu_stinchcombe_white_statistics(series: pd.Series, test_type: str = 'one_sided',
-                                         num_threads: int = 8) -> pd.Series:
+                                         num_threads: int = 8, verbose: bool = True) -> pd.Series:
     """
     Multithread Chu-Stinchcombe-White test implementation, p.251
 
     :param series: (pd.Series) Series to get statistics for
     :param test_type: (str): Two-sided or one-sided test
     :param num_threads: (int) Number of cores
+    :param verbose: (bool) Flag to report progress on asynch jobs
     :return: (pd.Series) Statistics
     """
     molecule = series.index[2:series.shape[0]]  # For the first two values we don't have enough info
@@ -79,5 +80,6 @@ def get_chu_stinchcombe_white_statistics(series: pd.Series, test_type: str = 'on
                                  series=series,
                                  test_type=test_type,
                                  num_threads=num_threads,
+                                 verbose=verbose,
                                  )
     return s_n_t_series
