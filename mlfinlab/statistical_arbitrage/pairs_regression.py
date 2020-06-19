@@ -54,23 +54,21 @@ def calc_all_regression(data_x, data_y):
 
 def calc_rolling_regression(data_x, data_y, window):
     """
-    Calculate slope, intercept, spread, and z-score for time series data_x and data_y for a rolled
-    window.
+    Calculate data_x log returns, data_y log returns, beta, constant, ret_spread, and z-score for
+    time series of data_x and data_y with the given window.
 
-    :param data_x: (pd.Series) Time series x.
-    :param data_y: (pd.Series) Time series y.
-    :param window: (int) Number of rolled windows.
-    :return: (pd.DataFrame) DataFrame of given data_x, data_y, beta, constant, spread, and z-score
-            for each rolled window.
+    :param data_x: (pd.Series) Time series of price of x (DO NOT adjust for log).
+    :param data_y: (pd.Series) Time series of price of y (DO NOT adjust for log).
+    :param window: (int) Number of rolling windows.
+    :return: (pd.DataFrame) DataFrame of given data_x, data_y, logret_x, logret_y, beta, constant,
+        ret_spread, and z-score.
     """
-    # Convert data_x to np.array.
-    np_x = np.array(data_x)
+    # Change to log returns and conver to np.array.
+    np_x = np.array(np.log(data_x).diff().fillna(0))
+    np_y = np.array([np.log(data_y).diff().fillna(0)])
 
     # Add 1 to all values to account for intercept.
     np_x = np.vstack((np_x, np.ones(np_x.shape))).T
-
-    # Convert data_y to np.array.
-    np_y = np.array([data_y])
 
     # Combined data.
     data = np.hstack((np_x, np_y.T))
@@ -79,7 +77,7 @@ def calc_rolling_regression(data_x, data_y, window):
     data = _rolling_window(data, window)
 
     # Initialize result.
-    res = np.zeros((np_x.shape[0], 6))
+    res = np.zeros((np_x.shape[0], 4))
 
     for i in range(data.shape[0]):
         res[i + window - 1] = _calc_rolling_params(data[i])
@@ -87,6 +85,8 @@ def calc_rolling_regression(data_x, data_y, window):
     # Set nan for beginning windows.
     res[:window - 1] = np.nan
 
+    # Stack original data and log returns with the results.
+    res = np.hstack((np.array([data_x]).T, np.array([data_y]).T, np_x[:, [0]], np_y.T))
     # Columns name.
     col_name = ['data_x', 'data_y', 'beta', 'constant', 'spread', 'z_score']
     return pd.DataFrame(res, index=data_x.index, columns=col_name)
@@ -114,20 +114,20 @@ def _calc_rolling_params(data):
     # Calculate spread.
     spread = np_y - np_x.dot(beta)
 
-    # Calculate standard deviation.
-    st_dev = np.std(spread)
+    # Calculate cumulative sum of spread of returns.
+    cum_spread = spread.cumsum()
 
-    # Calculate last entry's z-score.
-    z_score = (spread[-1] - np.mean(spread)) / st_dev
+    # Calculate z-score.
+    z_score = (cum_spread[-1] - np.mean(cum_spread)) / np.std(cum_spread)
 
-    res = np.array([np_x[-1][0], np_y[-1], beta[0], beta[1], spread[-1], z_score])
+    res = np.array([beta[0][0], beta[1][0], spread[-1][0], z_score])
 
     return res
 
 
 def _rolling_window(data, window):
     """
-    Helper function to generate a rolled window.
+    Helper function to generate rolling windows.
 
     :param data: (np.array) Original data given by user.
     :param window: (int) Number of rolling window.

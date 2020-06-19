@@ -1,5 +1,5 @@
 """
-Test Regression.
+Test Pairs Regression.
 """
 
 import unittest
@@ -10,9 +10,9 @@ import numpy as np
 from mlfinlab.statistical_arbitrage import calc_all_regression, calc_rolling_regression
 
 
-class TestRegression(unittest.TestCase):
+class TestPairsRegression(unittest.TestCase):
     """
-    Test Regression.
+    Test Pairs Regression.
     """
 
     def setUp(self):
@@ -34,14 +34,18 @@ class TestRegression(unittest.TestCase):
 
         # Check shape.
         self.assertEqual(res.shape[0], 2141)
-        self.assertEqual(res.shape[1], 6)
+        self.assertEqual(res.shape[1], 9)
 
         # Check all values.
         self.assertAlmostEqual(res.iloc[:, 0][3], 48.57666, delta=1e-3)
         self.assertAlmostEqual(res.iloc[:, 1][279], 15.899999, delta=1e-3)
-        self.assertAlmostEqual(res.iloc[:, 2][1027], 0.43064298, delta=1e-3)
-        self.assertAlmostEqual(res.iloc[:, 3][586], 7.6484215, delta=1e-3)
-        self.assertAlmostEqual(res.iloc[:, 4][1788], 3.33921477, delta=1e-3)
+        self.assertAlmostEqual(res.iloc[:, 2][1027], -0.01450508, delta=1e-3)
+        self.assertAlmostEqual(res.iloc[:, 3][586], -0.00373308, delta=1e-3)
+        self.assertAlmostEqual(res.iloc[:, 4][1788], 0.75397453, delta=1e-3)
+        self.assertAlmostEqual(res.iloc[:, 5][2000], 0, delta=1e-3)
+        self.assertAlmostEqual(res.iloc[:, 6][786], 0.00270831, delta=1e-3)
+        self.assertAlmostEqual(res.iloc[:, 7][182], -0.0668679, delta=1e-3)
+        self.assertAlmostEqual(res.iloc[:, 8][999], -1.4291310, delta=1e-3)
 
     def test_rolling_regression(self):
         """
