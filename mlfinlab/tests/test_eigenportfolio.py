@@ -56,16 +56,19 @@ class TestEigenportfolio(unittest.TestCase):
         """
         Test Eigenportfolio.
         """
-        # Calculate PCA for given data with 1 principal component.
-        res = calc_all_eigenportfolio(np.log(self.data), 1)
+        # Calculate PCA for given data with 5 principal components.
+        res = calc_all_eigenportfolio(self.data, 5)
 
         # There are two items in the tuple.
-        self.assertEqual(res.shape[0], 4284)
+        self.assertEqual(res.shape[0], 8575)
         self.assertEqual(res.shape[1], 23)
 
         # Length of projection is the same as data.
-        self.assertEqual(res.index[0][0], 'spread')
-        self.assertEqual(res.index[-1][1], 'constants')
+        self.assertEqual(res.index[0][0], 'log_ret')
+        self.assertEqual(res.index[2300][1], 'ret_spread')
+        self.assertEqual(res.index[4600][1], 'cum_spread')
+        self.assertEqual(res.index[-6][1], 'eigenportfolio')
+        self.assertEqual(res.index[-1][1], 'z_score')
 
         # Check the values for spreads.
         self.assertAlmostEqual(res.iloc[5, 10], 0.186152852268, delta=1e-3)

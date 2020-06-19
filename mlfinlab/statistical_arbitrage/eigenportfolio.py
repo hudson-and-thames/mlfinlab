@@ -32,10 +32,10 @@ def calc_all_eigenportfolio(data, num):
     spread = data - data_proj.dot(beta)
 
     # Calculate cumulative sum of spread of returns.
-    cum_spread = spread.cumsum()
+    cum_resid = spread.cumsum()
 
     # Calculate z-score.
-    z_score = (cum_spread - np.mean(cum_spread)) / np.std(cum_spread)
+    z_score = (cum_resid - np.mean(cum_resid)) / np.std(cum_resid)
 
     # Index name for beta.
     beta_idx = []
@@ -54,8 +54,8 @@ def calc_all_eigenportfolio(data, num):
     data_eigvec = pd.DataFrame(data_eigvec.T, index=eigenp_idx, columns=data.columns)
 
     # Combine all dataframes.
-    combined_df = pd.concat([data, data_eigvec, beta, spread, cum_spread, z_score], axis=0,
-                            keys=['log_ret', 'eigenportfolio', 'beta', 'ret_spread', 'cum_spread',
+    combined_df = pd.concat([data, data_eigvec, beta, spread, cum_resid, z_score], axis=0,
+                            keys=['log_ret', 'eigenportfolio', 'beta', 'ret_spread', 'cum_resid',
                                   'z_score'])
     return combined_df
 
