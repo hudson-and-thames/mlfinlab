@@ -4,7 +4,7 @@ Eigenportfolio applications
 import pandas as pd
 import numpy as np
 
-from .pairs_regression import _calc_rolling_reg_params, _rolling_window
+from .base import _calc_rolling_reg_params, _rolling_window
 
 
 def calc_all_eigenportfolio(data, num):
