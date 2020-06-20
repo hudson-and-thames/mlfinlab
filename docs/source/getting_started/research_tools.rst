@@ -8,23 +8,23 @@ the progress. Financial Machine Learning is no different in that a lot of the pa
 across different journals and different fields. Ranging from journals on econometrics to machine
 learning, researchers often struggle to find the best academic papers to begin their studies.
 
-At Hudson & Thames, we primarily use two resources: `Connected Paper`_ and `EThOS`_. These two
+At Hudson & Thames, we primarily use two resources: `Connected Papers`_ and `EThOS`_. These two
 free sites have been invaluable and offer an advantage to search through the most cutting edge
 resources available for our MlFinLab library.
 
-.. _Connected Paper: https://www.connectedpapers.com/
+.. _Connected Papers: https://www.connectedpapers.com/
 .. _EThOS: https://ethos.bl.uk/Home.do
 
 
-Connected Paper
-###############
+Connected Papers
+################
 
-Connected paper is unique in that it is not a citation tree. A citation from a paper does not
+Connected papers is unique in that it is not a citation tree. A citation from a paper does not
 necessarily lead the reader to another paper. The two topics might be completely different and
 an unimportant topic for the researcher.
 
 It uniquely identifies the related papers by looking at the cocitation and bibliographic coupling.
-More about the website is available at the connected paper founder’s `medium`_ post.
+More about the website is available at the connected papers founder’s `medium`_ post.
 
 To give a brief demonstration, we will examine a `paper`_ by Li and Hoi that started our Online Portfolio Selection module.
 
@@ -35,7 +35,7 @@ If you type in the name of the paper, you will see a graph like the one below.
    :align: center
 
 It immediately shows which are the most associated papers. The darker circles indicate that they are
-more recent, so we can easily follow from the older papers to the newer ones. Connected paper also
+more recent, so we can easily follow from the older papers to the newer ones. Connected papers also
 has an amazing feature for prior works and derivative works.
 
 Prior works is available for researchers to see what are the most famous and cited papers in this field
@@ -64,7 +64,7 @@ the paper of interest.
 EThOS
 #####
 
-EThOS is a online library sponsored by the United Kingdom to make publicly-funded research available
+`EThOS`_ is a online library sponsored by the United Kingdom to make publicly-funded research available
 to all researchers.
 
 The best feature for EThOS is the availability of all doctoral theses in the UK. If your topic of
