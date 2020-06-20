@@ -81,7 +81,7 @@ def calc_rolling_pairs_regression(data_x, data_y, window):
 
     # Fill in the array.
     for i in range(data.shape[0]):
-        res[i + window - 1] = _calc_rolling_params(data[i])
+        res[i + window - 1] = _calc_rolling_reg_params(data[i])
 
     # Set nan for beginning windows.
     res[:window - 1] = np.nan
@@ -94,9 +94,9 @@ def calc_rolling_pairs_regression(data_x, data_y, window):
     return pd.DataFrame(res, index=data_x.index, columns=col_name)
 
 
-def _calc_rolling_params(data):
+def _calc_rolling_reg_params(data):
     """
-    Helper function to calculate rolling parameters.
+    Helper function to calculate rolling regression parameters.
 
     :param data: (np.array) Rolling window of original data.
     :return: (np.array) Data_x, data_y, beta, constant, spread, cum_resid, and z-score.
