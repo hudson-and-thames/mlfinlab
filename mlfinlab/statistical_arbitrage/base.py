@@ -114,8 +114,8 @@ class StatArb:
         np_xy = self._rolling_window(np_xy, self.window)
 
         # Fill in the array.
-        for it in range(np_xy.shape[0]):
-            self._calc_rolling_params(np_xy[it], it + self.window - 1)
+        for itr in range(np_xy.shape[0]):
+            self._calc_rolling_params(np_xy[itr], itr + self.window - 1)
 
         # Set np.nan for values before the initial window.
         self.beta[:, :self.window - 1] = np.nan
@@ -236,7 +236,7 @@ class StatArb:
         :param data: (np.array) Data for z-score calculation.
         :return: (np.array) Z-score of the given data.
         """
-        return (data - np.mean(data)) / np.std(data)
+        return (data - np.mean(data, axis=0)) / np.std(data, axis=0)
 
     @staticmethod
     def _linear_regression(data_x, data_y):
