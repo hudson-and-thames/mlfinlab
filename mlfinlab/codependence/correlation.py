@@ -12,24 +12,40 @@ from scipy.spatial.distance import squareform, pdist
 
 def angular_distance(x: np.array, y: np.array) -> float:
     """
-    Returns angular distance between two vectors. Angular distance is a slight modification of correlation which
+    Returns angular distance between two vectors. Angular distance is a slight modification of Pearson correlation which
     satisfies metric conditions.
 
-    :param x: (np.array) X vector.
-    :param y: (np.array) Y vector.
+    Formula used for calculation:
+
+    Ang_Distance = (1/2 * (1 - Corr))^(1/2)
+
+    Read Cornell lecture notes for more information about angular distance:
+    https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes.
+
+    :param x: (np.array/pd.Series) X vector.
+    :param y: (np.array/pd.Series) Y vector.
     :return: (float) Angular distance.
     """
+
     corr_coef = np.corrcoef(x, y)[0][1]
     return np.sqrt(0.5 * (1 - corr_coef))
 
 
 def absolute_angular_distance(x: np.array, y: np.array) -> float:
     """
-    Returns a modification of angular distance where absolute value of correlation coefficient is used.
+    Returns absolute angular distance between two vectors. It is a modification of angular distance where the absolute
+    value of the Pearson correlation coefficient is used.
 
-    :param x: (np.array) X vector
-    :param y: (np.array) Y vector
-    :return: (float) Absolute angular distance
+    Formula used for calculation:
+
+    Abs_Ang_Distance = (1/2 * (1 - abs(Corr)))^(1/2)
+
+    Read Cornell lecture notes for more information about absolute angular distance:
+    https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes.
+
+    :param x: (np.array/pd.Series) X vector.
+    :param y: (np.array/pd.Series) Y vector.
+    :return: (float) Absolute angular distance.
     """
 
     corr_coef = np.corrcoef(x, y)[0][1]
@@ -38,11 +54,19 @@ def absolute_angular_distance(x: np.array, y: np.array) -> float:
 
 def squared_angular_distance(x: np.array, y: np.array) -> float:
     """
-    Returns a modification of angular distance where square of correlation coefficient is used.
+    Returns squared angular distance between two vectors. It is a modification of angular distance where the square of
+    Pearson correlation coefficient is used.
 
-    :param x: (np.array) X vector
-    :param y: (np.array) Y vector
-    :return: (float) Squared angular distance
+    Formula used for calculation:
+
+    Squared_Ang_Distance = (1/2 * (1 - (Corr)^2))^(1/2)
+
+    Read Cornell lecture notes for more information about squared angular distance:
+    https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes.
+
+    :param x: (np.array/pd.Series) X vector.
+    :param y: (np.array/pd.Series) Y vector.
+    :return: (float) Squared angular distance.
     """
 
     corr_coef = np.corrcoef(x, y)[0][1]
@@ -51,12 +75,21 @@ def squared_angular_distance(x: np.array, y: np.array) -> float:
 
 def distance_correlation(x: np.array, y: np.array) -> float:
     """
-    Distance correlation captures both linear and non-linear dependencies.
-    Distance correlation coefficient is described in https://en.wikipedia.org/wiki/Distance_correlation
+    Returns distance correlation between two vectors. Distance correlation captures both linear and non-linear
+    dependencies.
 
-    :param x: (np.array) X vector
-    :param y: (np.array) Y vector
-    :return: (float) Distance correlation coefficient
+    Formula used for calculation:
+
+    Distance_Corr[X, Y] = dCov[X, Y] / (dCov[X, X] * dCov[Y, Y])^(1/2)
+
+    dCov[X, Y] is the average Hadamard product of the doubly-centered Euclidean distance matrices of X, Y.
+
+    Read Cornell lecture notes for more information about distance correlation:
+    https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes.
+
+    :param x: (np.array/pd.Series) X vector.
+    :param y: (np.array/pd.Series) Y vector.
+    :return: (float) Distance correlation coefficient.
     """
 
     x = x[:, None]

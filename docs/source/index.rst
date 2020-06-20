@@ -143,24 +143,17 @@ Benefits include:
 Platinum Sponsor:
 *****************
 
-.. figure:: logo/machine-factor-technologies.png
+.. figure:: logo/plat_sponsors.png
    :scale: 100 %
    :align: center
    :figclass: align-center
    :alt: Platinum Sponsors
-   :target: https://machinefactor.tech/
+   :target: https://hudsonthames.org/sponsors/
 
 Gold Sponsors:
 **************
 
 .. figure:: logo/gold_sponsors.png
-   :scale: 100 %
-   :align: center
-   :figclass: align-center
-   :alt: Gold Sponsors
-   :target: https://hudsonthames.org/sponsors/
-
-.. figure:: logo/ali_saif.jpg
    :scale: 100 %
    :align: center
    :figclass: align-center
@@ -263,6 +256,7 @@ This project is licensed under an all rights reserved licence.
     getting_started/barriers_to_entry
     getting_started/researcher
     getting_started/datasets
+    getting_started/research_tools
 
 .. toctree::
     :maxdepth: 2
@@ -271,11 +265,21 @@ This project is licensed under an all rights reserved licence.
 
     implementations/data_structures
     implementations/filters
-    implementations/codependence
     implementations/frac_diff
     implementations/structural_breaks
     implementations/microstructural_features
 
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Codependence
+    :hidden:
+
+    codependence/introduction
+    codependence/correlation_based_metrics
+    codependence/information_theory_metrics
+    codependence/codependence_marti
+    codependence/codependence_matrix
 
 .. toctree::
     :maxdepth: 2
@@ -286,6 +290,9 @@ This project is licensed under an all rights reserved licence.
     implementations/labeling_trend_scanning
     implementations/labeling_tail_sets
     implementations/labeling_fixed_time_horizon
+    implementations/labeling_excess_median
+    implementations/labeling_raw_return
+    implementations/labeling_vs_benchmark
 
 .. toctree::
     :maxdepth: 2

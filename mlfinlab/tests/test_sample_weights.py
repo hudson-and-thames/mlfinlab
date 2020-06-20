@@ -40,14 +40,15 @@ class TestSampling(unittest.TestCase):
                                               min_ret=0.005,
                                               num_threads=3,
                                               vertical_barrier_times=vertical_barriers,
-                                              side_prediction=self.data['side'])
+                                              side_prediction=self.data['side'],
+                                              verbose=False)
 
     def test_ret_attribution(self):
         """
         Assert that return attribution length equals triple barrier length, check particular values
         """
         non_nan_meta_labels = self.meta_labeled_events.dropna()
-        ret_weights = get_weights_by_return(non_nan_meta_labels, self.data['close'])
+        ret_weights = get_weights_by_return(non_nan_meta_labels, self.data['close'], verbose=False)
         self.assertTrue(ret_weights.shape[0] == non_nan_meta_labels.shape[0])
         self.assertTrue(abs(ret_weights.iloc[0] - 0.781807) <= 1e5)
         self.assertTrue(abs(ret_weights.iloc[3] - 1.627944) <= 1e5)
@@ -57,11 +58,11 @@ class TestSampling(unittest.TestCase):
         Assert that time decay weights length equals triple barrier length, check particular values
         """
         non_nan_meta_labels = self.meta_labeled_events.dropna()
-        standard_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=0.5)
-        no_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=1)
-        neg_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=-0.5)
-        converge_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=0)
-        pos_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=1.5)
+        standard_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=0.5, verbose=False)
+        no_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=1, verbose=False)
+        neg_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=-0.5, verbose=False)
+        converge_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=0, verbose=False)
+        pos_decay = get_weights_by_time_decay(non_nan_meta_labels, self.data['close'], decay=1.5, verbose=False)
 
         self.assertTrue(standard_decay.shape == no_decay.shape)
         self.assertTrue(standard_decay.shape == neg_decay.shape)
