@@ -4,7 +4,6 @@ Eigenportfolio applications
 import pandas as pd
 import numpy as np
 
-from .base import _calc_rolling_reg_params, _rolling_window
 
 
 def calc_all_eigenportfolio(data, num):
@@ -77,7 +76,7 @@ def calc_rolling_eigenportfolio(data, num, window):
     np_data = np.array(data)
 
     # Rolled data.
-    data = _rolling_window(np_data, window)
+    #data = _rolling_window(np_data, window)
 
 
     return
