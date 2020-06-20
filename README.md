@@ -113,7 +113,7 @@ Benefits include:
 ### Gold Sponsors:
 <div align="center">
    <a href="https://hudsonthames.org/sponsors/">
-   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/docs/source/logo/gold_sponsors.png" height="400"><br>
+   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/docs/source/logo/gold_sponsors.png" height="325"><br>
 </div>
 
 
