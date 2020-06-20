@@ -20,6 +20,9 @@ class Eigenportfolio(StatArb):
     - ``self.z_score`` (pd.DataFrame) Z-score calculated from cumulative residuals.
     - ``self.intercept`` (bool) Checks to include constant term for regression. (Default) True.
     - ``self.window`` (int) Number of window to roll. (Default) 0 if no rolling.
+    - ``self.eigenportfolio`` (pd.DataFrame) Eigenportfolio calculated from PCA.
+    - ``self.pc_num`` (int) Number of principal components.
+    - ``self.pca`` (np.array) Projected log_returns data according to PCA.
     """
 
     def __init__(self):
@@ -37,18 +40,19 @@ class Eigenportfolio(StatArb):
         :param window: (int) Length of rolling windows. (Default) 0 if no rolling.
         :param intercept: (bool) Indicates presence of intercept for the regression. (Default) True.
         """
-        # Check some conditions.
-        # self._check(data, pc, window, intercept)
+        # Check conditions.
+        self._check(data, pc_num, window, intercept)
 
         # Set pc, intercept and window.
         self.pc_num = pc_num
         self.intercept = intercept
         self.window = window
 
-        # Set index, column, and price data.
+        # Set index, column, price data, and number of assets.
         self.idx = data.index
         self.col = data.columns
         self.price = data
+        self.num_assets = len(self.col)
 
         # Convert given prices to np.array of log returns.
         self.log_returns = self._calc_log_returns(data)
@@ -73,6 +77,9 @@ class Eigenportfolio(StatArb):
 
             # Calculate z-score.
             self.z_score = self._calc_zscore(self.cum_resid)
+        else:
+            # Allocate with rolling windows.
+            self._rolling_allocate(self.log_returns)
 
         # Convert log returns to pd.DataFrame.
         self.log_returns = pd.DataFrame(self.log_returns, index=self.idx, columns=self.col)
@@ -92,6 +99,114 @@ class Eigenportfolio(StatArb):
         # Convert eigenportfolio.
         self._convert_eigenportfolio(self.eigenportfolio)
 
+    @staticmethod
+    def _check(*args):
+        """
+        Checks if the user given variables are correct.
+
+        :param args: User given data, pc_num, window, intercept.
+        """
+        # Set values.
+        data, pc_num, window, intercept = args[0], args[1], args[2], args[3]
+
+        # Check if data is a pd.DataFrame.
+        if not isinstance(data, pd.DataFrame):
+            raise ValueError("Data must be a pd.DataFrame.")
+
+        # Check that the given data has no null value.
+        if data.isnull().any().sum() != 0:
+            raise ValueError("Given data contains values of null. Remove the null values.")
+
+        # Check that the given data has no values of 0.
+        if (data == 0).any().sum() != 0:
+            raise ValueError("Given data contains values of 0. Remove the 0 values.")
+
+        # Check if pc_num is an integer.
+        if not isinstance(pc_num, int):
+            raise ValueError("Number of principal components must be an integer.")
+
+        # Check if the range of pc_num is correct.
+        if pc_num < 0 or pc_num > data.shape[1]:
+            raise ValueError("Number of principal components must be between 0 and the number of "
+                             "assets. 0 indicates using all components.")
+
+        # Check if window is an integer.
+        if not isinstance(window, int):
+            raise ValueError("Length of window must be an integer.")
+
+        # Check if the range of window is correct.
+        if window < 0 or window > data.shape[0]:
+            raise ValueError("Length of window must be between 0 and the number of "
+                             "periods. 0 indicates using the entire data.")
+
+        # Check if intercept is a boolean.
+        if not isinstance(intercept, bool):
+            raise ValueError("Intercept must be either True or False.")
+
+    def _calc_rolling_params(self, data, adj_window):
+        """
+        Helper function to calculate rolling eigenportfolio parameters.
+
+        :param data: (np.array) Rolling window of combined x and y log returns.
+        :param adj_window: (int) Adjusted window to set values for the arrays.
+        """
+        pca, eigenportfolio = self._calc_pca(data, self.pc_num)
+
+        # If intercept is True, add a constant of 1 on the right side of np_x.
+        if self.intercept:
+            pca = self._add_constant(pca)
+
+        # Calculate the beta coefficients for linear regression.
+        beta = self._linear_regression(pca, data)
+
+        # Calculate spread of residuals.
+        resid = data - pca.dot(beta)
+
+        # Calculate the cumulative sum of residuals.
+        cum_resid = resid.cumsum(axis=0)
+
+        # Calculate and set z-score.
+        self.z_score[adj_window] = self._calc_zscore(cum_resid)[-1]
+
+        # Insert beta.
+        self.beta[adj_window] = beta
+
+        # Insert resid.
+        self.resid[adj_window] = resid[-1]
+
+        # Insert cum_resid.
+        self.cum_resid[adj_window] = cum_resid[-1]
+
+        # Insert eigenportfolio.
+        self.eigenportfolio[adj_window] = eigenportfolio.T
+
+    def _rolling_allocate(self, log_returns):
+        """
+        Calculate allocate with a rolling window.
+
+        :param log_returns: (np.array) Log returns of the given data.
+        """
+        # Preset variables.
+        self.beta = np.zeros((log_returns.shape[0], self.intercept + self.pc_num, self.num_assets))
+        self.resid = np.zeros((log_returns.shape[0], self.num_assets))
+        self.cum_resid = np.zeros((log_returns.shape[0], self.num_assets))
+        self.z_score = np.zeros((log_returns.shape[0], self.num_assets))
+        self.eigenportfolio = np.zeros((log_returns.shape[0], self.pc_num, self.num_assets))
+
+        # Rolling combined data.
+        log_returns = self._rolling_window(log_returns, self.window)
+
+        # Fill in the array.
+        for itr in range(log_returns.shape[0]):
+            self._calc_rolling_params(log_returns[itr], itr + self.window - 1)
+
+        # Set np.nan for values before the initial window.
+        self.beta[:self.window - 1] = np.nan
+        self.resid[:self.window - 1] = np.nan
+        self.cum_resid[:self.window - 1] = np.nan
+        self.z_score[:self.window - 1] = np.nan
+        self.eigenportfolio[:self.window - 1] = np.nan
+
     def _convert_eigenportfolio(self, eigenportfolio):
         """
         Converts given np.array of eigenportfolios to pd.DataFrame.
@@ -106,7 +221,8 @@ class Eigenportfolio(StatArb):
             eigen_idx.append('eigenportfolio {}'.format(i))
 
         # Set self.eigenportfolio.
-        self.eigenportfolio = pd.DataFrame(eigenportfolio, index=self.col, columns=eigen_idx).T
+        self.eigenportfolio = pd.concat([pd.DataFrame(b, index=eigen_idx, columns=self.col)
+                                         for b in self.eigenportfolio], keys=self.idx)
 
     def _convert_zscore(self, z_score):
         """
@@ -150,7 +266,8 @@ class Eigenportfolio(StatArb):
             beta_idx.append('constants')
 
         # Set self.beta.
-        self.beta = pd.DataFrame(beta, index=beta_idx, columns=self.col)
+        self.beta = pd.concat([pd.DataFrame(b, index=beta_idx, columns=self.col)
+                               for b in self.beta], keys=self.idx)
 
     @staticmethod
     def _calc_pca(data, num):
@@ -197,54 +314,3 @@ class Eigenportfolio(StatArb):
         res = np.array(res).reshape(res.shape)
 
         return res
-
-
-def calc_rolling_eigenportfolio(data, num, window):
-    """
-    Calculate the rolling residuals and eigenportfolio for the number of principal components and
-    number of rolling windows.
-
-    :param data: (pd.DataFrame) User given data.
-    :param num: (int) Number of top-principal components.
-    :param window: (int) Number of rolling window.
-    :return: (pd.DataFrame) The residuals and eigenportfolio of the given data and principal components.
-    """
-    # Change data into log returns.
-    data = np.log(data).diff().fillna(0)
-
-    # Convert to np.array.
-    np_data = np.array(data)
-
-    # Rolled data.
-    # data = _rolling_window(np_data, window)
-
-    return
-
-
-def _calc_rolling_eig_params(data, num):
-    """
-    Helper function to calculate rolling eigenportfolio parameters.
-
-    :param data: (np.array) Rolling window of original data.
-    :return: (np.array) Data_x, data_y, beta, constant, spread, cum_resid, and z-score.
-    """
-
-    # Calculate beta, the slope and intercept.
-    try:
-        beta = np.linalg.inv(np_x.T.dot(np_x)).dot(np_x.T).dot(np_y)
-    except:
-        beta = np.linalg.pinv(np_x.T.dot(np_x)).dot(np_x.T).dot(np_y)
-
-    # Calculate spread.
-    spread = np_y - np_x.dot(beta)
-
-    # Calculate cumulative sum of spread of returns.
-    cum_resid = spread.cumsum()
-
-    # Calculate z-score.
-    z_score = (cum_resid[-1] - np.mean(cum_resid)) / np.std(cum_resid)
-
-    # Separate the resulting array.
-    res = np.array([beta[0][0], beta[1][0], spread[-1][0], cum_resid[-1], z_score])
-
-    return res

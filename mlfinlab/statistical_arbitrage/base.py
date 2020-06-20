@@ -34,6 +34,7 @@ class StatArb:
         self.window = 0
         self.idx = None
         self.col = None
+        self.num_assets = None
         # self.signal = None (To be implemented)
 
     def allocate(self, price_x, price_y, window=0, intercept=True):
@@ -46,11 +47,12 @@ class StatArb:
         :param intercept: (bool) Indicates presence of intercept for the regression. (Default) True.
         """
         # Check some conditions.
-        # self._check(price_x, price_y, window, intercept)
+        self._check(price_x, price_y, window, intercept)
 
-        # Set intercept and window.
+        # Set intercept, window, and num_assets.
         self.intercept = intercept
         self.window = window
+        self.num_assets = 2
 
         # Convert given prices to np.array of log returns.
         np_x = self._calc_log_returns(price_x)
@@ -74,7 +76,11 @@ class StatArb:
             # Calculate z-score.
             self.z_score = self._calc_zscore(self.cum_resid)
         else:
-            self._rolling_allocate(np_x, np_y)
+            # Combine np_x and np_y.
+            np_xy = np.hstack((np_x, np_y))
+
+            # Allocate with rolling windows.
+            self._rolling_allocate(np_xy)
 
         # Convert prices to pd.DataFrame.
         self._convert_price(price_x, price_y)
@@ -94,21 +100,65 @@ class StatArb:
         # Convert z_score.
         self._convert_zscore(self.z_score)
 
-    def _rolling_allocate(self, np_x, np_y):
+    @staticmethod
+    def _check(*args):
+        """
+        Checks if the user given variables are correct.
+
+        :param args: User given price_x, price_y, window, intercept.
+        """
+        # Set values.
+        price_x, price_y, window, intercept = args[0], args[1], args[2], args[3]
+
+        # Check if price_x is a pd.Series.
+        if not isinstance(price_x, pd.Series):
+            raise ValueError("Price x must be a pd.Series.")
+
+        # Check if price_y is a pd.Series.
+        if not isinstance(price_y, pd.Series):
+            raise ValueError("Price y must be a pd.Series.")
+
+        # Check that the given data has no null value.
+        if price_x.isnull().any().sum() != 0:
+            raise ValueError("Given price x contains values of null. Remove the null values.")
+        if price_y.isnull().any().sum() != 0:
+            raise ValueError("Given price y contains values of null. Remove the null values.")
+
+        # Check that the given data has no values of 0.
+        if (price_x == 0).any().sum() != 0:
+            raise ValueError("Given price x contains values of 0. Remove the 0 values.")
+        # Check that the given data has no values of 0.
+        if (price_y == 0).any().sum() != 0:
+            raise ValueError("Given price y contains values of 0. Remove the 0 values.")
+
+        # Check if the indices for x and y match.
+        if not ((price_x.index == price_y.index).all()):
+            raise ValueError("Indices for price x and y do not match.")
+
+        # Check if window is an integer.
+        if not isinstance(window, int):
+            raise ValueError("Length of window must be an integer.")
+
+        # Check if the range of window is correct.
+        if window < 0 or window > price_x.shape[0]:
+            raise ValueError("Length of window must be between 0 and the number of "
+                             "periods. 0 indicates using the entire data.")
+
+        # Check if intercept is a boolean.
+        if not isinstance(intercept, bool):
+            raise ValueError("Intercept must be either True or False.")
+
+    def _rolling_allocate(self, np_xy):
         """
         Calculate allocate with a rolling window.
 
-        :param np_x: (np.array) Log returns of price_x.
-        :param np_y: (np.array) Log returns of price_y.
+        :param np_xy: (np.array) Log returns of price_x and price_y.
         """
         # Preset variables.
-        self.beta = np.zeros((self.intercept+1, np_x.shape[0]))
-        self.resid = np.zeros((np_x.shape[0], 1))
-        self.cum_resid = np.zeros((np_x.shape[0], 1))
-        self.z_score = np.zeros((np_x.shape[0], 1))
-
-        # Combine np_x and np_y.
-        np_xy = np.hstack((np_x, np_y))
+        self.beta = np.zeros((self.intercept+1, np_xy.shape[0]))
+        self.resid = np.zeros((np_xy.shape[0], 1))
+        self.cum_resid = np.zeros((np_xy.shape[0], 1))
+        self.z_score = np.zeros((np_xy.shape[0], 1))
 
         # Rolling combined data.
         np_xy = self._rolling_window(np_xy, self.window)
