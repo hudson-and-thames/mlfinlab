@@ -42,7 +42,7 @@ class StatArb:
 
         :param price_x: (pd.Series) Time series of price of x (DO NOT adjust for log).
         :param price_y: (pd.Series) Time series of price of y (DO NOT adjust for log).
-        :param window: (int) Number of window to roll. (Default) 0 if no rolling.
+        :param window: (int) Length of rolling windows. (Default) 0 if no rolling.
         :param intercept: (bool) Indicates presence of intercept for the regression. (Default) True.
         """
         # Check some conditions.

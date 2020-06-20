@@ -3,60 +3,141 @@ Eigenportfolio applications
 """
 import pandas as pd
 import numpy as np
+from .base import StatArb
 
 
-
-def calc_all_eigenportfolio(data, num):
+class Eigenportfolio(StatArb):
     """
-    Calculate the spread, z_score, and eigenportfolio for the number of principal components.
+    Implements Eigenportfolio.
 
-    :param data: (pd.DataFrame) User given data.
-    :param num: (int) Number of top-principal components.
-    :return: (pd.DataFrame) The spread, z-score, and eigenportfolio of the given data and principal
-        components.
+    Possible outputs are:
+
+    - ``self.price`` (pd.DataFrame) Price of the given assets.
+    - ``self.log_returns`` (pd.DataFrame) Log returns calculated by given price data.
+    - ``self.beta`` (pd.DataFrame) Regression parameters.
+    - ``self.resid`` (pd.DataFrame) Residuals from Regression.
+    - ``self.cum_resid`` (pd.DataFrame) Cumulative residuals from Regression.
+    - ``self.z_score`` (pd.DataFrame) Z-score calculated from cumulative residuals.
+    - ``self.intercept`` (bool) Checks to include constant term for regression. (Default) True.
+    - ``self.window`` (int) Number of window to roll. (Default) 0 if no rolling.
     """
-    # Change data into log returns.
-    data = np.log(data).diff().fillna(0)
 
-    # Calculate the projection and eigenvector from the PCA of data.
-    data_proj, data_eigvec = calc_pca(data, num)
+    def __init__(self):
+        self.eigenportfolio = None
+        self.pc = None
+        self.window = None
+        self.intercept = None
 
-    # Add a constant of 1 on the right side for data_proj to account for intercepts.
-    data_proj = np.hstack((data_proj, np.ones((data_proj.shape[0], 1))))
+    def allocate(self, data, pc=0, window=0, intercept=True):
+        """
+        Calculate eigenportfolios for a given data, number of principal components, and window value.
 
-    # Linear regression by matrix multiplication.
-    beta = np.linalg.inv(data_proj.T.dot(data_proj)).dot(data_proj.T).dot(np.array(data))
+        :param data: (pd.DataFrame) Time series of different assets.
+        :param pc: (int) Number of principal components. (Default) 0, if using all components.
+        :param window: (int) Length of rolling windows. (Default) 0 if no rolling.
+        :param intercept: (bool) Indicates presence of intercept for the regression. (Default) True.
+        """
+        # Check some conditions.
+        # self._check(data, pc, window, intercept)
 
-    # Calculate spread.
-    spread = data - data_proj.dot(beta)
+        # Set pc, intercept and window.
+        self.pc = pc
+        self.intercept = intercept
+        self.window = window
 
-    # Calculate cumulative sum of spread of returns.
-    cum_resid = spread.cumsum()
+        # Convert given prices to np.array of log returns.
+        np_data = self._calc_log_returns(data)
 
-    # Calculate z-score.
-    z_score = (cum_resid - np.mean(cum_resid)) / np.std(cum_resid)
+    @staticmethod
+    def _calc_pca(data, num):
+        """
+        Calculates the PCA projection of the data onto the n-top components.
 
-    # Index name for beta.
-    beta_idx = []
+        :param data: (np.array) Data to be projected.
+        :param num: (int) Number of top-principal components.
+        :return: (tuple) (np.array) Projected data, (np.array) Eigenvectors
+        """
+        # Standardize the data.
+        data = (data - data.mean(axis=0)) / np.std(data, axis=0)
 
-    # Index name for eigenportfolio.
-    eigenp_idx = []
+        # Calculate the covariance matrix.
+        cov = data.T.dot(data) / data.shape[0]
 
-    # Set index name.
-    for i in range(beta.shape[0] - 1):
-        beta_idx.append('weight {}'.format(i))
-        eigenp_idx.append('eigenportfolio {}'.format(i))
-    beta_idx.append('constants')
+        # Calculate the eigenvalue and eigenvector.
+        eigval, eigvec = np.linalg.eigh(cov)
 
-    # Conver to pd.DataFrame.
-    beta = pd.DataFrame(beta, index=beta_idx, columns=data.columns)
-    data_eigvec = pd.DataFrame(data_eigvec.T, index=eigenp_idx, columns=data.columns)
+        # Get the index by sorting eigenvalue in descending order.
+        idx = np.argsort(eigval)[::-1]
 
-    # Combine all dataframes.
-    combined_df = pd.concat([data, data_eigvec, beta, spread, cum_resid, z_score], axis=0,
-                            keys=['log_ret', 'eigenportfolio', 'beta', 'ret_spread', 'cum_resid',
-                                  'z_score'])
-    return combined_df
+        # Sort eigenvector according to principal components.
+        eigvec = eigvec[:, idx[:num]]
+
+        # Projected data and eigenvector.
+        return data.dot(eigvec), eigvec
+
+    @staticmethod
+    def _calc_log_returns(price):
+        """
+        Calculate the log returns for the given price data.
+
+        :param price: (pd.DataFrame) Time series of prices.
+        :return: (np.array) Log returns for the given price data.
+        """
+        # Convert to log.
+        res = np.log(price)
+
+        # Take the difference and replace the first value with 0.
+        res = res.diff().fillna(0)
+
+        # Conver to np.array and reshape to make a column format.
+        res = np.array(np.log(res).diff().fillna(0)).reshape(res.shape)
+
+        return res
+
+
+
+    # # Change data into log returns.
+    # data = np.log(data).diff().fillna(0)
+    #
+    # # Calculate the projection and eigenvector from the PCA of data.
+    # data_proj, data_eigvec = calc_pca(data, num)
+    #
+    # # Add a constant of 1 on the right side for data_proj to account for intercepts.
+    # data_proj = np.hstack((data_proj, np.ones((data_proj.shape[0], 1))))
+    #
+    # # Linear regression by matrix multiplication.
+    # beta = np.linalg.inv(data_proj.T.dot(data_proj)).dot(data_proj.T).dot(np.array(data))
+    #
+    # # Calculate spread.
+    # spread = data - data_proj.dot(beta)
+    #
+    # # Calculate cumulative sum of spread of returns.
+    # cum_resid = spread.cumsum()
+    #
+    # # Calculate z-score.
+    # z_score = (cum_resid - np.mean(cum_resid)) / np.std(cum_resid)
+    #
+    # # Index name for beta.
+    # beta_idx = []
+    #
+    # # Index name for eigenportfolio.
+    # eigenp_idx = []
+    #
+    # # Set index name.
+    # for i in range(beta.shape[0] - 1):
+    #     beta_idx.append('weight {}'.format(i))
+    #     eigenp_idx.append('eigenportfolio {}'.format(i))
+    # beta_idx.append('constants')
+    #
+    # # Conver to pd.DataFrame.
+    # beta = pd.DataFrame(beta, index=beta_idx, columns=data.columns)
+    # data_eigvec = pd.DataFrame(data_eigvec.T, index=eigenp_idx, columns=data.columns)
+    #
+    # # Combine all dataframes.
+    # combined_df = pd.concat([data, data_eigvec, beta, spread, cum_resid, z_score], axis=0,
+    #                         keys=['log_ret', 'eigenportfolio', 'beta', 'ret_spread', 'cum_resid',
+    #                               'z_score'])
+    # return combined_df
 
 
 def calc_rolling_eigenportfolio(data, num, window):
@@ -112,29 +193,3 @@ def _calc_rolling_eig_params(data, num):
 
     return res
 
-
-def calc_pca(data, num):
-    """
-    Calculates the PCA projection of the data onto the n-top components.
-
-    :param data: (np.array) Data to be projected.
-    :param num: (int) Number of top-principal components.
-    :return: (tuple) (np.array) Projected data, (np.array) Eigenvectors
-    """
-    # Standardize the data.
-    data = (data - data.mean(axis=0)) / np.std(data, axis=0)
-
-    # Calculate the covariance matrix.
-    cov = data.T.dot(data) / data.shape[0]
-
-    # Calculate the eigenvalue and eigenvector.
-    eigval, eigvec = np.linalg.eigh(cov)
-
-    # Get the index by sorting eigenvalue in descending order.
-    idx = np.argsort(eigval)[::-1]
-
-    # Sort eigenvector according to principal components.
-    eigvec = eigvec[:, idx[:num]]
-
-    # Projected data and eigenvector.
-    return data.dot(eigvec), eigvec
