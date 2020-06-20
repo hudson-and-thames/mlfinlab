@@ -20,10 +20,10 @@ class MatrixFlagLabels:
     weaknesses in Leigh's original template. Additionally, he applies this bull flag labeling method to intraday
     candlestick data, rather than just closing prices.
 
-    To find the total weight for a given day (or tick), the current price as well as the preceding window days (or
-    ticks) number of prices is used. The data window is split into 10 buckets each containing a chronological tenth of
-    the data window. Each point in 1 bucket is put into a decile corresponding to a position in a column based
-    on percentile relative to the entire data window. Bottom 10% on lowest row, next 10% on second  lowest row etc.
+    To find the total weight for a given day, the current price as well as the preceding window days number of prices is
+    used. The data window is split into 10 buckets each containing a chronological tenth of the data window. Each point
+    in 1 bucket is put into a decile corresponding to a position in a column based on percentile relative to the entire
+    data window. Bottom 10% on lowest row, next 10% on second lowest row etc.
     The proportion of points in each decile is reported to finalize the column. The first tenth of the data is
     transformed to the leftmost column, the next tenth to the next column on the right and so on until finally a 10 by
     10 matrix is achieved. This matrix is then multiplied element-wise with the 10 by 10 template, and the sum of all
@@ -33,6 +33,10 @@ class MatrixFlagLabels:
     """
 
     def __init__(self, data, window):
+        """
+        :param data: (pd.Series) Price data for one stock.
+        :param window: (int) Length of preceding data window used when generating the fit matrix for one day.
+        """
         assert (len(data) >= 10), "Length of data must be at least 10."
         assert (window >= 10), "Window must be at least 10."
         assert (len(data) >= window), "Window cannot be greater than length of data."
