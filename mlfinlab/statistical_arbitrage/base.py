@@ -8,6 +8,7 @@ import pandas as pd
 
 
 class StatArb:
+    # pylint: disable=too-many-instance-attributes
     """
     Implements Statistical Arbitrage.
 
@@ -286,7 +287,7 @@ class StatArb:
         :param data: (np.array) Data for z-score calculation.
         :return: (np.array) Z-score of the given data.
         """
-        return (data - np.mean(data, axis=0)) / np.std(data, axis=0)
+        return np.nan_to_num((data - np.mean(data, axis=0)) / np.std(data, axis=0))
 
     @staticmethod
     def _linear_regression(data_x, data_y):

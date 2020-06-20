@@ -7,6 +7,8 @@ from .base import StatArb
 
 
 class Eigenportfolio(StatArb):
+    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=arguments-differ
     """
     Implements Eigenportfolio.
 
@@ -222,7 +224,7 @@ class Eigenportfolio(StatArb):
 
         # Set self.eigenportfolio.
         self.eigenportfolio = pd.concat([pd.DataFrame(b, index=eigen_idx, columns=self.col)
-                                         for b in self.eigenportfolio], keys=self.idx)
+                                         for b in eigenportfolio], keys=self.idx)
 
     def _convert_zscore(self, z_score):
         """

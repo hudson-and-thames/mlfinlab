@@ -5,11 +5,12 @@ Test StatArb.
 import unittest
 import os
 import pandas as pd
+import numpy as np
 
 from mlfinlab.statistical_arbitrage import StatArb
 
 
-class TestPairsRegression(unittest.TestCase):
+class TestStatArb(unittest.TestCase):
     """
     Test StatArb.
     """
@@ -27,57 +28,106 @@ class TestPairsRegression(unittest.TestCase):
 
     def test_pairs_trading(self):
         """
-        Test pairs trading.
+        Test pairs trading for all and rolling windows.
         """
         # Initialize StatArb.
         model = StatArb()
+        model1 = StatArb()
+        model2 = StatArb()
+        model3 = StatArb()
+
         # Allocate data to model.
-        model.allocate(self.data.iloc[:, 0], self.data.iloc[:, 1])
+        model.allocate(self.data.iloc[:, 0], self.data.iloc[:, 1], intercept=False)
+        model1.allocate(self.data.iloc[:, 0], self.data.iloc[:, 1], window=4, intercept=False)
+        model2.allocate(self.data.iloc[:, 0], self.data.iloc[:, 1], window=6)
+        model3.allocate(self.data.iloc[:, 0], self.data.iloc[:, 1])
 
+    def test_value_error(self):
+        """
+        Tests ValueError for the user given inputs.
+        """
+        price_x = self.data.iloc[:, 0]
+        price_y = self.data.iloc[:, 1]
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = StatArb()
+            # Check if price_x is a series.
+            model.allocate(1, price_y)
 
-    # def test_all_pairs_regression(self):
-    #     """
-    #     Test pairs regression.
-    #     """
-    #     res = calc_all_pairs_regression(self.data.iloc[:, 0], self.data.iloc[:, 1])
-    #
-    #     # Check shape.
-    #     self.assertEqual(res.shape[0], 2141)
-    #     self.assertEqual(res.shape[1], 9)
-    #
-    #     # Check all values.
-    #     self.assertAlmostEqual(res.iloc[:, 0][3], 48.57666, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 1][279], 15.899999, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 2][1027], -0.01450508, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 3][586], -0.00373308, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 4][1788], 0.75397453, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 5][2000], 0, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 6][786], 0.00270831, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 7][182], -0.0668679, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 8][999], -1.4291310, delta=1e-3)
-    #
-    # def test_rolling_pairs_regression(self):
-    #     """
-    #     Test rolling pairs regression.
-    #     """
-    #
-    #     # Singular matrix problem within window of 2.
-    #     res = calc_rolling_pairs_regression(self.data.iloc[:, 3], self.data.iloc[:, 4], window=2)
-    #
-    #     # Calculated results.
-    #     res = calc_rolling_pairs_regression(self.data.iloc[:, 0], self.data.iloc[:, 1], window=60)
-    #
-    #     # Check shape.
-    #     self.assertEqual(res.shape[0], 2141)
-    #     self.assertEqual(res.shape[1], 9)
-    #
-    #     # Check all values.
-    #     self.assertAlmostEqual(res.iloc[:, 0][3], 48.5766677, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 1][279], 15.899999, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 2][1027], -0.01450508, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 3][586], -0.00373308, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 4][1788], 0.65632123, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 5][2000], 0.0004675070, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 6][786], 0.00106000, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 7][182], 0, delta=1e-3)
-    #     self.assertAlmostEqual(res.iloc[:, 8][999], -1.07505059, delta=1e-3)
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = StatArb()
+            # Check if price_y is a series.
+            model.allocate(price_x, 1)
+
+        # Create null series.
+        null_price = price_x.copy()
+        null_price[:] = np.nan
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = StatArb()
+            # Check if price_x is null.
+            model.allocate(null_price, price_y)
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = StatArb()
+            # Check if price_y is null.
+            model.allocate(price_x, null_price)
+
+        # Create zero series.
+        zero_price = price_x.copy()
+        zero_price[:] = 0
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = StatArb()
+            # Check if price_x is null.
+            model.allocate(zero_price, price_y)
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = StatArb()
+            # Check if price_y is null.
+            model.allocate(price_x, zero_price)
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = StatArb()
+            # Check if price indices are the same.
+            model.allocate(price_x[0:500], price_y[1:501])
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = StatArb()
+            # Check if window is negative.
+            model.allocate(price_x, price_y, window=-1)
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = StatArb()
+            # Check if window is an integer.
+            model.allocate(price_x, price_y, window=0.5)
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = StatArb()
+            # Check if window is less than the index.
+            model.allocate(price_x, price_y, window=4000)
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = StatArb()
+            # Check if intercept is a boolean.
+            model.allocate(price_x, price_y, intercept=1)
+
+    def test_pinv_edge(self):
+        """
+        Tests pinv edge case for singular matrix.
+        """
+        # Initialize StatArb.
+        model = StatArb()
+
+        # Allocate data to model.
+        model.allocate(self.data.iloc[:, 0], self.data.iloc[:, 0], window=1)
