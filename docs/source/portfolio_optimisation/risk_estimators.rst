@@ -53,7 +53,7 @@ This class provides functions for calculating different types of covariance matr
 
 
 Minimum Covariance Determinant
-==============================
+##############################
 
 Minimum Covariance Determinant (MCD) is a robust estimator of covariance that was introduced by P.J. Rousseeuw.
 
@@ -69,7 +69,7 @@ Our method is a wrapper for the sklearn MinCovDet class. For more details about 
 visit `sklearn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.covariance.MinCovDet.html>`__.
 
 Implementation
-##############
+**************
 
 .. py:currentmodule:: mlfinlab.portfolio_optimization.risk_estimators
 
@@ -77,8 +77,10 @@ Implementation
    :members: __init__, minimum_covariance_determinant
 
 
+----
+
 Maximum Likelihood Covariance Estimator (Empirical Covariance)
-==============================================================
+##############################################################
 
 Maximum Likelihood Estimator of a sample is an unbiased estimator of the corresponding population’s covariance matrix.
 
@@ -93,15 +95,17 @@ Our method is a wrapper for the sklearn EmpiricalCovariance class. For more deta
 please visit `sklearn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.covariance.EmpiricalCovariance.html>`__.
 
 Implementation
-##############
+**************
 
 .. autoclass:: RiskEstimators
    :noindex:
    :members: empirical_covariance
 
 
+----
+
 Covariance Estimator with Shrinkage
-===================================
+###################################
 
 Shrinkage allows one to avoid the inability to invert the covariance matrix due to numerical reasons. Shrinkage consists
 of reducing the ratio between the smallest and the largest eigenvalues of the empirical covariance matrix.
@@ -145,15 +149,17 @@ For more details about the function and its parameters, please visit `sklearn do
       Shrinkage methods are described in greater detail in the works listed in the introduction.
 
 Implementation
-##############
+**************
 
 .. autoclass:: RiskEstimators
    :noindex:
    :members: shrinked_covariance
 
 
+----
+
 Semi-Covariance Matrix
-======================
+######################
 
 Semi-Covariance matrix is used to measure the downside volatility of a portfolio and can be used as a measure to minimize it.
 This metric also allows measuring the volatility of returns below a specific threshold.
@@ -174,15 +180,17 @@ If the :math:`B` is set to zero, the volatility of negative returns is measured.
       An example of Semi-Covariance usage can be found `here <https://www.solactive.com/wp-content/uploads/2018/04/Solactive_Minimum-Downside-Volatility-Indices.pdf>`__.
 
 Implementation
-##############
+**************
 
 .. autoclass:: RiskEstimators
    :noindex:
    :members: semi_covariance
 
 
+----
+
 Exponentially-Weighted Covariance Matrix
-========================================
+########################################
 
 Each element in the Exponentially-weighted Covariance matrix is the last element from an exponentially weighted moving average
 series based on series of covariances between returns of the corresponding assets. It's used to give greater weight to most
@@ -215,15 +223,17 @@ and :math:`j^{th}` asset, :math:`EWMA(\sum)_{t}` is the :math:`t^{th}` observati
 moving average of :math:`\sum`.
 
 Implementation
-##############
+**************
 
 .. autoclass:: RiskEstimators
    :noindex:
    :members: exponential_covariance
 
 
+----
+
 De-noising and De-toning Covariance/Correlation Matrix
-======================================================
+######################################################
 
 Two methods for de-noising are implemented in this module:
 
@@ -231,7 +241,7 @@ Two methods for de-noising are implemented in this module:
 - Targeted Shrinkage
 
 Constant Residual Eigenvalue De-noising Method
-##############################################
+**********************************************
 
 The main idea behind the Constant Residual Eigenvalue de-noising method is to separate the noise-related eigenvalues from
 the signal-related ones. This is achieved by fitting the Marcenko-Pastur distribution of the empirical distribution of
@@ -292,7 +302,7 @@ The de-noising function works as follows:
     Lopez de Prado suggests that this de-noising algorithm is preferable as it removes the noise while preserving the signal.
 
 Targeted Shrinkage De-noising
-#############################
+*****************************
 
 The main idea behind the Targeted Shrinkage de-noising method is to shrink the eigenvectors/eigenvalues that are
 noise-related. This is done by shrinking the correlation matrix calculated from noise-related eigenvectors/eigenvalues
@@ -331,7 +341,7 @@ The de-noising function works as follows:
 (If the correlation matrix is given as an input, the first and the last steps of the algorithm are omitted)
 
 De-toning
-#########
+*********
 
 De-noised correlation matrix from the previous methods can also be de-toned by excluding a number of first
 eigenvectors representing the market component.
@@ -379,15 +389,17 @@ The de-toning function works as follows:
 
 
 Implementation
-##############
+**************
 
 .. autoclass:: RiskEstimators
    :noindex:
    :members: denoise_covariance
 
 
+----
+
 Example Code
-============
+############
 
 .. code-block::
 
