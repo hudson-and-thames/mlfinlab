@@ -33,7 +33,10 @@ class MatrixFlagLabels:
     """
 
     def __init__(self, data, window):
-        # PUT ASSERTIONS THAT LEN OF DATA AND WINDOW MUST BE AT LEAST 10 #
+        assert (len(data) >= 10), "Length of data must be at least 10."
+        assert (window >= 10), "Window must be at least 10."
+        assert (len(data) >= window), "Window cannot be greater than length of data."
+        assert isinstance(data, pd.Series), "Data must be pd.Series."
         self.data = data
         self.window = window
         self.template = pd.DataFrame([[.5, 0, -1, -1, -1, -1, -1, -1, -1, 0],  # Leigh's template
@@ -53,6 +56,7 @@ class MatrixFlagLabels:
                             NaN values not allowed, as they will not automatically be treated as zeros.
         """
         assert template.shape == (10, 10), "Template must be 10 by 10."
+        assert not template.isnull().values.any(), "No NaN values allowed in template."
         self.template = template
 
     def _transform_data(self, row_num, window=30):
@@ -120,7 +124,7 @@ class MatrixFlagLabels:
         :param threshold: (float) If None, labels will be returned numerically as the score for the day. If not None,
                         then labels are returned categorically, with the positive category for labels which exceed
                         the threshold.
-        :return: (pd.Series) Flag scores for the data series on each eligible day (meaning for indices self.window and
+        :return: (pd.Series) Total scores for the data series on each eligible day (meaning for indices self.window and
                     onwards).
         """
         labels = []
