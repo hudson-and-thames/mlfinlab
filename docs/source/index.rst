@@ -143,24 +143,17 @@ Benefits include:
 Platinum Sponsor:
 *****************
 
-.. figure:: logo/machine-factor-technologies.png
+.. figure:: logo/plat_sponsors.png
    :scale: 100 %
    :align: center
    :figclass: align-center
    :alt: Platinum Sponsors
-   :target: https://machinefactor.tech/
+   :target: https://hudsonthames.org/sponsors/
 
 Gold Sponsors:
 **************
 
 .. figure:: logo/gold_sponsors.png
-   :scale: 100 %
-   :align: center
-   :figclass: align-center
-   :alt: Gold Sponsors
-   :target: https://hudsonthames.org/sponsors/
-
-.. figure:: logo/ali_saif.jpg
    :scale: 100 %
    :align: center
    :figclass: align-center
