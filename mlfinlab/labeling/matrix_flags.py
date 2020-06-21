@@ -122,7 +122,7 @@ class MatrixFlagLabels:
                     multiplying the matrix element-wise with the template.
         """
         new_mat = matrix * template
-        total_fit = sum(new_mat.sum(axis=0))
+        total_fit = new_mat.values.sum()
         return total_fit
 
     def apply_labeling_matrix(self, threshold=None):

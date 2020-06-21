@@ -13,7 +13,7 @@ using technical charting heuristics. <http://chart-patterns.technicalanalysis.or
 detail.
 
 A bull flag occurs when a stock's price rapidly increases, followed by a downwards trending consolidation period, followed by a breakout
-increase in price legitimizing and increasing on the original increase. As defined, "A bull flag pattern is a horizontal or downward
+increase in price confirming the original increase. As defined, "A bull flag pattern is a horizontal or downward
 sloping flag of consolidation followed by a sharp rise in the positive direction, the breakout." [Leigh et al. 2002].
 Being able to identify the early stages of the breakout process can lead to a profitable strategy of buying the breakout and
 then selling some number of days later, when the price has theoretically stabilized again.
@@ -26,7 +26,7 @@ The bull flag labeling pattern requires the use of a template to match the price
 template.
 
 .. figure:: labeling_images/bull_flag_template.png
-   :scale: 80 %
+   :scale: 60 %
    :align: center
    :figclass: align-center
    :alt: bull flag template
@@ -44,6 +44,23 @@ column is on the left and last column is on the right in the resulting 10 by 10 
 by the template matrix, and all columns are summed. The sum of all columns, finally, is the fit value for the day. If desired, the user
 can specify a threshold to determine positive and negative classes. The value of the threshold depends on how strict of a classifier the user
 desires, and the allowable values based on the template matrix.
+
+The following shows the identified bull flag regions on price data in MSFT stock from 2019-2020 using the original template shown above, with
+a time window of 40 days.
+
+.. figure:: labeling_images/msft_bull_flag40.png
+   :scale: 120 %
+   :align: center
+   :figclass: align-center
+   :alt: bull flag msft
+
+   Bull flag template from Leigh et al. (2002) applied to MSFT data. Green dots show when the template has identified the region as a
+   bull flag breakout point.
+
+The user should know what kind of timescale is desired when deciding the data window for this method. Using a small data window will catch
+small, short-lived trends, while missing longer-term trends, and vice versa for being a large data window. Additionally, the choice of template
+determines which kind of pattern is tracked, and should be customized with respect to the data. A template which is optimal for intraday prices, for
+example, may not work nearly as well for close prices.
 
 .. tip::
    **Simple Example**
@@ -92,6 +109,10 @@ Below is an example on how to use the matrix flags labeling method.
     # Get categorical labels based on whether the day's weight is above 2.5.
     categorical = Flags.apply_labeling_matrix(threshold=2.5)
 
+    # Change the template from default to user defined.
+    new_template = pd.DataFrame(np.random.randint(-3, 3, size=(10, 10)))
+    Flags.set_template(template=new_template)
+
 
 
 Research Notebook
@@ -101,7 +122,7 @@ The following research notebook can be used to better understand the matrix flag
 
 * `Matrix Flags Example`_
 
-.. _`Matrix Flags Example`: link here
+.. _`Matrix Flags Example`: https://github.com/hudson-and-thames/research/blob/master/Labelling/Labels%20Matrix%20Flags/Matrix%20Flag%20Labels.ipynb
 
 
 
