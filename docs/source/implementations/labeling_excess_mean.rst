@@ -93,10 +93,10 @@ Below is an example on how to create labels of excess over mean.
     numerical = excess_over_mean(data=data, lag=True)
 
     # Get returns over mean as a categorical label
-    categorical = excess_over_mean(data, binary=True, lag=True)
+    categorical = excess_over_mean(data=data, binary=True, lag=True)
 
     # Get categorical forward looking monthly labels.
-    labels = excess_over_mean(data, binary=True, resample_by='M', lag=True)
+    labels = excess_over_mean(data=data, binary=True, resample_by='M', lag=True)
 
 
 Research Notebooks
