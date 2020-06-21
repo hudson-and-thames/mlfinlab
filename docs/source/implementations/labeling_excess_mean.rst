@@ -1,18 +1,18 @@
 .. _implementations-labeling_excess_mean:
 
-==========================
-Labeling Excess Over Mean
-==========================
+================
+Excess Over Mean
+================
 
-Using cross-sectional data on returns of many different stocks, each observation is labeled according to whether (or how much)
+Using cross-sectional data on returns of many different stocks, each observation is labeled according to whether, or how much,
 its return exceeds the mean return. It is a common practice to label observations based on whether the return is positive or negative.
 However, this may produce unbalanced classes, as during market booms the probability of a positive return is much higher, and
-during market crashes they are lower (Coqueret and Guida, 2020). Labeling according to a benchmark such as mean return
+during market crashes they are lower (Coqueret and Guida, 2020). Labeling according to a benchmark such as mean market return
 alleviates this issue.
 
-A dataframe containing forward returns is calculated from close prices. The mean return of all companies at time  :math:`t`  in the
+A dataframe containing forward returns is calculated from close prices. The mean return of all stocks at time :math:`t`  in the
 dataframe is used to represent the market return, and excess returns are calculated by subtracting the mean return from each stock's return
-over the time period  :math:`t`. The numerical returns can then be used as-is (for regression analysis), or can be relabeled to
+over the time period :math:`t`. The numerical returns can then be used as-is (for regression analysis), or can be relabeled to
 represent their sign (for classification analysis).
 
 At time :math:`t`:
@@ -21,6 +21,8 @@ At time :math:`t`:
     :nowrap:
 
     \begin{gather*}
+    P_t = \{p_{t,0}, p_{t,1}, ..., p_{t,n}\} \\
+
     R_t = \{r_{t,0}, r_{t,1}, ..., r_{t,n}\} \\
 
     \mu_t = mean(R_t) \\
@@ -42,13 +44,19 @@ If categorical rather than numerical labels are desired:
      \end{split}
      \end{equation}
 
+If desired, the user can specify a `resampling period <https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects>`_
+to apply to the price data prior to calculating returns. The user can also lag the returns to make them forward-looking.
 
 The following shows the distribution of numerical excess over mean for a set of 20 stocks for the time period between Jan 2019
 and May 2020.
 
-.. image:: labeling_images/distribution_over_mean.png
+.. figure:: labeling_images/distribution_over_mean.png
    :scale: 100 %
    :align: center
+   :figclass: align-center
+   :alt: labeling over mean
+
+   Distribution of returns over mean for 20 stocks.
 
 .. tip::
    **Underlying Literature**
@@ -82,10 +90,13 @@ Below is an example on how to create labels of excess over mean.
     data.columns = data.columns.droplevel(1)
 
     # Get returns over mean numerically
-    excess_over_mean(data)
+    numerical = excess_over_mean(data=data, lag=True)
 
     # Get returns over mean as a categorical label
-    excess_over_mean(data, binary=True)
+    categorical = excess_over_mean(data, binary=True, lag=True)
+
+    # Get categorical forward looking monthly labels.
+    labels = excess_over_mean(data, binary=True, resample_by='M', lag=True)
 
 
 Research Notebooks
