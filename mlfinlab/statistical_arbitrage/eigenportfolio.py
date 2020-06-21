@@ -225,7 +225,7 @@ class Eigenportfolio(StatArb):
         # Set self.eigenportfolio.
         if self.window:
             self.eigenportfolio = pd.concat([pd.DataFrame(b, index=eigen_idx, columns=self.col)
-                                            for b in eigenportfolio], keys=self.idx)
+                                             for b in eigenportfolio], keys=self.idx)
         else:
             self.eigenportfolio = pd.DataFrame(eigenportfolio, index=eigen_idx, columns=self.col)
 
@@ -273,7 +273,7 @@ class Eigenportfolio(StatArb):
         # Set self.beta.
         if self.window:
             self.beta = pd.concat([pd.DataFrame(b, index=beta_idx, columns=self.col)
-                                for b in self.beta], keys=self.idx)
+                                   for b in self.beta], keys=self.idx)
         else:
             self.eigenportfolio = pd.DataFrame(beta, index=beta_idx, columns=self.col)
 
