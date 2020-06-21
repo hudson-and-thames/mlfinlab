@@ -10,3 +10,4 @@ from mlfinlab.labeling.fixed_time_horizon import fixed_time_horizon
 from mlfinlab.labeling.excess_over_median import excess_over_median
 from mlfinlab.labeling.raw_return import raw_return
 from mlfinlab.labeling.return_vs_benchmark import return_over_benchmark
+from mlfinlab.labeling.excess_over_mean import excess_over_mean
