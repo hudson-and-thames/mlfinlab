@@ -201,8 +201,8 @@ Plotting
 .. code-block::
 
     # Instantiate HERC Class
-    hcaa = HierarchicalEqualRiskContribution()
-    hcaa.allocate(asset_prices=stock_prices, risk_measure='equal_weighting')
+    herc = HierarchicalEqualRiskContribution()
+    herc.allocate(asset_prices=stock_prices, risk_measure='equal_weighting')
 
     # Plot Dendrogram
     hcaa.plot_clusters(assets=stock_prices.columns)
