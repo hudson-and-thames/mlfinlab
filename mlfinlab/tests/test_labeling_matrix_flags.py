@@ -133,3 +133,17 @@ class TestMatrixFlagLabels(unittest.TestCase):
         test5_subset_actual = pd.Series([-0.91666667, -1.25, -1.75, -2.16666667, -2.66666667, -2.66666667, -2.75,
                                          -2.5, -2.58333333, -2.66666667], index=test5_subset.index)
         pd.testing.assert_series_equal(test5_subset, test5_subset_actual)
+
+    def test_threshold(self):
+        """
+        Tests for when threshold is desired.
+        """
+        data = self.close['spx'][425:500]
+        idx = data[60:].index
+        flags = MatrixFlagLabels(data=data, window=60)
+        test5 = flags.apply_labeling_matrix(threshold=4)
+        test6 = flags.apply_labeling_matrix(threshold=-1.5)
+        test5_actual = pd.Series([-1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], index=idx)
+        test6_actual = pd.Series([1]*15, index=idx)
+        pd.testing.assert_series_equal(test5, test5_actual)
+        pd.testing.assert_series_equal(test6, test6_actual)
