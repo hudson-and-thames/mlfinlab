@@ -218,4 +218,4 @@ The following research notebooks provide a more detailed exploration of the algo
 
 * `How to use mlfinlab's HierarchicalEqualRiskContribution class`_
 
-.. _How to use mlfinlab's HierarchicalEqualRiskContribution class: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Hierarchical%20Clustering%20Asset%20Allocation%20(HERC)/HERC%20Tutorial%20Notebook.ipynb
+.. _How to use mlfinlab's HierarchicalEqualRiskContribution class: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Hierarchical%20Equal%20Risk%20Contribution%20(HERC)/HERC%20Tutorial%20Notebook.ipynb
