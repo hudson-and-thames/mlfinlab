@@ -105,7 +105,7 @@ class MatrixFlagLabels:
             # We count the number of times each bin appears in each tenth of data, starting from the highest decile.
             column, _ = np.histogram(tenth_bins, bins=[i for i in range(11)])
             # Convert the count in the column to proportion.
-            column = [i/len(tenth) for i in column]
+            column = np.array(column)/len(tenth)
             matrix[col_num] = column[::-1]  # Reverse so that highest decile is on top of the column.
             col_num += 1
 

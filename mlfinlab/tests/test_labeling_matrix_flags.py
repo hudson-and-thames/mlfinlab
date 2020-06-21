@@ -43,26 +43,26 @@ class TestMatrixFlagLabels(unittest.TestCase):
         Tests for user setting a new template. Also verifies that exception is raised for invalid template formats.
         """
         new_template = pd.DataFrame(np.random.randint(-3, 3, size=(10, 10)))
-        Flags = MatrixFlagLabels(self.close['spx'], window=100)
-        Flags.set_template(new_template)  # Correct template
+        flags = MatrixFlagLabels(self.close['spx'], window=100)
+        flags.set_template(new_template)  # Correct template
 
         bad_shape = pd.DataFrame(np.random.randint(-3, 3, size=(9, 10)))  # Not 10 by 10
         with self.assertRaises(Exception):
-            Flags.set_template(bad_shape)
+            flags.set_template(bad_shape)
 
         nan_template = new_template.copy()
         nan_template.iloc[2, 3] = np.nan  # Has NaN
         with self.assertRaises(Exception):
-            Flags.set_template(nan_template)
+            flags.set_template(nan_template)
 
     def test_transform_data(self):
         """
         Tests that the transform_data method gives the correct 10 by 10 matrix.
         """
         data = self.close['spx'][3:103]
-        Flags = MatrixFlagLabels(data, window=30)
-        test1 = Flags._transform_data(row_num=32, window=30)
-        test2 = Flags._transform_data(row_num=100, window=90)
+        flags = MatrixFlagLabels(data, window=30)
+        test1 = flags._transform_data(row_num=32, window=30)
+        test2 = flags._transform_data(row_num=100, window=90)
 
         test1_actual = pd.DataFrame([[0, 1. / 3, 0, 0, 1. / 3, 1. / 3, 0, 0, 0, 0],
                                      [0, 2. / 3, 0, 0, 1. / 3, 0, 0, 0, 0, 0],
@@ -97,8 +97,8 @@ class TestMatrixFlagLabels(unittest.TestCase):
                                [0, 0, 0, 0, 0, 0, 2. / 3, 0, 0, 1. / 3],
                                [0, 0, 0, 0, 0, 1. / 3, 1. / 3, 1. / 3, 0, 0]])
 
-        Flags = MatrixFlagLabels(self.close['spx'], window=100)  # Inputs don't matter.
-        test3 = Flags._apply_template_to_matrix(matrix, Flags.template)
+        flags = MatrixFlagLabels(self.close['spx'], window=100)  # Inputs don't matter.
+        test3 = flags._apply_template_to_matrix(matrix, flags.template)
         self.assertAlmostEqual(test3, 2.6666666667)
 
         # Replace the template with another bull template proposed in Cervello-Royo's paper.
@@ -113,8 +113,8 @@ class TestMatrixFlagLabels(unittest.TestCase):
                                      [0, -1, -5, -5, -5, -5, -5, -5, -5, -5],
                                      [5, -1, -5, -5, -5, -5, -5, -5, -5, -5]])
 
-        Flags.set_template(new_template)
-        test4 = Flags._apply_template_to_matrix(matrix, Flags.template)
+        flags.set_template(new_template)
+        test4 = flags._apply_template_to_matrix(matrix, flags.template)
         self.assertAlmostEqual(test4, -22.666666667)
 
     def test_apply_labeling(self):
@@ -122,8 +122,8 @@ class TestMatrixFlagLabels(unittest.TestCase):
         Test for the function the users would actually use, for creating full labels from matrix.
         """
         data = self.close['spx'][0:100]
-        Flags = MatrixFlagLabels(data=data, window=60)
-        test5 = Flags.apply_labeling_matrix()
+        flags = MatrixFlagLabels(data=data, window=60)
+        test5 = flags.apply_labeling_matrix()
 
         # Verify that the output has 40 (100 - 60) rows.
         self.assertTrue(len(test5) == 40)
