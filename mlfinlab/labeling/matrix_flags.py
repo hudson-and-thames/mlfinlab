@@ -1,3 +1,5 @@
+# pylint: disable=no-self-use
+# pylint: disable=unnecessary-comprehension
 """
 Matrix Flag labeling method.
 """

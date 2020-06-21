@@ -1,4 +1,5 @@
 # pylint: disable=missing-module-docstring
+# pylint: disable=protected-access
 
 import unittest
 import os
