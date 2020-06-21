@@ -7,7 +7,7 @@ import os
 import pandas as pd
 import numpy as np
 
-from mlfinlab.statistical_arbitrage import calc_pca, calc_all_eigenportfolio
+from mlfinlab.statistical_arbitrage import Eigenportfolio
 
 
 class TestEigenportfolio(unittest.TestCase):
@@ -26,93 +26,96 @@ class TestEigenportfolio(unittest.TestCase):
         # Read csv, parse dates, and drop NaN.
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date").dropna(axis=1)
 
-    def test_calc_pca(self):
+    def test_eigenportfolio(self):
         """
-        Test PCA calculation.
+        Test eigenportfolio for all and rolling windows.
         """
-        # Calculate PCA for given data with 1 principal component.
-        res = calc_pca(np.array(np.log(self.data)), 1)
+        # Initialize StatArb.
+        model = Eigenportfolio()
+        model1 = Eigenportfolio()
+        model2 = Eigenportfolio()
+        model3 = Eigenportfolio()
 
-        # There are two items in the tuple.
-        self.assertEqual(len(res), 2)
+        # Allocate data to model.
+        model.allocate(self.data, pc_num=2, intercept=False)
+        model1.allocate(self.data, pc_num=5, window=4, intercept=False)
+        model2.allocate(self.data, pc_num=4, window=6)
+        model3.allocate(self.data, pc_num=3)
 
-        # Length of projection is the same as data.
-        self.assertEqual(len(res[0]), 2141)
-
-        # Check some values for projection.
-        self.assertAlmostEqual(res[0][5][0], -3.719554, delta=1e-3)
-        self.assertAlmostEqual(res[0][100][0], -3.56338343, delta=1e-3)
-        self.assertAlmostEqual(res[0][1000][0], 2.6786415, delta=1e-3)
-
-        # Check the length of the second output.
-        self.assertEqual(len(res[1]), 23)
-
-        # Check some values for the first principal component.
-        self.assertAlmostEqual(res[1][4][0], -0.24159355, delta=1e-3)
-        self.assertAlmostEqual(res[1][9][0], -0.233308519, delta=1e-3)
-        self.assertAlmostEqual(res[1][22][0], -0.2389528258, delta=1e-3)
-
-    def test_calc_all_eigenportfolio(self):
+    def test_value_error(self):
         """
-        Test Eigenportfolio.
+        Tests ValueError for the user given inputs.
         """
-        # Calculate PCA for given data with 5 principal components.
-        res = calc_all_eigenportfolio(self.data, 5)
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = Eigenportfolio()
+            # Check if data is a pd.DataFrame.
+            model.allocate(1, pc_num=5)
 
-        # There are two items in the tuple.
-        self.assertEqual(res.shape[0], 8575)
-        self.assertEqual(res.shape[1], 23)
+        # Create null pd.DataFrame.
+        null_price = self.data.copy()
+        null_price[:] = np.nan
 
-        # Check log_ret.
-        checking = res.loc['log_ret']
-        self.assertEqual(checking.shape[0], 2141)
-        self.assertEqual(checking.shape[1], 23)
-        self.assertAlmostEqual(checking.iloc[5, 10], 0.0187271, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[286, 20], 0.0018205386, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[1020, -1], 0.00436869, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[-7, -5], 0.012938479, delta=1e-3)
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = Eigenportfolio()
+            # Check if data has null values.
+            model.allocate(null_price, pc_num=5)
 
-        # Check eigenportfolio.
-        checking = res.loc['eigenportfolio']
-        self.assertEqual(checking.shape[0], 5)
-        self.assertEqual(checking.shape[1], 23)
-        self.assertAlmostEqual(checking.iloc[2, 2], -0.21104666, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[3, 5], -0.0429993, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[-1, -1], -0.19957352, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[-3, -5], -0.024271028, delta=1e-3)
+        # Create zero pd.DataFrame.
+        zero_price = self.data.copy()
+        zero_price[:] = 0
 
-        # Check beta.
-        checking = res.loc['beta']
-        self.assertEqual(checking.shape[0], 6)
-        self.assertEqual(checking.shape[1], 23)
-        self.assertAlmostEqual(checking.iloc[5, 10], -0.000103154, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[3, 5], -0.000201566, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[-1, -1], 0.0001479435, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[-3, -5], 0.00122519692, delta=1e-3)
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = Eigenportfolio()
+            # Check if data has zero values.
+            model.allocate(zero_price, pc_num=5)
 
-        # Check ret_spread.
-        checking = res.loc['ret_spread']
-        self.assertEqual(checking.shape[0], 2141)
-        self.assertEqual(checking.shape[1], 23)
-        self.assertAlmostEqual(checking.iloc[5, 10], 0.0009046264, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[286, 20], 0.0006582330, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[1020, -1], 0.001412272, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[-7, -5], -0.0011325141, delta=1e-3)
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = Eigenportfolio()
+            # Check if pc_num is an integer.
+            model.allocate(self.data, pc_num=4.3)
 
-        # Check cum_resid.
-        checking = res.loc['cum_resid']
-        self.assertEqual(checking.shape[0], 2141)
-        self.assertEqual(checking.shape[1], 23)
-        self.assertAlmostEqual(checking.iloc[5, 10], -0.027034045, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[286, 20], 0.0143180950, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[1020, -1], 0.0229146139, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[-7, -5], -0.00209802, delta=1e-3)
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = Eigenportfolio()
+            # Check if pc_num is positive.
+            model.allocate(self.data, pc_num=-1)
 
-        # Check z_score.
-        checking = res.loc['z_score']
-        self.assertEqual(checking.shape[0], 2141)
-        self.assertEqual(checking.shape[1], 23)
-        self.assertAlmostEqual(checking.iloc[5, 10], 0.780354221, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[286, 20], 0.1498292811, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[1020, -1], 1.01987316572, delta=1e-3)
-        self.assertAlmostEqual(checking.iloc[-7, -5], 0.737870045, delta=1e-3)
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = Eigenportfolio()
+            # Check if pc_num is less than the number of assets.
+            model.allocate(self.data, pc_num=50)
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = Eigenportfolio()
+            # Check if window is an integer.
+            model.allocate(self.data, pc_num=3, window=0.6)
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = Eigenportfolio()
+            # Check if window is non-negative
+            model.allocate(self.data, pc_num=3, window=-1)
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = Eigenportfolio()
+            # Check if window is less than the number of periods.
+            model.allocate(self.data, pc_num=3, window=4000)
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = Eigenportfolio()
+            # Check if window is less than the number of periods.
+            model.allocate(self.data, pc_num=3, window=4000)
+
+        with self.assertRaises(ValueError):
+            # Initialize model.
+            model = Eigenportfolio()
+            # Check if intercept is a boolean.
+            model.allocate(self.data, pc_num=3, window=20, intercept=1)

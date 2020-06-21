@@ -33,19 +33,19 @@ class Eigenportfolio(StatArb):
         self.pca = None
         super(Eigenportfolio, self).__init__()
 
-    def allocate(self, data, pc_num=0, window=0, intercept=True):
+    def allocate(self, data, pc_num, window=0, intercept=True):
         """
         Calculate eigenportfolios for a given data, number of principal components, and window value.
 
         :param data: (pd.DataFrame) Time series of different assets.
-        :param pc_num: (int) Number of principal components. (Default) 0, if using all components.
+        :param pc_num: (int) Number of principal components.
         :param window: (int) Length of rolling windows. (Default) 0 if no rolling.
         :param intercept: (bool) Indicates presence of intercept for the regression. (Default) True.
         """
         # Check conditions.
         self._check(data, pc_num, window, intercept)
 
-        # Set pc, intercept and window.
+        # Set pc_num, intercept and window.
         self.pc_num = pc_num
         self.intercept = intercept
         self.window = window
@@ -128,9 +128,9 @@ class Eigenportfolio(StatArb):
             raise ValueError("Number of principal components must be an integer.")
 
         # Check if the range of pc_num is correct.
-        if pc_num < 0 or pc_num > data.shape[1]:
-            raise ValueError("Number of principal components must be between 0 and the number of "
-                             "assets. 0 indicates using all components.")
+        if pc_num < 1 or pc_num > data.shape[1]:
+            raise ValueError("Number of principal components must be between 1 and the number of "
+                             "assets.")
 
         # Check if window is an integer.
         if not isinstance(window, int):
@@ -223,8 +223,11 @@ class Eigenportfolio(StatArb):
             eigen_idx.append('eigenportfolio {}'.format(i))
 
         # Set self.eigenportfolio.
-        self.eigenportfolio = pd.concat([pd.DataFrame(b, index=eigen_idx, columns=self.col)
-                                         for b in eigenportfolio], keys=self.idx)
+        if self.window:
+            self.eigenportfolio = pd.concat([pd.DataFrame(b, index=eigen_idx, columns=self.col)
+                                            for b in eigenportfolio], keys=self.idx)
+        else:
+            self.eigenportfolio = pd.DataFrame(eigenportfolio, index=eigen_idx, columns=self.col)
 
     def _convert_zscore(self, z_score):
         """
@@ -268,8 +271,11 @@ class Eigenportfolio(StatArb):
             beta_idx.append('constants')
 
         # Set self.beta.
-        self.beta = pd.concat([pd.DataFrame(b, index=beta_idx, columns=self.col)
-                               for b in self.beta], keys=self.idx)
+        if self.window:
+            self.beta = pd.concat([pd.DataFrame(b, index=beta_idx, columns=self.col)
+                                for b in self.beta], keys=self.idx)
+        else:
+            self.eigenportfolio = pd.DataFrame(beta, index=beta_idx, columns=self.col)
 
     @staticmethod
     def _calc_pca(data, num):
