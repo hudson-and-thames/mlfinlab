@@ -27,7 +27,7 @@ def get_signal(prob, num_classes, pred=None):
     """
     # Get signals from predictions.
     if prob.shape[0] == 0:
-        return pd.Series()
+        return pd.Series(dtype='float64')
 
     # 1) Generate signals from multinomial classification (one-vs-rest).
     bet_sizes = (prob - 1/num_classes) / (prob * (1 - prob))**0.5
@@ -85,7 +85,7 @@ def mp_avg_active_signals(signals, molecule):
     :param molecule: (list) Indivisible tasks to be passed to 'mp_pandas_obj', in this case a list of datetimes.
     :return: (pandas.Series) The averaged bet size sub-series.
     """
-    out = pd.Series()
+    out = pd.Series(dtype='float64')
     for loc in molecule:
         df0 = (signals.index.to_numpy() <= loc)&((loc < signals['t1'])|pd.isnull(signals['t1']))
         act = signals[df0].index

@@ -170,18 +170,34 @@ class TestNCO(unittest.TestCase):
         kde_bwidth_alt = 0
 
         # Expected weights for minimum variance allocation
+        # Second line in the below test was changed after v.0.11.3 from [0.257547, 0.265450, 0.242453, 0.234551]
+        #                                                          to   [0.273299, 0.242542, 0.241464, 0.242696]
+        # due to scikit-learn changing np.random outputs
         w_cvo_expected = pd.DataFrame([[0.249287, 0.256002, 0.242593, 0.252118],
-                                       [0.257547, 0.265450, 0.242453, 0.234551]])
+                                       [0.273299, 0.242542, 0.241464, 0.242696]])
 
+        # Second line in the below test was changed after v.0.11.3 from [0.257547, 0.265450, 0.242453, 0.234551]
+        #                                                          to   [0.273299, 0.242542, 0.241464, 0.242696]
+        # due to scikit-learn changing np.random outputs
         w_nco_expected = pd.DataFrame([[0.248396, 0.243172, 0.250751, 0.257680],
-                                       [0.257547, 0.265450, 0.242453, 0.234551]])
+                                       [0.273299, 0.242542, 0.241464, 0.242696]])
 
         # Expected weights for maximum Sharpe ratio allocation
-        w_cvo_sr_expected = pd.DataFrame([[-1.081719, 1.810936, 1.218067, 3.978880],
-                                          [-2.431651, 0.594868, -0.210175, 5.117628]])
+        # Values in the below test was changed after v.0.11.3 from [[-1.081719, 1.810936, 1.218067, 3.978880]
+        #                                                           [-2.431651, 0.594868, -0.210175, 5.117628]]
+        #                                                     to   [[-0.128849, -0.326671,  0.870183,  2.020053]
+        #                                                           [-3.786126, -0.881858,  1.418773,  3.062546]]
+        # due to scikit-learn changing np.random outputs
+        w_cvo_sr_expected = pd.DataFrame([[-0.128849, -0.326671, 0.870183, 2.020053],
+                                          [-3.786126, -0.881858, 1.418773, 3.062546]])
 
-        w_nco_sr_expected = pd.DataFrame([[-1.060835, 1.910503, 1.315026, 3.908128],
-                                          [-0.937168, 1.886158, -0.389275, 4.884809]])
+        # Values in the below test was changed after v.0.11.3 from [[-1.060835, 1.910503, 1.315026, 3.908128]
+        #                                                           [-0.937168, 1.886158, -0.389275, 4.884809]]
+        #                                                     to   [[-0.204089, -0.050088,  0.912494,  1.983382]
+        #                                                           [-3.723231, -1.809242,  1.862001,  2.61035]]
+        # due to scikit-learn changing np.random outputs
+        w_nco_sr_expected = pd.DataFrame([[-0.204089, -0.050088, 0.912494, 1.983382],
+                                          [-3.723231, -1.809242, 1.862001, 2.61035]])
 
         # Finding the optimal weights for minimum variance
         w_cvo, w_nco = nco.allocate_mcos(mu_vec, cov_mat, num_obs, num_sims, kde_bwidth, min_var_portf, lw_shrinkage)
@@ -190,11 +206,11 @@ class TestNCO(unittest.TestCase):
         w_cvo_sr, w_nco_sr = nco.allocate_mcos(mu_vec, cov_mat, num_obs, num_sims, kde_bwidth_alt, min_var_portf_alt, lw_shrinkage)
 
         # Testing if the optimal allocation simulations are right
-        np.testing.assert_almost_equal(np.array(w_cvo), np.array(w_cvo_expected), decimal=4)
-        np.testing.assert_almost_equal(np.array(w_nco), np.array(w_nco_expected), decimal=4)
+        np.testing.assert_almost_equal(np.array(w_cvo), np.array(w_cvo_expected), decimal=6)
+        np.testing.assert_almost_equal(np.array(w_nco), np.array(w_nco_expected), decimal=6)
 
-        np.testing.assert_almost_equal(np.array(w_cvo_sr), np.array(w_cvo_sr_expected), decimal=4)
-        np.testing.assert_almost_equal(np.array(w_nco_sr), np.array(w_nco_sr_expected), decimal=4)
+        np.testing.assert_almost_equal(np.array(w_cvo_sr), np.array(w_cvo_sr_expected), decimal=6)
+        np.testing.assert_almost_equal(np.array(w_nco_sr), np.array(w_nco_sr_expected), decimal=6)
 
     @staticmethod
     def test_estim_errors_mcos():

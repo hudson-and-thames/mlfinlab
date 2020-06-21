@@ -155,5 +155,5 @@ def get_konto_entropy(message: str, window: int = 0) -> float:
         out['h'] = out['sum'] / out['num']
     except ZeroDivisionError:
         out['h'] = 0
-    out['r'] = 1 - out['h'] / np.log2(len(message))  # Redundancy, 0<=r<=1
+    out['r'] = 1 - out['h'] / (np.log2(len(message)) if np.log2(len(message)) > 0 else 1)  # Redundancy, 0<=r<=1
     return out['h']

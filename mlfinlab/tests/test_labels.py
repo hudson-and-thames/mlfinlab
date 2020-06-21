@@ -106,7 +106,8 @@ class TestChapter3(unittest.TestCase):
                                            min_ret=0.005,
                                            num_threads=3,
                                            vertical_barrier_times=vertical_barriers,
-                                           side_prediction=None)
+                                           side_prediction=None,
+                                           verbose=False)
 
         # Test that the events are the same as expected (naive test)
         self.assertTrue(triple_barrier_events.shape == (8, 4))  # Assert shape
@@ -128,7 +129,8 @@ class TestChapter3(unittest.TestCase):
                                          min_ret=0.005,
                                          num_threads=3,
                                          vertical_barrier_times=vertical_barriers,
-                                         side_prediction=self.data['side'])
+                                         side_prediction=self.data['side'],
+                                         verbose=False)
 
         # Assert that the two different events are the the same as they are generated using same data
         self.assertTrue(np.all(meta_labeled_events['t1'] == triple_barrier_events['t1']))
@@ -146,7 +148,8 @@ class TestChapter3(unittest.TestCase):
                                         min_ret=0.005,
                                         num_threads=3,
                                         vertical_barrier_times=False,
-                                        side_prediction=None)
+                                        side_prediction=None,
+                                        verbose=False)
 
         # Assert targets match other events trgts
         self.assertTrue(np.all(triple_barrier_events['trgt'] == no_vertical_events['trgt']))
@@ -173,7 +176,8 @@ class TestChapter3(unittest.TestCase):
                                            min_ret=0.005,
                                            num_threads=3,
                                            vertical_barrier_times=vertical_barriers,
-                                           side_prediction=None)
+                                           side_prediction=None,
+                                           verbose=False)
 
         triple_labels = get_bins(triple_barrier_events, self.data['close'])
         self.assertTrue(np.all(triple_labels[np.abs(triple_labels['ret']) < triple_labels['trgt']]['bin'] == 0))
@@ -187,7 +191,8 @@ class TestChapter3(unittest.TestCase):
                                            min_ret=0.005,
                                            num_threads=3,
                                            vertical_barrier_times=vertical_barriers,
-                                           side_prediction=self.data['side'])
+                                           side_prediction=self.data['side'],
+                                           verbose=False)
 
         triple_labels = get_bins(triple_barrier_events, self.data['close'])
 
@@ -226,7 +231,8 @@ class TestChapter3(unittest.TestCase):
                                                 min_ret=0.005,
                                                 num_threads=3,
                                                 vertical_barrier_times=vertical_barriers,
-                                                side_prediction=None)
+                                                side_prediction=None,
+                                                verbose=False)
 
         triple_labels_ptsl_large = get_bins(triple_barrier_events_ptsl, self.data['close'])
         labels_large = triple_labels_ptsl_large['bin']
@@ -242,7 +248,8 @@ class TestChapter3(unittest.TestCase):
                                                 min_ret=0.005,
                                                 num_threads=3,
                                                 vertical_barrier_times=vertical_barriers,
-                                                side_prediction=None)
+                                                side_prediction=None,
+                                                verbose=False)
 
         triple_labels_ptsl_small = get_bins(triple_barrier_events_ptsl, self.data['close'])
         labels_small = triple_labels_ptsl_small['bin']
@@ -258,7 +265,8 @@ class TestChapter3(unittest.TestCase):
                                                 min_ret=0.005,
                                                 num_threads=3,
                                                 vertical_barrier_times=vertical_barriers,
-                                                side_prediction=None)
+                                                side_prediction=None,
+                                                verbose=False)
 
         labels_no_ones = get_bins(triple_barrier_events_ptsl, self.data['close'])['bin']
         self.assertTrue(np.all(labels_no_ones < 1))
@@ -281,7 +289,8 @@ class TestChapter3(unittest.TestCase):
                                            min_ret=0.005,
                                            num_threads=3,
                                            vertical_barrier_times=vertical_barriers,
-                                           side_prediction=None)
+                                           side_prediction=None,
+                                           verbose=False)
         triple_labels = get_bins(triple_barrier_events, self.data['close'])
 
         # Drop the 2 zero labels in the set since they are "rare"

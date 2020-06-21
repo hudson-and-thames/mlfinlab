@@ -129,7 +129,8 @@ def ml_cross_val_score(
     .. code-block:: python
 
         cv_gen = PurgedKFold(n_splits=n_splits, samples_info_sets=samples_info_sets, pct_embargo=pct_embargo)
-        scores_array = ml_cross_val_score(classifier, X, y, cv_gen, sample_weight=None, scoring=accuracy_score)
+        scores_array = ml_cross_val_score(classifier, X, y, cv_gen, sample_weight_train=sample_train,
+                                          sample_weight_score=sample_score, scoring=accuracy_score)
 
     :param classifier: (ClassifierMixin) A sk-learn Classifier object instance.
     :param X: (pd.DataFrame) The dataset of records to evaluate.

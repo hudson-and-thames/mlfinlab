@@ -9,9 +9,10 @@ import pandas as pd
 import numpy as np
 
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.ensemble.bagging import BaseBagging, BaggingClassifier, BaggingRegressor
+from sklearn.ensemble import BaggingClassifier, BaggingRegressor
+from sklearn.ensemble._bagging import BaseBagging
+from sklearn.ensemble._base import _partition_estimators
 from sklearn.base import ClassifierMixin, RegressorMixin
-from sklearn.ensemble.base import _partition_estimators
 from sklearn.utils.random import sample_without_replacement
 from sklearn.utils import indices_to_mask
 from sklearn.metrics import accuracy_score, r2_score
@@ -453,8 +454,9 @@ class SequentiallyBootstrappedBaggingClassifier(SequentiallyBootstrappedBaseBagg
                  "This probably means too few estimators were used "
                  "to compute any reliable oob estimates.")
 
-        oob_decision_function = (predictions /
-                                 predictions.sum(axis=1)[:, np.newaxis])
+        oob_decision_function = np.divide(predictions, predictions.sum(axis=1)[:, np.newaxis],
+                                          out=np.zeros_like(predictions),
+                                          where=predictions.sum(axis=1)[:, np.newaxis] != 0)
         oob_score = accuracy_score(y, np.argmax(predictions, axis=1))
 
         self.oob_decision_function_ = oob_decision_function
