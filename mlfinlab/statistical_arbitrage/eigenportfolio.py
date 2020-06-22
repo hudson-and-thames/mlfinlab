@@ -3,6 +3,7 @@ Implements Eigenportfolio.
 """
 import pandas as pd
 import numpy as np
+import warnings
 from .base import StatArb
 
 
@@ -293,7 +294,9 @@ class Eigenportfolio(StatArb):
         :return: (tuple) (np.array) Projected data, (np.array) Eigenvectors
         """
         # Standardize the data.
-        data = (data - data.mean(axis=0)) / np.std(data, axis=0)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            data = np.nan_to_num((data - np.mean(data, axis=0)) / np.std(data, axis=0))
 
         # Calculate the covariance matrix.
         cov = data.T.dot(data) / data.shape[0]

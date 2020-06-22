@@ -5,6 +5,7 @@ Implements Pairs Trading strategy.
 
 import numpy as np
 import pandas as pd
+import warnings
 
 
 class StatArb:
@@ -293,7 +294,10 @@ class StatArb:
         :param data: (np.array) Data for z-score calculation.
         :return: (np.array) Z-score of the given data.
         """
-        return np.nan_to_num((data - np.mean(data, axis=0)) / np.std(data, axis=0))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            res = np.nan_to_num((data - np.mean(data, axis=0)) / np.std(data, axis=0))
+        return res
 
     @staticmethod
     def _linear_regression(data_x, data_y):
