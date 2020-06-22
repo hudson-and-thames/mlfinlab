@@ -360,7 +360,12 @@ This project is licensed under an all rights reserved licence.
     :caption: Statistical Arbitrage
     :hidden:
 
-    implementations/statistical_arbitrage
+    statistical_arbitrage/introduction
+    statistical_arbitrage/pairs_trading
+    statistical_arbitrage/eigenportfolio
+    statistical_arbitrage/stationarity
+    statistical_arbitrage/cointegration
+    statistical_arbitrage/signals
 
 .. toctree::
     :maxdepth: 2
