@@ -41,10 +41,10 @@ ideal scenario for a statistical arbitrage strategy is one that does not have a 
 the process. This, however, does not always hold true. An example of a trend stationary is shown
 below:
 
-.. image:: statistical_arbitrage_images/stationary.png
+.. image:: statarb_images/stationary.png
    :width: 49 %
 
-.. image:: statistical_arbitrage_images/trend_stationary.png
+.. image:: statarb_images/trend_stationary.png
    :width: 49 %
 
 It is possible to detrend the trend_stationarity and the user can easily do so by setting the regression to

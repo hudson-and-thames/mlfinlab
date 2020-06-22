@@ -1,6 +1,6 @@
 # pylint: disable=bare-except
 """
-Calculate pairs regression.
+Implements Pairs Trading strategy.
 """
 
 import numpy as np
@@ -10,7 +10,13 @@ import pandas as pd
 class StatArb:
     # pylint: disable=too-many-instance-attributes
     """
-    Implements Statistical Arbitrage.
+    .. warning::
+
+        - The structure is designed to use the original price data for calculation. The class itself
+          calculates the log returns for the arbitrage. Do NOT adjust your input for the logarithmic
+          scale.
+
+        - Use pd.Series as inputs.
 
     Possible outputs are:
 
