@@ -17,7 +17,7 @@ Introduction
 ============
 
 Online Portfolio Selection
-==========================
+##########################
 
 Online Portfolio Selection can broadly be divided into two parts: Portfolio Selection and Online Learning.
 
@@ -64,7 +64,7 @@ All of the online portfolio selection strategies will be built on top of the bas
     3. Data points with null or 0 value.
 
 Import
-======
+######
 
 Strategies can be imported by using variations of the following lines.
 
@@ -92,7 +92,7 @@ Strategies can be imported by using variations of the following lines.
     from mlfinlab.online_portfolio_selection import BAH, UP
 
 Initialize
-==========
+##########
 
 Strategies are first initialized to create an object. Certain strategies require parameters to initialize.
 
@@ -108,7 +108,7 @@ Strategies are first initialized to create an object. Certain strategies require
     cornk = CORNK(window=2, rho=5, k=2)
 
 Allocate
-========
+########
 
 All strategies use ``allocate()`` to calculate the portfolio weights based on the given data. The user must supply the given data in a ``pd.DataFrame`` that is indexed by time.
 
@@ -143,7 +143,7 @@ Three additional options are available for the ``allocate`` method.
    :width: 99 %
 
 Result
-======
+######
 
 Upon weights allocation the possible outputs are:
 
@@ -175,7 +175,7 @@ Upon weights allocation the possible outputs are:
    :width: 33 %
 
 Data
-====
+####
 
 Data selection is one of the hardest problems in research. With numerous test sets and a vast amount of resources
 available to the public, it is tempting to overfit and choose the data that best represent your hypothesis.
@@ -201,7 +201,7 @@ lens of selection, I hope to introduce the readers to a more practical and famil
 understand the module in a more intuitive way.
 
 NYSE 1962-1984
-##############
+**************
 
 This is the original NYSE data that Thomas Cover used for his papers. Although it covers a lot of sectors
 and should have been useful when the paper was published, it is difficult to gauge if this dataset adds
@@ -219,7 +219,7 @@ are American Brands and Commercial Metals, and the least performing stock, DuPon
 returns as no stocks in this list decreased in value.
 
 DJIA 2001-2003
-##############
+**************
 
 This is a more recent dataset that involves companies that are still well known to us. 2001 to 2003 covers
 a bear market run that should be useful to see how our strategies are affected in times of general downturn.
@@ -232,7 +232,7 @@ DJIA from 2001 to 2003 provides strikingly different patterns compared to the pr
 Only 5 companies increased in price as most declined at a steady rate.
 
 TSE 1994-1998
-#############
+*************
 
 The Toronto Stock Exchange data includes a collection that may be unfamiliar to most researchers. It is an
 interesting universe with half of the stocks decreasing in value. With a combination of both overperforming
@@ -245,7 +245,7 @@ Half of the stocks decreasing in value. With a combination of both overperformin
 selection strategies need to identify the ups and downs to have profitable returns.
 
 SP500 1998-2003
-###############
+***************
 
 This dataset also includes the bear and bull run during turbulent times. It is longer than the DJIA data by
 3 more years and includes many companies that are familiar to us. This will be a good comparison to our new
@@ -259,7 +259,7 @@ and includes many companies that are familiar to us. SP500 during this time goes
 and in the long run, all but 5 companies increase in value.
 
 MSCI 1993-2020
-##############
+**************
 
 I used the MSCI Developed Markets Index from 1993/01/01, which includes 23 countries:
 
@@ -278,7 +278,7 @@ Finland is not the first country to come in mind with metrics like these, but th
 around the 2000s puts every other country aside. Most countries show movements that are strongly correlated with each other.
 
 US Equity 2011-2020
-###################
+*******************
 
 For a more recent dataset, I collected the 44 largest US stocks based on market capitalization according to a
 Financial Times `report <http://media.ft.com/cms/253867ca-1a60-11e0-b003-00144feab49a.pdf>`_.
