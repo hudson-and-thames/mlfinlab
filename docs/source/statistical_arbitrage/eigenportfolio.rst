@@ -69,6 +69,11 @@ the trading assets and seeking different hedge ratios to capture the idiosyncrat
 Results
 #######
 
+Rolling Window
+**************
+
+All results can be used with a rolling window function with a given ``window=number``.
+
 Price
 *****
 

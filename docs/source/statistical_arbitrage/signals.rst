@@ -1,11 +1,4 @@
 .. _statistical_arbitrage-signals:
-.. note::
-
-    References
-
-    1. `Gatev, E., Goetzmann, W.N. and Rouwenhorst, K.G., 2006. Pairs trading: Performance of a
-    relative-value arbitrage rule. The Review of Financial Studies, 19(3), pp.797-827.
-    <https://academic.oup.com/rfs/article/19/3/797/1646694>`_
 
 =======
 Signals
@@ -55,3 +48,5 @@ The trading signals will be defined as:
 
 Hurst Exponent
 ##############
+
+To be implemented.
