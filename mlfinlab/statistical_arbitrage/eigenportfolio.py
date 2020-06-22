@@ -1,5 +1,5 @@
 """
-Eigenportfolio applications
+Implements Eigenportfolio.
 """
 import pandas as pd
 import numpy as np
@@ -10,7 +10,13 @@ class Eigenportfolio(StatArb):
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=arguments-differ
     """
-    Implements Eigenportfolio.
+    .. warning::
+
+        - The structure is designed to use the original price data for calculation. The class itself
+          calculates the log returns for the arbitrage. Do NOT adjust your input for the logarithmic
+          scale.
+
+        - Use pd.DataFrame as inputs.
 
     Possible outputs are:
 
@@ -227,7 +233,7 @@ class Eigenportfolio(StatArb):
             self.eigenportfolio = pd.concat([pd.DataFrame(b, index=eigen_idx, columns=self.col)
                                              for b in eigenportfolio], keys=self.idx)
         else:
-            self.eigenportfolio = pd.DataFrame(eigenportfolio, index=eigen_idx, columns=self.col)
+            self.eigenportfolio = pd.DataFrame(eigenportfolio, index=self.col, columns=eigen_idx).T
 
     def _convert_zscore(self, z_score):
         """
@@ -275,7 +281,7 @@ class Eigenportfolio(StatArb):
             self.beta = pd.concat([pd.DataFrame(b, index=beta_idx, columns=self.col)
                                    for b in self.beta], keys=self.idx)
         else:
-            self.eigenportfolio = pd.DataFrame(beta, index=beta_idx, columns=self.col)
+            self.beta = pd.DataFrame(beta, index=beta_idx, columns=self.col)
 
     @staticmethod
     def _calc_pca(data, num):
@@ -300,6 +306,9 @@ class Eigenportfolio(StatArb):
 
         # Sort eigenvector according to principal components.
         eigvec = eigvec[:, idx[:num]]
+
+        # Normalize eigenvector.
+        eigvec = eigvec / np.std(eigvec)
 
         # Projected data and eigenvector.
         return data.dot(eigvec), eigvec

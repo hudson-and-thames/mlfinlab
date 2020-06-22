@@ -43,7 +43,7 @@ Results
 Price
 *****
 
-``model.price`` is used to call the originally inputted price data with the first column as x
+``model.price`` is used to call the originally given price data with the first column as x
 and the second column as y.
 
 Log Returns
