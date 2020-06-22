@@ -6,7 +6,7 @@ import numpy as np
 import warnings
 
 from .base import StatArb
-from .signals import _linear_regression
+from .signals import _linear_regression, _add_constant
 
 
 class Eigenportfolio(StatArb):
@@ -75,7 +75,7 @@ class Eigenportfolio(StatArb):
 
             # If intercept is True, add a constant of 1 on the right side of np_x.
             if self.intercept:
-                self.pca = self._add_constant(self.pca)
+                self.pca = _add_constant(self.pca)
 
             # Calculate the beta coefficients for linear regression.
             self.beta = _linear_regression(self.pca, self.log_returns)
@@ -165,7 +165,7 @@ class Eigenportfolio(StatArb):
 
         # If intercept is True, add a constant of 1 on the right side of np_x.
         if self.intercept:
-            pca = self._add_constant(pca)
+            pca = _add_constant(pca)
 
         # Calculate the beta coefficients for linear regression.
         beta = _linear_regression(pca, data)

@@ -1,3 +1,4 @@
+# pylint: disable=bare-except
 """
 Implements Signals.
 """
@@ -43,3 +44,14 @@ def _linear_regression(data_x, data_y):
     except:
         beta = np.linalg.pinv(data_x.T.dot(data_x)).dot(data_x.T).dot(data_y)
     return beta
+
+
+def _add_constant(returns):
+    """
+    Adds a constant of 1 on the right side of the given returns.
+
+    :param returns: (np.array) Log returns for a given time series.
+    :return: (np.array) Log returns with an appended column of 1 on the right.
+    """
+    #  Adds a column of 1 on the right side of the given array.
+    return np.hstack((returns, np.ones((returns.shape[0], 1))))

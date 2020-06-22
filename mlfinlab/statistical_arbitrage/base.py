@@ -1,4 +1,3 @@
-# pylint: disable=bare-except
 """
 Implements Pairs Trading strategy.
 """
@@ -7,7 +6,7 @@ import numpy as np
 import pandas as pd
 import warnings
 
-from .signals import _linear_regression
+from .signals import _linear_regression, _add_constant
 
 
 class StatArb:
@@ -70,7 +69,7 @@ class StatArb:
 
         # If intercept is True, add a constant of 1 on the right side of np_x.
         if self.intercept:
-            np_x = self._add_constant(np_x)
+            np_x = _add_constant(np_x)
 
         # No rolling windows.
         if not self.window:
@@ -300,17 +299,6 @@ class StatArb:
             warnings.simplefilter("ignore")
             res = np.nan_to_num((data - np.mean(data, axis=0)) / np.std(data, axis=0))
         return res
-
-    @staticmethod
-    def _add_constant(returns):
-        """
-        Adds a constant of 1 on the right side of the given returns.
-
-        :param returns: (np.array) Log returns for a given time series.
-        :return: (np.array) Log returns with an appended column of 1 on the right.
-        """
-        #  Adds a column of 1 on the right side of the given array.
-        return np.hstack((returns, np.ones((returns.shape[0], 1))))
 
     @staticmethod
     def _calc_log_returns(price):
