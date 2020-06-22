@@ -307,8 +307,8 @@ class Eigenportfolio(StatArb):
         # Sort eigenvector according to principal components.
         eigvec = eigvec[:, idx[:num]]
 
-        # Normalize eigenvector.
-        eigvec = eigvec / np.std(eigvec)
+        # Scale eigenvector to leverage of 1.
+        eigvec = eigvec / np.sum(np.abs(eigvec), axis=0)
 
         # Projected data and eigenvector.
         return data.dot(eigvec), eigvec
