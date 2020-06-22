@@ -79,24 +79,23 @@ Below is an example on how to create labels of excess over mean.
 
 .. code-block::
 
-    import pandas as pd
     import yfinance as yf
     from mlfinlab.labeling import excess_over_mean
 
-    # Import price data
+    # Import price data.
     tickers = "AAPL MSFT AMZN GOOG"
     data = yf.download(tickers, start="2019-01-01", end="2020-05-01", group_by="ticker")
     data = data.loc[:, (slice(None), 'Adj Close')]
     data.columns = data.columns.droplevel(1)
 
-    # Get returns over mean numerically
-    numerical = excess_over_mean(data=data, lag=True)
+    # Get returns over mean numerically.
+    numerical = excess_over_mean(prices=data, lag=True)
 
-    # Get returns over mean as a categorical label
-    categorical = excess_over_mean(data=data, binary=True, lag=True)
+    # Get returns over mean as a categorical label.
+    categorical = excess_over_mean(prices=data, binary=True, lag=True)
 
     # Get categorical forward looking monthly labels.
-    labels = excess_over_mean(data=data, binary=True, resample_by='M', lag=True)
+    labels = excess_over_mean(prices=data, binary=True, resample_by='M', lag=True)
 
 
 Research Notebooks
