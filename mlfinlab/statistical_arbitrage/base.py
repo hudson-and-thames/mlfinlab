@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 import warnings
 
+from .signals import _linear_regression
+
 
 class StatArb:
     # pylint: disable=too-many-instance-attributes
@@ -73,7 +75,7 @@ class StatArb:
         # No rolling windows.
         if not self.window:
             # Calculate the beta coefficients for linear regression.
-            self.beta = self._linear_regression(np_x, np_y)
+            self.beta = _linear_regression(np_x, np_y)
 
             # Calculate spread of residuals.
             self.resid = np_y - np_x.dot(self.beta)
@@ -195,7 +197,7 @@ class StatArb:
         np_y = np_xy[:, [-1]]
 
         # Calculate the beta coefficients for linear regression.
-        beta = self._linear_regression(np_x, np_y)
+        beta = _linear_regression(np_x, np_y)
 
         # Calculate spread of residuals.
         resid = np_y - np_x.dot(beta)
@@ -298,21 +300,6 @@ class StatArb:
             warnings.simplefilter("ignore")
             res = np.nan_to_num((data - np.mean(data, axis=0)) / np.std(data, axis=0))
         return res
-
-    @staticmethod
-    def _linear_regression(data_x, data_y):
-        """
-        Calculates the parameter vector using matrix multiplication.
-
-        :param data_x: (np.array) Time series of log returns of x.
-        :param data_y: (np.array) Time series of log returns of y.
-        :return: (np.array) Parameter vector.
-        """
-        try:
-            beta = np.linalg.inv(data_x.T.dot(data_x)).dot(data_x.T).dot(data_y)
-        except:
-            beta = np.linalg.pinv(data_x.T.dot(data_x)).dot(data_x.T).dot(data_y)
-        return beta
 
     @staticmethod
     def _add_constant(returns):

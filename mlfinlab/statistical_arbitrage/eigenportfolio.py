@@ -4,7 +4,9 @@ Implements Eigenportfolio.
 import pandas as pd
 import numpy as np
 import warnings
+
 from .base import StatArb
+from .signals import _linear_regression
 
 
 class Eigenportfolio(StatArb):
@@ -76,7 +78,7 @@ class Eigenportfolio(StatArb):
                 self.pca = self._add_constant(self.pca)
 
             # Calculate the beta coefficients for linear regression.
-            self.beta = self._linear_regression(self.pca, self.log_returns)
+            self.beta = _linear_regression(self.pca, self.log_returns)
 
             # Calculate spread of residuals.
             self.resid = self.log_returns - self.pca.dot(self.beta)
@@ -166,7 +168,7 @@ class Eigenportfolio(StatArb):
             pca = self._add_constant(pca)
 
         # Calculate the beta coefficients for linear regression.
-        beta = self._linear_regression(pca, data)
+        beta = _linear_regression(pca, data)
 
         # Calculate spread of residuals.
         resid = data - pca.dot(beta)

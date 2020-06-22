@@ -9,7 +9,7 @@ from mlfinlab.statistical_arbitrage.base import StatArb
 from mlfinlab.statistical_arbitrage.eigenportfolio import Eigenportfolio
 
 # Signals.
-from mlfinlab.statistical_arbitrage.signals import z_score, ornstein_uhlenbeck
+from mlfinlab.statistical_arbitrage.signals import z_score, s_score
 
 # Stationarity.
 from mlfinlab.statistical_arbitrage.stationarity import calc_adfuller, calc_kpss
