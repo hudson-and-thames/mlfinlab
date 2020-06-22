@@ -128,9 +128,9 @@ weight of the  :math:`i^{th}` cluster calculated in Step-3.
 Implementation
 ##############
 
-.. automodule:: mlfinlab.portfolio_optimization.hcaa
+.. automodule:: mlfinlab.portfolio_optimization.herc
 
-    .. autoclass:: HierarchicalClusteringAssetAllocation
+    .. autoclass:: HierarchicalEqualRiskContribution
         :members:
 
         .. automethod:: __init__
