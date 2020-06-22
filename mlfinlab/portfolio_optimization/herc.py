@@ -11,7 +11,7 @@ from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
 from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
 
 
-class HierarchicalClusteringAssetAllocation:
+class HierarchicalEqualRiskContribution:
     """
     This class implements the Hierarchical Equal Risk Contribution (HERC) algorithm and it's extended components mentioned in the
     following papers: `Raffinot, Thomas, The Hierarchical Equal Risk Contribution Portfolio (August 23,
@@ -48,7 +48,7 @@ class HierarchicalClusteringAssetAllocation:
                  risk_measure='equal_weighting', linkage='ward', optimal_num_clusters=None):
         # pylint: disable=too-many-branches
         """
-        Calculate asset allocations using the HCAA algorithm.
+        Calculate asset allocations using the Hierarchical Equal Risk Contribution algorithm.
 
         :param asset_names: (list) A list of strings containing the asset names.
         :param asset_prices: (pd.DataFrame) A dataframe of historical asset prices (daily close)

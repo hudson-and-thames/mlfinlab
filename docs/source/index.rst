@@ -333,7 +333,7 @@ This project is licensed under an all rights reserved licence.
     portfolio_optimisation/mean_variance
     portfolio_optimisation/critical_line_algorithm
     portfolio_optimisation/hierarchical_risk_parity
-    portfolio_optimisation/hierarchical_clustering_asset_allocation
+    portfolio_optimisation/hierarchical_equal_risk_contribution
     portfolio_optimisation/nested_clustered_optimisation
     portfolio_optimisation/theory_implied_correlation
 
