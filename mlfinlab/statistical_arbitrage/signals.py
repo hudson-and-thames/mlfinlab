@@ -28,6 +28,34 @@ def s_score(data):
     :param data: (np.array) Data for s-score calculation.
     :return: (np.array) S-score of the given data.
     """
+    # Shift x down 1.
+    data_x = data[:-1]
+
+    # Add constant.
+    data_x = _add_constant(data_x)
+
+    # Shift y up 1.
+    data_y = data[1:]
+
+    # Calculate beta.
+    beta = _linear_regression(data_x, data_y)
+
+    # Calculate residuals.
+    resid = data_y - data_x.dot(beta)
+
+    # Set variables.
+    a = beta[-1]
+    b = beta[0]
+    zeta = np.var(resid, axis=0)
+    kappa = -np.log(b) * 252
+    m = a / (1 - b)
+
+
+    #
+    return
+
+
+def hurst(data):
     return
 
 
