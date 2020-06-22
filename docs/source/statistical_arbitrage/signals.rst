@@ -1,4 +1,4 @@
-.. _statistical_arbitrage-introduction:
+.. _statistical_arbitrage-signals:
 .. note::
 
     References
