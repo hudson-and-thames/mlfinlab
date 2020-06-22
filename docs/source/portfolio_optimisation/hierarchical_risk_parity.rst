@@ -119,7 +119,7 @@ Implementation
     have -1 at the 3rd and 5th index. By default, a list of 1s will be initialised if no custom input is specified.
 
     |h4| Different Linkage Methods |h4_|
-    HRP, by default, uses the single-linkage clustering algorithm. (See the tip under the HCAA algorithm for more details.)
+    HRP, by default, uses the single-linkage clustering algorithm. (See the tip under the HERC algorithm for more details.)
 
 
 

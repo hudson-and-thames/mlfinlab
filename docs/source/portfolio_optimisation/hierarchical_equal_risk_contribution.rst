@@ -205,9 +205,9 @@ Plotting
     herc.allocate(asset_prices=stock_prices, risk_measure='equal_weighting')
 
     # Plot Dendrogram
-    hcaa.plot_clusters(assets=stock_prices.columns)
+    herc.plot_clusters(assets=stock_prices.columns)
 
-.. image:: portfolio_optimisation_images/dendrogram_hcaa.png
+.. image:: portfolio_optimisation_images/dendrogram_herc.png
 
 In the above image, the colors of assets corresponds to the cluster to which that asset belongs. Assets in the same cluster have the same color. Note that this coloring scheme may change based on the optimal number of clusters identified by the algorithm (or specified by the user).
 
