@@ -27,16 +27,17 @@ def calc_ou_process(data):
     Calculates the s-score, derived from the Ornstein-Uhlenbeck process, for the given data.
 
     :param data: (np.array) Data for s-score calculation.
-    :return: (np.array) S-score of the given data.
+    :return: (tuple) (np.array) S-score of the given data, (np.array) Mean-reverting time.
     """
-    # Create resulting pd.DataFrame.
-    res = np.zeros(data.shape)
+    # Create resulting np.array.
+    ou_process = np.zeros(data.shape)
+    mr_speed = np.zeros(data.shape)
 
     # Iterate through all the columns.
     for i in range(data.shape[1]):
         # Fill in each column.
-        res[:, [i]] = _s_score(data[:, i])
-    return res
+        ou_process[:, [i]], mr_speed[:, [i]] = _s_score(data[:, i])
+    return ou_process, mr_speed
 
 
 def _s_score(_data):
@@ -66,13 +67,20 @@ def _s_score(_data):
     a = beta[-1]
     b = beta[0]
     zeta = np.var(resid, axis=0)
-    kappa = -np.log(b) * 252
+
+    # Suppress log warnings.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        kappa = -np.log(np.abs(b)) * 252
+
     m = a / (1 - b)
     var_eq = np.sqrt(zeta / (1 - b ** 2))
 
-    # Set signal.
-    signal = (_data - m) / var_eq
-    return signal, kappa
+    # Set signal and suppress divide by zero warnings.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        signal = (_data - m) / var_eq
+    return signal, 1 / kappa
 
 
 def _linear_regression(data_x, data_y):

@@ -27,6 +27,9 @@ class StatArb:
     - ``self.resid`` (pd.DataFrame) Residuals from Regression.
     - ``self.cum_resid`` (pd.DataFrame) Cumulative residuals from Regression.
     - ``self.z_score`` (pd.DataFrame) Z-score calculated from cumulative residuals.
+    - ``self.s_score`` (pd.DataFrame) S-score calculated from cumulative residuals and
+        Ornstein-Uhlenbeck process.
+    - ``self.mr_time`` (pd.DataFrame) Mean reversion time calculated from cumulative residuals.
     - ``self.intercept`` (bool) Checks to include constant term for regression. (Default) True.
     - ``self.window`` (int) Number of window to roll. (Default) 0 if no rolling.
     """
@@ -38,12 +41,13 @@ class StatArb:
         self.resid = None
         self.cum_resid = None
         self.z_score = None
+        self.s_score = None
+        self.mr_time = None
         self.intercept = False
         self.window = 0
         self.idx = None
         self.col = None
         self.num_assets = None
-        # self.signal = None (To be implemented)
 
     def allocate(self, price_x, price_y, window=0, intercept=True):
         """
@@ -83,6 +87,9 @@ class StatArb:
 
             # Calculate z-score.
             self.z_score = calc_zscore(self.cum_resid)
+
+            # Calculate s-score.
+            self.s_score, self.mr_time = calc_ou_process(self.cum_resid)
         else:
             # Combine np_x and np_y.
             np_xy = np.hstack((np_x, np_y))
@@ -107,6 +114,12 @@ class StatArb:
 
         # Convert z_score.
         self._convert_zscore(self.z_score)
+
+        # Convert s_score.
+        self._convert_sscore(self.s_score)
+
+        # Convert mr_time.
+        self._convert_mrtime(self.mr_time)
 
     @staticmethod
     def _check(*args):
@@ -167,6 +180,8 @@ class StatArb:
         self.resid = np.zeros((np_xy.shape[0], 1))
         self.cum_resid = np.zeros((np_xy.shape[0], 1))
         self.z_score = np.zeros((np_xy.shape[0], 1))
+        self.s_score = np.zeros((np_xy.shape[0], 1))
+        self.mr_time = np.zeros((np_xy.shape[0], 1))
 
         # Rolling combined data.
         np_xy = self._rolling_window(np_xy, self.window)
@@ -180,6 +195,8 @@ class StatArb:
         self.resid[:self.window - 1] = np.nan
         self.cum_resid[:self.window - 1] = np.nan
         self.z_score[:self.window - 1] = np.nan
+        self.s_score[:self.window - 1] = np.nan
+        self.mr_time[:self.window - 1] = np.nan
 
     def _calc_rolling_params(self, np_xy, adj_window):
         """
@@ -206,6 +223,10 @@ class StatArb:
         # Calculate and set z-score.
         self.z_score[adj_window] = calc_zscore(cum_resid)[-1]
 
+        # Calculate s-score and mr_time.
+        _s_score, _mr_time = calc_ou_process(self.cum_resid)
+        self.s_score[adj_window], self.mr_time[adj_window] = _s_score[-1], _mr_time[-1]
+
         # Insert beta.
         self.beta[:, [adj_window]] = beta
 
@@ -227,6 +248,22 @@ class StatArb:
         shape = (data.shape[0] - window + 1, window) + data.shape[1:]
         strides = (data.strides[0],) + data.strides
         return np.lib.stride_tricks.as_strided(data, shape=shape, strides=strides)
+
+    def _convert_mrtime(self, mr_time):
+        """
+        Converts given np.array of mr_time to pd.DataFrame.
+
+        :param mr_time: (np.array) MR-Time calculated from cumulative residuals.
+        """
+        self.mr_time = pd.DataFrame(mr_time, index=self.idx, columns=['Mean Reversion Time'])
+
+    def _convert_sscore(self, s_score):
+        """
+        Converts given np.array of s_score to pd.DataFrame.
+
+        :param s_score: (np.array) S-score calculated from cumulative residuals.
+        """
+        self.s_score = pd.DataFrame(s_score, index=self.idx, columns=['S-Score'])
 
     def _convert_zscore(self, z_score):
         """

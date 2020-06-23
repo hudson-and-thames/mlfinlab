@@ -29,6 +29,9 @@ class Eigenportfolio(StatArb):
     - ``self.resid`` (pd.DataFrame) Residuals from Regression.
     - ``self.cum_resid`` (pd.DataFrame) Cumulative residuals from Regression.
     - ``self.z_score`` (pd.DataFrame) Z-score calculated from cumulative residuals.
+    - ``self.s_score`` (pd.DataFrame) S-score calculated from cumulative residuals and
+        Ornstein-Uhlenbeck process.
+    - ``self.mr_time`` (pd.DataFrame) Mean reversion time calculated from cumulative residuals.
     - ``self.intercept`` (bool) Checks to include constant term for regression. (Default) True.
     - ``self.window`` (int) Number of window to roll. (Default) 0 if no rolling.
     - ``self.eigenportfolio`` (pd.DataFrame) Eigenportfolio calculated from PCA.
@@ -88,6 +91,9 @@ class Eigenportfolio(StatArb):
 
             # Calculate z-score.
             self.z_score = calc_zscore(self.cum_resid)
+
+            # Calculate s-score.
+            self.s_score, self.mr_time = calc_ou_process(self.cum_resid)
         else:
             # Allocate with rolling windows.
             self._rolling_allocate(self.log_returns)
@@ -109,6 +115,12 @@ class Eigenportfolio(StatArb):
 
         # Convert eigenportfolio.
         self._convert_eigenportfolio(self.eigenportfolio)
+
+        # Convert s_score.
+        self._convert_sscore(self.s_score)
+
+        # Convert mr_time.
+        self._convert_mrtime(self.mr_time)
 
     @staticmethod
     def _check(*args):
@@ -179,6 +191,10 @@ class Eigenportfolio(StatArb):
         # Calculate and set z-score.
         self.z_score[adj_window] = calc_zscore(cum_resid)[-1]
 
+        # Calculate s-score and mr_time.
+        _s_score, _mr_time = calc_ou_process(self.cum_resid)
+        self.s_score[adj_window], self.mr_time[adj_window] = _s_score[-1], _mr_time[-1]
+
         # Insert beta.
         self.beta[adj_window] = beta
 
@@ -203,6 +219,8 @@ class Eigenportfolio(StatArb):
         self.cum_resid = np.zeros((log_returns.shape[0], self.num_assets))
         self.z_score = np.zeros((log_returns.shape[0], self.num_assets))
         self.eigenportfolio = np.zeros((log_returns.shape[0], self.pc_num, self.num_assets))
+        self.s_score = np.zeros((log_returns.shape[0], self.num_assets))
+        self.mr_time = np.zeros((log_returns.shape[0], self.num_assets))
 
         # Rolling combined data.
         log_returns = self._rolling_window(log_returns, self.window)
@@ -217,6 +235,24 @@ class Eigenportfolio(StatArb):
         self.cum_resid[:self.window - 1] = np.nan
         self.z_score[:self.window - 1] = np.nan
         self.eigenportfolio[:self.window - 1] = np.nan
+        self.s_score[:self.window - 1] = np.nan
+        self.mr_time[:self.window - 1] = np.nan
+
+    def _convert_mrtime(self, mr_time):
+        """
+        Converts given np.array of mr_time to pd.DataFrame.
+
+        :param mr_time: (np.array) MR-Time calculated from cumulative residuals.
+        """
+        self.mr_time = pd.DataFrame(mr_time, index=self.idx, columns=self.col)
+
+    def _convert_sscore(self, s_score):
+        """
+        Converts given np.array of s_score to pd.DataFrame.
+
+        :param s_score: (np.array) S-score calculated from cumulative residuals.
+        """
+        self.s_score = pd.DataFrame(s_score, index=self.idx, columns=self.col)
 
     def _convert_eigenportfolio(self, eigenportfolio):
         """
