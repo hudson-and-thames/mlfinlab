@@ -23,19 +23,33 @@ def z_score(data):
 
 def s_score(data):
     """
-    Calculates the s-score for the given data.
+    Calculates the s-score, calculated with the ornstein-uhlenbeck process, for the given data.
 
     :param data: (np.array) Data for s-score calculation.
     :return: (np.array) S-score of the given data.
     """
+    res = np.zeros(data.shape)
+    for i in range(data.shape[1]):
+        res[:, [i]] = _s_score(data[:, i])
+    return res
+
+
+def _s_score(_data):
+    """
+    Helper function to loop each column for s_score.
+
+    :param _data: (np.array) Data for s-score calculation.
+    :return: (np.array) S-score of the given data.
+    """
+    _data = _data.reshape((_data.size, 1))
     # Shift x down 1.
-    data_x = data[:-1]
+    data_x = _data[:-1]
 
     # Add constant.
-    data_x = _add_constant(data_x)
+    data_x = _add_constant(data_x.reshape((data_x.size, 1)))
 
     # Shift y up 1.
-    data_y = data[1:]
+    data_y = _data[1:]
 
     # Calculate beta.
     beta = _linear_regression(data_x, data_y)
@@ -49,10 +63,11 @@ def s_score(data):
     zeta = np.var(resid, axis=0)
     kappa = -np.log(b) * 252
     m = a / (1 - b)
+    var_eq = np.sqrt(zeta / (1 - b ** 2))
 
-
-    #
-    return
+    # Set signal.
+    signal = (_data - m) / var_eq
+    return signal
 
 
 def hurst(data):
