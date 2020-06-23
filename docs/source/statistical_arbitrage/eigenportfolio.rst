@@ -215,6 +215,19 @@ Traditional methods for z-score signals from the example that we used can be:
 
 4. At z-score of -1, close out your trades.
 
+S-Score
+*******
+
+``model.s_score`` is used to call the s_score of the cumulative residuals of the regression model
+calculated from the Ornstein-Uhlenbeck Process. More information is available with :doc:`signals`.
+
+Mean Reversion Time
+*******************
+
+``model.mr_time`` is used to call the mean reversion time of the cumulative residuals of the
+regression model calculated from the Ornstein-Uhlenbeck Process. More information is available
+with :doc:`signals`.
+
 Example Code
 ############
 

@@ -3,8 +3,8 @@
 Implements Signals.
 """
 
-import numpy as np
 import warnings
+import numpy as np
 
 
 def calc_zscore(data):
@@ -64,22 +64,21 @@ def _s_score(_data):
     resid = data_y - data_x.dot(beta)
 
     # Set variables.
-    a = beta[-1]
-    b = beta[0]
+    aa = beta[-1]
+    bb = beta[0]
     zeta = np.var(resid, axis=0)
+    mm = aa / (1 - bb)
+    var_eq = np.sqrt(zeta / (1 - bb ** 2))
 
     # Suppress log warnings.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        kappa = -np.log(np.abs(b)) * 252
-
-    m = a / (1 - b)
-    var_eq = np.sqrt(zeta / (1 - b ** 2))
+        kappa = -np.log(np.abs(bb)) * 252
 
     # Set signal and suppress divide by zero warnings.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        signal = (_data - m) / var_eq
+        signal = (_data - mm) / var_eq
     return signal, 1 / kappa
 
 

@@ -1,9 +1,9 @@
 """
 Implements Eigenportfolio.
 """
+import warnings
 import pandas as pd
 import numpy as np
-import warnings
 
 from .base import StatArb
 from .signals import _linear_regression, _add_constant, calc_zscore, calc_ou_process

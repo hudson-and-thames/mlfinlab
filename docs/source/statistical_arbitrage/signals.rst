@@ -37,11 +37,29 @@ This can be changed into an :math:`AR(1)` model with the following properties:
 - :math:`a = m(1 - b)`
 - :math:`var(\zeta) = \sigma^2 \frac{1 - b^2}{2 \kappa}`
 
+S-Score
+*******
+
 We will primarily use the OU-process to generate trading signals for statistical arbitrage.
 The trading signals will be defined as:
 
 .. math::
     s = \frac{X_t -  m}{var(X_t)} = \frac{\mu\sqrt{2\kappa}}{\sigma}
+
+A larger absolute value of s-score indicates a larger deviation from the mean.
+
+.. py:currentmodule:: mlfinlab.statistical_arbitrage.signals
+
+.. autofunction:: calc_ou_process
+
+Mean Reversion Time
+*******************
+
+Mean reversion time is calculated by taking the inverse of :math:`\kappa`. The time then equates to:
+
+.. math:: \frac{1}{\kappa}
+
+The higher the number, the longer it will take to revert back to its projected mean.
 
 Z-Score
 #######
@@ -57,3 +75,7 @@ but powerful equation indicates the magnitude of the deviation from the mean.
 - :math:`x`: Data point
 - :math:`\mu`: Mean
 - :math:`\sigma`: Standard Deviation
+
+.. py:currentmodule:: mlfinlab.statistical_arbitrage.signals
+
+.. autofunction:: calc_zscore
