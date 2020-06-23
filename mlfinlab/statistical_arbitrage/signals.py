@@ -4,7 +4,6 @@ Implements Signals.
 """
 
 import numpy as np
-import pandas as pd
 import warnings
 
 
@@ -15,8 +14,10 @@ def z_score(data):
     :param data: (np.array) Data for z-score calculation.
     :return: (np.array) Z-score of the given data.
     """
+    # Suppress divide by zero warnings.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
+        # Change nan to 0.
         res = np.nan_to_num((data - np.mean(data, axis=0)) / np.std(data, axis=0))
     return res
 
@@ -28,8 +29,12 @@ def s_score(data):
     :param data: (np.array) Data for s-score calculation.
     :return: (np.array) S-score of the given data.
     """
+    # Create resulting pd.DataFrame.
     res = np.zeros(data.shape)
+
+    # Iterate through all the columns.
     for i in range(data.shape[1]):
+        # Fill in each column.
         res[:, [i]] = _s_score(data[:, i])
     return res
 
@@ -39,7 +44,7 @@ def _s_score(_data):
     Helper function to loop each column for s_score.
 
     :param _data: (np.array) Data for s-score calculation.
-    :return: (np.array) S-score of the given data.
+    :return: (tuple) (np.array) S-score of the given data, (np.array) Time scale for mean reversion.
     """
     _data = _data.reshape((_data.size, 1))
     # Shift x down 1.
@@ -67,11 +72,7 @@ def _s_score(_data):
 
     # Set signal.
     signal = (_data - m) / var_eq
-    return signal
-
-
-def hurst(data):
-    return
+    return signal, kappa
 
 
 def _linear_regression(data_x, data_y):
