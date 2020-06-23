@@ -257,17 +257,17 @@ def plot_min_ffd(series):
     "mildly non-stationary."
 
     The right y-axis on the plot is the ADF statistic computed on the input series downsampled
-    to daily frequency.
+    to a daily frequency.
 
     The x-axis displays the d value used to generate the series on which the ADF statistic is computed.
 
     The left y-axis plots the correlation between the original series (d=0) and the differentiated
     series at various d values.
 
-    Examples on how to interpret the results of this function are available in the corresponsing part
+    Examples on how to interpret the results of this function are available in the corresponding part
     in the book Advances in Financial Machine Learning.
 
-    :param series: (pd.DataFrame) Dataframe that contains 'close' column with prices to use.
+    :param series: (pd.DataFrame) Dataframe that contains a 'close' column with prices to use.
     :return: (plt.AxesSubplot) A plot that can be displayed or used to obtain resulting data.
     """
 
