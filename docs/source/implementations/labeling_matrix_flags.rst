@@ -44,15 +44,16 @@ The matrix flag labeling method, in order to find a single day's fit, consists o
  - The prices in the data window are ranked and decile cutoffs are found. A mapping is found between each price and its decile.
  - The data window is split into 10 chronological buckets each containing a tenth of the data window.
  - Each data window bucket is converted to a column of 10 elements, with the first bucket corresponding to the leftmost column, the second
-   to the second from left, until the last bucket corresponds to the rightmost column. Each row in a column corresponds to decile over entire
-   entire data window, with the top row corresponding to top 90-100th precentile, second row corresponds to the 80-90th percentile, and so on.
- - The mapping between price and decile over data window is applied, and each row consists of the proportion of points in the bucket which
+   to the second from left, and so on until the last bucket corresponds to the rightmost column. Each row in a column corresponds to decile over
+   the entire data window, with the top row corresponding to top 90-100th percentile, second row corresponding to the 80-90th percentile, and
+   so on.
+ - The mapping between price and decile over the data window is applied, and each row consists of the proportion of points in the bucket which
    falls into each decile. For example, suppose the second bucket contains 50% points in the 20-30th percentile, and 50% points in the 0-10th
    percentile. The corresponding column would be, from top to bottom, [0, 0, 0, 0, 0, 0, 0, 0.5, 0, 0.5]. This process is done for all ten
    buckets, until a 10 by 10 matrix is formed.
- - This 10 by 10 matrix is multiplied element-wise by the template. The sum of sum of columns of this result is calculated to be the
+ - This 10 by 10 matrix is multiplied element-wise by the template. The sum of all elements of this resulting matrix is calculated to be the
    total fit for the day.
- - If a threshold is given, this fit is converted to a categorical label, with the positive class given if the fit equals or exceeds the
+ - If a threshold is given, the fit is converted to a categorical label, with the positive class given if the fit equals or exceeds the
    threshold, and the negative class otherwise. The value of the threshold depends on how strict of a classifier the user
    desires, and the allowable values based on the template matrix.
 
@@ -122,7 +123,7 @@ Below is an example on how to use the matrix flags labeling method.
     # Initialize with a window of 60 days.
     Flags = MatrixFlagLabels(prices=data, window=60, template_name='leigh_bull')
 
-    # Get numerical weights based on the template (for days 60 and onwards).cd doc
+    # Get numerical weights based on the template (for days 60 and onwards).
     weights = Flags.apply_labeling_matrix()
 
     # Get categorical labels based on whether the day's weight is above 2.5.

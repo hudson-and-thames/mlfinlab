@@ -148,3 +148,37 @@ class TestMatrixFlagLabels(unittest.TestCase):
         test6_actual = pd.Series([1]*15, index=idx)
         pd.testing.assert_series_equal(test5, test5_actual)
         pd.testing.assert_series_equal(test6, test6_actual)
+
+    def test_template_init(self):
+        """
+        Checks that other templates are given correctly.
+        """
+        close = self.close['spx']
+        leigh_bull = pd.DataFrame([[.5, 0, -1, -1, -1, -1, -1, -1, -1, 0],
+                                   [1, 0.5, 0, -0.5, -1, -1, -1, -1, -0.5, 0],
+                                   [1, 1, 0.5, 0, -0.5, -0.5, -0.5, -0.5, 0, 0.5],
+                                   [0.5, 1, 1, 0.5, 0, -0.5, -0.5, -0.5, 0, 1],
+                                   [0, 0.5, 1, 1, 0.5, 0, 0, 0, 0.5, 1],
+                                   [0, 0, 0.5, 1, 1, 0.5, 0, 0, 1, 1],
+                                   [-0.5, 0, 0, 0.5, 1, 1, 0.5, 0.5, 1, 1],
+                                   [-0.5, -1, 0, 0, 0.5, 1, 1, 1, 1, 0],
+                                   [-1, -1, -1, -0.5, 0, 0.5, 1, 1, 0, -2],
+                                   [-1, -1, -1, -1, -1, 0, 0.5, 0.5, -2, -2.5]])
+        leigh_bear = pd.DataFrame(np.flip(np.array(leigh_bull), axis=0))
+        cervelloroyo_bull = pd.DataFrame([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                          [0, 0, 0, 0, -1, -1, -1, -1, -1, -1],
+                                          [0, 0, 0, -1, -2, -2, -2, -2, -2, -2],
+                                          [0, 0, -1, -3, -3, -3, -3, -3, -3, -3],
+                                          [0, -1, -3, -5, -5, -5, -5, -5, -5, -5],
+                                          [0, -1, -5, -5, -5, -5, -5, -5, -5, -5],
+                                          [0, -1, -5, -5, -5, -5, -5, -5, -5, -5],
+                                          [5, -1, -5, -5, -5, -5, -5, -5, -5, -5]])
+        cervelloroyo_bear = pd.DataFrame(np.flip(np.array(cervelloroyo_bull), axis=0))
+        test7 = MatrixFlagLabels(close, 30, template_name='leigh_bear')
+        test8 = MatrixFlagLabels(close, 30, template_name='cervelloroyo_bear')
+        test9 = MatrixFlagLabels(close, 30, template_name='cervelloroyo_bull')
+        pd.testing.assert_frame_equal(test7.template, leigh_bear)
+        pd.testing.assert_frame_equal(test8.template, cervelloroyo_bear)
+        pd.testing.assert_frame_equal(test9.template, cervelloroyo_bull)
