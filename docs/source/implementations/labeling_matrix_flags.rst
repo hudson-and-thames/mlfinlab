@@ -73,7 +73,7 @@ The user should know what kind of timescale is desired when deciding the data wi
 small, short-lived trends, while missing longer-term trends, and vice versa for a large data window. Additionally, the choice of template
 determines which kind of pattern is tracked, and should be customized with respect to the data. A template which is optimal for 15 minute
 bars, for example, may not work nearly as well for hourly or daily bars. The user may choose a preset template, or input their own. Currently,
-the allowable templates are the bear and bull versions of the templates used in Leigh's and Cervelló-Royo's papers.
+the allowable pre-set templates are the bear and bull versions of the templates used in Leigh's and Cervelló-Royo's papers.
 
 .. tip::
    **Simple Example**
@@ -122,13 +122,13 @@ Below is an example on how to use the matrix flags labeling method.
     # Initialize with a window of 60 days.
     Flags = MatrixFlagLabels(prices=data, window=60, template_name='leigh_bull')
 
-    # Get numerical weights based on the template (for days 60 and onwards).
+    # Get numerical weights based on the template (for days 60 and onwards).cd doc
     weights = Flags.apply_labeling_matrix()
 
     # Get categorical labels based on whether the day's weight is above 2.5.
     categorical = Flags.apply_labeling_matrix(threshold=2.5)
 
-    # Change the template from default to user defined.
+    # Change the template from pre-set to user defined.
     new_template = pd.DataFrame(np.random.randint(-3, 3, size=(10, 10)))
     Flags.set_template(template=new_template)
 

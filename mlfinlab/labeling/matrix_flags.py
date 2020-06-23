@@ -38,6 +38,8 @@ class MatrixFlagLabels:
         """
         :param prices: (pd.Series) Price data for one stock.
         :param window: (int) Length of preceding data window used when generating the fit matrix for one day.
+        :param template_name: (str) Name of the an available template in the template library. Allowable names:
+                            'leigh_bear', 'leigh_bull', 'cervelloroyo_bear', 'cervellororo_bull'.
         """
         assert (len(prices) >= 10), "Length of data must be at least 10."
         assert (window >= 10), "Window must be at least 10."
