@@ -60,6 +60,35 @@ level textbooks:
    :alt: Academic Journals
    :target: https://www.pm-research.com/
 
+Praise for MlFinLab
+###################
+
+“Financial markets are complex systems like no other. Extracting signal from financial data requires specialized tools
+that are distinct from those used in general machine learning. The MlFinLab package compiles important algorithms
+that every quant should know and use.”
+
+\- `Dr. Marcos Lopez de Prado <https://www.linkedin.com/in/lopezdeprado/>`_, Co-founder and CIO at True Positive Technologies; Professor of Practice at Cornell University
+
+----
+
+"Those who doubt open-source libraries just need to look at the impact of Pandas, Scikit-learn, and the like. MIFinLab
+is doing to financial machine learning what Tensorflow and PyTorch are doing to deep learning."
+
+\- `Dr. Ernest Chan <https://www.linkedin.com/in/epchan/>`_, Hedge Fund Manager at QTS & Author
+
+----
+
+"For many decades, finance has relied on overly simplistic statistical techniques to identify patterns in data.
+Machine learning promises to change that by allowing researchers to use modern nonlinear and highly dimensional
+techniques. Yet, applying those machine learning algorithms to model financial problems is easier said than done:
+finance is not a plug-and-play subject as it relates to machine learning.
+
+MlFinLab provides access to the latest cutting edges methods. MlFinLab is thus essential for quants who want to be
+ahead of the technology rather than being replaced by it."
+
+\- `Dr. Thomas Raffinot <https://www.linkedin.com/in/thomas-raffinot-b75734b/>`_, Financial Data Scientist at ENGIE Global Markets
+
+----
 
 Unlocking the Commons
 #####################
@@ -114,12 +143,12 @@ Benefits include:
 Platinum Sponsor:
 *****************
 
-.. figure:: logo/machine-factor-technologies.png
+.. figure:: logo/plat_sponsors.png
    :scale: 100 %
    :align: center
    :figclass: align-center
    :alt: Platinum Sponsors
-   :target: https://machinefactor.tech/
+   :target: https://hudsonthames.org/sponsors/
 
 Gold Sponsors:
 **************
@@ -206,7 +235,7 @@ Early Adopters:
 .. _`Shawn Unger`: https://www.linkedin.com/in/shawnunger1/
 .. _`Ruifan Pei`: https://www.linkedin.com/in/ruifan-pei-b994b177/
 .. _`Sritanu Chakraborty`: https://www.linkedin.com/in/sritanuchakraborty/
-.. _`Kofi Glove`: https://www.linkedin.com/in/kofiglover/
+.. _`Kofi Glover`: https://www.linkedin.com/in/kofiglover/
 
 License
 #######
@@ -227,6 +256,7 @@ This project is licensed under an all rights reserved licence.
     getting_started/barriers_to_entry
     getting_started/researcher
     getting_started/datasets
+    getting_started/research_tools
 
 .. toctree::
     :maxdepth: 2
@@ -235,11 +265,21 @@ This project is licensed under an all rights reserved licence.
 
     implementations/data_structures
     implementations/filters
-    implementations/codependence
     implementations/frac_diff
     implementations/structural_breaks
     implementations/microstructural_features
 
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Codependence
+    :hidden:
+
+    codependence/introduction
+    codependence/correlation_based_metrics
+    codependence/information_theory_metrics
+    codependence/codependence_marti
+    codependence/codependence_matrix
 
 .. toctree::
     :maxdepth: 2
@@ -249,6 +289,10 @@ This project is licensed under an all rights reserved licence.
     implementations/tb_meta_labeling
     implementations/labeling_trend_scanning
     implementations/labeling_tail_sets
+    implementations/labeling_fixed_time_horizon
+    implementations/labeling_excess_median
+    implementations/labeling_raw_return
+    implementations/labeling_vs_benchmark
 
 .. toctree::
     :maxdepth: 2
@@ -289,9 +333,21 @@ This project is licensed under an all rights reserved licence.
     portfolio_optimisation/mean_variance
     portfolio_optimisation/critical_line_algorithm
     portfolio_optimisation/hierarchical_risk_parity
-    portfolio_optimisation/hierarchical_clustering_asset_allocation
+    portfolio_optimisation/hierarchical_equal_risk_contribution
     portfolio_optimisation/nested_clustered_optimisation
     portfolio_optimisation/theory_implied_correlation
+
+.. toctree::
+    :maxdepth: 5
+    :caption: Online Portfolio Selection
+    :hidden:
+
+    online_portfolio_selection/introduction
+    online_portfolio_selection/benchmarks
+    online_portfolio_selection/momentum
+    online_portfolio_selection/mean_reversion
+    online_portfolio_selection/pattern_matching
+    online_portfolio_selection/universal_portfolio
 
 .. toctree::
     :maxdepth: 2

@@ -1,27 +1,54 @@
 .. _portfolio_optimisation-risk_metrics:
 
+.. |br| raw:: html
+
+    <br>
+
+.. |h3| raw:: html
+
+    <h3>
+
+.. |h3_| raw:: html
+
+    </h3>
+
+.. |h4| raw:: html
+
+    <h4>
+
+.. |h4_| raw:: html
+
+    </h4>
+
+.. |h5| raw:: html
+
+    <h5>
+
+.. |h5_| raw:: html
+
+    </h5>
+
 
 ============
 Risk Metrics
 ============
 
 The RiskMetrics class contains functions for calculation of common risk metrics used by investment professionals.
-The list of supported metrics will grow with future updates of the package. Now, the following risk calculations are supported:
-
-1. ``Variance``
-2. ``Value at Risk (VaR)``
-3. ``Expected Shortfall (CVaR)``
-4. ``Conditional Drawdown at Risk (CDaR)``
+The list of supported metrics will grow with future updates of the package.
 
 .. tip::
-   **Underlying Literature**
+   |h4| Underlying Literature |h4_|
 
    The following sources elaborate extensively on the topic:
 
    - **Portfolio Optimization with Drawdown Constraints** *by* Alexei Chekhlov, Stanislav Uryasev, Michael Zabarankin `available here <https://www.ise.ufl.edu/uryasev/files/2011/11/drawdown.pdf>`_. *Introduces a CDaR measure and compares it to the CVaR measure.*
 
+
+Supported Metrics
+#################
+
 Variance
-########
+********
 
 This measure can be used to compare portfolios based on estimations of the volatility of returns.
 
@@ -29,13 +56,13 @@ The Variance of a portfolio is calculated as follows:
 
 .. math::
 
-      Var = w^{T} * Cov * w
+      \sigma^{2} = w^{T}\sum w
 
-Where :math:`w` is the vector of weights for instruments in a portfolio, and
-:math:`Cov` is a covariance matrix of instruments in a portfolio. Result :math:`Var` is a scalar.
+where :math:`w` is the vector of weights for instruments in a portfolio, and :math:`\sum` is a covariance matrix of assets in a portfolio. Result :math:`\sigma^{2}` is a scalar.
+
 
 Value at Risk (VaR)
-###################
+*******************
 
 This measure can be used to compare portfolios based on the amount of investments that can be lost in the next observation,
 assuming the returns for assets follow a multivariate normal distribution.
@@ -52,7 +79,7 @@ VaR of :math:`0.15` at :math:`\alpha = 0.05` level means that with a :math:`5\%`
 decrease by :math:`15\%` on the next observation.
 
 Expected Shortfall (CVaR)
-#########################
+*************************
 
 This measure can be used to compare portfolios based on the average amount of investments that can be lost in a
 worst-case scenario, assuming the returns for assets follow a multivariate normal distribution.
@@ -75,7 +102,7 @@ This picture from Y. Vardanyan demonstrates the differences between the VaR and 
    :align: center
 
 Conditional Drawdown at Risk (CDaR)
-###################################
+***********************************
 
 This measure can be used to compare portfolios based on the average amount of a portfolio drawdown in a
 worst-case scenario, assuming the drawdowns follow a normal distribution.
@@ -101,11 +128,9 @@ the average drawdown is :math:`0.15` units in which the portfolio price is measu
 
 .. tip::
 
-    This risk metric is described in more detail in the work **Portfolio Optimization with Drawdown Constraints** `available here <https://www.ise.ufl.edu/uryasev/files/2011/11/drawdown.pdf>`_.
+    * This risk metric is described in more detail in the work **Portfolio Optimization with Drawdown Constraints** `available here <https://www.ise.ufl.edu/uryasev/files/2011/11/drawdown.pdf>`_.
 
-.. tip::
-
-    VaR, CVaR and CDaR metrics can also be used for individual assets.
+    * VaR, CVaR and CDaR metrics can also be used for individual assets.
 
 Implementation
 ##############
@@ -117,14 +142,14 @@ Implementation
 
         .. automethod:: __init__
 
-Example
-########
+Example Code
+############
 Below is an example of how to use the package functions to calculate risk metrics for a portfolio.
 
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.labeling import RiskMetrics
+    from mlfinlab.portfolio_optimization import RiskMetrics
 
     # Import dataframe of returns for assets in a portfolio
     assets_returns = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)

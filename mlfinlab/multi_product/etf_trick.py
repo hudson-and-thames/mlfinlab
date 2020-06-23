@@ -210,7 +210,7 @@ class ETFTrick:
         :param data_df: The data set on which to apply the ETF trick.
         :return: (pd.Series): pandas Series with ETF trick values
         """
-        etf_series = pd.Series()
+        etf_series = pd.Series(dtype='float64')
         for index, row in zip(data_df.index, data_df.values):
             # Split row in corresponding values for ETF trick
             # pylint: disable=unbalanced-tuple-unpacking
@@ -304,7 +304,7 @@ class ETFTrick:
         :param: batch_size: (int): Size of the batch that you would like to make use of
         :return: (pd.Series): pandas Series with ETF trick values starting from 1.0
         """
-        etf_series = pd.Series()
+        etf_series = pd.Series(dtype='float64')
         self._get_batch_from_csv(batch_size)
         # Data frame which contains all precomputed info for etf trick
         data_df = self.generate_trick_components(cache=None)  # Cache is empty on the first batch run

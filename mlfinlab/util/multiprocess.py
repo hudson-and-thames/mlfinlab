@@ -69,7 +69,7 @@ def nested_parts(num_atoms, num_threads, upper_triangle=False):
 
 
 # Snippet 20.7 (page 310), The mpPandasObj, used at various points in the book
-def mp_pandas_obj(func, pd_obj, num_threads=24, mp_batches=1, lin_mols=True, **kargs):
+def mp_pandas_obj(func, pd_obj, num_threads=24, mp_batches=1, lin_mols=True, verbose=True, **kargs):
     """
     Advances in Financial Machine Learning, Snippet 20.7, page 310.
 
@@ -105,6 +105,7 @@ def mp_pandas_obj(func, pd_obj, num_threads=24, mp_batches=1, lin_mols=True, **k
     :param num_threads: (int) The number of threads that will be used in parallel (one processor per thread)
     :param mp_batches: (int) Number of parallel batches (jobs per core)
     :param lin_mols: (bool) Tells if the method should use linear or nested partitioning
+    :param verbose: (bool) Flag to report progress on asynch jobs
     :param kargs: (var args) Keyword arguments needed by func
     :return: (pd.DataFrame) of results
     """
@@ -123,12 +124,12 @@ def mp_pandas_obj(func, pd_obj, num_threads=24, mp_batches=1, lin_mols=True, **k
     if num_threads == 1:
         out = process_jobs_(jobs)
     else:
-        out = process_jobs(jobs, num_threads=num_threads)
+        out = process_jobs(jobs, num_threads=num_threads, verbose=verbose)
 
     if isinstance(out[0], pd.DataFrame):
         df0 = pd.DataFrame()
     elif isinstance(out[0], pd.Series):
-        df0 = pd.Series()
+        df0 = pd.Series(dtype='float64')
     else:
         return out
 
@@ -205,7 +206,7 @@ def report_progress(job_num, num_jobs, time0, task):
 
 
 # Snippet 20.9.2, pg 312, Example of Asynchronous call to pythons multiprocessing library
-def process_jobs(jobs, task=None, num_threads=24):
+def process_jobs(jobs, task=None, num_threads=24, verbose=True):
     """
     Advances in Financial Machine Learning, Snippet 20.9.2, page 312.
 
@@ -216,6 +217,7 @@ def process_jobs(jobs, task=None, num_threads=24):
     :param jobs: (list) Jobs (molecules)
     :param task: (str) Task description
     :param num_threads: (int) The number of threads that will be used in parallel (one processor per thread)
+    :param verbose: (bool) Flag to report progress on asynch jobs
     :return: (None)
     """
 
@@ -230,7 +232,8 @@ def process_jobs(jobs, task=None, num_threads=24):
     # Process asynchronous output, report progress
     for i, out_ in enumerate(outputs, 1):
         out.append(out_)
-        report_progress(i, len(jobs), time0, task)
+        if verbose:
+            report_progress(i, len(jobs), time0, task)
 
     pool.close()
     pool.join()  # This is needed to prevent memory leaks

@@ -142,6 +142,7 @@ The method returns np.array of minimum average monthly returns by the method as 
 method is [Bonferroni, Holm, BHY, Average].
 
 .. autoclass:: CampbellBacktesting
+   :noindex:
    :members: __init__, profit_hurdle
 
 Example
@@ -174,4 +175,4 @@ Research Notebooks
 The following research notebooks can be used to better understand how the algorithms within this module work and how
 they can be used on real data.
 
-* `Backtesting Notebook <https://github.com/hudson-and-thames/research/blob/master/Backtesting/Backtesting.ipynb>`_
+* `Backtesting Notebook <https://github.com/hudson-and-thames/research/blob/master/Backtest%20Overfitting/Backtesting.ipynb>`_

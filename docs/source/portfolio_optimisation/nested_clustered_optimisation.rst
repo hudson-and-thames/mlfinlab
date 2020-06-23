@@ -1,5 +1,33 @@
 .. _portfolio_optimisation-nested_clustered_optimisation:
 
+.. |br| raw:: html
+
+    <br>
+
+.. |h3| raw:: html
+
+    <h3>
+
+.. |h3_| raw:: html
+
+    </h3>
+
+.. |h4| raw:: html
+
+    <h4>
+
+.. |h4_| raw:: html
+
+    </h4>
+
+.. |h5| raw:: html
+
+    <h5>
+
+.. |h5_| raw:: html
+
+    </h5>
+
 ===================================
 Nested Clustered Optimization (NCO)
 ===================================
@@ -12,7 +40,7 @@ The NCO class includes functions related to:
 - Sample data generation to use in the above functions.
 
 .. tip::
-   **Underlying Literature**
+   |h4| Underlying Literature |h4_|
 
    The following sources elaborate extensively on the topic:
 
@@ -98,8 +126,8 @@ Implementation
 
         .. automethod:: __init__
 
-Example
-########
+Example Code
+############
 Below is an example of how to use the package functions to calculate risk metrics for a portfolio.
 
 .. code-block::
@@ -138,6 +166,6 @@ Research Notebooks
 
 The following research notebooks provide a more detailed exploration of the algorithm.
 
-* `NCO Notebook`_
+* `Nested Clustered Optimisation Notebook`_
 
-.. _NCO Notebook: https://github.com/hudson-and-thames/research/blob/master/NCO/NCO.ipynb
+.. _Nested Clustered Optimisation Notebook: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Nested%20Clustered%20Optimisation%20(NCO)/NCO.ipynb

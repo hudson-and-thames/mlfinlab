@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.portfolio_optimization.hrp import HierarchicalRiskParity
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
 class TestHRP(unittest.TestCase):
@@ -50,25 +50,13 @@ class TestHRP(unittest.TestCase):
         self.assertEqual(len(weights) - self.data.shape[1], 0)
         self.assertAlmostEqual(np.sum(weights), 0)
 
-    def test_hrp_with_shrinkage(self):
-        """
-        Test the weights calculated by HRP algorithm with covariance shrinkage.
-        """
-
-        hrp = HierarchicalRiskParity()
-        hrp.allocate(asset_prices=self.data, use_shrinkage=True, asset_names=self.data.columns)
-        weights = hrp.weights.values[0]
-        assert (weights >= 0).all()
-        assert len(weights) == self.data.shape[1]
-        np.testing.assert_almost_equal(np.sum(weights), 1)
-
     def test_dendrogram_plot(self):
         """
         Test if dendrogram plot object is correctly rendered.
         """
 
         hrp = HierarchicalRiskParity()
-        hrp.allocate(asset_prices=self.data, use_shrinkage=True, asset_names=self.data.columns)
+        hrp.allocate(asset_prices=self.data, asset_names=self.data.columns)
         dendrogram = hrp.plot_clusters(assets=self.data.columns)
         assert dendrogram.get('icoord')
         assert dendrogram.get('dcoord')
@@ -105,18 +93,6 @@ class TestHRP(unittest.TestCase):
             data = self.data.reset_index()
             hrp.allocate(asset_prices=data, asset_names=self.data.columns)
 
-    def test_resampling_asset_prices(self):
-        """
-        Test resampling of asset prices.
-        """
-
-        hrp = HierarchicalRiskParity()
-        hrp.allocate(asset_prices=self.data, resample_by='B', asset_names=self.data.columns)
-        weights = hrp.weights.values[0]
-        assert (weights >= 0).all()
-        assert len(weights) == self.data.shape[1]
-        np.testing.assert_almost_equal(np.sum(weights), 1)
-
     def test_all_inputs_none(self):
         """
         Test allocation when all inputs are None.
@@ -132,7 +108,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         hrp.allocate(asset_returns=returns, asset_names=self.data.columns)
         weights = hrp.weights.values[0]
         assert (weights >= 0).all()
@@ -145,7 +121,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         hrp.allocate(asset_names=self.data.columns, covariance_matrix=returns.cov())
         weights = hrp.weights.values[0]
         assert (weights >= 0).all()
@@ -158,7 +134,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         covariance = returns.cov()
         d_matrix = np.zeros_like(covariance)
         diagnoal_sqrt = np.sqrt(np.diag(covariance))
@@ -179,7 +155,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        hrp.allocate(asset_names=self.data.columns, asset_prices=self.data, linkage_method='ward')
+        hrp.allocate(asset_names=self.data.columns, asset_prices=self.data, linkage='ward')
         weights = hrp.weights.values[0]
         assert hrp.ordered_indices == [13, 7, 1, 6, 4, 16, 3, 17, 14, 0, 15, 8,
                                        9, 10, 12, 18, 22, 5, 19, 2, 20, 11, 21]
@@ -205,7 +181,7 @@ class TestHRP(unittest.TestCase):
         """
 
         hrp = HierarchicalRiskParity()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         hrp.allocate(asset_returns=returns)
         weights = hrp.weights.values[0]
         assert (weights >= 0).all()
@@ -219,5 +195,5 @@ class TestHRP(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             hrp = HierarchicalRiskParity()
-            returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+            returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
             hrp.allocate(asset_returns=returns.values)
