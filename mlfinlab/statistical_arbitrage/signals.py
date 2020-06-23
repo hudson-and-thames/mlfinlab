@@ -64,21 +64,21 @@ def _s_score(_data):
     resid = data_y - data_x.dot(beta)
 
     # Set variables.
-    aa = beta[-1]
-    bb = beta[0]
+    alpha = beta[-1]
+    beta = beta[0]
     zeta = np.var(resid, axis=0)
-    mm = aa / (1 - bb)
-    var_eq = np.sqrt(zeta / (1 - bb ** 2))
+    mean = alpha / (1 - beta)
+    var_eq = np.sqrt(zeta / (1 - beta ** 2))
 
     # Suppress log warnings.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        kappa = -np.log(np.abs(bb)) * 252
+        kappa = -np.log(np.abs(beta)) * 252
 
     # Set signal and suppress divide by zero warnings.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        signal = (_data - mm) / var_eq
+        signal = (_data - mean) / var_eq
     return signal, 1 / kappa
 
 
