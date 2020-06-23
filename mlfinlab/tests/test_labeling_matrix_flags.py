@@ -186,3 +186,5 @@ class TestMatrixFlagLabels(unittest.TestCase):
         # Exception for invalid name.
         with self.assertRaises(Exception):
             MatrixFlagLabels(close[0:7], window=30, template_name='abcd')
+        with self.assertRaises(Exception):
+            test7._init_template('abcd')
