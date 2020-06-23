@@ -93,13 +93,59 @@ The following graph shows a fractionally differenced series plotted over the ori
    A deeper analysis of the problem and the tests of the method on various futures is available in the
    **Chapter 5 of Advances in Financial Machine Learning**.
 
+This module also allows
+
 Implementation
-##############
+**************
 
 The following function implemented in mlfinlab can be used to derive fractionally differentiated features.
 
 .. py:currentmodule:: mlfinlab.features.fracdiff
 .. autofunction::  frac_diff_ffd
+
+
+Stationarity With Maximum Memory Representation
+###############################################
+
+The following description is based on **Chapter 5 of Advances in Financial Machine Learning**:
+
+Applying the fixed-width window fracdiff (FFD) method on series, the minimum coefficient d∗ can be computed.
+With this d∗ the resulting fractionally differentiated series is stationary. This coefficient
+d∗ quantifies the amount of memory that needs to be removed to achieve stationarity.
+If the input series:
+- is already stationary, then d∗ = 0.
+- contains a unit root, then d∗ < 1.
+- exhibits explosive behavior (like in a bubble), then d∗ > 1.
+
+A case of particular interest is 0 < d∗ ≪ 1, when the original series is “mildly non-stationary.”
+In this case, although differentiation is needed, a full integer differentiation removes
+excessive memory (and predictive power).
+
+Below plos shows how the output of a plot_min_ffd function looks.
+
+.. figure:: plot_min_ffd_graph.png
+   :scale: 80 %
+   :align: center
+   :figclass: align-center
+   :alt: Minimum D value that passes the ADF test
+
+   Fractionally differentiated series with a fixed-width window `(Lopez de Prado 2018) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3447398>`_
+
+
+.. tip::
+
+   A deeper analysis of the problem and the tests of the method on various futures is available in the
+   **Chapter 5 of Advances in Financial Machine Learning**.
+
+This module also allows
+
+Implementation
+**************
+
+The following function implemented in mlfinlab can be used to derive fractionally differentiated features.
+
+.. py:currentmodule:: mlfinlab.features.fracdiff
+.. autofunction::  frac_diff_ffd, plot_min_ffd
 
 Example
 #######
