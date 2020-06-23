@@ -71,15 +71,4 @@ The most commonly used filtering method is the cointegration test. Using the coi
 can see which pairs of assets pass the threshold to reject the null hypothesis. More information is
 available with :doc:`cointegration`.
 
-Not implemented in the module yet, but options for filtering include:
-
-1. Principal Component Analysis
-2. Clustering
-
-    - Fundamental values
-    - Sector/Industry
-    - K-means
-
-3. Heuristics
-
-4. Distance/Correlation Matrix
+For various measures of testing for codependency try different tests described from :doc:`../codependence/introduction`
