@@ -268,14 +268,28 @@ def plot_min_ffd(series):
 
     :param series: (pd.DataFrame) Dataframe that contains 'close' column with prices to use.
     """
-    out = pd.DataFrame(columns=['adfStat', 'pVal', 'lags', 'nObs', '95% conf', 'corr'])
+
+    results = pd.DataFrame(columns=['adfStat', 'pVal', 'lags', 'nObs', '95% conf', 'corr'])
+
+    # Iterate through d values with 0.1 step
     for d in np.linspace(0, 1, 11):
-        df1 = np.log(series[['close']]).resample('1D').last()  # downcast to daily obs
-        df1.dropna(inplace=True)
-        df2 = frac_diff_ffd(df1, diff_amt=d, thresh=0.01).dropna()
-        corr = np.corrcoef(df1.loc[df2.index, 'close'], df2['close'])[0, 1]
-        df2 = adfuller(df2['close'], maxlag=1, regression='c', autolag=None)
-        out.loc[d] = list(df2[:4]) + [df2[4]['5%']] + [corr]  # with critical value
-    out[['adfStat', 'corr']].plot(secondary_y='adfStat', figsize=(10, 8))
+        close_prices = np.log(series[['close']]).resample('1D').last()  # Downcast to daily obs
+        close_prices.dropna(inplace=True)
+
+        # Applying fractional differentiation
+        differenced_series = frac_diff_ffd(close_prices, diff_amt=d, thresh=0.01).dropna()
+
+        # Correlation between the original and the differentiated series
+        corr = np.corrcoef(close_prices.loc[differenced_series.index, 'close'],
+                           differenced_series['close'])[0, 1]
+        # Applying ADF
+        differenced_series = adfuller(differenced_series['close'], maxlag=1, regression='c', autolag=None)
+
+        # Results to dataframe
+        results.loc[d] = list(df2[:4]) + [df2[4]['5%']] + [corr]  # With critical value
+
+    # Plotting
+    results[['adfStat', 'corr']].plot(secondary_y='adfStat', figsize=(10, 8))
     plt.axhline(out['95% conf'].mean(), linewidth=1, color='r', linestyle='dotted')
+
     return
