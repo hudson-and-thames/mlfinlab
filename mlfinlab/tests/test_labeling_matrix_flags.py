@@ -98,7 +98,7 @@ class TestMatrixFlagLabels(unittest.TestCase):
                                [0, 0, 0, 0, 0, 0, 2. / 3, 0, 0, 1. / 3],
                                [0, 0, 0, 0, 0, 1. / 3, 1. / 3, 1. / 3, 0, 0]])
 
-        flags = MatrixFlagLabels(self.close['spx'], window=100)  # Inputs don't matter.
+        flags = MatrixFlagLabels(self.close['spx'], window=100, template_name='leigh_bull')
         test3 = flags._apply_template_to_matrix(matrix, flags.template)
         self.assertAlmostEqual(test3, 2.6666666667)
 
@@ -123,7 +123,7 @@ class TestMatrixFlagLabels(unittest.TestCase):
         Test for the function the users would actually use, for creating full labels from matrix.
         """
         data = self.close['spx'][0:100]
-        flags = MatrixFlagLabels(data=data, window=60)
+        flags = MatrixFlagLabels(prices=data, window=60, template_name='leigh_bull')
         test5 = flags.apply_labeling_matrix()
 
         # Verify that the output has 40 (100 - 60) rows.
@@ -141,7 +141,7 @@ class TestMatrixFlagLabels(unittest.TestCase):
         """
         data = self.close['spx'][425:500]
         idx = data[60:].index
-        flags = MatrixFlagLabels(data=data, window=60)
+        flags = MatrixFlagLabels(prices=data, window=60, template_name='leigh_bull')
         test5 = flags.apply_labeling_matrix(threshold=4)
         test6 = flags.apply_labeling_matrix(threshold=-1.5)
         test5_actual = pd.Series([-1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], index=idx)

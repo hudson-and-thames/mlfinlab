@@ -34,27 +34,62 @@ class MatrixFlagLabels:
     allowable values based on the template matrix.
     """
 
-    def __init__(self, data, window):
+    def __init__(self, prices, window, template_name=None):
         """
-        :param data: (pd.Series) Price data for one stock.
+        :param prices: (pd.Series) Price data for one stock.
         :param window: (int) Length of preceding data window used when generating the fit matrix for one day.
         """
-        assert (len(data) >= 10), "Length of data must be at least 10."
+        assert (len(prices) >= 10), "Length of data must be at least 10."
         assert (window >= 10), "Window must be at least 10."
-        assert (len(data) >= window), "Window cannot be greater than length of data."
-        assert isinstance(data, pd.Series), "Data must be pd.Series."
-        self.data = data
+        assert (len(prices) >= window), "Window cannot be greater than length of data."
+        assert isinstance(prices, pd.Series), "Data must be pd.Series."
+        self.data = prices
         self.window = window
-        self.template = pd.DataFrame([[.5, 0, -1, -1, -1, -1, -1, -1, -1, 0],  # Leigh's template
-                                      [1, 0.5, 0, -0.5, -1, -1, -1, -1, -0.5, 0],
-                                      [1, 1, 0.5, 0, -0.5, -0.5, -0.5, -0.5, 0, 0.5],
-                                      [0.5, 1, 1, 0.5, 0, -0.5, -0.5, -0.5, 0, 1],
-                                      [0, 0.5, 1, 1, 0.5, 0, 0, 0, 0.5, 1],
-                                      [0, 0, 0.5, 1, 1, 0.5, 0, 0, 1, 1],
-                                      [-0.5, 0, 0, 0.5, 1, 1, 0.5, 0.5, 1, 1],
-                                      [-0.5, -1, 0, 0, 0.5, 1, 1, 1, 1, 0],
-                                      [-1, -1, -1, -0.5, 0, 0.5, 1, 1, 0, -2],
-                                      [-1, -1, -1, -1, -1, 0, 0.5, 0.5, -2, -2.5]])
+        self.template = pd.DataFrame()
+
+        if template_name is not None:
+            self._init_template(template_name)
+
+    def _init_template(self, name):
+        """
+        :param name: (str) Name of the an available template in the template library. Allowable names: 'leigh_bear',
+                    'leigh_bull', 'cervelloroyo_bear', 'cervellororo_bull'.
+        """
+        leigh_bull = pd.DataFrame([[.5, 0, -1, -1, -1, -1, -1, -1, -1, 0],
+                                   [1, 0.5, 0, -0.5, -1, -1, -1, -1, -0.5, 0],
+                                   [1, 1, 0.5, 0, -0.5, -0.5, -0.5, -0.5, 0, 0.5],
+                                   [0.5, 1, 1, 0.5, 0, -0.5, -0.5, -0.5, 0, 1],
+                                   [0, 0.5, 1, 1, 0.5, 0, 0, 0, 0.5, 1],
+                                   [0, 0, 0.5, 1, 1, 0.5, 0, 0, 1, 1],
+                                   [-0.5, 0, 0, 0.5, 1, 1, 0.5, 0.5, 1, 1],
+                                   [-0.5, -1, 0, 0, 0.5, 1, 1, 1, 1, 0],
+                                   [-1, -1, -1, -0.5, 0, 0.5, 1, 1, 0, -2],
+                                   [-1, -1, -1, -1, -1, 0, 0.5, 0.5, -2, -2.5]])
+
+        leigh_bear = pd.DataFrame(np.flip(np.array(leigh_bull), axis=0))
+        cervelloroyo_bull = pd.DataFrame([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                          [0, 0, 0, 0, -1, -1, -1, -1, -1, -1],
+                                          [0, 0, 0, -1, -2, -2, -2, -2, -2, -2],
+                                          [0, 0, -1, -3, -3, -3, -3, -3, -3, -3],
+                                          [0, -1, -3, -5, -5, -5, -5, -5, -5, -5],
+                                          [0, -1, -5, -5, -5, -5, -5, -5, -5, -5],
+                                          [0, -1, -5, -5, -5, -5, -5, -5, -5, -5],
+                                          [5, -1, -5, -5, -5, -5, -5, -5, -5, -5]])
+        cervelloroyo_bear = pd.DataFrame(np.flip(np.array(cervelloroyo_bull), axis=0))
+
+        if name == 'leigh_bull':
+            self.set_template(leigh_bull)
+        elif name == 'leigh_bear':
+            self.set_template(leigh_bear)
+        elif name == 'cervelloroyo_bear':
+            self.set_template(cervelloroyo_bear)
+        elif name == 'cervelloroyo_bull':
+            self.set_template(cervelloroyo_bull)
+        else:
+            raise Exception("Invalid template name. Valid names for are 'leigh_bull', 'leigh_bear', "
+                            "'cervelloroyo_bear', 'cervelloroyo_bull'.")
 
     def set_template(self, template):
         """
@@ -107,7 +142,7 @@ class MatrixFlagLabels:
             # We count the number of times each bin appears in each tenth of data, starting from the highest decile.
             column, _ = np.histogram(tenth_bins, bins=[i for i in range(11)])
             # Convert the count in the column to proportion.
-            column = np.array(column)/len(tenth)
+            column = np.array(column) / len(tenth)
             matrix[col_num] = column[::-1]  # Reverse so that highest decile is on top of the column.
             col_num += 1
 
@@ -128,8 +163,8 @@ class MatrixFlagLabels:
     def apply_labeling_matrix(self, threshold=None):
         """
         :param threshold: (float) If None, labels will be returned numerically as the score for the day. If not None,
-                        then labels are returned categorically, with the positive category for labels which exceed
-                        the threshold.
+                        then labels are returned categorically, with the positive category for labels that are equal to
+                        or exceed the threshold.
         :return: (pd.Series) Total scores for the data series on each eligible day (meaning for indices self.window and
                     onwards).
         """

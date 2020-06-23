@@ -71,8 +71,9 @@ a time window of 40 days.
 
 The user should know what kind of timescale is desired when deciding the data window for this method. Using a small data window will catch
 small, short-lived trends, while missing longer-term trends, and vice versa for a large data window. Additionally, the choice of template
-determines which kind of pattern is tracked, and should be customized with respect to the data. A template which is optimal for intraday prices, for
-example, may not work nearly as well for close prices.
+determines which kind of pattern is tracked, and should be customized with respect to the data. A template which is optimal for 15 minute
+bars, for example, may not work nearly as well for hourly or daily bars. The user may choose a preset template, or input their own. Currently,
+the allowable templates are the bear and bull versions of the templates used in Leigh's and Cervelló-Royo's papers.
 
 .. tip::
    **Simple Example**
@@ -84,7 +85,7 @@ example, may not work nearly as well for close prices.
 
     We split the data into ten chronological subsets such that the first subset is [100, 102]. 100% of elements in the first subset
     fall into the lowest decile, so the corresponding column would be [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]. The second subset is [104, 106],
-    of which 1 out of 2 is in the 2nd decile, and the other is in the 3rd decile, so the column would be [0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0].
+    of which 1 out of 2 prices is in the 2nd decile, and the other is in the 3rd decile, so the column would be [0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0].
     This is done until the entire 10 by 10 matrix is generated. The columns in this matrix represent the 10 chronological subsets, and each
     element in the column represents the proportion of points in each subset corresponding to its respective decile over the entire data window.
 
@@ -119,7 +120,7 @@ Below is an example on how to use the matrix flags labeling method.
     data = hist['Close']
 
     # Initialize with a window of 60 days.
-    Flags = MatrixFlagLabels(prices=data, window=60)
+    Flags = MatrixFlagLabels(prices=data, window=60, template_name='leigh_bull')
 
     # Get numerical weights based on the template (for days 60 and onwards).
     weights = Flags.apply_labeling_matrix()
