@@ -7,6 +7,7 @@ process.
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from statsmodels.tsa.stattools import adfuller
 
@@ -267,6 +268,7 @@ def plot_min_ffd(series):
     in the book Advances in Financial Machine Learning.
 
     :param series: (pd.DataFrame) Dataframe that contains 'close' column with prices to use.
+    :return: (plt.AxesSubplot) A plot that can be displayed or used to obtain resulting data.
     """
 
     results = pd.DataFrame(columns=['adfStat', 'pVal', 'lags', 'nObs', '95% conf', 'corr'])
@@ -286,10 +288,10 @@ def plot_min_ffd(series):
         differenced_series = adfuller(differenced_series['close'], maxlag=1, regression='c', autolag=None)
 
         # Results to dataframe
-        results.loc[d] = list(df2[:4]) + [df2[4]['5%']] + [corr]  # With critical value
+        results.loc[d] = list(differenced_series[:4]) + [differenced_series[4]['5%']] + [corr]  # With critical value
 
     # Plotting
-    results[['adfStat', 'corr']].plot(secondary_y='adfStat', figsize=(10, 8))
-    plt.axhline(out['95% conf'].mean(), linewidth=1, color='r', linestyle='dotted')
+    plot = results[['adfStat', 'corr']].plot(secondary_y='adfStat', figsize=(10, 8))
+    plt.axhline(results['95% conf'].mean(), linewidth=1, color='r', linestyle='dotted')
 
-    return
+    return plot
