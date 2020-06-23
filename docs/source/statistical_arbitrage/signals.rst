@@ -1,5 +1,12 @@
 .. _statistical_arbitrage-signals:
 
+.. note::
+
+    Strategies were implemented with modifications from:
+
+    1. `Avellaneda, M. and Lee, J.H., 2010. Statistical arbitrage in the US equities market. Quantitative Finance, 10(7), pp.761-782.
+    <https://www.tandfonline.com/doi/pdf/10.1080/14697680903124632>`_
+
 =======
 Signals
 =======
@@ -9,10 +16,6 @@ procedure is needed before applying these tools to a real live trading environme
 
 Ornstein-Uhlenbeck Process
 ##########################
-
-.. note::
-    `Bertram, W.K., 2010. Analytic solutions for optimal statistical arbitrage trading. Physica A: Statistical mechanics and its applications, 389(11), pp.2234-2243.
-    <http://www.stagirit.org/sites/default/files/articles/a_0340_ssrn-id1505073.pdf>`_
 
 The Ornstein-Uhlenbeck process is a stochastic mean-reverting process with the following equation:
 
@@ -38,14 +41,19 @@ We will primarily use the OU-process to generate trading signals for statistical
 The trading signals will be defined as:
 
 .. math::
-    s = X_t - \frac{E(X_t)}{var(X_t)} = \frac{\mu\sqrt{2\kappa}}{\sigma}
+    s = \frac{X_t -  m}{var(X_t)} = \frac{\mu\sqrt{2\kappa}}{\sigma}
 
-Kalman Filtering
-################
+Z-Score
+#######
 
-To Be Implemented.
+Z-Score is also another popular method of measuring the distance of the measurement from the mean.
+It has an underlying assumption that the distribution is Gaussian, which may not necessarily be
+true for many of the financial data available to us. Nonetheless, it is often used as the simple
+but powerful equation indicates the magnitude of the deviation from the mean.
 
-Hurst Exponent
-##############
+.. math::
+    z = \frac{x - \mu}{\sigma}
 
-To be implemented.
+- :math:`x`: Data point
+- :math:`\mu`: Mean
+- :math:`\sigma`: Standard Deviation
