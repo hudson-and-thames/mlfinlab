@@ -7,7 +7,7 @@ import numpy as np
 import warnings
 
 
-def z_score(data):
+def calc_zscore(data):
     """
     Calculates the z-score for the given data.
 
@@ -22,9 +22,9 @@ def z_score(data):
     return res
 
 
-def s_score(data):
+def calc_ou_process(data):
     """
-    Calculates the s-score, calculated with the ornstein-uhlenbeck process, for the given data.
+    Calculates the s-score, derived from the Ornstein-Uhlenbeck process, for the given data.
 
     :param data: (np.array) Data for s-score calculation.
     :return: (np.array) S-score of the given data.

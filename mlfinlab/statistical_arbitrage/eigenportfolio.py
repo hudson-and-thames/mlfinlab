@@ -6,7 +6,7 @@ import numpy as np
 import warnings
 
 from .base import StatArb
-from .signals import _linear_regression, _add_constant
+from .signals import _linear_regression, _add_constant, calc_zscore, calc_ou_process
 
 
 class Eigenportfolio(StatArb):
@@ -87,7 +87,7 @@ class Eigenportfolio(StatArb):
             self.cum_resid = self.resid.cumsum(axis=0)
 
             # Calculate z-score.
-            self.z_score = self._calc_zscore(self.cum_resid)
+            self.z_score = calc_zscore(self.cum_resid)
         else:
             # Allocate with rolling windows.
             self._rolling_allocate(self.log_returns)
@@ -177,7 +177,7 @@ class Eigenportfolio(StatArb):
         cum_resid = resid.cumsum(axis=0)
 
         # Calculate and set z-score.
-        self.z_score[adj_window] = self._calc_zscore(cum_resid)[-1]
+        self.z_score[adj_window] = calc_zscore(cum_resid)[-1]
 
         # Insert beta.
         self.beta[adj_window] = beta

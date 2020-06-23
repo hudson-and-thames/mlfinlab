@@ -4,9 +4,8 @@ Implements Pairs Trading strategy.
 
 import numpy as np
 import pandas as pd
-import warnings
 
-from .signals import _linear_regression, _add_constant
+from .signals import _linear_regression, _add_constant, calc_zscore, calc_ou_process
 
 
 class StatArb:
@@ -83,7 +82,7 @@ class StatArb:
             self.cum_resid = self.resid.cumsum(axis=0)
 
             # Calculate z-score.
-            self.z_score = self._calc_zscore(self.cum_resid)
+            self.z_score = calc_zscore(self.cum_resid)
         else:
             # Combine np_x and np_y.
             np_xy = np.hstack((np_x, np_y))
@@ -164,7 +163,7 @@ class StatArb:
         :param np_xy: (np.array) Log returns of price_x and price_y.
         """
         # Preset variables.
-        self.beta = np.zeros((self.intercept+1, np_xy.shape[0]))
+        self.beta = np.zeros((self.intercept + 1, np_xy.shape[0]))
         self.resid = np.zeros((np_xy.shape[0], 1))
         self.cum_resid = np.zeros((np_xy.shape[0], 1))
         self.z_score = np.zeros((np_xy.shape[0], 1))
@@ -205,7 +204,7 @@ class StatArb:
         cum_resid = resid.cumsum(axis=0)
 
         # Calculate and set z-score.
-        self.z_score[adj_window] = self._calc_zscore(cum_resid)[-1]
+        self.z_score[adj_window] = calc_zscore(cum_resid)[-1]
 
         # Insert beta.
         self.beta[:, [adj_window]] = beta
@@ -286,19 +285,6 @@ class StatArb:
         # Set index and column from self.price.
         self.idx = self.price.index
         self.col = self.price.columns
-
-    @staticmethod
-    def _calc_zscore(data):
-        """
-        Calculates the z-score for the given data.
-
-        :param data: (np.array) Data for z-score calculation.
-        :return: (np.array) Z-score of the given data.
-        """
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            res = np.nan_to_num((data - np.mean(data, axis=0)) / np.std(data, axis=0))
-        return res
 
     @staticmethod
     def _calc_log_returns(price):
