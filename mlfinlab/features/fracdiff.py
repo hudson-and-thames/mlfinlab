@@ -274,12 +274,12 @@ def plot_min_ffd(series):
     results = pd.DataFrame(columns=['adfStat', 'pVal', 'lags', 'nObs', '95% conf', 'corr'])
 
     # Iterate through d values with 0.1 step
-    for d in np.linspace(0, 1, 11):
+    for d_value in np.linspace(0, 1, 11):
         close_prices = np.log(series[['close']]).resample('1D').last()  # Downcast to daily obs
         close_prices.dropna(inplace=True)
 
         # Applying fractional differentiation
-        differenced_series = frac_diff_ffd(close_prices, diff_amt=d, thresh=0.01).dropna()
+        differenced_series = frac_diff_ffd(close_prices, diff_amt=d_value, thresh=0.01).dropna()
 
         # Correlation between the original and the differentiated series
         corr = np.corrcoef(close_prices.loc[differenced_series.index, 'close'],
@@ -288,7 +288,7 @@ def plot_min_ffd(series):
         differenced_series = adfuller(differenced_series['close'], maxlag=1, regression='c', autolag=None)
 
         # Results to dataframe
-        results.loc[d] = list(differenced_series[:4]) + [differenced_series[4]['5%']] + [corr]  # With critical value
+        results.loc[d_value] = list(differenced_series[:4]) + [differenced_series[4]['5%']] + [corr]  # With critical value
 
     # Plotting
     plot = results[['adfStat', 'corr']].plot(secondary_y='adfStat', figsize=(10, 8))

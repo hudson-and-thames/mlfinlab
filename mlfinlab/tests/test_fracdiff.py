@@ -7,7 +7,6 @@ import os
 import math
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 from mlfinlab.features import fracdiff, plot_min_ffd
 
@@ -103,8 +102,8 @@ class TestFractionalDifferentiation(unittest.TestCase):
                                          [0.1, 0.99295323],
                                          [0.2, 0.97712122],
                                          [0.3, 0.95098824],
-                                         [0.4, 0.9142265 ],
-                                         [0.5, 0.8641224 ],
+                                         [0.4, 0.91422650],
+                                         [0.5, 0.86412240],
                                          [0.6, 0.80909555],
                                          [0.7, 0.76457507],
                                          [0.8, 0.67228154],
