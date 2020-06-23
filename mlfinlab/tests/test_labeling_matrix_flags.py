@@ -182,3 +182,7 @@ class TestMatrixFlagLabels(unittest.TestCase):
         pd.testing.assert_frame_equal(test7.template, leigh_bear)
         pd.testing.assert_frame_equal(test8.template, cervelloroyo_bear)
         pd.testing.assert_frame_equal(test9.template, cervelloroyo_bull)
+
+        # Exception for invalid name.
+        with self.assertRaises(Exception):
+            MatrixFlagLabels(close[0:7], window=30, template_name='abcd')
