@@ -5,6 +5,7 @@ import scipy.spatial.distance as ssd
 import scipy.cluster.hierarchy as sch
 from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
 
+
 class TIC:
     """
     This class implements the Theory-Implied Correlation (TIC) algorithm and the correlation matrix distance

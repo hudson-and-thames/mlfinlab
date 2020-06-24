@@ -92,13 +92,12 @@ up on [Patreon](https://www.patreon.com/HudsonThames).
 Benefits include:
 1. Uninterrupted access: Should the code base pivot to closed source - your company will have access to all 
    implementations and the source code.
-2. A seat on the Hudson & Thames advisory council and votes towards the direction of research and implementations.
-3. Ongoing access to slide show presentations and Jupyter Notebooks. (files can be edited to suit your personal 
+2. Ongoing access to slide show presentations and Jupyter Notebooks. (files can be edited to suit your personal 
    needs such as classroom notes or client presentations.)
-4. Company / Organisation profile on [www.hudsonthames.org](https://hudsonthames.org/sponsors/)
-5. Use of Hudson & Thames sponsor badge on your website.
-6. Access to our communities Slack Channel.
-7. Subscription to project release updates and news.
+3. Company / Organisation profile on [www.hudsonthames.org](https://hudsonthames.org/sponsors/)
+4. Use of Hudson & Thames sponsor badge on your website.
+5. Access to our communities Slack Channel.
+6. Subscription to project release updates and news.
 
 ### Platinum Sponsor:
 <div align="center">
