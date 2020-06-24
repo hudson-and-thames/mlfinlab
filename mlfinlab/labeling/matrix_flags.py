@@ -39,7 +39,7 @@ class MatrixFlagLabels:
         :param prices: (pd.Series) Price data for one stock.
         :param window: (int) Length of preceding data window used when generating the fit matrix for one day.
         :param template_name: (str) Name of the an available template in the template library. Allowable names:
-                            'leigh_bear', 'leigh_bull', 'cervelloroyo_bear', 'cervellororo_bull'.
+                            ``leigh_bear``, ``leigh_bull``, ``cervelloroyo_bear``, ``cervellororo_bull``.
         """
         assert (len(prices) >= 10), "Length of data must be at least 10."
         assert (window >= 10), "Window must be at least 10."
@@ -54,8 +54,8 @@ class MatrixFlagLabels:
 
     def _init_template(self, name):
         """
-        :param name: (str) Name of the an available template in the template library. Allowable names: 'leigh_bear',
-                    'leigh_bull', 'cervelloroyo_bear', 'cervellororo_bull'.
+        :param name: (str) Name of the an available template in the template library. Allowable names: ``leigh_bear``,
+        ``leigh_bull``, ``cervelloroyo_bear``, ``cervellororo_bull``.
         """
         leigh_bull = pd.DataFrame([[.5, 0, -1, -1, -1, -1, -1, -1, -1, 0],
                                    [1, 0.5, 0, -0.5, -1, -1, -1, -1, -0.5, 0],
@@ -90,7 +90,7 @@ class MatrixFlagLabels:
         elif name == 'cervelloroyo_bull':
             self.set_template(cervelloroyo_bull)
         else:
-            raise Exception("Invalid template name. Valid names for are 'leigh_bull', 'leigh_bear', "
+            raise Exception("Invalid template name. Valid names are 'leigh_bull', 'leigh_bear', "
                             "'cervelloroyo_bear', 'cervelloroyo_bull'.")
 
     def set_template(self, template):

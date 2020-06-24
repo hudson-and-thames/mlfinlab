@@ -41,7 +41,7 @@ template.
 The matrix flag labeling method, in order to find a single day's fit, consists of the following steps:
 
  - The data window is taken, which consists of the current day's price and a number of days preceding.
- - The prices in the data window are ranked and decile cutoffs are found. A mapping is found between each price and its decile.
+ - The prices in the data window are ranked and decile cutoffs are found. Each price is mapped to the corresponding decile.
  - The data window is split into 10 chronological buckets each containing a tenth of the data window.
  - Each data window bucket is converted to a column of 10 elements, with the first bucket corresponding to the leftmost column, the second
    to the second from left, and so on until the last bucket corresponds to the rightmost column. Each row in a column corresponds to decile over
