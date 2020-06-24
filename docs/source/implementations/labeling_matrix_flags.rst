@@ -76,6 +76,17 @@ determines which kind of pattern is tracked, and should be customized with respe
 bars, for example, may not work nearly as well for hourly or daily bars. The user may choose a preset template, or input their own. Currently,
 the allowable pre-set templates are the bear and bull versions of the templates used in Leigh's and Cervelló-Royo's papers.
 
+.. figure:: labeling_images/matrix_templates.png
+   :scale: 60 %
+   :align: center
+   :figclass: align-center
+   :alt: templates
+
+   Left: Leigh's bull flag template. Right: Cervelló-Royo's bull flag template. The bear versions can be found by flipping
+   the bull versions about the horizontal axis. The highest possible fit using the Leigh template is 10, and using Cervelló-Royo
+   is 5.
+
+
 .. tip::
    **Simple Example**
 
