@@ -17,21 +17,21 @@ algorithm. This class also acts as a parent class for the other strategies’ en
 Three different capital allocation methods have been implemented.
 
 Historical Performance
-======================
+######################
 
 The default capital allocation method according to Cover’s paper was a historical-performance based one.
 In this case, the concept can be easily represented as initially allocating a set of capital to all
 experts and collecting the total sum at the end of the period.
 
 Uniform
-=======
+#######
 
 Uniform allocation refers to a similar principle as a CRP. Instead of leaving each individual capital
 to each expert, after every period capital is rebalanced equally among all experts. The capital from
 the better performing expert will move to the less performing ones.
 
 Top-K
-=====
+#####
 
 .. image:: images/universal_portfolio/top_k.png
    :width: 99 %
@@ -58,7 +58,7 @@ best-performing experts. Through this method, we can reduce our overfitting and 
     difficult for us to exactly approximate a portfolio.
 
 Results
-=======
+#######
 
 In addition to the outputs represented with the original ``OLPS`` class, the ensemble methods have more options.
 
@@ -73,7 +73,7 @@ In addition to the outputs represented with the original ``OLPS`` class, the ens
 - ``self.k`` (int) Number of top-k experts.
 
 Example Code
-============
+############
 
 .. code-block::
 
