@@ -23,7 +23,7 @@ class TestDataStructures(unittest.TestCase):
         Set the file path for the tick data csv
         """
         project_path = os.path.dirname(__file__)
-        self.path = project_path + '/test_data/imbalance_sample_data.csv'
+        self.path = project_path + '/test_data/imbalance_sample_data_small.csv'
 
     def test_ema_run_dollar_bars(self):
         """
@@ -49,7 +49,7 @@ class TestDataStructures(unittest.TestCase):
                                    to_csv=True, output_path='test.csv')
         db4 = pd.read_csv('test.csv', parse_dates=[0])
 
-        self.assertEqual(db1.shape, (3, 10))
+        self.assertEqual(db1.shape, (2, 10))
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -71,10 +71,10 @@ class TestDataStructures(unittest.TestCase):
         self.assertEqual(db1.loc[0, 'close'], 1305.75)
 
         # Assert OHLC is correct (the first value)
-        self.assertEqual(db1.loc[2, 'open'], 1307.25)
-        self.assertEqual(db1.loc[2, 'high'], 1307.25)
-        self.assertEqual(db1.loc[2, 'low'], 1302.25)
-        self.assertEqual(db1.loc[2, 'close'], 1302.25)
+        self.assertEqual(db1.loc[1, 'open'], 1305.75)
+        self.assertEqual(db1.loc[1, 'high'], 1308.75)
+        self.assertEqual(db1.loc[1, 'low'], 1305.25)
+        self.assertEqual(db1.loc[1, 'close'], 1307.25)
 
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
         self.assertTrue((db1.loc[:, 'volume'] >= db1.loc[:, 'cum_buy_volume']).all())
@@ -106,7 +106,7 @@ class TestDataStructures(unittest.TestCase):
                                    to_csv=True, output_path='test.csv')
         db4 = pd.read_csv('test.csv', parse_dates=[0])
 
-        self.assertEqual(db1.shape, (3, 10))
+        self.assertEqual(db1.shape, (2, 10))
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -128,10 +128,10 @@ class TestDataStructures(unittest.TestCase):
         self.assertEqual(db1.loc[0, 'close'], 1305.75)
 
         # Assert OHLC is correct (the first value)
-        self.assertEqual(db1.loc[2, 'open'], 1307.25)
-        self.assertEqual(db1.loc[2, 'high'], 1307.25)
-        self.assertEqual(db1.loc[2, 'low'], 1302.25)
-        self.assertEqual(db1.loc[2, 'close'], 1302.25)
+        self.assertEqual(db1.loc[1, 'open'], 1305.75)
+        self.assertEqual(db1.loc[1, 'high'], 1308.75)
+        self.assertEqual(db1.loc[1, 'low'], 1305.25)
+        self.assertEqual(db1.loc[1, 'close'], 1307.25)
 
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
         self.assertTrue((db1.loc[:, 'volume'] >= db1.loc[:, 'cum_buy_volume']).all())
@@ -163,7 +163,7 @@ class TestDataStructures(unittest.TestCase):
                                  to_csv=True, output_path='test.csv')
         db4 = pd.read_csv('test.csv', parse_dates=[0])
 
-        self.assertEqual(db1.shape, (4, 10))
+        self.assertEqual(db1.shape, (2, 10))
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -185,10 +185,10 @@ class TestDataStructures(unittest.TestCase):
         self.assertEqual(db1.loc[0, 'close'], 1305.75)
 
         # Assert OHLC is correct (the first value)
-        self.assertEqual(db1.loc[2, 'open'], 1307.25)
-        self.assertEqual(db1.loc[2, 'high'], 1307.75)
-        self.assertEqual(db1.loc[2, 'low'], 1303.5)
-        self.assertEqual(db1.loc[2, 'close'], 1304.5)
+        self.assertEqual(db1.loc[1, 'open'], 1305.75)
+        self.assertEqual(db1.loc[1, 'high'], 1308.75)
+        self.assertEqual(db1.loc[1, 'low'], 1305.25)
+        self.assertEqual(db1.loc[1, 'close'], 1307.25)
 
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
         self.assertTrue((db1.loc[:, 'volume'] >= db1.loc[:, 'cum_buy_volume']).all())
@@ -223,7 +223,7 @@ class TestDataStructures(unittest.TestCase):
                                    to_csv=True, output_path='test.csv')
         db4 = pd.read_csv('test.csv', parse_dates=[0])
 
-        self.assertEqual(db1.shape, (9, 10))
+        self.assertEqual(db1.shape, (5, 10))
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -244,10 +244,10 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
 
         # Assert OHLC is correct (some index)
-        self.assertEqual(db1.loc[7, 'open'], 1302.5)
-        self.assertEqual(db1.loc[7, 'high'], 1304.75)
-        self.assertEqual(db1.loc[7, 'low'], 1301.75)
-        self.assertEqual(db1.loc[7, 'close'], 1304.5)
+        self.assertEqual(db1.loc[4, 'open'], 1306)
+        self.assertEqual(db1.loc[4, 'high'], 1306.75)
+        self.assertEqual(db1.loc[4, 'low'], 1303.5)
+        self.assertEqual(db1.loc[4, 'close'], 1303.5)
 
         self.assertTrue((db1.loc[:, 'volume'] >= db1.loc[:, 'cum_buy_volume']).all())
 
@@ -278,7 +278,7 @@ class TestDataStructures(unittest.TestCase):
                                      to_csv=True, output_path='test.csv')
         db4 = pd.read_csv('test.csv', parse_dates=[0])
 
-        self.assertEqual(db1.shape, (9, 10))
+        self.assertEqual(db1.shape, (5, 10))
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -300,10 +300,10 @@ class TestDataStructures(unittest.TestCase):
         self.assertEqual(db1.loc[0, 'close'], 1305.75)
 
         # Assert OHLC is correct (the first value)
-        self.assertEqual(db1.loc[2, 'open'], 1306.0)
-        self.assertEqual(db1.loc[2, 'high'], 1307.75)
-        self.assertEqual(db1.loc[2, 'low'], 1305.75)
-        self.assertEqual(db1.loc[2, 'close'], 1307.75)
+        self.assertEqual(db1.loc[4, 'open'], 1306)
+        self.assertEqual(db1.loc[4, 'high'], 1306.75)
+        self.assertEqual(db1.loc[4, 'low'], 1303.5)
+        self.assertEqual(db1.loc[4, 'close'], 1303.5)
 
         self.assertTrue((db1.loc[:, 'high'] >= db1.loc[:, 'low']).all())
         self.assertTrue((db1.loc[:, 'volume'] >= db1.loc[:, 'cum_buy_volume']).all())
@@ -335,7 +335,7 @@ class TestDataStructures(unittest.TestCase):
                                      to_csv=True, output_path='test.csv')
         db4 = pd.read_csv('test.csv', parse_dates=[0])
 
-        self.assertEqual(db1.shape, (9, 10))
+        self.assertEqual(db1.shape, (5, 10))
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -392,7 +392,7 @@ class TestDataStructures(unittest.TestCase):
                                    to_csv=True, output_path='test.csv')
         db4 = pd.read_csv('test.csv', parse_dates=[0])
 
-        self.assertEqual(db1.shape, (9, 10))
+        self.assertEqual(db1.shape, (5, 10))
 
         # Assert diff batch sizes have same number of bars
         self.assertTrue(db1.shape == db2.shape)
@@ -436,8 +436,8 @@ class TestDataStructures(unittest.TestCase):
                          np.int64(5), 'Limit order', 'B23']
 
         # pylint: disable=protected-access
-        self.assertRaises(ValueError, ds.BaseRunBars._assert_csv(
-            pd.DataFrame(wrong_date).T))
+        self.assertRaises(ValueError, ds.BaseRunBars._assert_csv,
+                          pd.DataFrame(wrong_date).T)
         # pylint: disable=protected-access
         self.assertRaises(AssertionError,
                           ds.BaseRunBars._assert_csv,

@@ -8,7 +8,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
 class TestRiskEstimators(unittest.TestCase):
@@ -27,7 +27,7 @@ class TestRiskEstimators(unittest.TestCase):
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
         # And series of returns
-        ret_est = ReturnsEstimation()
+        ret_est = ReturnsEstimators()
         self.returns = ret_est.calculate_returns(self.data)
 
     def test_mp_pdf(self):
@@ -211,10 +211,69 @@ class TestRiskEstimators(unittest.TestCase):
                                   [0.13353165, 1, -0.21921986],
                                   [-0.13353165, -0.21921986, 1]])
 
-        # Finding the eigenvalues
+        # Finding the de-noised correlation matrix
         corr_matrix = risk_estimators._denoised_corr(eigenvalues, eigenvectors, 1)
 
         # Testing if the de-noised correlation matrix is right
+        np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
+
+    @staticmethod
+    def test_denoised_corr_targ_shrink():
+        """
+        Test the second method of shrinkage of the eigenvalues associated with noise.
+        """
+
+        risk_estimators = RiskEstimators()
+
+        # Eigenvalues and eigenvectors to use
+        eigenvalues = np.array([[1.3562, 0, 0],
+                                [0, 0.9438, 0],
+                                [0, 0, 0.7]])
+        eigenvectors = np.array([[-3.69048184e-01, -9.29410263e-01, 1.10397126e-16],
+                                 [-6.57192300e-01, 2.60956474e-01, 7.07106781e-01],
+                                 [6.57192300e-01, -2.60956474e-01, 7.07106781e-01]])
+
+        # Expected correlation matrix
+        expected_corr = np.array([[1, 0.32892949, -0.32892949],
+                                  [0.32892949, 1, -0.58573558],
+                                  [-0.32892949, -0.58573558, 1]])
+
+        # Finding the de-noised correlation matrix
+        corr_matrix = risk_estimators._denoised_corr_targ_shrink(eigenvalues, eigenvectors, 1)
+
+        # Testing if the de-noised correlation matrix is right
+        np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
+
+    @staticmethod
+    def test_detoned():
+        """
+        Test the de-toning of the correlation matrix.
+        """
+
+        risk_estimators = RiskEstimators()
+
+        # Correlation matrix to use
+        corr = np.array([[1, 0.1, -0.1],
+                         [0.1, 1, -0.3],
+                         [-0.1, -0.3, 1]])
+
+        # Eigenvalues and eigenvectors to use
+        eigenvalues = np.array([[1.3562, 0, 0],
+                                [0, 0.9438, 0],
+                                [0, 0, 0.7]])
+        eigenvectors = np.array([[-3.69048184e-01, -9.29410263e-01, 1.10397126e-16],
+                                 [-6.57192300e-01, 2.60956474e-01, 7.07106781e-01],
+                                 [6.57192300e-01, -2.60956474e-01, 7.07106781e-01]])
+
+        # Expected correlation matrix
+        expected_corr = np.array([[1, -0.33622026, 0.33622026],
+                                  [-0.33622026, 1, 0.88478197],
+                                  [0.33622026, 0.88478197, 1]])
+
+        # Finding the de-toned correlation matrix
+        corr_matrix = risk_estimators._detoned_corr(corr, eigenvalues, eigenvectors, 1)
+
+        # Testing if the de-toned correlation matrix is right
         np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
 
     @staticmethod
@@ -231,17 +290,46 @@ class TestRiskEstimators(unittest.TestCase):
                                [-0.001, -0.006, 0.01]])
         tn_relation = 50
         kde_bwidth = 0.25
+        alpha = 0.2
+        denoise_method = 'const_resid_eigen'
+        denoise_method_alt = 'target_shrink'
+        detone = False
+        detone_alt = True
+        market_component = 1
 
         # Expected de-noised covariance matrix
         expected_cov = np.array([[0.01, 0.00267029, -0.00133514],
                                  [0.00267029, 0.04, -0.00438387],
                                  [-0.00133514, -0.00438387, 0.01]])
 
+        expected_cov_alt = np.array([[0.01, 0.0057, -0.0028],
+                                     [0.0057, 0.04, -0.0106],
+                                     [-0.0028, -0.0106, 0.01]])
+
+        expected_cov_detoned = np.array([[0.01, -0.00672445, 0.00336222],
+                                         [-0.00672445, 0.04, 0.01769514],
+                                         [0.00336222, 0.01769514, 0.01]])
+
         # Finding the de-noised covariance matrix
-        cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation, kde_bwidth)
+        cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method, detone,
+                                                                 market_component, kde_bwidth)
+
+        # Using the alternative de-noising method
+        cov_matrix_denoised_alt = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method_alt,
+                                                                     detone, market_component, kde_bwidth, alpha)
+
+        # Finding the de-toned covariance matrix
+        cov_matrix_detoned = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method, detone_alt,
+                                                                market_component, kde_bwidth)
 
         # Testing if the de-noised covariance matrix is right
         np.testing.assert_almost_equal(cov_matrix_denoised, expected_cov, decimal=4)
+
+        # Testing if the de-noised covariance matrix is right
+        np.testing.assert_almost_equal(cov_matrix_denoised_alt, expected_cov_alt, decimal=4)
+
+        # Testing if the de-toned covariance matrix is right
+        np.testing.assert_almost_equal(cov_matrix_detoned, expected_cov_detoned, decimal=4)
 
     def test_minimum_covariance_determinant(self):
         """

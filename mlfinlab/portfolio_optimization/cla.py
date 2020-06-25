@@ -4,13 +4,13 @@ from math import log, ceil
 import numpy as np
 import pandas as pd
 
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
-class CLA:
+class CriticalLineAlgorithm:
     # pylint: disable=too-many-instance-attributes
     """
-    This class implements the famous Critical Line Algorithm for mean-variance portfolio optimisation. It is reproduced with
+    This class implements the famous Critical Line Algorithm (CLA) for mean-variance portfolio optimisation. It is reproduced with
     modification from the following paper: `D.H. Bailey and M.L. Prado “An Open-Source Implementation of the Critical- Line
     Algorithm for Portfolio Optimization”,Algorithms, 6 (2013), 169-196. <http://dx.doi.org/10.3390/a6010169>`_.
 
@@ -31,7 +31,7 @@ class CLA:
 
         :param weight_bounds: (tuple) A tuple specifying the lower and upper bound ranges for the portfolio weights
         :param calculate_expected_returns: (str) The method to use for calculation of expected returns.
-                                                 Currently supports "mean" and "exponential"
+                                                 Currently supports ``mean`` and ``exponential``
         """
 
         self.weight_bounds = weight_bounds
@@ -48,7 +48,7 @@ class CLA:
         self.min_var = None
         self.efficient_frontier_means = None
         self.efficient_frontier_sigma = None
-        self.returns_estimator = ReturnsEstimation()
+        self.returns_estimator = ReturnsEstimators()
 
     def allocate(self,
                  asset_names=None,
@@ -65,8 +65,8 @@ class CLA:
         :param asset_prices: (pd.Dataframe) Dataframe of historical asset prices (adj closed)
         :param expected_asset_returns: (list) List of mean stock returns (mu)
         :param covariance_matrix: (pd.Dataframe/numpy matrix) User supplied covariance matrix of asset returns
-        :param solution: (str) Specifies the type of solution to compute. Supported strings: "cla_turning_points", "max_sharpe",
-                               "min_volatility", "efficient_frontier"
+        :param solution: (str) Specifies the type of solution to compute. Supported strings: ``cla_turning_points``, ``max_sharpe``,
+                               ``min_volatility``, ``efficient_frontier``
         :param resample_by: (str) Specifies how to resample the prices - weekly, daily, monthly etc.. Defaults to
                                   None for no resampling
         """
@@ -487,7 +487,7 @@ class CLA:
     def _initialise(self, asset_prices, expected_asset_returns, covariance_matrix, resample_by):
         # pylint: disable=invalid-name, too-many-branches, bad-continuation
         """
-        Initialise covariances, upper-counds, lower-bounds and storage buffers.
+        Initialise covariances, upper-bounds, lower-bounds and storage buffers.
 
         :param asset_prices: (pd.Dataframe) Dataframe of asset prices indexed by date
         :param expected_asset_returns: (list) A list of mean stock returns (mu)
@@ -524,13 +524,13 @@ class CLA:
         if isinstance(self.weight_bounds[0], numbers.Real):
             self.lower_bounds = np.ones(self.expected_returns.shape) * self.weight_bounds[0]
         else:
-            self.lower_bounds = np.array(self.weight_bounds[0]).reshape(self.expected_returns.shape)
+            self.lower_bounds = np.array(self.weight_bounds[0]).astype(float).reshape(self.expected_returns.shape)
 
         # Intialise upper bounds
-        if isinstance(self.weight_bounds[0], numbers.Real):
+        if isinstance(self.weight_bounds[1], numbers.Real):
             self.upper_bounds = np.ones(self.expected_returns.shape) * self.weight_bounds[1]
         else:
-            self.upper_bounds = np.array(self.weight_bounds[1]).reshape(self.expected_returns.shape)
+            self.upper_bounds = np.array(self.weight_bounds[1]).astype(float).reshape(self.expected_returns.shape)
 
         # Initialise storage buffers
         self.weights = []

@@ -1,150 +1,397 @@
 .. _portfolio_optimisation-mean_variance:
 
+.. |br| raw:: html
+
+    <br>
+
+.. |h3| raw:: html
+
+    <h3>
+
+.. |h3_| raw:: html
+
+    </h3>
+
+.. |h4| raw:: html
+
+    <h4>
+
+.. |h4_| raw:: html
+
+    </h4>
+
+.. |h5| raw:: html
+
+    <h5>
+
+.. |h5_| raw:: html
+
+    </h5>
+
 .. note::
-    The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies. Each
-    algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight allocations
-    on the specific user data. This way, each implementation can be called in the same way and makes it simple for users to use them.
-    Next up, lets discuss about some of these implementations and the different parameters they require.
+    The portfolio optimization module contains different algorithms that are used for asset allocation and optimising strategies.
+    Each algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight
+    allocations on the specific user data. This way, each implementation can be called in the same way and this makes it simple
+    for users to use them.
 
 
 ==========================
 Mean-Variance Optimisation
 ==========================
 
-This class contains some classic Mean-Variance optimisation techniques based on Harry Markowitz's methods. We use
-`cvxpy <https://www.cvxpy.org/index.html>`_ as our quadratic optimiser instead of the more frequently used
-`scipy.optimize <https://docs.scipy.org/doc/scipy/reference/optimize.html>`_. This was a design choice for two reasons:
-(a) the documentation of cvxpy is better than that of scipy and (b) cvxpy's code is much more readable and easier to understand.
+Traditionally, portfolio optimization is nothing more than a simple mathematical optimization problem, where your objective is to
+achieve optimal portfolio allocation bounded by some constraints. It can be mathematically expressed as follows:
 
-Currently, the following solution strings are supported by MVO class:
+.. math::
+        \begin{align*}
+            & \underset{\mathbf{x}}{\text{max}} & & f(\mathbf{x}) \\
+            & \text{s.t.} & & g(\mathbf{x}) \leq 0 \\
+            &&& h(\mathbf{x}) = 0 \\
+        \end{align*}
 
-1. ``inverse_variance`` : Calculates the weights according to simple inverse-variance allocation.
-2. ``min_volatility`` : Calculates the weights relating to Minimum Variance portfolio.
-3. ``max_sharpe`` : Calculates the weights relating to the maximum Sharpe Ratio portfolio. Users can specify the risk-free return value through the :py:mod:`risk_free_rate` parameter.
-4. ``efficient_risk`` : Calculates an efficient risk portfolio for a specified target return. Users can specify their target return value through the :py:mod:`target_return` parameter.
+where :math:`x \in R^n` and :math:`h(x), g(x)` represent convex functions correlating to the equality and inequality constraints
+respectively. Based on the mean-variance framework first developed by Harry Markowitz, a portfolio optimization problem can be
+formulated as follows,
 
-Solutions
-#########
+.. math::
+        \begin{align*}
+            & \underset{\mathbf{w}}{\text{min}} & & w^T\sum w \\
+            & \text{s.t.} & & \sum_{i=1}^{n}w_{i} = 1 \\
+            &&& \mu^Tw = \mu_t \\
+        \end{align*}
+
+where :math:`w` refers to the set of weights for the portfolio assets, :math:`\sum` is the covariance matrix of the assets,
+:math:`\mu` is the expected asset returns and :math:`\mu_t` represents the target portfolio return of the investor. Note that this
+represents a very basic (and a specific) use-case of portfolio allocation where the investor wants to minimse the portfolio risk
+for a given target return. As the needs of an investor increase, the complexity of the problem also changes with different
+objective functions and multitude of constraints governing the optimal set of weights.
+
+The MeanVarianceOptimisation() class (MVO) provides a very flexible framework for many common portfolio allocation problems
+encountered in practice. Users need to simply call a master function and by specifying the required parameters, the MVO class does
+the hard work by utilising a quadratic optimiser and calculating the optimal set of weights based on the problem and constraints
+specified.
+
+.. note::
+    |h4| The Quadratic Optimiser |h4_|
+    Many mean-variance objective functions are typical quadratic optimization problems and can be solved by using a black-box
+    quadratic optimiser. We use `cvxpy <https://www.cvxpy.org/index.html>`_ as our quadratic optimiser instead of the more
+    frequently used `scipy.optimize <https://docs.scipy.org/doc/scipy/reference/optimize.html>`_. This was a design choice for the
+    following reasons:
+
+    * The documentation of cvxpy is better than that of scipy, escpecially the parts related to optimization.
+    * cvxpy's code is much more readable and easier to understand.
+    * **Note that cvxpy only supports convex optimization problems as opposed to scipy.optimise which can also tackle concave problems**. Although this might seem as a downside, cvxpy raises clear error notifications if the problem is not convex and the required conditions are not met. This is very important for us as it ensures the solvability of an objective function - if there is no error from cvxpy's side, the objective function is correct and is guaranteed to run till completion by the optimiser.
+
+Supported Portfolio Allocation Solutions
+########################################
+
+MlFinLab's :py:mod:`MeanVarianceOptimisation` class provide some common portfolio optimization problems out-of-the-box. In this section we go over a quick overview of
+these:
 
 Inverse Variance
 ****************
 
-With this solution string, only the main diagonal of the covariance matrix is used for weights allocation:
+For this solution, the diagonal of the covariance matrix is used for weights allocation.
 
 .. math::
 
-      W_{i} = \frac{\frac{1}{Cov_{i,i}}}{\sum_{j=1}^{N}{\frac{1}{Cov_{j,j}}}}
+      w_{i} = \frac{\sum^{-1}}{\sum_{j=1}^{N}(\sum_{j,j})^{-1}}
 
-Where :math:`W_{i}` is the weight allocated to the :math:`i` -th element in a portfolio, :math:`Cov_{i,i}` is the :math:`i` -th element
-on the main diagonal of the covariance matrix of elements in a portfolio, :math:`N` is the number of elements in a portfolio.
+where :math:`w_{i}` is the weight allocated to the :math:`i^{th}` asset in a portfolio, :math:`\sum_{i,i}` is the :math:`i^{th}`
+element on the main diagonal of the covariance matrix of elements in a portfolio and :math:`N` is the number of elements in a
+portfolio.
 
-Minimum Variance
-****************
+**Solution String:** ``inverse_variance``
 
-With this solution string, the entire covariance matrix is used for weights allocation.
+Minimum Volatility
+******************
 
-The following optimisation problem is being solved:
+For this solution, the objective is to generate a portfolio with the least variance. The following optimization problem is
+being solved.
 
 .. math::
 
-      minimise: W^{T} * Cov * W
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{minimise}} & & w^T\sum w \\
+        & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N
+    \end{align*}
 
-      s.t.: \sum_{j=1}^{N}{W_{j}} = 1
-
-Where :math:`W` is the vector of weights, :math:`Cov` is the covariance matrix of elements in a portfolio,
-:math:`N` is the number of elements in a portfolio.
+**Solution String:** ``min_volatility``
 
 Maximum Sharpe Ratio
 ********************
 
-With this solution string, the entire covariance matrix, the vector of mean returns, and the risk-free ratio are used
-for weights allocation.
-
-The standard problem of maximum Sharpe ratio portfolio optimization, formulated as:
+For this solution, the objective is (as the name suggests) to maximise the Sharpe Ratio of your portfolio.
 
 .. math::
-      :nowrap:
 
-      \begin{align*}
-      maximise: \frac{MeanRet_{j} * W^{T} - R_{f}}{(W^{T} * Cov * W)^{1/2}}
-      \end{align*}
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{maximise}} & & \frac{\mu^{T}w - R_{f}}{(w^{T}\sum w)^{1/2}} \\
+        & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N
+    \end{align*}
 
-      \begin{align*}
-      s.t.: \sum_{j=1}^{N}{W_{j}} = 1
-      \end{align*}
-
-      \begin{align*}
-      W_{j} \ge 0, j=1,..,N
-      \end{align*}
-
-has the objective function being possibly non-concave. Therefore, it's not a convex optimization problem.
-
-However, the problem can be transformed into an equivalent one, but with a convex quadratic objective function:
+A major problem with the above formulation is that the objective function is not convex and this presents a problem for cvxpy
+which only accepts convex optimization problems. As a result, the problem can be transformed into an equivalent one, but with
+a convex quadratic objective function.
 
 .. math::
-      :nowrap:
 
-      \begin{align*}
-      minimise: Y^{T} * Cov * Y
-      \end{align*}
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{minimise}} & & y^T\sum y \\
+        & \text{s.t.} & & (\mu^{T}w - R_{f})^{T}y = 1 \\
+        &&& \sum_{j=1}^{N}y_{j} = \kappa, \\
+        &&& \kappa \geq 0, \\
+        &&& w_{j} = \frac{y_j}{\kappa}, j=1,..,N
+    \end{align*}
 
-      \begin{align*}
-      s.t.: \sum_{j=1}^{N}{(MeanRet_{j} - R_{f}) * Y_{j}} = 1
-      \end{align*}
+where :math:`y` refer to the set of unscaled weights, :math:`\kappa` is the scaling factor and the other symbols refer to
+their usual meanings.
 
-      \begin{align*}
-      \sum_{j=1}^{N}{Y_{j}} = \kappa
-      \end{align*}
-
-      \begin{align*}
-      \kappa \ge 0
-      \end{align*}
-
-After the optimisation: :math:`W_{j} = Y_{j} / \kappa`
-
-Where :math:`W` is the vector of weights, :math:`Y` is the vector of unscaled weights, :math:`\kappa` is the scaling factor,
-:math:`Cov` is the covariance matrix of elements in a portfolio, :math:`MeanRet` is the vector of mean returns,
-:math:`R_{f}` is the risk-free rate, :math:`N` is the number of elements in a portfolio.
+**Solution String:** ``max_sharpe``
 
 .. tip::
-
-    The process of deriving this optimisation problem from the standard maximising Sharpe ratio problem is described
+    |h4| Underlying Literature |h4_|
+    The process of deriving this optimization problem from the standard maximising Sharpe ratio problem is described
     in the notes `IEOR 4500 Maximizing the Sharpe ratio <http://people.stat.sc.edu/sshen/events/backtesting/reference/maximizing%20the%20sharpe%20ratio.pdf>`_  from Columbia University.
 
 Efficient Risk
 **************
 
-With this solution string, the entire covariance matrix, the vector of mean returns, and the target return are used
-for weights allocation.
-
-The following optimisation problem is being solved:
+For this solution, the objective is to minimise risk given a target return value by the investor. Note that the risk value for
+such a portfolio will not be the minimum, which is achieved by the minimum-variance solution. However, the optimiser will find
+the set of weights which efficiently allocate risk constrained by the provided target return, hence the name "efficient risk".
 
 .. math::
-      :nowrap:
 
-      \begin{align*}
-      minimise : W^{T} * Cov * W
-      \end{align*}
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{min}} & & w^T\sum w \\
+        & \text{s.t.} & & \mu^Tw = \mu_t\\
+        &&& \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N \\
+    \end{align*}
 
-      \begin{align*}
-      s.t.: \sum_{j=1}^{N}{MeanRet_{j} * W_{j}} = TrgetRet
-      \end{align*}
+where :math:`\mu_t` is the target portfolio return set by the investor and the other symbols refer to their usual meanings.
 
-      \begin{align*}
-      \sum_{j=1}^{N}{W_{j}} = 1
-      \end{align*}
+**Solution String:** ``efficient_risk``
 
-Where :math:`W` is the vector of weights, :math:`Cov` is the covariance matrix of elements in a portfolio,
-:math:`MeanRet` is the vector of mean returns, :math:`TrgetRet` is the target return, :math:`N` is the number of elements in a portfolio.
+Efficient Return
+****************
+
+For this solution, the objective is to maximise the portfolio return given a target risk value by the investor. This is very
+similar to the *efficient_risk* solution. The optimiser will find the set of weights which efficiently try to maximise return
+constrained by the provided target risk, hence the name "efficient return".
+
+.. math::
+
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{max}} & & \mu^Tw \\
+        & \text{s.t.} & & w^T\sum w = \sigma^{2}_t\\
+        &&& \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N \\
+    \end{align*}
+
+where :math:`\sigma^{2}_t` is the target portfolio risk set by the investor and the other symbols refer to their usual meanings.
+
+**Solution String:** ``efficient_return``
+
+Maximum Return - Minimum Volatility
+***********************************
+
+This is often referred to as *quadratic risk utility.* The objective function consists of both the portfolio return and the risk.
+Thus, minimising the objective relates to minimising the risk and correspondingly maximising the return. Here, :math:`\lambda` is
+the risk-aversion parameter which models the amount of risk the user is willing to take. A higher value means the investor will
+have high defense against risk at the expense of lower returns and keeping a lower value will place higher emphasis on maximising
+returns, neglecting the risk associated with it.
+
+.. math::
+
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{min}} & &  \lambda * w^T\sum w - \mu^Tw\\
+        & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N \\
+    \end{align*}
+
+**Solution String:** ``max_return_min_volatility``
+
+Maximum Diversification
+***********************
+
+Maximum diversification portfolio tries to diversify the holdings across as many assets as possible. In the 2008 paper, `Toward Maximum Diversification <https://blog.thinknewfound.com/2018/12/maximizing-diversification/#easy-footnote-bottom-1-6608>`_, the diversification ratio, :math:`D`, of a portfolio, is defined as:
+
+.. math::
+
+        D = \frac{w^{T}\sigma}{\sqrt{w^{T}\sum w}}
+
+where :math:`\sigma` is the vector of volatilities and :math:`\sum` is the covariance matrix. The term in the denominator is the
+volatility of the portfolio and the term in the numerator is the weighted average volatility of the assets. More diversification
+within a portfolio decreases the denominator and leads to a higher diversification ratio. The corresponding objective function and
+the constraints are:
+
+.. math::
+
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{max}} & &  D\\
+        & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N \\
+    \end{align*}
+
+**Solution String:** ``max_diversification``
 
 .. tip::
+    |h4| Underlying Literature |h4_|
+    You can read more about maximum diversification portfolio in the following blog post on the website *Flirting with Models:* `Maximizing Diversification <https://blog.thinknewfound.com/2018/12/maximizing-diversification/>`_.
 
-    Note that users can also specify upper and lower bounds for asset weights:
+Maximum Decorrelation
+*********************
 
-    - Either a single upper and lower bound value can be applied for to all the asset weights in which case a single
-      tuple needs to be passed: (low, high). By default a bound of (0, 1) is applied.
-    - If individual bounds are required, then a dictionary needs to be passed with the key being the asset index and
-      the value being the tuple of lower and higher bound values. Something like this: ``{asset_index : (low_i, high_i)}``
+For this solution, the objective is to minimise the correlation between the assets of a portfolio
+
+.. math::
+
+    \begin{align*}
+        & \underset{\mathbf{w}}{\text{min}} & &  w^TA w\\
+        & \text{s.t.} & & \sum_{j=1}^{n}w_{j} = 1 \\
+        &&& w_{j} \geq 0, j=1,..,N \\
+    \end{align*}
+
+where :math:`A` is the correlation matrix of assets. The Maximum Decorrelation portfolio is closely related to Minimum Variance and Maximum Diversification, but applies to the case where an investor believes all assets have similar returns and volatility, but heterogeneous correlations. It is a Minimum Variance optimization that is performed on the correlation matrix rather than the covariance matrix, :math:`\sum`.
+
+**Solution String:** ``max_decorrelation``
+
+.. tip::
+    |h4| Underlying Literature |h4_|
+    You can read more on maximum decorrelation portfolio in the following blog post: `Max Decorrelation Portfolio <https://systematicedge.wordpress.com/2013/05/12/max-decorrelation-portfolio/>`_.
+
+Creating a Custom Portfolio Allocation
+######################################
+
+For most of the users, the above solutions will be enough for their use-cases. However, we also provide a way for users to create
+their custom portfolio problem. **This includes complete flexibility to specify the input, optimization variables, objective function and the corresponding constraints**. Let us go through the step-by-step process of formulating your own allocation problem:
+
+Non-CVXPY Variables
+*******************
+
+The first step is to specify input variables not related to cvxpy (i.e. not defined as cvxpy variable objects, :py:mod:`cvxpy.Variable`). This can include anything ranging from raw asset prices data to historical returns to integer or string variables. All data types are supported - ``int``, ``float``, ``str``, ``Numpy matrices/lists``, ``Python lists``, ``Pandas dataframe``.
+
+.. code-block::
+
+    data = pd.read_csv('stock_prices.csv', parse_dates=True, index_col="Date")
+    non_cvxpy_variables = {
+            'asset_prices': data,
+            'num_assets': data.shape[1],
+            'covariance': data.cov(),
+            'asset_names': data.columns,
+            'expected_returns': ReturnsEstimation().calculate_mean_historical_returns(asset_prices=data, resample_by='W')
+    }
+
+In the above code example, we initialise a dataframe of historical stock prices and then define the dictionary containing all user
+required input variables. **The key of the dictionary is the variable name and the value is the Pythonic value you want to assign that variable.**
+
+CVXPY Variables
+***************
+
+The second step is to specify the cvxpy specific variables which are declared in the syntax required by cvxpy. You can include as
+many new variables as you need by initialising a simple Python list with each declaration being a string. **Each of these variables should be a** :py:mod:`cvxpy.Variable` **object.**
+
+.. code-block::
+
+    cvxpy_variables = [
+            'risk = cp.quad_form(weights, covariance)',
+            'portfolio_return = cp.matmul(weights, expected_returns)'
+    ]
+
+Here, we are declaring two new cvxpy variables - :py:mod:`risk` and :py:mod:`portfolio_return`. Note that we are using non-cvxpy
+variables - :py:mod:`covariance` and :py:mod:`expected_returns` - declared in the previous step to initialise the new ones.
+
+.. note::
+    |h4| Variable for Portfolio Weights |h4_|
+
+    Internally, the code declares a Python variable - :py:mod:`weights` - for the final portfolio weights. We request you to use
+    this same variable name whenever you want to include it in one of your custom variable declarations. Refer to the above code
+    snippet for an example.
+
+    |h4| Calling CVXPY |h4_|
+
+    Internally, cvxpy is imported as follows:
+
+    .. code-block::
+
+        import cvxpy as cp
+
+    For creating any cvxpy specific variables, you need to reference the library as :py:mod:`cp` otherwise the code will fail to
+    run and give you an error.
+
+Custom Objective Function
+**************************
+
+The third step is to specify the objective function for our portfolio optimization problem. You need to simply pass a string form
+of the Python code for the objective function.
+
+.. code-block::
+
+    custom_obj = 'cp.Minimize(risk)'
+
+
+Optimisation Constraints
+************************
+
+This is an optional step which requires you to specify the constraints for your optimization problem. Similar to how we specified
+cvxpy variables, the constraints need to be specified as a Python list with each constraint being a string representation.
+
+.. code-block::
+
+    constraints = ['cp.sum(weights) == 1', 'weights >= 0', 'weights <= 1']
+
+.. warning::
+    Please note that cvxpy does not support strict inequality constraints - ``>`` or ``<`` - and will fail to solve your
+    problem if you do specify one.
+
+Bringing it all together, the code looks like this:
+
+.. code-block::
+
+    mvo = MeanVarianceOptimisation()
+    custom_obj = 'cp.Minimize(risk)'
+    constraints = ['cp.sum(weights) == 1', 'weights >= 0', 'weights <= 1']
+    non_cvxpy_variables = {
+        'num_assets': self.data.shape[1],
+        'covariance': self.data.cov(),
+        'expected_returns': ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+                                                                                  resample_by='W')
+    }
+    cvxpy_variables = [
+        'risk = cp.quad_form(weights, covariance)',
+        'portfolio_return = cp.matmul(weights, expected_returns)'
+    ]
+    mvo.allocate_custom_objective(non_cvxpy_variables=non_cvxpy_variables,
+                                  cvxpy_variables=cvxpy_variables,
+                                  objective_function=custom_obj,
+                                  constraints=constraints)
+    print(mvo.weights)
+
+.. note::
+    |h4| Some Important Miscellaneous Points |h4_|
+
+    * The custom allocation feature still uses cvxpy as the quadratic optimiser. Hence, only convex objective functions are accepted since cvxpy currently does not support non-convex functions. We plan on adding support for non-linear and non-convex objective solutions soon!
+
+    * The order of declaring variables also matters here. All non-cvxpy and cvxpy variables are initialised in a linear order, i.e. traversing dictionary from top to bottom and the list from left to right, hence you need to specify them in the order you want it to. For e.g. the following code is wrong and will give an error,
+
+        .. code-block::
+
+            cvxpy_variables = [
+                'x = cp.quad_form(weights, y)',
+                'y = cp.Variable(1)'
+            ]
+
+      The formula for :py:mod:`x` uses :py:mod:`y`, but due to the order of the list, :py:mod:`y` will be initialised after
+      :py:mod:`x` and give an error.
+
+
+.. warning::
+    Although we have written extensive unittests, the custom allocation code is still in an experimental stage and you may
+    encounter errors which we may have failed to incorporate. We request you to raise an issue `here <https://github.com/hudson-and-thames/mlfinlab/issues>`_ and we will promptly push a fix for it.
 
 Implementation
 ##############
@@ -156,82 +403,42 @@ Implementation
 
         .. automethod:: __init__
 
+.. note::
+    |h4| Using Custom Input |h4_|
+    We provide great flexibility to the users in terms of the input data - they can either pass their own pre-calculated input
+    matrices/dataframes or leave it to us to calculate them. A quick reference on common input parameters which you will encounter
+    throughout the portfolio optimization module:
+
+        * :py:mod:`asset_prices`: Dataframe/matrix of historical raw asset prices **indexed by date**.
+        * :py:mod:`asset_returns`: Dataframe/matrix of historical asset returns. This will be a :math:`TxN` matrix where :math:`T` is the time-series and :math:`N` refers to the number of assets in the portfolio.
+        * :py:mod:`expected_asset_returns`: List of expected returns per asset i.e. the mean of historical asset returns. This refers to the parameter :math:`\mu` used in portfolio optimization literature. For a portfolio of 5 assets, ``expected_asset_returns = [0.45, 0.56, 0.89, 1.34, 2.4]``.
+        * :py:mod:`covariance_matrix`: The covariance matrix of asset returns.
+
 
 Plotting
 ########
 
-``plot_efficient_frontier()`` : Plots the efficient frontier. The red dot corresponds to the Maximum Sharpe portfolio.
+``plot_efficient_frontier()`` : Plots the efficient frontier. You can specify the minimum and maximum return till which you want
+the frontier to be displayed.
 
-.. code-block::::
+.. code-block::
 
     mvo = MeanVarianceOptimisation()
-    mvo.allocate(asset_prices=stock_prices, resample_by='B')
-
-    # Assuming there is a stock_returns dataframe
-    mvo.plot_efficient_frontier(covariance=stock_returns.cov(),
-                                expected_asset_returns=stock_returns.mean()*252,
-                                num_assets=len(stock_returns.columns))
+    expected_returns = ReturnsEstimation().calculate_mean_historical_returns(asset_prices=self.data,
+                                                                             resample_by='W')
+    covariance = ReturnsEstimation().calculate_returns(asset_prices=self.data, resample_by='W').cov()
+    plot = mvo.plot_efficient_frontier(covariance=covariance,
+                                       max_return=1.0,
+                                       expected_asset_returns=expected_returns)
 
 .. image:: portfolio_optimisation_images/efficient_frontier.png
 
-
-Example Code
-############
-
-Basic example
-*************
-
-.. code-block::
-
-    import pandas as pd
-    from mlfinlab.portfolio_optimization.mean_variance import MeanVarianceOptimisation
-
-    # Read in data
-    stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')
-
-    # Compute IVP weights
-    mvo = MeanVarianceOptimisation()
-    mvo.allocate(asset_names=stock_prices.columns, asset_prices=stock_prices,
-                 solution='inverse_variance', resample_by='B
-    ivp_weights = mvo.weights.sort_values(by=0, ascending=False, axis=1)
-
-.. note::
-
-    We provide great flexibility to the users in terms of the input data - either they can pass raw historical stock prices
-    as the parameter :py:mod:`asset_prices` in which case the expected returns and covariance matrix will be calculated
-    using this data. Else, they can also pass pre-calculated :py:mod:`expected_returns` and :py:mod:`covariance_matrix`.
-
-Different solutions
-*******************
-
-.. code-block::
-
-    # Compute different mean-variance solutions using MVO
-    mvo = MeanVarianceOptimisation()
-
-    # Maximum Sharpe Solution
-    mvo.allocate(asset_prices=stock_prices, solution='max_sharpe')
-    mvo_weights = mvo.weights.sort_values(by=0, ascending=False, axis=1)
-
-    # Minimum Variance Solution
-    mvo.allocate(asset_prices=stock_prices, solution='min_volatility')
-    mvo_weights = mvo.weights.sort_values(by=0, ascending=False, axis=1)
-
-    # Efficient Risk Solution
-    mvo.allocate(asset_prices=stock_prices, solution='efficient_risk', target_return=0.4)
-    mvo_weights = mvo.weights
-
-    # Portfolio Characteristics
-    portfolio_return = mvo.portfolio_return
-    sharpe_ratio = mvo.portfolio_sharpe_ratio
-    risk = mvo.portfolio_risk
 
 
 Research Notebooks
 ##################
 
-The following research notebooks provides a more detailed exploration of the algorithm as outlined at the back of Ch16 in
-Advances in Financial Machine Learning.
+The following research notebooks provide a more detailed exploration of the algorithm.
 
 * `Chapter 16 Exercise Notebook`_
 

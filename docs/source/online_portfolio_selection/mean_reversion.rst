@@ -26,7 +26,7 @@ There are four mean reversion strategies implemented in the Online Portfolio Sel
 ----
 
 Passive Aggressive Mean Reversion
-=================================
+#################################
 
 Passive Aggressive Mean Reversion alternates between a passive and aggressive approach to the current market conditions.
 The strategy can effectively prevent a huge loss and maximize returns by setting a threshold for mean reversion.
@@ -63,7 +63,7 @@ We will introduce three versions of Passive Aggressive Mean Reversion: PAMR, PAM
 - :math:`\epsilon` is the mean reversion threshold constant.
 
 PAMR
-####
+****
 
 The first method is described as the following optimization problem:
 
@@ -73,7 +73,7 @@ The first method is described as the following optimization problem:
 With the original problem formulation and :math:`\epsilon` parameters, PAMR is the most basic implementation.
 
 PAMR-1
-######
+******
 
 PAMR-1 introduces a slack variable to PAMR.
 
@@ -85,7 +85,7 @@ PAMR-1 introduces a slack variable to PAMR.
 A higher :math:`C` value indicates the affinity to a more aggressive approach.
 
 PAMR-2
-######
+******
 
 PAMR-2 contains a quadratic term to the original slack variable from PAMR-1.
 
@@ -103,7 +103,7 @@ By increasing the slack variable at a quadratic rate, the method regularizes por
     PAMR-1 and PAMR-2 tends to have higher returns compared to a normal PAMR.
 
 Parameters
-##########
+**********
 
 Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
 for the users. For NYSE, aggressiveness was not an important parameter as returns were primarily affected by
@@ -139,7 +139,7 @@ a hyperparameter.
     - Aggressiveness (Agg) has minimal impact on returns, but a value between 10 and 100 typically worked well.
 
 Implementation
-##############
+**************
 
 .. automodule:: mlfinlab.online_portfolio_selection.pamr
 
@@ -150,7 +150,7 @@ Implementation
         .. automethod:: __init__
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -184,7 +184,7 @@ Example Code
 ----
 
 Confidence Weighted Mean Reversion
-==================================
+##################################
 
 Extending from PAMR, Confidence Weighted Mean Reversion looks at the autocovariance across all assets.
 Instead of focusing on a single asset's deviation from the original price, CWMR takes in second-order
@@ -216,7 +216,7 @@ a confidence interval :math:`\theta` determined by the threshold, :math:`\epsilo
 CWMR has two variations to solve this optimization problem with CWMR-SD and CWMR-Var.
 
 CWMR-SD
-#######
+*******
 
 CWMR uses the Kullback-Leibler divergence to further formulate the optimization problem as following:
 
@@ -227,7 +227,7 @@ CWMR uses the Kullback-Leibler divergence to further formulate the optimization 
     \text{such that } \epsilon - \mu^{\top}\cdot x_t \geq \phi x_t^{\top} \Sigma x_t\text{, } \mu^{\top} \cdot \textbf{1} = 1 \text{, and } \mu \geq 0
 
 CWMR-Var
-########
+********
 
 The standard deviation method further assumes the PSD property of :math:`\Sigma` to refactor the equations as the following:
 
@@ -248,7 +248,7 @@ The standard deviation method further assumes the PSD property of :math:`\Sigma`
     The constant calculations of matrix inversion is extremely unstable and makes the model prone to any outliers and hyperparameters.
 
 Parameters
-##########
+**********
 
 Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
 for the users. CWMR in general does not have an optimal parameter. The results are extremely dependent on the
@@ -278,7 +278,7 @@ seems to indicate a congregation at 0.5.
     using other mean reversion strategies for implementations.
 
 Implementation
-##############
+**************
 
 .. automodule:: mlfinlab.online_portfolio_selection.cwmr
 
@@ -289,7 +289,7 @@ Implementation
         .. automethod:: __init__
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -319,7 +319,7 @@ Example Code
 ----
 
 Online Moving Average Reversion
-================================
+###############################
 
 Traditional mean reversion techniques have an underlying assumption that the next price relative is inversely
 proportional to the latest price relative; however, mean reversion trends are not limited to a single period.
@@ -349,7 +349,7 @@ OLMAR has two variations to solve this optimization problem with OLMAR-1 and OLM
 - :math:`\lambda` is the lagrangian multiplier to change the new weights.
 
 OLMAR-1
-#######
+*******
 
 OLMAR-1 utilizes simple moving average to predict prices.
 
@@ -363,7 +363,7 @@ OLMAR-1 utilizes simple moving average to predict prices.
     \: \: \: \: \: \: \: \: \: \: \: \: \: \: = \frac{1}{w} \left( 1+ \frac{1}{x_t}+ \cdot \cdot \cdot + \frac{1}{\odot^{w-2}_{i=0}x_{t-i}} \right)
 
 OLMAR-2
-#######
+*******
 
 OLMAR-2 uses exponential moving average to predict prices.
 
@@ -391,7 +391,7 @@ OLMAR-2 uses exponential moving average to predict prices.
     strategy in a real trading environment.
 
 Parameters
-##########
+**********
 
 Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
 for the users. :math:`\epsilon` has minimal impact on the returns as the primary driving paramter for these strategies
@@ -419,7 +419,7 @@ TSE's window was similar to that of NYSE, but the optimal alpha was much higher,
     - :math:`\epsilon` has minimal effect on returns.
 
 Implementation
-##############
+**************
 
 .. automodule:: mlfinlab.online_portfolio_selection.olmar
 
@@ -430,7 +430,7 @@ Implementation
         .. automethod:: __init__
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -460,7 +460,7 @@ Example Code
 ----
 
 Robust Median Reversion
-=======================
+#######################
 
 Robust Median Reversion extends the previous Online Moving Average Reversion by introducing L1 median of the specified windows.
 Instead of reverting to a moving average, RMR reverts to the L1 median estimator, which proves to be a more effective method of
@@ -499,7 +499,7 @@ Then next portfolio weights will use the predicted price to produce the optimal 
 - :math:`\bar{x}` is the mean of the projected price relative.
 
 Parameters
-##########
+**********
 
 Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
 for the users. Similarly to OLMAR, the parameters primarily depend on the window value. N_iteration of 200 typically had
@@ -523,7 +523,7 @@ the period of mean reversion was the most influential parameter to affect the po
     - It is recommended to leave the :math:`\tau` at 0.001 for computational issues.
 
 Implementation
-##############
+**************
 
 .. automodule:: mlfinlab.online_portfolio_selection.rmr
 
@@ -534,7 +534,7 @@ Implementation
         .. automethod:: __init__
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -564,7 +564,7 @@ Example Code
 ----
 
 Research Notebook
-=================
+#################
 
     The following `mean reversion <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Mean%20Reversion.ipynb>`_
     notebook provides a more detailed exploration of the strategies.

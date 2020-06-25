@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import cvxpy as cp
 import matplotlib.pyplot as plt
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
 
 
@@ -13,6 +13,7 @@ class MeanVarianceOptimisation:
     This class implements some classic mean-variance optimisation techniques for calculating the efficient frontier solutions.
     With the help of quadratic optimisers, users can generate optimal portfolios for different objective functions. Currently
     solutions to the following portfolios can be generated:
+
         1. Inverse Variance
         2. Maximum Sharpe
         3. Minimum Volatility
@@ -29,7 +30,7 @@ class MeanVarianceOptimisation:
         Constructor.
 
         :param calculate_expected_returns: (str) The method to use for calculation of expected returns.
-                                                 Currently supports "mean" and "exponential".
+                                                 Currently supports: ``mean``, ``exponential``.
         """
 
         self.weights = list()
@@ -39,7 +40,7 @@ class MeanVarianceOptimisation:
         self.portfolio_return = None
         self.portfolio_sharpe_ratio = None
         self.calculate_expected_returns = calculate_expected_returns
-        self.returns_estimator = ReturnsEstimation()
+        self.returns_estimator = ReturnsEstimators()
         self.risk_estimators = RiskEstimators()
         self.weight_bounds = (0, 1)
         self.risk_free_rate = risk_free_rate
@@ -55,9 +56,9 @@ class MeanVarianceOptimisation:
         :param expected_asset_returns: (list/np.array/pd.dataframe) A list of mean stock returns (mu).
         :param covariance_matrix: (pd.DataFrame/numpy matrix) User supplied covariance matrix of asset returns (sigma).
         :param solution: (str) The type of solution/algorithm to use to calculate the weights.
-                               Currently supported solution strings - inverse_variance, min_volatility, max_sharpe,
-                               efficient_risk, max_return_min_volatility, max_diversification, efficient_return
-                               and max_decorrelation.
+                               Supported solution strings - ``inverse_variance``, ``min_volatility``, ``max_sharpe``,
+                               ``efficient_risk``, ``max_return_min_volatility``, ``max_diversification``, ``efficient_return``
+                               and ``max_decorrelation``.
         :param target_return: (float) Target return of the portfolio.
         :param target_risk: (float) Target risk of the portfolio.
         :param risk_aversion: (float) Quantifies the risk averse nature of the investor - a higher value means
@@ -75,35 +76,35 @@ class MeanVarianceOptimisation:
             self.weight_bounds = weight_bounds
 
         # Calculate the expected asset returns and covariance matrix if not given by the user
-        expected_asset_returns, cov = self._calculate_estimators(asset_prices,
-                                                                 expected_asset_returns,
-                                                                 covariance_matrix)
+        expected_asset_returns, covariance = self._calculate_estimators(asset_prices,
+                                                                        expected_asset_returns,
+                                                                        covariance_matrix)
 
         if solution == 'inverse_variance':
-            self._inverse_variance(covariance=cov, expected_returns=expected_asset_returns)
+            self._inverse_variance(covariance=covariance, expected_returns=expected_asset_returns)
         elif solution == 'min_volatility':
-            self._min_volatility(covariance=cov,
+            self._min_volatility(covariance=covariance,
                                  expected_returns=expected_asset_returns)
         elif solution == 'max_return_min_volatility':
-            self._max_return_min_volatility(covariance=cov,
+            self._max_return_min_volatility(covariance=covariance,
                                             expected_returns=expected_asset_returns,
                                             risk_aversion=risk_aversion)
         elif solution == 'max_sharpe':
-            self._max_sharpe(covariance=cov,
+            self._max_sharpe(covariance=covariance,
                              expected_returns=expected_asset_returns)
         elif solution == 'efficient_risk':
-            self._min_volatility_for_target_return(covariance=cov,
+            self._min_volatility_for_target_return(covariance=covariance,
                                                    expected_returns=expected_asset_returns,
                                                    target_return=target_return)
         elif solution == 'efficient_return':
-            self._max_return_for_target_risk(covariance=cov,
+            self._max_return_for_target_risk(covariance=covariance,
                                              expected_returns=expected_asset_returns,
                                              target_risk=target_risk)
         elif solution == 'max_diversification':
-            self._max_diversification(covariance=cov,
+            self._max_diversification(covariance=covariance,
                                       expected_returns=expected_asset_returns)
         else:
-            self._max_decorrelation(covariance=cov,
+            self._max_decorrelation(covariance=covariance,
                                     expected_returns=expected_asset_returns)
 
         # Calculate the portfolio sharpe ratio
@@ -112,41 +113,45 @@ class MeanVarianceOptimisation:
         # Do some post-processing of the weights
         self._post_process_weights()
 
-    def allocate_custom_objective(self, custom_objective, asset_names=None, asset_prices=None, expected_asset_returns=None,
-                                  covariance_matrix=None, target_return=0.2, target_risk=0.01, risk_aversion=10):
-        # pylint: disable=eval-used, too-many-locals
+    def allocate_custom_objective(self, non_cvxpy_variables, cvxpy_variables, objective_function, constraints=None):
+        # pylint: disable=eval-used, exec-used
         """
         Create a portfolio using custom objective and constraints.
 
-        :param custom_objective: (dict) A custom objective function with custom constraints. You need to write it in the form
-                                        expected by cvxpy. The objective will be a single string while the constraints can be a
-                                        list of strings specifying the constraints. For e.g. {'objective': 'cp.Maximisie(
-                                        expected_asset_returns)', 'constraints': ['weights >= 0', 'weights <= 1']}.
-        :param asset_names: (list) A list of strings containing the asset names.
-        :param asset_prices: (pd.DataFrame) A dataframe of historical asset prices (daily close).
-        :param expected_asset_returns: (list/np.array/pd.dataframe) A list of mean stock returns (mu).
-        :param covariance_matrix: (pd.DataFrame/numpy matrix) User supplied covariance matrix of asset returns (sigma).
-        :param target_return: (float) Target return of the portfolio.
-        :param target_risk: (float) Target risk of the portfolio.
-        :param risk_aversion: (float) Quantifies the risk averse nature of the investor - a higher value means
-                                      more risk averse and vice-versa.
+        :param non_cvxpy_variables: (dict) A dictionary of variables to be used for providing the required input matrices and
+                                           other inputs required by the user. The key of dictionary will be the variable name
+                                           while the value can be anything ranging from a numpy matrix, list, dataframe or number.
+        :param cvxpy_variables: (list) This is a list of cvxpy specific variables that will be initialised in the format required
+                                       by cvxpy. For e.g. ["risk = cp.quad_form(weights, covariance)"] where you are initialising
+                                       a variable named "risk" using cvxpy. Note that cvxpy is being imported as "cp", so be sure
+                                       to refer to cvxpy as cp.
+        :param custom_objective: (str)  A custom objective function. You need to write it in the form
+                                        expected by cvxpy. The objective will be a single string, e.g. 'cp.Maximise(
+                                        expected_asset_returns)'.
+        :param constraints: (list) a list of strings containing the optimisation constraints. For e.g. ['weights >= 0', 'weights <= 1']
         """
 
-        self._error_checks(asset_names, asset_prices, expected_asset_returns, covariance_matrix)
+        # Initialise the non-cvxpy variables
+        locals_ptr = locals()
+        for variable_name, variable_value in non_cvxpy_variables.items():
+            exec(variable_name + " = None")
+            locals_ptr[variable_name] = variable_value
 
-        # Calculate the expected asset returns and covariance matrix if not given by the user
-        expected_asset_returns, cov = self._calculate_estimators(asset_prices,
-                                                                 expected_asset_returns,
-                                                                 covariance_matrix)
+        self.num_assets = locals_ptr['num_assets']
+        self.asset_names = list(range(self.num_assets))
+        if 'asset_names' in locals_ptr:
+            self.asset_names = locals_ptr['asset_names']
 
+        # Optimisation weights
         weights = cp.Variable(self.num_assets)
         weights.value = np.array([1 / self.num_assets] * self.num_assets)
-        risk = cp.quad_form(weights, cov)
-        portfolio_return = cp.matmul(weights, expected_asset_returns)
+
+        # Initialise cvxpy specific variables
+        for variable in cvxpy_variables:
+            exec(variable)
 
         # Optimisation objective and constraints
-        objective, constraints = custom_objective['objective'], custom_objective['constraints']
-        allocation_objective = eval(objective)
+        allocation_objective = eval(objective_function)
         allocation_constraints = []
         for constraint in constraints:
             allocation_constraints.append(eval(constraint))
@@ -159,13 +164,13 @@ class MeanVarianceOptimisation:
         problem.solve(warm_start=True)
         if weights.value is None:
             raise ValueError('No optimal set of weights found.')
-
         self.weights = weights.value
-        self.portfolio_risk = risk.value
-        self.portfolio_return = portfolio_return.value[0]
 
-        # Calculate the portfolio sharpe ratio
-        self.portfolio_sharpe_ratio = ((self.portfolio_return - self.risk_free_rate) / (self.portfolio_risk ** 0.5))
+        # Calculate portfolio metrics
+        if 'risk' in locals_ptr:
+            self.portfolio_risk = locals_ptr['risk'].value
+        if 'portfolio_return' in locals_ptr:
+            self.portfolio_return = locals_ptr['portfolio_return'].value
 
         # Do some post-processing of the weights
         self._post_process_weights()
@@ -202,7 +207,7 @@ class MeanVarianceOptimisation:
                               expected_asset_returns=expected_returns,
                               solution='efficient_risk',
                               target_return=portfolio_return)
-                volatilities.append(self.portfolio_risk)
+                volatilities.append(self.portfolio_risk ** 0.5)
                 returns.append(portfolio_return)
                 sharpe_ratios.append((portfolio_return - risk_free_rate) / (self.portfolio_risk ** 0.5 + 1e-16))
             except Exception:
@@ -390,7 +395,7 @@ class MeanVarianceOptimisation:
 
         :param covariance: (pd.DataFrame) Covariance dataframe of asset returns.
         :param expected_returns: (list/np.array/pd.dataframe) A list of mean stock returns (mu).
-        :param risk_aversion: (float) Quantifies the risk averse nature of the investor - a higher value means
+        :param risk_aversion: (float) Quantifies the risk-averse nature of the investor - a higher value means
                            more risk averse and vice-versa.
         """
 

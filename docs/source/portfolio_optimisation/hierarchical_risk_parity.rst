@@ -20,6 +20,7 @@
 
     </h4>
 
+
 .. note::
     The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies.
     Each algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight
@@ -31,37 +32,42 @@
 Hierarchical Risk Parity (HRP)
 ==============================
 
-The Hierarchical Risk Parity algorithm is a novel portfolio optimisation method developed by Marcos Lopez de Prado. A quick
-overview of the different steps in the algorithm:
+
+The Hierarchical Risk Parity algorithm is a novel portfolio optimisation method combining machine learning and traditional
+portfolio optimisation. Although, it is a simple algorithm, it has been found to be very stable as compared to its older
+counterparts (the traditional mean variance optimisation methods).
+
+Overview of the Algorithm
+#########################
 
 
-    |h3| **1. Hierarchical Tree Clustering** |h3_|
-    This step breaks down the assets in our portfolio into different hierarchical clusters using the famous Hierarchical Tree
-    Clustering algorithm. The assets in the portfolio are segregated into clusters which mimic the real-life interactions between
-    the assets in a portfolio - some stocks are related to each other more than others and hence can be grouped within the same
-    cluster. At the end of the step, we are left with the follow tree structure (also called a dendrogram).
+Hierarchical Tree Clustering
+****************************
+This step breaks down the assets in our portfolio into different hierarchical clusters using the famous Hierarchical Tree
+Clustering algorithm. The assets in the portfolio are segregated into clusters which mimic the real-life interactions between
+the assets in a portfolio - some stocks are related to each other more than others and hence can be grouped within the same
+cluster. At the end of the step, we are left with the follow tree structure (also called a dendrogram).
 
-    .. image:: portfolio_optimisation_images/dendrogram.png
+.. image:: portfolio_optimisation_images/dendrogram.png
 
-    |br|
+|br|
 
-    |h3| **2. Matrix Seriation** |h3_|
-    Matrix seriation is a very old statistical technique which is used to rearrange the data to show the inherent clusters
-    clearly. Using the order of hierarchical clusters from the previous step, we rearrange the rows and columns of the covariance
-    matrix of stocks so that similar investments are placed together and dissimilar investments are placed far apart
+Matrix Seriation
+****************
+Matrix seriation is a very old statistical technique which is used to rearrange the data to show the inherent clusters
+clearly. Using the order of hierarchical clusters from the previous step, we rearrange the rows and columns of the covariance
+matrix of stocks so that similar investments are placed together and dissimilar investments are placed far apart
 
-    .. image:: portfolio_optimisation_images/seriation.png
+.. image:: portfolio_optimisation_images/seriation.png
 
-    |br|
+|br|
 
-    |h3| **3. Recursive Bisection** |h3_|
-    This is the final and the most important step of this algorithm where the actual weights are assigned to the assets in a
-    top-down recursive manner. Based on the hierarchical tree dendrogram formed in the first step, the weights trickle down the
-    tree and get assigned to the portfolio assets.
+Recursive Bisection
+*******************
+This is the final and the most important step of this algorithm where the actual weights are assigned to the assets in a
+top-down recursive manner. Based on the hierarchical tree dendrogram formed in the first step, the weights trickle down the
+tree and get assigned to the portfolio assets.
 
-
-Although, it is a simple algorithm, it has been found to be very stable as compared to its older counterparts (the traditional
-mean variance optimisation methods).
 
 .. tip::
     |h4| Underlying Literature |h4_|
@@ -86,6 +92,7 @@ Implementation
     We provide great flexibility to the users in terms of the input data - they can either pass their own pre-calculated input
     matrices/dataframes or leave it to us to calculate them. A quick reference on common input parameters which you will encounter
     throughout the portfolio optimisation module:
+
         * :py:mod:`asset_prices`: Dataframe/matrix of historical raw asset prices **indexed by date**.
         * :py:mod:`asset_returns`: Dataframe/matrix of historical asset returns. This will be a :math:`TxN` matrix where :math:`T` is the time-series and :math:`N` refers to the number of assets in the portfolio.
         * :py:mod:`expected_asset_returns`: List of expected returns per asset i.e. the mean of historical asset returns. This refers to the parameter :math:`\mu` used in portfolio optimisation literature. For a portfolio of 5 assets, ``expected_asset_returns = [0.45, 0.56, 0.89, 1.34, 2.4]``.
@@ -112,7 +119,7 @@ Implementation
     have -1 at the 3rd and 5th index. By default, a list of 1s will be initialised if no custom input is specified.
 
     |h4| Different Linkage Methods |h4_|
-    HRP, by default, uses the single-linkage clustering algorithm. (See the tip under the HCAA algorithm for more details.)
+    HRP, by default, uses the single-linkage clustering algorithm. (See the tip under the HERC algorithm for more details.)
 
 
 
@@ -129,7 +136,7 @@ Example Code
 
     # Compute HRP weights
     hrp = HierarchicalRiskParity()
-    hrp.allocate(asset_prices=stock_prices, resample_by='B')
+    hrp.allocate(asset_prices=stock_prices)
     hrp_weights = hrp.weights.sort_values(by=0, ascending=False, axis=1)
 
     # Building a dollar neutral Long/Short portfolio by shorting the first 4 stocks and being long the others
@@ -137,7 +144,7 @@ Example Code
     side_weights = pd.Series([1]*stock_prices.shape[1], index=self.data.columns)
     side_weights.loc[stock_prices.columns[:4]] = -1
     hrp.allocate(asset_prices=self.data, asset_names=self.data.columns, side_weights=side_weights)
-    hrp.allocate(asset_prices=stock_prices, side_weights=side_weights, resample_by='B')
+    hrp.allocate(asset_prices=stock_prices, side_weights=side_weights)
     hrp_weights = hrp.weights.sort_values(by=0, ascending=False, axis=1)
 
 
@@ -151,7 +158,7 @@ Plotting
 
     # Instantiate HRP Class
     hrp = HierarchicalRiskParity()
-    hrp.allocate(asset_prices=stock_prices, resample_by='B')
+    hrp.allocate(asset_prices=stock_prices)
 
     # Plot Dendrogram
     hrp.plot_clusters(assets=stock_prices.columns)

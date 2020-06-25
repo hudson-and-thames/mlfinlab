@@ -21,7 +21,7 @@ There are four benchmarks strategies implemented in the Online Portfolio Selecti
 ----
 
 Buy and Hold
-============
+############
 
 Buy and Hold is a strategy where an investor invests in an initial portfolio and never rebalances it. The portfolio weights, however, change
 as time goes by because the underlying assets change in prices.
@@ -40,7 +40,7 @@ Returns for Buy and Hold can be calculated by multiplying the initial weight and
     If no weights are given for the ``allocate`` method for Buy and Hold, uniform weights will be used.
 
 Implementation
-##############
+**************
 
 .. automodule:: mlfinlab.online_portfolio_selection.bah
 
@@ -50,7 +50,7 @@ Implementation
 
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -80,7 +80,7 @@ Example Code
 ----
 
 Best Stock
-==========
+##########
 
 Best Stock strategy chooses the best performing asset in hindsight.
 
@@ -106,7 +106,7 @@ Once the initial portfolio has been determined, the final weights can be represe
     inherently decides the weights for all time period by choosing the best performing asset.
 
 Implementation
-##############
+**************
 
 .. automodule:: mlfinlab.online_portfolio_selection.best_stock
 
@@ -116,7 +116,7 @@ Implementation
 
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -142,7 +142,7 @@ Example Code
 ----
 
 Constant Rebalanced Portfolio
-=============================
+#############################
 
 Constant Rebalanced Portfolio rebalances to a certain portfolio weight every time period. This particular weight can be set by the user,
 and if there are no inputs, it will automatically allocate equal weights to all assets. The total returns for a CRP can be calculated by
@@ -171,7 +171,7 @@ Once the initial portfolio has been determined, the final weights can be represe
     - If neither parameters or weights are given, CRP will use uniform weights.
 
 Implementation
-##############
+**************
 
 .. automodule:: mlfinlab.online_portfolio_selection.crp
 
@@ -183,7 +183,7 @@ Implementation
 
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -222,7 +222,7 @@ Example Code
 ----
 
 Best Constant Rebalanced Portfolio
-==================================
+##################################
 
 Best Constant Rebalanced Portfolio is a strategy that is implemented in hindsight, which is similar to Best Stock. It uses the same weight
 for all time periods. However, it determines those weights by having the complete market sequence of the past. The objective function for
@@ -248,7 +248,7 @@ Once the optimal weight has been determined, the final returns can be calculated
     weights because BCRP inherently decides the weights for all time period by choosing the weights.
 
 Implementation
-##############
+**************
 
 .. automodule:: mlfinlab.online_portfolio_selection.bcrp
 
@@ -257,7 +257,7 @@ Implementation
         :inherited-members:
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -283,7 +283,7 @@ Example Code
 ----
 
 Research Notebook
-=================
+#################
 
 The following `benchmarks <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
 notebook provides a more detailed exploration of the strategies.

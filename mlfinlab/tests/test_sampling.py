@@ -31,7 +31,7 @@ class TestSampling(unittest.TestCase):
         """
         Set samples_info_sets (t1), price bars
         """
-        self.price_bars = pd.Series(index=pd.date_range(start="1/1/2018", end='1/8/2018', freq='H'))
+        self.price_bars = pd.Series(index=pd.date_range(start="1/1/2018", end='1/8/2018', freq='H'), dtype='float64')
         self.samples_info_sets = pd.DataFrame(index=self.price_bars.index[[1, 2, 5, 7, 10, 11, 12, 20]])
         self.samples_info_sets['t1'] = self.samples_info_sets.index + pd.Timedelta('2H')
 

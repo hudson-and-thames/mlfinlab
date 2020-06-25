@@ -19,7 +19,7 @@ There are three momentum strategies implemented in the Online Portfolio Selectio
 ----
 
 Exponential Gradient
-====================
+####################
 
 Exponential Gradient is a momentum strategy that focuses on the best performing asset of the last time period.
 The portfolio shifts its weights to the best performing asset of the last period with an adjustment of :math:`\eta`, the learning rate.
@@ -38,7 +38,7 @@ Exponential Gradients have an extremely efficient computational time that scales
 and broadly speaking, there are three update methods to iteratively update the selection of portfolio weights.
 
 Multiplicative Update
-#####################
+*********************
 
 David Helmbold first proposed a regularization term that adopts relative entropy in his `paper <https://www.cis.upenn.edu/~mkearns/finread/portfolio.pdf>`_.
 
@@ -58,7 +58,7 @@ Multiplicative update algorithm can be stated as the following.
 where :math:`Z` is a normalization term to sum the weights to 1.
 
 Gradient Projection
-###################
+*******************
 
 Instead of relative entropy, gradient projection adopts an :math:`L_2`-regularization term for the optimization equation.
 
@@ -71,7 +71,7 @@ Gradient projection can then be iteratively updated with the following equation.
     b_{t+1} = b_t + \eta \cdot \left( \frac{x_t}{b_t \cdot x_t} - \frac{1}{m} \sum_{j=1}^{m} \frac{x_t}{b_t \cdot x_t} \right)
 
 Expectation Maximization
-########################
+************************
 
 Lastly, Expectation Maximization uses a :math:`\chi^2` regularization term.
 
@@ -87,7 +87,7 @@ Then the corresponding update rule becomes
     The three update methods have similar returns for the same set of parameters.
 
 Parameters
-##########
+**********
 
 Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
 for the users. For NYSE, a low value of :math:`\eta` was optimal, which indicates a lack of a clear momentum strategy.
@@ -112,7 +112,7 @@ of a momentum strategy.
     - Low :math:`\eta` : Passively follow the best performing asset.
 
 Implementation
-##############
+**************
 
 .. automodule:: mlfinlab.online_portfolio_selection.eg
 
@@ -123,7 +123,7 @@ Implementation
         .. automethod:: __init__
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -157,7 +157,7 @@ Example Code
 ----
 
 Follow the Leader
-=================
+#################
 
 The biggest drawback of using Exponential Gradient is the failure to look at the changes before the latest period.
 Follow the Leader mediates this shortfall by directly tracking the Best Constant Rebalanced Portfolio; therefore, FTL
@@ -176,7 +176,7 @@ looks at the whole history of the data and calculates the portfolio weights that
     every data point, the time complexity quadratically scales with the number of points.
 
 Implementation
-##############
+**************
 
 .. automodule:: mlfinlab.online_portfolio_selection.ftl
 
@@ -185,7 +185,7 @@ Implementation
         :inherited-members:
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -215,7 +215,7 @@ Example Code
 ----
 
 Follow the Regularized Leader
-=============================
+#############################
 
 Follow the Regularized Leader adds an additional regularization term to the objective function for Follow the Leader to prevent a drastic deviation in each period.
 
@@ -234,7 +234,7 @@ Follow the Regularized Leader adds an additional regularization term to the obje
     every data point, the time complexity quadratically scales with the number of points.
 
 Parameters
-##########
+**********
 
 Using `optuna <https://optuna.org/>`_, we experimented with different parameters to provide a general guideline
 for the users. For NYSE, a high regularization was an effective method to generate high returns
@@ -260,7 +260,7 @@ The highest returns are results with :math:`\beta` of 0.2. Lower values of beta 
     - Low :math:`\beta` : Passively follow the best performing asset. Strategy becomes a CRP with the given user weights and CRP-Uniform if no weights are given.
 
 Implementation
-##############
+**************
 
 .. automodule:: mlfinlab.online_portfolio_selection.ftrl
 
@@ -271,7 +271,7 @@ Implementation
         .. automethod:: __init__
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -301,7 +301,7 @@ Example Code
 ----
 
 Research Notebook
-=================
+#################
 
 The following `momentum <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb>`_
 notebook provides a more detailed exploration of the strategies.

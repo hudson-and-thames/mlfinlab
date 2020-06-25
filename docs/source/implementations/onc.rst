@@ -121,3 +121,12 @@ An example showing how the ONC algorithm is used can be seen below:
 
     # Output of the ONC algorithm with 10 simulations for each number of clusters tested
     assets_corr_onc, clusters, silh_scores = onc.get_onc_clusters(assets_corr, repeat=10)
+
+Research Notebooks
+##################
+
+The following research notebooks can be used to better understand the Optimal Number of Clusters algorithm.
+
+* `Optimal Number of Clusters Example`_
+
+.. _`Optimal Number of Clusters Example`: https://github.com/hudson-and-thames/research/blob/master/Clustering/ONC/Optimal_Number_of_Clusters.ipynb

@@ -324,7 +324,6 @@ class TestGetW(unittest.TestCase):
         with warnings.catch_warnings(record=True) as warn_catch:
             warnings.simplefilter("always")
             w_param = get_w_power(0.1, 2)
-            print(warn_catch[0].category)
             self.assertTrue(len(warn_catch) == 1)
             self.assertEqual(0, w_param)
             self.assertTrue('User' in str(warn_catch[0].category))
