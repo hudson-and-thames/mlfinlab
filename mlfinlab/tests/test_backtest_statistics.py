@@ -182,6 +182,17 @@ class TestBacktestStatistics(unittest.TestCase):
         self.assertAlmostEqual(result_prob_sr, 0.95727,
                                delta=1e-4)
 
+        # Test warnings
+
+        with self.assertWarns(UserWarning):  # Test statistic is complex
+            probabilistic_sharpe_ratio(1.2, 1.0, 2, 2, 3)
+
+        with self.assertWarns(UserWarning):  # Test statistic is inf
+            probabilistic_sharpe_ratio(2, 1.0, 2, 0.5, 1)
+
+        with self.assertWarns(UserWarning):  # Test statistic is nan
+            probabilistic_sharpe_ratio(2, 1.0, 1, 0.5, 1)
+
     def test_deflated_sharpe_ratio(self):
         """
         Check deflated Sharpe ratio using numerical example
