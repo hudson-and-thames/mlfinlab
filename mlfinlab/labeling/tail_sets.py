@@ -15,22 +15,33 @@ class TailSetLabels:
     portfolio.
     """
 
-    def __init__(self, prices, window, mean_abs_dev):
+    def __init__(self, prices, n_bins, vol_adj=None, window=None):
         """
         :param prices: (pd.DataFrame) Asset prices.
-        :param window: (int) Window period used in the calculation of the volatility.
-        :param mean_abs_dev: (bool) To use the mean absolute deviation or traditional standard deviation.
+        :param n_bins: (int) Number of bins to determine the quantiles for defining the tail sets. The top and
+                        bottom quantiles are considered to be the positive and negative tail sets, respectively.
+        :param vol_adj: (bool) Whether to take volatility adjusted returns. Allowable inputs are ``None``,
+                        ``mean_abs_dev``, and ``stdev``.
+        :param window: (int) Window period used in the calculation of the volatility adjusted returns, if vol_adj is not
+                        None. Has no impact if vol_adj is None.
         """
+        assert len(prices) > n_bins, "n_bins exceeds the length of prices series!"
+        if vol_adj is not None:
+            assert isinstance(window, int), "If vol_adj is not None, window must be int."
+            assert len(prices) > window, "Length of price data must be greater than the window."
+
         self.prices = prices
         self.rets = np.log(prices).diff().dropna()
         self.window = window
-        self.mean_abs_dev = mean_abs_dev
+        self.n_bins = n_bins
+        self.vol_adj = vol_adj
 
-        # Properties relating to the tail sets
-        self.vol_adj_rets = None
+        # Properties relating to the tail sets.
+        self.vol_adj_rets = self.rets  # If no vol_adj.
 
-        # Compute tail sets
-        self._vol_adjusted_rets()
+        # Compute tail sets.
+        if self.vol_adj is not None:
+            self._vol_adjusted_rets()
         self.tail_sets = self.vol_adj_rets.dropna().apply(self._extract_tail_sets, axis=1)
         self.positive_tail_set = self.tail_sets.apply(self._positive_tail_set, axis=1)
         self.negative_tail_set = self.tail_sets.apply(self._negative_tail_set, axis=1)
@@ -43,9 +54,8 @@ class TailSetLabels:
         The positive and negative sets are each a series of lists with the names of the securities that fall within each
         set at a specific timestamp.
 
-        For the full matirx a value of 1 indicates the volatility adjusted returns were in the upper decile, a value of
-        -1 for the bottom decile.
-
+        For the full matrix a value of 1 indicates the volatility adjusted returns were in the top quantile, a value of
+        -1 for the bottom quantile.
         :return: (tuple) positive set, negative set, full matrix set.
         """
         return self.positive_tail_set, self.negative_tail_set, self.tail_sets
@@ -59,18 +69,18 @@ class TailSetLabels:
         window = self.window
 
         # Have 2 measure of vol, the mean absolute, and stdev
-        if self.mean_abs_dev:
+        if self.vol_adj == 'mean_abs_dev':
             # Huffman and Moll (2011) show that risk measured as the mean absolute deviation has more explanatory
             # power for future expected returns than standard deviation.
             vol = self.rets.abs().ewm(span=window, min_periods=window).mean()
-        else:
+        elif self.vol_adj == 'stdev':
             vol = self.rets.rolling(window).std()
-
+        else:
+            raise Exception('Invalid name for vol_adj. Valid names are ''mean_abs_dev'', ''stdev'', or None.')
         # Save vol adj rets
-        self.vol_adj_rets = self.rets / vol
+        self.vol_adj_rets = (self.rets / vol).dropna()
 
-    @staticmethod
-    def _extract_tail_sets(row):
+    def _extract_tail_sets(self, row):
         """
         Method used in a .apply() setting to transform each row in a DataFrame to the positive and negative tail sets.
 
@@ -80,18 +90,19 @@ class TailSetLabels:
         :return: (pd.Series) Tail set with positive and negative labels.
         """
         # Get decile labels
-        row_deciles = pd.qcut(x=row, q=10, labels=range(1, 11), retbins=False)
+        row = row.rank(method='first')  # To avoid error with unique bins when using qcut due to too many 0 values.
+        row_quantiles = pd.qcut(x=row, q=self.n_bins, labels=range(1, 1 + self.n_bins), retbins=False)
 
         # Set class labels
-        row_deciles = row_deciles.to_numpy()  # Convert to numpy array
-        row_deciles[(row_deciles != 1) & (row_deciles != 10)] = 0
-        row_deciles[row_deciles == 1] = -1
-        row_deciles[row_deciles == 10] = 1
+        row_quantiles = row_quantiles.to_numpy()  # Convert to numpy array
+        row_quantiles[(row_quantiles != 1) & (row_quantiles != self.n_bins)] = 0
+        row_quantiles[row_quantiles == 1] = -1
+        row_quantiles[row_quantiles == self.n_bins] = 1
 
         # Convert to series
-        row_deciles = pd.Series(row_deciles, index=row.index)
+        row_quantiles = pd.Series(row_quantiles, index=row.index)
 
-        return row_deciles
+        return row_quantiles
 
     @staticmethod
     def _positive_tail_set(row):
@@ -101,7 +112,8 @@ class TailSetLabels:
 
         This method is used in an apply() setting.
 
-        :param row: (pd.Series) Volatility adjusted prices.
+        :param row: (pd.Series) Labeled row of several stocks where each is already labeled with +1 (positive tail set),
+                    -1 (negative tail set), or 0.
         :return: (list) Securities in the positive tail set.
         """
         return list(row[row == 1].index)
@@ -114,7 +126,8 @@ class TailSetLabels:
 
         This method is used in an apply() setting.
 
-        :param row: (pd.Series) Volatility adjusted prices.
+        :param row: (pd.Series) Labeled row of several stocks where each is already labeled with +1 (positive tail set),
+                    -1 (negative tail set), or 0.
         :return: (list) Securities in the negative tail set.
         """
         return list(row[row == -1].index)
