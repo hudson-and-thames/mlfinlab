@@ -7,7 +7,7 @@ import numpy as np
 from scipy.stats import weightedtau, kendalltau, spearmanr, pearsonr
 
 
-def _get_eigen_vector(dot_matrix, variance_thresh):
+def _get_eigen_vector(dot_matrix, variance_thresh, num_features=None):
     """
     Advances in Financial Machine Learning, Snippet 8.5, page 119.
 
@@ -17,6 +17,7 @@ def _get_eigen_vector(dot_matrix, variance_thresh):
 
     :param dot_matrix: (np.array): Matrix for which eigen values/vectors should be computed.
     :param variance_thresh: (float): Percentage % of overall variance which compressed vectors should explain.
+    :param num_features: (int) Manually set number of features, overrides variance_thresh. (None by default)
     :return: (pd.Series, pd.DataFrame): Eigenvalues, Eigenvectors.
     """
     # Compute eigen_vec from dot prod matrix, reduce dimension
@@ -31,7 +32,10 @@ def _get_eigen_vector(dot_matrix, variance_thresh):
 
     # 3) Reduce dimension, form PCs
     cum_var = eigen_val.cumsum() / eigen_val.sum()
-    dim = cum_var.values.searchsorted(variance_thresh)
+    if num_features is not None: # Either a preset number of features
+        dim = num_features - 1
+    else: # Or defined by variance level
+        dim = cum_var.values.searchsorted(variance_thresh)
     eigen_val, eigen_vec = eigen_val.iloc[:dim + 1], eigen_vec.iloc[:, :dim + 1]
     return eigen_val, eigen_vec
 
@@ -46,7 +50,7 @@ def _standardize_df(data_frame):
     return data_frame.sub(data_frame.mean(), axis=1).div(data_frame.std(), axis=1)
 
 
-def get_orthogonal_features(feature_df, variance_thresh=.95):
+def get_orthogonal_features(feature_df, variance_thresh=.95, num_features=None):
     """
     Advances in Financial Machine Learning, Snippet 8.5, page 119.
 
@@ -56,13 +60,14 @@ def get_orthogonal_features(feature_df, variance_thresh=.95):
 
     :param feature_df: (pd.DataFrame): Dataframe of features.
     :param variance_thresh: (float): Percentage % of overall variance which compressed vectors should explain.
+    :param num_features: (int) Manually set number of features, overrides variance_thresh. (None by default)
     :return: (pd.DataFrame): Compressed PCA features which explain %variance_thresh of variance.
     """
     # Given a dataframe of features, compute orthogonal features
     feature_df_standard = _standardize_df(feature_df)  # Standardize
     dot_matrix = pd.DataFrame(np.dot(feature_df_standard.T, feature_df_standard), index=feature_df.columns,
                               columns=feature_df.columns)
-    _, eigen_vec = _get_eigen_vector(dot_matrix, variance_thresh)
+    _, eigen_vec = _get_eigen_vector(dot_matrix, variance_thresh, num_features)
     pca_features = np.dot(feature_df_standard, eigen_vec)
     return pca_features
 
