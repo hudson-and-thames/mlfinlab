@@ -278,8 +278,8 @@ def probabilistic_sharpe_ratio(observed_sr: float, benchmark_sr: float, number_o
     """
 
     test_value = ((observed_sr - benchmark_sr) * np.sqrt(number_of_returns - 1)) / \
-                  np.sqrt((1 - skewness_of_returns * observed_sr +
-                  (kurtosis_of_returns - 1) / 4 * observed_sr ** 2))
+                  ((1 - skewness_of_returns * observed_sr + (kurtosis_of_returns - 1) / \
+                    4 * observed_sr ** 2)**(1 / 2))
 
     if np.isnan(test_value):
         warnings.warn('Test value is nan. Please check the input values.', UserWarning)
