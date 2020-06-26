@@ -75,6 +75,14 @@ class StandardBars(BaseBars):
             dollar_value = price * volume
             signed_tick = self._apply_tick_rule(price)
 
+            if isinstance(self.threshold, (int, float)):
+                # If the threshold is fixed, it's used for every sampling
+                threshold = self.threshold
+            else:
+                # If the threshold is changing, then the threshold defined just before
+                # sampling time is used
+                threshold = self.threshold.iloc[self.threshold.index.get_loc(date_time, method='pad')]
+
             if self.open_price is None:
                 self.open_price = price
 
@@ -89,7 +97,7 @@ class StandardBars(BaseBars):
                 self.cum_statistics['cum_buy_volume'] += volume
 
             # If threshold reached then take a sample
-            if self.cum_statistics[self.metric] >= self.threshold:  # pylint: disable=eval-used
+            if self.cum_statistics[self.metric] >= threshold:  # pylint: disable=eval-used
                 self._create_bars(date_time, price,
                                   self.high_price, self.low_price, list_bars)
 
