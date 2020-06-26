@@ -27,6 +27,46 @@ pg 25) to build the more interesting features for predicting financial time seri
    `Easley, David, Marcos M. López de Prado, and Maureen O’Hara. "The volume clock: Insights into the high-frequency
    paradigm." The Journal of Portfolio Management 39.1 (2012): 19-29. <https://jpm.pm-research.com/content/39/1/19.abstract>`_
 
+.. tip::
+   A threshold can be either fixed (given as ``float``) or dynamic (given as ``pd.Series``). If a dynamic threshold is used
+   then there is no need to declare threshold for every observation. Values are needed only for the first observation
+   (or any time before it) and later at times when the threshold is changed to a new value.
+   Whenever sampling is made, the most recent threshold level is used.
+
+   **An example for volume bars**
+   We have daily observations of prices and volumes:
+
+   +------------+------------+-----------+
+   | Time       | Price      | Volume    |
+   +============+============+===========+
+   | 20.04.2020 | 1000       | 10        |
+   +------------+------------+-----------+
+   | 21.04.2020 | 990        | 10        |
+   +------------+------------+-----------+
+   | 22.04.2020 | 1000       | 20        |
+   +------------+------------+-----------+
+   | 23.04.2020 | 1100       | 10        |
+   +------------+------------+-----------+
+   | 24.04.2020 | 1000       | 10        |
+   +------------+------------+-----------+
+
+   And we set a dynamic threshold:
+
+   +------------+------------+
+   | Time       | Threshold  |
+   +============+============+
+   | 20.04.2020 | 20         |
+   +------------+------------+
+   | 23.04.2020 | 10         |
+   +------------+------------+
+
+   The data will be sampled as follows:
+
+   - 20.04.2020 and 21.04.2020 into one bar, as their volume is 20.
+   - 23.04.2020 as a single bar, as its volume is 20.
+   - 23.04.2020 as a single bar, as it now fills the lower volume threshold of 10.
+   - 24.04.2020 as a single bar again.
+
 Time Bars
 *********
 
