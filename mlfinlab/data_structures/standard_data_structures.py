@@ -106,8 +106,8 @@ class StandardBars(BaseBars):
         return list_bars
 
 
-def get_dollar_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], threshold: float = 70000000, batch_size: int = 20000000,
-                    verbose: bool = True, to_csv: bool = False, output_path: Optional[str] = None):
+def get_dollar_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], threshold: Union[float, pd.Series] = 70000000,
+                    batch_size: int = 20000000, verbose: bool = True, to_csv: bool = False, output_path: Optional[str] = None):
     """
     Creates the dollar bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
@@ -117,7 +117,9 @@ def get_dollar_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], th
 
     :param file_path_or_df: (str, iterable of str, or pd.DataFrame) Path to the csv file(s) or Pandas Data Frame containing raw tick data
                             in the format[date_time, price, volume]
-    :param threshold: (float) A cumulative value above this threshold triggers a sample to be taken.
+    :param threshold: (float, or pd.Series) A cumulative value above this threshold triggers a sample to be taken.
+                      If a series is given, then at each sampling time the closest previous threshold is used.
+                      (Values in the series can only be at times when the threshold is changed, not for every observation)
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
@@ -130,8 +132,8 @@ def get_dollar_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], th
     return dollar_bars
 
 
-def get_volume_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], threshold: float = 70000000, batch_size: int = 20000000,
-                    verbose: bool = True, to_csv: bool = False, output_path: Optional[str] = None):
+def get_volume_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], threshold: Union[float, pd.Series] = 70000000,
+                    batch_size: int = 20000000, verbose: bool = True, to_csv: bool = False, output_path: Optional[str] = None):
     """
     Creates the volume bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
@@ -140,7 +142,9 @@ def get_volume_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], th
 
     :param file_path_or_df: (str, iterable of str, or pd.DataFrame) Path to the csv file(s) or Pandas Data Frame containing raw tick data
                             in the format[date_time, price, volume]
-    :param threshold: (float) A cumulative value above this threshold triggers a sample to be taken.
+    :param threshold: (float, or pd.Series) A cumulative value above this threshold triggers a sample to be taken.
+                      If a series is given, then at each sampling time the closest previous threshold is used.
+                      (Values in the series can only be at times when the threshold is changed, not for every observation)
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
@@ -152,14 +156,16 @@ def get_volume_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], th
     return volume_bars
 
 
-def get_tick_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], threshold: float = 70000000, batch_size: int = 20000000,
-                  verbose: bool = True, to_csv: bool = False, output_path: Optional[str] = None):
+def get_tick_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], threshold: Union[float, pd.Series] = 70000000,
+                  batch_size: int = 20000000, verbose: bool = True, to_csv: bool = False, output_path: Optional[str] = None):
     """
     Creates the tick bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
     :param file_path_or_df: (str, iterable of str, or pd.DataFrame) Path to the csv file(s) or Pandas Data Frame containing raw tick data
                              in the format[date_time, price, volume]
-    :param threshold: (float) A cumulative value above this threshold triggers a sample to be taken.
+    :param threshold: (float, or pd.Series) A cumulative value above this threshold triggers a sample to be taken.
+                      If a series is given, then at each sampling time the closest previous threshold is used.
+                      (Values in the series can only be at times when the threshold is changed, not for every observation)
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
