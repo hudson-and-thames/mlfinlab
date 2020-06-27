@@ -8,7 +8,7 @@ class TailSetLabels:
     Tail set labels are a classification labeling technique introduced in the following paper: Nonlinear support vector
     machines can systematically identify stocks with high and low future returns. Algorithmic Finance, 2(1), pp.45-58.
 
-    A tail set is defined to be a group of stocks whose volatility-adjusted price change is in the highest or lowest
+    A tail set is defined to be a group of stocks whose volatility-adjusted return is in the highest or lowest
     quantile, for example the highest or lowest 5%.
 
     A classification model is then fit using these labels to determine which stocks to buy and sell in a long / short
@@ -25,7 +25,7 @@ class TailSetLabels:
         :param window: (int) Window period used in the calculation of the volatility adjusted returns, if vol_adj is not
                         None. Has no impact if vol_adj is None.
         """
-        assert len(prices) > n_bins, "n_bins exceeds the length of prices series!"
+        assert prices.shape[1] > n_bins, "n_bins exceeds the number of stocks!"
         if vol_adj is not None:
             assert isinstance(window, int), "If vol_adj is not None, window must be int."
             assert len(prices) > window, "Length of price data must be greater than the window."
@@ -68,7 +68,7 @@ class TailSetLabels:
         """
         window = self.window
 
-        # Have 2 measure of vol, the mean absolute, and stdev
+        # Have 2 measure of vol, the mean absolute, and stdev.
         if self.vol_adj == 'mean_abs_dev':
             # Huffman and Moll (2011) show that risk measured as the mean absolute deviation has more explanatory
             # power for future expected returns than standard deviation.
@@ -77,29 +77,29 @@ class TailSetLabels:
             vol = self.rets.rolling(window).std()
         else:
             raise Exception('Invalid name for vol_adj. Valid names are ''mean_abs_dev'', ''stdev'', or None.')
-        # Save vol adj rets
+        # Save vol adj rets.
         self.vol_adj_rets = (self.rets / vol).dropna()
 
     def _extract_tail_sets(self, row):
         """
         Method used in a .apply() setting to transform each row in a DataFrame to the positive and negative tail sets.
 
-        Currently this method splits the data using deciles (10 groups).
+        This method splits the data into quantiles determined by the user, with n_bins.
 
         :param row: (pd.Series) Vol adjusted returns for a given date.
         :return: (pd.Series) Tail set with positive and negative labels.
         """
-        # Get decile labels
+        # Get decile labels.
         row = row.rank(method='first')  # To avoid error with unique bins when using qcut due to too many 0 values.
         row_quantiles = pd.qcut(x=row, q=self.n_bins, labels=range(1, 1 + self.n_bins), retbins=False)
 
-        # Set class labels
+        # Set class labels.
         row_quantiles = row_quantiles.to_numpy()  # Convert to numpy array
         row_quantiles[(row_quantiles != 1) & (row_quantiles != self.n_bins)] = 0
         row_quantiles[row_quantiles == 1] = -1
         row_quantiles[row_quantiles == self.n_bins] = 1
 
-        # Convert to series
+        # Convert to series.
         row_quantiles = pd.Series(row_quantiles, index=row.index)
 
         return row_quantiles
@@ -107,7 +107,7 @@ class TailSetLabels:
     @staticmethod
     def _positive_tail_set(row):
         """
-        Takes as input a row from the vol_adj_price DataFrame and then returns a list of names of the securities in the
+        Takes as input a row from the vol_adj_ret DataFrame and then returns a list of names of the securities in the
         positive tail set, for this specific row date.
 
         This method is used in an apply() setting.
@@ -121,7 +121,7 @@ class TailSetLabels:
     @staticmethod
     def _negative_tail_set(row):
         """
-        Takes as input a row from the vol_adj_price DataFrame and then returns a list of names of the securities in the
+        Takes as input a row from the vol_adj_ret DataFrame and then returns a list of names of the securities in the
         negative tail set, for this specific row date.
 
         This method is used in an apply() setting.
