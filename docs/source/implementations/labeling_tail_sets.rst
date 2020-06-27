@@ -64,10 +64,11 @@ industrials sector.
    :scale: 100 %
    :align: center
    :figclass: align-center
-   :alt: purging image
+   :alt: tail sets
 
-    The positive tail sets are the 10% most positive volatility-adjusted returns, and the negative tail sets are the 10% most negative.
-    The vertical dotted lines represent the decile cut. The + and − regions are the ones used for model training.
+   The positive tail sets are the 10% most positive volatility-adjusted returns, and the negative tail sets are the
+   10% most negative. The vertical dotted lines represent the decile cut. The + and − regions are the ones used for
+   model training.
 
 
 How to use these labels in practice?
