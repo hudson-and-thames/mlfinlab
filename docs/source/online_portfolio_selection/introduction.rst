@@ -161,7 +161,7 @@ Upon weights allocation the possible outputs are:
     ``self.all_weights`` returns all the predicted weights for the entire given dataset.
     To interpret the results, if you see that for ``2015-5-16`` the final weights are
     ``{A: 0.2, B:0.3, C:0.5}``, the strategy has predicted those particular weights given
-    the data until ``2015-05-15``. The daily returns (or any periodic returns) can be then
+    the data until ``2015-05-15``. The daily returns (or any periodic returns) are then
     calculated by the dot product of the weights and returns.
 
 .. note::
@@ -169,7 +169,7 @@ Upon weights allocation the possible outputs are:
     algorithm will require the entire dataset or just a particular window. As an example,
     ``OLMAR-1`` and ``RMR`` both have a given window value as a lookback period. Therefore,
     as long as we have the given weights that we calculated from the previous run and
-    sufficient data to cover the window value, we can output the new weights be adjusting the
+    sufficient data to cover the window value, we can output the new weights by adjusting the
     ``weights`` for ``.allocate()`` and the given ``asset_prices``. However, this method will
     not work for strategies that look back for the entire period. ``OLMAR-2`` is an exponential
     moving average algorithm that incorporates data for all periods and ``CORN`` algorithms look
