@@ -8,7 +8,7 @@ import math
 import numpy as np
 import pandas as pd
 
-from mlfinlab.features import fracdiff
+from mlfinlab.features import fracdiff, plot_min_ffd
 
 
 class TestFractionalDifferentiation(unittest.TestCase):
@@ -88,3 +88,34 @@ class TestFractionalDifferentiation(unittest.TestCase):
             fd_series = fracdiff.frac_diff_ffd(data_series, diff_amt=diff_amt)
             self.assertTrue(fd_series.shape[0] == len(data_series))
             self.assertTrue(isinstance(fd_series['close'][0], np.float64) and math.isnan(fd_series['close'][0]))
+
+    def test_plot_min_ffd(self):
+        """
+        Assert that the plot for min ffd is correct,
+
+        Testing is based on the correlation between the original series (d=0)
+        and the differentiated series.
+        """
+        data_series = self.data['close'].to_frame()
+
+        expected_correlation = np.array([[0, 1],
+                                         [0.1, 0.99295323],
+                                         [0.2, 0.97712122],
+                                         [0.3, 0.95098824],
+                                         [0.4, 0.91422650],
+                                         [0.5, 0.86412240],
+                                         [0.6, 0.80909555],
+                                         [0.7, 0.76457507],
+                                         [0.8, 0.67228154],
+                                         [0.9, 0.62583193],
+                                         [1.0, 0.51058195]])
+
+        # Obtaining a plot for min ffd
+        plot = plot_min_ffd(data_series)
+        correlation = plot.lines[0].get_xydata()
+
+        print(type(plot))
+
+
+        # Test if equal
+        np.testing.assert_allclose(correlation, expected_correlation)

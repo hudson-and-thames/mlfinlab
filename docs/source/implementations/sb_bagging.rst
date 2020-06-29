@@ -35,11 +35,11 @@ An example of using SequentiallyBootstrappedBaggingClassifier
     price_bars = pd.read_csv('PRICE_BARS_FILE_PATH', index_col=0, parse_dates = [0, 2])
 
     triple_barrier_events = triple_barrier_events.loc[X.index, :] # take only train part
-    price_events = price_events[(price_events.index >= X.index.min()) &
-                                (price_events.index <= X.index.max())]
+    triple_barrier_events = triple_barrier_events[(triple_barrier_events.index >= X.index.min()) &
+                                                  (triple_barrier_events.index <= X.index.max())]
 
     base_est = RandomForestClassifier(n_estimators=1, criterion='entropy', bootstrap=False,
-                                   class_weight='balanced_subsample')
+                                      class_weight='balanced_subsample')
     clf = SequentiallyBootstrappedBaggingClassifier(base_estimator=base_est,
                                                     samples_info_sets=triple_barrier_events.t1,
                                                     price_bars=price_bars, oob_score=True)
