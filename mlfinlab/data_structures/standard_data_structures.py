@@ -75,6 +75,14 @@ class StandardBars(BaseBars):
             dollar_value = price * volume
             signed_tick = self._apply_tick_rule(price)
 
+            if isinstance(self.threshold, (int, float)):
+                # If the threshold is fixed, it's used for every sampling
+                threshold = self.threshold
+            else:
+                # If the threshold is changing, then the threshold defined just before
+                # sampling time is used
+                threshold = self.threshold.iloc[self.threshold.index.get_loc(date_time, method='pad')]
+
             if self.open_price is None:
                 self.open_price = price
 
@@ -89,7 +97,7 @@ class StandardBars(BaseBars):
                 self.cum_statistics['cum_buy_volume'] += volume
 
             # If threshold reached then take a sample
-            if self.cum_statistics[self.metric] >= self.threshold:  # pylint: disable=eval-used
+            if self.cum_statistics[self.metric] >= threshold:  # pylint: disable=eval-used
                 self._create_bars(date_time, price,
                                   self.high_price, self.low_price, list_bars)
 
@@ -98,8 +106,8 @@ class StandardBars(BaseBars):
         return list_bars
 
 
-def get_dollar_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], threshold: float = 70000000, batch_size: int = 20000000,
-                    verbose: bool = True, to_csv: bool = False, output_path: Optional[str] = None):
+def get_dollar_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], threshold: Union[float, pd.Series] = 70000000,
+                    batch_size: int = 20000000, verbose: bool = True, to_csv: bool = False, output_path: Optional[str] = None):
     """
     Creates the dollar bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
@@ -109,7 +117,9 @@ def get_dollar_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], th
 
     :param file_path_or_df: (str, iterable of str, or pd.DataFrame) Path to the csv file(s) or Pandas Data Frame containing raw tick data
                             in the format[date_time, price, volume]
-    :param threshold: (float) A cumulative value above this threshold triggers a sample to be taken.
+    :param threshold: (float, or pd.Series) A cumulative value above this threshold triggers a sample to be taken.
+                      If a series is given, then at each sampling time the closest previous threshold is used.
+                      (Values in the series can only be at times when the threshold is changed, not for every observation)
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
@@ -122,8 +132,8 @@ def get_dollar_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], th
     return dollar_bars
 
 
-def get_volume_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], threshold: float = 70000000, batch_size: int = 20000000,
-                    verbose: bool = True, to_csv: bool = False, output_path: Optional[str] = None):
+def get_volume_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], threshold: Union[float, pd.Series] = 70000000,
+                    batch_size: int = 20000000, verbose: bool = True, to_csv: bool = False, output_path: Optional[str] = None):
     """
     Creates the volume bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
@@ -132,7 +142,9 @@ def get_volume_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], th
 
     :param file_path_or_df: (str, iterable of str, or pd.DataFrame) Path to the csv file(s) or Pandas Data Frame containing raw tick data
                             in the format[date_time, price, volume]
-    :param threshold: (float) A cumulative value above this threshold triggers a sample to be taken.
+    :param threshold: (float, or pd.Series) A cumulative value above this threshold triggers a sample to be taken.
+                      If a series is given, then at each sampling time the closest previous threshold is used.
+                      (Values in the series can only be at times when the threshold is changed, not for every observation)
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
@@ -144,14 +156,16 @@ def get_volume_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], th
     return volume_bars
 
 
-def get_tick_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], threshold: float = 70000000, batch_size: int = 20000000,
-                  verbose: bool = True, to_csv: bool = False, output_path: Optional[str] = None):
+def get_tick_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], threshold: Union[float, pd.Series] = 70000000,
+                  batch_size: int = 20000000, verbose: bool = True, to_csv: bool = False, output_path: Optional[str] = None):
     """
     Creates the tick bars: date_time, open, high, low, close, volume, cum_buy_volume, cum_ticks, cum_dollar_value.
 
     :param file_path_or_df: (str, iterable of str, or pd.DataFrame) Path to the csv file(s) or Pandas Data Frame containing raw tick data
                              in the format[date_time, price, volume]
-    :param threshold: (float) A cumulative value above this threshold triggers a sample to be taken.
+    :param threshold: (float, or pd.Series) A cumulative value above this threshold triggers a sample to be taken.
+                      If a series is given, then at each sampling time the closest previous threshold is used.
+                      (Values in the series can only be at times when the threshold is changed, not for every observation)
     :param batch_size: (int) The number of rows per batch. Less RAM = smaller batch size.
     :param verbose: (bool) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
