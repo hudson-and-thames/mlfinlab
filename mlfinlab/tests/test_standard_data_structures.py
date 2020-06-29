@@ -31,6 +31,17 @@ class TestDataStructures(unittest.TestCase):
         """
         threshold = 100000
 
+        # Creating a dynamic threshold
+        data = pd.read_csv(self.path)
+        data.index = pd.to_datetime(data['Date and Time'])
+        data = data.drop('Date and Time', axis=1)
+
+        t_constant = pd.Series([100000], index=[data.index[0]])
+        t_dynamic = pd.Series([10000, 20000, 50000], index=[data.index[0], data.index[40], data.index[80]])
+        t_low = pd.Series([1000], index=[data.index[0]])
+
+        # Generating dollar bars
+
         db1 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
         db2 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
         db3 = ds.get_dollar_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
@@ -54,6 +65,19 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(db1.loc[0, 'low'] == 1005.0)
         self.assertTrue(db1.loc[0, 'close'] == 1304.5)
 
+        # Testing dynamic threshold size
+        df_constant = ds.get_dollar_bars(self.path, threshold=t_constant, batch_size=1000, verbose=False)
+        df_dynamic = ds.get_dollar_bars(self.path, threshold=t_dynamic, batch_size=1000, verbose=False)
+        df_low = ds.get_dollar_bars(self.path, threshold=t_low, batch_size=1000, verbose=False)
+
+        # Assert that constant size outputs the same result
+        self.assertTrue(df_constant.shape == db1.shape)
+        self.assertTrue(np.all(df_constant.values == db1.values))
+
+        # Assert sizes of different thresolds
+        self.assertTrue(df_dynamic.shape == (14, 10))
+        self.assertTrue(df_low.shape == (99, 10))
+
         # delete generated csv file (if it wasn't generated test would fail)
         os.remove('test.csv')
 
@@ -62,6 +86,16 @@ class TestDataStructures(unittest.TestCase):
         Tests the volume bars implementation.
         """
         threshold = 30
+
+        # Creating a dynamic threshold
+        data = pd.read_csv(self.path)
+        data.index = pd.to_datetime(data['Date and Time'])
+        data = data.drop('Date and Time', axis=1)
+
+        t_constant = pd.Series([30], index=[data.index[0]])
+        t_dynamic = pd.Series([5, 10, 30], index=[data.index[0], data.index[40], data.index[80]])
+        t_low = pd.Series([5], index=[data.index[0]])
+
         db1 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
         db2 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
         db3 = ds.get_volume_bars(self.path, threshold=threshold, batch_size=10, verbose=False)
@@ -85,6 +119,19 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(db1.loc[0, 'low'] == 1005.0)
         self.assertTrue(db1.loc[0, 'close'] == 1304.75)
 
+        # Testing dynamic threshold size
+        df_constant = ds.get_volume_bars(self.path, threshold=t_constant, batch_size=1000, verbose=False)
+        df_dynamic = ds.get_volume_bars(self.path, threshold=t_dynamic, batch_size=1000, verbose=False)
+        df_low = ds.get_volume_bars(self.path, threshold=t_low, batch_size=1000, verbose=False)
+
+        # Assert that constant size outputs the same result
+        self.assertTrue(df_constant.shape == db1.shape)
+        self.assertTrue(np.all(df_constant.values == db1.values))
+
+        # Assert sizes of different thresolds
+        self.assertTrue(df_dynamic.shape == (20, 10))
+        self.assertTrue(df_low.shape == (32, 10))
+
         # delete generated csv file (if it wasn't generated test would fail)
         os.remove('test.csv')
 
@@ -93,6 +140,15 @@ class TestDataStructures(unittest.TestCase):
         Test the tick bars implementation.
         """
         threshold = 10
+
+        # Creating a dynamic threshold
+        data = pd.read_csv(self.path)
+        data.index = pd.to_datetime(data['Date and Time'])
+        data = data.drop('Date and Time', axis=1)
+
+        t_constant = pd.Series([10], index=[data.index[0]])
+        t_dynamic = pd.Series([2, 5, 10], index=[data.index[0], data.index[40], data.index[80]])
+        t_low = pd.Series([2], index=[data.index[0]])
 
         db1 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=1000, verbose=False)
         db2 = ds.get_tick_bars(self.path, threshold=threshold, batch_size=50, verbose=False)
@@ -116,6 +172,19 @@ class TestDataStructures(unittest.TestCase):
         self.assertTrue(db1.loc[0, 'high'] == 1904.75)
         self.assertTrue(db1.loc[0, 'low'] == 1005.0)
         self.assertTrue(db1.loc[0, 'close'] == 1304.50)
+
+        # Testing dynamic threshold size
+        df_constant = ds.get_tick_bars(self.path, threshold=t_constant, batch_size=1000, verbose=False)
+        df_dynamic = ds.get_tick_bars(self.path, threshold=t_dynamic, batch_size=1000, verbose=False)
+        df_low = ds.get_tick_bars(self.path, threshold=t_low, batch_size=1000, verbose=False)
+
+        # Assert that constant size outputs the same result
+        self.assertTrue(df_constant.shape == db1.shape)
+        self.assertTrue(np.all(df_constant.values == db1.values))
+
+        # Assert sizes of different thresolds
+        self.assertTrue(df_dynamic.shape == (28, 10))
+        self.assertTrue(df_low.shape == (50, 10))
 
         # delete generated csv file (if it wasn't generated test would fail)
         os.remove('test.csv')
