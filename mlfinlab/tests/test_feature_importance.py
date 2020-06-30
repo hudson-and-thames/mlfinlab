@@ -61,6 +61,13 @@ class TestFeatureImportance(unittest.TestCase):
         # Check correlation metrics results
         self.assertAlmostEqual(pca_corr_res['Weighted_Kendall_Rank'][0], 0.7424, delta=1e-1)
 
+        # Check particular number of PCA features
+        pca_ten_features = get_orthogonal_features(self.X, num_features=10)
+        self.assertEqual(pca_ten_features.shape[1], 10)
+
+        pca_five_features = get_orthogonal_features(self.X, num_features=5)
+        self.assertEqual(pca_five_features.shape[1], 5)
+
     def test_feature_importance(self):
         """
         Test features importance: MDI, MDA, SFI and plot function

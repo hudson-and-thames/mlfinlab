@@ -26,6 +26,7 @@ stationary, but not over differencing such that we lose all predictive power.
 
    - **Advances in Financial Machine Learning, Chapter 5** *by* Marcos Lopez de Prado. *Describes the motivation behind the Fractionally Differentiated Features and algorithms in more detail*
 
+
 Fixed-width Window Fracdiff
 ###########################
 
@@ -93,29 +94,102 @@ The following graph shows a fractionally differenced series plotted over the ori
    A deeper analysis of the problem and the tests of the method on various futures is available in the
    **Chapter 5 of Advances in Financial Machine Learning**.
 
+
 Implementation
-##############
+**************
 
 The following function implemented in mlfinlab can be used to derive fractionally differentiated features.
 
 .. py:currentmodule:: mlfinlab.features.fracdiff
 .. autofunction::  frac_diff_ffd
 
+
+Stationarity With Maximum Memory Representation
+###############################################
+
+The following description is based on **Chapter 5 of Advances in Financial Machine Learning**:
+
+Applying the fixed-width window fracdiff (FFD) method on series, the minimum coefficient :math:`d^{*}` can be computed.
+With this :math:`d^{*}` the resulting fractionally differentiated series is stationary. This coefficient
+:math:`d^{*}` quantifies the amount of memory that needs to be removed to achieve stationarity.
+
+If the input series:
+
+- is already stationary, then :math:`d^{*}=0`.
+- contains a unit root, then :math:`d^{*} < 1`.
+- exhibits explosive behavior (like in a bubble), then :math:`d^{*} > 1`.
+
+A case of particular interest is :math:`0 < d^{*} \ll 1`, when the original series is "mildly non-stationary."
+In this case, although differentiation is needed, a full integer differentiation removes
+excessive memory (and predictive power).
+
+The following grap shows how the output of a ``plot_min_ffd`` function looks.
+
+.. figure:: plot_min_ffd_graph.png
+   :scale: 80 %
+   :align: center
+   :figclass: align-center
+   :alt: Minimum D value that passes the ADF test
+
+   ADF statistic as a function of d
+
+The right y-axis on the plot is the ADF statistic computed on the input series downsampled
+to a daily frequency.
+
+The x-axis displays the d value used to generate the series on which the ADF statistic is computed.
+
+The left y-axis plots the correlation between the original series ( :math:`d = 0` ) and the differentiated
+series at various :math:`d` values.
+
+The horizontal dotted line is the ADF test critical value at a 95% confidence level. Based on
+where the ADF statistic crosses this threshold, the minimum :math:`d` value can be defined.
+
+The correlation coefficient at a given :math:`d` value can be used to determine the amount of memory
+that was given up to achieve stationarity. (The higher the correlation - the less memory was given up)
+
+According to Lopez de Prado:
+
+"Virtually all finance papers attempt to recover stationarity by applying an integer
+differentiation :math:`d = 1`, which means that most studies have over-differentiated
+the series, that is, they have removed much more memory than was necessary to
+satisfy standard econometric assumptions."
+
+.. tip::
+
+   An example on how the resulting figure can be analyzed is available in
+   **Chapter 5 of Advances in Financial Machine Learning**.
+
+
+Implementation
+**************
+
+The following function implemented in mlfinlab can be used to achieve stationarity with maximum memory representation.
+
+.. autofunction::  plot_min_ffd
+
+
 Example
 #######
 
-Given that we know the amount we want to difference our price series, fractionally differentiated features can be derived
-as follows:
+Given that we know the amount we want to difference our price series, fractionally differentiated features, and the
+minimum d value that passes the ADF test can be derived as follows:
 
 .. code-block::
 
    import numpy as np
    import pandas as pd
 
-   from mlfinlab.features.fracdiff import frac_diff_ffd
+   from mlfinlab.features.fracdiff import frac_diff_ffd, plot_min_ffd
 
+   # Import price data
    data = pd.read_csv('FILE_PATH')
+
+   # Deriving the fractionally differentiated features
    frac_diff_series = frac_diff_ffd(data['close'], 0.5)
+
+   # Plotting the graph to find the minimum d
+   # Make sure the input dataframe has a 'close' column
+   plot_min_ffd(data)
 
 
 Research Notebook
