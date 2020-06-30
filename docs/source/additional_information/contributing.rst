@@ -5,22 +5,22 @@ Contributing
 ============
 
 Areas of Contribution
-=====================
+#####################
 
-Currently we have a `live project board`_ that follows the principles of Agile Project Management. This board is available to the public and lets everyone know what the maintainers are currently working on. The board has an ice bucket filled with new features and documentation that have priority.
+Currently we have a `live project board`_ that follows the principles of Agile Project Management. This board is available
+to the public and lets everyone know what the Researchers are currently working on.
 
-Needless to say, if you are interested in working on something not on the project board, just drop us an email. We would be very excited to discuss this further.
+At the time of writing, we are focusing our attentions primarily on those contributions by the current Researchers enrolled
+in our `Mentorship Program <https://hudsonthames.org/mentorship/>`_.
 
-The typical contributions are:
-
-* Answering the questions at the back of a chapter in a Jupyter Notebook. `Research repo`_
-* Adding new features and core functionality to the mlfinlab package.
+There is of course room for the public to make contributions. The most useful are those that help to improve user experience.
+Good examples of this is writing `tutorial notebooks <https://github.com/hudson-and-thames/research>`_ which answer questions
+from the back of a chapter, mlfinlab recipes, improving docstrings, and adding new sphinx documentation.
 
 .. _live project board: https://github.com/orgs/hudson-and-thames/projects
-.. _Research repo: https://github.com/hudson-and-thames/research
 
-Templates
-=========
+Raising Issues
+##############
 
 We have created `templates`_ to help aid in creating issues and PRs:
 
@@ -28,5 +28,7 @@ We have created `templates`_ to help aid in creating issues and PRs:
 * Feature request
 * Custom issue template
 * Pull Request Template
+
+Please do create issues for new feature requests and bug fixes.
 
 .. _templates: https://github.com/hudson-and-thames/mlfinlab/issues/new/choose

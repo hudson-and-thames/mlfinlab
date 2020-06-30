@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 from mlfinlab.portfolio_optimization.hrp import HierarchicalRiskParity
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimation
+from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
 class TestHRP(unittest.TestCase):
@@ -18,8 +18,9 @@ class TestHRP(unittest.TestCase):
 
     def setUp(self):
         """
-        Set the file path for the tick data csv
+        Set the file path for the tick data csv.
         """
+
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
@@ -37,25 +38,25 @@ class TestHRP(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
-    def test_hrp_with_shrinkage(self):
+    def test_hrp_long_short(self):
         """
-        Test the weights calculated by HRP algorithm with covariance shrinkage
+        Test the Long Short Portfolio via side_weights Serries 1 for Long, -1 for Short (index=asset names)
         """
-
         hrp = HierarchicalRiskParity()
-        hrp.allocate(asset_prices=self.data, use_shrinkage=True, asset_names=self.data.columns)
+        side_weights = pd.Series([1] * self.data.shape[1], index=self.data.columns)
+        side_weights.loc[self.data.columns[:4]] = -1
+        hrp.allocate(asset_prices=self.data, asset_names=self.data.columns, side_weights=side_weights)
         weights = hrp.weights.values[0]
-        assert (weights >= 0).all()
-        assert len(weights) == self.data.shape[1]
-        np.testing.assert_almost_equal(np.sum(weights), 1)
+        self.assertEqual(len(weights) - self.data.shape[1], 0)
+        self.assertAlmostEqual(np.sum(weights), 0)
 
     def test_dendrogram_plot(self):
         """
-        Test if dendrogram plot object is correctly rendered
+        Test if dendrogram plot object is correctly rendered.
         """
 
         hrp = HierarchicalRiskParity()
-        hrp.allocate(asset_prices=self.data, use_shrinkage=True, asset_names=self.data.columns)
+        hrp.allocate(asset_prices=self.data, asset_names=self.data.columns)
         dendrogram = hrp.plot_clusters(assets=self.data.columns)
         assert dendrogram.get('icoord')
         assert dendrogram.get('dcoord')
@@ -65,7 +66,7 @@ class TestHRP(unittest.TestCase):
 
     def test_quasi_diagnalization(self):
         """
-        Test the quasi-diagnalisation step of HRP algorithm
+        Test the quasi-diagnalisation step of HRP algorithm.
         """
 
         hrp = HierarchicalRiskParity()
@@ -75,7 +76,7 @@ class TestHRP(unittest.TestCase):
 
     def test_value_error_for_non_dataframe_input(self):
         """
-        Test ValueError on passing non-dataframe input
+        Test ValueError on passing non-dataframe input.
         """
 
         with self.assertRaises(ValueError):
@@ -84,7 +85,7 @@ class TestHRP(unittest.TestCase):
 
     def test_value_error_for_non_date_index(self):
         """
-        Test ValueError on passing dataframe not indexed by date
+        Test ValueError on passing dataframe not indexed by date.
         """
 
         with self.assertRaises(ValueError):
@@ -92,21 +93,9 @@ class TestHRP(unittest.TestCase):
             data = self.data.reset_index()
             hrp.allocate(asset_prices=data, asset_names=self.data.columns)
 
-    def test_resampling_asset_prices(self):
-        """
-        Test resampling of asset prices
-        """
-
-        hrp = HierarchicalRiskParity()
-        hrp.allocate(asset_prices=self.data, resample_by='B', asset_names=self.data.columns)
-        weights = hrp.weights.values[0]
-        assert (weights >= 0).all()
-        assert len(weights) == self.data.shape[1]
-        np.testing.assert_almost_equal(np.sum(weights), 1)
-
     def test_all_inputs_none(self):
         """
-        Test allocation when all inputs are None
+        Test allocation when all inputs are None.
         """
 
         with self.assertRaises(ValueError):
@@ -115,11 +104,11 @@ class TestHRP(unittest.TestCase):
 
     def test_hrp_with_input_as_returns(self):
         """
-        Test HRP when passing asset returns dataframe as input
+        Test HRP when passing asset returns dataframe as input.
         """
 
         hrp = HierarchicalRiskParity()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         hrp.allocate(asset_returns=returns, asset_names=self.data.columns)
         weights = hrp.weights.values[0]
         assert (weights >= 0).all()
@@ -128,13 +117,83 @@ class TestHRP(unittest.TestCase):
 
     def test_hrp_with_input_as_covariance_matrix(self):
         """
-        Test HRP when passing a covariance matrix as input
+        Test HRP when passing a covariance matrix as input.
         """
 
         hrp = HierarchicalRiskParity()
-        returns = ReturnsEstimation().calculate_returns(asset_prices=self.data)
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         hrp.allocate(asset_names=self.data.columns, covariance_matrix=returns.cov())
         weights = hrp.weights.values[0]
         assert (weights >= 0).all()
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_hrp_with_input_as_distance_matrix(self):
+        """
+        Test HRP when passing a distance matrix as input.
+        """
+
+        hrp = HierarchicalRiskParity()
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
+        covariance = returns.cov()
+        d_matrix = np.zeros_like(covariance)
+        diagnoal_sqrt = np.sqrt(np.diag(covariance))
+        np.fill_diagonal(d_matrix, diagnoal_sqrt)
+        d_inv = np.linalg.inv(d_matrix)
+        corr = np.dot(np.dot(d_inv, covariance), d_inv)
+        corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
+        distance_matrix = np.sqrt((1 - corr).round(5) / 2)
+        hrp.allocate(asset_names=self.data.columns, covariance_matrix=covariance, distance_matrix=distance_matrix)
+        weights = hrp.weights.values[0]
+        self.assertTrue((weights >= 0).all())
+        self.assertTrue(len(weights) == self.data.shape[1])
+        self.assertAlmostEqual(np.sum(weights), 1)
+
+    def test_hrp_with_linkage_method(self):
+        """
+        Test HRP when passing a custom linkage method.
+        """
+
+        hrp = HierarchicalRiskParity()
+        hrp.allocate(asset_names=self.data.columns, asset_prices=self.data, linkage='ward')
+        weights = hrp.weights.values[0]
+        assert hrp.ordered_indices == [13, 7, 1, 6, 4, 16, 3, 17, 14, 0, 15, 8,
+                                       9, 10, 12, 18, 22, 5, 19, 2, 20, 11, 21]
+        self.assertTrue((weights >= 0).all())
+        self.assertTrue(len(weights) == self.data.shape[1])
+        self.assertAlmostEqual(np.sum(weights), 1)
+
+    def test_no_asset_names(self):
+        """
+        Test HRP when not supplying a list of asset names.
+        """
+
+        hrp = HierarchicalRiskParity()
+        hrp.allocate(asset_prices=self.data)
+        weights = hrp.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_no_asset_names_with_asset_returns(self):
+        """
+        Test HRP when not supplying a list of asset names and when the user passes asset_returns.
+        """
+
+        hrp = HierarchicalRiskParity()
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
+        hrp.allocate(asset_returns=returns)
+        weights = hrp.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
+
+    def test_valuerror_with_no_asset_names(self):
+        """
+        Test ValueError when not supplying a list of asset names and no other input.
+        """
+
+        with self.assertRaises(ValueError):
+            hrp = HierarchicalRiskParity()
+            returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
+            hrp.allocate(asset_returns=returns.values)

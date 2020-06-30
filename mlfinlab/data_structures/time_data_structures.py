@@ -21,7 +21,13 @@ class TimeBars(BaseBars):
     """
 
     def __init__(self, resolution: str, num_units: int, batch_size: int = 20000000):
+        """
+        Constructor
 
+        :param resolution: (str) Type of bar resolution: ['D', 'H', 'MIN', 'S']
+        :param num_units: (int) Number of days, minutes, etc.
+        :param batch_size: (int) Number of rows to read in from the csv, per batch
+        """
         BaseBars.__init__(self, metric=None, batch_size=batch_size)
 
         # Threshold at which to sample (in seconds)
@@ -46,7 +52,8 @@ class TimeBars(BaseBars):
         For loop which compiles time bars.
         We did investigate the use of trying to solve this in a vectorised manner but found that a For loop worked well.
 
-        :param data: Contains 3 columns - date_time, price, and volume.
+        :param data: (tuple) Contains 3 columns - date_time, price, and volume.
+        :return: (list) Extracted bars
         """
 
         # Iterate over rows
@@ -110,7 +117,7 @@ def get_time_bars(file_path_or_df: Union[str, Iterable[str], pd.DataFrame], reso
     :param verbose: (int) Print out batch numbers (True or False)
     :param to_csv: (bool) Save bars to csv after every batch run (True or False)
     :param output_path: (str) Path to csv file, if to_csv is True
-    :return: Dataframe of time bars, if to_csv=True return None
+    :return: (pd.DataFrame) Dataframe of time bars, if to_csv=True return None
     """
 
     bars = TimeBars(resolution=resolution, num_units=num_units, batch_size=batch_size)

@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 from scipy.special import comb
 from scipy.stats import gaussian_kde
+from numba import njit, objmode
 
 
 class M2N:
@@ -139,56 +140,13 @@ class M2N:
         :return: (list) List of estimated parameter if no invalid values are encountered (e.g. complex values,
          divide-by-zero), otherwise an empty list is returned.
         """
-        m_1, m_2, m_3, m_4 = self.moments[0:4]  # Expand list of moments to individual variables for clarity.
-        param_list = []
-
-        # Using a while-loop here to be able to use 'break' functionality.
-        # We need to stop the calculation at any given step to avoid throwing warnings or errors,
-        # and be in control of our return values. I'm open to other suggestions, but multiple return statements isn't
-        # one of them.
-        while True:
-            # Calculate mu_1, Equation (22).
-            mu_1 = (m_1 - (1 - p_1) * mu_2) / p_1
-
-            # Calculate sigma_2, Equation (24)
-            if (3 * (1 - p_1) * (mu_2 - mu_1)) == 0:
-                # Validity check 1: Check for divide-by-zero.
-                break
-
-            sigma_2_squared = ((m_3 + 2 * p_1 * mu_1**3 + (p_1 - 1) * mu_2**3 - 3 * mu_1 * (m_2 + mu_2**2 * (p_1-1))) /
-                               (3*(1-p_1)*(mu_2-mu_1)))
-            if sigma_2_squared < 0:
-                # Validity check 2: Prevent potential complex values.
-                break
-
-            sigma_2 = sigma_2_squared**0.5
-            # Calculate sigma_1, Equation (23)
-            sigma_1_squared = ((m_2 - sigma_2**2 - mu_2**2) / p_1 + sigma_2**2 + mu_2**2 - mu_1**2)
-
-            if sigma_1_squared < 0:
-                # Validity check 3: Prevent potential complex values.
-                break
-            sigma_1 = sigma_1_squared**0.5
-
-            # Adjust guess for p_1, Equation (25)
-            p_1_deno = (3 * (sigma_1**4 - sigma_2**4) + 6 * (sigma_1**2 * mu_1**2 - sigma_2**2 * mu_2**2) + mu_1**4 -
-                        mu_2**4)
-            if p_1_deno == 0:
-                # Validity check 5: Break if about to divide by zero.
-                break
-
-            p_1 = (m_4 - 3*sigma_2**4 - 6*sigma_2**2*mu_2**2 - mu_2**4) / p_1_deno
-            if (p_1 < 0) or (p_1 > 1):
-                # Validity check 6: The probability must be between zero and one.
-                break
-
-            # Add all new parameter estimates to the return list if no break has occurred before now.
-            param_list = [mu_1, mu_2, sigma_1, sigma_2, p_1]
-
-            # We only want this to execute once at most, so call a final break if one hasn't been called yet.
-            break
+        # Expand list of moments to individual variables for clarity.
+        m_1, m_2, m_3, m_4 = self.moments[0:4]
 
         # Check to see if every value made it through.
+        param_list = iter_4_jit(mu_2, p_1, m_1, m_2, m_3, m_4)
+        param_list = param_list.tolist()
+
         if len(param_list) < 5:
             return []
 
@@ -204,71 +162,15 @@ class M2N:
         :return: (list) List of estimated parameter if no invalid values are encountered (e.g. complex values,
          divide-by-zero), otherwise an empty list is returned.
         """
-        m_1, m_2, m_3, m_4, m_5 = self.moments  # Expand list of moments to individual variables for clarity.
 
-        # Using a while-loop here to be able to use 'break' functionality.
-        # We need to stop the calculation at any given step to avoid throwing warnings or errors, and be in control
-        # of our return values. I'm open to other suggestions, but multiple return statements isn't one of them.
-        param_list = []
-        while True:
-            # Calculate mu_1, Equation (22).
-            mu_1 = (m_1 - (1 - p_1) * mu_2) / p_1
-            if (3 * (1 - p_1) * (mu_2 - mu_1)) == 0:
-                # Validity check 1: check for divide-by-zero.
-                break
+        # Expand list of moments to individual variables for clarity.
+        (m_1, m_2, m_3, m_4, m_5,) = self.moments
 
-            # Calculate sigma_2, Equation (24).
-            sigma_2_squared = ((m_3 + 2 * p_1 * mu_1**3 + (p_1-1) * mu_2**3 - 3 * mu_1 * (m_2 + mu_2**2 * (p_1-1))) /
-                               (3*(1-p_1)*(mu_2-mu_1)))
-            if sigma_2_squared < 0:
-                # Validity check 2: check for upcoming complex numbers.
-                break
-            sigma_2 = sigma_2_squared**0.5
+        # Call numba decorated function to do the actual calculations
+        param_list = iter_5_jit(mu_2, p_1, m_1, m_2, m_3, m_4, m_5)
 
-            # Calculate sigma_1, Equation (23).
-            sigma_1_squared = ((m_2 - sigma_2**2 - mu_2**2)/p_1 + sigma_2**2 + mu_2**2 - mu_1**2)
-            if sigma_1_squared < 0:
-                # Validity check 3: check for upcoming complex numbers.
-                break
-            sigma_1 = sigma_1_squared**0.5
+        param_list = param_list.tolist()
 
-            # Adjust the guess for mu_2, Equation (27).
-            if (1 - p_1) < 1e-4:
-                # Validity check 5: break to prevent divide-by-zero.
-                break
-
-            a_1_squared = (6 * sigma_2**4 + (m_4 - p_1 * (3 * sigma_1**4 + 6 * sigma_1**2 * mu_1**2 + mu_1**4)) /
-                           (1-p_1))
-            if a_1_squared < 0:
-                # Validity check 6: break to avoid taking the square root of negative number.
-                break
-
-            a_1 = a_1_squared**0.5
-            mu_2_squared = (a_1 - 3 * sigma_2**2)
-            if np.iscomplex(mu_2_squared) or mu_2_squared < 0:
-                # Validity check 7: break to avoid complex numbers.
-                break
-
-            mu_2 = mu_2_squared**0.5
-            # Adjust guess for p_1, Equation (28, 29).
-            a_2 = 15 * sigma_1**4 * mu_1 + 10 * sigma_1**2 * mu_1**3 + mu_1**5
-            b_2 = 15 * sigma_2**4 * mu_2 + 10 * sigma_2**2 * mu_2**3 + mu_2**5
-            if (a_2 - b_2) == 0:
-                # Validity check 8: break to prevent divide-by-zero.
-                break
-
-            p_1 = (m_5 - b_2) / (a_2 - b_2)
-            if (p_1 < 0) or (p_1 > 1):
-                # Validity check 9: p_1 value must be between 0 and 1.
-                break
-
-            # Add all new parameter estimates to the return list if no break has occurred before now.
-            param_list = [mu_1, mu_2, sigma_1, sigma_2, p_1]
-
-            # We only want this to execute once at most, so call a final break if one hasn't been called yet.
-            break
-
-        # Check to see if every value made it through.
         if len(param_list) < 5:
             return []
 
@@ -395,3 +297,167 @@ def most_likely_parameters(data, ignore_columns='error', res=10_000):
         d_results[col] = top_value
 
     return d_results
+
+
+@njit()
+def iter_4_jit(mu_2, p_1, m_1, m_2, m_3, m_4):  # pragma: no cover
+    """
+    "Numbarized" evaluation of the set of equations that make up variant #1 of the EF3M algorithm (fitting using the
+    first four moments).
+
+    :param mu_2: (float) Initial parameter value for mu_2
+    :param p_1: (float) Probability defining the mixture; p_1, 1 - p_1
+    :param m_1, m_2, m_3, m_4: (float) The first four (1... 4) raw moments of the mixture distribution.
+    :return: (list) List of estimated parameter if no invalid values are encountered (e.g. complex values,
+        divide-by-zero), otherwise an empty list is returned.
+    """
+    param_list = np.empty(0, dtype=np.float64)
+
+    # Using a while-loop here to be able to use 'break' functionality.
+    # We need to stop the calculation at any given step to avoid throwing warnings or errors,
+    # and be in control of our return values. I'm open to other suggestions, but multiple return statements isn't
+    # one of them.
+    while True:
+        # Calculate mu_1, Equation (22).
+        mu_1 = (m_1 - (1 - p_1) * mu_2) / p_1
+
+        # Calculate sigma_2, Equation (24)
+        if (3 * (1 - p_1) * (mu_2 - mu_1)) == 0:
+            # Validity check 1: Check for divide-by-zero.
+            break
+
+        sigma_2_squared = (
+            m_3
+            + 2 * p_1 * mu_1 ** 3
+            + (p_1 - 1) * mu_2 ** 3
+            - 3 * mu_1 * (m_2 + mu_2 ** 2 * (p_1 - 1))
+        ) / (3 * (1 - p_1) * (mu_2 - mu_1))
+        if sigma_2_squared < 0:
+            # Validity check 2: Prevent potential complex values.
+            break
+
+        sigma_2 = sigma_2_squared ** 0.5
+        # Calculate sigma_1, Equation (23)
+        sigma_1_squared = (
+            (m_2 - sigma_2 ** 2 - mu_2 ** 2) / p_1
+            + sigma_2 ** 2
+            + mu_2 ** 2
+            - mu_1 ** 2
+        )
+
+        if sigma_1_squared < 0:
+            # Validity check 3: Prevent potential complex values.
+            break
+        sigma_1 = sigma_1_squared ** 0.5
+
+        # Adjust guess for p_1, Equation (25)
+        p_1_deno = (
+            3 * (sigma_1 ** 4 - sigma_2 ** 4)
+            + 6 * (sigma_1 ** 2 * mu_1 ** 2 - sigma_2 ** 2 * mu_2 ** 2)
+            + mu_1 ** 4
+            - mu_2 ** 4
+        )
+        if p_1_deno == 0:
+            # Validity check 5: Break if about to divide by zero.
+            break
+
+        p_1 = (
+            m_4 - 3 * sigma_2 ** 4 - 6 * sigma_2 ** 2 * mu_2 ** 2 - mu_2 ** 4
+        ) / p_1_deno
+        if (p_1 < 0) or (p_1 > 1):
+            # Validity check 6: The probability must be between zero and one.
+            break
+
+        # Add all new parameter estimates to the return list if no break has occurred before now.
+        param_list = np.array([mu_1, mu_2, sigma_1, sigma_2, p_1], dtype=np.float64)
+
+        # We only want this to execute once at most, so call a final break if one hasn't been called yet.
+        break
+
+    return param_list
+
+
+@njit()
+def iter_5_jit(mu_2, p_1, m_1, m_2, m_3, m_4, m_5):  # pragma: no cover
+    """
+    "Numbarized" evaluation of the set of equations that make up variant #2 of the EF3M algorithm (fitting using the
+     first five moments).
+
+    :param mu_2: (float) Initial parameter value for mu_2
+    :param p_1: (float) Probability defining the mixture; p_1, 1-p_1
+    :param m_1, m_2, m_3, m_4, m_5: (float) The first five (1... 5) raw moments of the mixture distribution.
+    :return: (list) List of estimated parameter if no invalid values are encountered (e.g. complex values,
+        divide-by-zero), otherwise an empty list is returned.
+    """
+    param_list = np.empty(0, dtype=np.float64)
+
+    # Using a while-loop here to be able to use 'break' functionality.
+    # We need to stop the calculation at any given step to avoid throwing warnings or errors, and be in control
+    # of our return values. I'm open to other suggestions, but multiple return statements isn't one of them.
+    while True:
+        # Calculate mu_1, Equation (22).
+        mu_1 = (m_1 - (1 - p_1) * mu_2) / p_1
+        if (3 * (1 - p_1) * (mu_2 - mu_1)) == 0:
+            # Validity check 1: check for divide-by-zero.
+            break
+
+        # Calculate sigma_2, Equation (24).
+        sigma_2_squared = (m_3 + 2 * p_1 * mu_1 ** 3 + (p_1 - 1) * mu_2 ** 3 - 3 * mu_1 * (m_2 + mu_2 ** 2 * (p_1 - 1))
+                           ) / (3 * (1 - p_1) * (mu_2 - mu_1))
+
+        if sigma_2_squared < 0:
+            # Validity check 2: check for upcoming complex numbers.
+            break
+
+        sigma_2 = sigma_2_squared ** 0.5
+
+        # Calculate sigma_1, Equation (23).
+        sigma_1_squared = ((m_2 - sigma_2 ** 2 - mu_2 ** 2) / p_1 + sigma_2 ** 2 + mu_2 ** 2 - mu_1 ** 2)
+        if sigma_1_squared < 0:
+            # Validity check 3: check for upcoming complex numbers.
+            break
+
+        sigma_1 = sigma_1_squared ** 0.5
+
+        # Adjust the guess for mu_2, Equation (27).
+        if (1 - p_1) < 1e-4:
+            # Validity check 5: break to prevent divide-by-zero.
+            break
+
+        a_1_squared = 6 * sigma_2 ** 4 + (m_4 - p_1 * (3 * sigma_1 ** 4 + 6 * sigma_1 ** 2 * mu_1 ** 2 + mu_1 ** 4)
+                                          ) / (1 - p_1)
+        if a_1_squared < 0:
+            # Validity check 6: break to avoid taking the square root of negative number.
+            break
+
+        a_1 = a_1_squared ** 0.5
+        mu_2_squared = a_1 - 3 * sigma_2 ** 2
+
+        # Validity check 7: break to avoid complex numbers.
+        # Todo: Avoid Numba object mode.
+        # Numba does not support numpy.iscomplex. This creates an overhead.
+        with objmode(mu_2_squared_is_complex="boolean"):
+            mu_2_squared_is_complex = bool(np.iscomplex(mu_2_squared))
+        if mu_2_squared_is_complex or mu_2_squared < 0:
+            break
+
+        mu_2 = mu_2_squared ** 0.5
+        # Adjust guess for p_1, Equation (28, 29).
+        a_2 = 15 * sigma_1 ** 4 * mu_1 + 10 * sigma_1 ** 2 * mu_1 ** 3 + mu_1 ** 5
+        b_2 = 15 * sigma_2 ** 4 * mu_2 + 10 * sigma_2 ** 2 * mu_2 ** 3 + mu_2 ** 5
+        if (a_2 - b_2) == 0:
+            # Validity check 8: break to prevent divide-by-zero.
+            break
+
+        p_1 = (m_5 - b_2) / (a_2 - b_2)
+        if (p_1 < 0) or (p_1 > 1):
+            # Validity check 9: p_1 value must be between 0 and 1.
+            break
+
+        # Add all new parameter estimates to the return list if no break has occurred before now.
+        param_list = np.array([mu_1, mu_2, sigma_1, sigma_2, p_1], dtype=np.float64)
+
+        # We only want this to execute once at most, so call a final break if one hasn't been called yet.
+        break
+
+    return param_list

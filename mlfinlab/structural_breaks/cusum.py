@@ -10,11 +10,11 @@ from mlfinlab.util import mp_pandas_obj
 def _get_values_diff(test_type, series, index, ind):
     """
     Gets the difference between two values given a test type.
-    :param test_type: one_sided or two_sided
-    :param series: Series of values
-    :param index: primary index
-    :param ind: secondary index
-    :return: Difference between 2 values
+    :param test_type: (str) Type of the test ['one_sided', 'two_sided']
+    :param series: (pd.Series) Series of values
+    :param index: (pd.Index) primary index
+    :param ind: (pd.Index) secondary index
+    :return: (float) Difference between 2 values
     """
     if test_type == 'one_sided':
         values_diff = series.loc[index] - series.loc[ind]
@@ -29,10 +29,11 @@ def _get_values_diff(test_type, series, index, ind):
 def _get_s_n_for_t(series: pd.Series, test_type: str, molecule: list) -> pd.Series:
     """
     Get maximum S_n_t value for each value from molecule for Chu-Stinchcombe-White test
-    :param series: (pd.Series) to get statistics for
-    :param test_type: (str): two-sided or one-sided test
-    :param molecule: (list) of indices to get test statistics for
-    :return: (pd.Series) of statistics
+
+    :param series: (pd.Series) Series to get statistics for
+    :param test_type: (str): Two-sided or one-sided test
+    :param molecule: (list) Indices to get test statistics for
+    :return: (pd.Series) Statistics
     """
 
     s_n_t_series = pd.DataFrame(index=molecule, columns=['stat', 'critical_value'])
@@ -62,14 +63,15 @@ def _get_s_n_for_t(series: pd.Series, test_type: str, molecule: list) -> pd.Seri
 
 
 def get_chu_stinchcombe_white_statistics(series: pd.Series, test_type: str = 'one_sided',
-                                         num_threads: int = 8) -> pd.Series:
+                                         num_threads: int = 8, verbose: bool = True) -> pd.Series:
     """
     Multithread Chu-Stinchcombe-White test implementation, p.251
 
-    :param series: (pd.Series) to get statistics for
-    :param test_type: (str): two-sided or one-sided test
-    :param num_threads: (int) number of cores
-    :return: (pd.Series) of statistics
+    :param series: (pd.Series) Series to get statistics for
+    :param test_type: (str): Two-sided or one-sided test
+    :param num_threads: (int) Number of cores
+    :param verbose: (bool) Flag to report progress on asynch jobs
+    :return: (pd.Series) Statistics
     """
     molecule = series.index[2:series.shape[0]]  # For the first two values we don't have enough info
 
@@ -78,5 +80,6 @@ def get_chu_stinchcombe_white_statistics(series: pd.Series, test_type: str = 'on
                                  series=series,
                                  test_type=test_type,
                                  num_threads=num_threads,
+                                 verbose=verbose,
                                  )
     return s_n_t_series

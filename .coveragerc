@@ -10,6 +10,7 @@ omit=*__init__*
      # Ensure we exclude any files in .local
      */.local/*
 branch=True
+disable_warnings = no-data-collected
 
 [report]
 partial_branches=True

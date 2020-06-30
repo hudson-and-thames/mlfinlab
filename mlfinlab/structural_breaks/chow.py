@@ -3,7 +3,7 @@ Explosiveness tests: Chow-Type Dickey-Fuller Test
 """
 
 import pandas as pd
-from mlfinlab.structural_breaks.sadf import _get_betas
+from mlfinlab.structural_breaks.sadf import get_betas
 from mlfinlab.util import mp_pandas_obj
 
 
@@ -13,12 +13,12 @@ def _get_dfc_for_t(series: pd.Series, molecule: list) -> pd.Series:
     """
     Get Chow-Type Dickey-Fuller Test statistics for each index in molecule
 
-    :param series: (pd.Series) series to test
-    :param molecule: (list) of dates to test
-    :return: (pd.Series) fo statistics for each index from molecule
+    :param series: (pd.Series) Series to test
+    :param molecule: (list) Dates to test
+    :return: (pd.Series) Statistics for each index from molecule
     """
 
-    dfc_series = pd.Series(index=molecule)
+    dfc_series = pd.Series(index=molecule, dtype='float64')
 
     for index in molecule:
         series_diff = series.diff().dropna()
@@ -27,20 +27,22 @@ def _get_dfc_for_t(series: pd.Series, molecule: list) -> pd.Series:
 
         y = series_diff.loc[series_lag.index].values
         x = series_lag.values
-        coefs, coef_vars = _get_betas(x.reshape(-1, 1), y)
+        coefs, coef_vars = get_betas(x.reshape(-1, 1), y)
         b_estimate, b_var = coefs[0], coef_vars[0][0]
         dfc_series[index] = b_estimate / (b_var ** 0.5)
+
     return dfc_series
 
 
-def get_chow_type_stat(series: pd.Series, min_length: int = 20, num_threads: int = 8) -> pd.Series:
+def get_chow_type_stat(series: pd.Series, min_length: int = 20, num_threads: int = 8, verbose: bool = True) -> pd.Series:
     """
     Multithread implementation of Chow-Type Dickey-Fuller Test, p.251-252
 
-    :param series: (pd.Series) series to test
-    :param min_length: (int) minimum sample length used to estimate statistics
-    :param num_threads: (int): number of cores to use
-    :return: (pd.Series) of Chow-Type Dickey-Fuller Test statistics
+    :param series: (pd.Series) Series to test
+    :param min_length: (int) Minimum sample length used to estimate statistics
+    :param num_threads: (int): Number of cores to use
+    :param verbose: (bool) Flag to report progress on asynch jobs
+    :return: (pd.Series) Chow-Type Dickey-Fuller Test statistics
     """
     # Indices to test. We drop min_length first and last values
     molecule = series.index[min_length:series.shape[0] - min_length]
@@ -48,5 +50,6 @@ def get_chow_type_stat(series: pd.Series, min_length: int = 20, num_threads: int
                                pd_obj=('molecule', molecule),
                                series=series,
                                num_threads=num_threads,
+                               verbose=verbose,
                                )
     return dfc_series
