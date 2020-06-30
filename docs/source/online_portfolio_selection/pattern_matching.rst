@@ -21,7 +21,7 @@ There are three pattern matching strategies implemented in the Online Portfolio 
 ----
 
 Correlation Driven Nonparametric Learning
-=========================================
+#########################################
 
 Correlation Driven Nonparametric Learning strategies look at historical market sequences to identify similarly correlated periods.
 Existing pattern matching strategies attempt to exploit and identify the correlation between different market windows by using
@@ -34,7 +34,7 @@ Three different variations of the CORN strategies are implemented in the Online 
 ----
 
 Correlation Driven Nonparametric Learning (CORN)
-################################################
+************************************************
 
 CORN formally defines a similar set to be one that satisfies the following equation:
 
@@ -91,7 +91,7 @@ CORN Implementation
 ----
 
 Correlation Driven Nonparametric Learning - Uniform (CORN-U)
-############################################################
+************************************************************
 
 Because the CORN strategies are dependent on the parameters, we propose a more generic one that takes an
 ensemble approach to reduce variability. One possible CORN ensemble is the CORN-U method.
@@ -140,7 +140,7 @@ CORN-U Implementation
 ----
 
 Correlation Driven Nonparametric Learning - K (CORN-K)
-######################################################
+******************************************************
 
 CORN-K further improves the CORN-U by generating more parameters of experts. There is more variability as
 different ranges of window and :math:`\rho` value are considered to create more options.
@@ -185,7 +185,7 @@ CORN-K Implementation
         .. automethod:: __init__
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -249,7 +249,7 @@ Example Code
 ----
 
 Symmetric Correlation Driven Nonparametric Learning
-===================================================
+###################################################
 
 Symmetric CORN utilizes the concept of Market symmetry which states that markets have mirrored price movements. Increasing price trends
 represents a mirror of a decreasing trend. This gives us an intuitional understanding that if the price movements are strongly negatively
@@ -287,7 +287,7 @@ Two different variations of the SCORN strategies are implemented in the Online P
 ----
 
 Symmetric Correlation Driven Nonparametric Learning (SCORN)
-###########################################################
+***********************************************************
 
 SCORN Parameters
 ----------------
@@ -323,7 +323,7 @@ SCORN Implementation
 ----
 
 Symmetric Correlation Driven Nonparametric Learning - K (SCORN-K)
-#################################################################
+*****************************************************************
 
 .. tip::
 
@@ -361,7 +361,7 @@ SCORN-K Implementation
         .. automethod:: __init__
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -416,7 +416,7 @@ Example Code
 ----
 
 Functional Correlation Driven Nonparametric Learning
-====================================================
+####################################################
 
 FCORN further extends the SCORN by introducing a concept of an activation function. Applying the concept
 to the previous CORN algorithms, the activation function for the SCORN can be considered as a piecewise function.
@@ -455,7 +455,7 @@ Two different variations of the FCORN strategies are implemented in the Online P
 ----
 
 Functional Correlation Driven Nonparametric Learning (FCORN)
-############################################################
+************************************************************
 
 FCORN Parameters
 ----------------
@@ -493,7 +493,7 @@ FCORN Implementation
 ----
 
 Functional Correlation Driven Nonparametric Learning - K (FCORN-K)
-##################################################################
+******************************************************************
 
 .. tip::
 
@@ -520,7 +520,7 @@ FCORN-K Implementation
         .. automethod:: __init__
 
 Example Code
-############
+************
 
 .. code-block::
 
@@ -575,7 +575,7 @@ Example Code
 ----
 
 Research Notebook
-=================
+#################
 
 The following `pattern matching <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Pattern%20Matching.ipynb>`_
 notebook provides a more detailed exploration of the strategies.

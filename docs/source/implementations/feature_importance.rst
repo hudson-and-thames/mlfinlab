@@ -50,6 +50,8 @@ An example showing how to use various feature importance functions:
     price_bars = pd.read_csv('PRICE_BARS_FILE_PATH', index_col=0, parse_dates=[0, 2])
 
     triple_barrier_events = triple_barrier_events.loc[X_train.index, :] # Take only train part
+    triple_barrier_events = triple_barrier_events[(triple_barrier_events.index >= X_train.index.min()) &
+                                                  (triple_barrier_events.index <= X_train.index.max())]
 
     cv_gen = PurgedKFold(n_splits=4, samples_info_sets=triple_barrier_events.t1)
 
