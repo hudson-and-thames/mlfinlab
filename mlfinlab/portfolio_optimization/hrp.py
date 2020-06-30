@@ -169,7 +169,7 @@ class HierarchicalRiskParity:
 
         short_ptf = side_weights[side_weights == -1].index
         buy_ptf = side_weights[side_weights == 1].index
-        if not short_ptf.empty:
+        if len(short_ptf) > 0:
             # Short half size
             self.weights.loc[short_ptf] /= self.weights.loc[short_ptf].sum().values[0]
             self.weights.loc[short_ptf] *= -0.5
