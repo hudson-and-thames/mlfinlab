@@ -63,7 +63,7 @@ Sequential Bootstrapping
 
 The key power of ensemble learning techniques is bagging (which is bootstrapping with replacement). The key idea behind
 bagging is to randomly choose samples for each decision tree. In this case trees become diverse and by averaging predictions
-of diverse tress built on randomly selected samples and random subset of features data scientists make the algorithm much
+of diverse trees built on randomly selected samples and random subset of features data scientists make the algorithm much
 less prone to overfit.
 
 However, in our case we would not only like to randomly choose samples but also choose samples which are unique and non-concurrent.
