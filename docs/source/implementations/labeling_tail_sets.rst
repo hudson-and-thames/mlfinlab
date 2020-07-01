@@ -120,9 +120,9 @@ Below is an example on how to create the positive, negative, and full matrix Tai
     pos_set, neg_set, matrix_set = labels.get_tail_sets()
 
     # Lag the labels to make them forward looking
-    pos_set = pos_set.lag(1)
-    neg_set = neg_set.lag(1)
-    matrix_set = matrix_set.lag(1)
+    pos_set = pos_set.shift(-1)
+    neg_set = neg_set.shift(-1)
+    matrix_set = matrix_set.shift(-1)
 
 
 Research Notebooks

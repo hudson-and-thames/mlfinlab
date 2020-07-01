@@ -7,6 +7,7 @@ Implements statistics related to:
 - various Sharpe ratios
 - minimum track record length
 """
+import warnings
 import pandas as pd
 import scipy.stats as ss
 import numpy as np
@@ -276,9 +277,23 @@ def probabilistic_sharpe_ratio(observed_sr: float, benchmark_sr: float, number_o
     :return: (float) Probabilistic Sharpe ratio
     """
 
-    probab_sr = ss.norm.cdf(((observed_sr - benchmark_sr) * (number_of_returns - 1) ** (1 / 2)) / \
-                            (1 - skewness_of_returns * observed_sr +
-                             (kurtosis_of_returns - 1) / 4 * observed_sr ** 2) ** (1 / 2))
+    test_value = ((observed_sr - benchmark_sr) * np.sqrt(number_of_returns - 1)) / \
+                  ((1 - skewness_of_returns * observed_sr + (kurtosis_of_returns - 1) / \
+                    4 * observed_sr ** 2)**(1 / 2))
+
+    if np.isnan(test_value):
+        warnings.warn('Test value is nan. Please check the input values.', UserWarning)
+        return test_value
+
+    if isinstance(test_value, complex):
+        warnings.warn('Output is a complex number. You may want to check the input skewness (too high), '
+                      'kurtosis (too low), or observed_sr values.', UserWarning)
+
+    if np.isinf(test_value):
+        warnings.warn('Test value is infinite. You may want to check the input skewness, '
+                      'kurtosis, or observed_sr values.', UserWarning)
+
+    probab_sr = ss.norm.cdf(test_value)
 
     return probab_sr
 
