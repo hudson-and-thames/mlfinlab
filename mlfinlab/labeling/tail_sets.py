@@ -20,12 +20,12 @@ class TailSetLabels:
         :param prices: (pd.DataFrame) Asset prices.
         :param n_bins: (int) Number of bins to determine the quantiles for defining the tail sets. The top and
                         bottom quantiles are considered to be the positive and negative tail sets, respectively.
-        :param vol_adj: (bool) Whether to take volatility adjusted returns. Allowable inputs are ``None``,
+        :param vol_adj: (str) Whether to take volatility adjusted returns. Allowable inputs are ``None``,
                         ``mean_abs_dev``, and ``stdev``.
         :param window: (int) Window period used in the calculation of the volatility adjusted returns, if vol_adj is not
                         None. Has no impact if vol_adj is None.
         """
-        assert prices.shape[1] > n_bins, "n_bins exceeds the number of stocks!"
+        assert prices.shape[1] >= n_bins, "n_bins exceeds the number of stocks!"
         if vol_adj is not None:
             assert isinstance(window, int), "If vol_adj is not None, window must be int."
             assert len(prices) > window, "Length of price data must be greater than the window."
@@ -89,7 +89,7 @@ class TailSetLabels:
         :param row: (pd.Series) Vol adjusted returns for a given date.
         :return: (pd.Series) Tail set with positive and negative labels.
         """
-        # Get decile labels.
+        # Get quantile labels.
         row = row.rank(method='first')  # To avoid error with unique bins when using qcut due to too many 0 values.
         row_quantiles = pd.qcut(x=row, q=self.n_bins, labels=range(1, 1 + self.n_bins), retbins=False)
 
