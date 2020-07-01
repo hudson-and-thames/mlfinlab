@@ -38,7 +38,7 @@ def get_ind_matrix(samples_info_sets, price_bars):
     bar_index = sorted(list(set(bar_index)))  # Drop duplicates and sort
 
     # Get sorted timestamps with index in sorted array
-    sorted_timestamps = dict(zip(sorted(bar_index), range(len(bar_index))))
+    sorted_timestamps = dict(zip(bar_index, range(len(bar_index))))
 
     tokenized_endtimes = np.column_stack((label_endtime.index.map(sorted_timestamps), label_endtime.map(
         sorted_timestamps).values))  # Create array of arrays: [label_index_position, label_endtime_position]
