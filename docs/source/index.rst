@@ -294,6 +294,7 @@ This project is licensed under an all rights reserved licence.
     implementations/labeling_excess_median
     implementations/labeling_raw_return
     implementations/labeling_vs_benchmark
+    implementations/labeling_excess_mean
 
 
 .. toctree::
