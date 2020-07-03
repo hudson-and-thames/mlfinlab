@@ -22,7 +22,7 @@ copyright = '2019, Hudson & Thames,'
 author = 'Hudson & Thames'
 
 # The full version, including alpha/beta/rc tags
-release = '0.12.0'
+release = '0.12.3'
 
 
 # -- General configuration ---------------------------------------------------
