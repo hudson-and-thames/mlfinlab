@@ -56,6 +56,10 @@ def _cluster_kmeans_base(corr_mat: pd.DataFrame, max_num_clusters: int = 10, rep
     """
 
     # Distance matrix
+
+    # Fill main diagonal of corr matrix with 1s to avoid elements being close to 1 with e-16.
+    # As this previously caused Errors when taking square root from negative values.
+    np.fill_diagonal(corr_mat.values, 1)
     distance = ((1 - corr_mat.fillna(0)) / 2.0) ** 0.5
     silh = pd.Series(dtype='float64')
 
