@@ -134,7 +134,7 @@ def _combine_features(X, clusters, exclude_key) -> np.array:
     return np.array(new_exog)
 
 
-def _check_for_low_silhouette_scores(X: pd.DataFrame, dep_matrix:pd.DataFrame,
+def _check_for_low_silhouette_scores(X: pd.DataFrame, dep_matrix: pd.DataFrame,
                                      critical_threshold: float = 0.0) -> pd.DataFrame:
     """
     Machine Learning for Asset Managers
