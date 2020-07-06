@@ -42,14 +42,15 @@ def get_feature_clusters(X: pd.DataFrame, dependence_metric: str, distance_metri
                                 for correction of the same.
     :return: (list) Feature subsets.
     """
-    # Checking if dataset contains features low silhouette
-    X = _check_for_low_silhouette_scores(X, critical_threshold)
 
     # Get the dependence matrix
     if dependence_metric != 'linear':
         dep_matrix = get_dependence_matrix(X, dependence_method=dependence_metric)
     else:
         dep_matrix = X.corr()
+
+    # Checking if dataset contains features low silhouette
+    X = _check_for_low_silhouette_scores(X, dep_matrix, critical_threshold)
 
     if n_clusters is None and (distance_metric is None or linkage_method is None):
         return list(get_onc_clusters(dep_matrix.fillna(0))[1].values())  # Get optimal number of clusters
@@ -133,7 +134,8 @@ def _combine_features(X, clusters, exclude_key) -> np.array:
     return np.array(new_exog)
 
 
-def _check_for_low_silhouette_scores(X: pd.DataFrame, critical_threshold: float = 0.0) -> pd.DataFrame:
+def _check_for_low_silhouette_scores(X: pd.DataFrame, dep_matrix: pd.DataFrame,
+                                     critical_threshold: float = 0.0) -> pd.DataFrame:
     """
     Machine Learning for Asset Managers
     Snippet 6.5.2.1 , page 85. Step 1: Features Clustering (last paragraph)
@@ -143,10 +145,11 @@ def _check_for_low_silhouette_scores(X: pd.DataFrame, critical_threshold: float 
     clusters and it needs a transformation.
 
     :param X: (pd.DataFrame) Dataframe of features.
+    :param dep_matrix: (pd.DataFrame) Dataframe with dependences between features.
     :param critical_threshold: (float) Threshold for determining low silhouette score.
     :return: (pd.DataFrame) Dataframe of features.
     """
-    _, clstrs, silh = get_onc_clusters(X.corr())
+    _, clstrs, silh = get_onc_clusters(dep_matrix)
     low_silh_feat = silh[silh < critical_threshold].index
     if len(low_silh_feat) > 0:
         print(f'{len(low_silh_feat)} feature/s found with low silhouette score {low_silh_feat}. Returning the transformed dataset')
