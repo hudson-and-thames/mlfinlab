@@ -89,17 +89,25 @@ def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: boo
     else:
         # Estimating the copula
         x_unif = ss.rankdata(x) / len(x)
-        x_unif = ss.rankdata(y) / len(y)
+        y_unif = ss.rankdata(y) / len(y)
 
         copula_density = np.histogram2d(x_unif, y_unif, bins=n_bins, density=True)[0]
         copula_freq = np.histogram2d(x_unif, y_unif, bins=n_bins, density=False)[0]
-        bin_area = (copula_freq / copula_density / len(x))[0, 0]
+
+        # This line is different from the original code snippet as the [0, 0] element in the density matrix can be 0
+        # Thay may have caused problems in the calculations
+        bin_area = 1 / (n_bins)**2
         probabilities = copula_density.ravel() + 1e-9
 
         # Using (-1) * entropy formula
         mutual_info = sum(probabilities * np.log(probabilities) * bin_area) # Mutual information as a copula entropy
 
     if normalize is True:
+        if estimator != 'standard':
+            # When using copulas for estimation, we have to use another entropies for normalization
+            x = ss.rankdata(x) / len(x)
+            y = ss.rankdata(y) / len(y)
+
         marginal_x = ss.entropy(np.histogram(x, n_bins)[0])  # Marginal for x
         marginal_y = ss.entropy(np.histogram(y, n_bins)[0])  # Marginal for y
         mutual_info /= min(marginal_x, marginal_y)
