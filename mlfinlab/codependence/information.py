@@ -54,8 +54,8 @@ def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: boo
     3. ``copula_entropy`` - estimating the copula (as a normalized ranking of the observations) and
        calculating its entropy. Then MI estimator = (-1) * copula entropy.
 
-    The last two estimators implementation is taken from the blogpost by Dr. Gautier Marti.
-    Read this blogpost for more information about the diferences in the estimators:
+    The last two estimators' implementation is taken from the blog post by Dr. Gautier Marti.
+    Read this blog post for more information about the differences in the estimators:
     https://gmarti.gitlab.io/qfin/2020/07/01/mutual-information-is-copula-entropy.html
 
     :param x: (np.array) X vector.
@@ -72,12 +72,38 @@ def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: boo
         corr_coef = np.corrcoef(x, y)[0][1]
         n_bins = get_optimal_number_of_bins(x.shape[0], corr_coef=corr_coef)
 
-    contingency = np.histogram2d(x, y, n_bins)[0]
-    mutual_info = mutual_info_score(None, None, contingency=contingency)  # Mutual information
+    if estimator == 'standard':
+        # Calculating contingency matrix from binned observations
+        contingency = np.histogram2d(x, y, n_bins)[0]
+        mutual_info = mutual_info_score(None, None, contingency=contingency)  # Mutual information
+
+    elif estimator == 'standard_copula':
+        # Estimating the copula
+        x_unif = ss.rankdata(x) / len(x)
+        y_unif = ss.rankdata(y) / len(y)
+
+        # Calculating contingency matrix from binned copula
+        contingency = np.histogram2d(x_unif, y_unif, n_bins)[0]
+        mutual_info = mutual_info_score(None, None, contingency=contingency)  # Mutual information using a copula
+
+    else:
+        # Estimating the copula
+        x_unif = ss.rankdata(x) / len(x)
+        x_unif = ss.rankdata(y) / len(y)
+
+        copula_density = np.histogram2d(x_unif, y_unif, bins=n_bins, density=True)[0]
+        copula_freq = np.histogram2d(x_unif, y_unif, bins=n_bins, density=False)[0]
+        bin_area = (copula_freq / copula_density / len(x))[0, 0]
+        probabilities = copula_density.ravel() + 1e-9
+
+        # Using (-1) * entropy formula
+        mutual_info = sum(probabilities * np.log(probabilities) * bin_area) # Mutual information as a copula entropy
+
     if normalize is True:
         marginal_x = ss.entropy(np.histogram(x, n_bins)[0])  # Marginal for x
         marginal_y = ss.entropy(np.histogram(y, n_bins)[0])  # Marginal for y
         mutual_info /= min(marginal_x, marginal_y)
+
     return mutual_info
 
 
