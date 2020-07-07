@@ -14,7 +14,8 @@ from mlfinlab.codependence.gnpr_distance import spearmans_rho, gpr_distance, gnp
 # pylint: disable=invalid-name
 
 def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float = 0.5,
-                          bandwidth: float = 0.01) -> pd.DataFrame:
+                          bandwidth: float = 0.01, n_bins: int = None, normalize: bool = True,
+                          estimator: str = 'standard') -> pd.DataFrame:
     """
     This function returns a dependence matrix for elements given in the dataframe using the chosen dependence method.
 
@@ -26,6 +27,12 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float
     :param theta: (float) Type of information being tested in the GPR and GNPR distances. Falls in range [0, 1].
                           (0.5 by default)
     :param bandwidth: (float) Bandwidth to use for splitting observations in the GPR and GNPR distances. (0.01 by default)
+    :param n_bins: (int) Number of bins for discretization in ``information_variation`` and ``mutual_information``,
+                         if None the optimal number will be calculated. (None by default)
+    :param normalize: (bool) Flag used to normalize the result to [0, 1] in ``information_variation`` and
+                             ``mutual_information``. (True by default)
+    :param estimator: (str) Estimator to be used for calculation in ``mutual_information``.
+                            [``standard``, ``standard_copula``, ``copula_entropy``] (``standard`` by default)
     :return: (pd.DataFrame) Dependence matrix.
     """
     # Get the feature names.
@@ -35,9 +42,9 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float
 
     # Defining the dependence function.
     if dependence_method == 'information_variation':
-        dep_function = lambda x, y: variation_of_information_score(x, y, normalize=True)
+        dep_function = lambda x, y: variation_of_information_score(x, y, n_bins=n_bins, normalize=normalize)
     elif dependence_method == 'mutual_information':
-        dep_function = lambda x, y: get_mutual_info(x, y, normalize=True)
+        dep_function = lambda x, y: get_mutual_info(x, y, n_bins=n_bins, normalize=normalize, estimator=estimator)
     elif dependence_method == 'distance_correlation':
         dep_function = distance_correlation
     elif dependence_method == 'spearmans_rho':
