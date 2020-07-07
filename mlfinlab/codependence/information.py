@@ -34,9 +34,10 @@ def get_optimal_number_of_bins(num_obs: int, corr_coef: float = None) -> int:
     return int(bins)
 
 
-def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: bool = False) -> float:
+def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: bool = False,
+                    estimator: str = 'standard') -> float:
     """
-    Returns mutual information (I) between two vectors.
+    Returns mutual information (MI) between two vectors.
 
     This function uses the discretization with the optimal bins algorithm proposed in the works of
     Hacine-Gharbi et al. (2012) and Hacine-Gharbi and Ravier (2018).
@@ -44,11 +45,26 @@ def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: boo
     Read Cornell lecture notes for more information about the mutual information:
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes.
 
+    This function supports multiple ways the mutual information can be estimated:
+
+    1. ``standard`` - the standard way of estimation - binning observations according to a given
+       number of bins and applying the MI formula.
+    2. ``standard_copula`` - estimating the copula (as a normalized ranking of the observations) and
+       applying the standard mutual information estimator on it.
+    3. ``copula_entropy`` - estimating the copula (as a normalized ranking of the observations) and
+       calculating its entropy. Then MI estimator = (-1) * copula entropy.
+
+    The last two estimators implementation is taken from the blogpost by Dr. Gautier Marti.
+    Read this blogpost for more information about the diferences in the estimators:
+    https://gmarti.gitlab.io/qfin/2020/07/01/mutual-information-is-copula-entropy.html
+
     :param x: (np.array) X vector.
     :param y: (np.array) Y vector.
     :param n_bins: (int) Number of bins for discretization, if None the optimal number will be calculated.
                          (None by default)
     :param normalize: (bool) Flag used to normalize the result to [0, 1]. (False by default)
+    :param estimator: (str) Estimator to be used for calculation. [``standard``, ``standard_copula``, ``copula_entropy``]
+                            (``standard`` by default)
     :return: (float) Mutual information score.
     """
 
