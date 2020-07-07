@@ -92,7 +92,6 @@ def get_mutual_info(x: np.array, y: np.array, n_bins: int = None, normalize: boo
         y_unif = ss.rankdata(y) / len(y)
 
         copula_density = np.histogram2d(x_unif, y_unif, bins=n_bins, density=True)[0]
-        copula_freq = np.histogram2d(x_unif, y_unif, bins=n_bins, density=False)[0]
 
         # This line is different from the original code snippet as the [0, 0] element in the density matrix can be 0
         # Thay may have caused problems in the calculations
