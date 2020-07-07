@@ -51,14 +51,22 @@ class TestCodependence(unittest.TestCase):
         """
         Test mutual info, information variability metrics.
         """
+        # Test mutual info score
         mut_info = get_mutual_info(self.x, self.y_1, normalize=False)
         mut_info_norm = get_mutual_info(self.x, self.y_1, normalize=True)
         mut_info_bins = get_mutual_info(self.x, self.y_1, n_bins=10)
+        mut_info_stand_copula = get_mutual_info(self.x, self.y_1, normalize=False, estimator='standard_copula')
+        mut_info_copula_entropy = get_mutual_info(self.x, self.y_1, normalize=False, estimator='copula_entropy')
+        mut_info_stand_copula_norm = get_mutual_info(self.x, self.y_1, normalize=True, estimator='standard_copula')
+        mut_info_copula_entropy_norm = get_mutual_info(self.x, self.y_1, normalize=True, estimator='copula_entropy')
 
-        # Test mutual info score
         self.assertAlmostEqual(mut_info, 0.522, delta=1e-2)
         self.assertAlmostEqual(mut_info_norm, 0.64, delta=1e-2)
         self.assertAlmostEqual(mut_info_bins, 0.626, delta=1e-2)
+        self.assertAlmostEqual(mut_info_stand_copula, 0.876, delta=1e-2)
+        self.assertAlmostEqual(mut_info_copula_entropy, 0.879, delta=1e-2)
+        self.assertAlmostEqual(mut_info_stand_copula_norm, 0.399, delta=1e-2)
+        self.assertAlmostEqual(mut_info_copula_entropy_norm, 0.400, delta=1e-2)
 
         # Test information variation score
         info_var = variation_of_information_score(self.x, self.y_1, normalize=False)
