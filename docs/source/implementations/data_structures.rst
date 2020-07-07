@@ -63,7 +63,7 @@ pg 25) to build the more interesting features for predicting financial time seri
    The data will be sampled as follows:
 
    - 20.04.2020 and 21.04.2020 into one bar, as their volume is 20.
-   - 23.04.2020 as a single bar, as its volume is 20.
+   - 22.04.2020 as a single bar, as its volume is 20.
    - 23.04.2020 as a single bar, as it now fills the lower volume threshold of 10.
    - 24.04.2020 as a single bar again.
 

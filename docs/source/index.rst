@@ -283,17 +283,18 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
-    :caption: Labelling
+    :caption: Labeling
     :hidden:
 
-    implementations/tb_meta_labeling
-    implementations/labeling_trend_scanning
-    implementations/labeling_tail_sets
-    implementations/labeling_fixed_time_horizon
-    implementations/labeling_matrix_flags
-    implementations/labeling_excess_median
-    implementations/labeling_raw_return
-    implementations/labeling_vs_benchmark
+    labeling/tb_meta_labeling
+    labeling/labeling_trend_scanning
+    labeling/labeling_tail_sets
+    labeling/labeling_fixed_time_horizon
+    labeling/labeling_matrix_flags
+    labeling/labeling_excess_median
+    labeling/labeling_raw_return
+    labeling/labeling_vs_benchmark
+    labeling/labeling_excess_mean
 
 
 .. toctree::
