@@ -257,6 +257,8 @@ class TestRiskEstimators(unittest.TestCase):
                          [0.1, 1, -0.3],
                          [-0.1, -0.3, 1]])
 
+        eVal, eVec = np.linalg.eigh(corr)                         
+
         # Eigenvalues and eigenvectors to use
         eigenvalues = np.array([[1.3562, 0, 0],
                                 [0, 0.9438, 0],
@@ -264,6 +266,9 @@ class TestRiskEstimators(unittest.TestCase):
         eigenvectors = np.array([[-3.69048184e-01, -9.29410263e-01, 1.10397126e-16],
                                  [-6.57192300e-01, 2.60956474e-01, 7.07106781e-01],
                                  [6.57192300e-01, -2.60956474e-01, 7.07106781e-01]])
+                                 
+        np.testing.assert_almost_equal(np.diag(np.flip(eVal)), eigenvalues, decimal=4)
+        np.testing.assert_almost_equal(np.fliplr(eVec), eigenvectors, decimal=4)
 
         # Expected correlation matrix
         expected_corr = np.array([[1, -0.33622026, 0.33622026],
@@ -271,7 +276,7 @@ class TestRiskEstimators(unittest.TestCase):
                                   [0.33622026, 0.88478197, 1]])
 
         # Finding the de-toned correlation matrix
-        corr_matrix = risk_estimators._detoned_corr(corr, eigenvalues, eigenvectors, 1)
+        corr_matrix = risk_estimators._detoned_corr(eigenvalues, eigenvectors, 1)
 
         # Testing if the de-toned correlation matrix is right
         np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)

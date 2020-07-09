@@ -618,7 +618,7 @@ class RiskEstimators:
 
         return corr
 
-    def _detoned_corr(self, corr, eigenvalues, eigenvectors, num_facts, market_component=1):
+    def _detoned_corr(self, eigenvalues, eigenvectors, num_facts, market_component=1):
         """
         De-tones the correlation matrix by removing the market component.
 
@@ -626,7 +626,6 @@ class RiskEstimators:
         of the first eigenvalue that is above the maximum theoretical eigenvalue and the number of
         eigenvectors related to a market component.
 
-        :param corr: (np.array) Correlation matrix to detone.
         :param eigenvalues: (np.array) Matrix with eigenvalues on the main diagonal.
         :param eigenvectors: (float) Eigenvectors array.
         :param num_facts: (float) Threshold for eigenvalues to be fixed.
