@@ -633,9 +633,6 @@ class RiskEstimators:
         :return: (np.array) De-toned correlation matrix.
         """
 
-        # Getting the de-noised correlation matrix
-        corr = self._denoised_corr(eigenvalues, eigenvectors, num_facts)
-
         # Getting the eigenvalues and eigenvectors related to market component
         eigenvalues_mark = eigenvalues[:market_component, :market_component]
         eigenvectors_mark = eigenvectors[:, :market_component]
