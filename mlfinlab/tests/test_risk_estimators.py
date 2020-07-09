@@ -279,7 +279,7 @@ class TestRiskEstimators(unittest.TestCase):
         corr_matrix = risk_estimators._detoned_corr(eigenvalues, eigenvectors, 1)
 
         # Testing if the de-toned correlation matrix is right
-        np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
+        np.testing.assert_almost_equal(corr, corr_matrix, expected_corr, decimal=4)
 
     @staticmethod
     def test_denoise_covariance():
