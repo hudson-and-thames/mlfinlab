@@ -46,10 +46,14 @@ def get_optimal_transport_distance(x: np.array, y: np.array, target_dependence: 
     :return: (float) Optimal transport distance.
     """
 
-    # Setting a number of observations
-    nb_obs = 1000
+    # Defining a number of observations used
+    n_obs = 1000
 
-    # Target copula with comonotonicity
+    # Creating forget copula with independence
+    forget_copula = np.array([[u, v] for u, v in zip(np.random.uniform(size=nb_obs),
+                                                     np.random.uniform(size=nb_obs))])
+
+    # Creating target copula with a given dependence type
     target = np.array([[i / nb_obs, i / nb_obs]
                        for i in range(nb_obs)])
 
@@ -92,3 +96,26 @@ def compute_copula_ot_dependence(empirical: np.array, target: np.array, forget: 
 
     # compute the copula ot dependence measure
     return 1 - e2t_dist / (e2f_dist + e2t_dist)
+
+def create_target_copula(target_dependence: str, n_obs: int) -> np.array:
+    """
+    Creates target copula with given dependence an number of observations.
+
+    :param target_dependence: (str) Type of dependence to use for copula creation.[``comonotonicity``,
+                                    ``countermonotonicity``]
+    :param n_obs: (int) Number of observations to use for copula creation.
+    :return: (np.array) Resulting copula.
+    """
+
+    if target_dependence == 'comonotonicity':
+        target = np.array([[i / nb_obs, i / nb_obs] for i in range(n_obs)])
+
+    else if target_dependence == 'countermonotonicity':
+        target = np.array([[i / nb_obs, (n_obs - i) / nb_obs] for i in range(n_obs)])
+
+    else:
+        raise Exception('This type of target dependence is not supported')
+
+
+    return target
+
