@@ -344,7 +344,7 @@ class RiskEstimators:
 
         # Detone the correlation matrix if needed
         if detone:
-            corr = self._detoned_corr(corr, eigenval, eigenvec, market_component)
+            corr = self._detoned_corr(corr, market_component)
 
         # Calculating the covariance matrix from the de-noised correlation matrix
         cov_denoised = self.corr_to_cov(corr, np.diag(cov) ** (1 / 2))
@@ -618,7 +618,7 @@ class RiskEstimators:
 
         return corr
 
-    def _detoned_corr(self, corr, eigenvalues, eigenvectors, market_component=1):
+    def _detoned_corr(self, corr, market_component=1):
         """
         De-tones the correlation matrix by removing the market component.
 
@@ -627,11 +627,12 @@ class RiskEstimators:
         eigenvectors related to a market component.
 
         :param corr: (np.array) Correlation matrix to detone.
-        :param eigenvalues: (np.array) Matrix with eigenvalues on the main diagonal.
-        :param eigenvectors: (float) Eigenvectors array.
         :param market_component: (int) Number of fist eigevectors related to a market component. (1 by default)
         :return: (np.array) De-toned correlation matrix.
         """
+
+        # Calculating eigenvalues and eigenvectors of the de-noised matrix
+        eigenvalues, eigenvectors = self._get_pca(corr)
 
         # Getting the eigenvalues and eigenvectors related to market component
         eigenvalues_mark = eigenvalues[:market_component, :market_component]

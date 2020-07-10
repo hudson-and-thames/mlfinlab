@@ -276,7 +276,7 @@ class TestRiskEstimators(unittest.TestCase):
                                   [0.39391882, 0.6897809, 1]])
 
         # Finding the de-toned correlation matrix
-        corr_matrix = risk_estimators._detoned_corr(corr, eigenvalues, eigenvectors)
+        corr_matrix = risk_estimators._detoned_corr(corr)
 
         # Testing if the de-toned correlation matrix is right
         np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
@@ -311,9 +311,9 @@ class TestRiskEstimators(unittest.TestCase):
                                      [0.0057, 0.04, -0.0106],
                                      [-0.0028, -0.0106, 0.01]])
 
-        expected_cov_detoned = np.array([[0.01, -0.00672445, 0.00336222],
-                                         [-0.00672445, 0.04, 0.01769514],
-                                         [0.00336222, 0.01769514, 0.01]])
+        expected_cov_detoned = np.array([[0.01, -0.0094, 0.0047],
+                                         [-0.0094, 0.04, 0.0111],
+                                         [0.0047, 0.0111, 0.01]])
 
         # Finding the de-noised covariance matrix
         cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method, detone,
