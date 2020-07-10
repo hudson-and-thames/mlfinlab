@@ -9,19 +9,23 @@ import ot
 
 # pylint: disable=invalid-name
 
-def get_ranked_observations(x: np.array, y: np.array) -> float:
+def get_empirical_copula(x: np.array, y: np.array) -> np.array:
     """
-    Returns ranked observations - empirical copula.
+    Calculate empirical copula using ranked observations.
 
     :param x: (np.array) X vector.
     :param y: (np.array) Y vector.
-    :return: (tuple) Tuple with ranked observations.
+    :return: (np.array) Empirical copula.
     """
 
-    Xunif = ss.rankdata(x) / len(x)
-    Yunif = ss.rankdata(y) / len(y)
+    # Calculate ranked observations
+    x_unif = ss.rankdata(x) / len(x)
+    y_unif = ss.rankdata(y) / len(y)
 
-    return Xunif, Yunif
+    # Empirical copula
+    empirical = np.array([[x, y] for x, y in zip(x_unif, y_unif)])
+
+    return empirical
 
 def get_optimal_transport_distance(x: np.array, y: np.array, target_dependence: str) -> float:
     """
@@ -47,24 +51,24 @@ def get_optimal_transport_distance(x: np.array, y: np.array, target_dependence: 
     """
 
     # Defining a number of observations used
-    n_obs = 1000
+    n_obs = x.shape[0]
 
     # Creating forget copula with independence
-    forget_copula = np.array([[u, v] for u, v in zip(np.random.uniform(size=nb_obs),
-                                                     np.random.uniform(size=nb_obs))])
+    forget = np.array([[u, v] for u, v in zip(np.random.uniform(size=n_obs),
+                                              np.random.uniform(size=n_obs))])
 
     # Creating target copula with a given dependence type
-    target = np.array([[i / nb_obs, i / nb_obs]
-                       for i in range(nb_obs)])
+    target = create_target_copula(target_dependence, n_obs)
 
-    # Forget copula with independence
-    forget = np.array([[u, v]
-                       for u, v in zip(np.random.uniform(size=nb_obs),
-                                       np.random.uniform(size=nb_obs))])
+    # Creating empirical copula from observaions
+    empirical = get_empirical_copula(x, y)
 
-    return optimal_transport
+    # Optimal transport distance
+    copula_ot = compute_copula_ot_dependence(empirical, target, forget, n_obs)
 
-def compute_copula_ot_dependence(empirical: np.array, target: np.array, forget: np.array, nb_obs: int) -> float:
+    return copula_ot
+
+def compute_copula_ot_dependence(empirical: np.array, target: np.array, forget: np.array, n_obs: int) -> float:
     """
     Calculates optimal copula transport dependence measure.
 
@@ -75,27 +79,28 @@ def compute_copula_ot_dependence(empirical: np.array, target: np.array, forget: 
     :return: (float) Optimal transport dependence.
     """
 
-    # uniform distribution on samples
-    t_measure, f_measure, e_measure = (
-        np.ones((nb_obs,)) / nb_obs,
-        np.ones((nb_obs,)) / nb_obs,
-        np.ones((nb_obs,)) / nb_obs)
+    # Uniform distribution on samples
+    t_measure, f_measure, e_measure = (np.ones((n_obs,)) / n_obs,
+                                       np.ones((n_obs,)) / n_obs,
+                                       np.ones((n_obs,)) / n_obs)
 
-    # compute the ground distance matrix between locations
+    # Compute the ground distance matrix between locations
     gdist_e2t = ot.dist(empirical, target)
     gdist_e2f = ot.dist(empirical, forget)
 
-    # compute the optimal transport matrix
+    # Compute the optimal transport matrix
     e2t_ot = ot.emd(t_measure, e_measure, gdist_e2t)
     e2f_ot = ot.emd(f_measure, e_measure, gdist_e2f)
 
-    # compute the optimal transport distance:
+    # Compute the optimal transport distance:
     # <optimal transport matrix, ground distance matrix>_F
     e2t_dist = np.trace(np.dot(np.transpose(e2t_ot), gdist_e2t))
     e2f_dist = np.trace(np.dot(np.transpose(e2f_ot), gdist_e2f))
 
-    # compute the copula ot dependence measure
-    return 1 - e2t_dist / (e2f_dist + e2t_dist)
+    # Compute the copula ot dependence measure
+    ot_measure = 1 - e2t_dist / (e2f_dist + e2t_dist)
+
+    return ot_measure
 
 def create_target_copula(target_dependence: str, n_obs: int) -> np.array:
     """
@@ -108,14 +113,12 @@ def create_target_copula(target_dependence: str, n_obs: int) -> np.array:
     """
 
     if target_dependence == 'comonotonicity':
-        target = np.array([[i / nb_obs, i / nb_obs] for i in range(n_obs)])
+        target = np.array([[i / n_obs, i / n_obs] for i in range(n_obs)])
 
-    else if target_dependence == 'countermonotonicity':
-        target = np.array([[i / nb_obs, (n_obs - i) / nb_obs] for i in range(n_obs)])
+    elif target_dependence == 'countermonotonicity':
+        target = np.array([[i / n_obs, (n_obs - i) / n_obs] for i in range(n_obs)])
 
     else:
         raise Exception('This type of target dependence is not supported')
 
-
     return target
-
