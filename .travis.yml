@@ -2,7 +2,7 @@
 language: python
 matrix:
   include:
-    - python: 3.5.0
+    - python: 3.5
       dist: xenial
       sudo: true
 # command to install dependencies
