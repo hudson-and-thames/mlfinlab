@@ -53,11 +53,11 @@ class HierarchicalRiskParity:
         :param side_weights: (pd.Series/numpy matrix) With asset_names in index and value 1 for Buy, -1 for Sell
                                                       (default 1 for all)
         :param linkage: (string) Type of linkage used for Hierarchical Clustering. Supported strings - ``single``,
-                                 ``average``, ``complete``, ``ward``.
+                                 ``average``, ``complete``.
         """
 
         # Perform error checks
-        self._error_checks(asset_prices, asset_returns, covariance_matrix)
+        self._error_checks(asset_prices, asset_returns, covariance_matrix, linkage)
 
         if asset_names is None:
             if asset_prices is not None:
@@ -240,7 +240,7 @@ class HierarchicalRiskParity:
         self.weights = pd.DataFrame(self.weights)
 
     @staticmethod
-    def _error_checks(asset_prices, asset_returns, covariance_matrix):
+    def _error_checks(asset_prices, asset_returns, covariance_matrix, linkage):
         """
         Perform initial warning checks.
 
@@ -248,6 +248,8 @@ class HierarchicalRiskParity:
                                             indexed by date.
         :param asset_returns: (pd.DataFrame/numpy matrix) User supplied matrix of asset returns.
         :param covariance_matrix: (pd.Dataframe/numpy matrix) User supplied covariance matrix of asset returns
+        :param linkage: (string) Type of linkage used for Hierarchical Clustering. Supported strings - ``single``,
+                                 ``average``, ``complete``.
         """
 
 
@@ -260,3 +262,6 @@ class HierarchicalRiskParity:
                 raise ValueError("Asset prices matrix must be a dataframe")
             if not isinstance(asset_prices.index, pd.DatetimeIndex):
                 raise ValueError("Asset prices dataframe must be indexed by date.")
+
+        if linkage == 'ward':
+            raise ValueError("The Ward method is not supported on the Quantopian platform.")

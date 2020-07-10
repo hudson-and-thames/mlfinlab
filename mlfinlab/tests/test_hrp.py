@@ -149,19 +149,14 @@ class TestHRP(unittest.TestCase):
         self.assertTrue(len(weights) == self.data.shape[1])
         self.assertAlmostEqual(np.sum(weights), 1)
 
-    def test_hrp_with_linkage_method(self):
+    def test_value_error_when_passing_ward(self):
         """
-        Test HRP when passing a custom linkage method.
+        Test ValueError when passing the Ward linkage method.
         """
 
-        hrp = HierarchicalRiskParity()
-        hrp.allocate(asset_names=self.data.columns, asset_prices=self.data, linkage='ward')
-        weights = hrp.weights.values[0]
-        assert hrp.ordered_indices == [13, 7, 1, 6, 4, 16, 3, 17, 14, 0, 15, 8,
-                                       9, 10, 12, 18, 22, 5, 19, 2, 20, 11, 21]
-        self.assertTrue((weights >= 0).all())
-        self.assertTrue(len(weights) == self.data.shape[1])
-        self.assertAlmostEqual(np.sum(weights), 1)
+        with self.assertRaises(ValueError):
+            hrp = HierarchicalRiskParity()
+            hrp.allocate(asset_names=self.data.columns, asset_prices=self.data, linkage='ward')
 
     def test_no_asset_names(self):
         """
