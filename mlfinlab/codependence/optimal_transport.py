@@ -1,6 +1,6 @@
 """
-Implementations of Optimal Transport dependence measure porposed by Dr. Marti et al. : https://arxiv.org/abs/1610.09659
-And implemented in the blog post by Dr. Marti: https://gmarti.gitlab.io/qfin/2020/06/25/copula-optimal-transport-dependence.html
+Implementations of Optimal Transport dependence measure porposed by Marti et al. : https://arxiv.org/abs/1610.09659
+And implemented in the blog post by Marti: https://gmarti.gitlab.io/qfin/2020/06/25/copula-optimal-transport-dependence.html
 """
 import numpy as np
 import scipy.stats as ss
@@ -23,13 +23,26 @@ def get_ranked_observations(x: np.array, y: np.array) -> float:
 
     return Xunif, Yunif
 
-def get_optimal_transport_distance(x: np.array, y: np.array, normalize: bool = False) -> float:
+def get_optimal_transport_distance(x: np.array, y: np.array, target_dependence: str) -> float:
     """
-    Returns optimal transport distance between two vectors.
+    Calculates optimal transport distance between two vectors.
+
+    This implementation is based on the blog post by Marti:
+    https://gmarti.gitlab.io/qfin/2020/06/25/copula-optimal-transport-dependence.html
+
+    The target and forget copulas are being used to reference where between them does the empirical
+    copula stad in the space of copulas. The forget copula used is the copula associated to
+    independent random variables. The target copula is defined by the target_dependence parameter.
+
+    Currently, these target_dependence copulas are supported:
+
+    - ``comonotonicity`` - a comonotone copula.
+    - ``countermonotonicity`` - a countermonotone copula.
 
     :param x: (np.array) X vector.
     :param y: (np.array) Y vector.
-    :param normalize: (bool) Flag used to normalize the result to [0, 1]. (False by default)
+    :param target_dependence: (str) Type of target dependence to use when measuring distance.
+                                    (``comonotonicity`` by default)
     :return: (float) Optimal transport distance.
     """
 
@@ -49,7 +62,7 @@ def get_optimal_transport_distance(x: np.array, y: np.array, normalize: bool = F
 
 def compute_copula_ot_dependence(empirical: np.array, target: np.array, forget: np.array, nb_obs: int) -> float:
     """
-    Calculates optimalcopula transport dependence measure.
+    Calculates optimal copula transport dependence measure.
 
     :param empirical: (np.array) Empirical copula.
     :param target: (np.array) Target copula.
