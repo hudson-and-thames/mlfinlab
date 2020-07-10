@@ -257,7 +257,7 @@ class TestRiskEstimators(unittest.TestCase):
                          [0.1, 1, -0.3],
                          [-0.1, -0.3, 1]])
 
-        eVal, eVec = np.linalg.eigh(corr) 
+        e_val, e_vec = np.linalg.eigh(corr) 
 
         # Eigenvalues and eigenvectors to use
         eigenvalues = np.array([[1.3562, 0, 0],
@@ -267,8 +267,8 @@ class TestRiskEstimators(unittest.TestCase):
                                  [-6.57192300e-01, 2.60956474e-01, 7.07106781e-01],
                                  [6.57192300e-01, -2.60956474e-01, 7.07106781e-01]])
         
-        np.testing.assert_almost_equal(np.diag(np.flip(eVal)), eigenvalues, decimal=4)
-        np.testing.assert_almost_equal(np.fliplr(eVec), eigenvectors, decimal=4)
+        np.testing.assert_almost_equal(np.diag(np.flip(e_val)), eigenvalues, decimal=4)
+        np.testing.assert_almost_equal(np.fliplr(e_vec), eigenvectors, decimal=4)
 
         # Expected correlation matrix
         expected_corr = np.array([[1, -0.39391882, 0.39391882],
