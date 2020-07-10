@@ -10,17 +10,20 @@ import pandas as pd
 from mlfinlab.codependence.information import variation_of_information_score, get_mutual_info
 from mlfinlab.codependence.correlation import distance_correlation
 from mlfinlab.codependence.gnpr_distance import spearmans_rho, gpr_distance, gnpr_distance
+from mlfinlab.codependence.optimal_transport import optimal_transport_distance
+
 
 # pylint: disable=invalid-name
 
 def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float = 0.5,
                           bandwidth: float = 0.01, n_bins: int = None, normalize: bool = True,
-                          estimator: str = 'standard') -> pd.DataFrame:
+                          estimator: str = 'standard', target_dependence: str = 'comonotonicity') -> pd.DataFrame:
     """
     This function returns a dependence matrix for elements given in the dataframe using the chosen dependence method.
 
     List of supported algorithms to use for generating the dependence matrix: ``information_variation``,
-    ``mutual_information``, ``distance_correlation``, ``spearmans_rho``, ``gpr_distance``, ``gnpr_distance``.
+    ``mutual_information``, ``distance_correlation``, ``spearmans_rho``, ``gpr_distance``, ``gnpr_distance``,
+    ``optimal_transport``.
 
     :param df: (pd.DataFrame) Features.
     :param dependence_method: (str) Algorithm to be use for generating dependence_matrix.
@@ -33,6 +36,8 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float
                              ``mutual_information``. (True by default)
     :param estimator: (str) Estimator to be used for calculation in ``mutual_information``.
                             [``standard``, ``standard_copula``, ``copula_entropy``] (``standard`` by default)
+    :param target_dependence: (str) Type of target dependence to use in ``optimal_transport``.
+                                    [``comonotonicity``, ``countermonotonicity``] (``comonotonicity`` by default)
     :return: (pd.DataFrame) Dependence matrix.
     """
     # Get the feature names.
@@ -53,6 +58,8 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float
         dep_function = lambda x, y: gpr_distance(x, y, theta=theta)
     elif dependence_method == 'gnpr_distance':
         dep_function = lambda x, y: gnpr_distance(x, y, theta=theta, bandwidth=bandwidth)
+    elif dependence_method == 'optimal_transport':
+        dep_function = lambda x, y: optimal_transport_distance(x, y, target_dependence=target_dependence)
     else:
         raise ValueError(f"{dependence_method} is not a valid method. Please use one of the supported methods \
                             listed in the docsting.")

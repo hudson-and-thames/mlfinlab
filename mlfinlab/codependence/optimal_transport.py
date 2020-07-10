@@ -27,7 +27,7 @@ def _get_empirical_copula(x: np.array, y: np.array) -> np.array:
 
     return empirical
 
-def optimal_transport_distance(x: np.array, y: np.array, target_dependence: str) -> float:
+def optimal_transport_distance(x: np.array, y: np.array, target_dependence: str = 'comonotonicity') -> float:
     """
     Calculates optimal transport distance between two vectors.
 
