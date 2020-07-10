@@ -276,7 +276,7 @@ class TestRiskEstimators(unittest.TestCase):
                                   [0.39391882, 0.6897809, 1]])
         
         # Finding the de-toned correlation matrix
-        corr_matrix = risk_estimators._detoned_corr(corr, eigenvalues, eigenvectors, 1)
+        corr_matrix = risk_estimators._detoned_corr(corr, eigenvalues, eigenvectors)
 
         # Testing if the de-toned correlation matrix is right
         np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
