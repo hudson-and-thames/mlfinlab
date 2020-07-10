@@ -9,7 +9,7 @@ import ot
 
 # pylint: disable=invalid-name
 
-def get_empirical_copula(x: np.array, y: np.array) -> np.array:
+def _get_empirical_copula(x: np.array, y: np.array) -> np.array:
     """
     Calculate empirical copula using ranked observations.
 
@@ -27,7 +27,7 @@ def get_empirical_copula(x: np.array, y: np.array) -> np.array:
 
     return empirical
 
-def get_optimal_transport_distance(x: np.array, y: np.array, target_dependence: str) -> float:
+def optimal_transport_distance(x: np.array, y: np.array, target_dependence: str) -> float:
     """
     Calculates optimal transport distance between two vectors.
 
@@ -58,17 +58,17 @@ def get_optimal_transport_distance(x: np.array, y: np.array, target_dependence: 
                                               np.random.uniform(size=n_obs))])
 
     # Creating target copula with a given dependence type
-    target = create_target_copula(target_dependence, n_obs)
+    target = _create_target_copula(target_dependence, n_obs)
 
     # Creating empirical copula from observaions
-    empirical = get_empirical_copula(x, y)
+    empirical = _get_empirical_copula(x, y)
 
     # Optimal transport distance
-    copula_ot = compute_copula_ot_dependence(empirical, target, forget, n_obs)
+    copula_ot = _compute_copula_ot_dependence(empirical, target, forget, n_obs)
 
     return copula_ot
 
-def compute_copula_ot_dependence(empirical: np.array, target: np.array, forget: np.array, n_obs: int) -> float:
+def _compute_copula_ot_dependence(empirical: np.array, target: np.array, forget: np.array, n_obs: int) -> float:
     """
     Calculates optimal copula transport dependence measure.
 
@@ -102,7 +102,7 @@ def compute_copula_ot_dependence(empirical: np.array, target: np.array, forget: 
 
     return ot_measure
 
-def create_target_copula(target_dependence: str, n_obs: int) -> np.array:
+def _create_target_copula(target_dependence: str, n_obs: int) -> np.array:
     """
     Creates target copula with given dependence an number of observations.
 
