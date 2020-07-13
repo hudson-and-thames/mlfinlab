@@ -44,6 +44,7 @@ def optimal_transport_distance(x: np.array, y: np.array, target_dependence: str 
     - ``comonotonicity`` - a comonotone copula.
     - ``countermonotonicity`` - a countermonotone copula.
     - ``gaussian`` - a Gaussain copula with custom correlation coefficient.
+    - ``positive_negative`` - a copula of both positive and negtative correlation.
 
     :param x: (np.array) X vector.
     :param y: (np.array) Y vector.
@@ -110,7 +111,7 @@ def _create_target_copula(target_dependence: str, n_obs: int, gauss_corr: float)
     Creates target copula with given dependence an number of observations.
 
     :param target_dependence: (str) Type of dependence to use for copula creation.[``comonotonicity``,
-                                    ``countermonotonicity``, ``gaussian``]
+                                    ``countermonotonicity``, ``gaussian``, ``positive_negative``]
     :param n_obs: (int) Number of observations to use for copula creation.
     :param gauss_corr: (float) Correlation coefficient to use when creating Gaussian copula.
     :return: (np.array) Resulting copula.
@@ -134,6 +135,9 @@ def _create_target_copula(target_dependence: str, n_obs: int, gauss_corr: float)
         # Ranking observations - getting copula as a result
         target.T[0] = ss.rankdata(target.T[0]) / len(target.T[0])
         target.T[1] = ss.rankdata(target.T[1]) / len(target.T[1])
+
+    elif target_dependence == 'positive_negative':
+        target = np.array([[i / n_obs, ((i % 2) * i + ((i + 1) % 2) * (n_obs - i) ) / n_obs] for i in range(n_obs)])
 
     else:
         raise Exception('This type of target dependence is not supported')
