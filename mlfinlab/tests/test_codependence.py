@@ -112,6 +112,8 @@ class TestCodependence(unittest.TestCase):
                                                 target_dependence='gaussian', gaussian_corr=0.6)
         ot_matrix_posneg = get_dependence_matrix(self.X_matrix, dependence_method='optimal_transport',
                                                  target_dependence='positive_negative')
+        ot_matrix_diffvar = get_dependence_matrix(self.X_matrix, dependence_method='optimal_transport',
+                                                  target_dependence='different_variations')
 
         #Distance_matrix
         angl = get_distance_matrix(vi_matrix, distance_metric='angular')
@@ -129,6 +131,7 @@ class TestCodependence(unittest.TestCase):
         self.assertEqual(ot_matrix_counter.shape[0], self.X_matrix.shape[1])
         self.assertEqual(ot_matrix_gauss.shape[0], self.X_matrix.shape[1])
         self.assertEqual(ot_matrix_posneg.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(ot_matrix_diffvar.shape[0], self.X_matrix.shape[1])
 
         self.assertEqual(angl.shape[0], self.X_matrix.shape[1])
         self.assertEqual(sq_angl.shape[0], self.X_matrix.shape[1])
@@ -211,6 +214,10 @@ class TestCodependence(unittest.TestCase):
         ot_distance_xy2_posneg = optimal_transport_distance(self.x, self.y_2, 'positive_negative')
         ot_distance_xy3_posneg = optimal_transport_distance(self.x, self.y_3, 'positive_negative')
 
+        ot_distance_xy1_diffvar = optimal_transport_distance(self.x, self.y_1, 'different_variations')
+        ot_distance_xy2_diffvar = optimal_transport_distance(self.x, self.y_2, 'different_variations')
+        ot_distance_xy3_diffvar = optimal_transport_distance(self.x, self.y_3, 'different_variations')
+
         self.assertAlmostEqual(ot_distance_xy1_comon, 0.18828889, delta=1e-7)
         self.assertAlmostEqual(ot_distance_xy2_comon, 0.18171391, delta=1e-7)
         self.assertAlmostEqual(ot_distance_xy3_comon, 0.97448323, delta=1e-7)
@@ -226,6 +233,10 @@ class TestCodependence(unittest.TestCase):
         self.assertAlmostEqual(ot_distance_xy1_posneg, 0.4459249, delta=1e-7)
         self.assertAlmostEqual(ot_distance_xy2_posneg, 0.4195972, delta=1e-7)
         self.assertAlmostEqual(ot_distance_xy3_posneg, 0.4336539, delta=1e-7)
+
+        self.assertAlmostEqual(ot_distance_xy1_diffvar, 0.0611081, delta=1e-7)
+        self.assertAlmostEqual(ot_distance_xy2_diffvar, 0.0619758, delta=1e-7)
+        self.assertAlmostEqual(ot_distance_xy3_diffvar, 0.1478687, delta=1e-7)
 
         # Test for error if unsupported target dependence is given
         with self.assertRaises(Exception):
