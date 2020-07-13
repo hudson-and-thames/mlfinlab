@@ -511,12 +511,13 @@ class TestMVO(unittest.TestCase):
 
         mvo = MeanVarianceOptimisation()
         mvo.allocate(asset_prices=self.data)
+        print(mvo.get_portfolio_metrics())
         with patch('sys.stdout', new=StringIO()) as fake_out:
             mvo.get_portfolio_metrics()
             output = fake_out.getvalue().strip()
             self.assertTrue('Portfolio Return = 0.017362404155484328' in output)
             self.assertTrue('Portfolio Risk = 9.385801639141577e-06' in output)
-            self.assertTrue('Portfolio Sharpe Ratio = 9.385801639141577e-06' in output)
+            self.assertTrue('Portfolio Sharpe Ratio = -4.125045816381284' in output)
 
     def test_custom_objective_function(self):
         """
