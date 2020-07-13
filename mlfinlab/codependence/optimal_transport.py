@@ -45,6 +45,8 @@ def optimal_transport_distance(x: np.array, y: np.array, target_dependence: str 
     - ``countermonotonicity`` - a countermonotone copula.
     - ``gaussian`` - a Gaussain copula with custom correlation coefficient.
     - ``positive_negative`` - a copula of both positive and negtative correlation.
+    - ``different_variations`` - a copula with some elements having extreme variations,
+                                 while those of others are relatively small, and conversely.
 
     :param x: (np.array) X vector.
     :param y: (np.array) Y vector.
@@ -111,7 +113,8 @@ def _create_target_copula(target_dependence: str, n_obs: int, gauss_corr: float)
     Creates target copula with given dependence an number of observations.
 
     :param target_dependence: (str) Type of dependence to use for copula creation.[``comonotonicity``,
-                                    ``countermonotonicity``, ``gaussian``, ``positive_negative``]
+                                    ``countermonotonicity``, ``gaussian``, ``positive_negative``,
+                                    ``different_variations``]
     :param n_obs: (int) Number of observations to use for copula creation.
     :param gauss_corr: (float) Correlation coefficient to use when creating Gaussian copula.
     :return: (np.array) Resulting copula.
@@ -142,6 +145,11 @@ def _create_target_copula(target_dependence: str, n_obs: int, gauss_corr: float)
         # Creating copula where each even elemetnt is on the counterdiagonal and each odd is on the main diagonal
         target = np.array([[i / n_obs,
                             ((i % 2) * i + ((i + 1) % 2) * (n_obs - i)) / n_obs] for i in range(n_obs)])
+
+    elif target_dependence == 'different_variations':
+        # Creating copula where each even elemetnt is on the upper triangle odd is on the lower triangle
+        target = np.array([[i / n_obs,
+                            (abs(n_obs - ((i + 1) % 2) * i) - abs(n_obs - (i % 2) * i)) / n_obs] for i in range(n_obs)])
 
     else:
         raise Exception('This type of target dependence is not supported')
