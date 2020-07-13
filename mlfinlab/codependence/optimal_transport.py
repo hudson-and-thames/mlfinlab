@@ -28,7 +28,7 @@ def _get_empirical_copula(x: np.array, y: np.array) -> np.array:
     return empirical
 
 def optimal_transport_distance(x: np.array, y: np.array, target_dependence: str = 'comonotonicity',
-                               gaussian_corr: float = 0.7) -> float:
+                               gaussian_corr: float = 0.7, var_threshold: float = 0.2) -> float:
     """
     Calculates optimal transport distance between two vectors.
 
@@ -47,12 +47,17 @@ def optimal_transport_distance(x: np.array, y: np.array, target_dependence: str 
     - ``positive_negative`` - a copula of both positive and negtative correlation.
     - ``different_variations`` - a copula with some elements having extreme variations,
                                  while those of others are relatively small, and conversely.
+    - ``small_variations`` - a copula with elements being positively correlated for small variations
+                             but uncorrelated otherwise.
 
     :param x: (np.array) X vector.
     :param y: (np.array) Y vector.
     :param target_dependence: (str) Type of target dependence to use when measuring distance.
                                     (``comonotonicity`` by default)
-    :param gaussian_corr: (str) Correlation coefficient to use when creating Gaussian copula. (0.7 by default)
+    :param gaussian_corr: (float) Correlation coefficient to use when creating ``gaussian`` and
+                                  ``small_variations`` copulas. [from 0 to 1] (0.7 by default)
+    :param var_threshold: (float) Variation threshold to use for coefficient to use in ``small_variations``.
+                                  Sets the relative area of correlation in a copula. [from 0 to 1] (0.2 by default)
     :return: (float) Optimal transport distance.
     """
 
@@ -64,7 +69,7 @@ def optimal_transport_distance(x: np.array, y: np.array, target_dependence: str 
                                               np.random.uniform(size=n_obs))])
 
     # Creating target copula with a given dependence type
-    target = _create_target_copula(target_dependence, n_obs, gaussian_corr)
+    target = _create_target_copula(target_dependence, n_obs, gaussian_corr, var_threshold)
 
     # Creating empirical copula from observaions
     empirical = _get_empirical_copula(x, y)
@@ -108,15 +113,17 @@ def _compute_copula_ot_dependence(empirical: np.array, target: np.array, forget:
 
     return ot_measure
 
-def _create_target_copula(target_dependence: str, n_obs: int, gauss_corr: float) -> np.array:
+def _create_target_copula(target_dependence: str, n_obs: int, gauss_corr: float, var_threshold: float) -> np.array:
     """
     Creates target copula with given dependence an number of observations.
 
     :param target_dependence: (str) Type of dependence to use for copula creation.[``comonotonicity``,
                                     ``countermonotonicity``, ``gaussian``, ``positive_negative``,
-                                    ``different_variations``]
+                                    ``different_variations``, ``small_variations``]
     :param n_obs: (int) Number of observations to use for copula creation.
-    :param gauss_corr: (float) Correlation coefficient to use when creating Gaussian copula.
+    :param gauss_corr: (float) Correlation coefficient to use when creating ``gaussian`` and
+                                  ``small_variations`` copulas.
+    :param var_threshold: (float) Variation threshold to use for coefficient to use in ``small_variations``.
     :return: (np.array) Resulting copula.
     """
 
@@ -150,6 +157,42 @@ def _create_target_copula(target_dependence: str, n_obs: int, gauss_corr: float)
         # Creating copula where each even elemetnt is on the upper triangle odd is on the lower triangle
         target = np.array([[i / n_obs,
                             (abs(n_obs - ((i + 1) % 2) * i) - abs(n_obs - (i % 2) * i)) / n_obs] for i in range(n_obs)])
+
+    elif target_dependence == 'small_variations':
+        # Naumber of observatiosn to be in the correlatied part and outside of it
+        obs_out = int(n_obs * (1 - var_threshold) / 2)
+        obs_corr = n_obs - 2 * obs_out
+
+        # Left part of copula consists of uncorrelated elements
+        target_1 = np.array([[i / n_obs, ((i % 2) * np.random.uniform(0, obs_out) +
+                                          ((i + 1) % 2) * np.random.uniform(n_obs - obs_out, n_obs)) / 5000]
+                             for i in range(obs_out)])
+
+        # Center part of copula consists correlated elements
+
+        # Parameters for center part
+        mean = [0, 0]
+        cov = [[1, gauss_corr],
+               [gauss_corr, 1]]
+
+        # Center part observations created
+        target_2 = np.random.multivariate_normal(mean, cov, obs_corr)
+
+        # Ranked
+        target_2.T[0] = ss.rankdata(target_2.T[0]) / len(target_2.T[0])
+        target_2.T[1] = ss.rankdata(target_2.T[1]) / len(target_2.T[1])
+
+        # And scaled
+        target_2.T[1] = target_2.T[1] * var_threshold + (1 - var_threshold) / 2
+        target_2.T[0] = target_2.T[0] * var_threshold + (1 - var_threshold) / 2
+
+        # Right part of copula consists of uncorrelated elements
+        target_3 = np.array([[i / n_obs, ((i % 2) * np.random.uniform(0, obs_out) +
+                                          ((i + 1) % 2) * np.random.uniform(n_obs - obs_out, n_obs)) / 5000]
+                             for i in range(n_obs - obs_out, n_obs)])
+
+        # Combining parts of the copula
+        target = np.concatenate((target_1, target_2, target_3), axis=0)
 
     else:
         raise Exception('This type of target dependence is not supported')

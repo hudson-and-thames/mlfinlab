@@ -18,7 +18,7 @@ from mlfinlab.codependence.optimal_transport import optimal_transport_distance
 def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float = 0.5,
                           bandwidth: float = 0.01, n_bins: int = None, normalize: bool = True,
                           estimator: str = 'standard', target_dependence: str = 'comonotonicity',
-                          gaussian_corr: float = 0.7) -> pd.DataFrame:
+                          gaussian_corr: float = 0.7, var_threshold: float = 0.2) -> pd.DataFrame:
     """
     This function returns a dependence matrix for elements given in the dataframe using the chosen dependence method.
 
@@ -38,9 +38,13 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float
     :param estimator: (str) Estimator to be used for calculation in ``mutual_information``.
                             [``standard``, ``standard_copula``, ``copula_entropy``] (``standard`` by default)
     :param target_dependence: (str) Type of target dependence to use in ``optimal_transport``.
-                                    [``comonotonicity``, ``countermonotonicity``, ``gaussian``]
+                                    [``comonotonicity``, ``countermonotonicity``, ``gaussian``,
+                                    ``positive_negative``, ``different_variations``, ``small_variations``]
                                     (``comonotonicity`` by default)
-    :param gaussian_corr: (str) Correlation coefficient to use when creating Gaussian copula. (0.7 by default)
+    :param gaussian_corr: (float) Correlation coefficient to use when creating ``gaussian`` and
+                                  ``small_variations`` copulas. [from 0 to 1] (0.7 by default)
+    :param var_threshold: (float) Variation threshold to use for coefficient to use in ``small_variations``.
+                                  Sets the relative area of correlation in a copula. [from 0 to 1] (0.2 by default)
     :return: (pd.DataFrame) Dependence matrix.
     """
     # Get the feature names.
@@ -62,7 +66,7 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float
     elif dependence_method == 'gnpr_distance':
         dep_function = lambda x, y: gnpr_distance(x, y, theta=theta, bandwidth=bandwidth)
     elif dependence_method == 'optimal_transport':
-        dep_function = lambda x, y: optimal_transport_distance(x, y, target_dependence, gaussian_corr)
+        dep_function = lambda x, y: optimal_transport_distance(x, y, target_dependence, gaussian_corr, var_threshold)
     else:
         raise ValueError(f"{dependence_method} is not a valid method. Please use one of the supported methods \
                             listed in the docsting.")
