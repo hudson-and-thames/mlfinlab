@@ -102,13 +102,14 @@ def _compute_copula_ot_dependence(empirical: np.array, target: np.array, forget:
 
     return ot_measure
 
-def _create_target_copula(target_dependence: str, n_obs: int) -> np.array:
+def _create_target_copula(target_dependence: str, n_obs: int, gauss_corr: float) -> np.array:
     """
     Creates target copula with given dependence an number of observations.
 
     :param target_dependence: (str) Type of dependence to use for copula creation.[``comonotonicity``,
                                     ``countermonotonicity``]
     :param n_obs: (int) Number of observations to use for copula creation.
+    :param gauss_corr: (float) Correlation coefficient to use when creating Gaussian copula.
     :return: (np.array) Resulting copula.
     """
 
@@ -118,6 +119,19 @@ def _create_target_copula(target_dependence: str, n_obs: int) -> np.array:
     elif target_dependence == 'countermonotonicity':
         target = np.array([[i / n_obs, (n_obs - i) / n_obs] for i in range(n_obs)])
 
+    elif target_dependence == 'gaussian':
+        # Parameters to use when creating Gaussian copula
+        mean = [0, 0]
+        cov = [[1, gauss_corr],
+               [gauss_corr, 1]]
+
+        # Creating a set of observations to transform to copula
+        target = np.random.multivariate_normal(mean, cov, n_obs)
+
+        # Ranking observations - getting copula as a result
+        target.T[0] = rankdata(target.T[0]) / len(target.T[0])
+        target.T[1] = rankdata(target.T[1]) / len(target.T[1])
+        
     else:
         raise Exception('This type of target dependence is not supported')
 
