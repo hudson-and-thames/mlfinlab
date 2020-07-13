@@ -118,9 +118,11 @@ def _create_target_copula(target_dependence: str, n_obs: int, gauss_corr: float)
     """
 
     if target_dependence == 'comonotonicity':
+        # Creating copula where each element is plased on the main diagonal
         target = np.array([[i / n_obs, i / n_obs] for i in range(n_obs)])
 
     elif target_dependence == 'countermonotonicity':
+        # Creating copula where each element is plased on the counterdiagonal
         target = np.array([[i / n_obs, (n_obs - i) / n_obs] for i in range(n_obs)])
 
     elif target_dependence == 'gaussian':
@@ -137,7 +139,9 @@ def _create_target_copula(target_dependence: str, n_obs: int, gauss_corr: float)
         target.T[1] = ss.rankdata(target.T[1]) / len(target.T[1])
 
     elif target_dependence == 'positive_negative':
-        target = np.array([[i / n_obs, ((i % 2) * i + ((i + 1) % 2) * (n_obs - i) ) / n_obs] for i in range(n_obs)])
+        # Creating copula where each even elemetnt is on the counterdiagonal and each odd is on the main diagonal
+        target = np.array([[i / n_obs,
+                            ((i % 2) * i + ((i + 1) % 2) * (n_obs - i)) / n_obs] for i in range(n_obs)])
 
     else:
         raise Exception('This type of target dependence is not supported')
