@@ -516,7 +516,7 @@ class TestMVO(unittest.TestCase):
             output = fake_out.getvalue().strip()
             self.assertTrue('Portfolio Return = 0.017362404155484328' in output)
             self.assertTrue('Portfolio Risk = 9.385801639141577e-06' in output)
-            self.assertTrue('Portfolio Sharpe Ratio = 9.385801639141577e-06' in output)
+            self.assertTrue('Portfolio Sharpe Ratio = -4.125045816381286' in output)
 
     def test_custom_objective_function(self):
         """

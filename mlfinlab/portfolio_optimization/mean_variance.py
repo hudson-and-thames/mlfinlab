@@ -182,7 +182,7 @@ class MeanVarianceOptimisation:
 
         print("Portfolio Return = %s" % self.portfolio_return)
         print("Portfolio Risk = %s" % self.portfolio_risk)
-        print("Portfolio Sharpe Ratio = %s" % self.portfolio_risk)
+        print("Portfolio Sharpe Ratio = %s" % self.portfolio_sharpe_ratio)
 
     def plot_efficient_frontier(self, covariance, expected_asset_returns, min_return=0, max_return=0.4,
                                 risk_free_rate=0.05):
