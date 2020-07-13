@@ -108,6 +108,8 @@ class TestCodependence(unittest.TestCase):
                                                 target_dependence='comonotonicity')
         ot_matrix_counter = get_dependence_matrix(self.X_matrix, dependence_method='optimal_transport',
                                                   target_dependence='countermonotonicity')
+        ot_matrix_gauss = get_dependence_matrix(self.X_matrix, dependence_method='optimal_transport',
+                                                target_dependence='gaussian', gaussian_corr=0.6)
 
         #Distance_matrix
         angl = get_distance_matrix(vi_matrix, distance_metric='angular')
@@ -123,6 +125,7 @@ class TestCodependence(unittest.TestCase):
         self.assertEqual(gnpr_matrix.shape[0], self.X_matrix.shape[1])
         self.assertEqual(ot_matrix_comon.shape[0], self.X_matrix.shape[1])
         self.assertEqual(ot_matrix_counter.shape[0], self.X_matrix.shape[1])
+        self.assertEqual(ot_matrix_gauss.shape[0], self.X_matrix.shape[1])
 
         self.assertEqual(angl.shape[0], self.X_matrix.shape[1])
         self.assertEqual(sq_angl.shape[0], self.X_matrix.shape[1])
