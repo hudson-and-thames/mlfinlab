@@ -27,7 +27,8 @@ def _get_empirical_copula(x: np.array, y: np.array) -> np.array:
 
     return empirical
 
-def optimal_transport_distance(x: np.array, y: np.array, target_dependence: str = 'comonotonicity') -> float:
+def optimal_transport_distance(x: np.array, y: np.array, target_dependence: str = 'comonotonicity',
+                               gaussian_corr: float = 0.7) -> float:
     """
     Calculates optimal transport distance between two vectors.
 
@@ -42,11 +43,13 @@ def optimal_transport_distance(x: np.array, y: np.array, target_dependence: str 
 
     - ``comonotonicity`` - a comonotone copula.
     - ``countermonotonicity`` - a countermonotone copula.
+    - ``gaussian`` - a Gaussain copula with custom correlation coefficient.
 
     :param x: (np.array) X vector.
     :param y: (np.array) Y vector.
     :param target_dependence: (str) Type of target dependence to use when measuring distance.
                                     (``comonotonicity`` by default)
+    :param gaussian_corr: (str) Correlation coefficient to use when creating Gaussian copula. (0.7 by default)
     :return: (float) Optimal transport distance.
     """
 
@@ -58,7 +61,7 @@ def optimal_transport_distance(x: np.array, y: np.array, target_dependence: str 
                                               np.random.uniform(size=n_obs))])
 
     # Creating target copula with a given dependence type
-    target = _create_target_copula(target_dependence, n_obs)
+    target = _create_target_copula(target_dependence, n_obs, gaussian_corr)
 
     # Creating empirical copula from observaions
     empirical = _get_empirical_copula(x, y)
@@ -107,7 +110,7 @@ def _create_target_copula(target_dependence: str, n_obs: int, gauss_corr: float)
     Creates target copula with given dependence an number of observations.
 
     :param target_dependence: (str) Type of dependence to use for copula creation.[``comonotonicity``,
-                                    ``countermonotonicity``]
+                                    ``countermonotonicity``, ``gaussian``]
     :param n_obs: (int) Number of observations to use for copula creation.
     :param gauss_corr: (float) Correlation coefficient to use when creating Gaussian copula.
     :return: (np.array) Resulting copula.
@@ -129,9 +132,9 @@ def _create_target_copula(target_dependence: str, n_obs: int, gauss_corr: float)
         target = np.random.multivariate_normal(mean, cov, n_obs)
 
         # Ranking observations - getting copula as a result
-        target.T[0] = rankdata(target.T[0]) / len(target.T[0])
-        target.T[1] = rankdata(target.T[1]) / len(target.T[1])
-        
+        target.T[0] = ss.rankdata(target.T[0]) / len(target.T[0])
+        target.T[1] = ss.rankdata(target.T[1]) / len(target.T[1])
+
     else:
         raise Exception('This type of target dependence is not supported')
 
