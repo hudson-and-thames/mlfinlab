@@ -1,4 +1,4 @@
-.. _implementations-codependence_marti:
+.. _codependence-codependence_marti:
 
 .. note::
    The following implementations and documentation closely follow the work of Gautier Marti:

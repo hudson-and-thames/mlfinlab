@@ -46,9 +46,9 @@ def optimal_transport_distance(x: np.array, y: np.array, target_dependence: str 
     - ``gaussian`` - a Gaussian copula with a custom correlation coefficient.
     - ``positive_negative`` - a copula of both positive and negative correlation.
     - ``different_variations`` - a copula with some elements having extreme variations,
-                                 while those of others are relatively small, and conversely.
+      while those of others are relatively small, and conversely.
     - ``small_variations`` - a copula with elements being positively correlated for small variations
-                             but uncorrelated otherwise.
+      but uncorrelated otherwise.
 
     :param x: (np.array) X vector.
     :param y: (np.array) Y vector.
