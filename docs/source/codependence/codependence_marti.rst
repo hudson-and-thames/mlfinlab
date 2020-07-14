@@ -177,7 +177,8 @@ The following example shows how the above functions can be used:
 .. code-block::
 
    import pandas as pd
-   from mlfinlab.codependence import spearmans_rho, gpr_distance, gnpr_distance
+   from mlfinlab.codependence import spearmans_rho, gpr_distance, gnpr_distance,
+                                     get_dependence_matrix
 
    # Getting the dataframe with time series of returns
    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
@@ -194,6 +195,11 @@ The following example shows how the above functions can be used:
 
    # Calculating the GNPR distance between two time series with dependence information only
    gnpr_dist = gnpr_distance(data[element_x], data[element_y], theta=1)
+
+   # Calculating the GNPR distance between all time series with both
+   # distribution and dependence information
+   gnpr_matrix = get_dependence_matrix(data, dependence_method='gnpr_distance',
+                                       ftheta=0.5)
 
 Research Notebooks
 ##################
