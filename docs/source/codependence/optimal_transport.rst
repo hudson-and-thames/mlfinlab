@@ -39,11 +39,22 @@ With this geometric view,
 
 With this optimal copula transport tool, one can look for answers to, for example:
 
-    a. “Which pairs of assets are both positively and negatively correlated?”
+    A. “Which pair of assets having :math:`\rho = 0.7` correlation has the nearest copula to the Gaussian one?”
 
-    b. “Which assets occur extreme variations while those of others are relatively small, and conversely?”
+    B. “Which pairs of assets are both positively and negatively correlated?”
 
-    c. “Which pairs of assets are positively correlated for small variations but uncorrelated otherwise?”
+    C. “Which assets occur extreme variations while those of others are relatively small, and conversely?”
+
+    D. “Which pairs of assets are positively correlated for small variations but uncorrelated otherwise?”
+
+.. figure:: images/target_copulas.png
+   :scale: 100 %
+   :align: center
+   :figclass: align-center
+   :alt: Target Copulas
+
+   Target copulas (simulated or handcrafted) and their respective nearest copulas which an-swer questions A,B,C,D. (Source: Exploring and measuring non-linear correlations: Copulas, Lightspeed Transportation and Clustering)
+
 
 .. Tip::
    For an example comparing the behaviour of Optimal Transport distacne to Pearson's correlation, Spearman's rho,
@@ -100,6 +111,15 @@ jointly encode all the dependence. They allow to study scale-free measures of de
 to  monotonous  transformations  of  the  variables. Some  copulas  play  a major role in the measure of dependence,
 namely :math:`W` and :math:`M` the Frechet-Hoeffding copula bounds, and the independence
 copula :math:`П(u_i,u_j) =u_i u_j`.
+
+.. figure:: images/dependence_copulas.png
+   :scale: 100 %
+   :align: center
+   :figclass: align-center
+   :alt: Dependence Copulas
+
+   Copulas  measure  (left  column)  and  cumulative  distribution  function  (right  column) heatmaps for negative dependence (first row), independence (second row), i.e.  the uniform distribution over :math:`[0, 1]^2`, and positive dependence (third row) (Source: Exploring and measuring non-linear correlations: Copulas, Lightspeed Transportation and Clustering)
+
 
 
 **Proposition 1 (Frechet-Hoeffding copula bounds)** For any copula :math:`C: [0, 1]^2 → [0, 1]` and
