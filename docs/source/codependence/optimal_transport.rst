@@ -95,6 +95,89 @@ distribution :math:`C` such that :math:`F(X_i, X_j) = C(F_i(X_i), F_j(X_j))` .
 :math:`C` , the copula of :math:`X` , is the bivariate distribution of uniform
 marginals :math:`U_i, U_j:=F_i(X_i), F_j(X_j)`
 
+Copulas  are  central  for  studying  the  dependence  between  random  variables:  their  uniform marginals
+jointly encode all the dependence. They allow to study scale-free measures of dependence  and  are invariant
+to  monotonous  transformations  of  the  variables. Some  copulas  play  a major role in the measure of dependence,
+namely :math:`W` and :math:`M` the Frechet-Hoeffding copula bounds, and the independence
+copula :math:`П(u_i,u_j) =u_i u_j`.
+
+
+**Proposition 1 (Frechet-Hoeffding copula bounds)** For any copula :math:`C: [0, 1]^2 → [0, 1]` and
+any :math:`(u_i, u_j) \in [0, 1]^2` the following bounds hold:
+
+.. math::
+
+    W(u_i, u_j) \le C(u_i, u_j) \le M(u_i, u_j)
+
+where :math:`W(u_i, u_j) = max \{u_i + u_j−1, 0 \}` is the copula for countermonotonic
+random variables and :math:`M(u_i, u_j) = min \{ u_i, u_j \}` is the copula for comonotonic random variables.
+
+Notice  that  when  working  with  empirical  data,  we  do  not  know  a  priori  the  margins
+:math:`F_i` for applying the probability integral transform :math:`U_i := F_i(X_i)` . Deheuvels in has introduced a
+practical estimator for the uniform margins and the underlying copula, the empirical copula transform.
+
+**Definition 1 (Empirical Copula Transform)** Let :math:`(X^t_i, X^t_j), t = 1, ..., T` , be :math:`T` observations
+from a random vector :math:`(X_i, X_j)` with continuous margins. Since one cannot directly obtain the corresponding
+copula observations :math:`(U^t_i, U^t_j) := (F_i(X^t_i), F_j(X^t_j))` , where :math:`t = 1, ..., T` , without
+knowing a priori :math:`F_i` , one can instead estimate the empirical
+margins :math:`F^T_i(x) = \frac{1}{T}\sum^T_{t=1}I(X^t_i \le x)` , to obtain the :math:`T` empirical
+observations :math:`(\tilde{U}^t_i, \tilde{U}^t_j) := (F^T_i(X^t_i), F^T_j(X^t_j))` . Equivalently,
+since :math:`U^t_i = R^t_i / T, R^t_i` being the rank of observation :math:`X^t_i` , the empirical copula
+transform can be considered as the normalized rank transform.
+
+The idea of optimal transport is intuitive. It was first formulated by Gaspard Monge in 1781 as a problem to
+efficiently level the ground:  Given that work is measured by the distance multipliedby the amount of dirt
+displaced, what is the minimum amount of work required to level the ground? Optimal transport plans and distances
+give the answer to this problem. In practice, empirical distributions can be represented by histograms. We follow
+notations from(Cuturi, 2013).
+
+Let :math:`r, c` be two histograms in the probability simplex :math:`\sum_m = \{x \in R^m_+ : x^T 1_m = 1\}` .
+Let :math:`U(r, c) = \{ P \in R^{m × m}_+ | P1_m = r, P^T 1_m = c\}` be the transportation polytope
+of :math:`r` and :math:`c` ,that is the set containing all possible transport plans between :math:`r` and :math:`c` .
+
+**Definition 2 (Optimal Transport)** Given a :math:`m × m` cost matrix :math:`M`, the cost of mapping :math:`r` to
+:math:`c` using a transportation matrix :math:`P` can be quantified as:math:`〈 P, M 〉_F` , where :math:`〈·, ·〉_F` is
+the Frobenius dot-product. The optimal transport between :math:`r` and :math:`c` given transportation cost
+:math:`M` is thus:
+
+.. math::
+
+    d_M(r, c) := min_{P \in U (r, c)}〈P, M〉_F
+
+Whenever :math:`M` belongs to the cone of distance matrices, the optimum of the transportation problem
+:math:`d_M(r, c)` is itself a distance.
+
+Using the optimal transport distance between copulas, we now propose a dependence coefficient which is parameterized
+by two sets of copulas: target copulas andf orget copulas.
+
+**Definition 3 (Target/Forget Dependence Coefficient)** Let :math:`{C^−_l}_l` be the set of forget-dependence copulas.
+Let :math:`{C^+_k}_k` be the set of target-dependence copulas. Let :math:`C` be the copula of :math:`(X_i, X_j)` .
+Let :math:`d_M` be an optimal transport distance parameterized by a ground metric :math:`M` . We  define
+the Target/Forget Dependence Coefficient as:
+
+.. math::
+
+    TFDC(X_i, X_j; {C^+_k}_k, {C^−_l}_l) := \frac{min_l d_M(C^−_l, C)}{min_l d_M(C^−_l, C) + min_k d_M(C, C^+_k)} \in [0,1]
+
+Using this  definition,  we  obtain:
+
+.. math::
+
+    TFDC (X_i, X_j; {C:+_k}_k, {C:−_l}_l) = 0 ⇔ C \in {C^−_l}_l
+
+    TFDC(X_i ,X_j; {C^+_k}_k, {C^−_l}_l) = 1 ⇔ C \in {C^+_k}_k
+
+
+It is known by risk managers how dangerous it can be to rely solely on a correlation coefficient
+to measure dependence.  That is why we have proposed a novel approach to explore, summarize and measure the
+pairwise correlations which exist between variables in a dataset. The experiments show the benefits of the
+proposed method: It allows to highlight the various dependence patterns that canbe found between financial
+time series, which strongly depart from the Gaussian copula widely usedin financial engineering.
+Though answering dependence queriesas briefly outlined is still an art, we plan to develop a rich language so
+that a user can formulate complex questions about dependence, which will be automatically translated into
+copulas in order to let the methodology provide these questions accurate answers.
+
+
 Implementation
 ##############
 
