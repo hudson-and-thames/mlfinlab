@@ -11,7 +11,45 @@
 Optimal Transport
 =================
 
-...
+The basic idea of the optimal copula transport dependence measure is rather simple. It relies on leveraging:
+
+    1. Copulas, which are distributions encoding fully the dependence between random variables.
+
+    2. A geometrical point of view: Where does the empirical copula stand in the space of copulas?
+       In particular, how far is it from reference copulas such as the Fréchet–Hoeffding copula bounds
+       (copulas associated to comonotone, countermonotone, independent random variables)?
+
+.. figure:: images/optimal_transport_distance.png
+   :scale: 100 %
+   :align: center
+   :figclass: align-center
+   :alt: Optimal Transport distance
+
+   Dependence is measured as the relative distance from independence to the nearest target-dependence: comonotonicity or countermonotonicity. (Source: Measuring non-linear dependence with Optimal Transport)
+
+With this geometric view,
+
+    1. It is rather easy to extend this novel dependence measure to alternative use cases
+       (e.g. by changing the reference copulas).
+
+    2. It can also allow to look for specific patterns in the dependence structure
+       (generalization of conditional correlation): Typically, one would try to answer
+       “What is the correlation between these two stocks knowing that the VIX is above 40?”
+       (e.g. estimate ρXY|Z>z;
+
+With this optimal copula transport tool, one can look for answers to, for example:
+
+    a. “Which pairs of assets are both positively and negatively correlated?”
+
+    b. “Which assets occur extreme variations while those of others are relatively small, and conversely?”
+
+    c. “Which pairs of assets are positively correlated for small variations but uncorrelated otherwise?”
+
+.. Tip::
+   For an example comparing the behaviour of Optimal Transport distacne to Pearson's correlation, Spearman's rho,
+   and Kendall tau distance, please read this blogpost by Gautier Marti:
+   `Measuring non-linear dependence with Optimal Transport <https://gmarti.gitlab.io/qfin/2020/06/25/copula-optimal-transport-dependence.html>`_.
+
 
 Optimal Transport distance
 ==========================
