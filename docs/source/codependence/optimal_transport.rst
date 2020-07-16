@@ -54,7 +54,46 @@ With this optimal copula transport tool, one can look for answers to, for exampl
 Optimal Transport distance
 ==========================
 
-...
+According to the description of the method from the original paper by Marti et al.:
+
+This methodology allows using copulas to encode dependence between variables, state-of-the-art optimal transport
+for providing a relevant geometry to the copulas, andclustering for summarizing the main dependence patterns found
+between the variables.
+
+The idea of the approach is to "target specific dependence patterns and ignore others. We want to target dependence
+which are relevant to such or such problem, and forget about the dependence which are not in the scope of the problems
+at hand, or even worse which may be spurious associations (pure chance or artifacts in the data)."
+
+
+The proposed codepependence coefficient "can be parameterized by a set of target-dependences, and a set
+of forget-dependences. Sets of target and forget dependences can be built using expert hypotheses,
+or by leveraging the centers of clusters resulting from an exploratory clustering of the pairwise dependences.
+To achieve this goal, we will leverage three tools: copulas, optimal transportation, and clustering."
+
+
+Optimal transport is based on the underlying theory of the Earth Mover’s Distance. Until very recently,
+optimal transportation distances between distributions were not deemed relevant for machine learning applications
+since the best computational cost known was super-cubic to the number of bins used for discretizing the
+distribution supports which grows itself exponentially with the dimension. A mere distance evaluation
+could take several seconds!
+
+Copulas and optimal transportation are not yet mainstream tools, but they have recently gained attention
+in machine learning, and several copula-based dependence measures have been proposed for improving
+feature selection methods.
+
+
+Copulas are functions that couple multivariate distribution functions to their univariate marginal distribution functions.
+
+According to the original paper, bivariate copulas are considered, as higher dimensions would cost high computational burden.
+But but most of the results and the methodology presented hold in the multivariate setting.
+
+
+**Theorem 1 (Sklar’s Theorem)** Let :math:`X = (X_i, X_j)` be  a random  vector with  a joint
+cumulative distribution function :math:`F` , and having continuous marginal cumulative
+distribution functions :math:`F_i, F_j` respectively. Then, there exists a unique
+distribution :math:`C` such that :math:`F(X_i, X_j) = C(F_i(X_i), F_j(X_j))` .
+:math:`C` , the copula of :math:`X` , is the bivariate distribution of uniform
+marginals :math:`U_i, U_j:=F_i(X_i), F_j(X_j)`
 
 Implementation
 ##############
