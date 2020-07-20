@@ -79,7 +79,7 @@ An alternative way of estimating the Mutual information is through using copulas
 A link between Mutual information and copula entropy was presented in the paper by
 `Ma, Jian & Sun, Zengqi. (2008). Mutual information is copula entropy <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_.
 
-`A blog post by Dr. Gautier Marti <https://gmarti.gitlab.io/qfin/2020/07/01/mutual-information-is-copula-entropy.html>`_
+`A blog post by Gautier Marti <https://gmarti.gitlab.io/qfin/2020/07/01/mutual-information-is-copula-entropy.html>`_
 includes descriptions of two alternative estimators of copula entropy:
 
 - First, estimate the copula (as a normalized ranking of the observations). Then apply the standard
@@ -110,7 +110,7 @@ includes descriptions of two alternative estimators of copula entropy:
     I[X, Y] = (-1) * H[C(X, Y)]
     \end{gather*}
 
-According to Dr. Marti, these two estimators have some advantages over the standard approach:
+According to Gautier Marti, these two estimators have some advantages over the standard approach:
 
 -  First, continuous marginals (think the distribution of returns of each stock) have a potentially
    unbounded support making it hard to bin properly.
@@ -208,7 +208,7 @@ The following example highlights how the various metrics behave under various va
     import numpy as np
     import matplotlib.pyplot as plt
 
-    from mlfinlab.codependence import distance_correlation, get_mutual_info, variation_of_information_score
+    from mlfinlab.codependence (import distance_correlation, get_mutual_info, variation_of_information_score)
     from ace import model # ace package is used for max correlation estimation
 
     def max_correlation(x: np.array, y: np.array) -> float:

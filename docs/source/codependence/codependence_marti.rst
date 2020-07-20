@@ -177,8 +177,8 @@ The following example shows how the above functions can be used:
 .. code-block::
 
    import pandas as pd
-   from mlfinlab.codependence import spearmans_rho, gpr_distance, gnpr_distance,
-                                     get_dependence_matrix
+   from mlfinlab.codependence import (spearmans_rho, gpr_distance, gnpr_distance,
+                                     get_dependence_matrix)
 
    # Getting the dataframe with time series of returns
    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])

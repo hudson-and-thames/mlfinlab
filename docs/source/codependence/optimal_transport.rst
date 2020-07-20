@@ -31,7 +31,7 @@ As described by Gautier Marti `here <https://gmarti.gitlab.io/qfin/2020/06/25/co
    Dependence is measured as the relative distance from independence to the nearest target-dependence: comonotonicity or
    countermonotonicity. `(Blog post by Gautier Marti) <https://gmarti.gitlab.io/qfin/2020/06/25/copula-optimal-transport-dependence.html>`__
 
-"With this geometric view,
+"With this geometric view:
 
     1. It is rather easy to extend this novel dependence measure to alternative use cases
        (e.g. by changing the reference copulas).
@@ -217,8 +217,8 @@ The following example shows how the optimal transport distance can be used:
 .. code-block::
 
    import pandas as pd
-   from mlfinlab.codependence import optimal_transport_distance,
-                              get_dependence_matrix
+   from mlfinlab.codependence import (optimal_transport_distance,
+                                     get_dependence_matrix)
 
    # Getting the dataframe with time series of returns
    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
