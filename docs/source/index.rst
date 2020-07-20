@@ -280,6 +280,7 @@ This project is licensed under an all rights reserved licence.
     codependence/information_theory_metrics
     codependence/codependence_marti
     codependence/codependence_matrix
+    codependence/optimal_transport
 
 .. toctree::
     :maxdepth: 2
