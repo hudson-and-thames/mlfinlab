@@ -269,7 +269,9 @@ class RiskEstimators:
         
         Two denoising methods are supported:
         1. Constant Residual Eigenvalue Method (``const_resid_eigen``)
-        2. Targeted Shrinkage Method (``target_shrink``)
+        2. Spectral Method (``spectral``)
+        3. Targeted Shrinkage Method (``target_shrink``)
+        
         
         The Constant Residual Eigenvalue Method works as follows:
         
@@ -584,9 +586,8 @@ class RiskEstimators:
         corr = self.cov_to_corr(corr)
 
         return corr
-
-    @staticmethod    
-    def _denoised_corr_spectral(eigenvalues, eigenvectors, num_facts):
+  
+    def _denoised_corr_spectral(self, eigenvalues, eigenvectors, num_facts):
         """
         De-noises the correlation matrix using the Spectral method.
         
@@ -614,6 +615,9 @@ class RiskEstimators:
         
          # De-noised correlation matrix
         corr = np.dot(eigenvectors, eigenvalues).dot(eigenvectors.T)
+        
+        # Rescaling the correlation matrix to have 1s on the main diagonal
+        corr = self.cov_to_corr(corr)
         
         return corr
 
@@ -657,21 +661,22 @@ class RiskEstimators:
 
         return corr
 
-    def _detoned_corr(self, corr, market_component=1):
+    def _detoned_corr(self, corr, eigenvalues, eigenvectors, num_facts, market_component=1):
         """
         De-tones the correlation matrix by removing the market component.
-
         The input is the eigenvalues and the eigenvectors of the correlation matrix and the number
         of the first eigenvalue that is above the maximum theoretical eigenvalue and the number of
         eigenvectors related to a market component.
-
         :param corr: (np.array) Correlation matrix to detone.
+        :param eigenvalues: (np.array) Matrix with eigenvalues on the main diagonal.
+        :param eigenvectors: (float) Eigenvectors array.
+        :param num_facts: (float) Threshold for eigenvalues to be fixed.
         :param market_component: (int) Number of fist eigevectors related to a market component. (1 by default)
         :return: (np.array) De-toned correlation matrix.
         """
 
-        # Calculating eigenvalues and eigenvectors of the de-noised matrix
-        eigenvalues, eigenvectors = self._get_pca(corr)
+        # Getting the de-noised correlation matrix
+        corr = self._denoised_corr(eigenvalues, eigenvectors, num_facts)
 
         # Getting the eigenvalues and eigenvectors related to market component
         eigenvalues_mark = eigenvalues[:market_component, :market_component]
@@ -687,3 +692,4 @@ class RiskEstimators:
         corr = self.cov_to_corr(corr)
 
         return corr
+        
