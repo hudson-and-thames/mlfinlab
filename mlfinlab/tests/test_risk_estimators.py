@@ -216,7 +216,7 @@ class TestRiskEstimators(unittest.TestCase):
 
         # Testing if the de-noised correlation matrix is right
         np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
-        
+
     @staticmethod
     def test_denoised_corr_spectral():
         """
@@ -232,15 +232,15 @@ class TestRiskEstimators(unittest.TestCase):
         eigenvectors = np.array([[-3.69048184e-01, -9.29410263e-01, 1.10397126e-16],
                                  [-6.57192300e-01, 2.60956474e-01, 7.07106781e-01],
                                  [6.57192300e-01, -2.60956474e-01, 7.07106781e-01]])
-        
-        # Expected correlation matrix 
+
+        # Expected correlation matrix
         expected_corr = np.array([[1, 1, -1],
                                   [1, 1, -1],
                                   [-1, -1, 1]])
-        
+
         # Finding the de-noised correlation matrix
         corr_matrix = risk_estimators._denoised_corr_spectral(eigenvalues, eigenvectors, 1)
-        
+
         # Testing if the de-noised correlation matrix is right
         np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
 
@@ -308,15 +308,15 @@ class TestRiskEstimators(unittest.TestCase):
         """
         Test the shrinkage the eigenvalues associated with noise.
         """
-        
-        
+
+
         risk_estimators = RiskEstimators()
-        
+
         # Covariance matrix to de-noise and parameters for the theoretical distribution.
         cov_matrix = np.array([[0.01, 0.002, -0.001],
                                [0.002, 0.04, -0.006],
                                [-0.001, -0.006, 0.01]])
-        
+
         tn_relation = 50
         kde_bwidth = 0.25
         alpha = 0.2
@@ -326,52 +326,49 @@ class TestRiskEstimators(unittest.TestCase):
         detone = False
         detone_alt = True
         market_component = 1
-        
+
         # Expected de-noised covariance matrix
         expected_cov = np.array([[0.01, 0.00267029, -0.00133514],
                                  [0.00267029, 0.04, -0.00438387],
                                  [-0.00133514, -0.00438387, 0.01]])
-        
+
         expected_cov_alt = np.array([[0.01, 0.0057, -0.0028],
                                      [0.0057, 0.04, -0.0106],
                                      [-0.0028, -0.0106, 0.01]])
-        
-        expected_cov_alt_2 = np.array([[ 0.01,  0.02, -0.01],
-                                       [ 0.02,  0.04, -0.02],
-                                       [-0.01, -0.02,  0.01]])
-        
+
+        expected_cov_alt_2 = np.array([[0.01, 0.02, -0.01],
+                                       [0.02, 0.04, -0.02],
+                                       [-0.01, -0.02, 0.01]])
+
         expected_cov_detoned = np.array([[0.01, -0.00672445, 0.00336222],
                                          [-0.00672445, 0.04, 0.01769514],
                                          [0.00336222, 0.01769514, 0.01]])
-        
+
         # Finding the de-noised covariance matrix
-        cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method, detone,
-                                                                     market_component, kde_bwidth)
+        cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method, detone, market_component, kde_bwidth)
 
         # Using the alternative de-noising method
-        cov_matrix_denoised_alt = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method_alt,
-                                                                     detone, market_component, kde_bwidth, alpha)
+        cov_matrix_denoised_alt = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method_alt, detone, market_component, kde_bwidth, alpha)
 
         # Using the second alternative of the de-noising method
-        cov_matrix_denoised_alt_2 = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method_alt_2,
-                                                                     detone, market_component, kde_bwidth)
+        cov_matrix_denoised_alt_2 = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method_alt_2, detone, market_component, kde_bwidth)
 
         # Finding the de-toned covariance matrix
         cov_matrix_detoned = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method, detone_alt,
                                                                 market_component, kde_bwidth)
-    
+
         # Testing if the de-noised covariance matrix is right
         np.testing.assert_almost_equal(cov_matrix_denoised, expected_cov, decimal=4)
-    
+
         # Testing if the de-noised covariance matrix is right
         np.testing.assert_almost_equal(cov_matrix_denoised_alt, expected_cov_alt, decimal=4)
-    
+
         # Testing if the de-noised covariance matrix is right
         np.testing.assert_almost_equal(cov_matrix_denoised_alt_2, expected_cov_alt_2, decimal=4)
-    
+
         # Testing if the de-toned covariance matrix is right
         np.testing.assert_almost_equal(cov_matrix_detoned, expected_cov_detoned, decimal=4)
-    
+
 
     def test_minimum_covariance_determinant(self):
         """

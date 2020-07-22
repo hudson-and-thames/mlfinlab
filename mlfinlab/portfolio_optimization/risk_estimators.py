@@ -266,55 +266,55 @@ class RiskEstimators:
                            market_component=1, kde_bwidth=0.01, alpha=0):
         """
         De-noises the covariance matrix or the correlation matrix.
-        
+
         Two denoising methods are supported:
         1. Constant Residual Eigenvalue Method (``const_resid_eigen``)
         2. Spectral Method (``spectral``)
         3. Targeted Shrinkage Method (``target_shrink``)
-        
-        
+
+
         The Constant Residual Eigenvalue Method works as follows:
-        
+
         First, a correlation is calculated from the covariance matrix (if the input is the covariance matrix).
-        
+
         Second, eigenvalues and eigenvectors of the correlation matrix are calculated using the linalg.eigh
         function from numpy package.
-        
+
         Third, a maximum theoretical eigenvalue is found by fitting Marcenko-Pastur (M-P) distribution
         to the empirical distribution of the correlation matrix eigenvalues. The empirical distribution
         is obtained through kernel density estimation using the KernelDensity class from sklearn.
         The fit of the M-P distribution is done by minimizing the Sum of Squared estimate of Errors
         between the theoretical pdf and the kernel. The minimization is done by adjusting the variation
         of the M-P distribution.
-        
+
         Fourth, the eigenvalues of the correlation matrix are sorted and the eigenvalues lower than
         the maximum theoretical eigenvalue are set to their average value. This is how the eigenvalues
         associated with noise are shrinked. The de-noised covariance matrix is then calculated back
         from new eigenvalues and eigenvectors.
-        
-        The Spectral Method works just like the Constant Residual Eigenvalue Method, but instead of replacing 
+
+        The Spectral Method works just like the Constant Residual Eigenvalue Method, but instead of replacing
         eigenvalues lower than the maximum theoretical eigenvalue to their average value, they are replaced with
         zero instead.
-        
+
         The Targeted Shrinkage Method works as follows:
-        
+
         First, a correlation is calculated from the covariance matrix (if the input is the covariance matrix).
-        
+
         Second, eigenvalues and eigenvectors of the correlation matrix are calculated using the linalg.eigh
         function from numpy package.
-        
+
         Third, the correlation matrix composed from eigenvectors and eigenvalues related to noise is
         shrunk using the alpha variable. The shrinkage is done by summing the noise correlation matrix
         multiplied by alpha to the diagonal of the noise correlation matrix multiplied by (1-alpha).
-        
+
         Fourth, the shrinked noise correlation matrix is summed to the information correlation matrix.
-        
+
         Correlation matrix can also be detoned by excluding a number of first eigenvectors representing
         the market component.
-        
+
         These algorithms are reproduced with minor modifications from the following book:
         Marcos Lopez de Prado “Machine Learning for Asset Managers”, (2020).
-        
+
         :param cov: (np.array) Covariance matrix or correlation matrix.
         :param tn_relation: (float) Relation of sample length T to the number of variables N used to calculate the
                                     covariance matrix.
@@ -344,7 +344,7 @@ class RiskEstimators:
         if denoise_method == 'target_shrink':
             # Based on the threshold, de-noising the correlation matrix
             corr = self._denoised_corr_targ_shrink(eigenval, eigenvec, num_facts, alpha)
-        elif denoise_method == 'spectral': 
+        elif denoise_method == 'spectral':
             # Based on the threshold, de-noising the correlation matrix
             corr = self._denoised_corr_spectral(eigenval, eigenvec, num_facts)
         else: # Default const_resid_eigen method
@@ -586,14 +586,14 @@ class RiskEstimators:
         corr = self.cov_to_corr(corr)
 
         return corr
-  
+
     def _denoised_corr_spectral(self, eigenvalues, eigenvectors, num_facts):
         """
         De-noises the correlation matrix using the Spectral method.
-        
+
         The input is the eigenvalues and the eigenvectors of the correlation matrix and the number
         of the first eigenvalue that is below the maximum theoretical eigenvalue.
-        
+
         De-noising is done by shrinking the eigenvalues associated with noise (the eigenvalues lower than
         the maximum theoretical eigenvalue are set to zero, preserving the trace of the
         correlation matrix).
@@ -603,22 +603,22 @@ class RiskEstimators:
         :param num_facts: (float) Threshold for eigenvalues to be fixed.
         :return: (np.array) De-noised correlation matrix.
         """
-        
+
         # Vector of eigenvalues from the main diagonal of a matrix
         eigenval_vec = np.diag(eigenvalues).copy()
-        
+
         # Replacing eigenvalues after num_facts to zero
         eigenval_vec[num_facts:] = 0
-        
+
         # Back to eigenvalues on main diagonal of a matrix
         eigenvalues = np.diag(eigenval_vec)
-        
+
          # De-noised correlation matrix
         corr = np.dot(eigenvectors, eigenvalues).dot(eigenvectors.T)
-        
+
         # Rescaling the correlation matrix to have 1s on the main diagonal
         corr = self.cov_to_corr(corr)
-        
+
         return corr
 
     @staticmethod
@@ -692,4 +692,3 @@ class RiskEstimators:
         corr = self.cov_to_corr(corr)
 
         return corr
-        
