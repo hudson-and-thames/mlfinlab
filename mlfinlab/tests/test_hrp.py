@@ -161,7 +161,6 @@ class TestHRP(unittest.TestCase):
         assert len(weights) == self.data.shape[1]
         np.testing.assert_almost_equal(np.sum(weights), 1)
 
-
     def test_hrp_with_linkage_method(self):
         """
         Test HRP when passing a custom linkage method.
