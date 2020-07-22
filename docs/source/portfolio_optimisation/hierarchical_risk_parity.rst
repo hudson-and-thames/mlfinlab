@@ -177,4 +177,4 @@ The following research notebooks provide a more detailed exploration of the algo
 
 * `How to use mlfinlab's HierarchicalRiskParity class`_
 
-.. _How to use mlfinlab's HierarchicalRiskParity class: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Hierarchical%20Risk%20Parity%20(HRP)/HRP%20use%20examples.ipynb
+.. _How to use mlfinlab's HierarchicalRiskParity class: https://github.com/hudson-and-thames/research/blob/codependence/Portfolio%20Optimisation%20Tutorials/Hierarchical%20Risk%20Parity%20(HRP)/HRP%20Notebook.ipynb

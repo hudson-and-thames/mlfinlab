@@ -250,4 +250,4 @@ The following research notebook can be used to better understand the optimal tra
 
 * `Optimal Transport`_
 
-.. _`Optimal Transport`: https://github.com/hudson-and-thames/research/blob/master/Codependence/Optimal%Transport/optimal_transport.ipynb
+.. _`Optimal Transport`: https://github.com/hudson-and-thames/research/blob/master/Codependence/Optimal%20Transport/optimal_transport.ipynb
