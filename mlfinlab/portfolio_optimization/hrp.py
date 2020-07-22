@@ -64,6 +64,8 @@ class HierarchicalRiskParity:
                 asset_names = asset_prices.columns
             elif asset_returns is not None and isinstance(asset_returns, pd.DataFrame):
                 asset_names = asset_returns.columns
+            elif covariance_matrix is not None and isinstance(covariance_matrix, pd.DataFrame):
+                asset_names = covariance_matrix.columns
             else:
                 raise ValueError("Please provide a list of asset names")
 
@@ -75,13 +77,17 @@ class HierarchicalRiskParity:
         # Calculate covariance of returns or use the user specified covariance matrix
         if covariance_matrix is None:
             covariance_matrix = asset_returns.cov()
-        covariance_matrix = pd.DataFrame(covariance_matrix, index=asset_names, columns=asset_names)
+        covariance_matrix = self._nan_and_diagonal_checks(covariance_matrix, nan_fill_value=0)
 
-        # Calculate correlation and distance from covariance matrix
+        # Calculate correlation matrix from the covariance matrix
         correlation_matrix = self.risk_estimator.cov_to_corr(covariance_matrix)
+        correlation_matrix = self._nan_and_diagonal_checks(correlation_matrix, nan_fill_value=0, diagonal_fill_value=1)
+
+        # Calculate the distance matrix or use a custom one
         if distance_matrix is None:
             distance_matrix = np.sqrt((1 - correlation_matrix).round(5) / 2)
         distance_matrix = pd.DataFrame(distance_matrix, index=asset_names, columns=asset_names)
+        distance_matrix = self._nan_and_diagonal_checks(distance_matrix, nan_fill_value=0, diagonal_fill_value=0)
 
         # Step-1: Tree Clustering
         self.clusters = self._tree_clustering(distance=distance_matrix, method=linkage)
@@ -112,6 +118,20 @@ class HierarchicalRiskParity:
 
         dendrogram_plot = dendrogram(self.clusters, labels=assets)
         return dendrogram_plot
+
+    def _nan_and_diagonal_checks(self, matrix, nan_fill_value=0, diagonal_fill_value=None):
+        """
+        Check for any NaN values in the matrix and discrepancies in the diagonal values.
+        :param matrix: (pd.DataFrame) The matrix which needs to be processed.
+        :param nan_fill_value: (float) Replacement value for NaNs
+        :param diagonal_fill_value: (float) The values to use for filling the diagonal.
+        :return: (pd.DataFrame) Processed matrix.
+        """
+
+        matrix = matrix.fillna(nan_fill_value)
+        if diagonal_fill_value:
+            np.fill_diagonal(matrix.values, val=diagonal_fill_value)
+        return matrix
 
     @staticmethod
     def _tree_clustering(distance, method='single'):
@@ -190,6 +210,7 @@ class HierarchicalRiskParity:
 
         inv_diag = 1 / np.diag(covariance.values)
         parity_w = inv_diag * (1 / np.sum(inv_diag))
+        parity_w = np.nan_to_num(parity_w)
         return parity_w
 
     def _get_cluster_variance(self, covariance, cluster_indices):
@@ -230,6 +251,11 @@ class HierarchicalRiskParity:
                 left_cluster_variance = self._get_cluster_variance(covariance, left_cluster)
                 right_cluster_variance = self._get_cluster_variance(covariance, right_cluster)
                 alloc_factor = 1 - left_cluster_variance / (left_cluster_variance + right_cluster_variance)
+
+                # If for some reason the allocation factor is not calculated properly due to NaNs in the data, then split
+                # the allocation equally between the two clusters.
+                if np.isnan(alloc_factor):
+                    alloc_factor = 0.5
 
                 # Assign weights to each sub-cluster
                 self.weights[left_cluster] *= alloc_factor

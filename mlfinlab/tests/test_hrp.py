@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from mlfinlab.portfolio_optimization.hrp import HierarchicalRiskParity
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
+from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
 
 
 class TestHRP(unittest.TestCase):
@@ -136,11 +137,7 @@ class TestHRP(unittest.TestCase):
         hrp = HierarchicalRiskParity()
         returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
         covariance = returns.cov()
-        d_matrix = np.zeros_like(covariance)
-        diagnoal_sqrt = np.sqrt(np.diag(covariance))
-        np.fill_diagonal(d_matrix, diagnoal_sqrt)
-        d_inv = np.linalg.inv(d_matrix)
-        corr = np.dot(np.dot(d_inv, covariance), d_inv)
+        corr = RiskEstimators.cov_to_corr(covariance)
         corr = pd.DataFrame(corr, index=covariance.columns, columns=covariance.columns)
         distance_matrix = np.sqrt((1 - corr).round(5) / 2)
         hrp.allocate(asset_names=self.data.columns, covariance_matrix=covariance, distance_matrix=distance_matrix)
@@ -148,6 +145,21 @@ class TestHRP(unittest.TestCase):
         self.assertTrue((weights >= 0).all())
         self.assertTrue(len(weights) == self.data.shape[1])
         self.assertAlmostEqual(np.sum(weights), 1)
+
+    def test_hrp_with_nan_inputs(self):
+        """
+        Test HRP with NaN inputs
+        """
+
+        hrp = HierarchicalRiskParity()
+        returns = ReturnsEstimators().calculate_returns(asset_prices=self.data)
+        covariance = returns.cov()
+        covariance *= np.nan
+        hrp.allocate(covariance_matrix=covariance)
+        weights = hrp.weights.values[0]
+        assert (weights >= 0).all()
+        assert len(weights) == self.data.shape[1]
+        np.testing.assert_almost_equal(np.sum(weights), 1)
 
     def test_value_error_when_passing_ward(self):
         """
