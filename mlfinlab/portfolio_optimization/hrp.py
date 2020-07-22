@@ -120,7 +120,8 @@ class HierarchicalRiskParity:
         dendrogram_plot = dendrogram(self.clusters, labels=assets)
         return dendrogram_plot
 
-    def _nan_and_diagonal_checks(self, matrix, nan_fill_value=0, diagonal_fill_value=None):
+    @staticmethod
+    def _nan_and_diagonal_checks(matrix, nan_fill_value=0, diagonal_fill_value=None):
         """
         Check for any NaN values in the matrix and discrepancies in the diagonal values.
 
