@@ -4,6 +4,8 @@ import pandas as pd
 from sklearn.neighbors import KernelDensity
 from sklearn.covariance import MinCovDet, EmpiricalCovariance, ShrunkCovariance, LedoitWolf, OAS
 from scipy.optimize import minimize
+from scipy.cluster.hierarchy import average, complete, single, dendrogram
+from matplotlib import pyplot as plt
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
@@ -262,6 +264,94 @@ class RiskEstimators:
 
         return cov_matrix
 
+    @staticmethod
+    def filter_corr_hierarchical(cor_matrix, method='complete', plot=False):
+        """
+            Creates a filtered correlation matrix using hierarchical clustering methods from an empirical 
+            correlation matrix, given that all values are non-negative [0 ~ 1]
+
+            This function allows for three types of hierarchical clustering - complete, single, and average 
+            linkage clusters. Link to hierarchical clustering methods documentation:
+            <https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html>`_
+
+            It works as follows:
+
+            First, the method creates a hierarchical clustering tree using scipy's hierarchical clustering methods 
+            from the empirical 2-D correlation matrix.
+
+            Second, it extracts and stores each cluster's filtered value (alpha) and assigns it to it's corresponding leaf.
+
+            Finally, we create a new filtered matrix by assigning each of the correlations to their corresponding 
+            parent node's alpha value.
+
+            :param cor_matrix: (np.array) Numpy array of an empirical correlation matrix.
+            :param method: (str) Hierarchical clustering method to use. (``complete`` by default, ``single``, ``average``)
+            :param plot (bool) Plots the hierarchical cluster tree. (False by default)
+            :return: (np.array) The filtered correlation matrix.
+        """
+        # pylint: disable=too-many-branches
+
+        # Check if all matrix elements are positive
+        if np.any(cor_matrix < 0):
+            print('ERROR: Not all elements in matrix are negative... Returning unfiltered matrix.')
+            return cor_matrix
+
+        # Check if matrix is 2-D
+        if len(cor_matrix.shape) == 2:
+            cor_x, cor_y = cor_matrix.shape
+        else:
+            print('ERROR: Invalid matrix dimensions, input must be 2-D array... Returning unfiltered matrix.')
+            return cor_matrix
+
+        # Check if matrix dimensions and diagonal values are valid.
+        if cor_x == cor_y and np.allclose(np.diag(cor_matrix), 1): # using np.allclose as diag values might be 0.99999
+            # Creating new coorelation condensed matrix for the upper triangle and dismissing the diagnol.
+            new_cor = cor_matrix[np.triu_indices(cor_matrix.shape[0], k=1)]
+        else: 
+            print('ERROR: Invalid matrix, input must be a correlation matrix of size (m x m)... Returning unfiltered matrix.')
+            return cor_matrix
+
+        # Compute the hierarchical clustering tree
+        if method == 'complete':
+            z_cluster = complete(new_cor)
+        elif method == 'single':
+            z_cluster = single(new_cor)
+        elif method == 'average':
+            z_cluster = average(new_cor)
+        else:
+            print('ERROR: Invalid method selected, please check docstring... Returning unfiltered matrix.')
+            return cor_matrix
+
+        # Plot the hierarchical cluster tree
+        if plot:
+            fig = plt.figure(figsize=(10, 6))
+            axis = fig.add_subplot(111)
+            dendrogram(z_cluster, ax=axis)
+            plt.show()
+
+        # Creates a pd.DataFrame that will act as a dictionary where the index is the leaf node id, and the values are
+        # thier corresponding cluster's alpha value
+        alpha_values = z_cluster[:, 2]
+        alphas = z_cluster[:, 0]
+        df_alphas = pd.DataFrame(alpha_values, index=alphas)
+        df_alphas.loc[z_cluster[0][1]] = alpha_values[0]
+
+        # Creates the filtered correlation matrix
+        filt_corr = np.ones((cor_x, cor_y), dtype=np.float64)
+        for x_ax in range(0, filt_corr.shape[0]):
+            for y_ax in range(0, filt_corr.shape[1]):
+                # Ignore the diagonal
+                if x_ax != y_ax:
+                    x_val = df_alphas.loc[[x_ax]][0].item()
+                    y_val = df_alphas.loc[[y_ax]][0].item()
+                    # Find the cluster's alpha value for the tree leaves id
+                    _max = np.max([x_val, y_val])
+                    # Set the new filtered matrix to the corresponding cluster's alpha value
+                    filt_corr[x_ax, y_ax] = _max
+        
+        # pylint: enable=too-many-branches
+        return filt_corr
+    
     def denoise_covariance(self, cov, tn_relation, denoise_method='const_resid_eigen', detone=False,
                            market_component=1, kde_bwidth=0.01, alpha=0):
         """
