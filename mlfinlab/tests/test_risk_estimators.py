@@ -304,6 +304,68 @@ class TestRiskEstimators(unittest.TestCase):
         np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
 
     @staticmethod
+    def test_filter_corr_hierarchical():
+        """
+        Test the filtering of the emperical correlation matrix.
+        """
+
+        risk_estimators = RiskEstimators()
+
+        # Correlation matrix to test
+        corr = np.array([[1, 0.70573243, 0.03085437, 0.6019651, 0.81214341],
+                         [0.70573243, 1, 0.03126594, 0.56559443, 0.88961155],
+                         [0.03085437, 0.03126594, 1, 0.01760481, 0.02842086],
+                         [0.60196510, 0.56559443, 0.01760481, 1, 0.73827921],
+                         [0.81214341, 0.88961155, 0.02842086, 0.73827921, 1]])
+
+        expected_corr_avg = np.array([[1, 0.44618396, 0.44618396, 0.44618396, 0.61711376],
+                                      [0.44618396, 1, 0.29843018, 0.29843018, 0.61711376],
+                                      [0.44618396, 0.29843018, 1, 0.01760481, 0.61711376],
+                                      [0.44618396, 0.29843018, 0.01760481, 1, 0.61711376],
+                                      [0.61711376, 0.61711376, 0.61711376, 0.61711376, 1]])
+
+        expected_corr_single = np.array([[1, 0.03126594, 0.03085437, 0.03085437, 0.03085437],
+                                         [0.03126594, 1, 0.03126594, 0.03126594, 0.03126594],
+                                         [0.03085437, 0.03126594, 1, 0.01760481, 0.02842086],
+                                         [0.03085437, 0.03126594, 0.01760481, 1, 0.02842086],
+                                         [0.03085437, 0.03126594, 0.02842086, 0.02842086, 1]])
+
+        expected_corr_complete = np.array([[1, 0.70573243, 0.70573243, 0.70573243, 0.88961155],
+                                           [0.70573243, 1, 0.56559443, 0.56559443, 0.88961155],
+                                           [0.70573243, 0.56559443, 1, 0.01760481, 0.88961155],
+                                           [0.70573243, 0.56559443, 0.01760481, 1, 0.88961155],
+                                           [0.88961155, 0.88961155, 0.88961155, 0.88961155, 1]])
+
+        methods_list = ['complete', 'single', 'average']
+        # Compute all methods with given correlation matrix
+        corr_complete, corr_single, corr_average = [risk_estimators.filter_corr_hierarchical(corr, methods, plot=True) for methods in methods_list]
+        
+        # Test plot
+        risk_estimators.filter_corr_hierarchical(corr, plot=True)
+
+        # Testing is filtered matricies are consistent with expected values.
+        np.testing.assert_almost_equal(corr_complete, expected_corr_complete, decimal=4)
+        np.testing.assert_almost_equal(corr_single, expected_corr_single, decimal=4)
+        np.testing.assert_almost_equal(corr_average, expected_corr_avg, decimal=4)
+
+        # Testing input matrix with invalid inputs.
+        bad_dimesion = np.array([1, 0])
+        bad_size = np.array([[1, 0, 1], [0, 1, 1]])
+        non_positive = np.array([[1, -1], [0, 1]])
+        non_sym = np.array([[0, 0], [0, 0]])
+
+        bad_inputs = [bad_dimesion, bad_size, non_positive, non_sym]
+        bad_inputs_results = [risk_estimators.filter_corr_hierarchical(bads) for bads in bad_inputs]
+
+        # Testing with invalid method parameter
+        bad_inputs_results.append(risk_estimators.filter_corr_hierarchical(corr, method='bad'))
+
+        # Testing to see if failed return fetches the unfiltered correlation array
+        for result in bad_inputs_results:
+            np.testing.assert_almost_equal(result, corr, decimal=4)
+
+
+    @staticmethod
     def test_denoise_covariance():
         """
         Test the shrinkage the eigenvalues associated with noise.
