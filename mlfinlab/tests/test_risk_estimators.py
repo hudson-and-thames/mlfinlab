@@ -356,14 +356,14 @@ class TestRiskEstimators(unittest.TestCase):
 
         bad_inputs = [bad_dimesion, bad_size, non_positive, non_sym]
         bad_inputs_results = [risk_estimators.filter_corr_hierarchical(bads) for bads in bad_inputs]
+        bad_inputs.append(corr)
 
         # Testing with invalid method parameter
         bad_inputs_results.append(risk_estimators.filter_corr_hierarchical(corr, method='bad'))
 
         # Testing to see if failed return fetches the unfiltered correlation array
-        for result in bad_inputs_results:
-            np.testing.assert_almost_equal(result, corr, decimal=4)
-
+        for idx, result in enumerate(bad_inputs_results):
+            np.testing.assert_almost_equal(result, bad_inputs[idx], decimal=4)
 
     @staticmethod
     def test_denoise_covariance():
