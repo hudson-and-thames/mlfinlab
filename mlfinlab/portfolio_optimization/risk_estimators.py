@@ -267,27 +267,27 @@ class RiskEstimators:
     @staticmethod
     def filter_corr_hierarchical(cor_matrix, method='complete', plot=False):
         """
-            Creates a filtered correlation matrix using hierarchical clustering methods from an empirical 
-            correlation matrix, given that all values are non-negative [0 ~ 1]
+        Creates a filtered correlation matrix using hierarchical clustering methods from an empirical 
+        correlation matrix, given that all values are non-negative [0 ~ 1]
 
-            This function allows for three types of hierarchical clustering - complete, single, and average 
-            linkage clusters. Link to hierarchical clustering methods documentation:
-            <https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html>`_
+        This function allows for three types of hierarchical clustering - complete, single, and average 
+        linkage clusters. Link to hierarchical clustering methods documentation:
+        <https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html>`_
 
-            It works as follows:
+        It works as follows:
 
-            First, the method creates a hierarchical clustering tree using scipy's hierarchical clustering methods 
-            from the empirical 2-D correlation matrix.
+        First, the method creates a hierarchical clustering tree using scipy's hierarchical clustering methods 
+        from the empirical 2-D correlation matrix.
 
-            Second, it extracts and stores each cluster's filtered value (alpha) and assigns it to it's corresponding leaf.
+        Second, it extracts and stores each cluster's filtered value (alpha) and assigns it to it's corresponding leaf.
 
-            Finally, we create a new filtered matrix by assigning each of the correlations to their corresponding 
-            parent node's alpha value.
+        Finally, we create a new filtered matrix by assigning each of the correlations to their corresponding 
+        parent node's alpha value.
 
-            :param cor_matrix: (np.array) Numpy array of an empirical correlation matrix.
-            :param method: (str) Hierarchical clustering method to use. (``complete`` by default, ``single``, ``average``)
-            :param plot (bool) Plots the hierarchical cluster tree. (False by default)
-            :return: (np.array) The filtered correlation matrix.
+        :param cor_matrix: (np.array) Numpy array of an empirical correlation matrix.
+        :param method: (str) Hierarchical clustering method to use. (``complete`` by default, ``single``, ``average``)
+        :param plot (bool) Plots the hierarchical cluster tree. (False by default)
+        :return: (np.array) The filtered correlation matrix.
         """
         # pylint: disable=too-many-branches
 
