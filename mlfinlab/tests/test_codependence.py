@@ -6,7 +6,7 @@ import unittest
 import numpy as np
 
 from mlfinlab.codependence.correlation import (squared_angular_distance, angular_distance, absolute_angular_distance,
-                                               distance_correlation)
+                                               distance_correlation, kl_dist, norm_dist)
 from mlfinlab.codependence.information import (get_mutual_info, variation_of_information_score,
                                                get_optimal_number_of_bins)
 from mlfinlab.codependence.codependence_matrix import (get_dependence_matrix, get_distance_matrix)
@@ -29,6 +29,13 @@ class TestCodependence(unittest.TestCase):
         self.y_1 = self.x ** 2 + state.normal(size=1000) / 5
         self.y_2 = abs(self.x) + state.normal(size=1000) / 5
         self.X_matrix, _ = get_classification_data(6, 2, 2, 100, sigma=0)
+        # Adding noise to matricies to avoid singularity
+        self.matrix_A = self.X_matrix + 0.00001*np.random.rand(100, 6)
+        self.matrix_B = self.X_matrix + 0.00003*np.random.rand(100, 6)
+        # getting the square produce of corr matricies to avoid negative values.
+        self.corr_A = np.corrcoef(self.matrix_A, rowvar=False) ** 2
+        self.corr_B = np.corrcoef(self.matrix_B, rowvar=False) ** 2
+
 
     def test_correlations(self):
         """
@@ -38,11 +45,15 @@ class TestCodependence(unittest.TestCase):
         sq_angular_dist = squared_angular_distance(self.x, self.y_1)
         abs_angular_dist = absolute_angular_distance(self.x, self.y_1)
         dist_corr = distance_correlation(self.x, self.y_1)
+        kullback_dist = kl_dist(self.corr_A, self.corr_B)
+        normal_dist = norm_dist(self.corr_A, self.corr_B)
 
         self.assertAlmostEqual(angular_dist, 0.67, delta=1e-2)
         self.assertAlmostEqual(abs_angular_dist, 0.6703, delta=1e-2)
         self.assertAlmostEqual(sq_angular_dist, 0.7, delta=1e-2)
         self.assertAlmostEqual(dist_corr, 0.529, delta=1e-2)
+        self.assertAlmostEqual(kullback_dist, 1.2468779409564554, delta=1e-2)
+        self.assertAlmostEqual(normal_dist, 2.793363555176552e-07, delta=1e-2)
 
         dist_corr_y_2 = distance_correlation(self.x, self.y_2)
         self.assertAlmostEqual(dist_corr_y_2, 0.5216, delta=1e-2)
