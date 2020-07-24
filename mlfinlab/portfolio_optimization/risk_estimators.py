@@ -267,21 +267,21 @@ class RiskEstimators:
     @staticmethod
     def filter_corr_hierarchical(cor_matrix, method='complete', draw_plot=False):
         """
-        Creates a filtered correlation matrix using hierarchical clustering methods from an empirical 
+        Creates a filtered correlation matrix using hierarchical clustering methods from an empirical
         correlation matrix, given that all values are non-negative [0 ~ 1]
 
-        This function allows for three types of hierarchical clustering - complete, single, and average 
+        This function allows for three types of hierarchical clustering - complete, single, and average
         linkage clusters. Link to hierarchical clustering methods documentation:
         <https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html>`_
 
         It works as follows:
 
-        First, the method creates a hierarchical clustering tree using scipy's hierarchical clustering methods 
+        First, the method creates a hierarchical clustering tree using scipy's hierarchical clustering methods
         from the empirical 2-D correlation matrix.
 
         Second, it extracts and stores each cluster's filtered value (alpha) and assigns it to it's corresponding leaf.
 
-        Finally, we create a new filtered matrix by assigning each of the correlations to their corresponding 
+        Finally, we create a new filtered matrix by assigning each of the correlations to their corresponding
         parent node's alpha value.
 
         :param cor_matrix: (np.array) Numpy array of an empirical correlation matrix.
@@ -307,7 +307,7 @@ class RiskEstimators:
         if cor_x == cor_y and np.allclose(np.diag(cor_matrix), 1): # using np.allclose as diag values might be 0.99999
             # Creating new coorelation condensed matrix for the upper triangle and dismissing the diagnol.
             new_cor = cor_matrix[np.triu_indices(cor_matrix.shape[0], k=1)]
-        else: 
+        else:
             print('ERROR: Invalid matrix, input must be a correlation matrix of size (m x m)... Returning unfiltered matrix.')
             return cor_matrix
 
@@ -348,10 +348,10 @@ class RiskEstimators:
                     _max = np.max([x_val, y_val])
                     # Set the new filtered matrix to the corresponding cluster's alpha value
                     filt_corr[x_ax, y_ax] = _max
-        
+
         # pylint: enable=too-many-branches
         return filt_corr
-    
+
     def denoise_covariance(self, cov, tn_relation, denoise_method='const_resid_eigen', detone=False,
                            market_component=1, kde_bwidth=0.01, alpha=0):
         """

@@ -341,7 +341,7 @@ class TestRiskEstimators(unittest.TestCase):
         corr_complete, corr_single, corr_average = [risk_estimators.filter_corr_hierarchical(corr, methods, draw_plot=True) for methods in methods_list]
 
         # Test plot
-        risk_estimators.filter_corr_hierarchical(corr, plot=True)
+        risk_estimators.filter_corr_hierarchical(corr, draw_plot=True)
 
         # Testing is filtered matricies are consistent with expected values.
         np.testing.assert_almost_equal(corr_complete, expected_corr_complete, decimal=4)
