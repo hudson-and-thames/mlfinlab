@@ -1,4 +1,5 @@
 # pylint: disable=missing-module-docstring
+import warnings
 import numpy as np
 import pandas as pd
 from sklearn.neighbors import KernelDensity
@@ -289,18 +290,17 @@ class RiskEstimators:
         :param plot (bool) Plots the hierarchical cluster tree. (False by default)
         :return: (np.array) The filtered correlation matrix.
         """
-        # pylint: disable=too-many-branches
 
         # Check if all matrix elements are positive
         if np.any(cor_matrix < 0):
-            print('ERROR: Not all elements in matrix are positive... Returning unfiltered matrix.')
+            warnings.warn('Not all elements in matrix are positive... Returning unfiltered matrix.', UserWarning)
             return cor_matrix
 
         # Check if matrix is 2-D
         if len(cor_matrix.shape) == 2:
             cor_x, cor_y = cor_matrix.shape
         else:
-            print('ERROR: Invalid matrix dimensions, input must be 2-D array... Returning unfiltered matrix.')
+            warnings.warn('Invalid matrix dimensions, input must be 2-D array... Returning unfiltered matrix.', UserWarning)
             return cor_matrix
 
         # Check if matrix dimensions and diagonal values are valid.
@@ -308,7 +308,7 @@ class RiskEstimators:
             # Creating new coorelation condensed matrix for the upper triangle and dismissing the diagnol.
             new_cor = cor_matrix[np.triu_indices(cor_matrix.shape[0], k=1)]
         else:
-            print('ERROR: Invalid matrix, input must be a correlation matrix of size (m x m)... Returning unfiltered matrix.')
+            warnings.warn('Invalid matrix, input must be a correlation matrix of size (m x m)... Returning unfiltered matrix.', UserWarning)
             return cor_matrix
 
         # Compute the hierarchical clustering tree
@@ -319,7 +319,7 @@ class RiskEstimators:
         elif method == 'average':
             z_cluster = average(new_cor)
         else:
-            print('ERROR: Invalid method selected, please check docstring... Returning unfiltered matrix.')
+            warnings.warn('Invalid method selected, please check docstring... Returning unfiltered matrix.', UserWarning)
             return cor_matrix
 
         # Plot the hierarchical cluster tree
@@ -342,7 +342,6 @@ class RiskEstimators:
         filt_corr = np.maximum(alphas_x, alphas_x.T)
         np.fill_diagonal(filt_corr, 1)
 
-        # pylint: enable=too-many-branches
         return filt_corr
 
     def denoise_covariance(self, cov, tn_relation, denoise_method='const_resid_eigen', detone=False,
