@@ -111,3 +111,28 @@ def distance_correlation(x: np.array, y: np.array) -> float:
     coef = np.sqrt(d_cov_xy) / np.sqrt(np.sqrt(d_cov_xx) * np.sqrt(d_cov_yy))
 
     return coef
+
+
+def kl_dist(corr_A: np.array, corr_B: np.array) -> float:
+    """
+    Returns the Kullback-Leibler distance between two correlation matrices, all elements must be positive.
+    
+    Formula used for calculation:
+    
+    kl_dist[X, Y] = 0.5 * ( Log( det(Y) / det(X) ) + tr((Y ^ -1).X - n )
+    
+    Where n is the dimension space spanned by X.
+    
+    Read Don H. Johnson's research paper for more information on Kullback-Leibler distance:
+    <https://scholarship.rice.edu/bitstream/handle/1911/19969/Joh2001Mar1Symmetrizi.PDF>`_
+    
+    :param corr_A: (np.array) Numpy array of the first correlation matrix.
+    :param corr_B: (np.array) Numpy array of the second correlation matrix.
+    :return: (np.float64) the Kullback-Leibler distance between the two matrices.
+    """
+
+    #import scipy.special as sc
+
+    n = corr_A.shape[0]
+    dist = 0.5 * (np.log(np.linalg.det(corr_B) / np.linalg.det(corr_A)) + np.trace(np.linalg.inv(corr_B).dot(corr_A)) - n)
+    return dist
