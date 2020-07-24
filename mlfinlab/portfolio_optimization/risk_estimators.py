@@ -265,7 +265,7 @@ class RiskEstimators:
         return cov_matrix
 
     @staticmethod
-    def filter_corr_hierarchical(cor_matrix, method='complete', plot=False):
+    def filter_corr_hierarchical(cor_matrix, method='complete', draw_plot=False):
         """
         Creates a filtered correlation matrix using hierarchical clustering methods from an empirical 
         correlation matrix, given that all values are non-negative [0 ~ 1]
@@ -323,7 +323,7 @@ class RiskEstimators:
             return cor_matrix
 
         # Plot the hierarchical cluster tree
-        if plot:
+        if draw_plot:
             fig = plt.figure(figsize=(10, 6))
             axis = fig.add_subplot(111)
             dendrogram(z_cluster, ax=axis)
