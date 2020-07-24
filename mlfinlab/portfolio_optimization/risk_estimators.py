@@ -293,7 +293,7 @@ class RiskEstimators:
 
         # Check if all matrix elements are positive
         if np.any(cor_matrix < 0):
-            print('ERROR: Not all elements in matrix are negative... Returning unfiltered matrix.')
+            print('ERROR: Not all elements in matrix are positive... Returning unfiltered matrix.')
             return cor_matrix
 
         # Check if matrix is 2-D
@@ -337,17 +337,10 @@ class RiskEstimators:
         df_alphas.loc[z_cluster[0][1]] = alpha_values[0]
 
         # Creates the filtered correlation matrix
-        filt_corr = np.ones((cor_x, cor_y), dtype=np.float64)
-        for x_ax in range(0, filt_corr.shape[0]):
-            for y_ax in range(0, filt_corr.shape[1]):
-                # Ignore the diagonal
-                if x_ax != y_ax:
-                    x_val = df_alphas.loc[[x_ax]][0].item()
-                    y_val = df_alphas.loc[[y_ax]][0].item()
-                    # Find the cluster's alpha value for the tree leaves id
-                    _max = np.max([x_val, y_val])
-                    # Set the new filtered matrix to the corresponding cluster's alpha value
-                    filt_corr[x_ax, y_ax] = _max
+        alphas_sorterd = df_alphas.sort_index()
+        alphas_x = np.tile(alphas_sorterd.values, (1, len(alphas_sorterd.values)))
+        filt_corr = np.maximum(alphas_x, alphas_x.T)
+        np.fill_diagonal(filt_corr, 1)
 
         # pylint: enable=too-many-branches
         return filt_corr
