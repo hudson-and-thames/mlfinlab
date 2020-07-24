@@ -136,3 +136,26 @@ def kl_dist(corr_A: np.array, corr_B: np.array) -> float:
     n = corr_A.shape[0]
     dist = 0.5 * (np.log(np.linalg.det(corr_B) / np.linalg.det(corr_A)) + np.trace(np.linalg.inv(corr_B).dot(corr_A)) - n)
     return dist
+
+
+def norm_dist(matrix_a: np.array, matrix_b: np.array, r_val=2) -> float:
+    """
+    Returns the normalized distance between two matrices.
+    
+    This function is a wrap for numpy's linear algebra method (numpy.linalg.norm).
+    Link to documentation: <https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html>`_
+    
+    Formula used to normalize matrix:
+    
+    norm_dist[X, Y] = sum( |X - Y| ^ r ) ^ 1/r
+    
+    Where r is a parameter. r=1 City block(L1 norm), r=2 Euclidean distance (L2 norm), 
+    r=inf Supermum (L_inf norm). For values of r < 1, the result is not really a mathematical ‘norm’.
+    
+    :param matrix_a: (np.array/pd.Series) Array of the first matrix.
+    :param matrix_b: (np.array/pd.Series) Array of the second matrix.
+    :param r_val: (int/str) The r value of the normalization formula. (``2`` by default, Any Integer)
+    :return: (np.float64) The Euclidean distance between the two matrices.
+    """
+
+    return np.linalg.norm(matrix_b - matrix_a, r_val)
