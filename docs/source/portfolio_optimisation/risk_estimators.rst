@@ -340,6 +340,25 @@ The de-noising function works as follows:
 
 (If the correlation matrix is given as an input, the first and the last steps of the algorithm are omitted)
 
+Spectral Clustering Filtering Method
+************************************
+
+The main idea behind spectral clustering is to remove the noise-related eigenvalues from an emperical correlation matrix, the method in which this is achieved is similar to the Constant Residual Eigenvalue de-noising method, the only difference is that instead of setting the eigenvalues which are below the theoretical value to their average value, they are set to zero in an attempt to remove the effects of those eigenvalues that are consistent with the null hypothesis of uncorrelated random variables.
+
+The maximum theoretical eigenvalue is calculated using the formula
+
+.. math::
+
+    \lambda_{max} = \sigma^2(1 + 1/A + 2\sqrt{1 / A})
+
+where :math:`\sigma^2 = 1` for correlation matrices, once achieved we set any eignevalues above this threshold to 0
+
+.. math::
+
+    \lambda_3^{NEW} = \lambda_4^{NEW} = \lambda_5^{NEW} = 0
+
+
+
 De-toning
 *********
 
@@ -394,6 +413,46 @@ Implementation
 .. autoclass:: RiskEstimators
    :noindex:
    :members: denoise_covariance
+
+
+----
+
+Hierarchical Cluster Filtering  
+##############################
+
+Hierarchical Clustering, unlike K-means Clustering, does not create multiple clusters of identical size, nor does it require a pre-defined number of clusters. Of the two different types of heirarchical clustering - Agglomerative and Divisive - Agglomerative, or bottom-up clustering is used here. 
+
+Agglomerative Clustering assigns each observation to it's own individual cluster before iteratively joining the two most similar clusters. This process repeats until only a singluar cluster remains.
+
+Given a positive emperical correlation matrix, :math:`C` generated using :math:`n` features, the procedure given below returns as an output a rooted tree and a filtered correlation maxtrix :math:`C^<` of elements :math:`c^<_i_j`. 
+
+First, set :math:`C = C^<`. 
+
+Then, beginning with the most highly correlated features (clusters) :math:`h` and :math:`k \in C` and the correlation between them, :math:`c_h_k`, one sets the elements :math:`c^<_i_j = c^<_j_i = c_h_k`. 
+
+The matrix :math:`C^<` is then redefined such that:
+
+:math:`\left\{\begin{matrix}c^<_q_j = f(c^<_h_j, c^<_k_j) & where \ j \notin h \ and \ j \notin k \\ c^<_i_j = c^<_i_j & otherwise\end{matrix}\right.`
+In effect, merging the clusters :math:`h` and :math:`k`. These steps are then completed for the next two most similar clusters, and are repeated for a total of :math:`n-1` iterations; until only a single cluster remains. 
+
+..
+  TODO: attach a graph of the cluster tree here.
+
+Given a positive emperical correlation matrix, :math:`C`:math:, the procedure given below returns as an output a rooted tree and a filtered correlation maxtrix :math:`C^<)`:math: of elements :math:`c^<_i_j`:math:. This cluster-tree can then be filtered through various One can then use a method such as :math:`Max(C_i, C_j)` where :math:`i and j \exists` in same cluster. Thus, creating the oportunity to filter a matrix by it's cluster's value.
+
+
+Given a data set comprised of n different observations, using the bottom-up method, one would first create n indivual clusters comprised of one data point each. Similarities between these clusters would then be computed, using the desired distance metric. Those two clusters which were found to have the smallest distance between them would be joined. This process would be repeated for a total n-1 iterations, resulting in single "cluster tree", as pictured in the figure below, with the earliest-joined elements at the deepest level of the tree. 
+
+.. tip::
+    Divisive Hierarchical clustering works in the opposite way. It starts with one single cluster wrapping all datapoints and divides the cluster at each step of it's iteration until it ends with n clusters.
+
+
+Implementation
+**************
+
+.. autoclass:: RiskEstimators
+   :noindex:
+   :members: filter_corr_hierarchical
 
 
 ----
