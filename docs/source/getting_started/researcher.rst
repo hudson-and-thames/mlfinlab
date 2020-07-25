@@ -5,7 +5,7 @@ Become a Researcher
 
 .. raw:: html
 
-   <iframe width="560" height="315" src="https://www.youtube.com/watch?v=gbEyN_5ctq8" frameborder="0" allow="accelerometer;
+   <iframe width="560" height="315" src="https://youtu.be/gbEyN_5ctq8" frameborder="0" allow="accelerometer;
     autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 |
