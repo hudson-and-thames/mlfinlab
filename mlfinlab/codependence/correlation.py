@@ -116,16 +116,16 @@ def distance_correlation(x: np.array, y: np.array) -> float:
 def kl_dist(corr_A: np.array, corr_B: np.array) -> float:
     """
     Returns the Kullback-Leibler distance between two correlation matrices, all elements must be positive.
-    
+
     Formula used for calculation:
-    
+
     kl_dist[X, Y] = 0.5 * ( Log( det(Y) / det(X) ) + tr((Y ^ -1).X - n )
-    
+
     Where n is the dimension space spanned by X.
-    
+
     Read Don H. Johnson's research paper for more information on Kullback-Leibler distance:
     <https://scholarship.rice.edu/bitstream/handle/1911/19969/Joh2001Mar1Symmetrizi.PDF>`_
-    
+
     :param corr_A: (np.array) Numpy array of the first correlation matrix.
     :param corr_B: (np.array) Numpy array of the second correlation matrix.
     :return: (np.float64) the Kullback-Leibler distance between the two matrices.
@@ -141,17 +141,17 @@ def kl_dist(corr_A: np.array, corr_B: np.array) -> float:
 def norm_dist(matrix_a: np.array, matrix_b: np.array, r_val=2) -> float:
     """
     Returns the normalized distance between two matrices.
-    
+
     This function is a wrap for numpy's linear algebra method (numpy.linalg.norm).
     Link to documentation: <https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html>`_
-    
+
     Formula used to normalize matrix:
-    
+
     norm_dist[X, Y] = sum( |X - Y| ^ r ) ^ 1/r
-    
-    Where r is a parameter. r=1 City block(L1 norm), r=2 Euclidean distance (L2 norm), 
+
+    Where r is a parameter. r=1 City block(L1 norm), r=2 Euclidean distance (L2 norm),
     r=inf Supermum (L_inf norm). For values of r < 1, the result is not really a mathematical ‘norm’.
-    
+
     :param matrix_a: (np.array/pd.Series) Array of the first matrix.
     :param matrix_b: (np.array/pd.Series) Array of the second matrix.
     :param r_val: (int/str) The r value of the normalization formula. (``2`` by default, Any Integer)
