@@ -159,6 +159,57 @@ Implementation
 
 .. autofunction:: squared_angular_distance
 
+Kullback-Leibler Distance
+=========================
+
+The Kullback-Leibler distance is a measure of distance between two probability densities, say p and q, which is defined as
+
+.. math::
+    K(p,q) = E_p \left[log\left(\frac{p}{q}\right)\right]
+
+Where :math:`E_p[.]` indicates the expectation value with respect to the probability density :math:`p`. Here we consider
+the Kullback-Leibler between multivariate Gaussian random variables (aka. Correlation matrices).
+
+Given two positive definite correlation matrices :math:`C_1` and :math:`C_2` assosiated with random variable :math:`X`, we can compute
+their probabilty density functions to :math:`P(C_1,X)` and :math:`P(C_1,X)` resulting in the following formula
+
+.. math::
+     K(P(C_1,X),P(C_2,X)) = E_{P(C_1,X)} \left[log\left(\frac{P(C_1,X)}{P(C_2,X)}\right)\right] = \frac{1}{2}\left[log\left(\frac{|C_1|}{|C_2|}\right)+tr(C^{-1}_2 C_1) -n) \right]
+
+where :math:`n` is the dimension of the space spanned by :math:`X`, and :math:`|C|` indicates the determinant of :math:`C`
+
+The Kullback-Leibler distance can be used to measure the stability of filtering/de-noising procedures with respect to statistical
+uncertainty.
+
+.. tip::
+    It is worth noting that the Kullback-Leibler distance takes naturally into account the statistical nature of correlation matrices
+    which is uncommon with other measures of distance between matrices such as Frobenius distance which is based on
+    the iso-morphism between the matrices space and the vectors space.
+
+Implementation
+##############
+
+.. autofunction:: kl_dist
+
+Norm Distance
+=============
+
+A Norm is a function that takes a random variable and returns a value(Norm Distance) that satisfies certain properties pertaining to
+scalability and additivity.
+
+The :math:`L` norms are the most common type of norms. They use the same logic behind the SRSS (Square Root of the Sum of Squares)
+
+.. math::
+    ||x||_r := \sqrt[r]{x^r_1 + ... + x^r_n}
+
+where :math:`r` is a positive integer. The Euclidean norm is by far the most commonly used norm on multi-dimensional variables with :math:`r = 2`
+which makes the Euclidean norm an :math:`L^2` type norm.
+
+Implementation
+##############
+
+.. autofunction:: norm_dist
+
 Examples
 ========
 
@@ -168,11 +219,17 @@ The following examples show how the described above correlation-based metrics ca
 .. code-block::
 
     import pandas as pd
+    import numpy as np
     from mlfinlab.codependence import distance_correlation, angular_distance,
-                                      absolute_angular_distance, squared_angular_distance
+                                      absolute_angular_distance, squared_angular_distance,
+                                      kl_dist, norm_dist
 
     # Import dataframe of returns for assets in a portfolio
     asset_returns = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)
+
+    # Creates correlation matrices of the returns DataFrame at different time frames
+    corr_18 = np.corrcoef(asset_returns.loc['01-01-2018':'01-01-2019'])
+    corr_19 = np.corrcoef(asset_returns.loc['01-01-2019':'01-01-2020'])
 
     asset1 = 'SPY'
     asset2 = 'TLT'
@@ -188,3 +245,9 @@ The following examples show how the described above correlation-based metrics ca
 
     # Calculate squared angular distance between chosen assets
     angular_dist = squared_angular_distance(asset_returns[asset1], asset_returns[assets2])
+
+    # Calculate the Kullback-Leibler distance between two correlation matrices
+    kldist = kl_dist(corr_18, corr_19)
+
+    # Calculates the Norm distance between two correlation matrices
+    dist = norm_dist(corr_18, corr_19)
