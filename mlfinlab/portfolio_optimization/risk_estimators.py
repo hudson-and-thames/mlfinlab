@@ -287,7 +287,7 @@ class RiskEstimators:
 
         :param cor_matrix: (np.array) Numpy array of an empirical correlation matrix.
         :param method: (str) Hierarchical clustering method to use. (``complete`` by default, ``single``, ``average``)
-        :param plot (bool) Plots the hierarchical cluster tree. (False by default)
+        :param draw_plot (bool) Plots the hierarchical cluster tree. (False by default)
         :return: (np.array) The filtered correlation matrix.
         """
 

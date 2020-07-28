@@ -349,15 +349,14 @@ The maximum theoretical eigenvalue is calculated using the formula
 
 .. math::
 
-    \lambda_{max} = \sigma^2(1 + 1/A + 2\sqrt{1 / A})
+    \lambda_{max} = \sigma^2(1 + \frac{1}{A} + 2\sqrt{\frac{1}{A}})
 
-where :math:`\sigma^2 = 1` for correlation matrices, once achieved we set any eignevalues above this threshold to 0
-
+where :math:`\sigma^2 = 1` for correlation matrices, once achieved we set any eignevalues above this threshold to :math:`0`.
+For example, we have a set of 5 eigenvalues sorted in the descending order ( :math:`\lambda_1` ... :math:`\lambda_5` ),
+  3 of which are below the maximum theoretical value, then we set
 .. math::
 
     \lambda_3^{NEW} = \lambda_4^{NEW} = \lambda_5^{NEW} = 0
-
-
 
 De-toning
 *********
@@ -435,10 +434,7 @@ The matrix :math:`C^<` is then redefined such that:
 .. math::
     \begin{cases} c^<_{qj} = f(c^<_{hj}, c^<_{kj}) & where \ j \notin h \ and \ j \notin k \\ c^<_{ij} = c^<_{ij} & otherwise \end{cases}
 
-In effect, merging the clusters :math:`h` and :math:`k`. These steps are then completed for the next two most similar clusters, and are repeated for a total of :math:`n-1` iterations; until only a single cluster remains. 
-
-..
-  TODO: attach a graph of the cluster tree here.
+In effect, merging the clusters :math:`h` and :math:`k`. These steps are then completed for the next two most similar clusters, and are repeated for a total of :math:`n-1` iterations; until only a single cluster remains.
 
 .. tip::
     Divisive Hierarchical clustering works in the opposite way. It starts with one single cluster wrapping all datapoints and divides the cluster at each step of it's iteration until it ends with n clusters.
@@ -504,6 +500,10 @@ Example Code
                                                               denoise_method='const_resid_eigen',
                                                               detone=False, kde_bwidth=kde_bwidth)
 
+    # Finding the Spectral Clustering De-noised Сovariance matrix
+    const_resid_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation,
+                                                              denoise_method='spectral')
+
     # Finding the Targeted Shrinkage De-noised Сovariance matrix
     targ_shrink_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation,
                                                               denoise_method='target_shrink',
@@ -514,6 +514,10 @@ Example Code
                                                              denoise_method='const_resid_eigen',
                                                              detone=True, market_component=1,
                                                              kde_bwidth=kde_bwidth)
+
+    # Finding the Hierarchical Clustering Filtered Correlation matrix
+    hierarchical_filtered = risk_estimators.filter_corr_hierarchical(cov_matrix, method='complete',
+                                                             draw_plot=False')
 
 Research Notebooks
 ##################
