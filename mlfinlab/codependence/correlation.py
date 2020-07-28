@@ -124,7 +124,7 @@ def kl_dist(corr_A: np.array, corr_B: np.array) -> float:
     Where n is the dimension space spanned by X.
 
     Read Don H. Johnson's research paper for more information on Kullback-Leibler distance:
-    <https://scholarship.rice.edu/bitstream/handle/1911/19969/Joh2001Mar1Symmetrizi.PDF>`_
+    `<https://scholarship.rice.edu/bitstream/handle/1911/19969/Joh2001Mar1Symmetrizi.PDF>`_
 
     :param corr_A: (np.array) Numpy array of the first correlation matrix.
     :param corr_B: (np.array) Numpy array of the second correlation matrix.
@@ -143,7 +143,7 @@ def norm_dist(matrix_a: np.array, matrix_b: np.array, r_val=2) -> float:
     Returns the normalized distance between two matrices.
 
     This function is a wrap for numpy's linear algebra method (numpy.linalg.norm).
-    Link to documentation: <https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html>`_
+    Link to documentation: `<https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html>`_
 
     Formula used to normalize matrix:
 

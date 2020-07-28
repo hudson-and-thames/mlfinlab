@@ -273,7 +273,7 @@ class RiskEstimators:
 
         This function allows for three types of hierarchical clustering - complete, single, and average
         linkage clusters. Link to hierarchical clustering methods documentation:
-        <https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html>`_
+        `<https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html>`_
 
         It works as follows:
 
@@ -287,7 +287,7 @@ class RiskEstimators:
 
         :param cor_matrix: (np.array) Numpy array of an empirical correlation matrix.
         :param method: (str) Hierarchical clustering method to use. (``complete`` by default, ``single``, ``average``)
-        :param draw_plot (bool) Plots the hierarchical cluster tree. (False by default)
+        :param draw_plot: (bool) Plots the hierarchical cluster tree. (False by default)
         :return: (np.array) The filtered correlation matrix.
         """
 

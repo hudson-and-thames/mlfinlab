@@ -353,7 +353,8 @@ The maximum theoretical eigenvalue is calculated using the formula
 
 where :math:`\sigma^2 = 1` for correlation matrices, once achieved we set any eignevalues above this threshold to :math:`0`.
 For example, we have a set of 5 eigenvalues sorted in the descending order ( :math:`\lambda_1` ... :math:`\lambda_5` ),
-  3 of which are below the maximum theoretical value, then we set
+3 of which are below the maximum theoretical value, then we set
+
 .. math::
 
     \lambda_3^{NEW} = \lambda_4^{NEW} = \lambda_5^{NEW} = 0
@@ -434,7 +435,8 @@ The matrix :math:`C^<` is then redefined such that:
 .. math::
     \begin{cases} c^<_{qj} = f(c^<_{hj}, c^<_{kj}) & where \ j \notin h \ and \ j \notin k \\ c^<_{ij} = c^<_{ij} & otherwise \end{cases}
 
-In effect, merging the clusters :math:`h` and :math:`k`. These steps are then completed for the next two most similar clusters, and are repeated for a total of :math:`n-1` iterations; until only a single cluster remains.
+where :math:`f(c^<_{hj}, c^<_{kj}` is any distance metric. In effect, merging the clusters :math:`h` and :math:`k`. These steps are then completed for the next two most similar clusters, and are repeated for a total of :math:`n-1` iterations; until only a single cluster remains.
+
 
 .. tip::
     Divisive Hierarchical clustering works in the opposite way. It starts with one single cluster wrapping all datapoints and divides the cluster at each step of it's iteration until it ends with n clusters.
