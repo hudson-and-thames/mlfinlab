@@ -338,7 +338,7 @@ class TestRiskEstimators(unittest.TestCase):
 
         methods_list = ['complete', 'single', 'average']
         # Compute all methods with given correlation matrix
-        corr_complete, corr_single, corr_average = [risk_estimators.filter_corr_hierarchical(corr, methods, draw_plot=True) for methods in methods_list]
+        corr_complete, corr_single, corr_average = [risk_estimators.filter_corr_hierarchical(corr, methods) for methods in methods_list]
 
         # Test plot
         risk_estimators.filter_corr_hierarchical(corr, draw_plot=True)
