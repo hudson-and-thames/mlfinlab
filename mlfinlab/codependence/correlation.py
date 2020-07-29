@@ -147,7 +147,7 @@ def norm_dist(matrix_a: np.array, matrix_b: np.array, r_val=2) -> float:
 
     Formula used to normalize matrix:
 
-    norm_dist[X, Y] = sum( |X - Y| ^ r ) ^ 1/r
+    norm_dist[X, Y] = sum( abs(X - Y) ^ r ) ^ 1/r
 
     Where r is a parameter. r=1 City block(L1 norm), r=2 Euclidean distance (L2 norm),
     r=inf Supermum (L_inf norm). For values of r < 1, the result is not really a mathematical ‘norm’.
