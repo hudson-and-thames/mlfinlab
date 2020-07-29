@@ -220,9 +220,9 @@ The following examples show how the described above correlation-based metrics ca
 
     import pandas as pd
     import numpy as np
-    from mlfinlab.codependence import distance_correlation, angular_distance,
+    from mlfinlab.codependence import (distance_correlation, angular_distance,
                                       absolute_angular_distance, squared_angular_distance,
-                                      kl_dist, norm_dist
+                                      kl_dist, norm_dist, get_dependence_matrix)
 
     # Import dataframe of returns for assets in a portfolio
     asset_returns = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)
@@ -245,6 +245,9 @@ The following examples show how the described above correlation-based metrics ca
 
     # Calculate squared angular distance between chosen assets
     angular_dist = squared_angular_distance(asset_returns[asset1], asset_returns[assets2])
+
+    # Calculate angular distance between all assets
+    angular_dist_matrix = get_dependence_matrix(data, dependence_method='gnpr_distance')
 
     # Calculate the Kullback-Leibler distance between two correlation matrices
     kldist = kl_dist(corr_18, corr_19)

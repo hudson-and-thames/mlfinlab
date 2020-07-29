@@ -75,6 +75,55 @@ It can also be normalized using a known upper boundary:
 
     I[X, Y] \le min\{H[X] + H[Y]\}
 
+An alternative way of estimating the Mutual information is through using copulas.
+A link between Mutual information and copula entropy was presented in the paper by
+`Ma, Jian & Sun, Zengqi. (2008). Mutual information is copula entropy <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_.
+
+`A blog post by Gautier Marti <https://gmarti.gitlab.io/qfin/2020/07/01/mutual-information-is-copula-entropy.html>`_
+includes descriptions of two alternative estimators of copula entropy:
+
+- First, estimate the copula (as a normalized ranking of the observations). Then apply the standard
+  mutual information estimator on the normalized rankings of the observations.
+
+.. math::
+    :nowrap:
+
+    \begin{gather*}
+    X_{unif} = \frac{X_{ranked}}{N}\\
+
+    Y_{unif} = \frac{Y_{ranked}}{N}\\
+
+    I[X, Y] = \sum\limits_{x \in S_{X_{unif}}} \sum\limits_{y \in S_{Y_{unif}}}p[x,y]log[\frac{p[x,y]}{p[x]p[y]}]
+    \end{gather*}
+
+- First, estimate the copula (as a normalized ranking of the observations). Then and calculate the
+  entropy of a copula. Estimator of the Mutual Information would be equal to negative copula entropy:
+
+.. math::
+    :nowrap:
+
+    \begin{gather*}
+    X_{unif} = \frac{X_{ranked}}{N}\\
+
+    Y_{unif} = \frac{Y_{ranked}}{N}\\
+
+    I[X, Y] = (-1) * H[C(X, Y)]
+    \end{gather*}
+
+According to Gautier Marti, these two estimators have some advantages over the standard approach:
+
+-  First, continuous marginals (think the distribution of returns of each stock) have a potentially
+   unbounded support making it hard to bin properly.
+-  Second, the discretization process to estimate the density used to compute the entropy, may
+   introduce biases in the mutual information estimate due to a rather difficult and arbitrary
+   binning of the support.
+
+Using their copula :math:`C(X,Y)`, allows to bypass the estimation of the margins.
+The copula has compact support in :math:`[0, 1]`, and its margins are uniform.
+
+
+Alternative Mutual Information estimators are also available in the below function.
+
 Implementation
 ##############
 
@@ -159,7 +208,7 @@ The following example highlights how the various metrics behave under various va
     import numpy as np
     import matplotlib.pyplot as plt
 
-    from mlfinlab.codependence import distance_correlation, get_mutual_info, variation_of_information_score
+    from mlfinlab.codependence (import distance_correlation, get_mutual_info, variation_of_information_score)
     from ace import model # ace package is used for max correlation estimation
 
     def max_correlation(x: np.array, y: np.array) -> float:
