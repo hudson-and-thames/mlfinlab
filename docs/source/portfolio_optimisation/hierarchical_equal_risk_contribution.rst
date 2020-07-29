@@ -80,7 +80,7 @@ upon by HERC by dividing the tree, at each step, based on the structure induced 
 At each level of the tree, an Equal Risk Contribution allocation is used i.e. the weights are:
 
 .. math::
-    \alpha_1 = \frac{RC_1}{RC_1 + RC_2}; \alpha_2 = 1 - \alpha_1
+    \alpha_1 = 1 - \frac{RC_1}{RC_1 + RC_2}; \alpha_2 = 1 - \alpha_1
 
 where :math:`\alpha_1`, :math:`\alpha_2` are the weights of left and right clusters respectively and :math:`RC_1`, :math:`RC_2`
 are the risk contributions of left and right clusters.
