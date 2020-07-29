@@ -132,4 +132,4 @@ The following research notebooks can be used to better understand the Tail Set l
 
 * `Tail Set Labels Example`_
 
-.. _`Tail Set Labels Example`: https://github.com/hudson-and-thames/research/blob/master/Labelling/Labels%20Tail%20Sets/tail_set_labels_example.ipynb
+.. _`Tail Set Labels Example`: https://github.com/hudson-and-thames/research/blob/master/Labeling/Labels%20Tail%20Sets/Tail-Sets.ipynb

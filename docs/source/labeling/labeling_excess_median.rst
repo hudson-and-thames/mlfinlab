@@ -97,4 +97,4 @@ The following research notebooks can be used to better understand labeling exces
 
 * `Excess Over Median Example`_
 
-.. _`Excess Over Median Example`: https://github.com/hudson-and-thames/research/blob/master/Labelling/Labels%20Excess%20Over%20Median/Excess%20Over%20Median.ipynb
+.. _`Excess Over Median Example`: https://github.com/hudson-and-thames/research/blob/master/Labeling/Labels%20Excess%20Over%20Median/Excess%20Over%20Median.ipynb
