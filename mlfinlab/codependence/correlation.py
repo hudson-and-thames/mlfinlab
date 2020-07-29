@@ -4,6 +4,7 @@ Codependence: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&downlo
 """
 
 import numpy as np
+import pandas as pd
 from scipy.spatial.distance import squareform, pdist
 
 
@@ -113,49 +114,59 @@ def distance_correlation(x: np.array, y: np.array) -> float:
     return coef
 
 
-def kl_dist(corr_A: np.array, corr_B: np.array) -> float:
+def kullback_leibler_distance(corr_a, corr_b):
     """
     Returns the Kullback-Leibler distance between two correlation matrices, all elements must be positive.
 
     Formula used for calculation:
 
-    kl_dist[X, Y] = 0.5 * ( Log( det(Y) / det(X) ) + tr((Y ^ -1).X - n )
+    kullback_leibler_distance[X, Y] = 0.5 * ( Log( det(Y) / det(X) ) + tr((Y ^ -1).X - n )
 
     Where n is the dimension space spanned by X.
 
     Read Don H. Johnson's research paper for more information on Kullback-Leibler distance:
     `<https://scholarship.rice.edu/bitstream/handle/1911/19969/Joh2001Mar1Symmetrizi.PDF>`_
 
-    :param corr_A: (np.array) Numpy array of the first correlation matrix.
-    :param corr_B: (np.array) Numpy array of the second correlation matrix.
+    :param corr_a: (np.array/pd.Series/pd.DataFrame) Numpy array of the first correlation matrix.
+    :param corr_b: (np.array/pd.Series/pd.DataFrame) Numpy array of the second correlation matrix.
     :return: (np.float64) the Kullback-Leibler distance between the two matrices.
     """
 
-    #import scipy.special as sc
+    # Check if input type is pd.DataFrame
+    if isinstance(corr_a, pd.DataFrame) and isinstance(corr_b, pd.DataFrame):
+        corr_a = corr_a.to_numpy()
+        corr_b = corr_b.to_numpy()
 
-    n = corr_A.shape[0]
-    dist = 0.5 * (np.log(np.linalg.det(corr_B) / np.linalg.det(corr_A)) + np.trace(np.linalg.inv(corr_B).dot(corr_A)) - n)
+    n = corr_a.shape[0]
+    dist = 0.5 * (np.log(np.linalg.det(corr_b) / np.linalg.det(corr_a)) +
+                  np.trace(np.linalg.inv(corr_b).dot(corr_a)) - n)
+
     return dist
 
 
-def norm_dist(matrix_a: np.array, matrix_b: np.array, r_val=2) -> float:
+def norm_distance(matrix_a, matrix_b, r_val=2):
     """
     Returns the normalized distance between two matrices.
 
     This function is a wrap for numpy's linear algebra method (numpy.linalg.norm).
-    Link to documentation: `<https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html>`_
+    Link to documentation: `<https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html>`_.
 
     Formula used to normalize matrix:
 
-    norm_dist[X, Y] = sum( abs(X - Y) ^ r ) ^ 1/r
+    norm_distance[X, Y] = sum( abs(X - Y) ^ r ) ^ 1/r
 
     Where r is a parameter. r=1 City block(L1 norm), r=2 Euclidean distance (L2 norm),
     r=inf Supermum (L_inf norm). For values of r < 1, the result is not really a mathematical ‘norm’.
 
-    :param matrix_a: (np.array/pd.Series) Array of the first matrix.
-    :param matrix_b: (np.array/pd.Series) Array of the second matrix.
+    :param matrix_a: (np.array/pd.Series/pd.DataFrame) Array of the first matrix.
+    :param matrix_b: (np.array/pd.Series/pd.DataFrame) Array of the second matrix.
     :param r_val: (int/str) The r value of the normalization formula. (``2`` by default, Any Integer)
     :return: (np.float64) The Euclidean distance between the two matrices.
     """
+
+    # Check if input type is pd.DataFrame
+    if isinstance(matrix_a, pd.DataFrame) and isinstance(matrix_b, pd.DataFrame):
+        matrix_a = matrix_a.to_numpy()
+        matrix_b = matrix_b.to_numpy()
 
     return np.linalg.norm(matrix_b - matrix_a, r_val)

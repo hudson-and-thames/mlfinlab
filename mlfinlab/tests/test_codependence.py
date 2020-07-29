@@ -4,9 +4,10 @@ Test functions from codependence module: correlation distances, mutual info, var
 
 import unittest
 import numpy as np
+import pandas as pd
 
 from mlfinlab.codependence.correlation import (squared_angular_distance, angular_distance, absolute_angular_distance,
-                                               distance_correlation, kl_dist, norm_dist)
+                                               distance_correlation, kullback_leibler_distance, norm_distance)
 from mlfinlab.codependence.information import (get_mutual_info, variation_of_information_score,
                                                get_optimal_number_of_bins)
 from mlfinlab.codependence.codependence_matrix import (get_dependence_matrix, get_distance_matrix)
@@ -37,6 +38,9 @@ class TestCodependence(unittest.TestCase):
         # getting the square produce of corr matricies to avoid negative values.
         self.corr_A = np.corrcoef(self.matrix_A, rowvar=False) ** 2
         self.corr_B = np.corrcoef(self.matrix_B, rowvar=False) ** 2
+        # Getting the pd.DataFrames to test for different input type
+        self.corr_A_df = pd.DataFrame(self.corr_A)
+        self.corr_B_df = pd.DataFrame(self.corr_B)
 
 
     def test_correlations(self):
@@ -47,15 +51,20 @@ class TestCodependence(unittest.TestCase):
         sq_angular_dist = squared_angular_distance(self.x, self.y_1)
         abs_angular_dist = absolute_angular_distance(self.x, self.y_1)
         dist_corr = distance_correlation(self.x, self.y_1)
-        kullback_dist = kl_dist(self.corr_A, self.corr_B)
-        normal_dist = norm_dist(self.corr_A, self.corr_B)
+        kullback_dist = kullback_leibler_distance(self.corr_A, self.corr_B)
+        norm_dist = norm_distance(self.corr_A, self.corr_B)
+        kullback_dist_df = kullback_leibler_distance(self.corr_A_df, self.corr_B_df)
+        norm_dist_df = norm_distance(self.corr_A_df, self.corr_B_df)
 
         self.assertAlmostEqual(angular_dist, 0.67, delta=1e-2)
         self.assertAlmostEqual(abs_angular_dist, 0.6703, delta=1e-2)
         self.assertAlmostEqual(sq_angular_dist, 0.7, delta=1e-2)
         self.assertAlmostEqual(dist_corr, 0.529, delta=1e-2)
-        self.assertAlmostEqual(kullback_dist, 1.2468779409564554, delta=1e-2)
-        self.assertAlmostEqual(normal_dist, 2.793363555176552e-07, delta=1e-2)
+        self.assertAlmostEqual(kullback_dist, 1.3119669122717053, delta=1e-2)
+        self.assertAlmostEqual(norm_dist, 3.911384908252778e-07, delta=1e-2)
+        # Checking if return is consistent when input type is pd.DataFrame
+        self.assertAlmostEqual(kullback_dist_df, 1.3119669122717053, delta=1e-2)
+        self.assertAlmostEqual(norm_dist_df, 3.911384908252778e-07, delta=1e-2)
 
         dist_corr_y_2 = distance_correlation(self.x, self.y_2)
         self.assertAlmostEqual(dist_corr_y_2, 0.5216, delta=1e-2)

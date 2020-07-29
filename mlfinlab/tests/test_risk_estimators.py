@@ -371,7 +371,6 @@ class TestRiskEstimators(unittest.TestCase):
         Test the shrinkage the eigenvalues associated with noise.
         """
 
-
         risk_estimators = RiskEstimators()
 
         # Covariance matrix to de-noise and parameters for the theoretical distribution.

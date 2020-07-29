@@ -170,11 +170,12 @@ The Kullback-Leibler distance is a measure of distance between two probability d
 Where :math:`E_p[.]` indicates the expectation value with respect to the probability density :math:`p`. Here we consider
 the Kullback-Leibler between multivariate Gaussian random variables (aka. Correlation matrices).
 
-Given two positive definite correlation matrices :math:`C_1` and :math:`C_2` assosiated with random variable :math:`X`, we can compute
-their probabilty density functions to :math:`P(C_1,X)` and :math:`P(C_1,X)` resulting in the following formula
+Given two positive definite correlation matrices :math:`C_1` and :math:`C_2` associated with random variable :math:`X`, we can compute
+their probability density functions to :math:`P(C_1,X)` and :math:`P(C_1,X)` resulting in the following formula
 
 .. math::
-     K(P(C_1,X),P(C_2,X)) = E_{P(C_1,X)} \left[log\left(\frac{P(C_1,X)}{P(C_2,X)}\right)\right] = \frac{1}{2}\left[log\left(\frac{|C_1|}{|C_2|}\right)+tr(C^{-1}_2 C_1) -n) \right]
+     K(P(C_1,X),P(C_2,X)) = E_{P(C_1,X)} \left[log\left(\frac{P(C_1,X)}{P(C_2,X)}\right)\right] =
+     \frac{1}{2}\left[log\left(\frac{|C_1|}{|C_2|}\right)+tr(C^{-1}_2 C_1) -n) \right]
 
 where :math:`n` is the dimension of the space spanned by :math:`X`, and :math:`|C|` indicates the determinant of :math:`C`
 
@@ -183,13 +184,16 @@ uncertainty.
 
 .. tip::
     It is worth noting that the Kullback-Leibler distance takes naturally into account the statistical nature of correlation matrices
-    which is uncommon with other measures of distance between matrices such as Frobenius distance which is based on
-    the iso-morphism between the matrices space and the vectors space.
+    which is uncommon with other measures of distance between matrices such as the Frobenius distance which is based on
+    the iso-morphism between the matrices space and the vectors space. For more information on using the Kullback-Leibler
+    distance to measure the statistical uncertainty of correlation matrices check out
+    `Michele Tumminello's research paper <https://www.researchgate.net/publication/5915427>`__.
+
 
 Implementation
 **************
 
-.. autofunction:: kl_dist
+.. autofunction:: kullback_leibler_distance
 
 Norm Distance
 #############
@@ -208,7 +212,7 @@ which makes the Euclidean norm an :math:`L^2` type norm.
 Implementation
 **************
 
-.. autofunction:: norm_dist
+.. autofunction:: norm_distance
 
 Examples
 ########
@@ -222,7 +226,7 @@ The following examples show how the described above correlation-based metrics ca
     import numpy as np
     from mlfinlab.codependence import (distance_correlation, angular_distance,
                                       absolute_angular_distance, squared_angular_distance,
-                                      kl_dist, norm_dist, get_dependence_matrix)
+                                      kullback_leibler_distance, norm_distance, get_dependence_matrix)
 
     # Import dataframe of returns for assets in a portfolio
     asset_returns = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)
@@ -250,7 +254,7 @@ The following examples show how the described above correlation-based metrics ca
     angular_dist_matrix = get_dependence_matrix(data, dependence_method='gnpr_distance')
 
     # Calculate the Kullback-Leibler distance between two correlation matrices
-    kldist = kl_dist(corr_18, corr_19)
+    kldist = kullback_leibler_distance(corr_18, corr_19)
 
-    # Calculates the Norm distance between two correlation matrices
-    dist = norm_dist(corr_18, corr_19)
+    # Calculate the Norm distance between two correlation matrices
+    dist = norm_distance(corr_18, corr_19)
