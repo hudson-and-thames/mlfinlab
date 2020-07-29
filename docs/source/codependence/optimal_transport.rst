@@ -66,7 +66,7 @@ With this optimal copula transport tool, one can look for answers to, for exampl
 ----
 
 Optimal Transport distance
-==========================
+##########################
 
 According to the description of the method from `the original paper by Marti et al. <https://arxiv.org/pdf/1610.09659.pdf>`__:
 
@@ -203,14 +203,14 @@ copulas in order to let the methodology provide these questions accurate answers
 
 
 Implementation
-##############
+**************
 
 .. py:currentmodule:: mlfinlab.codependence.optimal_transport
 
 .. autofunction:: optimal_transport_distance
 
 Examples
-========
+########
 
 The following example shows how the optimal transport distance can be used:
 
@@ -244,7 +244,7 @@ The following example shows how the optimal transport distance can be used:
                                             target_dependence='positive_negative')
 
 Research Notebooks
-##################
+******************
 
 The following research notebook can be used to better understand the optimal transport distance measure described above.
 

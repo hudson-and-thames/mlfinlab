@@ -9,7 +9,7 @@ Correlation-Based Metrics
 =========================
 
 Distance Correlation
-====================
+####################
 
 **Distance correlation** can capture not only linear association but also non-linear variable dependencies which Pearson correlation can not.
 It was introduced in 2005 by Gábor J. Szekely and is described in the work
@@ -44,14 +44,14 @@ This figure is from `"Introducing the discussion paper by Székely and Rizzo" <h
 by Michale A. Newton. It provides a great overview for readers.
 
 Implementation
-##############
+**************
 
 .. py:currentmodule:: mlfinlab.codependence.correlation
 
 .. autofunction:: distance_correlation
 
 Standard Angular Distance
-=========================
+#########################
 
 **Angular distance** is a slight modification of the Pearson correlation coefficient which satisfies all distance metric conditions.
 This measure is known as the angular distance because when we use *covariance* as an *inner product*, we can interpret correlation as :math:`cos\theta`.
@@ -91,12 +91,12 @@ Values of standard angular distance fall in the range:
    The angular distance satisfies all the conditions of a true metric, (Lopez de Prado, 2020.)
 
 Implementation
-##############
+**************
 
 .. autofunction:: angular_distance
 
 Absolute Angular Distance
-=========================
+#########################
 
 This modification of angular distance uses an absolute value of Pearson correlation in the formula.
 
@@ -126,12 +126,12 @@ Values of absolute angular distance fall in the range:
    sign of the correlation is ignored, (Lopez de Prado, 2020)
 
 Implementation
-##############
+**************
 
 .. autofunction:: absolute_angular_distance
 
 Squared Angular Distance
-=========================
+########################
 
 Squared angular distance uses the squared value of Pearson correlation in the formula and has similar properties to absolute
 angular distance. The only difference is that a higher distance is assigned to the elements that have a small absolute correlation.
@@ -155,12 +155,12 @@ Values of squared angular distance fall in the range:
    :alt: Modified Angular Distance
 
 Implementation
-##############
+**************
 
 .. autofunction:: squared_angular_distance
 
 Kullback-Leibler Distance
-=========================
+#########################
 
 The Kullback-Leibler distance is a measure of distance between two probability densities, say p and q, which is defined as
 
@@ -187,12 +187,12 @@ uncertainty.
     the iso-morphism between the matrices space and the vectors space.
 
 Implementation
-##############
+**************
 
 .. autofunction:: kl_dist
 
 Norm Distance
-=============
+#############
 
 A Norm is a function that takes a random variable and returns a value(Norm Distance) that satisfies certain properties pertaining to
 scalability and additivity.
@@ -206,12 +206,12 @@ where :math:`r` is a positive integer. The Euclidean norm is by far the most com
 which makes the Euclidean norm an :math:`L^2` type norm.
 
 Implementation
-##############
+**************
 
 .. autofunction:: norm_dist
 
 Examples
-========
+########
 
 The following examples show how the described above correlation-based metrics can be used on real data:
 

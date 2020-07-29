@@ -47,7 +47,7 @@ The following figure highlights how we can view the relationships of various inf
    The correspondence between joint entropy, marginal entropies, conditional entropies, mutual information and variation of information (Lopez de Prado, 2020)
 
 Mutual Information
-==================
+##################
 
 According to Lopez de Prado: "**Mutual Information** is defined as the decrease in uncertainty (or informational gain)
 in :math:`X` that results from knowing the value of :math:`Y`. Mutual information is not a metric as it doesn't satisfy
@@ -125,7 +125,7 @@ The copula has compact support in :math:`[0, 1]`, and its margins are uniform.
 Alternative Mutual Information estimators are also available in the below function.
 
 Implementation
-##############
+**************
 
 .. py:currentmodule:: mlfinlab.codependence.information
 
@@ -133,7 +133,7 @@ Implementation
 
 
 Variation of Information
-========================
+########################
 
 According to Lopez de Prado: "**Variation of Information** can be interpreted as the uncertainty we expect in one variable
 if we are told the value of another". The variation of information is a true metric and satisfies the axioms from the introduction.
@@ -150,13 +150,13 @@ when comparing variations of information across different population sizes, as d
 `Cornell lecture slides, p.21 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_
 
 Implementation
-##############
+**************
 
 .. autofunction::  variation_of_information_score
 
 
 Discretization
-==============
+##############
 
 Both mutual information and variation of information are using random variables that are discrete. To use these tools for
 continuous random variables the discretization approach can be used.
@@ -188,13 +188,13 @@ for marginal and joint entropy.
 This optimal binning method is used in the mutual information and variation of information functions.
 
 Implementation
-##############
+**************
 
 .. autofunction:: get_optimal_number_of_bins
 
 
 Examples
-========
+########
 
 The following example highlights how the various metrics behave under various variable dependencies:
 

@@ -19,7 +19,7 @@ distance metrics described previously.
    MlFinLab makes use of these functions in the clustered feature importance and portfolio optimization modules.
 
 Implementation
-==============
+##############
 
 .. py:currentmodule:: mlfinlab.codependence.codependence_matrix
 .. autofunction:: get_dependence_matrix
@@ -27,7 +27,7 @@ Implementation
 
 
 Example
-=======
+*******
 
 .. code-block::
 
