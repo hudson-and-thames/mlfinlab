@@ -38,9 +38,6 @@ class TestCodependence(unittest.TestCase):
         # getting the square produce of corr matricies to avoid negative values.
         self.corr_A = np.corrcoef(self.matrix_A, rowvar=False) ** 2
         self.corr_B = np.corrcoef(self.matrix_B, rowvar=False) ** 2
-        # Getting the pd.DataFrames to test for different input type
-        self.corr_A_df = pd.DataFrame(self.corr_A)
-        self.corr_B_df = pd.DataFrame(self.corr_B)
 
 
     def test_correlations(self):
@@ -53,8 +50,11 @@ class TestCodependence(unittest.TestCase):
         dist_corr = distance_correlation(self.x, self.y_1)
         kullback_dist = kullback_leibler_distance(self.corr_A, self.corr_B)
         norm_dist = norm_distance(self.corr_A, self.corr_B)
-        kullback_dist_df = kullback_leibler_distance(self.corr_A_df, self.corr_B_df)
-        norm_dist_df = norm_distance(self.corr_A_df, self.corr_B_df)
+        # Assigns pd.DataFrame as input
+        corr_A_df = pd.DataFrame(self.corr_A)
+        corr_B_df = pd.DataFrame(self.corr_B)
+        kullback_dist_df = kullback_leibler_distance(corr_A_df, corr_B_df)
+        norm_dist_df = norm_distance(corr_A_df, corr_B_df)
 
         self.assertAlmostEqual(angular_dist, 0.67, delta=1e-2)
         self.assertAlmostEqual(abs_angular_dist, 0.6703, delta=1e-2)
@@ -63,8 +63,8 @@ class TestCodependence(unittest.TestCase):
         self.assertAlmostEqual(kullback_dist, 1.3119669122717053, delta=1e-2)
         self.assertAlmostEqual(norm_dist, 3.911384908252778e-07, delta=1e-2)
         # Checking if return is consistent when input type is pd.DataFrame
-        self.assertAlmostEqual(kullback_dist_df, 1.3119669122717053, delta=1e-2)
-        self.assertAlmostEqual(norm_dist_df, 3.911384908252778e-07, delta=1e-2)
+        self.assertAlmostEqual(kullback_dist_df, kullback_dist, delta=1e-2)
+        self.assertAlmostEqual(norm_dist_df, norm_dist, delta=1e-2)
 
         dist_corr_y_2 = distance_correlation(self.x, self.y_2)
         self.assertAlmostEqual(dist_corr_y_2, 0.5216, delta=1e-2)
