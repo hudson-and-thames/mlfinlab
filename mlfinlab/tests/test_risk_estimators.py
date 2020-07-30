@@ -349,18 +349,18 @@ class TestRiskEstimators(unittest.TestCase):
         bad_inputs = [bad_dimension, bad_size, non_positive, non_sym]
 
         # Testing for warnings
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True) as warn:
             warnings.simplefilter("always")
             bad_inputs_results = [risk_estimators.filter_corr_hierarchical(bads) for bads in bad_inputs]
-            self.assertEqual(len(w), 4)
+            self.assertEqual(len(warn), 4)
 
         bad_inputs.append(corr)
 
         # Testing with invalid method parameter
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True) as warn:
             warnings.simplefilter("always")
             bad_inputs_results.append(risk_estimators.filter_corr_hierarchical(corr, method='bad'))
-            self.assertEqual(len(w), 4)
+            self.assertEqual(len(warn), 1)
 
         # Testing to see if failed return fetches the unfiltered correlation array
         for idx, result in enumerate(bad_inputs_results):
