@@ -3,6 +3,7 @@
 Tests the functions from the RiskEstimators class.
 """
 
+import warnings
 import unittest
 import os
 import numpy as np
@@ -295,8 +296,7 @@ class TestRiskEstimators(unittest.TestCase):
         # Testing if the de-toned correlation matrix is right
         np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
 
-    @staticmethod
-    def test_filter_corr_hierarchical():
+    def test_filter_corr_hierarchical(self):
         """
         Test the filtering of the emperical correlation matrix.
         """
@@ -335,23 +335,32 @@ class TestRiskEstimators(unittest.TestCase):
         # Test plot
         risk_estimators.filter_corr_hierarchical(corr, draw_plot=True)
 
-        # Testing is filtered matricies are consistent with expected values.
+        # Testing is filtered matrices are consistent with expected values.
         np.testing.assert_almost_equal(corr_complete, expected_corr_complete, decimal=4)
         np.testing.assert_almost_equal(corr_single, expected_corr_single, decimal=4)
         np.testing.assert_almost_equal(corr_average, expected_corr_avg, decimal=4)
 
         # Testing input matrix with invalid inputs.
-        bad_dimesion = np.array([1, 0])
+        bad_dimension = np.array([1, 0])
         bad_size = np.array([[1, 0, 1], [0, 1, 1]])
         non_positive = np.array([[1, -1], [0, 1]])
         non_sym = np.array([[0, 0], [0, 0]])
 
-        bad_inputs = [bad_dimesion, bad_size, non_positive, non_sym]
-        bad_inputs_results = [risk_estimators.filter_corr_hierarchical(bads) for bads in bad_inputs]
+        bad_inputs = [bad_dimension, bad_size, non_positive, non_sym]
+
+        # Testing for warnings
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            bad_inputs_results = [risk_estimators.filter_corr_hierarchical(bads) for bads in bad_inputs]
+            self.assertEqual(len(w), 4)
+
         bad_inputs.append(corr)
 
         # Testing with invalid method parameter
-        bad_inputs_results.append(risk_estimators.filter_corr_hierarchical(corr, method='bad'))
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            bad_inputs_results.append(risk_estimators.filter_corr_hierarchical(corr, method='bad'))
+            self.assertEqual(len(w), 4)
 
         # Testing to see if failed return fetches the unfiltered correlation array
         for idx, result in enumerate(bad_inputs_results):

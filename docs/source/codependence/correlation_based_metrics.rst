@@ -168,14 +168,16 @@ The Kullback-Leibler distance is a measure of distance between two probability d
     K(p,q) = E_p \left[log\left(\frac{p}{q}\right)\right]
 
 Where :math:`E_p[.]` indicates the expectation value with respect to the probability density :math:`p`. Here we consider
-the Kullback-Leibler between multivariate Gaussian random variables (aka. Correlation matrices).
+the Kullback-Leibler distance between multivariate Gaussian random variables (aka. Correlation matrices).
 
 Given two positive definite correlation matrices :math:`C_1` and :math:`C_2` associated with random variable :math:`X`, we can compute
 their probability density functions to :math:`P(C_1,X)` and :math:`P(C_1,X)` resulting in the following formula
 
 .. math::
-     K(P(C_1,X),P(C_2,X)) = E_{P(C_1,X)} \left[log\left(\frac{P(C_1,X)}{P(C_2,X)}\right)\right] =
-     \frac{1}{2}\left[log\left(\frac{|C_1|}{|C_2|}\right)+tr(C^{-1}_2 C_1) -n) \right]
+    \begin{gather*}
+    K(P(C_1,X),P(C_2,X)) = E_{P(C_1,X)} \left[log\left(\frac{P(C_1,X)}{P(C_2,X)}\right)\right] = \\
+    \frac{1}{2}\left[log\left(\frac{|C_1|}{|C_2|}\right)+tr(C^{-1}_2 C_1) -n) \right]
+    \end{gather*}
 
 where :math:`n` is the dimension of the space spanned by :math:`X`, and :math:`|C|` indicates the determinant of :math:`C`
 

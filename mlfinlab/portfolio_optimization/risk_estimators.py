@@ -680,6 +680,7 @@ class RiskEstimators:
         the maximum theoretical eigenvalue are set to zero, preserving the trace of the
         correlation matrix).
         The result is the de-noised correlation matrix.
+
         :param eigenvalues: (np.array) Matrix with eigenvalues on the main diagonal.
         :param eigenvectors: (float) Eigenvectors array.
         :param num_facts: (float) Threshold for eigenvalues to be fixed.

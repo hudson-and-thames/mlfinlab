@@ -344,7 +344,7 @@ The de-noising function works as follows:
 Spectral Clustering Filtering Method
 ************************************
 
-The main idea behind spectral clustering is to remove the noise-related eigenvalues from an emperical correlation matrix,
+The main idea behind spectral clustering is to remove the noise-related eigenvalues from an empirical correlation matrix,
 the method in which this is achieved is similar to the Constant Residual Eigenvalue de-noising method, the only difference
 is that instead of setting the eigenvalues which are below the theoretical value to their average value, they are set to zero
 in an attempt to remove the effects of those eigenvalues that are consistent with the null hypothesis of uncorrelated random variables.
@@ -357,7 +357,7 @@ eigenvalues of the sample correlation matrix cannot be larger than
 
     \lambda_{max} = \sigma^2(1 + \frac{1}{Q} + 2\sqrt{\frac{1}{Q}})
 
-where :math:`\sigma^2 = 1` for correlation matrices, once achieved we set any eignevalues above this threshold to :math:`0`.
+where :math:`\sigma^2 = 1` for correlation matrices, once achieved we set any eigenvalues above this threshold to :math:`0`.
 For example, we have a set of 5 eigenvalues sorted in the descending order ( :math:`\lambda_1` ... :math:`\lambda_5` ),
 3 of which are below the maximum theoretical value, then we set
 
@@ -459,7 +459,9 @@ of :math:`n-1` iterations; until only a single cluster remains.
 
 .. tip::
     Divisive Hierarchical clustering works in the opposite way. It starts with one single cluster wrapping all
-    datapoints and divides the cluster at each step of its iteration until it ends with n clusters.
+    data points and divides the cluster at each step of its iteration until it ends with n clusters. For more information
+    on Hierarchical Procedures for correlation matrix filtering, Check Michele Tumminello et al research paper
+    `here <https://arxiv.org/pdf/0809.4615.pdf>`__.
 
 
 Implementation
