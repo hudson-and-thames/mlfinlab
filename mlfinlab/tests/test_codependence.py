@@ -32,13 +32,17 @@ class TestCodependence(unittest.TestCase):
         self.y_2 = abs(self.x) + state.normal(size=1000) / 5
         self.y_3 = self.x + state.normal(size=1000) / 5
         self.X_matrix, _ = get_classification_data(6, 2, 2, 100, sigma=0)
-        # Adding noise to matricies to avoid singularity
-        self.matrix_A = self.X_matrix + 0.00001*np.random.rand(100, 6)
-        self.matrix_B = self.X_matrix + 0.00003*np.random.rand(100, 6)
-        # getting the square produce of corr matricies to avoid negative values.
-        self.corr_A = np.corrcoef(self.matrix_A, rowvar=False) ** 2
-        self.corr_B = np.corrcoef(self.matrix_B, rowvar=False) ** 2
-
+        # Setting sample correlation matrices
+        self.corr_A = np.array([[1, 0.70573243, 0.03085437, 0.6019651, 0.81214341],
+                                [0.70573243, 1, 0.03126594, 0.56559443, 0.88961155],
+                                [0.03085437, 0.03126594, 1, 0.01760481, 0.02842086],
+                                [0.60196510, 0.56559443, 0.01760481, 1, 0.73827921],
+                                [0.81214341, 0.88961155, 0.02842086, 0.73827921, 1]])
+        self.corr_B = np.array([[1, 0.49805826, 0.00095199, 0.36236198, 0.65957691],
+                                [0.49805826, 1, 0.00097755, 0.31989705, 0.79140871],
+                                [0.00095199, 0.00097755, 1, 0.00030992, 0.00080774],
+                                [0.36236198, 0.31989705, 0.00030992, 1, 0.54505619],
+                                [0.65957691, 0.79140871, 0.00080774, 0.54505619, 1]])
 
     def test_correlations(self):
         """
@@ -60,8 +64,8 @@ class TestCodependence(unittest.TestCase):
         self.assertAlmostEqual(abs_angular_dist, 0.6703, delta=1e-2)
         self.assertAlmostEqual(sq_angular_dist, 0.7, delta=1e-2)
         self.assertAlmostEqual(dist_corr, 0.529, delta=1e-2)
-        self.assertAlmostEqual(kullback_dist, 1.3119669122717053, delta=1e-2)
-        self.assertAlmostEqual(norm_dist, 3.911384908252778e-07, delta=1e-2)
+        self.assertAlmostEqual(kullback_dist, 0.250807852409, delta=1e-2)
+        self.assertAlmostEqual(norm_dist, 0.58255075616, delta=1e-2)
         # Checking if return is consistent when input type is pd.DataFrame
         self.assertAlmostEqual(kullback_dist_df, kullback_dist, delta=1e-2)
         self.assertAlmostEqual(norm_dist_df, norm_dist, delta=1e-2)
