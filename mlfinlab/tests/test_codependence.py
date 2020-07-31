@@ -66,6 +66,7 @@ class TestCodependence(unittest.TestCase):
         self.assertAlmostEqual(dist_corr, 0.529, delta=1e-2)
         self.assertAlmostEqual(kullback_dist, 0.250807852409, delta=1e-2)
         self.assertAlmostEqual(norm_dist, 0.58255075616, delta=1e-2)
+
         # Checking if return is consistent when input type is pd.DataFrame
         self.assertAlmostEqual(kullback_dist_df, kullback_dist, delta=1e-2)
         self.assertAlmostEqual(norm_dist_df, norm_dist, delta=1e-2)

@@ -3,7 +3,6 @@
 Tests the functions from the RiskEstimators class.
 """
 
-import warnings
 import unittest
 import os
 import numpy as np
@@ -296,7 +295,8 @@ class TestRiskEstimators(unittest.TestCase):
         # Testing if the de-toned correlation matrix is right
         np.testing.assert_almost_equal(corr_matrix, expected_corr, decimal=4)
 
-    def test_filter_corr_hierarchical(self):
+    @staticmethod
+    def test_filter_corr_hierarchical():
         """
         Test the filtering of the emperical correlation matrix.
         """
@@ -340,31 +340,43 @@ class TestRiskEstimators(unittest.TestCase):
         np.testing.assert_almost_equal(corr_single, expected_corr_single, decimal=4)
         np.testing.assert_almost_equal(corr_average, expected_corr_avg, decimal=4)
 
+    def test_filter_corr_hierarchical_warnings(self):
+        """
+        Test warnings while filtering of the emperical correlation matrix.
+        """
+
+        risk_estimators = RiskEstimators()
+
         # Testing input matrix with invalid inputs.
+        corr = np.array([[1, 0.70573243], [0.70573243, 1]])
         bad_dimension = np.array([1, 0])
         bad_size = np.array([[1, 0, 1], [0, 1, 1]])
         non_positive = np.array([[1, -1], [0, 1]])
         non_sym = np.array([[0, 0], [0, 0]])
 
-        bad_inputs = [bad_dimension, bad_size, non_positive, non_sym]
+        # Lists to test the expected outputs
+        bad_inputs = [bad_dimension, bad_size, non_positive, non_sym, corr]
+        result = []
 
         # Testing for warnings
-        with warnings.catch_warnings(record=True) as warn:
-            warnings.simplefilter("always")
-            bad_inputs_results = [risk_estimators.filter_corr_hierarchical(bads) for bads in bad_inputs]
-            self.assertEqual(len(warn), 4)
+        with self.assertWarns(UserWarning):  # Warning for bad dimension
+            result.append(risk_estimators.filter_corr_hierarchical(bad_dimension))
 
-        bad_inputs.append(corr)
+        with self.assertWarns(UserWarning):  # Warning for bad size
+            result.append(risk_estimators.filter_corr_hierarchical(bad_size))
 
-        # Testing with invalid method parameter
-        with warnings.catch_warnings(record=True) as warn:
-            warnings.simplefilter("always")
-            bad_inputs_results.append(risk_estimators.filter_corr_hierarchical(corr, method='bad'))
-            self.assertEqual(len(warn), 1)
+        with self.assertWarns(UserWarning):  # Warning for non-positive matrix
+            result.append(risk_estimators.filter_corr_hierarchical(non_positive))
+
+        with self.assertWarns(UserWarning):  # Warning for non-symmetrical matrix
+            result.append(risk_estimators.filter_corr_hierarchical(non_sym))
+
+        with self.assertWarns(UserWarning):  # Warning for invalid method parameter
+            result.append(risk_estimators.filter_corr_hierarchical(corr, method='bad'))
 
         # Testing to see if failed return fetches the unfiltered correlation array
-        for idx, result in enumerate(bad_inputs_results):
-            np.testing.assert_almost_equal(result, bad_inputs[idx], decimal=4)
+        for idx, res in enumerate(result):
+            np.testing.assert_almost_equal(res, bad_inputs[idx], decimal=4)
 
     @staticmethod
     def test_denoise_covariance():
