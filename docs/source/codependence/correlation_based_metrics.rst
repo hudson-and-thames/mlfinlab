@@ -228,7 +228,8 @@ The following examples show how the described above correlation-based metrics ca
     import numpy as np
     from mlfinlab.codependence import (distance_correlation, angular_distance,
                                       absolute_angular_distance, squared_angular_distance,
-                                      kullback_leibler_distance, norm_distance, get_dependence_matrix)
+                                      kullback_leibler_distance, norm_distance,
+                                      get_dependence_matrix)
 
     # Import dataframe of returns for assets in a portfolio
     asset_returns = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)

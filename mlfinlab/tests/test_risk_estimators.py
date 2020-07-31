@@ -419,13 +419,16 @@ class TestRiskEstimators(unittest.TestCase):
                                          [0.0047, 0.0111, 0.01]])
 
         # Finding the de-noised covariance matrix
-        cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method, detone, market_component, kde_bwidth)
+        cov_matrix_denoised = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method,
+                                                                 detone, market_component, kde_bwidth)
 
         # Using the alternative de-noising method
-        cov_matrix_denoised_alt = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method_alt, detone, market_component, kde_bwidth, alpha)
+        cov_matrix_denoised_alt = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method_alt,
+                                                                     detone, market_component, kde_bwidth, alpha)
 
         # Using the second alternative of the de-noising method
-        cov_matrix_denoised_alt_2 = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method_alt_2, detone, market_component, kde_bwidth)
+        cov_matrix_denoised_alt_2 = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method_alt_2,
+                                                                       detone, market_component, kde_bwidth)
 
         # Finding the de-toned covariance matrix
         cov_matrix_detoned = risk_estimators.denoise_covariance(cov_matrix, tn_relation, denoise_method, detone_alt,
