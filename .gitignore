@@ -1,0 +1,12 @@
+.idea/*
+*.pyc
+__pycache__
+test_reports
+.coverage
+.DS_Store
+docs/build/
+.local/
+cover/
+*.pickle
+*/.ipynb_checkpoints/*
+mlfinlab.egg-info/*
