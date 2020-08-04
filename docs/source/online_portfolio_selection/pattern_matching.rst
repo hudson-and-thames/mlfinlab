@@ -8,7 +8,7 @@
     2. `Wang, Y. and Wang, D., 2019. Market Symmetry and Its Application to Pattern-Matching-Based Portfolio Selection. The Journal of Financial Data Science, 1(2), pp.78-93. <https://jfds.pm-research.com/content/1/2/78.short>`_
 
 ===================
-🔒 Pattern Matching
+Pattern Matching 🔒
 ===================
 
 This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
