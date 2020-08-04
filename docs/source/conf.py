@@ -65,4 +65,4 @@ html_static_path = ['_static']
 html_copy_source = True
 
 # Adding other LaTeX engine to fix build
-latex_engine = 'xelatex'
+# latex_engine = 'xelatex'
