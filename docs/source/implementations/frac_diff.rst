@@ -1,8 +1,8 @@
 .. _implementations-frac_diff:
 
-====================================
-Fractionally Differentiated Features
-====================================
+=======================================
+Fractionally Differentiated Features 🔒
+=======================================
 
 This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
 `Patreon <https://www.patreon.com/HudsonThames>`_.

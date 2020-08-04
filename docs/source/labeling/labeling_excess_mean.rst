@@ -1,8 +1,8 @@
 .. _implementations-labeling_excess_mean:
 
-================
-Excess Over Mean
-================
+===================
+Excess Over Mean 🔒
+===================
 
 This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
 `Patreon <https://www.patreon.com/HudsonThames>`_.

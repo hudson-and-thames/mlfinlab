@@ -8,9 +8,9 @@
    The initial implementation was taken from the blog post by Gautier Marti:
    `Measuring non-linear dependence with Optimal Transport <https://gmarti.gitlab.io/qfin/2020/06/25/copula-optimal-transport-dependence.html>`__.
 
-=================
-Optimal Transport
-=================
+====================
+Optimal Transport 🔒
+====================
 
 This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
 `Patreon <https://www.patreon.com/HudsonThames>`_.
