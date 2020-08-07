@@ -1,6 +1,10 @@
 .. _online_portfolio_selection-mean_reversion:
 
 .. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
+.. note::
 
     Strategies were implemented with modifications from:
 
@@ -566,5 +570,9 @@ Example Code
 Research Notebook
 #################
 
-    The following `mean reversion <https://github.com/Hudson-and-Thames-Clients/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Mean%20Reversion.ipynb>`_
-    notebook provides a more detailed exploration of the strategies.
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
+The following `mean reversion <https://github.com/Hudson-and-Thames-Clients/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Mean%20Reversion.ipynb>`_
+notebook provides a more detailed exploration of the strategies.

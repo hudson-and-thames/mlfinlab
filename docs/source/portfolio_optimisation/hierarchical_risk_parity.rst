@@ -20,6 +20,9 @@
 
     </h4>
 
+.. note::
+    This section includes accompanying Jupyter Notebook Tutorials that are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 .. note::
     The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies.
@@ -168,6 +171,10 @@ Plotting
 
 Research Notebooks
 ##################
+
+.. note::
+    These and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 The following research notebooks provide a more detailed exploration of the algorithm.
 

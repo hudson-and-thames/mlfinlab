@@ -1,5 +1,9 @@
 .. _implementations-labeling_fixed_time_horizon:
 
+.. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
 ====================
 Fixed Horizon Method
 ====================
@@ -100,6 +104,10 @@ Below is an example on how to use the Fixed Horizon labeling technique on real d
 
 Research Notebook
 #################
+
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 The following research notebook can be used to better understand the Fixed Horizon labeling technique.
 

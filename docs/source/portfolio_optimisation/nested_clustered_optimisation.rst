@@ -28,6 +28,10 @@
 
     </h5>
 
+.. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
 ===================================
 Nested Clustered Optimization (NCO)
 ===================================
@@ -163,6 +167,10 @@ Below is an example of how to use the package functions to calculate risk metric
 
 Research Notebooks
 ##################
+
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 The following research notebooks provide a more detailed exploration of the algorithm.
 

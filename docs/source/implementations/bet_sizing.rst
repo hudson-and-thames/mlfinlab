@@ -1,5 +1,9 @@
 .. py:currentmodule:: mlfinlab.bet_sizing.bet_sizing
 
+.. note::
+    This section includes accompanying Jupyter Notebook Tutorials that are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
 ==========
 Bet Sizing
 ==========
@@ -88,6 +92,10 @@ Snippets for Dynamic Bet Sizing
 
 Research Notebooks
 ##################
+
+.. note::
+    These and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 The following research notebooks can be used to better understand bet sizing.
 

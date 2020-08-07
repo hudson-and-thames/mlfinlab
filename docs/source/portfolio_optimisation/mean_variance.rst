@@ -29,6 +29,10 @@
     </h5>
 
 .. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
+.. note::
     The portfolio optimization module contains different algorithms that are used for asset allocation and optimising strategies.
     Each algorithm is encapsulated in its own class and has a public method called ``allocate()`` which calculates the weight
     allocations on the specific user data. This way, each implementation can be called in the same way and this makes it simple
@@ -437,6 +441,10 @@ the frontier to be displayed.
 
 Research Notebooks
 ##################
+
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 The following research notebooks provide a more detailed exploration of the algorithm.
 

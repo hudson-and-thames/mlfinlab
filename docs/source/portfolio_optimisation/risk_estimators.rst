@@ -28,6 +28,9 @@
 
     </h5>
 
+.. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 ===============
 Risk Estimators
@@ -461,6 +464,10 @@ Example Code
 
 Research Notebooks
 ##################
+
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 The following research notebook can be used to better understand how the algorithms within this module can be used on real data.
 

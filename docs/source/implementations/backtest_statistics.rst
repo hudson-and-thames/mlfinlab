@@ -1,5 +1,9 @@
 .. _implementations-backtest_statistics:
 
+.. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
 ===================
 Backtest Statistics
 ===================
@@ -386,6 +390,10 @@ An example showing how Flattening and Flips function is used can be seen below:
 
 Research Notebooks
 ##################
+
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 The following research notebooks can be used to better understand how the statistics within this module can be used on
 real data.

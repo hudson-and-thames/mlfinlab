@@ -1,6 +1,10 @@
 .. _online_portfolio_selection-benchmarks:
 
 .. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
+.. note::
 
     Strategies were implemented with modifications from:
 
@@ -284,6 +288,10 @@ Example Code
 
 Research Notebook
 #################
+
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 The following `benchmarks <https://github.com/Hudson-and-Thames-Clients/research/blob/master/Online%20Portfolio%20Selection/Introduction%20to%20Online%20Portfolio%20Selection.ipynb>`_
 notebook provides a more detailed exploration of the strategies.
