@@ -15,31 +15,34 @@ try algorithms hands-on and gain additional understanding of how they can be use
    :figclass: align-center
    :alt: Research Notebook preview
 
+Available Notebooks
+###################
+
 The following is the directory structure for the Notebooks in our private
 `Hudson & Thames Cliensts repository <https://github.com/Hudson-and-Thames-Clients>`_. The Research
-notebooks are highlighted in **bold**.
+notebooks are marked as links to their abstracts.
 
 
 | ├── Advances in Financial Machine Learning
 | │   ├── Backtest Statistics
-| │   │   └── **Chapter14_BacktestStatistics.ipynb**
+| │   │   └── `Chapter14_BacktestStatistics.ipynb <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id1>`_
 | │   ├── Bet Sizing
-| │   │   ├── **Chapter10_Exercises.ipynb**
-| │   │   ├── **Chapter10_Exercises (mlfinlab).ipynb**
-| │   │   ├── **ef3m_testing.ipynb**
+| │   │   ├── `Chapter10_Exercises.ipynb <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id2>`_
+| │   │   ├── `Chapter10_Exercises (mlfinlab).ipynb <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id3>`_
+| │   │   ├── `ef3m_testing.ipynb <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id4>`_
 | │   ├── Cross-Validation in Finance
-| │   │   └── **Chapter7_Exercises_CrossValidation.ipynb**
+| │   │   └── `Chapter7_Exercises_CrossValidation.ipynb <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id5>`_
 | │   ├── Ensemble Methods
-| │   │   ├── **Ensemble_Methods.ipynb**
+| │   │   ├── `Ensemble_Methods.ipynb <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id6>`_
 | │   ├── Feature Importance
-| │   │   ├── **Chapter8_Exercises_Feature_Importance.ipynb**
-| │   │   ├── **Cluster_Feature_Importance.ipynb**
+| │   │   ├── `Chapter8_Exercises_Feature_Importance.ipynb <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id7>`_
+| │   │   ├── `Cluster_Feature_Importance.ipynb <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id8>`_
 | │   ├── Financial Data Structures
-| │   │   ├── **Dollar-Imbalance-Bars.ipynb**
-| │   │   ├── **ETF_trick_hedge.ipynb**
-| │   │   ├── **Futures_Roll_Trick.ipynb**
-| │   │   ├── **Getting Started.ipynb**
-| │   │   ├── **Sample_Techniques.ipynb**
+| │   │   ├── `Dollar-Imbalance-Bars.ipynb <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id9>`_
+| │   │   ├── `ETF_trick_hedge.ipynb <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id10>`_
+| │   │   ├── `Futures_Roll_Trick.ipynb <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id11>`_
+| │   │   ├── `Getting Started.ipynb <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id12>`_
+| │   │   ├── `Sample_Techniques.ipynb <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id13>`_
 | │   │   └── tutorial_data
 | │   │       ├── dollar_bars.csv
 | │   │       ├── ES_Trades.zip
@@ -47,52 +50,53 @@ notebooks are highlighted in **bold**.
 | │   │       ├── time_bars.csv
 | │   │       └── volume_bars.csv
 | │   ├── Fractionally Differentiated Features
-| │   │   ├── **Chapter5_Exercises.ipynb**
+| │   │   ├── `Chapter5_Exercises.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id14>`_
 | │   ├── Hyper-Parameter Tuning
-| │   │   └── **Hyperparameter Tuning with CV.ipynb**
+| │   │   └── `Hyperparameter Tuning with CV.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id15>`_
 | │   ├── Labelling
-| │   │   ├── **BBand-Question.ipynb**
-| │   │   ├── **Chapter3-Part1.ipynb**
-| │   │   ├── **Meta-Labels-MNIST.ipynb**
-| │   │   └── **Trend-Follow-Question.ipynb**
+| │   │   ├── `BBand-Question.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id16>`_
+| │   │   ├── `Chapter3-Part1.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id17>`_
+| │   │   ├── `Meta-Labels-MNIST.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id18>`_
+| │   │   └── `Trend-Follow-Question.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id19>`_
 | │   ├── Machine Learning Asset Allocation
-| │   │   ├── **Chapter16.ipynb**
+| │   │   ├── `Chapter16.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id20>`_
 | │   ├── Microstructural Features
-| │   │   ├── **Chapter19-Questions.ipynb**
-| │   │   ├── **Microstructural-Features.ipynb**
+| │   │   ├── `Chapter19-Questions.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id21>`_
+| │   │   ├── `Microstructural-Features.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id22>`_
 | │   ├── Sample Weights
-| │   │   ├── **Chapter4_Exercises.ipynb**
-| │   │   ├── **Sequential_Bootstrapping.ipynb**
-| │   │   └── **Trend-Follow-Question-Extended-SB-Cross-Val.ipynb**
+| │   │   ├── `Chapter4_Exercises.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id23>`_
+| │   │   ├── `Sequential_Bootstrapping.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id24>`_
+| │   │   └── `Trend-Follow-Question-Extended-SB-Cross-Val.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id25>`_
 | │   └── Understanding Strategy Risk
-| │       └── **Chapter15_Exercises_UnderstandingStrategyRisk.ipynb**
+| │       └── `Chapter15_Exercises_UnderstandingStrategyRisk.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id26>`_
 | ├── A Framework for Backtest Overfitting
+| │   └── `Backtest Overfitting.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id27>`_
 | ├── Codependence
-| │   ├── **Codependence_by_Marti.ipynb**
-| │   └── **Optimal_Transport.ipynb**
+| │   ├── `Codependence_by_Marti.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id28>`_
+| │   └── `Optimal_Transport.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id29>`_
 | ├── Labeling
-| │   ├── **Labeling_vs_Benchmark.ipynb**
-| │   ├── **Labels_Excess_Over_Mean.ipynb**
-| │   ├── **Labels_Excess_Over_Median.ipynb**
-| │   ├── **Labels_Fixed_Horizon.ipynb**
-| │   ├── **Labels_Matrix_Flags.ipynb**
-| │   ├── **Labels_Raw_Return.ipynb**
-| │   └── **Labels_Tail_Sets.ipynb**
+| │   ├── `Labeling_vs_Benchmark.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id30>`_
+| │   ├── `Labels_Excess_Over_Mean.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id31>`_
+| │   ├── `Labels_Excess_Over_Median.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id32>`_
+| │   ├── `Labels_Fixed_Horizon.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id33>`_
+| │   ├── `Labels_Matrix_Flags.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id34>`_
+| │   ├── `Labels_Raw_Return.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id35>`_
+| │   └── `Labels_Tail_Sets.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id36>`_
 | ├── Online Portfolio Selection
-| │   ├── **Data Selection.ipynb**
-| │   ├── **Introduction to Online Portfolio Selection.ipynb**
+| │   ├── `Data Selection.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id37>`_
+| │   ├── `Introduction to Online Portfolio Selection.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id38>`_
 | │   ├── olps_create_obj.py
 | │   ├── olps_tuning.py
-| │   ├── **Online Portfolio Selection - Mean Reversion.ipynb**
-| │   ├── **Online Portfolio Selection - Momentum.ipynb**
-| │   └── **Online Portfolio Selection - Pattern Matching.ipynb**
+| │   ├── `Online Portfolio Selection - Mean Reversion.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id39>`_
+| │   ├── `Online Portfolio Selection - Momentum.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id40>`_
+| │   └── `Online Portfolio Selection - Pattern Matching.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id41>`_
 | ├── Portfolio Optimisation Tutorials
-| │   ├── **HERC_&_HRP_Comparison.ipynb**
-| │   ├── **Hierarchical_Equal_Risk_Contribution (HERC).ipynb**
-| │   ├── **Hierarchical_Risk_Parity_(HRP).ipynb**
-| │   ├── **Nested_Clustered_Optimisation_(NCO).ipynb**
-| │   ├── **Risk_Estimators.ipynb**
-| │   └── **Theory_Implied_Correlation_(TIC).ipynb**
+| │   ├── `HERC_&_HRP_Comparison.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id42>`_
+| │   ├── `Hierarchical_Equal_Risk_Contribution (HERC).ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id43>`_
+| │   ├── `Hierarchical_Risk_Parity_(HRP).ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id44>`_
+| │   ├── `Nested_Clustered_Optimisation_(NCO).ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id45>`_
+| │   ├── `Risk_Estimators.ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id46>`_
+| │   └── `Theory_Implied_Correlation_(TIC).ipynb** <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html#id47>`_
 | ├── Sample-Data
 | │   ├── assetalloc.csv
 | │   ├── classification_tree.csv
