@@ -15,7 +15,7 @@ The following research notebook can be used to better understand the matrix flag
 
 * `Matrix Flags Example`_
 
-.. _`Matrix Flags Example`: https://github.com/hudson-and-thames/research/blob/master/Labeling/Labels%20Matrix%20Flags/Matrix%20Flag%20Labels.ipynb
+.. _`Matrix Flags Example`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Labeling/Labels%20Matrix%20Flags/Matrix%20Flag%20Labels.ipynb
 
 
 

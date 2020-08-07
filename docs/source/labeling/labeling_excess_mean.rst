@@ -15,4 +15,4 @@ The following research notebooks can be used to better understand labeling exces
 
 * `Excess Over Mean Example`_
 
-.. _`Excess Over Mean Example`: https://github.com/hudson-and-thames/research/blob/master/Labeling/Labels%20Excess%20Over%20Mean/excess_over_mean.ipynb
+.. _`Excess Over Mean Example`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Labeling/Labels%20Excess%20Over%20Mean/excess_over_mean.ipynb

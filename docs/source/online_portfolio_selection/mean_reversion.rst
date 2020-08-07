@@ -566,5 +566,5 @@ Example Code
 Research Notebook
 #################
 
-    The following `mean reversion <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Mean%20Reversion.ipynb>`_
+    The following `mean reversion <https://github.com/Hudson-and-Thames-Clients/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Mean%20Reversion.ipynb>`_
     notebook provides a more detailed exploration of the strategies.

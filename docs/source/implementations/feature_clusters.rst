@@ -15,4 +15,4 @@ The for better understanding of its implementations see the notebook on Clustere
 
 * `Clustered Feature Importance`_
 
-.. _Clustered Feature Importance: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Feature%20Importance/Cluster_Feature_Importance.ipynb
+.. _Clustered Feature Importance: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Feature%20Importance/Cluster_Feature_Importance.ipynb

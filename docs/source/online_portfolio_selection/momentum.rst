@@ -303,5 +303,5 @@ Example Code
 Research Notebook
 #################
 
-The following `momentum <https://github.com/hudson-and-thames/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb>`_
+The following `momentum <https://github.com/Hudson-and-Thames-Clients/research/blob/master/Online%20Portfolio%20Selection/Online%20Portfolio%20Selection%20-%20Momentum.ipynb>`_
 notebook provides a more detailed exploration of the strategies.

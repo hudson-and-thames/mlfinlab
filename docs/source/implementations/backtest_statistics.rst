@@ -392,4 +392,4 @@ real data.
 
 * `Chapter 14 Exercise Notebook`_
 
-.. _Chapter 14 Exercise Notebook: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Backtest%20Statistics/Chapter14_BacktestStatistics.ipynb
+.. _Chapter 14 Exercise Notebook: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Backtest%20Statistics/Chapter14_BacktestStatistics.ipynb

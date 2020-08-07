@@ -24,7 +24,7 @@ For those of you interested in working with a two years of sample tick, volume, 
 You should be able to work on a few implementations of the code with this set. 
 
 .. _link: https://s3-us-west-2.amazonaws.com/tick-data-s3/downloads/ES_Sample.zip
-.. _research repo: https://github.com/hudson-and-thames/research/tree/master/Sample-Data
+.. _research repo: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Sample-Data
 
 
 Additional Sources
