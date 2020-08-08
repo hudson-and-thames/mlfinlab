@@ -28,6 +28,10 @@
 
     </h5>
 
+.. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
 ===================================
 Nested Clustered Optimization (NCO)
 ===================================
@@ -114,7 +118,7 @@ This method allows creating a random vector of means and a random covariance mat
 
     These algorithms are described in more detail in the work **A Robust Estimator of the Efficient Frontier** *by* Marcos Lopez de Prado `available here <https://papers.ssrn.com/abstract_id=3469961>`_.
 
-    Examples of using these functions are available in the `NCO Notebook <https://github.com/hudson-and-thames/research/blob/master/NCO/NCO.ipynb>`_.
+    Examples of using these functions are available in the `NCO Notebook <https://github.com/Hudson-and-Thames-Clients/research/blob/master/Portfolio%20Optimisation%20Tutorials/Nested%20Clustered%20Optimisation%20(NCO)/NCO.ipynb>`_.
 
 Implementation
 ##############
@@ -164,8 +168,12 @@ Below is an example of how to use the package functions to calculate risk metric
 Research Notebooks
 ##################
 
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
 The following research notebooks provide a more detailed exploration of the algorithm.
 
 * `Nested Clustered Optimisation Notebook`_
 
-.. _Nested Clustered Optimisation Notebook: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Nested%20Clustered%20Optimisation%20(NCO)/NCO.ipynb
+.. _Nested Clustered Optimisation Notebook: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Portfolio%20Optimisation%20Tutorials/Nested%20Clustered%20Optimisation%20(NCO)/NCO.ipynb

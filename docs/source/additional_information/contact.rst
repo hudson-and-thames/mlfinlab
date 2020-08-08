@@ -1,8 +1,8 @@
 .. _additional_information-contact:
 
-======================
-Join the Slack Channel
-======================
+=========================
+Join the Slack Channel 🔑
+=========================
 
 We host a booming community of like minded data scientists and quants, join the Slack channel now! Open to
 `sponsors <https://www.patreon.com/HudsonThames>`_ of our package.

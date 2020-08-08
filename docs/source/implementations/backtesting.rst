@@ -14,4 +14,4 @@ Research Notebooks
 The following research notebooks can be used to better understand how the algorithms within this module work and how
 they can be used on real data.
 
-* `Backtesting Notebook <https://github.com/hudson-and-thames/research/blob/master/Backtest%20Overfitting/Backtesting.ipynb>`_
+* `Backtesting Notebook <https://github.com/Hudson-and-Thames-Clients/research/blob/master/Backtest%20Overfitting/Backtesting.ipynb>`_

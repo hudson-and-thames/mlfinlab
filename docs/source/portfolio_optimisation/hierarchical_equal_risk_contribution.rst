@@ -20,6 +20,9 @@
 
     </h4>
 
+.. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 .. note::
     The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies.
@@ -214,8 +217,12 @@ In the above image, the colors of assets corresponds to the cluster to which tha
 Research Notebooks
 ##################
 
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
 The following research notebooks provide a more detailed exploration of the algorithm.
 
 * `How to use mlfinlab's HierarchicalEqualRiskContribution class`_
 
-.. _How to use mlfinlab's HierarchicalEqualRiskContribution class: https://github.com/hudson-and-thames/research/blob/master/Portfolio%20Optimisation%20Tutorials/Hierarchical%20Equal%20Risk%20Contribution%20(HERC)/HERC%20Tutorial%20Notebook.ipynb
+.. _How to use mlfinlab's HierarchicalEqualRiskContribution class: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Portfolio%20Optimisation%20Tutorials/Hierarchical%20Equal%20Risk%20Contribution%20(HERC)/HERC%20Tutorial%20Notebook.ipynb

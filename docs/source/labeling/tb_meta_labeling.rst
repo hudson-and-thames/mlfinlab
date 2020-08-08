@@ -1,3 +1,8 @@
+
+.. note::
+    This section includes accompanying Jupyter Notebook Tutorials that are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
 =================================
 Triple-Barrier and Meta-Labelling
 =================================
@@ -214,6 +219,10 @@ timeseries data set we can illustrate the components that make up meta labeling 
 Research Notebooks
 ##################
 
+.. note::
+    These and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
 The following research notebooks can be used to better understand the triple-barrier method and meta-labeling
 
 Triple-Barrier Method
@@ -222,15 +231,15 @@ Triple-Barrier Method
 * `Trend Follow Question`_
 * `Bollinger band Question`_
 
-.. _Trend Follow Question: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Labelling/Trend-Follow-Question.ipynb
-.. _Bollinger Band Question: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Labelling/BBand-Question.ipynb
+.. _Trend Follow Question: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Labelling/Trend-Follow-Question.ipynb
+.. _Bollinger Band Question: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Labelling/BBand-Question.ipynb
 
 Meta-Labeling Toy Example
 *************************
 
 * `Meta Labeling MNIST`_
 
-.. _Meta Labeling MNIST: https://github.com/hudson-and-thames/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Labelling/Meta-Labels-MNIST.ipynb
+.. _Meta Labeling MNIST: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Labelling/Meta-Labels-MNIST.ipynb
 
 
 

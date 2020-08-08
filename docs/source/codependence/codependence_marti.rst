@@ -1,6 +1,10 @@
 .. _codependence-codependence_marti:
 
 .. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
+.. note::
    The following implementations and documentation closely follow the work of Gautier Marti:
    `Some contributions to the clustering of financial time series and applications to credit default swaps <https://www.researchgate.net/publication/322714557>`_.
 
@@ -204,8 +208,12 @@ The following example shows how the above functions can be used:
 Research Notebooks
 ##################
 
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
 The following research notebook can be used to better understand the codependence metrics described above.
 
 * `Codependence by Marti`_
 
-.. _`Codependence by Marti`: https://github.com/hudson-and-thames/research/blob/master/Codependence/Codependence%20by%20Marti/codependence_by_marti.ipynb
+.. _`Codependence by Marti`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Codependence/Codependence%20by%20Marti/codependence_by_marti.ipynb

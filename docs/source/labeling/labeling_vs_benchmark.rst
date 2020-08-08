@@ -14,4 +14,4 @@ The following research notebook can be used to better understand the return agai
 
 * `Return Over Benchmark Example`_
 
-.. _`Return Over Benchmark Example`: https://github.com/hudson-and-thames/research/blob/master/Labeling/Labeling%20vs%20Benchmark/Labeling%20vs%20Benchmark.ipynb
+.. _`Return Over Benchmark Example`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Labeling/Labeling%20vs%20Benchmark
