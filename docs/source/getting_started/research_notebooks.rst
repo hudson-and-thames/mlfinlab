@@ -19,7 +19,7 @@ Available Notebooks
 ###################
 
 The following is the directory structure for the Notebooks in our private
-`Hudson & Thames Cliensts repository <https://github.com/Hudson-and-Thames-Clients>`_. The Research
+`Hudson & Thames Clients repository <https://github.com/Hudson-and-Thames-Clients>`_. The Research
 notebooks are marked as links to their abstracts.
 
 
