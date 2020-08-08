@@ -1,4 +1,4 @@
-.. image:: logo/ht_logo.png
+.. image:: logo/Hudson & Thames_verticalblack.png
    :scale: 15 %
    :align: center
    :target: https://hudsonthames.org/
