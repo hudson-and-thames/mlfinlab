@@ -13,7 +13,6 @@
 
 ![pylint Score](https://mperlet.github.io/pybadge/badges/10.svg)
 [![Documentation Status](https://readthedocs.org/projects/mlfinlab/badge/?version=latest)](https://mlfinlab.readthedocs.io/en/latest/?badge=latest)
-[![Downloads](https://img.shields.io/pypi/dm/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
 
 MlFinlab is a python package which helps portfolio managers and traders who want to leverage the power of machine learning by providing reproducible, interpretable, and easy to use tools. 
 Adding MlFinLab to your companies pipeline is like adding a department of PhD researchers to your team.
@@ -63,7 +62,7 @@ is doing to financial machine learning what Tensorflow and PyTorch are doing to 
 ## Documentation, Tutorials, Videos, and Source Code
 
 We lower barriers to entry for all users by providing extensive [documentation](https://mlfinlab.readthedocs.io/en/latest/) 
-and [tutorial notebooks](https://github.com/hudson-and-thames/research), with code examples.
+and [tutorial notebooks](https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html), with code examples.
 
 We in the process of experimenting with various product ideas and models. Currently all of our tools which are private, 
 are available to the various [Patreon](https://www.patreon.com/HudsonThames) tiers.
@@ -141,3 +140,7 @@ Looking forward to hearing from you!
 This project is licensed under an all rights reserved licence.
 
 [LICENSE.txt](https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt) file for details.
+
+## Note
+
+* This Public MlFinLab repo, houses our documentation and doesn't conatin the source code.
