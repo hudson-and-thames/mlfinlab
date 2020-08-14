@@ -19,6 +19,8 @@ Adding MlFinLab to your companies pipeline is like adding a department of PhD re
 
 > **pip install mlfinlab**
 
+For a detailed installation guide for MacOS, Linux, and Windows please visit [this link](https://mlfinlab.readthedocs.io/en/latest/getting_started/installation.html).
+
 We source all of our implementations from the most elite and peer-reviewed journals. Including publications from: 
 1. [The Journal of Financial Data Science](https://jfds.pm-research.com/)
 2. [The Journal of Portfolio Management](https://jpm.pm-research.com/)
