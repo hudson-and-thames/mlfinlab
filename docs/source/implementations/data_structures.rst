@@ -4,9 +4,9 @@
     This Documentation and accompanying Jupyter Notebook Tutorials that are now available via the respective tier on
     `Patreon <https://www.patreon.com/HudsonThames>`_.
 
-===============
-Data Structures
-===============
+==================
+Data Structures 🔒
+==================
 
 When analyzing financial data, unstructured data sets, in this case tick data, are commonly transformed into a structured
 format referred to as bars, where a bar represents a row in a table. mlfinlab implements tick, volume, and dollar bars
