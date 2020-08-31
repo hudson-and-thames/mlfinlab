@@ -3,9 +3,9 @@
     This Documentation and accompanying Jupyter Notebook Tutorials that are now available via the respective tier on
     `Patreon <https://www.patreon.com/HudsonThames>`_.
 
-=================================
-Triple-Barrier and Meta-Labelling
-=================================
+====================================
+Triple-Barrier and Meta-Labelling 🔒
+====================================
 
 The primary labeling method used in financial academia is the fixed-time horizon method. While ubiquitous, this method
 has many faults which are remedied by the triple-barrier method discussed below. The triple-barrier method can be
