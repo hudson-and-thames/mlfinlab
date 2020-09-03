@@ -9,8 +9,8 @@ import numpy as np
 from mlfinlab.structural_breaks.sadf import get_betas
 
 
-def trend_scanning_labels(price_series: pd.Series, t_events: list = None, look_forward_window: int = 20,
-                          min_sample_length: int = 5, step: int = 1) -> pd.DataFrame:
+def trend_scanning_labels(price_series: pd.Series, t_events: list = None, observation_window: int = 20,
+                          look_forward: bool = True, min_sample_length: int = 5, step: int = 1) -> pd.DataFrame:
     """
     `Trend scanning <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3257419>`_ is both a classification and
     regression labeling technique.
@@ -27,9 +27,12 @@ def trend_scanning_labels(price_series: pd.Series, t_events: list = None, look_f
     The output of this algorithm is a DataFrame with t1 (time stamp for the farthest observation), t-value, returns for
     the trend, and bin.
 
+    This function allows using both forward-looking and backward-looking window (use the look_forward parameter).
+
     :param price_series: (pd.Series) Close prices used to label the data set
     :param t_events: (list) Filtered events, array of pd.Timestamps
-    :param look_forward_window: (int) Maximum look forward window used to get the trend value
+    :param observation_window: (int) Maximum look forward window used to get the trend value
+    :param look_forward: (bool) True if using a forward-looking window, False if using a backward-looking one
     :param min_sample_length: (int) Minimum sample length used to fit regression
     :param step: (int) Optimal t-value index is searched every 'step' indices
     :return: (pd.DataFrame) Consists of t1, t-value, ret, bin (label information). t1 - label endtime, tvalue,

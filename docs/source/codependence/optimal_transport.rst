@@ -19,7 +19,7 @@ This documentation and accompanying Jupyter Notebook Tutorials are now available
 Research Notebooks
 ##################
 
-The following research notebook can be used to better understand the optimal transport distance measure described above.
+The following research notebook can be used to better understand the optimal copula transport dependence measure described above.
 
 * `Optimal Transport`_
 

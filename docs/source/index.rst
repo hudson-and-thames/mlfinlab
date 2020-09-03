@@ -86,7 +86,7 @@ finance is not a plug-and-play subject as it relates to machine learning.
 MlFinLab provides access to the latest cutting edges methods. MlFinLab is thus essential for quants who want to be
 ahead of the technology rather than being replaced by it."
 
-\- `Dr. Thomas Raffinot <https://www.linkedin.com/in/thomas-raffinot-b75734b/>`_, Financial Data Scientist at ENGIE Global Markets
+\- `Dr. Thomas Raffinot <https://www.linkedin.com/in/thomas-raffinot-b75734b/>`_, Lead Data Scientist at AXA Investment Managers
 
 ----
 
@@ -276,6 +276,16 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Data Generation
+    :hidden:
+
+    data_generation/introduction
+    data_generation/corrgan
+    data_generation/vine_methods
+    data_generation/data_verification
+
+.. toctree::
+    :maxdepth: 2
     :caption: Labeling
     :hidden:
 
@@ -301,6 +311,17 @@ This project is licensed under an all rights reserved licence.
     implementations/cross_validation
     implementations/EF3M
     implementations/bet_sizing
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Networks
+    :hidden:
+
+    networks/introduction
+    networks/mst
+    networks/visualisations
+    networks/dash
+
 
 .. toctree::
     :maxdepth: 2
@@ -344,6 +365,14 @@ This project is licensed under an all rights reserved licence.
     online_portfolio_selection/mean_reversion
     online_portfolio_selection/pattern_matching
     online_portfolio_selection/universal_portfolio
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Optimal Mean Reversion
+    :hidden:
+
+    oprtimal_mean_reversion/introduction
+    oprtimal_mean_reversion/ou_model
 
 .. toctree::
     :maxdepth: 2
