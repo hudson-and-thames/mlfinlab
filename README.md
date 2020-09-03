@@ -59,7 +59,7 @@ is doing to financial machine learning what Tensorflow and PyTorch are doing to 
 > MlFinLab provides access to the latest cutting edges methods. MlFinLab is thus essential for quants who want to be 
 >ahead of the technology rather than being replaced by it."
 
-[Dr. Thomas Raffinot](https://www.linkedin.com/in/thomas-raffinot-b75734b/), Financial Data Scientist at ENGIE Global Markets
+[Dr. Thomas Raffinot](https://www.linkedin.com/in/thomas-raffinot-b75734b/), Lead Data Scientist at AXA Investment Managers
 
 ## Documentation, Tutorials, Videos, and Source Code
 

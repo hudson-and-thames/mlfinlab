@@ -13,3 +13,9 @@ sphinx-rtd-theme==0.4.3 # needed for docs
 statsmodels==0.11.1
 cython==0.29.21
 POT==0.7.0
+networkx==2.4
+dash==1.14.0
+dash-cytoscape==0.2.0
+dash-bootstrap-components==0.10.3
+jupyter-dash==0.3.1
+tensorflow==2.2.0
