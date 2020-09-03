@@ -9,7 +9,7 @@ Correlation-Based Metrics
 =========================
 
 Distance Correlation
-====================
+####################
 
 **Distance correlation** can capture not only linear association but also non-linear variable dependencies which Pearson correlation can not.
 It was introduced in 2005 by Gábor J. Szekely and is described in the work
@@ -44,14 +44,14 @@ This figure is from `"Introducing the discussion paper by Székely and Rizzo" <h
 by Michale A. Newton. It provides a great overview for readers.
 
 Implementation
-##############
+**************
 
 .. py:currentmodule:: mlfinlab.codependence.correlation
 
 .. autofunction:: distance_correlation
 
 Standard Angular Distance
-=========================
+#########################
 
 **Angular distance** is a slight modification of the Pearson correlation coefficient which satisfies all distance metric conditions.
 This measure is known as the angular distance because when we use *covariance* as an *inner product*, we can interpret correlation as :math:`cos\theta`.
@@ -91,12 +91,12 @@ Values of standard angular distance fall in the range:
    The angular distance satisfies all the conditions of a true metric, (Lopez de Prado, 2020.)
 
 Implementation
-##############
+**************
 
 .. autofunction:: angular_distance
 
 Absolute Angular Distance
-=========================
+#########################
 
 This modification of angular distance uses an absolute value of Pearson correlation in the formula.
 
@@ -126,12 +126,12 @@ Values of absolute angular distance fall in the range:
    sign of the correlation is ignored, (Lopez de Prado, 2020)
 
 Implementation
-##############
+**************
 
 .. autofunction:: absolute_angular_distance
 
 Squared Angular Distance
-=========================
+########################
 
 Squared angular distance uses the squared value of Pearson correlation in the formula and has similar properties to absolute
 angular distance. The only difference is that a higher distance is assigned to the elements that have a small absolute correlation.
@@ -155,12 +155,70 @@ Values of squared angular distance fall in the range:
    :alt: Modified Angular Distance
 
 Implementation
-##############
+**************
 
 .. autofunction:: squared_angular_distance
 
+Kullback-Leibler Distance
+#########################
+
+The Kullback-Leibler distance is a measure of distance between two probability densities, say p and q, which is defined as
+
+.. math::
+    K(p,q) = E_p \left[log\left(\frac{p}{q}\right)\right]
+
+Where :math:`E_p[.]` indicates the expectation value with respect to the probability density :math:`p`. Here we consider
+the Kullback-Leibler distance between multivariate Gaussian random variables (aka. Correlation matrices).
+
+Given two positive definite correlation matrices :math:`C_1` and :math:`C_2` associated with random variable :math:`X`, we can compute
+their probability density functions to :math:`P(C_1,X)` and :math:`P(C_1,X)` resulting in the following formula
+
+.. math::
+    \begin{gather*}
+    K(P(C_1,X),P(C_2,X)) = E_{P(C_1,X)} \left[log\left(\frac{P(C_1,X)}{P(C_2,X)}\right)\right] = \\
+    \frac{1}{2}\left[log\left(\frac{|C_1|}{|C_2|}\right)+tr(C^{-1}_2 C_1) -n) \right]
+    \end{gather*}
+
+where :math:`n` is the dimension of the space spanned by :math:`X`, and :math:`|C|` indicates the determinant of :math:`C`
+
+The Kullback-Leibler distance can be used to measure the stability of filtering/de-noising procedures with respect to statistical
+uncertainty.
+
+.. tip::
+    It is worth noting that the Kullback-Leibler distance takes naturally into account the statistical nature of correlation matrices
+    which is uncommon with other measures of distance between matrices such as the Frobenius distance which is based on
+    the iso-morphism between the matrices space and the vectors space. For more information on using the Kullback-Leibler
+    distance to measure the statistical uncertainty of correlation matrices check out
+    `Michele Tumminello's research paper <https://www.researchgate.net/publication/5915427>`__.
+
+
+Implementation
+**************
+
+.. autofunction:: kullback_leibler_distance
+
+Norm Distance
+#############
+
+A Norm is a function that takes a random variable and returns a value(Norm Distance) that satisfies certain properties pertaining to
+scalability and additivity.
+
+The :math:`L` norms are the most common type of norms. They use the same logic behind the SRSS (Square Root of the Sum of Squares)
+
+.. math::
+    ||x||_r := \sqrt[r]{x^r_1 + ... + x^r_n}
+
+where :math:`r` is a positive integer. The Euclidean norm is by far the most commonly used norm on multi-dimensional variables with :math:`r = 2`
+which makes the Euclidean norm an :math:`L^2` type norm.
+
+Implementation
+**************
+
+.. autofunction:: norm_distance
+
+
 Examples
-========
+########
 
 The following examples show how the described above correlation-based metrics can be used on real data:
 
@@ -168,13 +226,18 @@ The following examples show how the described above correlation-based metrics ca
 .. code-block::
 
     import pandas as pd
+    import numpy as np
     from mlfinlab.codependence import (distance_correlation, angular_distance,
                                       absolute_angular_distance, squared_angular_distance,
+                                      kullback_leibler_distance, norm_distance,
                                       get_dependence_matrix)
-
 
     # Import dataframe of returns for assets in a portfolio
     asset_returns = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)
+
+    # Creates correlation matrices of the returns DataFrame at different time frames
+    corr_18 = np.corrcoef(asset_returns.loc['01-01-2018':'01-01-2019'])
+    corr_19 = np.corrcoef(asset_returns.loc['01-01-2019':'01-01-2020'])
 
     asset1 = 'SPY'
     asset2 = 'TLT'
@@ -193,3 +256,9 @@ The following examples show how the described above correlation-based metrics ca
 
     # Calculate angular distance between all assets
     angular_dist_matrix = get_dependence_matrix(data, dependence_method='gnpr_distance')
+
+    # Calculate the Kullback-Leibler distance between two correlation matrices
+    kldist = kullback_leibler_distance(corr_18, corr_19)
+
+    # Calculate the Norm distance between two correlation matrices
+    dist = norm_distance(corr_18, corr_19)

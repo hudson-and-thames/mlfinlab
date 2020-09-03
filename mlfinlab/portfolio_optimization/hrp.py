@@ -63,6 +63,17 @@ class HierarchicalRiskParity:
 
         pass
 
+    def _nan_and_diagonal_checks(matrix, nan_fill_value=0, diagonal_fill_value=None):
+        """
+        Check for any NaN values in the matrix and discrepancies in the diagonal values.
+        :param matrix: (pd.DataFrame) The matrix which needs to be processed.
+        :param nan_fill_value: (float) Replacement value for NaNs
+        :param diagonal_fill_value: (float) The values to use for filling the diagonal.
+        :return: (pd.DataFrame) Processed matrix.
+        """
+
+        pass
+
     @staticmethod
     def _tree_clustering(distance, method='single'):
         """
