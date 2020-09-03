@@ -166,6 +166,7 @@ The Kullback-Leibler distance is a measure of distance between two probability d
 
 .. math::
     K(p,q) = E_p \left[log\left(\frac{p}{q}\right)\right]
+
 Where :math:`E_p[.]` indicates the expectation value with respect to the probability density :math:`p`. Here we consider
 the Kullback-Leibler distance between multivariate Gaussian random variables (aka. Correlation matrices).
 
@@ -177,6 +178,7 @@ their probability density functions to :math:`P(C_1,X)` and :math:`P(C_1,X)` res
     K(P(C_1,X),P(C_2,X)) = E_{P(C_1,X)} \left[log\left(\frac{P(C_1,X)}{P(C_2,X)}\right)\right] = \\
     \frac{1}{2}\left[log\left(\frac{|C_1|}{|C_2|}\right)+tr(C^{-1}_2 C_1) -n) \right]
     \end{gather*}
+
 where :math:`n` is the dimension of the space spanned by :math:`X`, and :math:`|C|` indicates the determinant of :math:`C`
 
 The Kullback-Leibler distance can be used to measure the stability of filtering/de-noising procedures with respect to statistical
@@ -205,6 +207,7 @@ The :math:`L` norms are the most common type of norms. They use the same logic b
 
 .. math::
     ||x||_r := \sqrt[r]{x^r_1 + ... + x^r_n}
+
 where :math:`r` is a positive integer. The Euclidean norm is by far the most commonly used norm on multi-dimensional variables with :math:`r = 2`
 which makes the Euclidean norm an :math:`L^2` type norm.
 
