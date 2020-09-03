@@ -1,9 +1,12 @@
 # pylint: disable=missing-module-docstring
+import warnings
 import numpy as np
 import pandas as pd
 from sklearn.neighbors import KernelDensity
 from sklearn.covariance import MinCovDet, EmpiricalCovariance, ShrunkCovariance, LedoitWolf, OAS
 from scipy.optimize import minimize
+from scipy.cluster.hierarchy import average, complete, single, dendrogram
+from matplotlib import pyplot as plt
 from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
 
 
@@ -158,6 +161,29 @@ class RiskEstimators:
 
         pass
 
+    @staticmethod
+    def filter_corr_hierarchical(cor_matrix, method='complete', draw_plot=False):
+        """
+        Creates a filtered correlation matrix using hierarchical clustering methods from an empirical
+        correlation matrix, given that all values are non-negative [0 ~ 1]
+        This function allows for three types of hierarchical clustering - complete, single, and average
+        linkage clusters. Link to hierarchical clustering methods documentation:
+        `<https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html>`_
+        It works as follows:
+        First, the method creates a hierarchical clustering tree using scipy's hierarchical clustering methods
+        from the empirical 2-D correlation matrix.
+        Second, it extracts and stores each cluster's filtered value (alpha) and assigns it to it's corresponding leaf.
+        Finally, we create a new filtered matrix by assigning each of the correlations to their corresponding
+        parent node's alpha value.
+        
+        :param cor_matrix: (np.array) Numpy array of an empirical correlation matrix.
+        :param method: (str) Hierarchical clustering method to use. (``complete`` by default, ``single``, ``average``)
+        :param draw_plot: (bool) Plots the hierarchical cluster tree. (False by default)
+        :return: (np.array) The filtered correlation matrix.
+        """
+
+        pass
+
     def denoise_covariance(self, cov, tn_relation, denoise_method='const_resid_eigen', detone=False,
                            market_component=1, kde_bwidth=0.01, alpha=0):
         """
@@ -165,7 +191,8 @@ class RiskEstimators:
 
         Two denoising methods are supported:
         1. Constant Residual Eigenvalue Method (``const_resid_eigen``)
-        2. Targeted Shrinkage Method (``target_shrink``)
+        2. Spectral Method (``spectral``)
+        3. Targeted Shrinkage Method (``target_shrink``)
 
         The Constant Residual Eigenvalue Method works as follows:
 
@@ -185,6 +212,10 @@ class RiskEstimators:
         the maximum theoretical eigenvalue are set to their average value. This is how the eigenvalues
         associated with noise are shrinked. The de-noised covariance matrix is then calculated back
         from new eigenvalues and eigenvectors.
+
+        The Spectral Method works just like the Constant Residual Eigenvalue Method, but instead of replacing
+        eigenvalues lower than the maximum theoretical eigenvalue to their average value, they are replaced with
+        zero instead.
 
         The Targeted Shrinkage Method works as follows:
 
@@ -215,7 +246,6 @@ class RiskEstimators:
         :param alpha: (float) In range (0 to 1) - shrinkage of the noise correlation matrix to use in the
                               Targeted Shrinkage Method. (0 by default)
         :return: (np.array) De-noised covariance matrix or correlation matrix.
-
         """
 
         pass
@@ -389,6 +419,24 @@ class RiskEstimators:
         :param corr: (np.array) Correlation matrix to detone.
         :param market_component: (int) Number of fist eigevectors related to a market component. (1 by default)
         :return: (np.array) De-toned correlation matrix.
+        """
+
+        pass
+
+    def _denoised_corr_spectral(self, eigenvalues, eigenvectors, num_facts):
+        """
+        De-noises the correlation matrix using the Spectral method.
+        The input is the eigenvalues and the eigenvectors of the correlation matrix and the number
+        of the first eigenvalue that is below the maximum theoretical eigenvalue.
+        De-noising is done by shrinking the eigenvalues associated with noise (the eigenvalues lower than
+        the maximum theoretical eigenvalue are set to zero, preserving the trace of the
+        correlation matrix).
+        The result is the de-noised correlation matrix.
+
+        :param eigenvalues: (np.array) Matrix with eigenvalues on the main diagonal.
+        :param eigenvectors: (float) Eigenvectors array.
+        :param num_facts: (float) Threshold for eigenvalues to be fixed.
+        :return: (np.array) De-noised correlation matrix.
         """
 
         pass
