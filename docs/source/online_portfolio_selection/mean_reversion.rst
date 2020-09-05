@@ -13,9 +13,9 @@
     3. `Li, B. and Hoi, S.C., 2012. On-line portfolio selection with moving average reversion. arXiv preprint arXiv:1206.4626. <https://arxiv.org/pdf/1206.4626.pdf>`_
     4. `Huang, D., Zhou, J., Li, B., Hoi, S.C. and Zhou, S., 2016. Robust median reversion strategy for online portfolio selection. IEEE Transactions on Knowledge and Data Engineering, 28(9), pp.2480-2493. <https://core.ac.uk/download/pdf/35455615.pdf>`_
 
-==============
-Mean Reversion
-==============
+=================
+Mean Reversion 🔒
+=================
 
 ----
 
