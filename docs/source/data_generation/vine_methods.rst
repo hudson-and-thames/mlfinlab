@@ -259,7 +259,7 @@ The following research notebook can be used to better understand the Vines and E
 
 * `Generating Correlation Matrices using the Vines and Extended Onion Methods`_
 
-.. _`Generating Correlation Matrices using the Vines and Extended Onion Methods`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Data%20Generation/vines.ipynb
+.. _`Generating Correlation Matrices using the Vines and Extended Onion Methods`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Data%20Generation/Vines/vines.ipynb
 
 References
 ##########
