@@ -4,9 +4,9 @@
     This section includes documentation and accompanying Jupyter Notebook Tutorials that are now available via the respective tier on
     `Patreon <https://www.patreon.com/HudsonThames>`_.
 
-==========
-Bet Sizing
-==========
+=============
+Bet Sizing 🔒
+=============
 
 Bet Sizing Methods
 ##################
