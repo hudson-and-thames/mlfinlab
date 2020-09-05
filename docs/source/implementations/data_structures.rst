@@ -148,8 +148,8 @@ standard time bars:
     This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
     `Patreon <https://www.patreon.com/HudsonThames>`_.
 
-Information-Driven Bars
-#######################
+Information-Driven Bars 🔒
+##########################
 
 Imbalance Bars
 **************
@@ -189,8 +189,8 @@ Example
 
 |
 
-Research Notebooks
-##################
+Research Notebooks 🔒
+#####################
 
 .. note::
     These and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
