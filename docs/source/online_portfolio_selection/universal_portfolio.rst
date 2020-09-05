@@ -12,3 +12,19 @@ Universal Portfolio 🔒
 
 This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
 `Patreon <https://www.patreon.com/HudsonThames>`_.
+
+
+Historical Performance
+######################
+
+Uniform
+#######
+
+Top-K
+#####
+
+Results
+#######
+
+Example Code
+############
