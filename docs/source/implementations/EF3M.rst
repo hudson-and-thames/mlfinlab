@@ -6,6 +6,14 @@ This documentation and accompanying Jupyter Notebook Tutorials are now available
 `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 
+M2N
+###
+
+Utility Functions For Fitting Of Distribution Mixtures
+######################################################
+
+
+
 Research Notebooks
 ##################
 

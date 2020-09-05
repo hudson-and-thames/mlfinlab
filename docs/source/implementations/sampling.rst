@@ -7,6 +7,31 @@ Sampling 🔒
 This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
 `Patreon <https://www.patreon.com/HudsonThames>`_.
 
+
+Sample Uniqueness
+#################
+
+Sequential Bootstrapping
+########################
+
+Implementation
+**************
+
+Example
+*******
+
+Monte-Carlo Experiment
+**********************
+
+Sample Weights
+##############
+
+By Returns and Average Uniqueness
+*********************************
+
+By Time Decay
+*************
+
 Research Notebooks
 ##################
 

@@ -8,6 +8,12 @@ This documentation and accompanying Jupyter Notebook Tutorials are now available
 `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 
+Implementation
+**************
+
+Example
+*******
+
 Research Notebook
 *****************
 

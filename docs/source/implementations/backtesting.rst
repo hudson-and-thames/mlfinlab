@@ -1,12 +1,29 @@
 .. _implementations-backtesting:
 
-==================================
-Backtesting by Campbell and Yan 🔒
-==================================
+=====================================
+Framework for Backtest Overfitting 🔒
+=====================================
 
 This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
 `Patreon <https://www.patreon.com/HudsonThames>`_.
 
+Haircut Sharpe Ratio
+####################
+
+Implementation
+**************
+
+Example
+*******
+
+Profit Hurdle
+#############
+
+Implementation
+**************
+
+Example
+*******
 
 Research Notebooks
 ##################

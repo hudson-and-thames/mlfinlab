@@ -10,3 +10,24 @@ Information Theory Metrics 🔒
 
 This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
 `Patreon <https://www.patreon.com/HudsonThames>`_.
+
+Mutual Information
+##################
+
+Implementation
+**************
+
+Variation of Information
+########################
+
+Implementation
+**************
+
+Discretization
+##############
+
+Implementation
+**************
+
+Examples
+########

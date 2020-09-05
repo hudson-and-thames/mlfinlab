@@ -16,6 +16,15 @@ This documentation and accompanying Jupyter Notebook Tutorials are now available
 `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 
+Optimal Copula Transport dependence
+###################################
+
+Implementation
+**************
+
+Examples
+########
+
 Research Notebooks
 ##################
 

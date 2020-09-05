@@ -7,6 +7,21 @@ Fractionally Differentiated Features 🔒
 This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
 `Patreon <https://www.patreon.com/HudsonThames>`_.
 
+Fixed-width Window Fracdiff
+###########################
+
+Implementation
+**************
+
+Stationarity With Maximum Memory Representation
+###############################################
+
+Implementation
+**************
+
+Example
+#######
+
 Research Notebook
 #################
 
