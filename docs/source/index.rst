@@ -371,8 +371,8 @@ This project is licensed under an all rights reserved licence.
     :caption: Optimal Mean Reversion
     :hidden:
 
-    oprtimal_mean_reversion/introduction
-    oprtimal_mean_reversion/ou_model
+    optimal_mean_reversion/introduction
+    optimal_mean_reversion/ou_model
 
 .. toctree::
     :maxdepth: 2

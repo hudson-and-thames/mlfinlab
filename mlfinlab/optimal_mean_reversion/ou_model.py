@@ -123,7 +123,7 @@ class OrnsteinUhlenbeck:
 
         pass
 
-    def def fit_to_assets(self, data=None, start=None, end=None):
+    def fit_to_assets(self, data=None, start=None, end=None):
         """
         Creates the optimal portfolio in terms of Ornstein-Uhlenbeck model
         from two given time series for asset prices and fits the values

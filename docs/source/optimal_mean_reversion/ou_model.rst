@@ -294,9 +294,11 @@ Step 1: Model fitting
 In this step we need to use :code:`fit` function to fit OU model to our training data and set the constant
 parameters like transaction costs, discount rates, stop-loss level and data frequency. You have a choice not
 to set the stop-loss level at the beginning, but it will deny access to the functions that use the stop-loss level.
-To access them you just need to set the parameter :code:`self.L`
+To access them you just need to set the parameter :code:`self.L`. Also there is a possibility to not use the whole
+provided training sample, limiting it to a time interval of your choice with :code:`start` and :code:`end` parameters.
 
-You can use an array of two time series of asset prices, and the optimal portfolio will be constructed by the
+That option can be used if you provide a pandas DataFrame as an input data with Datetime-type indices.
+You can also use an np.array of two time series of asset prices, and the optimal portfolio will be constructed by the
 function itself, or use your own portfolio values as an input data.
 
 Implementation
@@ -307,11 +309,34 @@ Implementation
 
 .. tip::
 
-    To retrain the model just use one of the functions:
+    To retrain the model just use one of the functions :code:`fit_to_portfolio` or :code:`fit_to_assets`.
+    You have a choice either to use the new dataset or to change the training time interval of your currently
+    used dataset.
 
     .. autofunction:: fit_to_portfolio
 
     .. autofunction:: fit_to_assets
+
+It is important to understand how good of a fit your data is compared to a simulated process with the
+same parameters. To check we can use :code:`check_fit` function that shows the optimal parameter values obtained
+by fitting the OU model to our data and from the OU model simulated using our fitted parameters.
+
+.. autofunction:: check_fit
+
+.. figure:: images/fit_check_function.png
+       :scale: 100 %
+       :align: center
+       :figclass: align-center
+
+.. tip::
+
+    If you are interested in data generation you can create OU process simulations
+    using the :code:`ou_model_simulation` function. The parameters used for the
+    model can be either the fitted parameters to your data or you can set all of them
+    for yourself.
+
+    .. autofunction:: ou_model_simulation
+
 
 Step 2: Determining the optimal entry and exit values
 -----------------------------------------------------
@@ -367,6 +392,11 @@ Implementation
 
     .. autofunction:: description
 
+    .. figure:: images/description_function.png
+       :scale: 70 %
+       :align: center
+       :figclass: align-center
+
 Example
 =======
 
@@ -384,10 +414,10 @@ The following examples show how the described above module can be used on real d
     data2 =  yf.download("GLD GDX", start="2016-12-10", end="2017-03-09")
 
     # Create training dataset as an array of two asset prices
-    data_train = np.array([data1["Adj Close"]["GLD"], data1["Adj Close"]["GDX"]])
+    data_train = np.array([data1["Adj Close"]["GLD", "GDX"]])
 
     # Create an out-of-sample dataset
-    data_oos = np.array([data2["Adj Close"]["GLD"], data2["Adj Close"]["GDX"]])
+    data_oos = np.array([data2["Adj Close"]["GLD", "GDX"]])
 
     # Create the class object
     example = OrnsteinUhlenbeck()
@@ -395,33 +425,50 @@ The following examples show how the described above module can be used on real d
     # Fit the model to the training data and allocate data frequency,
     # transaction costs, discount rates and stop-loss level
     example.fit(data_train, data_frequency="D", discount_rate=[0.05, 0.05],
-                       transaction_cost=[0.02, 0.02], stop_loss=0.5)
+                transaction_cost=[0.02, 0.02], stop_loss=0.5)
 
     # The parameters can be allocated in an alternative way
     example.fit(data_train, data_frequency="D", discount_rate=0.5,
-                       transaction_cost=0.2, stop_loss=0.5)
+                transaction_cost=0.2, stop_loss=0.5)
+
+    # You can also use the pd.DataFrame as an input data
+    example.fit(data_train, data_frequency="D", discount_rate=[0.05, 0.05],
+                transaction_cost=[0.02, 0.02], stop_loss=0.5)
+
+    # In this case you can also specify the training interval you would like to use
+    example.fit(data_train, data_frequency="D", discount_rate=[0.05, 0.05],
+                start="2015-10-25", end="2016-11-09",
+                transaction_cost=[0.02, 0.02], stop_loss=0.5)
 
     # Stop-loss level, transaction costs and discount rates
     # can be changed along the way
-    example.L = 0.7
+    example.L = 0.5
+
+    # Check the model fit
+    example.check_fit()
 
     # Calculate the optimal liquidation level
-    b = ex2.optimal_entry_level()
+    b = example.optimal_entry_level()
 
     # Calculate the optimal entry level
-    d = ex2.optimal_entry_level()
+    d = example.optimal_entry_level()
 
     # Calculate the optimal liquidation level accounting for stop-loss
-    b_L = ex2.optimal_liquidation_level_stop_loss()
+    b_L = example.optimal_liquidation_level_stop_loss()
 
     # Calculate the optimal entry interval accounting for stop-loss
-    d_L = ex2.optimal_entry_interval_stop_loss()
+    d_L = example.optimal_entry_interval_stop_loss()
 
     # Showcase the data for both variations of the problem on the out of sample data
-    ex.plot_levels(data_oos, stop_loss=True)
+    example.plot_levels(data_oos, stop_loss=True)
 
     # Call the description function to see all the model's parameters and optimal levels
-    ex.description()
+    example.description()
 
     # Retrain the model
-    ex.fit_to_assets(data_oos)
+    # By changing the training interval
+    example.fit_to_assets(start="2015-08-25", end="2016-12-09")
+    # By changing the input data
+    example.fit_to_assets(data=data_oos)
+    # By using the simulated OU process
+    example.fit_to_portfolio(ou_model_simulation(400))
