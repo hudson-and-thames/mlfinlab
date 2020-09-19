@@ -404,6 +404,8 @@ The following examples show how the described above module can be used on real d
 
 
 .. code-block::
+    import numpy as np
+    import pandas as pd
 
     import yfinance as yf
     from mlfinlab.optimal_mean_reversion import OrnsteinUhlenbeck
@@ -414,10 +416,10 @@ The following examples show how the described above module can be used on real d
     data2 =  yf.download("GLD GDX", start="2016-12-10", end="2017-03-09")
 
     # Create training dataset as an array of two asset prices
-    data_train = np.array([data1["Adj Close"]["GLD", "GDX"]])
+    data_train = np.array([data1["Adj Close"]])
 
     # Create an out-of-sample dataset
-    data_oos = np.array([data2["Adj Close"]["GLD", "GDX"]])
+    data_oos = np.array([data2["Adj Close"]])
 
     # Create the class object
     example = OrnsteinUhlenbeck()
@@ -427,7 +429,7 @@ The following examples show how the described above module can be used on real d
     example.fit(data_train, data_frequency="D", discount_rate=[0.05, 0.05],
                 transaction_cost=[0.02, 0.02], stop_loss=0.5)
 
-    # The parameters can be allocated in an alternative way
+    # The parameters can be also allocated in an alternative way
     example.fit(data_train, data_frequency="D", discount_rate=0.5,
                 transaction_cost=0.2, stop_loss=0.5)
 
