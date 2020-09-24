@@ -404,6 +404,7 @@ The following examples show how the described above module can be used on real d
 
 
 .. code-block::
+
     import numpy as np
     import pandas as pd
 
