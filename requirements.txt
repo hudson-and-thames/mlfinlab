@@ -18,4 +18,4 @@ dash==1.14.0
 dash-cytoscape==0.2.0
 dash-bootstrap-components==0.10.3
 jupyter-dash==0.3.1
-tensorflow==2.2.0
+tensorflow==2.2.1
