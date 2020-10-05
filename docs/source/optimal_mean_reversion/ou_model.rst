@@ -1,6 +1,10 @@
 .. _optimal_mean_reverting_strategies-ou_model:
 
 .. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
+.. note::
    The following implementations and documentation closely follow the work of Tim Leung:
    `Tim Leung and Xin Li Optimal Mean reversion Trading: Mathematical Analysis and Practical Applications
    <https://www.amazon.com/Optimal-Mean-Reversion-Trading-Mathematical/dp/9814725919>`_.
@@ -603,6 +607,10 @@ isn't included. We also calculate an additional OU-model parameter - half-life.
 
 Research Notebook
 #################
+
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 The following research notebook can be used to better understand the concepts of trading under the Ornstein-Uhlenbeck Model.
 

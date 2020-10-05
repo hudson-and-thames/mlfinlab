@@ -85,7 +85,8 @@ Time Series Codependence Visualization
 
 .. note::
 
-    The correlated random walks time series generation and GNPR codependence measure approaches are fully explored in our :ref:`data_generation-correlated_random_walks`
+    The correlated random walks time series generation and GNPR codependence measure approaches are fully explored in
+    our :ref:`Correlated random walks <data_generation-correlated_random_walks>`
     and :ref:`Codependence by Marti <codependence-codependence_marti>` sections.
 
 Following the work of Donnat, Marti, and Very (2016) we provide a method to plot the GNPR codependence matrix and visualize the different

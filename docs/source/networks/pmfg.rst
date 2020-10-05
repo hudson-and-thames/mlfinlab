@@ -1,6 +1,10 @@
 .. _networks-pmfg:
 
 .. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
+.. note::
 
    The following sources elaborates extensively on the topic:
 
@@ -326,6 +330,10 @@ References
 
 Research Notebook
 #################
+
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 The following research notebook provides a more detailed exploration of the PMFG creation.
 

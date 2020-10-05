@@ -1,5 +1,9 @@
 .. _data_generation-hcbm:
 
+.. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
 ===========================================
 Hierarchical Correlation Block Model (HCBM)
 ===========================================
@@ -138,6 +142,10 @@ Example
 
 Research Notebook
 #################
+
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 The following research notebook can be used to better understand the Hierarchical Correlation Block Model.
 

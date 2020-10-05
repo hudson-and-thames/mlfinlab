@@ -1,5 +1,9 @@
 .. _data_generation-correlated_random_walks:
 
+.. note::
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
+
 =======================
 Correlated Random Walks
 =======================
@@ -145,6 +149,10 @@ The *Mix* example generates a time series that has a global normal distribution,
 
 Research Notebook
 #################
+
+.. note::
+    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
+    `Patreon <https://www.patreon.com/HudsonThames>`_.
 
 The following research notebook can be used to better understand Correlated Random Walks.
 
