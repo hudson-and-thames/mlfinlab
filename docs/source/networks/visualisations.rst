@@ -12,11 +12,16 @@ This section outlines how to create visualisations using the helper function fro
 The helper functions streamline the process of constructing the `MST` and `DashGraph` objects.
 This is the recommended way to create visualisations, unless you would like to pass in a custom matrix.
 
+.. figure:: images/data/mst_coloured.png
+    :align: center
+
+    MST visualisation based on stock price data form 18th February 2020 until the 24th of March 2020.
+
 To pass in a custom matrix, you must construct `MST` and `DashGraph` directly. Please refer to the
 MST with Custom Matrix section in the :ref:`MST <networks-minimum_spanning_tree>` part of the documentation.
 
-Creating a MST Visualisation
-#############################
+Creating Visualisations
+#######################
 
 The code snippet below shows how to create a MST visualisation and run the Dash server using the `generate_mst_server` method.
 The code snippet creates a distance matrix, inputs it into the ``MST`` class, which is passed to the ``DashGraph`` class.
@@ -64,11 +69,61 @@ log-return at time :math:`t` of asset :math:`i`:
 For a more detailed explanation, please refer to :ref:`Correlation-Based Metrics section <codependence-correlation_based_metrics>`,
 as it describes the measures in more detail.
 
+Creating ALMST Visualisations
+*****************************
+
+Similar to creating MST visualisations, you can use the `generate_almst_server` to create the ALMST server instead of the MST server.
+However, the input parameters and the output server are the same for the `ALMST` class. Both `ALMST` and `MST` are subclasses of the parent class `Graph`.
+
+.. code-block::
+
+    # Import pandas
+    import pandas as pd
+
+    # Import generate_almst_server method
+    from mlfinlab.networks.visualisations import generate_almst_server
+
+    # Import log return csv
+    log_return_dataframe = pd.read_csv('path_to_file.csv', index_col=False)
+
+    # Create ALMST server
+    server = generate_almst_server(log_return_dataframe)
+
+    # Run the server in the command line
+    server.run_server()
+
+The optional parameters such as colours, node sizes, and the Jupyter notebook mode are set in the same way as the `MST`.
+
+Comparing ALMST and MST
+***********************
+
+.. figure::
+    images/data/dualinterface.png
+
+In order to create a dual interface to compare both the ALMST and MST, we can use the `generate_mst_almst_comparison` method with the `ALMST` and `MST` as the input.
+
+.. code-block::
+
+    # Import pandas
+    import pandas as pd
+
+    # Import generate_mst_almst_comparison method
+    from mlfinlab.networks.visualisations import generate_mst_almst_comparison
+
+    # Import log return csv
+    log_return_dataframe = pd.read_csv('path_to_file.csv', index_col=False)
+
+    # Creates the ALMST vs. MST comparison server
+    server = generate_mst_almst_comparison(log_return_dataframe)
+
+    # Run the server in the command line
+    server.run_server()
+
 Implementation
 **************
 
-The `generate_mst_server` method constructs the server, ready to be run. It streamlines the process of creating a
-``MST`` and ``DashGraph`` object, and various optional parameters can be passed.
+The `generate_mst_server` and `generate_almst_server` methods construct the server, ready to be run. It streamlines the process of creating a
+``MST`` or ``ALMST`` respectively, and ``DashGraph`` object, and various optional parameters can be passed.
 
 .. py:currentmodule:: mlfinlab.networks.visualisations
 .. autofunction:: generate_mst_server
@@ -147,6 +202,41 @@ from the log returns dataframe. The correlation matrix is the input to the metho
 from the :ref:`Codependence module <codependence-introduction>`. The valid distance matrix types are 'angular',
 'abs_angular', and 'squared_angular'. Explanations on the different types of distance matrices can be found on the
 :ref:`Codependence module section <codependence-introduction>`.
+
+----
+
+Ranking Nodes by Centrality
+###########################
+
+For a PMFG graph, you can create a centrality ranking of the nodes. The ranking is based on the sum of 6 centrality
+measures, detailed below, all of which call methods from NetworkX centrality methods.
+
+.. py:currentmodule:: mlfinlab.networks.visualisations
+.. autofunction:: generate_central_peripheral_ranking
+
+An example for ranking of PMFG is shown below.
+
+.. code-block::
+
+   from mlfinlab.networks.visualisations import generate_central_peripheral_ranking
+
+   pmfg = PMFG(matrix, matrix_type='distance')
+
+   pmfg_graph = pmfg.get_graph()
+
+   ranking = generate_central_peripheral_ranking(pmfg_graph)
+
+The ranking returns an ordered list of tuples with the node name as the key and ranking as the value. The formula for the
+ranking is defined as:
+
+.. math::
+
+   ranking = \sum{(C_{D}^w + C_{D}^u + C_{BC}^w+ C_{BC}^u + C_{E}^u + C_{C}^w + C_{C}^u - \frac{C_{SO}^w}{100} - C_{EC}^u)}
+
+Where :math:`C_{D}^w` is the weighted degree, and :math:`C_{D}^u` is the degree for the unweighted graph. The factors included are:
+Degree (D), Betweenness Centrality (BC), Eccentricity (E), Closeness Centrality (C), Second Order Centrality (SO) and Eigenvector Centrality (EC).
+
+The Second Order Centrality (SO) is divided, as the output values would have a disproportionately large impact on the ranking.
 
 ----
 

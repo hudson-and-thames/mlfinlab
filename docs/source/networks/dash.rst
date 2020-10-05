@@ -175,6 +175,7 @@ Implementation
 **************
 
 .. automodule:: mlfinlab.networks.dash_graph
+    :noindex:
 
     .. autoclass:: DashGraph
         :members:
@@ -220,7 +221,33 @@ Initialising the `DashGraph` class with an additional argument 'jupyter notebook
 Running `mode='inline'` will allow the interactive visualisations to display within a cell output of the Jupyter notebook.
 For detailed explanations of the different modes, refer to `this article <https://medium.com/plotly/introducing-jupyterdash-811f1f57c02e>`_ on Jupyter Dash.
 
-----
+Dash Dual Interface for Comparisons
+###################################
+
+The `DualDashGraph` interface can be used to compare the MST and ALMST. The `DualDashGraph` takes in two `Graph` objects.
+`DualDashGraph` also allows for an additional argument to use the interface inside Jupyter Notebook.
+
+.. code-block::
+
+    # Extra argument 'jupyter notebook'
+    dash_graph = DualDashGraph(graph_one, graph_two, 'jupyter notebook')
+
+    # Get server app
+    app = dash_graph.get_server()
+
+    # Extra argument 'inline', 'external' or 'jupyterlab' for jupyter notebook
+    app.run_server(mode='inline')
+
+Implementation
+**************
+
+.. automodule:: mlfinlab.networks.dual_dash_graph
+
+    .. autoclass:: DualDashGraph
+        :members:
+        :inherited-members:
+
+        .. automethod:: __init__
 
 Research Notebook
 #################

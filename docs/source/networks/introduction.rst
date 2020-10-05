@@ -27,11 +27,11 @@ Four aspects of network visualisation tools have been added:
 
 1. Minimum Spanning Tree (MST).
 
-2. Average Linkage Minimum Spanning Tree (in development).
+2. Average Linkage Minimum Spanning Tree (ALMST).
 
-3. Planar Maximally Filtered Graph (in development).
+3. Planar Maximally Filtered Graph (PMFG).
 
-4. Planar Maximally Filtered Graph for big data (in development).
+4. Triangulated Maximally Filtered Graph (in development).
 
 The methods from the `visualisations.py` file can be used to create visualisations given a dataframe of log returns.
 

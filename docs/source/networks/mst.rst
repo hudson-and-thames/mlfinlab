@@ -149,7 +149,7 @@ The `DashGraph` class then takes in a `MST` as input and returns a server.
 Implementation
 **************
 
-.. automodule:: mlfinlab.networks.graph
+.. automodule:: mlfinlab.networks.mst
 
     .. autoclass:: MST
         :members:
@@ -181,7 +181,7 @@ Example Code
     import pandas as pd
 
     # Import MST class
-    from mlfinlab.networks.graph import MST
+    from mlfinlab.networks.mst import MST
 
     # Import Dash Graph class
     from mlfinlab.networks.dash_graph import DashGraph
