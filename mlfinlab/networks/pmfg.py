@@ -7,7 +7,6 @@ import itertools
 from itertools import count
 import warnings
 
-import planarity
 import networkx as nx
 from matplotlib import pyplot as plt
 
