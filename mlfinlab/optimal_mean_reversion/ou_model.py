@@ -123,6 +123,16 @@ class OrnsteinUhlenbeck:
 
         pass
 
+    def half_life(self):
+        """
+        Returns the half-life of the fitted OU process. Half-life stands for the average time that
+        it takes for the process to revert to its long term mean on a half of its initial deviation.
+
+        :return: (float) Half-life of the fitted OU process
+        """
+
+        pass
+
     def fit_to_assets(self, data=None, start=None, end=None):
         """
         Creates the optimal portfolio in terms of Ornstein-Uhlenbeck model
@@ -185,9 +195,9 @@ class OrnsteinUhlenbeck:
         """
         Computes the average Log Likelihood. (p.13)
 
-        :params: (tuple) A tuple of three elements representing theta, mu and sigma_squared.
-        :args: (tuple) All other values that to be passed to self._compute_log_likelihood()
-        :returns: (float) The average log likelihood from given parameters.
+        :param params: (tuple) A tuple of three elements representing theta, mu and sigma_squared.
+        :param args: (tuple) All other values that to be passed to self._compute_log_likelihood()
+        :return: (float) The average log likelihood from given parameters.
         """
 
         pass
@@ -207,10 +217,11 @@ class OrnsteinUhlenbeck:
         Plots the found optimal exit and entry levels on the graph
         alongside with the given data.
 
-        :param data: (np.array) An array with time series of portfolio prices / An array with
-            time series of of two assets prices.
+        :param data: (np.array/pd.DataFrame) Time series of portfolio prices /
+            time series of of two assets prices of size (n x 2).
         :param stop_loss: (bool) A flag whether to take stop-loss level into account.
             when showcasing the results.
+        :return: (plt.Figure) Figure with optimal exit and entry levels.
         """
 
         pass
