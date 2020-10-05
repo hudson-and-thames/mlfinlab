@@ -448,6 +448,10 @@ Research Notebooks
 
 The following research notebooks provide a more detailed exploration of the algorithm.
 
+* `Mean-Variance Portfolio Optimization`_
+
+.. _Mean-Variance Portfolio Optimization: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Portfolio%20Optimisation%20Tutorials/Mean%20Variance%20Optimisation%20(MVO)/MVO%20Tutorial%20Notebook.ipynb
+
 * `Chapter 16 Exercise Notebook`_
 
 .. _Chapter 16 Exercise Notebook: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Machine%20Learning%20Asset%20Allocation/Chapter16.ipynb

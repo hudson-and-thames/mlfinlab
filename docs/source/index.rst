@@ -282,6 +282,9 @@ This project is licensed under an all rights reserved licence.
     data_generation/introduction
     data_generation/corrgan
     data_generation/vine_methods
+    data_generation/correlated_random_walks
+    data_generation/hcbm
+    data_generation/bootstrap
     data_generation/data_verification
 
 .. toctree::
@@ -319,6 +322,8 @@ This project is licensed under an all rights reserved licence.
 
     networks/introduction
     networks/mst
+    networks/almst
+    networks/pmfg
     networks/visualisations
     networks/dash
 
@@ -330,6 +335,7 @@ This project is licensed under an all rights reserved licence.
 
     implementations/onc
     implementations/feature_clusters
+    implementations/hierarchical_clustering
 
 .. toctree::
     :maxdepth: 2

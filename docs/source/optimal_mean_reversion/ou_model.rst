@@ -15,7 +15,7 @@ Trading Under the Ornstein-Uhlenbeck Model
     mean.
 
 Model fitting
-=============
+#############
 
 .. note::
    We are solving the optimal stopping problem for a mean-reverting portfolio that is constructed by holding
@@ -98,7 +98,7 @@ log-likelihood by :math:`\hat{\ell}(\theta^*,\mu^*,\sigma^*)`. Then for every :m
 
 
 Optimal Timing of Trades
-===========================
+########################
 
 Suppose the investor already has a position with a value process :math:`(X_t)_{t>0}` that follows the OU process. When
 the investor closes his position at the time :math:`\tau` he receives the value :math:`(X_{\tau})` and pays a
@@ -106,7 +106,7 @@ constant transaction cost :math:`c_s \in \mathbb{R}` To maximize the expected di
 the optimal stopping problem:
 
 .. math::
-    V(x) = \underset{\tau \in T}{\sup} \mathbb{E}_x{e^{-r \tau} (X_{\tau} - c_s)| X_0 = x}
+    V(x) = \underset{\tau \in T}{\sup} \mathbb{E}_x({e^{-r \tau} (X_{\tau} - c_s)| X_0 = x})
 
 where :math:`T` denotes the set of all possible stopping times and :math:`r > 0` is our subjective constant
 discount rate. :math:`V(x)` represents the expected liquidation value accounted with X.
@@ -115,7 +115,7 @@ Current price plus transaction cost  constitute the cost of entering the trade a
 we can formalize the optimal entry problem:
 
 .. math::
-    J(x) = \underset{\nu \in T}{\sup} \mathbb{E}_x{e^{-\hat{r} \tau} (V(X_{\nu}) - X_{\nu} - c_b)| X_0 = x}
+    J(x) = \underset{\nu \in T}{\sup} \mathbb{E}_x({e^{-\hat{r} \tau} (V(X_{\nu}) - X_{\nu} - c_b)| X_0 = x})
 
 with
 
@@ -162,7 +162,7 @@ Mathematical Analysis and Practical Applications by Tim Leung and Xin Li
 following problems:
 
 Default optimal stopping problem
---------------------------------
+********************************
 
 Theorem 2.6 (p.23):
 
@@ -210,7 +210,7 @@ Where ":math:`\hat{\ }`" represents the use of transaction cost and discount rat
 
 
 Optimal stopping problem with stop-loss
----------------------------------------
+***************************************
 
 
 When we include the stop-loss in our optimal stopping problems the theorems we use to find the solution
@@ -283,13 +283,13 @@ The optimal entry interval :math:`(a_L^*,d_L^*)` is found using the respective e
 
 
 How to use this submodule
-=========================
+#########################
 
 This module gives you the ability to calculate optimal values of entering and liquidating the position for your
 portfolio. The whole process takes only 2 steps.
 
 Step 1: Model fitting
-----------------------
+*********************
 
 In this step we need to use :code:`fit` function to fit OU model to our training data and set the constant
 parameters like transaction costs, discount rates, stop-loss level and data frequency. You have a choice not
@@ -302,7 +302,8 @@ You can also use an np.array of two time series of asset prices, and the optimal
 function itself, or use your own portfolio values as an input data.
 
 Implementation
-++++++++++++++
+==============
+
 .. py:currentmodule:: mlfinlab.optimal_mean_reversion.ou_model.OrnsteinUhlenbeck
 
 .. autofunction:: fit
@@ -337,15 +338,22 @@ by fitting the OU model to our data and from the OU model simulated using our fi
 
     .. autofunction:: ou_model_simulation
 
+Since the half-life of the OU process parameter is widely used in various researches,
+the module has a function for calculating its value.
+
+.. autofunction:: half_life
+
 
 Step 2: Determining the optimal entry and exit values
------------------------------------------------------
+*****************************************************
+
 To get the optimal liquidation or entry level for your data we need to call one of the functions mentioned below.
 They present the solutions to the equations established during the theoretical part.
 To choose whether to account for stop-loss level or not choose the respective set of functions.
 
 Implementation
-++++++++++++++
+==============
+
 :math:`b^*`: - optimal level of liquidation:
 
 .. autofunction:: optimal_liquidation_level
@@ -372,7 +380,7 @@ Implementation
       *  If bought, liquidate the position as soon as portfolio price reaches the optimal liquidation level.
 
 Step 3: (Optional) Plot the optimal levels on your data
--------------------------------------------------------
+*******************************************************
 
 Additionally you have the ability to plot your optimal levels onto your out-of-sample data. Similarly to the
 fit step you have a choice whether to use portfolio prices or an array of asset prices. In the case of
@@ -384,7 +392,8 @@ the latter optimal coefficient found during the fit stage will be used to create
    :figclass: align-center
 
 Implementation
-++++++++++++++
+==============
+
 .. autofunction:: plot_levels
 
 .. tip::
@@ -398,57 +407,122 @@ Implementation
        :figclass: align-center
 
 Example
-=======
+#######
 
-The following examples show how the described above module can be used on real data:
-
+As data we will use downloaded GLD and GDX tickers from Yahoo Finance.
 
 .. code-block::
 
     import numpy as np
     import pandas as pd
-
     import yfinance as yf
-    from mlfinlab.optimal_mean_reversion import OrnsteinUhlenbeck
-
 
     # Import data from Yahoo finance
-    data1 =  yf.download("GLD GDX", start="2015-08-25", end="2016-12-09")
-    data2 =  yf.download("GLD GDX", start="2016-12-10", end="2017-03-09")
+    data1 =  yf.download("GLD GDX", start="2012-03-25", end="2016-01-09")
+    data2 =  yf.download("GLD GDX", start="2016-02-21", end="2020-08-15")
 
-    # Create training dataset as an array of two asset prices
-    data_train = np.array([data1["Adj Close"]])
+    # You can use the pd.DataFrame of two asset prices
+    data_train_dataframe = data1["Adj Close"][["GLD", "GDX"]]
+
+    # And also we can create training dataset as an array of two asset prices
+    data_train = np.array(data1["Adj Close"][["GLD", "GDX"]])
 
     # Create an out-of-sample dataset
-    data_oos = np.array([data2["Adj Close"]])
+    data_oos = data2["Adj Close"][["GLD", "GDX"]]
+
+
+The following examples show how the described above module can be used on real data:
+
+**Example 1**
+
+In this example we are using ``pd.DataFrame`` as an input data for the model. We  train our model
+on the whole provided sample and showcase our results on the separate out-of-sample dataset. We also include the
+stop-loss level in this example.
+
+.. code-block::
+
+    from mlfinlab.optimal_mean_reversion import OrnsteinUhlenbeck
 
     # Create the class object
     example = OrnsteinUhlenbeck()
 
     # Fit the model to the training data and allocate data frequency,
     # transaction costs, discount rates and stop-loss level
-    example.fit(data_train, data_frequency="D", discount_rate=[0.05, 0.05],
-                transaction_cost=[0.02, 0.02], stop_loss=0.5)
 
-    # The parameters can be also allocated in an alternative way
-    example.fit(data_train, data_frequency="D", discount_rate=0.5,
-                transaction_cost=0.2, stop_loss=0.5)
+    # Chosen data type can be pd.DataFrame
+    example.fit(data_train_dataframe, data_frequency="D", discount_rate=[0.05, 0.05],
+                transaction_cost=[0.02, 0.02], stop_loss=0.2)
 
-    # You can also use the pd.DataFrame as an input data
-    example.fit(data_train, data_frequency="D", discount_rate=[0.05, 0.05],
-                transaction_cost=[0.02, 0.02], stop_loss=0.5)
+    # Check the model fit
+    print(example.check_fit())
 
-    # In this case you can also specify the training interval you would like to use
-    example.fit(data_train, data_frequency="D", discount_rate=[0.05, 0.05],
-                start="2015-10-25", end="2016-11-09",
-                transaction_cost=[0.02, 0.02], stop_loss=0.5)
+    # Showcase the data for both variations of the problem on the out of sample data
+    fig = example.plot_levels(data_oos, stop_loss=True)
+    fig.set_figheight(15)
+    fig.set_figwidth(10)
+
+**Example 2**
+
+In this example we are using ``pd.DataFrame`` as an input data for the model. We  train our model
+on the slice of the provided data chosen based on provided time interval and showcase our results with
+``description`` function. We include the stop-loss level in this example and change it manually
+along the way. In the end we chose to retrain our data on a different slice of the provided data chosen
+based on provided time interval.
+
+.. code-block::
+
+    from mlfinlab.optimal_mean_reversion import OrnsteinUhlenbeck
+
+    # Create the class object
+    example = OrnsteinUhlenbeck()
+
+    # Fit the model to the training data and allocate data frequency,
+    # transaction costs, discount rates and stop-loss level
+
+    # We can specify the interval we want to use for training
+    example.fit(data_train_dataframe, data_frequency="D", discount_rate=[0.05, 0.05],
+                start="2012-03-27", end="2013-12-08",
+                transaction_cost=[0.02, 0.02], stop_loss=0.2)
+
+    # Check the model fit
+    print(example.check_fit(),"\n")
 
     # Stop-loss level, transaction costs and discount rates
     # can be changed along the way
-    example.L = 0.5
+    example.L = 0.3
+
+    # Call the description function to see all the model's parameters and optimal levels
+    print("Model description:\n",example.description())
+
+    # Retrain the model
+
+    # By changing the training interval
+    example.fit_to_assets(start="2015-08-25", end="2016-12-09")
+
+
+**Example 3**
+
+In this example we are using ``np.array`` as an input data for the model. We  train our model
+on the whole provided array and showcase our results on separate out-of-sample data. We don't include the
+stop-loss level in this example. In the end we chose to retrain our data on an out-of-sample dataset.
+
+
+.. code-block::
+
+    from mlfinlab.optimal_mean_reversion import OrnsteinUhlenbeck
+
+    # Create the class object
+    example = OrnsteinUhlenbeck()
+
+    # Fit the model to the training data and allocate data frequency,
+    # transaction costs, discount rates and stop-loss level
+
+    # You can input the np.array as data
+    example.fit(data_train, data_frequency="D", discount_rate=[0.05, 0.05],
+                transaction_cost=[0.02, 0.02], stop_loss=0.2)
 
     # Check the model fit
-    example.check_fit()
+    print(example.check_fit(),"\n")
 
     # Calculate the optimal liquidation level
     b = example.optimal_entry_level()
@@ -462,16 +536,76 @@ The following examples show how the described above module can be used on real d
     # Calculate the optimal entry interval accounting for stop-loss
     d_L = example.optimal_entry_interval_stop_loss()
 
-    # Showcase the data for both variations of the problem on the out of sample data
-    example.plot_levels(data_oos, stop_loss=True)
-
     # Call the description function to see all the model's parameters and optimal levels
-    example.description()
+    print("Model description:\n",example.description())
+
+    # Showcase the data for both variations of the problem on the out of sample data
+    fig = example.plot_levels(data_oos)
+    fig.set_figheight(15)
+    fig.set_figwidth(10)
 
     # Retrain the model
-    # By changing the training interval
-    example.fit_to_assets(start="2015-08-25", end="2016-12-09")
+
     # By changing the input data
     example.fit_to_assets(data=data_oos)
-    # By using the simulated OU process
-    example.fit_to_portfolio(ou_model_simulation(400))
+
+    # Check the model fit
+    print(example.check_fit(),"\n")
+
+
+**Example 4**
+
+In this example we are using ``np.array`` as an input data for the model. We  train our model
+on the simulated OU process based on given parameters and showcase our results on the
+simulated OU process based on the parameters of the fitted model. Stop-loss level in this example
+isn't included. We also calculate an additional OU-model parameter - half-life.
+
+.. code-block::
+
+    from mlfinlab.optimal_mean_reversion import OrnsteinUhlenbeck
+
+    # Create the class object
+    example = OrnsteinUhlenbeck()
+
+    # Setting the delta as if we are using the daily data
+    delta_t = 1/252
+
+    # Generate the mean-reverting data for the model input based on given parameters
+    ou_given = example.ou_model_simulation(n=400, theta_given=0.7, mu_given=12,
+                                           sigma_given=0.1, delta_t_given=delta_t)
+
+    # Fit the model to the training data and allocate data frequency,
+    # transaction costs, discount rates and stop-loss level
+
+    # The parameters can be allocated in an alternative way
+    example.fit(ou_given, data_frequency="D", discount_rate=0.05,
+                transaction_cost=0.02)
+
+    # Check the model fit
+    print(example.check_fit(), "\n")
+
+    # Call the description function to see all the model's parameters and optimal levels
+    print("Model description:\n",example.description(),"\n")
+
+    # Generate the mean-reverting data for the testing data based on fitted
+    ou_fitted = example.ou_model_simulation(n=400)
+
+    # Showcase the found optimal levels on the generated test data
+    fig = example.plot_levels(ou_fitted)
+    fig.set_figheight(15)
+    fig.set_figwidth(10)
+
+    # We can calculate the half-life of the OU model
+    h = example.half_life()
+
+    print("half-life: ",h)
+
+
+Research Notebook
+#################
+
+The following research notebook can be used to better understand the concepts of trading under the Ornstein-Uhlenbeck Model.
+
+* `Trading Under the Ornstein-Uhlenbeck Model`_
+
+.. _`Trading Under the Ornstein-Uhlenbeck Model`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Optimal%20Mean%20Reversion/ou_model.ipynb
