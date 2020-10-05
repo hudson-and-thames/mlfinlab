@@ -36,11 +36,38 @@ class DashGraph:
 
         pass
 
-    def _generate_cyto_graph(self):
+    def _set_cyto_graph(self):
         """
-        Generates the cytoscape graph element.
+        Sets the cytoscape graph elements.
+        """
 
-        :return: (Cytoscape) Returns the Cytoscpae graph object.
+        pass
+
+    def _get_node_group(self, node_name):
+        """
+        Returns the industry or sector name for a given node name.
+
+        :param node_name: (str) Name of a given node in the graph.
+        :return: (str) Name of industry that the node is in or "default" for nodes which haven't been assigned a group.
+        """
+
+        pass
+
+    def _get_node_size(self, index):
+        """
+        Returns the node size for given node index if the node sizes have been set.
+
+        :param index: (int) The index of the node.
+        :return: (float) Returns size of node set, 0 if it has not been set.
+        """
+
+        pass
+
+    def _update_elements(self, dps=4):
+        """
+        Updates the elements needed for the Dash Cytoscape Graph object.
+
+        :param dps: (int) Decimal places to round the edge values.
         """
 
         pass
@@ -70,44 +97,16 @@ class DashGraph:
 
         pass
 
-    def _get_node_group(self, node_name):
-        """
-        Returns the industry or sector name for a given node name.
-
-        :param node_name: (str) Name of a given node in the graph.
-        :return: (str) Name of industry that the node is in or "default" for nodes which haven't been assigned a group.
-        """
-
-        pass
-
-    def _get_node_size(self, index):
-        """
-        Returns the node size for given node index if the node sizes have been set.
-
-        :return: (float) Returns size of node set, 0 if it has not been set.
-        """
-
-        pass
-
     def _assign_sizes(self):
         """
         Assigns the node sizing by appending to the stylesheet.
         """
 
-        pass
-
-    def _update_elements(self, dps=4):
-        """
-        Updates the elements needed for the Dash Cytoscape Graph object.
-
-        :param dps: (int) Decimal places to round the edge values.
-        """
-
-        pass
+    pass
 
     def get_server(self):
         """
-        Starts up a small Flask server.
+        Returns a small Flask server.
 
         :return: (Dash) Returns the Dash app object, which can be run using run_server.
             Returns a Jupyter Dash object if DashGraph has been initialised for Jupyter Notebook.
@@ -177,12 +176,43 @@ class DashGraph:
 
         pass
 
-    @staticmethod
-    def _get_default_controls():
+    def _get_default_controls(self):
         """
         Returns the default controls for initialisation.
 
         :return: (dbc.Card) Dash Bootstrap Component Card which defines the side panel.
+        """
+
+        pass
+
+
+class PMFGDash(DashGraph):
+    """
+    PMFGDash class, a child of DashGraph, is the Dash interface class to display the PMFG.
+    """
+
+    def __init__(self, input_graph, app_display='default'):
+        """
+        Initialise the PMFGDash class but override the layout options.
+        """
+
+        pass
+
+    def _update_elements(self, dps=4):
+        """
+        Overrides the parent DashGraph class method _update_elements, to add styling for the MST edges.
+        Updates the elements needed for the Dash Cytoscape Graph object.
+
+        :param dps: (int) Decimal places to round the edge values. By default, this will round to 4 d.p's.
+        """
+
+        pass
+
+    def _get_default_stylesheet(self):
+        """
+        Gets the default stylesheet and adds the MST styling.
+
+        :return: (List) Returns the stylesheet to be added to the graph.
         """
 
         pass

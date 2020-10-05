@@ -41,6 +41,16 @@ class Graph(ABC):
 
         pass
 
+    def get_difference(self, input_graph_two):
+        """
+        Given two Graph with the same nodes, return a set of differences in edge connections.
+
+        :param input_graph_two: (Graph) A graph to compare self.graph against.
+        :return: (List) A list of unique tuples showing different edge connections.
+        """
+
+        pass
+
     def get_pos(self):
         """
         Returns the dictionary of the nodes coordinates.
@@ -92,35 +102,6 @@ class Graph(ABC):
         Returns a map of industry group matched with list of nodes.
 
         :return: (Dict) Dictionary of industry name to list of node indexes.
-        """
-
-        pass
-
-class MST(Graph):
-    """
-    MST is a subclass of Graph which creates a MST Graph object.
-    """
-
-    def __init__(self, matrix, matrix_type, mst_algorithm='kruskal'):
-        """
-        Creates a MST Graph object and stores the MST inside graph attribute.
-
-        :param matrix: (pd.Dataframe) Input matrices such as a distance or correlation matrix.
-        :param matrix_type: (str) Name of the matrix type (e.g. "distance" or "correlation").
-        :param mst_algorithm: (str) Valid MST algorithm types include 'kruskal', 'prim', or 'boruvka'.
-            By default, MST algorithm uses Kruskal's.
-        """
-
-        pass
-
-    @staticmethod
-    def create_mst(matrix, algorithm='kruskal'):
-        """
-        This method converts the input matrix into a MST graph.
-
-        :param matrix: (pd.Dataframe) Input matrix.
-        :param algorithm: (str) Valid MST algorithm types include 'kruskal', 'prim', or 'boruvka'.
-            By default, MST algorithm uses Kruskal's.
         """
 
         pass
