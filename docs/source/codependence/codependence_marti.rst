@@ -168,6 +168,29 @@ In a supervised setting, one could select an estimate :math:`\hat{\Theta}` of th
 optimizing some loss function by techniques such as cross-validation. Yet, the lack of a clear loss function makes
 the estimation of :math:`\Theta^{*}` difficult in an unsupervised setting".
 
+.. note::
+
+    The implementation of GNPR in the MlFinLab package was adjusted so that :math:`\tilde{d}_{0}^{2}`
+    (dependence information distance) is being calculated using the 1D Optimal Transport Distance
+    following the example in the
+    `POT package documentation <https://pythonot.github.io/auto_examples/plot_OT_1D.html#sphx-glr-auto-examples-plot-ot-1d-py>`_.
+    This solution was proposed by Marti.
+
+Distributions of random variables are approximated using histograms with a given number of bins as input.
+
+Optimal Transport Distance is then obtained from the Optimal Transportation Matrix (OTM) using
+the Loss Matrix (M) as shown in `Optimal Transport blog post by Marti <https://gmarti.gitlab.io/qfin/2020/06/25/copula-optimal-transport-dependence.html>`_:
+
+.. math::
+
+    \tilde{d}_{0}^{2} = tr (OT^{T} * M)
+
+where :math:`tr( \cdot )` is trace of a matrix and :math:`\cdot^{T}` is a transposed matrix.
+
+This approach solves the issue of defining support for underlying distributions and choosing a
+number of bins.
+
+
 Implementation
 **************
 
@@ -203,7 +226,7 @@ The following example shows how the above functions can be used:
    # Calculating the GNPR distance between all time series with both
    # distribution and dependence information
    gnpr_matrix = get_dependence_matrix(data, dependence_method='gnpr_distance',
-                                       ftheta=0.5)
+                                       theta=0.5)
 
 Research Notebooks
 ******************
