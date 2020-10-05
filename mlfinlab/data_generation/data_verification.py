@@ -1,6 +1,3 @@
-# Copyright 2019, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
 Contains methods for verifying synthetic data.
 """
@@ -11,7 +8,23 @@ import matplotlib.pyplot as plt
 from scipy.cluster import hierarchy
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import minimum_spanning_tree
+from mlfinlab.codependence import get_dependence_matrix
+from mlfinlab.clustering.hierarchical_clustering import optimal_hierarchical_cluster
 
+
+def plot_time_series_dependencies(time_series, dependence_method="gnpr_distance", **kwargs):
+    """
+    Plots the dependence matrix of a time series returns.
+
+    Used to verify a time series' underlying distributions via the GNPR distance method.
+    ``**kwargs`` are used to pass arguments to the `get_dependence_matrix` function used here.
+
+    :param time_series: (pd.DataFrame) Dataframe containing time series.
+    :param dependence_method: (str) Distance method to use by `get_dependence_matrix`
+    :return: (plt.Axes) Figure's axes.
+    """
+
+    return axis
 
 def _compute_eigenvalues(mats):
     """
@@ -148,7 +161,7 @@ def plot_eigenvectors(emp_mats, gen_mats, n_hist=100):
     pass
 
 
-def plot_heirarchical_structure(emp_mats, gen_mats):
+def plot_hierarchical_structure(emp_mats, gen_mats):
     """
     Plots the following stylized facts for comparison between empirical and generated
     correlation matrices:
@@ -224,6 +237,22 @@ def plot_stylized_facts(emp_mats, gen_mats, n_hist=100):
     :param gen_mats: (np.array) Generated correlation matrices.
         Has shape (n_samples_b, dim_b, dim_b)
     :param n_hist: (int) Number of bins for histogram plots. (100 by default).
+    """
+
+    pass
+
+
+def plot_optimal_hierarchical_cluster(mat, method="ward"):
+    """
+    Calculates and plots the optimal clustering of a correlation matrix.
+
+    It uses the `optimal_hierarchical_cluster` function in the clustering module to calculate
+    the optimal hierarchy cluster matrix.
+
+    :param mat: (np.array/pd.DataFrame) Correlation matrix.
+    :param method: (str) Method to calculate the hierarchy clusters. Can take the values
+        ["single", "complete", "average", "weighted", "centroid", "median", "ward"].
+    :return: (plt.Axes) Figure's axes.
     """
 
     pass

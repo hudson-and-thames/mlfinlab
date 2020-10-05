@@ -4,7 +4,9 @@ clustering of financial time series and applications to credit default swaps" by
 https://www.researchgate.net/publication/322714557
 """
 import numpy as np
+import pandas as pd
 from scipy.stats import spearmanr
+import ot
 
 # pylint: disable=invalid-name
 
@@ -58,7 +60,7 @@ def gpr_distance(x: np.array, y: np.array, theta: float) -> float:
     pass
 
 
-def gnpr_distance(x: np.array, y: np.array, theta: float, bandwidth: float = 0.01) -> float:
+def gnpr_distance(x: np.array, y: np.array, theta: float, n_bins: int = 50) -> float:
     """
     Calculates the empirical distance between two random variables under the Generic Non-Parametric Representation
     (GNPR) approach.
@@ -70,12 +72,19 @@ def gnpr_distance(x: np.array, y: np.array, theta: float, bandwidth: float = 0.0
     - for theta = 1 the dependence information is tested
     - for theta = 0.5 a mix of both information types is tested
 
-    With theta in [0, 1] the distance lies in the range [0, 1] and is a metric. (See original work for proof, p.71)
+    With theta in [0, 1] the distance lies in the range [0, 1] and is a metric.
+    (See original work for proof, p.71)
+
+    This method is modified as it uses 1D Optimal Transport Distance to measure
+    distribution distance. This solves the issue of defining support and choosing
+    a number of bins. The number of bins can be given as an input to speed up calculations.
+    Big numbers of bins can take a long time to calculate.
 
     :param x: (np.array/pd.Series) X vector.
     :param y: (np.array/pd.Series) Y vector (same number of observations as X).
     :param theta: (float) Type of information being tested. Falls in range [0, 1].
-    :param bandwidth: (float) Bandwidth to use for splitting the X and Y vector observations. (0.01 by default)
+    :param n_bins: (int) Number of bins to use to split the X and Y vector observations.
+        (100 by default)
     :return: (float) Distance under GNPR approach.
     """
 

@@ -16,7 +16,7 @@ from mlfinlab.codependence.optimal_transport import optimal_transport_dependence
 # pylint: disable=invalid-name
 
 def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float = 0.5,
-                          bandwidth: float = 0.01, n_bins: int = None, normalize: bool = True,
+                          n_bins: int = None, normalize: bool = True,
                           estimator: str = 'standard', target_dependence: str = 'comonotonicity',
                           gaussian_corr: float = 0.7, var_threshold: float = 0.2) -> pd.DataFrame:
     """
@@ -30,7 +30,6 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float
     :param dependence_method: (str) Algorithm to be use for generating dependence_matrix.
     :param theta: (float) Type of information being tested in the GPR and GNPR distances. Falls in range [0, 1].
                           (0.5 by default)
-    :param bandwidth: (float) Bandwidth to use for splitting observations in the GPR and GNPR distances. (0.01 by default)
     :param n_bins: (int) Number of bins for discretization in ``information_variation`` and ``mutual_information``,
                          if None the optimal number will be calculated. (None by default)
     :param normalize: (bool) Flag used to normalize the result to [0, 1] in ``information_variation`` and
