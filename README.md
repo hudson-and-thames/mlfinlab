@@ -80,19 +80,6 @@ virtual teams, spread across the world, primarily: New York, London, and Kyiv.
 
 
 ## Sponsors and Donating
-A special thank you to our sponsors! If you would like to become a sponsor and help support our research, please sign 
-up on [Patreon](https://www.patreon.com/HudsonThames) and purchase one of the many tiers.
-
-Benefits include:
-1. Access to source code via Github.
-2. Access to all online documentation.
-3. Access to all slide show presentations and Jupyter Notebook tutorials.
-4. Video lecture series and recordings.
-5. Company / Organisation profile on [www.hudsonthames.org](https://hudsonthames.org/sponsors/)
-6. Use of Hudson & Thames sponsor badge on your website.
-7. Twitter Shoutout!
-8. Access to our communities Slack Channel.
-9. Subscription to project release updates and news.
 
 ### Platinum Sponsors:
 <div align="center">
