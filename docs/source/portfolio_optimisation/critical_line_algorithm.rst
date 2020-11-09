@@ -38,9 +38,9 @@
     allocations on the specific user data. This way, each implementation can be called in the same way and this makes it simple
     for users to use them.
 
-=================================
-The Critical Line Algorithm (CLA)
-=================================
+=============================
+Critical Line Algorithm (CLA)
+=============================
 
 This is a robust alternative to the quadratic optimisation used to find mean-variance optimal portfolios. The major difference
 between classic mean-variance optimisation and the critical line algorithm (CLA) are the optimisation constraints involved. A
@@ -129,7 +129,7 @@ Note that the turning points found by ``cla_turning_points`` constitute a small 
 Implementation
 ##############
 
-.. automodule:: mlfinlab.portfolio_optimization.cla
+.. automodule:: mlfinlab.portfolio_optimization.modern_portfolio_theory.cla
 
     .. autoclass:: CriticalLineAlgorithm
         :members:
@@ -171,7 +171,7 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.portfolio_optimization.cla import CriticalLineAlgorithm
+    from mlfinlab.portfolio_optimization.modern_portfolio_theory import CriticalLineAlgorithm
 
     # Read in data
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')

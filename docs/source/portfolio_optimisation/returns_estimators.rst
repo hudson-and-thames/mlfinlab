@@ -78,7 +78,7 @@ Where :math:`R_{t}` is the return for :math:`t` -th observation, :math:`P_{t}` i
 Implementation
 ##############
 
-.. automodule:: mlfinlab.portfolio_optimization.returns_estimators
+.. automodule:: mlfinlab.portfolio_optimization.estimators.returns_estimators
 
     .. autoclass:: ReturnsEstimators
         :members:
@@ -92,7 +92,7 @@ Below is an example of how to use the package functions to calculate various est
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.portfolio_optimization import ReturnsEstimators
+    from mlfinlab.portfolio_optimization.estimators import ReturnsEstimators
 
     # Import dataframe of prices for assets in a portfolio
     asset_prices = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)

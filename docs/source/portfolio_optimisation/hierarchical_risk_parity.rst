@@ -82,7 +82,7 @@ tree and get assigned to the portfolio assets.
 Implementation
 ##############
 
-.. automodule:: mlfinlab.portfolio_optimization.hrp
+.. automodule:: mlfinlab.portfolio_optimization.clustering.hrp
 
     .. autoclass:: HierarchicalRiskParity
         :members:
@@ -132,7 +132,7 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.portfolio_optimization.hrp import HierarchicalRiskParity
+    from mlfinlab.portfolio_optimization.clustering.hrp import HierarchicalRiskParity
 
     # Read in data
     stock_prices = pd.read_csv('FILE_PATH', parse_dates=True, index_col='Date')

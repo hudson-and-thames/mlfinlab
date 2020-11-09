@@ -74,7 +74,7 @@ visit `sklearn documentation <https://scikit-learn.org/stable/modules/generated/
 Implementation
 **************
 
-.. py:currentmodule:: mlfinlab.portfolio_optimization.risk_estimators
+.. py:currentmodule:: mlfinlab.portfolio_optimization.estimators.risk_estimators
 
 .. autoclass:: RiskEstimators
    :members: __init__, minimum_covariance_determinant
@@ -480,7 +480,7 @@ Example Code
 
     import pandas as pd
     import numpy as np
-    from mlfinlab.portfolio_optimization import RiskEstimators, ReturnsEstimators
+    from mlfinlab.portfolio_optimization.estimators import RiskEstimators, ReturnsEstimators
 
     # Import price data
     stock_returns = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)
@@ -491,7 +491,7 @@ Example Code
 
     # Finding the MCD estimator on price data
     min_cov_det = risk_estimators.minimum_covariance_determinant(stock_prices, price_data=True)
-	
+
     # Finding the Empirical Covariance on price data
     empirical_cov = risk_estimators.empirical_covariance(stock_prices, price_data=True)
 
@@ -514,7 +514,7 @@ Example Code
 
     # Series of returns from series of prices
     stock_returns = ret_est.calculate_returns(stock_prices)
-	
+
     # Finding the simple covariance matrix from a series of returns
     cov_matrix = stock_returns.cov()
 

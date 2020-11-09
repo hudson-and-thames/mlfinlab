@@ -159,9 +159,9 @@ From the work **Estimation of Theory-Implied Correlation Matrices**:
 Implementation
 ##############
 
-.. automodule:: mlfinlab.portfolio_optimization.tic
+.. automodule:: mlfinlab.portfolio_optimization.estimators.tic
 
-    .. autoclass:: TIC
+    .. autoclass:: TheoryImpliedCorrelation
         :members:
 
         .. automethod:: __init__
@@ -172,7 +172,7 @@ Example Code
 .. code-block::
 
     import pandas as pd
-    from mlfinlab.portfolio_optimization.tic import TIC
+    from mlfinlab.portfolio_optimization.estimators import TheoryImpliedCorrelation
 
     # Reading data
     tree_classification = pd.read_csv('TREE_FILE_PATH')

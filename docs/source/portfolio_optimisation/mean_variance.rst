@@ -400,7 +400,7 @@ Bringing it all together, the code looks like this:
 Implementation
 ##############
 
-.. automodule:: mlfinlab.portfolio_optimization.mean_variance
+.. automodule:: mlfinlab.portfolio_optimization.modern_portfolio_theory.mean_variance
 
     .. autoclass:: MeanVarianceOptimisation
         :members:
