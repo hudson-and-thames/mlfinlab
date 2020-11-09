@@ -347,18 +347,45 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
-    :caption: Portfolio Optimization
+    :caption: Bayesian Models
     :hidden:
 
-    portfolio_optimisation/risk_metrics
-    portfolio_optimisation/returns_estimation
-    portfolio_optimisation/risk_estimators
-    portfolio_optimisation/mean_variance
-    portfolio_optimisation/critical_line_algorithm
+    portfolio_optimisation/black_litterman
+    portfolio_optimisation/entropy_pooling
+    portfolio_optimisation/robust_bayesian_allocation
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Clustering Models
+    :hidden:
+
     portfolio_optimisation/hierarchical_risk_parity
     portfolio_optimisation/hierarchical_equal_risk_contribution
     portfolio_optimisation/nested_clustered_optimisation
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Estimators
+    :hidden:
+
+    portfolio_optimisation/risk_estimators
+    portfolio_optimisation/returns_estimators
     portfolio_optimisation/theory_implied_correlation
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Modern Portfolio Theory
+    :hidden:
+
+    portfolio_optimisation/critical_line_algorithm
+    portfolio_optimisation/mean_variance
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Utils
+    :hidden:
+
+    portfolio_optimisation/risk_metrics
 
 .. toctree::
     :maxdepth: 5
