@@ -23,7 +23,6 @@ class RiskEstimators:
         Initialize
         """
 
-
         pass
 
     @staticmethod
@@ -276,6 +275,16 @@ class RiskEstimators:
 
         :param cov: (np.array) Covariance matrix.
         :return: (np.array) Covariance matrix.
+        """
+
+        pass
+
+    @staticmethod
+    def is_matrix_invertible(matrix):
+        """
+        Check if a matrix is invertible or not.
+        :param matrix: (Numpy matrix) A matrix whose invertibility we want to check.
+        :return: (bool) Boolean value depending on whether the matrix is invertible or not.
         """
 
         pass

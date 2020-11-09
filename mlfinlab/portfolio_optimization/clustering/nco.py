@@ -25,8 +25,7 @@ class NestedClusteredOptimisation:
 
         pass
 
-    @staticmethod
-    def allocate_cvo(cov, mu_vec=None):
+    def allocate_cvo(self, cov, mu_vec=None):
         """
         Estimates the Convex Optimization Solution (CVO).
 

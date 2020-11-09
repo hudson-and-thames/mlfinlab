@@ -130,6 +130,10 @@ Implementation
 
         .. automethod:: __init__
 
+.. note::
+    The NCO algorithm involves taking inverse of the covariance matrix. If a singular covariance matrix is encountered, then a pseudo-inverse (Moore-Penrose Inverse) will be calculated instead.
+    Please refer to the following Numpy documentation for more details - `pinv() <https://numpy.org/doc/stable/reference/generated/numpy.linalg.pinv.html>`_.
+
 Example Code
 ############
 Below is an example of how to use the package functions to calculate risk metrics for a portfolio.
