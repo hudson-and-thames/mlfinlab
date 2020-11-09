@@ -3,9 +3,8 @@ import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import linkage as scipy_linkage, dendrogram
 from scipy.spatial.distance import squareform
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
-from mlfinlab.portfolio_optimization.risk_metrics import RiskMetrics
-from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
+from mlfinlab.portfolio_optimization.estimators import ReturnsEstimators, RiskEstimators
+from mlfinlab.portfolio_optimization.utils import RiskMetrics
 
 
 class HierarchicalRiskParity:

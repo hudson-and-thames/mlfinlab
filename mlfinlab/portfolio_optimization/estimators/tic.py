@@ -3,10 +3,10 @@ import numpy as np
 import pandas as pd
 import scipy.spatial.distance as ssd
 import scipy.cluster.hierarchy as sch
-from mlfinlab.portfolio_optimization.risk_estimators import RiskEstimators
+from mlfinlab.portfolio_optimization.estimators.risk_estimators import RiskEstimators
 
 
-class TIC:
+class TheoryImpliedCorrelation:
     """
     This class implements the Theory-Implied Correlation (TIC) algorithm and the correlation matrix distance
     introduced by Herdin and Bonek. It is reproduced with modification from the following paper:

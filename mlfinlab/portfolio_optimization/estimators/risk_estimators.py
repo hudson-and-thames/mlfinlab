@@ -7,7 +7,7 @@ from sklearn.covariance import MinCovDet, EmpiricalCovariance, ShrunkCovariance,
 from scipy.optimize import minimize
 from scipy.cluster.hierarchy import average, complete, single, dendrogram
 from matplotlib import pyplot as plt
-from mlfinlab.portfolio_optimization.returns_estimators import ReturnsEstimators
+from mlfinlab.portfolio_optimization.estimators.returns_estimators import ReturnsEstimators
 
 
 class RiskEstimators:
