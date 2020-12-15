@@ -15,7 +15,7 @@
 [![Documentation Status](https://readthedocs.org/projects/mlfinlab/badge/?version=latest)](https://mlfinlab.readthedocs.io/en/latest/?badge=latest)
 
 MlFinlab is a python package which helps portfolio managers and traders who want to leverage the power of machine learning by providing reproducible, interpretable, and easy to use tools. 
-Adding MlFinLab to your companies pipeline is like adding a department of PhD researchers to your team.
+Adding MlFinLab to your company's pipeline is like adding a department of PhD researchers to your team.
 
 > **pip install mlfinlab**
 
@@ -132,4 +132,4 @@ This project is licensed under an all rights reserved licence.
 
 ## Note
 
-* This Public MlFinLab repo, houses our documentation and doesn't conatin the source code.
+* This Public MlFinLab repo, houses our documentation and doesn't contain the source code.
