@@ -94,7 +94,7 @@ Documentation, Tutorials, Videos, and Source Code
 #################################################
 
 We lower barriers to entry for all users by providing extensive `documentation <https://mlfinlab.readthedocs.io/en/latest/>`_
-and `tutorial notebooks <https://github.com/hudson-and-thames/research>`_, with code examples.
+and `tutorial notebooks <https://mlfinlab.readthedocs.io/en/latest/getting_started/research_notebooks.html>`_, with code examples.
 
 We in the process of experimenting with various product ideas and models. Currently all of our tools which are private,
 are available to the various `Patreon <https://www.patreon.com/HudsonThames>`_ tiers.
