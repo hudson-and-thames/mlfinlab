@@ -249,6 +249,8 @@ This project is licensed under an all rights reserved licence.
     getting_started/datasets
     getting_started/research_tools
     getting_started/research_notebooks
+    getting_started/portfoliolab
+    getting_started/arbitragelab
 
 .. toctree::
     :maxdepth: 2
