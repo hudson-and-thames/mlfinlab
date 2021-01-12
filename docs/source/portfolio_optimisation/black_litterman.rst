@@ -20,6 +20,10 @@
 
     </h4>
 
+.. warning::
+    MlFinLab's Portfolio Optimisation Module is deprecated and will be removed in a future version (starting 7.02.2021).
+    Please switch to the `PortfolioLab package <https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/bayesian/black_litterman.html>`__
+    that contains all previous MlFinLab functionality.
 
 .. note::
     The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies.
@@ -257,3 +261,12 @@ This exactly matches the values in column-3 of Table-2 in the above paper. Next 
     [4.3, 7.6, 9.3, 11.0, 4.5, 7.0, 8.1]
 
 Again, this is an exact match of the values in column-2 of Table-4.
+
+.. raw:: html
+
+    <script type="text/javascript">
+    if (String(window.location).indexOf("readthedocs") !== -1) {
+        window.alert('MlFinLab\'s Portfolio Optimisation Module is deprecated and will be removed in a future version (starting 7.02.2021).\nWe will redirect you to the PortfolioLab package - the new location of the Portfolio Optimisation Module.');
+        window.location.replace('https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/bayesian/black_litterman.html');
+    }
+    </script>

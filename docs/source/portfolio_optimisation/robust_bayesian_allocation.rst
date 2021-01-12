@@ -20,6 +20,10 @@
 
     </h4>
 
+.. warning::
+    MlFinLab's Portfolio Optimisation Module is deprecated and will be removed in a future version (starting 7.02.2021).
+    Please switch to the `PortfolioLab package <https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/bayesian/robust_bayesian_allocation.html>`__
+    that contains all previous MlFinLab functionality.
 
 .. note::
     The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies.
@@ -253,3 +257,12 @@ Example Code
 
     # Get the weights
     portfolio_weights = bayes_allocator.weights
+
+.. raw:: html
+
+    <script type="text/javascript">
+    if (String(window.location).indexOf("readthedocs") !== -1) {
+        window.alert('MlFinLab\'s Portfolio Optimisation Module is deprecated and will be removed in a future version (starting 7.02.2021).\nWe will redirect you to the PortfolioLab package - the new location of the Portfolio Optimisation Module.');
+        window.location.replace('https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/bayesian/robust_bayesian_allocation.html');
+    }
+    </script>

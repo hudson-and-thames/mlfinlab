@@ -1,5 +1,10 @@
 .. _online_portfolio_selection-introduction:
 
+.. warning::
+    MlFinLab's Online Portfolio Selection Module is deprecated and will be removed in a future version (starting 7.02.2021).
+    Please switch to the `PortfolioLab package <https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/online_portfolio_selection/introduction.html>`__
+    that contains all previous MlFinLab functionality.
+
 .. note::
     Special thanks to Li and Hoi's `OLPS <https://github.com/OLPS/OLPS>`_ toolbox and
     Marigold's `Universal Portfolio <https://github.com/Marigold/universal-portfolios>`_ for the implementation
@@ -321,3 +326,12 @@ Amgen, US Bancorp, American Express
 
 Amazon has been the clear winner for the past 10 years with Microsoft and Home Depot being a close second.
 One key note for this data will be to see how our strategies fared during the downturn caused by the coronavirus.
+
+.. raw:: html
+
+    <script type="text/javascript">
+    if (String(window.location).indexOf("readthedocs") !== -1) {
+        window.alert('MlFinLab\'s Online Portfolio Selection Module is deprecated and will be removed in a future version (starting 7.02.2021).\nWe will redirect you to the PortfolioLab package - the new location of the Online Portfolio Selection Module.');
+        window.location.replace('https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/online_portfolio_selection/introduction.html');
+    }
+    </script>

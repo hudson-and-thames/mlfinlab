@@ -20,6 +20,10 @@
 
     </h4>
 
+.. warning::
+    MlFinLab's Portfolio Optimisation Module is deprecated and will be removed in a future version (starting 7.02.2021).
+    Please switch to the `PortfolioLab package <https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/bayesian/entropy_pooling.html>`__
+    that contains all previous MlFinLab functionality.
 
 .. note::
     The portfolio optimisation module contains different algorithms that are used for asset allocation and optimising strategies.
@@ -353,3 +357,12 @@ The expected returns calculated above embed the structure of the views and at th
 
             where the view column :math:`V_{k}` contains the standard deviations of :math:`k^{th}` asset, :math:`\hat{m}^{2}_{k}` is the sample mean of :math:`V_k`, :math:`T` is the
             number of historical observations and :math:`\tilde{p}` is the posterior probability we want to calculate.
+
+.. raw:: html
+
+    <script type="text/javascript">
+    if (String(window.location).indexOf("readthedocs") !== -1) {
+        window.alert('MlFinLab\'s Portfolio Optimisation Module is deprecated and will be removed in a future version (starting 7.02.2021).\nWe will redirect you to the PortfolioLab package - the new location of the Portfolio Optimisation Module.');
+        window.location.replace('https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/bayesian/entropy_pooling.html');
+    }
+    </script>

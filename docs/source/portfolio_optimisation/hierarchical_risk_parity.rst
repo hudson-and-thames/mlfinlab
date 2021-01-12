@@ -20,6 +20,11 @@
 
     </h4>
 
+.. warning::
+    MlFinLab's Portfolio Optimisation Module is deprecated and will be removed in a future version (starting 7.02.2021).
+    Please switch to the `PortfolioLab package <https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/clustering/hierarchical_risk_parity.html>`__
+    that contains all previous MlFinLab functionality.
+
 .. note::
     This section includes accompanying Jupyter Notebook Tutorials that are now available via the respective tier on
     `Patreon <https://www.patreon.com/HudsonThames>`_.
@@ -185,3 +190,12 @@ The following research notebooks provide a more detailed exploration of the algo
 * `How to use mlfinlab's HierarchicalRiskParity class`_
 
 .. _How to use mlfinlab's HierarchicalRiskParity class: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Portfolio%20Optimisation%20Tutorials/Hierarchical%20Risk%20Parity%20(HRP)/HRP%20Notebook.ipynb
+
+.. raw:: html
+
+    <script type="text/javascript">
+    if (String(window.location).indexOf("readthedocs") !== -1) {
+        window.alert('MlFinLab\'s Portfolio Optimisation Module is deprecated and will be removed in a future version (starting 7.02.2021).\nWe will redirect you to the PortfolioLab package - the new location of the Portfolio Optimisation Module.');
+        window.location.replace('https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/clustering/hierarchical_risk_parity.html');
+    }
+    </script>

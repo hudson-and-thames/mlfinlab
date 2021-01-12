@@ -28,6 +28,11 @@
 
     </h5>
 
+.. warning::
+    MlFinLab's Portfolio Optimisation Module is deprecated and will be removed in a future version (starting 7.02.2021).
+    Please switch to the `PortfolioLab package <https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/modern_portfolio_theory/critical_line_algorithm.html>`__
+    that contains all previous MlFinLab functionality.
+
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
     `Patreon <https://www.patreon.com/HudsonThames>`_.
@@ -211,3 +216,12 @@ The following research notebooks provide a more detailed exploration of the algo
 * `Chapter 16 Exercise Notebook`_
 
 .. _Chapter 16 Exercise Notebook: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Machine%20Learning%20Asset%20Allocation/Chapter16.ipynb
+
+.. raw:: html
+
+    <script type="text/javascript">
+    if (String(window.location).indexOf("readthedocs") !== -1) {
+        window.alert('MlFinLab\'s Portfolio Optimisation Module is deprecated and will be removed in a future version (starting 7.02.2021).\nWe will redirect you to the PortfolioLab package - the new location of the Portfolio Optimisation Module.');
+        window.location.replace('https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/modern_portfolio_theory/critical_line_algorithm.html');
+    }
+    </script>

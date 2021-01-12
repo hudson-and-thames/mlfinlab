@@ -1,5 +1,9 @@
 .. _portfolio_optimisation-returns_estimation:
 
+.. warning::
+    MlFinLab's Portfolio Optimisation Module is deprecated and will be removed in a future version (starting 7.02.2021).
+    Please switch to the `PortfolioLab package <https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/estimators/returns_estimators.html>`__
+    that contains all previous MlFinLab functionality.
 
 ==================
 Returns Estimators
@@ -110,3 +114,12 @@ Below is an example of how to use the package functions to calculate various est
     assets_exp_annual_returns = ret_est.calculate_exponential_historical_returns(asset_prices,
                                                                                  frequency=252,
                                                                                  span=200)
+
+.. raw:: html
+
+    <script type="text/javascript">
+    if (String(window.location).indexOf("readthedocs") !== -1) {
+        window.alert('MlFinLab\'s Portfolio Optimisation Module is deprecated and will be removed in a future version (starting 7.02.2021).\nWe will redirect you to the PortfolioLab package - the new location of the Portfolio Optimisation Module.');
+        window.location.replace('https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/estimators/returns_estimators.html');
+    }
+    </script>
