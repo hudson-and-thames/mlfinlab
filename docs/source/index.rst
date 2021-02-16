@@ -93,8 +93,8 @@ This project is licensed under an all rights reserved licence and is NOT open-so
     codependence/correlation_based_metrics
     codependence/information_theory_metrics
     codependence/codependence_marti
-    codependence/optimal_transport
     codependence/codependence_matrix
+    codependence/optimal_transport
 
 .. toctree::
     :maxdepth: 2
@@ -169,57 +169,17 @@ This project is licensed under an all rights reserved licence and is NOT open-so
 
 .. toctree::
     :maxdepth: 2
-    :caption: Bayesian Models
+    :caption: Portfolio Optimisation
     :hidden:
 
-    portfolio_optimisation/black_litterman
-    portfolio_optimisation/entropy_pooling
-    portfolio_optimisation/robust_bayesian_allocation
+    portfolio_optimisation/portfolio_optimisation
 
 .. toctree::
     :maxdepth: 2
-    :caption: Clustering Models
-    :hidden:
-
-    portfolio_optimisation/hierarchical_risk_parity
-    portfolio_optimisation/hierarchical_equal_risk_contribution
-    portfolio_optimisation/nested_clustered_optimisation
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Estimators
-    :hidden:
-
-    portfolio_optimisation/risk_estimators
-    portfolio_optimisation/returns_estimators
-    portfolio_optimisation/theory_implied_correlation
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Modern Portfolio Theory
-    :hidden:
-
-    portfolio_optimisation/critical_line_algorithm
-    portfolio_optimisation/mean_variance
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Utils
-    :hidden:
-
-    portfolio_optimisation/risk_metrics
-
-.. toctree::
-    :maxdepth: 5
     :caption: Online Portfolio Selection
     :hidden:
 
-    online_portfolio_selection/introduction
-    online_portfolio_selection/benchmarks
-    online_portfolio_selection/momentum
-    online_portfolio_selection/mean_reversion
-    online_portfolio_selection/pattern_matching
-    online_portfolio_selection/universal_portfolio
+    online_portfolio_selection/online_portfolio_selection
 
 .. toctree::
     :maxdepth: 2
@@ -230,9 +190,17 @@ This project is licensed under an all rights reserved licence and is NOT open-so
     optimal_mean_reversion/ou_model
 
 .. toctree::
+    :maxdepth: 3
+    :caption: Developer Guide
+    :hidden:
+
+    changelog
+
+.. toctree::
     :maxdepth: 2
     :caption: Additional Information
     :hidden:
 
     additional_information/contributing
+    additional_information/analytics
     additional_information/license

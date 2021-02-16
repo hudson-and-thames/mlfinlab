@@ -6,11 +6,22 @@ Installation
 Recommended Versions
 ####################
 
-* Anaconda 3
-* Python 3.6 or 3.7
+* Anaconda
+* Python 3.8 and up.
 
 Installation
 ############
+
+.. warning::
+
+    You may be encountering the following error during the installation:
+
+    ``ERROR: tensorflow 2.2.1 has requirement numpy<1.19.0,>=1.16.0,``
+    ``but you'll have numpy 1.20.1 which is incompatible.``
+
+    You can ignore this message. It appears due to the updated dependency versions in the MlFinLab package.
+
+    All the MlFinLab functionality still works as expected.
 
 Mac OS X and Ubuntu Linux
 *************************
@@ -21,7 +32,7 @@ Mac OS X and Ubuntu Linux
 
 .. code-block::
 
-   conda create -n <env name> python=3.7 anaconda
+   conda create -n <env name> python=3.8 anaconda
 
 Accept all the requests to install.
 
@@ -72,7 +83,7 @@ Windows
 
 .. code-block::
 
-   conda create -n <env name> python=3.7
+   conda create -n <env name> python=3.8
 
 4. Activate the new environment:
 
