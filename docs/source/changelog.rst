@@ -18,5 +18,7 @@ Changelog
 * :support:`52` Migrated Portfolio Optimisation Module documentation from MlFinLab to PortfolioLab.
 * :feature:`52` Migrated Online Portfolio Selection Module code from MlFinLab to PortfolioLab.
 * :support:`52` Migrated Online Portfolio Selection Module documentation from MlFinLab to PortfolioLab.
-* :support:`52` Updated requirements versions (numpy==1.20.1, matplotlib==3.2.2
+* :support:`52` Updated requirements versions (numpy==1.20.1, matplotlib==3.2.2,
   pandas==1.1.5, scikit-learn==0.24.1, scipy==1.6.0, statsmodels==0.12.2).
+
+* :release:`0.15.3 <2021-01-12>`
