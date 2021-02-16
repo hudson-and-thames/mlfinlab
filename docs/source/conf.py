@@ -22,7 +22,7 @@ copyright = '2019, Hudson & Thames,'
 author = 'Hudson & Thames'
 
 # The full version, including alpha/beta/rc tags
-release = '0.15.1'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -63,6 +63,3 @@ add_module_names = False
 html_static_path = ['_static']
 
 html_copy_source = True
-
-# Adding other LaTeX engine to fix build
-# latex_engine = 'xelatex'
