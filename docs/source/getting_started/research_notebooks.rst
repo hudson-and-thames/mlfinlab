@@ -4,7 +4,7 @@
 Research Notebooks
 ==================
 
-Our notebooks are part of the documentation which can be purchased on a monthly subscription via the client portal `<https://portal.hudsonthames.org/>`_. These notebooks provide additional theoretical elements,
+Our notebooks are part of the documentation which can be purchased on a monthly subscription via the `client portal <https://portal.hudsonthames.org/>`_. These notebooks provide additional theoretical elements,
 examples of the use of the algorithms implemented in the MlFinLab package. Research notebooks are a perfect tool to
 try algorithms hands-on and gain additional understanding of how they can be used on real data examples.
 
