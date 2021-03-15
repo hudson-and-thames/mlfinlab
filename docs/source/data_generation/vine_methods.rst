@@ -1,8 +1,8 @@
 .. _data_generation-vine_methods:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 .. note::
    The following implementation and documentation is based on the works of Daniel Lewandowski, Dorota Kurowicka, and Harry Joe:
@@ -252,14 +252,8 @@ Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following research notebook can be used to better understand the Vines and Extended Onion methods.
-
-* `Generating Correlation Matrices using the Vines and Extended Onion Methods`_
-
-.. _`Generating Correlation Matrices using the Vines and Extended Onion Methods`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Data%20Generation/Vines/vines.ipynb
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 References
 ##########

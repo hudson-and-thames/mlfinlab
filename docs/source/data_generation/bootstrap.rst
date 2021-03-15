@@ -1,8 +1,8 @@
 .. _data_generation-bootstrapping:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 =============
 Bootstrapping
@@ -166,14 +166,8 @@ Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following research notebook can be used to better understand the bootstrap methods.
-
-* `Generating Matrices using Bootstrap Methods`_
-
-.. _`Generating Matrices using Bootstrap Methods`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Data%20Generation/Bootstrap/bootstrap.ipynb
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 References
 ##########

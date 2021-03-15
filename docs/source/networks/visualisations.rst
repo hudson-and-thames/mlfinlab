@@ -1,8 +1,8 @@
 .. _networks-visualisations:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 ===================
 Visualising Graphs
@@ -244,11 +244,5 @@ Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following notebook provides a more detailed exploration of the MST creation.
-
-* `MST visualisation`_
-
-.. _`MST visualisation`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Networks/mst.ipynb
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.

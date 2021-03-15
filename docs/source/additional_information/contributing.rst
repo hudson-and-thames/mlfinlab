@@ -7,17 +7,14 @@ Contributing
 Areas of Contribution
 #####################
 
-Currently we have a `live project board`_ that follows the principles of Agile Project Management. This board is available
-to the public and lets everyone know what the Researchers are currently working on.
+Currently we have a live project board that follows the principles of Agile Project Management.
 
 At the time of writing, we are focusing our attentions primarily on those contributions by the current Researchers enrolled
-in our `Mentorship Program <https://hudsonthames.org/mentorship/>`_.
+in our `Apprenticeship Program <https://hudsonthames.org/apprenticeship-program/>`_.
 
 There is of course room for the public to make contributions. The most useful are those that help to improve user experience.
-Good examples of this is writing `tutorial notebooks <https://github.com/hudson-and-thames/research>`_ which answer questions
+Good examples of this is writing tutorial notebooks which answer questions
 from the back of a chapter, mlfinlab recipes, improving docstrings, and adding new sphinx documentation.
-
-.. _live project board: https://github.com/orgs/hudson-and-thames/projects
 
 Raising Issues
 ##############

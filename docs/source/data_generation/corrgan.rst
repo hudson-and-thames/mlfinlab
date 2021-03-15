@@ -1,8 +1,8 @@
 .. _data_generation-corrgan:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 .. note::
    The following implementation and documentation closely follow the work of Gautier Marti:
@@ -83,11 +83,5 @@ Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following research notebook can be used to better understand the sampled correlation matrices.
-
-* `CorrGAN - Realistic Financial Correlation Matrices`_
-
-.. _`CorrGAN - Realistic Financial Correlation Matrices`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Data%20Generation/CorrGAN/corrgan.ipynb
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.

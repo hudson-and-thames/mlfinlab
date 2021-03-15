@@ -1,8 +1,8 @@
 .. _optimal_mean_reverting_strategies-ou_model:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 .. note::
    The following implementations and documentation closely follow the work of Tim Leung:
@@ -609,11 +609,5 @@ Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following research notebook can be used to better understand the concepts of trading under the Ornstein-Uhlenbeck Model.
-
-* `Trading Under the Ornstein-Uhlenbeck Model`_
-
-.. _`Trading Under the Ornstein-Uhlenbeck Model`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Optimal%20Mean%20Reversion/ou_model.ipynb
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.

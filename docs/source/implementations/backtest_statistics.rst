@@ -1,8 +1,8 @@
 .. _implementations-backtest_statistics:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 ===================
 Backtest Statistics
@@ -392,12 +392,5 @@ Research Notebooks
 ##################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following research notebooks can be used to better understand how the statistics within this module can be used on
-real data.
-
-* `Chapter 14 Exercise Notebook`_
-
-.. _Chapter 14 Exercise Notebook: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Backtest%20Statistics/Chapter14_BacktestStatistics.ipynb
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.

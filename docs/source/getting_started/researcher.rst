@@ -9,7 +9,7 @@ Become a Researcher
 
 |
 
-The Hudson & Thames `Mentorship Program`_ caters to ambitious students looking to make an impact on open-source and develop
+The Hudson & Thames `Apprenticeship Program`_ caters to ambitious students looking to make an impact on open-source and develop
 a portfolio of work based on financial machine learning. You will learn a wealth of skills, with a focus on writing
 production-level code, based on the most cutting edge research, from elite peer-reviewed journals, such as:
 
@@ -22,7 +22,7 @@ It is a powerful negotiating tool, when you can approach employers with an array
 .. centered::
    **“Contributing to open source is the most effective job-seeking hack you can take advantage of right now!”**
 
-.. _Mentorship Program: https://hudsonthames.org/mentorship/
+.. _Apprenticeship Program: https://hudsonthames.org/apprenticeship-program/
 
 The program was established to help provide students with a guided path to gaining the Researcher achievement at
 Hudson and Thames. Once the achievement has been unlocked you will gain lifetime access to our community, libraries,
@@ -41,4 +41,4 @@ The goal of the program is to gain Researcher status. We will guide you through 
 .. centered::
    `Become a Researcher!`_
 
-.. _Become a Researcher!: https://hudsonthames.org/mentorship/
+.. _Become a Researcher!: https://hudsonthames.org/apprenticeship-program/

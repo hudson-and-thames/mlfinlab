@@ -4,8 +4,8 @@
 Join the Slack Channel 🔑
 =========================
 
-We host a booming community of like minded data scientists and quants, join the Slack channel now! Open to
-`sponsors <https://www.patreon.com/HudsonThames>`_ of our package.
+We host a booming community of like minded data scientists and quants, join the Slack channel now! Available via
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/slack>`__.
 
 The channel has the following benefits:
 

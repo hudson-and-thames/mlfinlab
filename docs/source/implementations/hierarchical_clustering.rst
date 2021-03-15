@@ -68,5 +68,3 @@ Example
     plt.title("Optimal Clustering Correlation Matrix")
 
     plt.show()
-
-

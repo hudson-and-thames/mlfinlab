@@ -1,8 +1,8 @@
 .. _codependence-codependence_marti:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 .. note::
    The following implementations and documentation closely follow the work of Gautier Marti:
@@ -232,11 +232,5 @@ Research Notebooks
 ******************
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following research notebook can be used to better understand the codependence metrics described above.
-
-* `Codependence by Marti`_
-
-.. _`Codependence by Marti`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Codependence/Codependence%20by%20Marti/codependence_by_marti.ipynb
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.

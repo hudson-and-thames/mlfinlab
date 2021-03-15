@@ -30,7 +30,7 @@ Documentation & Tutorials
 #########################
 
 We lower barriers to entry for all users by providing extensive `documentation <https://mlfinlab.readthedocs.io/en/latest/>`_
-and `tutorial notebooks <http://portal.hudsonthames.org/>`_, with code examples.
+and `tutorial notebooks <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`_, with code examples.
 
 Who is Hudson & Thames?
 #######################

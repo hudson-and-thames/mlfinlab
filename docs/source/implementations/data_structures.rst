@@ -1,8 +1,8 @@
 .. _implementations-data_structures:
 
 .. note::
-    This section includes accompanying Jupyter Notebook Tutorials that are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 ===============
 Data Structures
@@ -145,8 +145,8 @@ standard time bars:
 |
 
 .. note::
-    This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 Information-Driven Bars 🔒
 ##########################
@@ -193,32 +193,8 @@ Research Notebooks 🔒
 #####################
 
 .. note::
-    These and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following research notebooks can be used to better understand the previously discussed data structures
-
-Standard Bars
-*************
-
-* `Getting Started`_
-* `Sample Techniques`_
-
-.. _Getting Started: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Financial%20Data%20Structures/Getting%20Started.ipynb
-.. _Sample Techniques: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Financial%20Data%20Structures/Sample_Techniques.ipynb
-
-Imbalance Bars
-**************
-
-* `Imbalance Bars`_
-
-.. _Imbalance Bars: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Financial%20Data%20Structures/Dollar-Imbalance-Bars.ipynb
-
-|
-
----------------------
-
-|
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 Data Preparation Tutorial
 #########################

@@ -1,7 +1,7 @@
 
 .. note::
-    This section includes accompanying Jupyter Notebook Tutorials that are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 =================================
 Triple-Barrier and Meta-Labelling
@@ -220,32 +220,5 @@ Research Notebooks
 ##################
 
 .. note::
-    These and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following research notebooks can be used to better understand the triple-barrier method and meta-labeling
-
-Triple-Barrier Method
-*********************
-
-* `Trend Follow Question`_
-* `Bollinger band Question`_
-
-.. _Trend Follow Question: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Labelling/Trend-Follow-Question.ipynb
-.. _Bollinger Band Question: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Labelling/BBand-Question.ipynb
-
-Meta-Labeling Toy Example
-*************************
-
-* `Meta Labeling MNIST`_
-
-.. _Meta Labeling MNIST: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Labelling/Meta-Labels-MNIST.ipynb
-
-
-
-
-
-
-
-
-
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.

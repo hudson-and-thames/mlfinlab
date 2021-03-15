@@ -4,8 +4,8 @@
 Fractionally Differentiated Features 🔒
 =======================================
 
-This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
-`Patreon <https://www.patreon.com/HudsonThames>`_.
+This documentation and accompanying Jupyter Notebook Tutorials are now available via
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 Fixed-width Window Fracdiff
 ###########################
@@ -24,12 +24,3 @@ Example
 
 Research Notebook
 #################
-
-The following research notebook can be used to better understand fractionally differentiated features.
-
-* `Fractionally Differentiated Features`_
-
-.. _Fractionally Differentiated Features: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Advances%20in%20Financial%20Machine%20Learning/Fractionally%20Differentiated%20Features/Chapter5_Exercises.ipynb
-
-
-

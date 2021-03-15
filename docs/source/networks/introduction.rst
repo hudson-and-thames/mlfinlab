@@ -70,4 +70,3 @@ convert the correlation coefficients :math:`\rho_{ij}` into distances:
 
 For a more detailed explanation, please refer to :ref:`Correlation-Based Metrics section <codependence-correlation_based_metrics>`,
 as it describes the measures in more detail.
-

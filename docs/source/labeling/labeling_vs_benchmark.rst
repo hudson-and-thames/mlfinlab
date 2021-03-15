@@ -4,8 +4,8 @@
 Return Versus Benchmark 🔒
 ==========================
 
-This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
-`Patreon <https://www.patreon.com/HudsonThames>`_.
+This documentation and accompanying Jupyter Notebook Tutorials are now available via
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 Implementation
 ##############
@@ -15,9 +15,3 @@ Example
 
 Research Notebook
 #################
-
-The following research notebook can be used to better understand the return against benchmark labeling technique.
-
-* `Return Over Benchmark Example`_
-
-.. _`Return Over Benchmark Example`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Labeling/Labeling%20vs%20Benchmark

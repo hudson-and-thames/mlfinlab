@@ -1,8 +1,8 @@
 .. _data_generation-correlated_random_walks:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 =======================
 Correlated Random Walks
@@ -151,15 +151,8 @@ Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following research notebook can be used to better understand Correlated Random Walks.
-
-* `Correlated Random Walks`_
-
-.. _`Correlated Random Walks`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Data%20Generation/Correlated%20Random%20Walks/correlated_random_walks.ipynb
-
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 References
 ##########

@@ -12,8 +12,8 @@
 Optimal Transport 🔒
 ====================
 
-This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
-`Patreon <https://www.patreon.com/HudsonThames>`_.
+This documentation and accompanying Jupyter Notebook Tutorials are now available via
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 
 Optimal Copula Transport dependence
@@ -27,9 +27,3 @@ Examples
 
 Research Notebooks
 ##################
-
-The following research notebook can be used to better understand the optimal copula transport dependence measure described above.
-
-* `Optimal Transport`_
-
-.. _`Optimal Transport`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Codependence/Optimal%20Transport/optimal_transport.ipynb
