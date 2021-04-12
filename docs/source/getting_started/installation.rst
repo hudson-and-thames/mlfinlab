@@ -61,7 +61,7 @@ Windows
 
 1. Download and install the latest version of `Anaconda 3 <https://www.anaconda.com/distribution/#download-section>`__
 2. Launch Anaconda Navigator
-3. Click Environments, choose an environment name, select Python 3.7, and click Create
+3. Click Environments, choose an environment name, select Python 3.8, and click Create
 4. Click Home, browse to your new environment, and click Install under Jupyter Notebook
 5. Launch Anaconda Prompt and activate the environment:
 
