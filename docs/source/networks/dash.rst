@@ -27,16 +27,16 @@ Graph Layout
 On the side panel, the top dropdown menu contains three different layouts designed to layout the MST.
 These are namely `cose-bilkent`, `cola` and `spread`, selected as optimal layouts to view the MST.
 
-.. image:: images/data/graphLayout.png
+.. image:: networks_images/graphLayout.png
     :width: 23%
 
-.. image:: images/data/coseBilkent.png
+.. image:: networks_images/coseBilkent.png
     :width: 23%
 
-.. image:: images/data/cola.png
+.. image:: networks_images/cola.png
     :width: 23%
 
-.. image:: images/data/spread.png
+.. image:: networks_images/spread.png
     :width: 23%
 
 Control panel alongside the layouts `cose-bilkent`, `cola` and `spread`.
@@ -67,13 +67,13 @@ Statistics Panel
 The statistics panel on the left hand side of the UI is designed to provide useful information about the MST displayed
 on the right. The following is a brief explanation of the statistic type, and the reason for selection.
 
-.. image:: images/data/statspanel1.png
+.. image:: networks_images/statspanel1.png
     :width: 30%
 
-.. image:: images/data/statspanel2.png
+.. image:: networks_images/statspanel2.png
     :width: 30%
 
-.. image:: images/data/statspanel3.png
+.. image:: networks_images/statspanel3.png
     :width: 30%
 
 The statistics can be used to analyse topological features of the MST.
@@ -188,7 +188,7 @@ Running Dash in Jupyter
 
 You can easily run Dash server within Jupyter Notebook. The `Jupyter Dash library <https://github.com/plotly/jupyter-dash>`_ is used to provide this functionality.
 
-.. image:: images/data/colouredJupyter.png
+.. image:: networks_images/colouredJupyter.png
 
 When you initialize the `DashGraph` class, you must add another argument 'jupyter notebook'.
 To run the visualisations in Jupyter, replace:

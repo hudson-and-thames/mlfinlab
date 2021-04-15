@@ -1,8 +1,8 @@
 .. _codependence-correlation_based_metrics:
 
 .. note::
-   The following implementations and documentation, closely follows the lecture notes from Cornell University, by Marcos Lopez de Prado:
-   `Codependence (Presentation Slides) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_.
+    The following implementations and documentation, closely follows the lecture notes from Cornell University, by Marcos Lopez de Prado:
+    `Codependence (Presentation Slides) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_.
 
 =========================
 Correlation-Based Metrics
@@ -83,12 +83,12 @@ Values of standard angular distance fall in the range:
     d_\rho[X, Y] \in [0, 1]
 
 .. figure:: images/angular_distance.png
-   :scale: 70 %
-   :align: center
-   :figclass: align-center
-   :alt: Angular Distance
+    :scale: 70 %
+    :align: center
+    :figclass: align-center
+    :alt: Angular Distance
 
-   The angular distance satisfies all the conditions of a true metric, (Lopez de Prado, 2020.)
+    The angular distance satisfies all the conditions of a true metric, (Lopez de Prado, 2020.)
 
 Implementation
 **************
@@ -117,13 +117,13 @@ Values of absolute angular distance fall in the range:
     d_{|\rho|}[X, Y] \in [0, 1]
 
 .. figure:: images/modified_angular_distance.png
-   :scale: 70 %
-   :align: center
-   :figclass: align-center
-   :alt: Modified Angular Distance
+    :scale: 70 %
+    :align: center
+    :figclass: align-center
+    :alt: Modified Angular Distance
 
-   In some financial applications, it makes more sense to apply a modified definition of angular distance, such that the
-   sign of the correlation is ignored, (Lopez de Prado, 2020)
+    In some financial applications, it makes more sense to apply a modified definition of angular distance, such that the
+    sign of the correlation is ignored, (Lopez de Prado, 2020)
 
 Implementation
 **************
@@ -149,10 +149,10 @@ Values of squared angular distance fall in the range:
     d_{\rho^2}[X, Y] \in [0, 1]
 
 .. figure:: images/modified_angular_distance.png
-   :scale: 70 %
-   :align: center
-   :figclass: align-center
-   :alt: Modified Angular Distance
+    :scale: 70 %
+    :align: center
+    :figclass: align-center
+    :alt: Modified Angular Distance
 
 Implementation
 **************
@@ -216,9 +216,8 @@ Implementation
 
 .. autofunction:: norm_distance
 
-
-Examples
-########
+Example
+#######
 
 The following examples show how the described above correlation-based metrics can be used on real data:
 
@@ -227,10 +226,11 @@ The following examples show how the described above correlation-based metrics ca
 
     import pandas as pd
     import numpy as np
+
     from mlfinlab.codependence import (distance_correlation, angular_distance,
-                                      absolute_angular_distance, squared_angular_distance,
-                                      kullback_leibler_distance, norm_distance,
-                                      get_dependence_matrix)
+                                       absolute_angular_distance, squared_angular_distance,
+                                       kullback_leibler_distance, norm_distance,
+                                       get_dependence_matrix)
 
     # Import dataframe of returns for assets in a portfolio
     asset_returns = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)

@@ -1,4 +1,4 @@
-.. _implementations-labeling_matrix_flags:
+.. _labeling-labeling_matrix_flags:
 
 ========================
 Labeling Matrix Flags 🔒

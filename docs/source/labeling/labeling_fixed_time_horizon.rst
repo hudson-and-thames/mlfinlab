@@ -1,4 +1,4 @@
-.. _implementations-labeling_fixed_time_horizon:
+.. _labeling-labeling_fixed_time_horizon:
 
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via
@@ -20,16 +20,16 @@ to :math:`t_0` over time horizon :math:`h`, assuming that returns are lagged, is
 Where :math:`t_1` is the time bar index after a fixed horizon has passed, and :math:`p_{t0}, p_{t1}`
 are prices at times :math:`t_0, t_1`. This method assigns a label based on comparison of rate of return to a threshold :math:`\tau`
 
- .. math::
-     \begin{equation}
-     \begin{split}
-       L_{t0, t1} = \begin{cases}
-       -1 &\ \text{if} \ \ r_{t0, t1} < -\tau\\
-       0 &\ \text{if} \ \ -\tau \leq r_{t0, t1} \leq \tau\\
-       1 &\ \text{if} \ \ r_{t0, t1} > \tau
-       \end{cases}
-     \end{split}
-     \end{equation}
+.. math::
+    \begin{equation}
+    \begin{split}
+        L_{t0, t1} = \begin{cases}
+        -1 &\ \text{if} \ \ r_{t0, t1} < -\tau\\
+        0 &\ \text{if} \ \ -\tau \leq r_{t0, t1} \leq \tau\\
+        1 &\ \text{if} \ \ r_{t0, t1} > \tau
+        \end{cases}
+    \end{split}
+    \end{equation}
 
 To avoid overlapping return windows, rather than specifying :math:`h`, the user is given the option of resampling the returns to
 get the desired return period. Possible inputs for the resample period can be found `here.
@@ -43,12 +43,12 @@ The following shows the distribution of labels for standardized returns on closi
 using a 20-day rolling window for the standard deviation.
 
 .. figure:: labeling_images/fixed_horizon_labels_example.png
-   :scale: 100 %
-   :align: center
-   :figclass: align-center
-   :alt: fixed horizon example
+    :scale: 100 %
+    :align: center
+    :figclass: align-center
+    :alt: fixed horizon example
 
-   Distribution of labels on standardized returns on closing prices of SPY.
+    Distribution of labels on standardized returns on closing prices of SPY.
 
 Though time bars are the most common format for financial data, there can be potential problems with over-reliance on time bars. Time
 bars exhibit high seasonality, as trading behavior may be quite different at the open or close versus midday; thus it will not be
@@ -58,46 +58,50 @@ as a pd.Series corresponding to the timestamps in the dataset. However, the fixe
 about the path of the prices [Lopez de Prado, 2018].
 
 .. tip::
-   **Underlying Literature**
+    **Underlying Literature**
 
-   The following sources describe this method in more detail:
+    The following sources describe this method in more detail:
 
-   - **Advances in Financial Machine Learning, Chapter 3.2** *by* Marcos Lopez de Prado (p. 43-44).
-   - **Machine Learning for Asset Managers, Chapter 5.2** *by* Marcos Lopez de Prado (p. 65-66).
+    - **Advances in Financial Machine Learning, Chapter 3.2** *by* Marcos Lopez de Prado (p. 43-44).
+    - **Machine Learning for Asset Managers, Chapter 5.2** *by* Marcos Lopez de Prado (p. 65-66).
 
 
 Implementation
 ##############
 
 .. py:currentmodule:: mlfinlab.labeling.fixed_time_horizon
+
 .. automodule:: mlfinlab.labeling.fixed_time_horizon
    :members:
 
 Example
 ########
+
 Below is an example on how to use the Fixed Horizon labeling technique on real data.
 
 .. code-block::
 
+    # Import packages
     import pandas as pd
     import numpy as np
 
+    # Import MlFinLab tools
     from mlfinlab.labeling import fixed_time_horizon
 
-    # Import price data.
+    # Import price data
     data = pd.read_csv('../Sample-Data/stock_prices.csv', index_col='Date', parse_dates=True)
     custom_threshold = pd.Series(np.random.random(len(data)), index = data.index)
 
-    # Create labels.
+    # Create labels
     labels = fixed_time_horizon(prices=data, threshold=0.01, lag=True)
 
-    # Create labels with a dynamic threshold.
+    # Create labels with a dynamic threshold
     labels = fixed_time_horizon(prices=data, threshold=custom_threshold, lag=True)
 
-    # Create labels with standardization.
+    # Create labels with standardization
     labels = fixed_time_horizon(prices=data, threshold=1, lag=True, standardized=True, window=5)
 
-    # Create labels after resampling weekly with standardization.
+    # Create labels after resampling weekly with standardization
     labels = fixed_time_horizon(prices=data, threshold=1, resample_by='W', lag=True,
                                 standardized=True, window=4)
 

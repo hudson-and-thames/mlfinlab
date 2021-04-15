@@ -14,4 +14,3 @@ Starting from February 2021 the Portfolio Optimisation and the Online Portfolio 
 package will be deprecated. Please move your implementations to PortfolioLab.
 
 `PortfolioLab package is available here <https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/>`_
-

@@ -1,3 +1,4 @@
+.. _getting_started-researcher:
 
 ===================
 Become a Researcher
@@ -9,7 +10,7 @@ Become a Researcher
 
 |
 
-The Hudson & Thames `Apprenticeship Program`_ caters to ambitious students looking to make an impact on open-source and develop
+The Hudson & Thames `Apprenticeship Program`_ caters to ambitious students looking to develop
 a portfolio of work based on financial machine learning. You will learn a wealth of skills, with a focus on writing
 production-level code, based on the most cutting edge research, from elite peer-reviewed journals, such as:
 
@@ -31,7 +32,7 @@ services such as high-quality tick data, journal subscriptions.
 
 The goal of the program is to gain Researcher status. We will guide you through the following achievements:
 
-1. Make a sizable contribution to the mlfinlab library.
+1. Make a sizable contribution to one of Hudson and Thames libraries.
 2. Passed the following production-ready checks: code style and 100% test coverage.
 3. Inline documentation, docstrings, and sphinx documentation.
 4. Completed tutorial notebooks to show mastery of the concepts worked on and provide external users with guided documentation.

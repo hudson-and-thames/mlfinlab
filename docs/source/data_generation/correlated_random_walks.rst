@@ -4,13 +4,13 @@
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via
     `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
-=======================
-Correlated Random Walks
-=======================
-
 .. note::
    The following implementation and documentation closely follow the work of Donnat, P., Marti, G. and Very, P.,
    `Toward a generic representation of random variables for machine learning <https://arxiv.org/pdf/1506.00976.pdf>`_.
+
+=======================
+Correlated Random Walks
+=======================
 
 Being able to discriminate random variables both on distribution and dependence on time series is
 motivated by the study of financial assets returns. The authors proposed a distance metric (GNPR) that "improves the
@@ -70,8 +70,8 @@ The available distributions are:
 
 .. autofunction:: generate_cluster_time_series
 
-Examples
-########
+Example
+#######
 
 The authors provide multiple parameters and distributions in their paper. :math:`N` represents the normal distribution, :math:`L` represents :math:`Laplace(0, 1/\sqrt{2})`, and
 :math:`S` represents :math:`t-distribution(3)/\sqrt{3}`
@@ -89,38 +89,39 @@ The authors provide multiple parameters and distributions in their paper. :math:
 The *Distribution* example generates a time series that has a global normal distribution, no correlation clustering, and 4 distribution clusters.
 
 .. figure:: images/distribution_example.png
-   :scale: 75 %
-   :align: center
-   :alt: Distribution Time Series Example
+    :scale: 75 %
+    :align: center
+    :alt: Distribution Time Series Example
 
-   (Top) Time series plot. (Left) GPR codependence matrix. Only two apparent clusters are seen with no indication of a global embedded distribution. (Right). All 4 distributions clusters can be seen, as well as the global embedded distribution.
+    (Top) Time series plot. (Left) GPR codependence matrix. Only two apparent clusters are seen with no indication of a global embedded distribution. (Right). All 4 distributions clusters can be seen, as well as the global embedded distribution.
 
 The *Dependence* example generates a time series that has a global normal distribution, 10 correlation clusters, and no distribution clusters.
 
 .. figure:: images/dependence_example.png
-   :scale: 75 %
-   :align: center
-   :alt: Dependence Time Series Example
+    :scale: 75 %
+    :align: center
+    :alt: Dependence Time Series Example
 
-   (Top) Time series plot. (Left) GPR codependence matrix. Only 10 correlation clusters are seen with no indication of a global embedded distribution. All 10 correlation clusters can be seen, as well as the global embedded distribution.
+    (Top) Time series plot. (Left) GPR codependence matrix. Only 10 correlation clusters are seen with no indication of a global embedded distribution. All 10 correlation clusters can be seen, as well as the global embedded distribution.
 
 The *Mix* example generates a time series that has a global normal distribution, 5 correlation clusters, and 2 distribution clusters.
 
 .. figure:: images/mix_example.png
-   :scale: 75 %
-   :align: center
-   :alt: Mix Time Series Example
+    :scale: 75 %
+    :align: center
+    :alt: Mix Time Series Example
 
-   (Top) Time series plot. (Left) GPR codependence matrix. Only 5 correlation clusters are seen with no indication of a global embedded distribution. All 5 correlation clusters and 2 distribution clusters can be seen, as well as the global embedded distribution.
+    (Top) Time series plot. (Left) GPR codependence matrix. Only 5 correlation clusters are seen with no indication of a global embedded distribution. All 5 correlation clusters and 2 distribution clusters can be seen, as well as the global embedded distribution.
 
 
 .. code::
 
     import matplotlib.pyplot as plt
+
     from mlfinlab.data_generation.correlated_random_walks import generate_cluster_time_series
     from mlfinlab.data_generation.data_verification import plot_time_series_dependencies
 
-    # Initialize the example parameters for the time series.
+    # Initialize the example parameters for the time series
     n_series = 200
     t_samples = 5000
     k_clusters = [1, 10, 5]
@@ -132,7 +133,7 @@ The *Mix* example generates a time series that has a global normal distribution,
                       ["normal",    "normal",    "student-t", "normal",    "student-t"]]
     titles = ["Distribution", "Dependence", "Mix"]
 
-    # Plot the time series and codependence matrix for each example.
+    # Plot the time series and codependence matrix for each example
     for i in range(len(k_clusters)):
         dataset = generate_cluster_time_series(n_series=n_series, t_samples=t_samples, k_corr_clusters=k_clusters[i],
                                                d_dist_clusters=d_clusters[i], rho_corr=rho_corrs[i],

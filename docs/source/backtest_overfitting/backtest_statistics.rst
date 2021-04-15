@@ -1,4 +1,4 @@
-.. _implementations-backtest_statistics:
+.. _backtest_overfitting-backtest_statistics:
 
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via
@@ -20,14 +20,13 @@ These include:
 * Filtering flips and flattenings from a series of returns.
 
 .. tip::
-   **Underlying Literature**
+    **Underlying Literature**
 
-   The following sources elaborate extensively on the topic:
+    The following sources elaborate extensively on the topic:
 
-   - **Advances in Financial Machine Learning, Chapter 14 & 15** *by* Marcos Lopez de Prado. (Page numbers in the code are referring to the pages in this book.)
-   - **The Sharpe Ratio Efficient Frontier** *by* David H. Bailey *and* Marcos Lopez de Prado `available here <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1821643>`_. *Provides a deeper understanding of Sharpe ratios implemented and Minimum track record length.*
+    - **Advances in Financial Machine Learning, Chapter 14 & 15** *by* Marcos Lopez de Prado. (Page numbers in the code are referring to the pages in this book.)
+    - **The Sharpe Ratio Efficient Frontier** *by* David H. Bailey *and* Marcos Lopez de Prado `available here <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1821643>`_. *Provides a deeper understanding of Sharpe ratios implemented and Minimum track record length.*
 
-.. py:currentmodule:: mlfinlab.backtest_statistics.statistics
 
 Annualized Sharpe Ratio
 #######################
@@ -41,9 +40,14 @@ in 3 months, the risk-free rate given should be the 3-month risk-free rate.
 Calculated as:
 
 .. math::
-   SharpeRatio = \frac{E[Returns] - RiskFreeRate}{\sqrt{V[Returns]}} * \sqrt{n}
+    SharpeRatio = \frac{E[Returns] - RiskFreeRate}{\sqrt{V[Returns]}} * \sqrt{n}
 
 Generally, the higher Sharpe Ratio is, the better.
+
+Implementation
+**************
+
+.. py:currentmodule:: mlfinlab.backtest_statistics.statistics
 
 .. autofunction:: sharpe_ratio
 
@@ -54,9 +58,9 @@ An example showing how Annualized Sharpe Ratio function is used with monthly cum
 
 .. code-block::
 
-   from mlfinlab.backtest_statistics import sharpe_ratio
+    from mlfinlab.backtest_statistics import sharpe_ratio
 
-   sr = sharpe_ratio(returns, entries_per_year=12)
+    sr = sharpe_ratio(returns, entries_per_year=12)
 
 
 Probabilistic Sharpe Ratio
@@ -73,7 +77,7 @@ If PSR exceeds 0.95, then SR is higher than the hypothetical (benchmark) SR at t
 Formula for calculation:
 
 .. math::
-   PSR[SR^{*}] = Z[\frac{(SR - SR^{*})\sqrt{T-1}}{\sqrt{1-\gamma_3*SR+\frac{\gamma_{4}-1}{4}*SR^2}}]
+    PSR[SR^{*}] = Z[\frac{(SR - SR^{*})\sqrt{T-1}}{\sqrt{1-\gamma_3*SR+\frac{\gamma_{4}-1}{4}*SR^2}}]
 
 Where:
 
@@ -89,6 +93,9 @@ Where:
 
     :math:`\gamma_4` - kurtosis of the returns
 
+Implementation
+**************
+
 .. autofunction:: probabilistic_sharpe_ratio
 
 
@@ -99,9 +106,10 @@ An example showing how Probabilistic Sharpe Ratio function is used with an examp
 
 .. code-block::
 
-   from mlfinlab.backtest_statistics import probabilistic_sharpe_ratio
+    from mlfinlab.backtest_statistics import probabilistic_sharpe_ratio
 
-   psr = probabilistic_sharpe_ratio(1.2, 1.0, 200)
+    psr = probabilistic_sharpe_ratio(1.2, 1.0, 200)
+
 
 Deflated Sharpe Ratio
 #####################
@@ -122,7 +130,7 @@ If DSR exceeds 0.95, then SR is higher than the hypothetical (benchmark) SR at t
 Hypothetical SR is calculated as:
 
 .. math::
-   SR^{*} = \sqrt{V[\{SR_{n}\}]}((1-\gamma)*Z^{-1}[1-\frac{1}{N}+\gamma*Z^{-1}[1-\frac{1}{N}*e^{-1}]
+    SR^{*} = \sqrt{V[\{SR_{n}\}]}((1-\gamma)*Z^{-1}[1-\frac{1}{N}+\gamma*Z^{-1}[1-\frac{1}{N}*e^{-1}]
 
 Where:
 
@@ -138,10 +146,14 @@ Where:
 
     :math:`e` - Euler constant
 
+Implementation
+**************
+
 .. autofunction:: deflated_sharpe_ratio
 
 Example
 *******
+
 An example showing how Deflated Sharpe Ratio function with list of SR estimates as well as properties of SR estimates
 and benchmark output:
 
@@ -151,6 +163,7 @@ and benchmark output:
 
     dsr = deflated_sharpe_ratio(1.2, [1.0, 1.1, 1.0], 200)
     dsr = deflated_sharpe_ratio(1.2, [0.7, 50], 200, estimates_param=True, benchmark_out=True)
+
 
 Information Ratio
 #################
@@ -167,8 +180,10 @@ daily observations it should be the benchmark of daily returns.
 Calculated as:
 
 .. math::
-   InformationRatio = \frac{E[Returns - Benchmark]}{\sqrt{V[Returns - Benchmark]}} * \sqrt{n}
+    InformationRatio = \frac{E[Returns - Benchmark]}{\sqrt{V[Returns - Benchmark]}} * \sqrt{n}
 
+Implementation
+**************
 
 .. autofunction:: information_ratio
 
@@ -179,9 +194,9 @@ An example showing how Annualized Information Ratio function is used with monthl
 
 .. code-block::
 
-   from mlfinlab.backtest_statistics import information_ratio
+    from mlfinlab.backtest_statistics import information_ratio
 
-   information_r = information_ratio(returns, benchmark=0.005, entries_per_year=12)
+    information_r = information_ratio(returns, benchmark=0.005, entries_per_year=12)
 
 
 Minimum Track Record Length
@@ -198,7 +213,7 @@ MinTRLis expressed in terms of number of observations, not annual or calendar te
 Minimum Track Record Length is calculated as:
 
 .. math::
-   MinTRL = 1 + [1-\gamma_3*SR+\frac{\gamma_{4}-1}{4}*SR^2]*(\frac{Z_{\alpha}}{SR-SR^{*}})^2
+    MinTRL = 1 + [1-\gamma_3*SR+\frac{\gamma_{4}-1}{4}*SR^2]*(\frac{Z_{\alpha}}{SR-SR^{*}})^2
 
 Where:
 
@@ -211,6 +226,9 @@ Where:
     :math:`\gamma_3` - skewness of the returns
 
     :math:`\gamma_4` - kurtosis of the returns
+
+Implementation
+**************
 
 .. autofunction:: minimum_track_record_length
 
@@ -245,6 +263,9 @@ concentration value is close to 1, returns highly concentrated (When 1, only one
 
 Returns :math:`nan` if less than 3 returns in series.
 
+Implementation
+**************
+
 .. autofunction:: bets_concentration
 
 Example
@@ -254,9 +275,9 @@ An example showing how Bets Concentration function is used can be seen below:
 
 .. code-block::
 
-   from mlfinlab.backtest_statistics import bets_concentration
+    from mlfinlab.backtest_statistics import bets_concentration
 
-   concentration = bets_concentration(returns)
+    concentration = bets_concentration(returns)
 
 
 All Bets Concentration
@@ -266,13 +287,13 @@ Concentration of returns measures the uniformity of returns from bets. Metric is
 and is calculated as follows:
 
 .. math::
-   Weight_{i} = \frac{Return_{i}}{\sum_{i}Return_{i}}
+    Weight_{i} = \frac{Return_{i}}{\sum_{i}Return_{i}}
 
 .. math::
-   SumSquares = \sum_{i}Weight_{i}^2
+    SumSquares = \sum_{i}Weight_{i}^2
 
 .. math::
-   HHI = \frac{SumSquares - \frac{1}{i}}{1 - \frac{1}{i}}
+    HHI = \frac{SumSquares - \frac{1}{i}}{1 - \frac{1}{i}}
 
 The closer the concentration is to 0, the more uniform the distribution of returns (When 0, returns are uniform). If the
 concentration is close to 1, returns highly concentrated (When 1, only one non-zero return).
@@ -284,9 +305,10 @@ grouped by time intervals (daily, monthly etc.) separately.
 * If concentration of negative returns is low, there is no left fat tail in returns distribution.
 * If after time grouping is less than 2 observations, returns third element as nan.
 
+Implementation
+**************
 
 .. autofunction:: all_bets_concentration
-
 
 Example
 *******
@@ -295,9 +317,9 @@ An example showing how All Bets Concentration function is used with weekly group
 
 .. code-block::
 
-   from mlfinlab.backtest_statistics import all_bets_concentration
+    from mlfinlab.backtest_statistics import all_bets_concentration
 
-   pos_concentr, neg_concentr, week_concentr = all_bets_concentration(returns, frequency='W')
+    pos_concentr, neg_concentr, week_concentr = all_bets_concentration(returns, frequency='W')
 
 
 Drawdown and Time Under Water
@@ -314,6 +336,8 @@ The function returns two series:
 1. Drawdown series index is time of a high watermark and the drawdown value.
 2. Time under water index is time of a high watermark and how much time passed till next high watermark is reached, in years. Also includes time between the last high watermark and last observation in returns as the last Time under water element. Without this element the estimations of Time under water can be biased.
 
+Implementation
+**************
 
 .. autofunction:: drawdown_and_time_under_water
 
@@ -324,10 +348,9 @@ An example showing how Drawdown and Time Under Water function is used with accou
 
 .. code-block::
 
-   from mlfinlab.backtest_statistics import drawdown_and_time_under_water
+    from mlfinlab.backtest_statistics import drawdown_and_time_under_water
 
-   drawdown, tuw = drawdown_and_time_under_water(returns, dollars=True)
-
+    drawdown, tuw = drawdown_and_time_under_water(returns, dollars=True)
 
 
 Average Holding Period
@@ -341,7 +364,7 @@ Updating EntryTime - time when a trade was opened, adjusted by increases in posi
 of the position increase.
 
 .. math::
-   EntTime_{0} = \frac{EntTime_{-1}*Weight_{-1} + TimeSinceTradeStart*(Weight_{0}-Weight_{-1})}{Weight_{0}}
+    EntTime_{0} = \frac{EntTime_{-1}*Weight_{-1} + TimeSinceTradeStart*(Weight_{0}-Weight_{-1})}{Weight_{0}}
 
 2. When the size of a bet is decreasing.
 
@@ -351,9 +374,12 @@ If entire position is closed, setting :math:`EntryTime` to :math:`CurrentTime`.
 3. Finally, calculating, using values captured in step 2.
 
 .. math::
-   AverageHoldingTime = \frac{\sum_{i}(HoldingTime_{i}*Weight_{i})}{\sum_{i}Weight_{i}}
+    AverageHoldingTime = \frac{\sum_{i}(HoldingTime_{i}*Weight_{i})}{\sum_{i}Weight_{i}}
 
 If no closed trades in the series, output is :math:`nan`
+
+Implementation
+**************
 
 .. autofunction:: average_holding_period
 
@@ -374,6 +400,9 @@ Points of Flipping: When target position changes sign (For example, changing fro
 
 Points of Flattening: When target position changes from nonzero to zero (For example, changing from 1.5 (long position) to 0 (no positions) on the next timestamp)
 
+Implementation
+**************
+
 .. autofunction:: timing_of_flattening_and_flips
 
 Example
@@ -383,13 +412,13 @@ An example showing how Flattening and Flips function is used can be seen below:
 
 .. code-block::
 
-   from mlfinlab.backtest_statistics import timing_of_flattening_and_flips
+    from mlfinlab.backtest_statistics import timing_of_flattening_and_flips
 
-   flattening_and_flips_timestamps = timing_of_flattening_and_flips(target_positions)
+    flattening_and_flips_timestamps = timing_of_flattening_and_flips(target_positions)
 
 
-Research Notebooks
-##################
+Research Notebook
+#################
 
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via

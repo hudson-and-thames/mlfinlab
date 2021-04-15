@@ -1,4 +1,4 @@
-.. _implementations-labeling_excess_mean:
+.. _labeling-labeling_excess_mean:
 
 ===================
 Excess Over Mean 🔒
@@ -13,5 +13,5 @@ Implementation
 Example
 ########
 
-Research Notebooks
-##################
+Research Notebook
+#################

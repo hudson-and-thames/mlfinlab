@@ -9,8 +9,8 @@ Hierarchical Correlation Block Model (HCBM)
 ===========================================
 
 .. note::
-   The following implementation and documentation closely follow the work of Marti, Andler, Nielsen, and Donnat:
-   `Clustering financial time series: How long is enough? <https://www.ijcai.org/Proceedings/16/Papers/367.pdf>`_.
+    The following implementation and documentation closely follow the work of Marti, Andler, Nielsen, and Donnat:
+    `Clustering financial time series: How long is enough? <https://www.ijcai.org/Proceedings/16/Papers/367.pdf>`_.
 
 HCBM
 ####
@@ -27,7 +27,7 @@ the most used correlation coefficient is the Pearson correlation coefficient, an
 
 The HCBM model consists of correlation matrices having a hierarchical block structure. Each block corresponds to a correlation cluster.
 The HCBM defines a set of nested partitions :math:`P = \{P_0 \supseteq P_1 \supseteq ... \supseteq P_h\}` for some :math:`h \in [1, N]` for :math:`N` univariate
-random variables. Each partition is further subdivided and paritioned again for :math:`k` levels where :math:`1 \leq k \leq h`. We define
+random variables. Each partition is further subdivided and partitioned again for :math:`k` levels where :math:`1 \leq k \leq h`. We define
 :math:`\underline{\rho_k}` and :math:`\bar{\rho_k}` such that for all :math:`1 \leq i,j \leq N`, we have :math:`\underline{\rho_k} \leq \rho_{i,j} \leq \bar{\rho_k}`,
 when :math:`C^{(k)}(X_i) = C^{(k)}(X_j)` and :math:`C^{(k+1)}(X_i) \neq C^{(k+1)}(X_j)` (:math:`C^{(k)}(X_i)` denotes the cluster :math:`X_i` in partition :math:`P_k`).
 
@@ -38,11 +38,11 @@ This implies that :math:`\underline{\rho_k}` and :math:`\bar{\rho_k}` are the mi
 Figure 1 is a sample HCBM matrix  generated with :math:`N = 256`, :math:`k = 4`, :math:`h = 4`, :math:`\underline{\rho_k} = 0.1`, and :math:`\bar{\rho_k} = 0.9`.
 
 .. figure:: images/hcbm_sample.png
-   :scale: 90 %
-   :align: center
-   :alt: Hierarchical Correlation Block Model (HCBM)
+    :scale: 90 %
+    :align: center
+    :alt: Hierarchical Correlation Block Model (HCBM)
 
-   Figure 1. (Left) HCBM matrix. (Right) Left HCBM matrix permuted once.
+    Figure 1. (Left) HCBM matrix. (Right) Left HCBM matrix permuted once.
 
 Figure 1 shows how an HCBM matrix has different levels of hierarchical clusters. The picture on the right shows how a correlation matrix is most commonly observed
 from asset returns.
@@ -61,6 +61,7 @@ Example
 .. code-block::
 
     import matplotlib.pyplot as plt
+
     from mlfinlab.data_generation.hcbm import generate_hcmb_mat
 
     # Initialize parameters.
@@ -99,11 +100,11 @@ structure as shown in Figure 1.
 Figure 2 shows both distributions created from an HCBM matrix. It has 1000 samples
 
 .. figure:: images/hcbm_time_series.png
-   :scale: 90 %
-   :align: center
-   :alt: HCBM Time Series
+    :scale: 90 %
+    :align: center
+    :alt: HCBM Time Series
 
-   Figure 2. (Left) Time Series generated from a Gaussian Distribution. (Right) Time Series generated from a Student-t distribution.
+    Figure 2. (Left) Time Series generated from a Gaussian Distribution. (Right) Time Series generated from a Student-t distribution.
 
 
 Implementation
@@ -120,22 +121,23 @@ Example
 .. code-block::
 
     import matplotlib.pyplot as plt
+
     from mlfinlab.data_generation.hcbm import generate_hcmb_mat, time_series_from_dist
 
-    # Initialize parameters.
+    # Initialize parameters
     samples = 1
     dim = 200
     rho_low = 0.1
     rho_high = 0.9
 
-    # Generate time series from HCBM matrix.
+    # Generate time series from HCBM matrix
     hcbm_mats = generate_hcmb_mat(t_samples=samples,
                                   n_size=dim,
                                   rho_low=rho_low,
                                   rho_high=rho_high)
     series_df = time_series_from_dist(hcbm_mats[0], dist="normal")
 
-    # Plot it.
+    # Plot it
     series_df.cumsum().plot(legend=None)
 
     plt.show()

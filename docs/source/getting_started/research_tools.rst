@@ -1,3 +1,4 @@
+.. _getting_started-research_tools:
 
 ==============
 Research Tools
@@ -31,8 +32,8 @@ To give a brief demonstration, we will examine a `paper`_ by Li and Hoi that sta
 If you type in the name of the paper, you will see a graph like the one below.
 
 .. image:: getting_started_images/graph.png
-   :width: 50%
-   :align: center
+    :width: 50%
+    :align: center
 
 It immediately shows which are the most associated papers. The darker circles indicate that they are
 more recent, so we can easily follow from the older papers to the newer ones. Connected papers also
@@ -43,8 +44,8 @@ to recognize the importance and start with the baseline material. If we click th
 for our current search, we see an image like this:
 
 .. image:: getting_started_images/prior.png
-   :width: 50%
-   :align: center
+    :width: 50%
+    :align: center
 
 We can easily see which were the most cited papers. It is not surprising that the number one paper
 associated with Online Portfolio Selection is Thomas Cover's Universal Portfolio, the original paper
@@ -55,8 +56,8 @@ works, they can move on to the derivative works, which cover the most recent pap
 the paper of interest.
 
 .. image:: getting_started_images/derivative.png
-   :width: 50%
-   :align: center
+    :width: 50%
+    :align: center
 
 .. _medium: https://medium.com/connectedpapers/announcing-connected-papers-a-visual-tool-for-researchers-to-find-and-explore-academic-papers-89146a54c7d4
 .. _paper: https://arxiv.org/abs/1212.2129

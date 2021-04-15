@@ -1,4 +1,4 @@
-.. _implementations-labeling_vs_benchmark:
+.. _labeling-labeling_vs_benchmark:
 
 ==========================
 Return Versus Benchmark 🔒

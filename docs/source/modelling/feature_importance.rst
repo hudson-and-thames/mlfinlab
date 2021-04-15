@@ -1,4 +1,4 @@
-.. _implementations-feature_importance:
+.. _modelling-feature_importance:
 
 =====================
 Feature Importance 🔒

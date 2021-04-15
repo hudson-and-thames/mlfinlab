@@ -53,31 +53,32 @@ Example
 .. code-block::
 
     import yfinance as yf
+
     from mlfinlab.data_generation.corrgan import sample_from_corrgan
     from mlfinlab.data_generation.data_verification import plot_stylized_facts
 
-    # Download stock data from yahoo finance.
+    # Download stock data from yahoo finance
     dimensions = 3
     prices = yf.download(tickers=" ".join(["AAPL", "MSFT", "AMZN"]), period='1y')['Close']
 
-    # Calculate correlation matrices.
+    # Calculate correlation matrices
     prices = prices.pct_change()
     rolling_corr = prices.rolling(252, min_periods=252//2).corr().dropna()
 
-    # Generate same quantity of data from CorrGAN.
+    # Generate same quantity of data from CorrGAN
     num_samples = len(rolling_corr.index.get_level_values(0).unique())
 
     corrgan_mats = sample_from_corrgan(model_loc="corrgan_models",
                                        dim=dimensions,
                                        n_samples=num_samples)
 
-    # Transform from pandas to numpy array.
+    # Transform from pandas to numpy array
     empirical_mats = []
     for date, corr_mat in rolling_corr.groupby(level=0):
         empirical_mats.append(corr_mat.values)
     empirical_mats = np.array(empirical_mats)
 
-    # Plot all stylized facts.
+    # Plot all stylized facts
     plot_stylized_facts(empirical_mats, corrgan_mats)
 
 Time Series Codependence Visualization
@@ -85,8 +86,7 @@ Time Series Codependence Visualization
 
 .. note::
 
-    The correlated random walks time series generation and GNPR codependence measure approaches are fully explored in
-    our :ref:`Correlated random walks <data_generation-correlated_random_walks>`
+    The correlated random walks time series generation and GNPR codependence measure approaches are fully explored in our :ref:`Correlated Random Walks <data_generation-correlated_random_walks>`
     and :ref:`Codependence by Marti <codependence-codependence_marti>` sections.
 
 Following the work of Donnat, Marti, and Very (2016) we provide a method to plot the GNPR codependence matrix and visualize the different
@@ -102,16 +102,17 @@ Example
 *******
 
 .. figure:: images/mix_example_single.png
-   :scale: 75 %
-   :align: center
-   :alt: Mix Time Series Example
+    :scale: 75 %
+    :align: center
+    :alt: Mix Time Series Example
 
-   (Left) GPR codependence matrix. Only 5 correlation clusters are seen with no indication of a global embedded distribution. All 5 correlation clusters and 2 distribution clusters can be seen, as well as the global embedded distribution.
+    (Left) GPR codependence matrix. Only 5 correlation clusters are seen with no indication of a global embedded distribution. All 5 correlation clusters and 2 distribution clusters can be seen, as well as the global embedded distribution.
 
 
 .. code::
 
     import matplotlib.pyplot as plt
+
     from mlfinlab.data_generation.correlated_random_walks import generate_cluster_time_series
     from mlfinlab.data_generation.data_verification import plot_time_series_dependencies
 
@@ -150,32 +151,33 @@ Example
 *******
 
 .. figure:: images/optimal_clustering.png
-   :scale: 90 %
-   :align: center
-   :alt: Optimal Clustering.
+    :scale: 90 %
+    :align: center
+    :alt: Optimal Clustering.
 
-   (Left) HCBM matrix. (Right) Optimal Clustering of the HCBM matrix.
+    (Left) HCBM matrix. (Right) Optimal Clustering of the HCBM matrix.
 
 .. code-block::
 
-    from mlfinlab.data_generation.data_verification import plot_optimal_hierarchical_cluster
-    from mlfinlab.data_generation.hcbm import generate_hcmb_mat
     import matplotlib.pyplot as plt
 
-    # Initialize parameters.
+    from mlfinlab.data_generation.data_verification import plot_optimal_hierarchical_cluster
+    from mlfinlab.data_generation.hcbm import generate_hcmb_mat
+
+    # Initialize parameters
     samples = 1
     dim = 200
     rho_low = 0.1
     rho_high = 0.9
 
-    # Generate HCBM matrix.
+    # Generate HCBM matrix
     hcbm_mat = generate_hcmb_mat(t_samples=samples,
                                  n_size=dim,
                                  rho_low=rho_low,
                                  rho_high=rho_high,
                                  permute=True)[0]
 
-    # Plot it.
+    # Plot it
     plt.figure(figsize=(6, 4))
     plt.pcolormesh(hcbm_mat, cmap='viridis')
     plt.colorbar()

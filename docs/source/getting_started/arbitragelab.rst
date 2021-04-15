@@ -48,4 +48,4 @@ as well as provide feedback that we can add to our next release and build the be
 We continue to maintain the code, fix bugs, and add new implementations on a regular basis. We also version all of
 our code and maintain a changelog so your company can swap between versions at any time.
 
-`Available Here <https://hudsonthames.org/statistical-arbitrage/>`_
+`Available Here <https://hudsonthames.org/arbitragelab/>`_

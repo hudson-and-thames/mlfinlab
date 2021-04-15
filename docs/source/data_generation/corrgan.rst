@@ -8,6 +8,9 @@
    The following implementation and documentation closely follow the work of Gautier Marti:
    `CorrGAN: Sampling Realistic Financial Correlation Matrices using Generative Adversarial Networks <https://arxiv.org/pdf/1910.09504.pdf>`_.
 
+.. warning::
+   In order to use this module, you should additionally install *TensorFlow* For more details, visit our :ref:`MlFinLab installation guide <getting_started-installation>`.
+
 =======
 CorrGAN
 =======
@@ -19,11 +22,11 @@ It was trained on approximately 10,000 empirical correlation matrices estimated 
 algorithm.
 
 .. figure:: images/sample_corrmat.png
-   :scale: 100 %
-   :align: center
-   :alt: Empirical vs Generated Correlation Matrices
+    :scale: 100 %
+    :align: center
+    :alt: Empirical vs Generated Correlation Matrices
 
-   (Left) Empirical correlation matrix estimated on stocks returns; (Right) GAN-generated correlation matrix. (Courtesy of `marti.ai <https://marti.ai/ml/2019/10/13/tf-dcgan-financial-correlation-matrices.html>`_)
+    (Left) Empirical correlation matrix estimated on stocks returns; (Right) GAN-generated correlation matrix. (Courtesy of `marti.ai <https://marti.ai/ml/2019/10/13/tf-dcgan-financial-correlation-matrices.html>`_)
 
 Gautier Marti found that previous methods for generating realistic correlation matrices were lacking. Other authors found as well that
 "there is no algorithm available for the generation of reasonably random financial correlation matrices with the Perron-Frobenius property. [...] we expect
@@ -64,8 +67,9 @@ Example
 
 .. code-block::
 
-    from mlfinlab.data_generation.corrgan import sample_from_corrgan
     import matplotlib.pyplot as plt
+
+    from mlfinlab.data_generation.corrgan import sample_from_corrgan
 
     # Sample from CorrGAN has shape (n_samples, dim, dim).
     # For this example it corresponds to (4, 100, 100).

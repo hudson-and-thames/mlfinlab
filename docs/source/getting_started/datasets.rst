@@ -1,17 +1,19 @@
+.. _getting_started-datasets:
 
 ========
 Datasets
 ========
 
-Mlfinlab package contains various financial datasets which can be used by a researcher as sandbox data.
+MlFinLab package contains various financial datasets which can be used by a researcher as sandbox data.
 
 Tick sample
 ###########
 
-Mlfinlab provides a sample of tick data for E-Mini S&P 500 futures which can be used to test bar compression algorithms,
+MlFinLab provides a sample of tick data for E-Mini S&P 500 futures which can be used to test bar compression algorithms,
 microstructural features, etc. Tick data sample consists of Timestamp, Price and Volume.
 
 .. py:currentmodule:: mlfinlab.datasets.load_datasets
+
 .. autofunction:: load_tick_sample
 
 
@@ -33,15 +35,15 @@ We also provide a sample of dollar bars for E-Mini S&P 500 futures. Data set str
    `Data Structures <https://mlfinlab.readthedocs.io/en/latest/implementations/data_structures.html>`_
 
 .. py:currentmodule:: mlfinlab.datasets.load_datasets
+
 .. autofunction:: load_dollar_bar_sample
-
-
 
 
 ETF prices
 ##########
 
 .. py:currentmodule:: mlfinlab.datasets.load_datasets
+
 .. autofunction:: load_stock_prices
 
 The data set consists of close prices for: EEM, EWG, TIP, EWJ, EFA, IEF, EWQ, EWU, XLB, XLE, XLF, LQD, XLK, XLU, EPP,
@@ -54,8 +56,8 @@ Example
 
 .. code-block::
 
-   from mlfinlab.datasets import (load_tick_sample, load_stock_prices, load_dollar_bar_sample)
+    from mlfinlab.datasets import (load_tick_sample, load_stock_prices, load_dollar_bar_sample)
 
-   tick_df = load_tick_sample()
-   dollar_bars_df = load_dollar_bar_sample()
-   stock_prices_df = load_stock_prices()
+    tick_df = load_tick_sample()
+    dollar_bars_df = load_dollar_bar_sample()
+    stock_prices_df = load_stock_prices()

@@ -5,8 +5,8 @@
     `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 .. note::
-   The following implementations and documentation closely follow the work of Gautier Marti:
-   `Some contributions to the clustering of financial time series and applications to credit default swaps <https://www.researchgate.net/publication/322714557>`_.
+    The following implementations and documentation closely follow the work of Gautier Marti:
+    `Some contributions to the clustering of financial time series and applications to credit default swaps <https://www.researchgate.net/publication/322714557>`_.
 
 =====================
 Codependence by Marti
@@ -33,8 +33,8 @@ motivated, for instance, from the study of financial assets returns: are two per
 From risk perspective, the answer is no [...], hence the propounded distance of this article".
 
 .. Tip::
-   Read the original work to understand the motivation behind creating the novel technique deeper and check the reference
-   papers that prove the above statements.
+    Read the original work to understand the motivation behind creating the novel technique deeper and check the reference
+    papers that prove the above statements.
 
 Spearman’s Rho
 ##############
@@ -113,8 +113,8 @@ and :math:`{\sigma}` predominate. Nonetheless, for datasets which contain heavy-
 GPR fails to capture this information".
 
 .. Tip::
-   The process of deriving this definition as well as a proof that :math:`d_{\Theta}` is a metric is present in the work:
-   `Some contributions to the clustering of financial time series and applications to credit default swaps <https://www.researchgate.net/publication/322714557>`_.
+    The process of deriving this definition as well as a proof that :math:`d_{\Theta}` is a metric is present in the work:
+    `Some contributions to the clustering of financial time series and applications to credit default swaps <https://www.researchgate.net/publication/322714557>`_.
 
 
 Implementation
@@ -196,40 +196,41 @@ Implementation
 
 .. autofunction:: gnpr_distance
 
-Examples
-########
+Example
+#######
 
 The following example shows how the above functions can be used:
 
 .. code-block::
 
-   import pandas as pd
-   from mlfinlab.codependence import (spearmans_rho, gpr_distance, gnpr_distance,
-                                     get_dependence_matrix)
+    import pandas as pd
 
-   # Getting the dataframe with time series of returns
-   data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+    from mlfinlab.codependence import (spearmans_rho, gpr_distance, gnpr_distance,
+                                       get_dependence_matrix)
 
-   element_x = 'SPY'
-   element_y = 'TLT'
+    # Getting the dataframe with time series of returns
+    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
 
-   # Calculating the Spearman's rho coefficient between two time series
-   rho = spearmans_rho(data[element_x], data[element_y])
+    element_x = 'SPY'
+    element_y = 'TLT'
 
-   # Calculating the GPR distance between two time series with both
-   # distribution and dependence information
-   gpr_dist = gpr_distance(data[element_x], data[element_y], theta=0.5)
+    # Calculating the Spearman's rho coefficient between two time series
+    rho = spearmans_rho(data[element_x], data[element_y])
 
-   # Calculating the GNPR distance between two time series with dependence information only
-   gnpr_dist = gnpr_distance(data[element_x], data[element_y], theta=1)
+    # Calculating the GPR distance between two time series with both
+    # distribution and dependence information
+    gpr_dist = gpr_distance(data[element_x], data[element_y], theta=0.5)
 
-   # Calculating the GNPR distance between all time series with both
-   # distribution and dependence information
-   gnpr_matrix = get_dependence_matrix(data, dependence_method='gnpr_distance',
-                                       theta=0.5)
+    # Calculating the GNPR distance between two time series with dependence information only
+    gnpr_dist = gnpr_distance(data[element_x], data[element_y], theta=1)
 
-Research Notebooks
-******************
+    # Calculating the GNPR distance between all time series with both
+    # distribution and dependence information
+    gnpr_matrix = get_dependence_matrix(data, dependence_method='gnpr_distance',
+                                        theta=0.5)
+
+Research Notebook
+#################
 
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via

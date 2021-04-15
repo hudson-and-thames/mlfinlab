@@ -1,4 +1,4 @@
-.. py:currentmodule:: mlfinlab.bet_sizing.bet_sizing
+.. _modelling-bet_sizing:
 
 .. note::
     This section includes documentation and accompanying Jupyter Notebook Tutorials that are now available via

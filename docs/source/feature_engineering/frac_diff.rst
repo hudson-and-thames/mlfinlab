@@ -1,4 +1,4 @@
-.. _implementations-frac_diff:
+.. _feature_engineering-frac_diff:
 
 =======================================
 Fractionally Differentiated Features 🔒

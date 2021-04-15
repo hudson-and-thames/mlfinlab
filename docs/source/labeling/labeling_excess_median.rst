@@ -1,4 +1,4 @@
-.. _implementations-labeling_excess_median:
+.. _labeling-labeling_excess_median:
 
 =====================
 Excess Over Median 🔒
@@ -13,5 +13,5 @@ Implementation
 Example
 ########
 
-Research Notebooks
-##################
+Research Notebook
+#################

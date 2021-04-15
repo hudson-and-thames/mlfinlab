@@ -1,4 +1,4 @@
-.. _implementations-labeling_tail_sets:
+.. _labeling-labeling_tail_sets:
 
 ============
 Tail Sets 🔒
@@ -22,5 +22,5 @@ Implementation
 Example
 ########
 
-Research Notebooks
-##################
+Research Notebook
+#################

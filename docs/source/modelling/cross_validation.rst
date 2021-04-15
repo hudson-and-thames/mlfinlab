@@ -1,4 +1,4 @@
-.. _implementations-cross_validation:
+.. _modelling-cross_validation:
 
 ===================
 Cross Validation 🔒

@@ -1,4 +1,4 @@
-.. _implementations-labeling_trend_scanning:
+.. _labeling-labeling_trend_scanning:
 
 =================
 Trend Scanning 🔒

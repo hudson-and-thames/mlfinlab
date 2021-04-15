@@ -1,3 +1,4 @@
+.. _labeling-tb_meta_labeling:
 
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via
@@ -23,8 +24,8 @@ can be better understood visually and is shown in the figure below taken from Ad
 Learning (`reference`_):
 
 .. image:: labeling_images/triple_barrier.png
-   :scale: 100 %
-   :align: center
+    :scale: 100 %
+    :align: center
 
 One of the major faults with the fixed-time horizon method is that observations are given a label with respect to a certain
 threshold after a fixed interval regardless of their respective volatilities. In other words, the expected returns of every
@@ -60,8 +61,8 @@ operating characteristic (ROC) curve of a binary classifier measures the cost of
 accepting higher false positive rates.
 
 .. image:: labeling_images/confusion_matrix.png
-   :scale: 40 %
-   :align: center
+    :scale: 40 %
+    :align: center
 
 The image illustrates the so-called “confusion matrix.” On a set of observations, there are items that exhibit a condition
 (positives, left rectangle), and items that do not exhibit a condition (negative, right rectangle). A binary classifier predicts
@@ -108,15 +109,16 @@ predicts a 3 and your secondary model says you have a high probability of the pr
 a 3, else not 3.
 
 .. image:: labeling_images/meta_labeling_architecture.png
-   :scale: 70 %
-   :align: center
+    :scale: 70 %
+    :align: center
 
 
 Implementation
 ##############
-.. py:currentmodule:: mlfinlab.labeling.labeling
 
 The following functions are used for the triple-barrier method which works in tandem with meta-labeling.
+
+.. py:currentmodule:: mlfinlab.labeling.labeling
 
 .. autofunction:: add_vertical_barrier
 
@@ -125,7 +127,6 @@ The following functions are used for the triple-barrier method which works in ta
 .. autofunction:: get_bins
 
 .. autofunction:: drop_labels
-
 
 Example
 #######
@@ -138,25 +139,28 @@ model, the process to generate meta-labels goes as follows.
 
 .. code-block::
 
-   import numpy as np
-   import pandas as pd
-   import mlfinlab as ml
+    # Import packages
+    import numpy as np
+    import pandas as pd
 
-   # Read in data
-   data = pd.read_csv('FILE_PATH')
+    # Import MlFinLab tools
+    import mlfinlab as ml
 
-   # Compute daily volatility
-   daily_vol = ml.util.get_daily_vol(close=data['close'], lookback=50)
+    # Read in data
+    data = pd.read_csv('FILE_PATH')
 
-   # Apply Symmetric CUSUM Filter and get timestamps for events
-   # Note: Only the CUSUM filter needs a point estimate for volatility
-   cusum_events = ml.filters.cusum_filter(data['close'],
-                                          threshold=daily_vol['2011-09-01':'2018-01-01'].mean())
+    # Compute daily volatility
+    daily_vol = ml.util.get_daily_vol(close=data['close'], lookback=50)
 
-   # Compute vertical barrier
-   vertical_barriers = ml.labeling.add_vertical_barrier(t_events=cusum_events,
-                                                        close=data['close'],
-                                                        num_days=1)
+    # Apply Symmetric CUSUM Filter and get timestamps for events
+    # Note: Only the CUSUM filter needs a point estimate for volatility
+    cusum_events = ml.filters.cusum_filter(data['close'],
+                                           threshold=daily_vol['2011-09-01':'2018-01-01'].mean())
+
+    # Compute vertical barrier
+    vertical_barriers = ml.labeling.add_vertical_barrier(t_events=cusum_events,
+                                                         close=data['close'],
+                                                         num_days=1)
 
 Once we have computed the daily volatility along with our vertical time barriers and have downsampled our series using
 the CUSUM filter, we can use the triple-barrier method to compute our meta-labels by passing in the side predicted by
@@ -164,16 +168,16 @@ the primary model.
 
 .. code-block::
 
-   pt_sl = [1, 2]
-   min_ret = 0.005
-   triple_barrier_events = ml.labeling.get_events(close=data['close'],
-                                                  t_events=cusum_events,
-                                                  pt_sl=pt_sl,
-                                                  target=daily_vol,
-                                                  min_ret=min_ret,
-                                                  num_threads=3,
-                                                  vertical_barrier_times=vertical_barriers,
-                                                  side_prediction=data['side'])
+    pt_sl = [1, 2]
+    min_ret = 0.005
+    triple_barrier_events = ml.labeling.get_events(close=data['close'],
+                                                   t_events=cusum_events,
+                                                   pt_sl=pt_sl,
+                                                   target=daily_vol,
+                                                   min_ret=min_ret,
+                                                   num_threads=3,
+                                                   vertical_barrier_times=vertical_barriers,
+                                                   side_prediction=data['side'])
 
 As can be seen above, we have scaled our lower barrier and set our minimum return to 0.005.
 
@@ -181,7 +185,7 @@ Meta-labels can then be computed using the time that each observation touched it
 
 .. code-block::
 
-   meta_labels = ml.labeling.get_bins(triple_barrier_events, data['close'])
+    meta_labels = ml.labeling.get_bins(triple_barrier_events, data['close'])
 
 This example ends with creating the meta-labels. To see a further explanation of using these labels in a secondary model
 to help filter out false positives, see the research notebooks below.
@@ -194,8 +198,8 @@ Does Meta Labeling Add to Signal Efficacy?
 
 Successful and long-lasting quantitative research programs require a solid foundation that includes procurement and
 curation of data, creation of building blocks for feature engineering, state of the art methodologies, and backtesting.
-In this project we explore an example of applying meta labeling to high quality S&P500 EMini Futures data and create an
-open-source python package (mlfinlab) that is based on the work of Dr. Marcos Lopez de Prado in his book
+In this project we explore an example of applying meta labeling to high quality S&P500 EMini Futures data and create a
+python package (MlFinLab) that is based on the work of Dr. Marcos Lopez de Prado in his book
 ‘Advances in Financial Machine Learning’. Dr. de Prado’s book provides a guideline for creating a successful platform.
 We also implement a Trend Following and Mean-reverting Bollinger band based trading strategies. Our results confirm the
 fact that a combination of event-based sampling, triple-barrier method and meta labeling improves the performance of the
@@ -216,8 +220,8 @@ timeseries data set we can illustrate the components that make up meta labeling 
 * `A Toy Example <https://hudsonthames.org/meta-labeling-a-toy-example>`_
 
 
-Research Notebooks
-##################
+Research Notebook
+#################
 
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via

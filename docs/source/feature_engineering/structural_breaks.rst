@@ -1,4 +1,4 @@
-.. _implementations-structural_breaks:
+.. _feature_engineering-structural_breaks:
 
 ====================
 Structural Breaks 🔒

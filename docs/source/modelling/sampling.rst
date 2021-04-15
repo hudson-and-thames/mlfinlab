@@ -1,4 +1,4 @@
-.. _implementations-sampling:
+.. _modelling-sampling:
 
 ===========
 Sampling 🔒

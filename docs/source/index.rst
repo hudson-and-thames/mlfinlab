@@ -29,8 +29,8 @@ We source all of our implementations from the most elite and peer-reviewed journ
 Documentation & Tutorials
 #########################
 
-We lower barriers to entry for all users by providing extensive `documentation <https://mlfinlab.readthedocs.io/en/latest/>`_
-and `tutorial notebooks <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`_, with code examples.
+We lower barriers to entry for all users by providing extensive `documentation <https://hudson-and-thames-mlfinlab-premium.readthedocs-hosted.com/en/latest/>`_
+and `tutorial notebooks <https://github.com/Hudson-and-Thames-Clients/research>`_, with code examples.
 
 Who is Hudson & Thames?
 #######################
@@ -77,12 +77,11 @@ This project is licensed under an all rights reserved licence and is NOT open-so
     :caption: Feature Engineering
     :hidden:
 
-    implementations/data_structures
-    implementations/filters
-    implementations/frac_diff
-    implementations/structural_breaks
-    implementations/microstructural_features
-
+    feature_engineering/data_structures
+    feature_engineering/filters
+    feature_engineering/frac_diff
+    feature_engineering/structural_breaks
+    feature_engineering/microstructural_features
 
 .. toctree::
     :maxdepth: 2
@@ -123,19 +122,20 @@ This project is licensed under an all rights reserved licence and is NOT open-so
     labeling/labeling_raw_return
     labeling/labeling_vs_benchmark
     labeling/labeling_excess_mean
-
+    labeling/labeling_bull_bear
 
 .. toctree::
     :maxdepth: 2
     :caption: Modelling
     :hidden:
 
-    implementations/sampling
-    implementations/sb_bagging
-    implementations/feature_importance
-    implementations/cross_validation
-    implementations/EF3M
-    implementations/bet_sizing
+    modelling/sampling
+    modelling/sb_bagging
+    modelling/feature_importance
+    modelling/cross_validation
+    modelling/stacked_module
+    modelling/EF3M
+    modelling/bet_sizing
 
 .. toctree::
     :maxdepth: 2
@@ -155,17 +155,17 @@ This project is licensed under an all rights reserved licence and is NOT open-so
     :caption: Clustering
     :hidden:
 
-    implementations/onc
-    implementations/feature_clusters
-    implementations/hierarchical_clustering
+    clustering/onc
+    clustering/feature_clusters
+    clustering/hierarchical_clustering
 
 .. toctree::
     :maxdepth: 2
     :caption: Backtest Overfitting
     :hidden:
 
-    implementations/backtesting
-    implementations/backtest_statistics
+    backtest_overfitting/backtesting
+    backtest_overfitting/backtest_statistics
 
 .. toctree::
     :maxdepth: 2
@@ -188,6 +188,13 @@ This project is licensed under an all rights reserved licence and is NOT open-so
 
     optimal_mean_reversion/introduction
     optimal_mean_reversion/ou_model
+    
+.. toctree::
+    :maxdepth: 2
+    :caption: Regression
+    :hidden:
+
+    regression/history_weighted_regression
 
 .. toctree::
     :maxdepth: 3

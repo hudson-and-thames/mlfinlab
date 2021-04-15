@@ -1,4 +1,4 @@
-.. _implementations-feature_clusters:
+.. _clustering-feature_clusters:
 
 ===================
 Feature Clusters 🔒
