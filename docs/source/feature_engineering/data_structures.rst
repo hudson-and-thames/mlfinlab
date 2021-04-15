@@ -157,7 +157,7 @@ standard time bars:
 |
 
 Information-Driven Bars 🔒
-#########################
+##########################
 
 Imbalance Bars
 **************
@@ -246,7 +246,7 @@ files from disk.
 |
 
 Research Notebooks 🔒
-####################
+#####################
 
 The following research notebooks can be used to better understand the previously discussed data structures.
 

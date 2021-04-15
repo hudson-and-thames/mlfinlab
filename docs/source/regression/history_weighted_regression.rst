@@ -12,9 +12,9 @@
     
     We mostly implement by choosing the consensus used in [Relevance] to be more consistent in notations.
     
-=============================
+==============================
 History Weighted Regression 🔒
-=============================
+==============================
 
 This documentation and accompanying Jupyter Notebook Tutorials are now available via
 `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
