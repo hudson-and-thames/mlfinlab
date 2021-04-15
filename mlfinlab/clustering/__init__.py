@@ -1,5 +1,5 @@
 """
-Optimal Number of Clusters algorithm (ONC)
+Implements clustering module methods.
 """
 
 from mlfinlab.clustering.onc import get_onc_clusters

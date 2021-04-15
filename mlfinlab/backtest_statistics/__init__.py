@@ -1,6 +1,7 @@
 """
-Implements general backtest statistics
+Implements general backtest statistics.
 """
+
 from mlfinlab.backtest_statistics.backtests import CampbellBacktesting
 from mlfinlab.backtest_statistics.statistics import (timing_of_flattening_and_flips, average_holding_period,
                                                      bets_concentration, all_bets_concentration,

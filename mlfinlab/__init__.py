@@ -19,12 +19,11 @@ import mlfinlab.util as util
 import mlfinlab.structural_breaks as structural_breaks
 import mlfinlab.feature_importance as feature_importance
 import mlfinlab.ensemble as ensemble
-import mlfinlab.portfolio_optimization as portfolio_optimization
 import mlfinlab.clustering as clustering
 import mlfinlab.microstructural_features as microstructural_features
 import mlfinlab.backtest_statistics.backtests as backtests
 import mlfinlab.backtest_statistics.statistics as backtest_statistics
-import mlfinlab.online_portfolio_selection as online_portfolio_selection
 import mlfinlab.networks as networks
 import mlfinlab.data_generation as data_generation
 import mlfinlab.optimal_mean_reversion as optimal_mean_reversion
+import mlfinlab.regression as regression
