@@ -10,6 +10,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :support:`63` Updated documentation theme to hudsonthames-sphinx-docs.
+
 * :release:`1.1.0 <2021-04-15>`
 * :feature:`56` MAE/MSE added as possible metrics for the Trend Scanning Module.
 * :feature:`58` Low silhouette scores check made optional in Feature Clusters Module.
