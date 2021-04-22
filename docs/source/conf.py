@@ -65,7 +65,7 @@ add_module_names = False
 # html_theme_options = {}
 
 html_context = {'logo': 'logo_white.png', 'theme_logo_only': True}
-html_favicon = '_static/favicon.png'
+html_favicon = '_static/favicon_mlfinlab.png'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
