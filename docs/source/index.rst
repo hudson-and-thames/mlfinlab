@@ -57,6 +57,7 @@ This project is licensed under an all rights reserved licence and is NOT open-so
 `LICENSE.txt <https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt>`_ file for details.
 
 
+
 .. toctree::
     :maxdepth: 2
     :caption: Getting Started
@@ -69,6 +70,7 @@ This project is licensed under an all rights reserved licence and is NOT open-so
     getting_started/datasets
     getting_started/research_tools
     getting_started/research_notebooks
+    getting_started/special_mention
     getting_started/portfoliolab
     getting_started/arbitragelab
 
