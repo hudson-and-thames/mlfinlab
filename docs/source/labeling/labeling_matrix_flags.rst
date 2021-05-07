@@ -4,6 +4,9 @@
 Labeling Matrix Flags 🔒
 ========================
 
+This documentation and accompanying Jupyter Notebook Tutorials are now available via
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
 .. Note::
     **Underlying Literature**
 
@@ -13,9 +16,6 @@ Labeling Matrix Flags 🔒
     - `Stock market trading rule discovery using technical charting heuristics <http://chart-patterns.technicalanalysis.org.uk/LMPR02.pdf>`__ *by* Leigh, W., Modani, N., Purvis, R. and Roberts, T. *This method was originally introduced in.*
     - `Classification-based Financial Markets Prediction using Deep Neural Networks <https://arxiv.org/abs/1603.08604>`__ *by* Dixon, M., Klabjan, D. and Bang, J.
 
-
-This documentation and accompanying Jupyter Notebook Tutorials are now available via
-`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 Implementation
 ##############

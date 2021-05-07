@@ -4,6 +4,9 @@
 Excess Over Mean 🔒
 ===================
 
+This documentation and accompanying Jupyter Notebook Tutorials are now available via
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
 .. Note::
     **Underlying Literature**
 
@@ -11,8 +14,6 @@ Excess Over Mean 🔒
 
     - `Machine Learning for Factor Investing <http://www.mlfactor.com/>`__, Chapter 5.5.1 *by* Coqueret, G. and Guida, T.
 
-This documentation and accompanying Jupyter Notebook Tutorials are now available via
-`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 Implementation
 ##############

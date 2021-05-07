@@ -8,6 +8,9 @@
 Information Theory Metrics 🔒
 =============================
 
+This documentation and accompanying Jupyter Notebook Tutorials are now available via
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
 .. Note::
     **Underlying Literature**
 
@@ -18,8 +21,6 @@ Information Theory Metrics 🔒
     - `Low bias histogram-based estimation of mutual information for feature selection <https://www.researchgate.net/publication/257014935>`__ *by* Hacine-Gharbi, A., Ravier, P., Harba, R. and Mohamadi, T.
     - `A binning formula of bi-histogram for joint entropy estimation using mean square error minimization <https://www.researchgate.net/publication/320887281>`_ *by* Hacine-Gharbi, A. and Ravier, P.
 
-This documentation and accompanying Jupyter Notebook Tutorials are now available via
-`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 Mutual Information
 ##################

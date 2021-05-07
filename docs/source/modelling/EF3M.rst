@@ -4,6 +4,9 @@
 Exact Fit using first 3 Moments (EF3M) 🔒
 =========================================
 
+This documentation and accompanying Jupyter Notebook Tutorials are now available via
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
 .. Note::
     **Underlying Literature**
 
@@ -11,8 +14,6 @@ Exact Fit using first 3 Moments (EF3M) 🔒
 
     - `A mixture of Gaussians approach to mathematical portfolio oversight: the EF3M algorithm <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1931734>`__ *by* Marcos Lopez de Prado and Matthew D. Foreman.
 
-This documentation and accompanying Jupyter Notebook Tutorials are now available via
-`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 M2N
 ###

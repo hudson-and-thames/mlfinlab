@@ -4,6 +4,9 @@
 Trend Scanning 🔒
 =================
 
+This documentation and accompanying Jupyter Notebook Tutorials are now available via
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
 .. image:: labeling_images/trend_scanning_plot.png
    :scale: 100 %
    :align: center
@@ -16,8 +19,6 @@ Trend Scanning 🔒
     - `Advances in Financial Machine Learning: Lecture 3/10 (seminar slides) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3257419>`__ *by* Marcos Lopez de Prado.
     - `Machine Learning for Asset Managers <https://www.cambridge.org/core/books/machine-learning-for-asset-managers/6D9211305EA2E425D33A9F38D0AE3545>`__ *by* Marcos Lopez de Prado.
 
-This documentation and accompanying Jupyter Notebook Tutorials are now available via
-`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 Implementation
 ##############

@@ -4,6 +4,9 @@
 Bull Bear 🔒
 ============
 
+This documentation and accompanying Jupyter Notebook Tutorials are now available via
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
 .. Note::
     **Underlying Literature**
 
@@ -12,8 +15,6 @@ Bull Bear 🔒
     - `A simple framework for analysing bull and bear markets <https://onlinelibrary.wiley.com/doi/pdf/10.1002/jae.664>`__ *by* Pagan, A.R. and Sossounov, K.A.
     - `Duration dependence in stock prices: An analysis of bull and bear markets <https://repec.cepr.org/repec/cpr/ceprdp/DP4104.pdf>`__ *by* Lunde, A. and Timmermann, A.
 
-This documentation and accompanying Jupyter Notebook Tutorials are now available via
-`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 Pagan and Sossounov
 ###################

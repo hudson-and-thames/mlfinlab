@@ -4,6 +4,9 @@
 Framework for Backtest Overfitting 🔒
 =====================================
 
+This documentation and accompanying Jupyter Notebook Tutorials are now available via
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
 .. Note::
    **Underlying Literature**
 
@@ -13,8 +16,6 @@ Framework for Backtest Overfitting 🔒
    - `… and the Cross-section of Expected Returns. <https://faculty.fuqua.duke.edu/~charvey/Research/Published_Papers/P118_and_the_cross.PDF>`__ *by* Harvey, C.R., Y. Liu, and H. Zhu. *Describes a structural model to capture trading strategies’ underlying distribution, referred to as the HLZ model.*
    - `The Statistics of Sharpe Ratios. <https://alo.mit.edu/wp-content/uploads/2017/06/The-Statistics-of-Sharpe-Ratios.pdf>`__ *by* Lo, A. *Gives a broader understanding of Sharpe ratio adjustments to autocorrelation and different time periods*
 
-This documentation and accompanying Jupyter Notebook Tutorials are now available via
-`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 Haircut Sharpe Ratio
 ####################

@@ -4,6 +4,9 @@
 Excess Over Median 🔒
 =====================
 
+This documentation and accompanying Jupyter Notebook Tutorials are now available via
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
 .. Note::
     **Underlying Literature**
 
@@ -11,8 +14,6 @@ Excess Over Median 🔒
 
     - `The benefits of tree-based models for stock selection <https://link.springer.com/article/10.1057/jam.2012.17>`__ *by* Zhu, M., Philpotts, F. and Stevenson, M.
 
-This documentation and accompanying Jupyter Notebook Tutorials are now available via
-`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 Implementation
 ##############

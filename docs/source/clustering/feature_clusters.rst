@@ -4,6 +4,9 @@
 Feature Clusters 🔒
 ===================
 
+This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
 .. Note::
     **Underlying Literature**
 
@@ -12,8 +15,6 @@ Feature Clusters 🔒
     - `Machine Learning for Asset Managers <https://www.cambridge.org/core/books/machine-learning-for-asset-managers/6D9211305EA2E425D33A9F38D0AE3545>`__ *by* Marcos Lopez de Prado.
     - `Clustered Feature Importance (Presentation Slides) <https://ssrn.com/abstract=3517595>`__ *by* Marcos Lopez de Prado.
 
-This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
-`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 Implementation
 **************
