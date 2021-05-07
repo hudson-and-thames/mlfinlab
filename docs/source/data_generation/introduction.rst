@@ -50,4 +50,3 @@ Where :math:`p` is the Pearson correlation, :math:`cov` is the covariance. :math
     Pearson correlation only captures linear effects. If two variables have strong non-linear dependency (squared or abs for example)
     Pearson correlation won't find any pattern between them. For information about capturing non-linear dependencies, read our :ref:`codependence-introduction`
     to Codependence.
-

@@ -57,13 +57,14 @@ volume bars instead of time bars, using data sampled at the same time every day 
 as a pd.Series corresponding to the timestamps in the dataset. However, the fixed horizon method will always fail to capture information
 about the path of the prices [Lopez de Prado, 2018].
 
-.. tip::
+.. Note::
     **Underlying Literature**
 
     The following sources describe this method in more detail:
 
-    - **Advances in Financial Machine Learning, Chapter 3.2** *by* Marcos Lopez de Prado (p. 43-44).
-    - **Machine Learning for Asset Managers, Chapter 5.2** *by* Marcos Lopez de Prado (p. 65-66).
+    - `Advances in Financial Machine Learning <https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086>`__, Chapter 3.2 *by* Marcos Lopez de Prado.
+    - `Machine Learning for Asset Managers <https://www.cambridge.org/core/books/machine-learning-for-asset-managers/6D9211305EA2E425D33A9F38D0AE3545>`__, Chapter 5.2 *by* Marcos Lopez de Prado.
+    - `Classification-based Financial Markets Prediction using Deep Neural Networks <https://arxiv.org/abs/1603.08604>`__ *by* Dixon, M., Klabjan, D. and Bang, J.
 
 
 Implementation
@@ -112,3 +113,11 @@ Research Notebook
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via
     `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
+
+References
+##########
+
+* `De Prado, M.L., 2018. Advances in financial machine learning. John Wiley & Sons. <https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086>`_
+* `De Prado, M.L., 2020. Machine learning for asset managers. Cambridge University Press. <https://www.cambridge.org/core/books/machine-learning-for-asset-managers/6D9211305EA2E425D33A9F38D0AE3545>`_
+* `Dixon, M., Klabjan, D. and Bang, J.H., 2017. Classification-based financial markets prediction using deep neural networks. Algorithmic Finance, 6(3-4), pp.67-77. <https://arxiv.org/abs/1603.08604>`_

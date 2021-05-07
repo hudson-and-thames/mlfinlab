@@ -1,12 +1,16 @@
 .. _networks-introduction:
 
-.. Note::
-    An overview of network methods can be found on `Marti et al. "A review of two decades of correlations,
-    hierarchies, networks and clustering in financial markets." (2017). <https://arxiv.org/abs/1703.00485>`_
-
 ============
 Introduction
 ============
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources describe this method in more detail:
+
+    - `A review of two decades of correlations, hierarchies, networks and clustering in financial markets <https://arxiv.org/abs/1703.00485>`__ *by* Marti, G., Nielsen, F., Bińkowski, M. and Donnat, P.
+
 
 Networks
 ########
@@ -70,3 +74,9 @@ convert the correlation coefficients :math:`\rho_{ij}` into distances:
 
 For a more detailed explanation, please refer to :ref:`Correlation-Based Metrics section <codependence-correlation_based_metrics>`,
 as it describes the measures in more detail.
+
+
+References
+##########
+
+* `Marti, G., Nielsen, F., Bińkowski, M. and Donnat, P., 2017. A review of two decades of correlations, hierarchies, networks and clustering in financial markets. arXiv preprint arXiv:1703.00485. <https://arxiv.org/pdf/1703.00485.pdf>`_

@@ -9,7 +9,6 @@
     The following sources elaborates extensively on the topic:
 
     1. `Tumminello, Michele, et al. "A tool for filtering information in complex systems." Proceedings of the National Academy of Sciences 102.30 (2005): 10421-10426. <https://arxiv.org/pdf/cond-mat/0501335.pdf>`_
-
     2. `Aste, Tomaso, et al. "Correlation filtering in financial time series." Noise and Fluctuations in Econophysics and Finance. Vol. 5848. International Society for Optics and Photonics, 2005. <https://arxiv.org/pdf/physics/0508118.pdf>`_
 
 ======================================
@@ -333,19 +332,18 @@ Research Notebook
 
 ----
 
+.. _`PMFG visualisation`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Networks/Planar_Maximally_Filtered_Graph.ipynb
+
+----
+
+
 References
 ##########
 
-1. Tumminello, M., Aste, T., Di Matteo, T. and Mantegna, R.N., 2005. A tool for filtering information in complex systems. Proceedings of the National Academy of Sciences, 102(30), pp.10421-10426.  https://arxiv.org/pdf/cond-mat/0501335.pdf
-
-2. Grünbaum, B., & Bose, R. (2013, August 14). Applications of graph theory. Retrieved September 16, 2020, from https://www.britannica.com/science/combinatorics/Applications-of-graph-theory
-
-3. Ringel, Gerhard. Map color theorem. Vol. 209. Springer Science & Business Media, 2012.
-
-4. Aste, Tomaso, et al. "Correlation filtering in financial time series." Noise and Fluctuations in Econophysics and Finance. Vol. 5848. International Society for Optics and Photonics, 2005. https://arxiv.org/pdf/physics/0508118.pdf
-
-5. Renka, R.J., 1984. Interpolation of data on the surface of a sphere. ACM Transactions on Mathematical Software (TOMS), 10(4), pp.417-436.
-
-6. Warne, D., 2013. On the effect of topology on cellular automata rule spaces.
-
-7. Staniec, K. and Debita, G., 2012. Evaluation of topological planarity and reliability for interference reduction in radio sensor networks. EURASIP Journal on Wireless Communications and Networking, 2012(1), p.56.
+* `Tumminello, M., Aste, T., Di Matteo, T. and Mantegna, R.N., 2005. A tool for filtering information in complex systems. Proceedings of the National Academy of Sciences, 102(30), pp.10421-10426. <https://arxiv.org/pdf/cond-mat/0501335.pdf>`_
+* `Grünbaum, B., & Bose, R. (2013, August 14). Applications of graph theory. Retrieved September 16, 2020, from <https://www.britannica.com/science/combinatorics/Applications-of-graph-theory>`_
+* `Ringel, Gerhard. Map color theorem. Vol. 209. Springer Science & Business Media, 2012. <https://www.springer.com/gp/book/9783642657610>`_
+* `Aste, Tomaso, et al. "Correlation filtering in financial time series." Noise and Fluctuations in Econophysics and Finance. Vol. 5848. International Society for Optics and Photonics, 2005. <https://arxiv.org/pdf/physics/0508118.pdf>`_
+* `Renka, R.J., 1984. Interpolation of data on the surface of a sphere. ACM Transactions on Mathematical Software (TOMS), 10(4), pp.417-436. <https://dl.acm.org/doi/10.1145/2701.356107>`_
+* `Warne, D., 2013. On the effect of topology on cellular automata rule spaces. <https://eprints.qut.edu.au/76202/4/76202_Accepted.pdf>`_
+* `Staniec, K. and Debita, G., 2012. Evaluation of topological planarity and reliability for interference reduction in radio sensor networks. EURASIP Journal on Wireless Communications and Networking, 2012(1), p.56. <https://jwcn-eurasipjournals.springeropen.com/articles/10.1186/1687-1499-2012-56>`_

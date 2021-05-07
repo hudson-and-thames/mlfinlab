@@ -39,3 +39,8 @@ which are described in the parts of this module.
     3. :math:`d(x,y) \le d(x,z) + d(z,y)` — triangle inequality;
 
     and these imply :math:`d(x,y) \ge 0` — non-negativity.
+
+References
+##########
+
+* `Lopez de Prado, M., 2020. Codependence (Presentation Slides). Available at SSRN 3512994. <https://ssrn.com/abstract=3512994>`_

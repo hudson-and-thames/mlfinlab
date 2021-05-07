@@ -599,3 +599,9 @@ Research Notebook
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via
     `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
+
+References
+##########
+
+* `Leung, T.S.T. and Li, X., 2015. Optimal mean reversion trading: Mathematical analysis and practical applications (Vol. 1). World Scientific. <https://www.amazon.com/Optimal-Mean-Reversion-Trading-Mathematical/dp/9814725919>`_.

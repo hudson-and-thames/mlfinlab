@@ -1,11 +1,5 @@
 .. _networks-almst:
 
-.. note::
-
-    The following source elaborates extensively on the topic:
-
-    `M. Tumminello, C. Coronnello, F. Lillo, S. Micciche, R. N. Mantegna, Spanning trees and bootstrap reliability estimation in correlation-based networks, International Journal of Bifurcation and Chaos 17 (2007) 2319–2329. <https://arxiv.org/pdf/physics/0605116.pdf>`_
-
 =============================================
 Average Linkage Minimum Spanning Tree (ALMST)
 =============================================
@@ -21,6 +15,14 @@ phylogenetic tree as a diagrammatic representation of the evolutionary relatedne
 A step by step example of UPGMA or ALCA method for trees can be found `here. <https://en.wikipedia.org/wiki/UPGMA>`_
 
 ----
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources describe this method in more detail:
+
+    - `Spanning trees and bootstrap reliability estimation in correlation-based networks <https://arxiv.org/pdf/physics/0605116.pdf>`__ *by* M. Tumminello, C. Coronnello, F. Lillo, S. Micciche, R. N. Mantegna.
+
 
 ALMST
 #####
@@ -221,3 +223,9 @@ This is the recommended way as it reduces the number of steps needed to create t
     # Get DualDash server
     server = DualDashGraph(mst, almst)
     server.run_server()
+
+
+References
+##########
+
+* `Tumminello, M., Coronnello, C., Lillo, F., Micciche, S. and Mantegna, R.N., 2007. Spanning trees and bootstrap reliability estimation in correlation-based networks. International Journal of Bifurcation and Chaos, 17(07), pp.2319-2329. <https://arxiv.org/pdf/physics/0605116.pdf>`_

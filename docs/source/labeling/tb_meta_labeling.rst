@@ -12,6 +12,14 @@ The primary labeling method used in financial academia is the fixed-time horizon
 has many faults which are remedied by the triple-barrier method discussed below. The triple-barrier method can be
 extended to incorporate meta-labeling which will also be demonstrated and discussed below.
 
+.. Note::
+    **Underlying Literature**
+
+    The following sources describe this method in more detail:
+
+    - `Advances in Financial Machine Learning <https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086>`__, Chapter 3 *by* Marcos Lopez de Prado.
+
+
 Triple-Barrier Method
 #####################
 
@@ -20,8 +28,8 @@ vertical barrier. The upper barrier represents the threshold an observation's re
 considered a buying opportunity (a label of 1), the lower barrier represents the threshold an observation's return needs
 to reach in order to be considered a selling opportunity (a label of -1), and the vertical barrier represents the amount
 of time an observation has to reach its given return in either direction before it is given a label of 0. This concept
-can be better understood visually and is shown in the figure below taken from Advances in Financial Machine
-Learning (`reference`_):
+can be better understood visually and is shown in the figure below taken from `Advances in Financial Machine
+Learning <https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086>`__:
 
 .. image:: labeling_images/triple_barrier.png
     :scale: 100 %
@@ -31,8 +39,6 @@ One of the major faults with the fixed-time horizon method is that observations 
 threshold after a fixed interval regardless of their respective volatilities. In other words, the expected returns of every
 observation are treated equally regardless of the associated risk. The triple-barrier method tackles this issue by dynamically
 setting the upper and lower barriers for each observation based on their given volatilities.
-
-.. _reference: https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086
 
 Meta-Labeling
 #############
@@ -226,3 +232,9 @@ Research Notebook
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via
     `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
+
+References
+##########
+
+* `De Prado, M.L., 2018. Advances in financial machine learning. John Wiley & Sons. <https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086>`_

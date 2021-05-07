@@ -1,4 +1,4 @@
-.. _codependence-optimal_trnsport:
+.. _codependence-optimal_transport:
 
 
 .. note::
@@ -16,6 +16,16 @@ This documentation and accompanying Jupyter Notebook Tutorials are now available
 `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `Exploring and measuring non-linear correlations: Copulas, Lightspeed Transportation and Clustering <https://arxiv.org/pdf/1610.09659.pdf>`__ *by* Marti, G., Andler, S., Nielsen, F. and Donnat, P.
+
+
+----
+
 Optimal Copula Transport dependence
 ###################################
 
@@ -24,6 +34,11 @@ Implementation
 
 Examples
 ########
+Research Notebook
+#################
 
-Research Notebooks
-##################
+
+References
+##########
+
+* `Marti, G., Andler, S., Nielsen, F. and Donnat, P., 2017, February. Exploring and measuring non-linear correlations: Copulas, Lightspeed Transportation and Clustering. In NIPS 2016 Time Series Workshop (pp. 59-69). PMLR. <https://arxiv.org/pdf/1610.09659.pdf>`_

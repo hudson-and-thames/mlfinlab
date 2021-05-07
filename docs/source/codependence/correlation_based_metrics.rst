@@ -8,6 +8,18 @@
 Correlation-Based Metrics
 =========================
 
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `Codependence (Presentation Slides) <https://ssrn.com/abstract=3512994>`__ *by* Marcos Lopez de Prado.
+    - `Measuring and testing dependence by correlation of distances <https://projecteuclid.org/download/pdfview_1/euclid.aos/1201012979>`__ *by* Székely, G.J., Rizzo, M.L. and Bakirov, N.K.
+    - `Introducing the discussion paper by Székely and Rizzo <https://arxiv.org/pdf/1010.3575.pdf>`__ *by* Michael A. Newton.
+    - `Building Diversified Portfolios that Outperform Out-of-Sample <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_ *by* Marcos Lopez de Prado.
+    - `Kullback-Leibler distance as a measure of the information filtered from multivariate data. <https://arxiv.org/pdf/0706.0168.pdf>`__ *by* Tumminello, M., Lillo, F. and Mantegna, R.N.
+
+
 Distance Correlation
 ####################
 
@@ -262,3 +274,13 @@ The following examples show how the described above correlation-based metrics ca
 
     # Calculate the Norm distance between two correlation matrices
     dist = norm_distance(corr_18, corr_19)
+
+
+References
+##########
+
+* `Lopez de Prado, M., 2020. Codependence (Presentation Slides). Available at SSRN 3512994. <https://ssrn.com/abstract=3512994>`_
+* `Székely, G.J., Rizzo, M.L. and Bakirov, N.K., 2007. Measuring and testing dependence by correlation of distances. The annals of statistics, 35(6), pp.2769-2794. <https://projecteuclid.org/download/pdfview_1/euclid.aos/1201012979>`_
+* `Newton, M.A., 2009. Introducing the discussion paper by Székely and Rizzo. The Annals of Applied Statistics, 3(4), pp.1233-1235. <https://arxiv.org/pdf/1010.3575.pdf>`_
+* `De Prado, M.L., 2016. Building diversified portfolios that outperform out of sample. The Journal of Portfolio Management, 42(4), pp.59-69. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_
+* `Tumminello, M., Lillo, F. and Mantegna, R.N., 2007. Kullback-Leibler distance as a measure of the information filtered from multivariate data. Physical Review E, 76(3), p.031123. <https://arxiv.org/pdf/0706.0168.pdf>`_

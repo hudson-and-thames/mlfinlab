@@ -10,6 +10,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :support:`64` Updated references in documentation.
 * :support:`63` Updated documentation theme to hudsonthames-sphinx-docs.
 
 * :release:`1.1.0 <2021-04-15>`

@@ -14,6 +14,14 @@ A dendrogram is a common technique to visualize the nested clusters. Divisive hi
 At each iteration, bigger clusters are separated into smaller and dissimilar clusters. Hierarchical clustering
 is useful to discern similar properties in datasets.
 
+.. Note::
+    **Underlying Literature**
+
+    The following sources describe this method in more detail:
+
+    - `TF 2.0 DCGAN for 100x100 financial correlation matrices <https://marti.ai/ml/2019/10/13/tf-dcgan-financial-correlation-matrices.html>`__ *by* Gautier Marti.
+
+
 Implementation
 ##############
 
@@ -73,3 +81,9 @@ Example
     plt.title("Optimal Clustering Correlation Matrix")
 
     plt.show()
+
+
+References
+##########
+
+* `Gautier Marti, TF 2.0 DCGAN for 100x100 financial correlation matrices <https://marti.ai/ml/2019/10/13/tf-dcgan-financial-correlation-matrices.html>`__

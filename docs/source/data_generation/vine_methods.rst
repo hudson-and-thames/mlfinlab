@@ -6,12 +6,23 @@
 
 .. note::
    The following implementation and documentation is based on the works of Daniel Lewandowski, Dorota Kurowicka, and Harry Joe:
-   `Generating random correlation matrices based on vines and extended onion method <https://www.sciencedirect.com/science/article/pii/S0047259X09000876>`_ and
-   `Generating random correlation matrices based partial correlations <https://www.sciencedirect.com/science/article/pii/S0047259X05000886>`_.
+   `Generating random correlation matrices based on vines and extended onion method <https://www.sciencedirect.com/science/article/pii/S0047259X09000876>`__ and
+   `Generating random correlation matrices based partial correlations <https://www.sciencedirect.com/science/article/pii/S0047259X05000886>`__.
 
 ===============================
 Vine and Extended Onion Methods
 ===============================
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `Generating random correlation matrices based on vines and extended onion method <https://www.sciencedirect.com/science/article/pii/S0047259X09000876>`__ *by* Lewandowski, D., Kurowicka, D. and Joe, H.
+    - `Generating random correlation matrices based partial correlations <https://www.sciencedirect.com/science/article/pii/S0047259X05000886>`__ *by* Harry Joe.
+    - `Robust dependence modeling for high-dimensional covariance matrices with financial applications <https://www.semanticscholar.org/paper/Robust-dependence-modeling-for-high-dimensional-Zhu-Welsch/9c8d214a91833e4f8727050f6af783a578f9f6e7>`__ *by* Harry Joe.
+    - `Behavior of the NORTA method for correlated random vector generation as the dimension increases <https://ecommons.cornell.edu/bitstream/handle/1813/9249/TR001372.pdf>`__ *by* Ghosh, S. and Henderson, S.G.
+
 
 Vines
 #####
@@ -260,6 +271,7 @@ Research Notebook
 References
 ##########
 
-1. Zhu, Z. and Welsch, R.E., 2018. Robust dependence modeling for high-dimensional covariance matrices with financial applications. The Annals of Applied Statistics, 12(2), pp.1228-1249.
-
-2. Ghosh, S. and Henderson, S.G., 2003. Behavior of the NORTA method for correlated random vector generation as the dimension increases. ACM Transactions on Modeling and Computer Simulation (TOMACS), 13(3), pp.276-294.
+* `Lewandowski, D., Kurowicka, D. and Joe, H., 2009. Generating random correlation matrices based on vines and extended onion method. Journal of multivariate analysis, 100(9), pp.1989-2001. <https://www.sciencedirect.com/science/article/pii/S0047259X09000876>`_
+* `Joe, H., 2006. Generating random correlation matrices based on partial correlations. Journal of Multivariate Analysis, 97(10), pp.2177-2189. <https://www.sciencedirect.com/science/article/pii/S0047259X05000886>`_
+* `Zhu, Z. and Welsch, R.E., 2018. Robust dependence modeling for high-dimensional covariance matrices with financial applications. Annals of Applied Statistics, 12(2), pp.1228-1249. <https://www.semanticscholar.org/paper/Robust-dependence-modeling-for-high-dimensional-Zhu-Welsch/9c8d214a91833e4f8727050f6af783a578f9f6e7>`_
+* `Ghosh, S. and Henderson, S.G., 2003. Behavior of the NORTA method for correlated random vector generation as the dimension increases. ACM Transactions on Modeling and Computer Simulation (TOMACS), 13(3), pp.276-294. <https://ecommons.cornell.edu/bitstream/handle/1813/9249/TR001372.pdf>`_

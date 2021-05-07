@@ -2,10 +2,10 @@
 
 .. note::
    The following implementation and documentation closely follow the work of Gautier Marti:
-   `CorrGAN: Sampling Realistic Financial Correlation Matrices using Generative Adversarial Networks <https://arxiv.org/pdf/1910.09504.pdf>`_.
+   `CorrGAN: Sampling Realistic Financial Correlation Matrices using Generative Adversarial Networks <https://arxiv.org/pdf/1910.09504.pdf>`__.
 
    And the work of Donnat, P., Marti, G. and Very, P:
-   `Toward a generic representation of random variables for machine learning <https://arxiv.org/pdf/1506.00976.pdf>`_.
+   `Toward a generic representation of random variables for machine learning <https://arxiv.org/pdf/1506.00976.pdf>`__.
 
 =================
 Data Verification
@@ -14,6 +14,15 @@ Data Verification
 Data verification for synthetic data is needed to confirm if it shares some properties of the original data.
 Being able to examine and validate synthetically generated data is critical to building more accurate systems. Without verification,
 we would operate on data that might not have any significance in the real world. We present several methods to examine the properties of this type of data.
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `CorrGAN: Sampling Realistic Financial Correlation Matrices using Generative Adversarial Networks <https://arxiv.org/pdf/1910.09504.pdf>`__ *by* Gautier Marti.
+    - `Toward a generic representation of random variables for machine learning <https://arxiv.org/pdf/1506.00976.pdf>`__ *by* Donnat, P., Marti, G. and Very, P.
+
 
 Stylized Factors of Correlation Matrices
 ########################################
@@ -188,3 +197,10 @@ Example
     plt.title("Optimal Clustering Correlation Matrix")
 
     plt.show()
+
+
+References
+##########
+
+* `Marti, G., 2020, May. Corrgan: Sampling realistic financial correlation matrices using generative adversarial networks. In ICASSP 2020-2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) (pp. 8459-8463). IEEE. <https://arxiv.org/pdf/1910.09504.pdf>`_
+* `Donnat, P., Marti, G. and Very, P., 2016. Toward a generic representation of random variables for machine learning. Pattern Recognition Letters, 70, pp.24-31. <https://arxiv.org/pdf/1506.00976.pdf>`_

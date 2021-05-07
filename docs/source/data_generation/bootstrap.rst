@@ -8,15 +8,19 @@
 Bootstrapping
 =============
 
-.. note::
-    The following implementation and documentation is based on the work of F. Musciotto, L. Marotta, S. Miccichè, and R. N. Mantegna
-    `Bootstrap validation of links of a minimum spanning tree <https://arxiv.org/pdf/1802.03395.pdf>`_.
-
 Bootstrapping is a statistical method used to resample a dataset with replacement to estimate its population statistics (such as
 mean, median, standard deviation, etc.) In machine learning applications, bootstrap sampling usually leads to less overfitting and
 improvement of the stability of our models.
 Bootstrap methods draw small samples (with replacement) from a large dataset one at a time, and organizing them to construct
 a new dataset. Here we examine three bootstrap methods. Row, Pair, and Block Bootstrap.
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `Bootstrap validation of links of a minimum spanning tree <https://arxiv.org/pdf/1802.03395.pdf>`__ *by* Musciotto, F., Marotta, L., Miccichè, S. and Mantegna, R.N.
+
 
 Row Bootstrap
 #############
@@ -175,4 +179,4 @@ Research Notebook
 References
 ##########
 
-1. Musciotto, F., Marotta, L., Miccichè, S. and Mantegna, R.N., 2018. Bootstrap validation of links of a minimum spanning tree. Physica A: Statistical Mechanics and its Applications, 512, pp.1032-1043.
+* `Musciotto, F., Marotta, L., Miccichè, S. and Mantegna, R.N., 2018. Bootstrap validation of links of a minimum spanning tree. Physica A: Statistical Mechanics and its Applications, 512, pp.1032-1043. <https://arxiv.org/pdf/1802.03395.pdf>`_

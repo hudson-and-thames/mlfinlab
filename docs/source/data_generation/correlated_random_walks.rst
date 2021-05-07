@@ -25,6 +25,14 @@ other methods such as generic parametric representation (GPR), :math:`L_2` dista
 
     The GNPR approach is described in our documentation, located in the :ref:`Codependence by Marti <codependence-codependence_marti>` section.
 
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `Toward a generic representation of random variables for machine learning <https://arxiv.org/pdf/1506.00976.pdf>`__ *by* Donnat, P., Marti, G. and Very, P.
+
+
 Time Series Generation with Different Distributions
 ###################################################
 
@@ -158,4 +166,5 @@ Research Notebook
 References
 ##########
 
-1. www.datagrapple.com. (n.d.). DataGrapple - Tech: A GNPR tutorial: How to cluster random walks. [online] Available at: https://www.datagrapple.com/Tech/GNPR-tutorial-How-to-cluster-random-walks.html [Accessed 26 Aug. 2020].
+* `Donnat, P., Marti, G. and Very, P., 2016. Toward a generic representation of random variables for machine learning. Pattern Recognition Letters, 70, pp.24-31. <https://arxiv.org/pdf/1506.00976.pdf>`__
+* `www.datagrapple.com. (n.d.). DataGrapple - Tech: A GNPR tutorial: How to cluster random walks. <https://www.datagrapple.com/Tech/GNPR-tutorial-How-to-cluster-random-walks.html>`_ [Accessed 26 Aug. 2020].

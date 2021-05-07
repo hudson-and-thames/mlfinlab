@@ -10,7 +10,7 @@ Hierarchical Correlation Block Model (HCBM)
 
 .. note::
     The following implementation and documentation closely follow the work of Marti, Andler, Nielsen, and Donnat:
-    `Clustering financial time series: How long is enough? <https://www.ijcai.org/Proceedings/16/Papers/367.pdf>`_.
+    `Clustering financial time series: How long is enough? <https://arxiv.org/pdf/1603.04017.pdf>`__.
 
 HCBM
 ####
@@ -148,3 +148,9 @@ Research Notebook
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via
     `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
+
+References
+##########
+
+* `Marti, G., Andler, S., Nielsen, F. and Donnat, P., 2016. Clustering financial time series: How long is enough?. arXiv preprint arXiv:1603.04017. <https://arxiv.org/pdf/1603.04017.pdf>`__

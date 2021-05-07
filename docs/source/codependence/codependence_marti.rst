@@ -235,3 +235,8 @@ Research Notebook
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via
     `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
+References
+##########
+
+* `Marti, G., 2017. Some contributions to the clustering of financial time series and applications to credit default swaps (Doctoral dissertation, Université Paris-Saclay (ComUE)). <https://www.researchgate.net/publication/322714557>`_

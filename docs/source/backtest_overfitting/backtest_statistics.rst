@@ -19,13 +19,13 @@ These include:
 * Average holding period from a series of positions.
 * Filtering flips and flattenings from a series of returns.
 
-.. tip::
+.. Note::
     **Underlying Literature**
 
     The following sources elaborate extensively on the topic:
 
-    - **Advances in Financial Machine Learning, Chapter 14 & 15** *by* Marcos Lopez de Prado. (Page numbers in the code are referring to the pages in this book.)
-    - **The Sharpe Ratio Efficient Frontier** *by* David H. Bailey *and* Marcos Lopez de Prado `available here <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1821643>`_. *Provides a deeper understanding of Sharpe ratios implemented and Minimum track record length.*
+    - `Advances in Financial Machine Learning <https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086>`__, Chapter 14 & 15 *by* Marcos Lopez de Prado.
+    - `The Sharpe Ratio Efficient Frontier <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1821643>`__ *by* David H. Bailey *and* Marcos Lopez de Prado. *Provides a deeper understanding of Sharpe ratios implemented and Minimum track record length.*
 
 
 Annualized Sharpe Ratio
@@ -423,3 +423,9 @@ Research Notebook
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via
     `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
+References
+##########
+
+* `De Prado, M.L., 2018. Advances in financial machine learning. John Wiley & Sons. <https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086>`_
+* `Bailey, D.H. and Lopez de Prado, M., 2012. The Sharpe ratio efficient frontier. Journal of Risk, 15(2), p.13. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1821643>`_

@@ -248,3 +248,11 @@ Research Notebook
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via
     `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
+
+References
+##########
+
+* `Huang, Feixue, Pengfei Gao, and Yu Wang. "Comparison of Prim and Kruskal on Shanghai and Shenzhen 300 Index hierarchical structure tree." 2009 International Conference on Web Information Systems and Mining. IEEE, 2009. <https://ieeexplore.ieee.org/abstract/document/5369459/>`_
+* `Marti, Gautier, et al. "A review of two decades of correlations, hierarchies, networks and clustering in financial markets." (2017). <https://arxiv.org/abs/1703.00485>`_
+* `Onnela, J-P., et al. "Dynamics of market correlations: Taxonomy and portfolio analysis." (2003) <https://www.researchgate.net/publication/8952753_Dynamics_of_Market_Correlations_Taxonomy_and_Portfolio_Analysis>`_

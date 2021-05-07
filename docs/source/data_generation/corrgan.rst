@@ -6,7 +6,7 @@
 
 .. note::
    The following implementation and documentation closely follow the work of Gautier Marti:
-   `CorrGAN: Sampling Realistic Financial Correlation Matrices using Generative Adversarial Networks <https://arxiv.org/pdf/1910.09504.pdf>`_.
+   `CorrGAN: Sampling Realistic Financial Correlation Matrices using Generative Adversarial Networks <https://arxiv.org/pdf/1910.09504.pdf>`__.
 
 .. warning::
    In order to use this module, you should additionally install *TensorFlow* For more details, visit our :ref:`MlFinLab installation guide <getting_started-installation>`.
@@ -43,6 +43,13 @@ CorrGAN generates correlation matrices that have many "stylized facts" seen in e
 4. Perron-Frobenius property (first eigenvector has positive entries).
 5. Hierarchical structure of correlations.
 6. Scale-free property of the corresponding Minimum Spanning Tree (MST).
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `CorrGAN: Sampling Realistic Financial Correlation Matrices using Generative Adversarial Networks <https://arxiv.org/pdf/1910.09504.pdf>`__ *by* Gautier Marti.
 
 
 Implementation
@@ -89,3 +96,9 @@ Research Notebook
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via
     `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
+
+References
+##########
+
+* `Marti, G., 2020, May. Corrgan: Sampling realistic financial correlation matrices using generative adversarial networks. In ICASSP 2020-2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) (pp. 8459-8463). IEEE. <https://arxiv.org/pdf/1910.09504.pdf>`_

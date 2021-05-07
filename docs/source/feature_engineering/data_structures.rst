@@ -12,6 +12,13 @@ When analyzing financial data, unstructured data sets, in this case tick data, a
 format referred to as bars, where a bar represents a row in a table. MlFinLab implements tick, volume, and dollar bars
 using traditional standard bar methods as well as the less common information driven bars.
 
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `Advances in Financial Machine Learning <https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086>`__, Chapter 2 *by* Marcos Lopez de Prado.
+
 Standard Bars
 #############
 
@@ -253,3 +260,10 @@ The following research notebooks can be used to better understand the previously
 .. note::
     This section includes an accompanying Jupyter Notebook Tutorial that is now available via
     `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
+
+References
+##########
+
+* `Easley, David, Marcos M. López de Prado, and Maureen O’Hara. "The volume clock: Insights into the high-frequency paradigm." The Journal of Portfolio Management 39.1 (2012): 19-29. <https://jpm.pm-research.com/content/39/1/19.abstract>`_
+* `De Prado, M.L., 2018. Advances in financial machine learning. John Wiley & Sons. <https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086>`_
