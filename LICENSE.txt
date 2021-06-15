@@ -2,14 +2,6 @@ Copyright 2019, Hudson and Thames Quantitative Research
 
 Copyright Protection Notice and Licensing Agreement
 
-This codebase is open-source only in the sense that the code is free to use
-as-is, and the source code is publicly available, however, all other rights
-are reserved under the Hudson and Thames Quantitative Research brand.
-
-Our intention is to make some of the techniques developed publicly available
-and to promote research in quantitative finance and machine learning.
-
-
 1. Copyright Protection Notice:
 
 1.1 Kindly note that the code-based platform and/or any part thereof which
