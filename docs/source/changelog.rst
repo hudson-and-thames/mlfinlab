@@ -10,20 +10,22 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :release:`1.2.0 <2021-06-23>`
 * :support:`64` Updated references in documentation.
 * :support:`63` Updated documentation theme to hudsonthames-sphinx-docs.
+* :bug:`66 major` Fixed issue with too many function calls in web analytics.
 
 * :release:`1.1.0 <2021-04-15>`
 * :feature:`56` MAE/MSE added as possible metrics for the Trend Scanning Module.
 * :feature:`58` Low silhouette scores check made optional in Feature Clusters Module.
-* :bug:`57` Fix purging bug in Purged KFold/Combinatorial Purged KFold.
+* :bug:`57 major` Fix purging bug in Purged KFold/Combinatorial Purged KFold.
 * :feature:`61` History Weighted Regression added to the Regression Module.
 * :support:`61` History Weighted Regression documentation.
 * :feature:`59` Code and unit tests style unified.
 * :support:`59` Documentation style unified.
 * :feature:`45` Added Pagan et al. and Lunde et al. Bull Bear Methods to the Labeling Module.
 * :support:`45` Added Pagan et al. and Lunde et al. Bull Bear Methods documentation.
-* :bug:`60` Fix structural break bug in the Chu-Stinchcombe-White test.
+* :bug:`60 major` Fix structural break bug in the Chu-Stinchcombe-White test.
 * :feature:`46` Stacked Module with Cross Validation, Feature Importance, and Sampling methods added.
 * :feature:`46` Lambda code in Microstructural Features Module speed-up.
 * :support:`46` Stacked Module documentation.
