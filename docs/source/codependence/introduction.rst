@@ -23,19 +23,24 @@ Pearson correlation is not the only way of measuring codependence. There are alt
 which are described in the parts of this module.
 
 .. note::
-   For some methods in this module, it’s discussed whether they are true metrics.
-   According to Arkhangel'skii, A. V. and Pontryagin, L. S. (1990), **General Topology I**:
-   A metric on a set :math:`X` is a function (called a distance):
+    For some methods in this module, it’s discussed whether they are true metrics.
+    According to Arkhangel'skii, A. V. and Pontryagin, L. S. (1990), **General Topology I**:
+    A metric on a set :math:`X` is a function (called a distance):
 
-   .. math::
-      d: X \times X \rightarrow [0,+ \infty) ;   x, y, z \in X
+    .. math::
+        d: X \times X \rightarrow [0,+ \infty) ;   x, y, z \in X
 
-   for which the following three axioms are satisfied:
+    for which the following three axioms are satisfied:
 
-   1. :math:`d(x, y) = 0 \iff x = y` — identity of indiscernibles;
+    1. :math:`d(x, y) = 0 \iff x = y` — identity of indiscernibles;
 
-   2. :math:`d(x,y) = d(y,x)` — symmetry;
+    2. :math:`d(x,y) = d(y,x)` — symmetry;
 
-   3. :math:`d(x,y) \le d(x,z) + d(z,y)` — triangle inequality;
+    3. :math:`d(x,y) \le d(x,z) + d(z,y)` — triangle inequality;
 
-   and these imply :math:`d(x,y) \ge 0` — non-negativity.
+    and these imply :math:`d(x,y) \ge 0` — non-negativity.
+
+References
+##########
+
+* `Lopez de Prado, M., 2020. Codependence (Presentation Slides). Available at SSRN 3512994. <https://ssrn.com/abstract=3512994>`_

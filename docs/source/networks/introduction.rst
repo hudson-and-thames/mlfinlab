@@ -1,27 +1,31 @@
 .. _networks-introduction:
 
-.. Note::
-    An overview of network methods can be found on `Marti et al. "A review of two decades of correlations,
-    hierarchies, networks and clustering in financial markets." (2017). <https://arxiv.org/abs/1703.00485>`_
-
 ============
 Introduction
 ============
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources describe this method in more detail:
+
+    - `A review of two decades of correlations, hierarchies, networks and clustering in financial markets <https://arxiv.org/abs/1703.00485>`__ *by* Marti, G., Nielsen, F., Bińkowski, M. and Donnat, P.
+
 
 Networks
 ########
 
 Networks module creates beautiful and informative visualizations of financial data, using network theory to describe complex
-systems
-such as financial markets.
+systems such as financial markets.
 
-Networks takes in a codependence or distance matrix between a set of elements and converts it into graphs such as a Minimum Spanning Tree, creating a mini `Flask
-<https://flask.palletsprojects.com>`_ server using `Plotly's Dash <https://dash.plotly.com>`_ to display the interactive
-graphs.
+Networks takes in a codependence or distance matrix between a set of elements and converts it into graphs such as a
+Minimum Spanning Tree, creating a mini `Flask <https://flask.palletsprojects.com>`_ server using `Plotly's Dash
+<https://dash.plotly.com>`_ to display the interactive graphs.
 
-.. figure:: images/introduction/dash_ui.png
+.. figure:: networks_images/dash_ui.png
 
-    Interactive Minimum Spanning Tree graph of 48 stocks based on daily closing price data from 15th August 2017 - 10th of August 2020
+    Interactive Minimum Spanning Tree graph of 48 stocks based on daily closing price data from 15th August 2017 - 10th
+    of August 2020
 
 Four aspects of network visualisation tools have been added:
 
@@ -71,3 +75,8 @@ convert the correlation coefficients :math:`\rho_{ij}` into distances:
 For a more detailed explanation, please refer to :ref:`Correlation-Based Metrics section <codependence-correlation_based_metrics>`,
 as it describes the measures in more detail.
 
+
+References
+##########
+
+* `Marti, G., Nielsen, F., Bińkowski, M. and Donnat, P., 2017. A review of two decades of correlations, hierarchies, networks and clustering in financial markets. arXiv preprint arXiv:1703.00485. <https://arxiv.org/pdf/1703.00485.pdf>`_

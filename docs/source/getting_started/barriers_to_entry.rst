@@ -1,10 +1,12 @@
+.. _getting_started-barriers_to_entry:
 
 =================
 Barriers to Entry
 =================
 
-As most of you know, getting through the first 3 chapters of the book is challenging as it relies on HFT data to 
-create the new financial data structures. Sourcing the HFT data is very difficult and thus we have resorted to purchasing
+As most of you know, getting through the first 3 chapters of the book "Advances in Financial Machine Learning" by
+Marcos López de Prado is challenging as it relies on HFT data to create the new financial data structures.
+Sourcing the HFT data is very difficult and thus we have resorted to purchasing
 the full history of S&P500 Emini futures tick data from `TickData LLC`_.
 
 We are not affiliated with TickData in any way but would like to recommend others to make use of their service. The full

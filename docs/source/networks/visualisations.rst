@@ -1,9 +1,5 @@
 .. _networks-visualisations:
 
-.. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
 ===================
 Visualising Graphs
 ===================
@@ -12,7 +8,7 @@ This section outlines how to create visualisations using the helper function fro
 The helper functions streamline the process of constructing the `MST` and `DashGraph` objects.
 This is the recommended way to create visualisations, unless you would like to pass in a custom matrix.
 
-.. figure:: images/data/mst_coloured.png
+.. figure:: networks_images/mst_coloured.png
     :align: center
 
     MST visualisation based on stock price data form 18th February 2020 until the 24th of March 2020.
@@ -56,7 +52,7 @@ An example of the csv when imported as a dataframe (as the `log_return_dataframe
 is shown below.
 
 .. figure::
-    images/introduction/input.png
+    networks_images/input.png
 
 The formula to calculate the log returns from OHLCV data is given as:
 
@@ -98,7 +94,7 @@ Comparing ALMST and MST
 ***********************
 
 .. figure::
-    images/data/dualinterface.png
+    networks_images/dualinterface.png
 
 In order to create a dual interface to compare both the ALMST and MST, we can use the `generate_mst_almst_comparison` method with the `ALMST` and `MST` as the input.
 
@@ -126,6 +122,7 @@ The `generate_mst_server` and `generate_almst_server` methods construct the serv
 ``MST`` or ``ALMST`` respectively, and ``DashGraph`` object, and various optional parameters can be passed.
 
 .. py:currentmodule:: mlfinlab.networks.visualisations
+
 .. autofunction:: generate_mst_server
 
 Jupyter Notebook
@@ -212,6 +209,7 @@ For a PMFG graph, you can create a centrality ranking of the nodes. The ranking 
 measures, detailed below, all of which call methods from NetworkX centrality methods.
 
 .. py:currentmodule:: mlfinlab.networks.visualisations
+
 .. autofunction:: generate_central_peripheral_ranking
 
 An example for ranking of PMFG is shown below.
@@ -244,11 +242,5 @@ Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following notebook provides a more detailed exploration of the MST creation.
-
-* `MST visualisation`_
-
-.. _`MST visualisation`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Networks/mst.ipynb
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.

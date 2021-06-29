@@ -1,15 +1,16 @@
-# Copyright 2019, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+"""
+This file contains the implementation of the Optimal Trading Rules for the OU model.
+"""
+# pylint: disable=missing-module-docstring, invalid-name, too-many-instance-attributes
 
-# pylint: disable=missing-module-docstring, invalid-name
 import warnings
+
 import numpy as np
+import pandas as pd
 from scipy.integrate import quad
 from scipy.optimize import root_scalar
-import matplotlib.pyplot as plt
 import scipy.optimize as so
-import pandas as pd
+import matplotlib.pyplot as plt
 
 
 class OrnsteinUhlenbeck:
@@ -78,7 +79,7 @@ class OrnsteinUhlenbeck:
         Helper function used in self.fit().
 
         :param input_data: (float/tuple) Input for cost or rate.
-        :return: A tuple of two elements with allocated data for cost/rate
+        :return: (tuple) A tuple of two elements with allocated data for cost/rate.
         """
 
         pass
@@ -90,8 +91,7 @@ class OrnsteinUhlenbeck:
 
         Helper function used in self.fit().
 
-        :param data_frequency: (str) Data frequency
-            ["D" - daily, "M" - monthly, "Y" - yearly].
+        :param data_frequency: (str) Data frequency ["D" - daily, "M" - monthly, "Y" - yearly].
         """
 
         pass
@@ -152,7 +152,7 @@ class OrnsteinUhlenbeck:
 
         :param n: (int) Number of simulated values.
         :param theta_given: (float) Long-term mean.
-        :param mu_given: (float) Mean revesion speed.
+        :param mu_given: (float) Mean reversion speed.
         :param sigma_given: (float) The amplitude of randomness in the system.
         :param delta_t_given: (float) Delta between observations, calculated in years.
         :return: (np.array) simulated portfolio prices.
@@ -166,11 +166,10 @@ class OrnsteinUhlenbeck:
         on the portfolio prices time series given.(p.13)
 
         :param portfolio: (np.array) Portfolio prices.
-        :return: (tuple) Optimal parameters (theta, mu, sigma_square, max_LL)
+        :return: (tuple) Optimal parameters (theta, mu, sigma_square, max_LL).
         """
 
         pass
-
 
     def check_fit(self):
         """
@@ -183,9 +182,9 @@ class OrnsteinUhlenbeck:
         Note: The check can occasionally return numbers significantly different from the fitted mll
         due to the random nature of the simulated process and the possibility of outliers. It is advised
         to perform the check multiple times and if it's consistently showing very different values of mll
-
         you might suspect the unsuitability of your data.
-        :return: (pd.Dataframe) Values for fitted and simulated OU model parameters
+
+        :return: (pd.DataFrame) Values for fitted and simulated OU model parameters
         """
 
         pass
@@ -196,7 +195,7 @@ class OrnsteinUhlenbeck:
         Computes the average Log Likelihood. (p.13)
 
         :param params: (tuple) A tuple of three elements representing theta, mu and sigma_squared.
-        :param args: (tuple) All other values that to be passed to self._compute_log_likelihood()
+        :param args: (tuple) All other values that to be passed to self._compute_log_likelihood().
         :return: (float) The average log likelihood from given parameters.
         """
 
@@ -204,6 +203,7 @@ class OrnsteinUhlenbeck:
 
     def description(self):
         """
+
         Returns all the general parameters of the model, training interval timestamps if provided, the goodness of fit,
         allocated trading costs and discount rates, stop-loss level, beta, which stands for the optimal ratio between
         two assets in the created portfolio, and optimal levels calculated. If the stop-loss level was given optimal
@@ -211,6 +211,8 @@ class OrnsteinUhlenbeck:
 
         :return: (pd.Series) Summary data for all model parameters and optimal levels.
         """
+
+        pass
 
     def plot_levels(self, data, stop_loss=False):
         """
@@ -389,4 +391,3 @@ class OrnsteinUhlenbeck:
         """
 
         pass
-

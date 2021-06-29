@@ -1,8 +1,8 @@
 .. _networks-dash:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 ===========================
 Dash Network Visualisations
@@ -27,16 +27,16 @@ Graph Layout
 On the side panel, the top dropdown menu contains three different layouts designed to layout the MST.
 These are namely `cose-bilkent`, `cola` and `spread`, selected as optimal layouts to view the MST.
 
-.. image:: images/data/graphLayout.png
+.. image:: networks_images/graphLayout.png
     :width: 23%
 
-.. image:: images/data/coseBilkent.png
+.. image:: networks_images/coseBilkent.png
     :width: 23%
 
-.. image:: images/data/cola.png
+.. image:: networks_images/cola.png
     :width: 23%
 
-.. image:: images/data/spread.png
+.. image:: networks_images/spread.png
     :width: 23%
 
 Control panel alongside the layouts `cose-bilkent`, `cola` and `spread`.
@@ -67,13 +67,13 @@ Statistics Panel
 The statistics panel on the left hand side of the UI is designed to provide useful information about the MST displayed
 on the right. The following is a brief explanation of the statistic type, and the reason for selection.
 
-.. image:: images/data/statspanel1.png
+.. image:: networks_images/statspanel1.png
     :width: 30%
 
-.. image:: images/data/statspanel2.png
+.. image:: networks_images/statspanel2.png
     :width: 30%
 
-.. image:: images/data/statspanel3.png
+.. image:: networks_images/statspanel3.png
     :width: 30%
 
 The statistics can be used to analyse topological features of the MST.
@@ -188,7 +188,7 @@ Running Dash in Jupyter
 
 You can easily run Dash server within Jupyter Notebook. The `Jupyter Dash library <https://github.com/plotly/jupyter-dash>`_ is used to provide this functionality.
 
-.. image:: images/data/colouredJupyter.png
+.. image:: networks_images/colouredJupyter.png
 
 When you initialize the `DashGraph` class, you must add another argument 'jupyter notebook'.
 To run the visualisations in Jupyter, replace:
@@ -253,11 +253,18 @@ Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
-The following notebook provides a more detailed exploration of the MST creation.
 
-* `MST visualisation`_
+References
+##########
 
-.. _`MST visualisation`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Networks/mst.ipynb
+* `Dogrusoz, U., Giral, E., Cetintas, A., Civril, A. and Demir, E., 2009. A layout algorithm for undirected compound graphs. Information Sciences, 179(7), pp.980-994. <https://arxiv.org/pdf/physics/0605116.pdf>`_
+* `Beineke, L.W., Oellermann, O.R. and Pippert, R.E., 2002. The average connectivity of a graph. Discrete mathematics, 252(1-3), pp.31-45. <https://www.sciencedirect.com/science/article/pii/S0012365X01001807>`_
+* `Onnela, J.P., Chakraborti, A., Kaski, K., Kertesz, J. and Kanto, A., 2003. Dynamics of market correlations: Taxonomy and portfolio analysis. Physical Review E, 68(5), p.056110. <https://www.researchgate.net/publication/8952753_Dynamics_of_Market_Correlations_Taxonomy_and_Portfolio_Analysis>`_
+* `Marti, G., Nielsen, F., Bińkowski, M. and Donnat, P., 2017. A review of two decades of correlations, hierarchies, networks and clustering in financial markets. arXiv preprint arXiv:1703.00485. <https://arxiv.org/abs/1703.00485>`_
+* `Huang, W.Q., Yao, S., Zhuang, X.T. and Yuan, Y., 2017. Dynamic asset trees in the US stock market: Structure variation and market phenomena. Chaos, Solitons & Fractals, 94, pp.44-53. <https://www.sciencedirect.com/science/article/pii/S0960077916303344>`_
+* `Jia, Y., Lu, V., Hoberock, J., Garland, M. and Hart, J.C., 2012. Edge v. node parallelism for graph centrality metrics. In GPU Computing Gems Jade Edition (pp. 15-28). Morgan Kaufmann. <https://www.sciencedirect.com/science/article/pii/B9780123859631000022>`_
+* `Fiedor, P., 2014. Networks in financial markets based on the mutual information rate. Physical Review E, 89(5), p.052801. <https://journals.aps.org/pre/abstract/10.1103/PhysRevE.89.052801>`_
+* `Hansen, D., Shneiderman, B. and Smith, M.A., 2010. Analyzing social media networks with NodeXL: Insights from a connected world. Morgan Kaufmann. <https://www.sciencedirect.com/science/article/pii/B9780128177563000066>`_

@@ -1,21 +1,31 @@
-codecov==2.0.15
-coverage==4.5.2
-cvxpy==1.1.1
-numba==0.49.1
-numpy==1.18.5
-matplotlib==3.2.1
-pandas==1.0.4
-pylint==2.5.3
-scikit-learn==0.23.1
-scipy==1.4.1
-sphinx==2.2.1 # needed for docs
-sphinx-rtd-theme==0.4.3 # needed for docs
-statsmodels==0.11.1
-cython==0.29.21
+# Production
+numpy==1.20.1
+matplotlib==3.2.2
+pandas==1.1.5
+scikit-learn==0.24.1
+scipy==1.6.0
+statsmodels==0.12.2
+cython==0.29.17
 POT==0.7.0
-networkx==2.4
-dash==1.14.0
+numba==0.52.0
+networkx==2.5
+dash==1.19.0
 dash-cytoscape==0.2.0
-dash-bootstrap-components==0.10.3
-jupyter-dash==0.3.1
+dash-bootstrap-components==0.11.3
+jupyter-dash==0.4.0
 tensorflow==2.2.1
+joblib==1.0.1
+analytics-python==1.2.9
+getmac==0.8.2
+
+
+# Develop
+bump2version==1.0.1
+bumpversion==0.6.0
+codecov==2.1.11
+coverage==5.4
+pylint==2.6.0
+sphinx==3.4.3 # Docs
+hudsonthames-sphinx-theme==0.1.3 # Docs
+sphinx-rtd-theme==0.5.2 # Docs
+releases==1.6.3 # Docs

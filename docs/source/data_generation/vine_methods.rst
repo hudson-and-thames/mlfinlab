@@ -1,17 +1,28 @@
 .. _data_generation-vine_methods:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 .. note::
    The following implementation and documentation is based on the works of Daniel Lewandowski, Dorota Kurowicka, and Harry Joe:
-   `Generating random correlation matrices based on vines and extended onion method <https://www.sciencedirect.com/science/article/pii/S0047259X09000876>`_ and
-   `Generating random correlation matrices based partial correlations <https://www.sciencedirect.com/science/article/pii/S0047259X05000886>`_.
+   `Generating random correlation matrices based on vines and extended onion method <https://www.sciencedirect.com/science/article/pii/S0047259X09000876>`__ and
+   `Generating random correlation matrices based partial correlations <https://www.sciencedirect.com/science/article/pii/S0047259X05000886>`__.
 
 ===============================
 Vine and Extended Onion Methods
 ===============================
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `Generating random correlation matrices based on vines and extended onion method <https://www.sciencedirect.com/science/article/pii/S0047259X09000876>`__ *by* Lewandowski, D., Kurowicka, D. and Joe, H.
+    - `Generating random correlation matrices based partial correlations <https://www.sciencedirect.com/science/article/pii/S0047259X05000886>`__ *by* Harry Joe.
+    - `Robust dependence modeling for high-dimensional covariance matrices with financial applications <https://www.semanticscholar.org/paper/Robust-dependence-modeling-for-high-dimensional-Zhu-Welsch/9c8d214a91833e4f8727050f6af783a578f9f6e7>`__ *by* Harry Joe.
+    - `Behavior of the NORTA method for correlated random vector generation as the dimension increases <https://ecommons.cornell.edu/bitstream/handle/1813/9249/TR001372.pdf>`__ *by* Ghosh, S. and Henderson, S.G.
+
 
 Vines
 #####
@@ -32,18 +43,18 @@ According to Zhu and Welsch (2018), they are defined as:
 
 
 .. figure:: images/vine_example.png
-   :scale: 100 %
-   :align: center
-   :alt: Vine Example
+    :scale: 100 %
+    :align: center
+    :alt: Vine Example
 
-   Graphical representation of a vine (courtesy of Zhu and Welsch (2018)).
+    Graphical representation of a vine (courtesy of Zhu and Welsch (2018)).
 
 The most common vine structures are regular vines (R-vines,) canonical vine (C-vines,) and drawable vines (D-vines).
 The following examples are based on the work of to Zhu and Welsch (2018).
 
 
 R-Vines
--------
+*******
 
 A vine is considered a regular vine on :math:`p` elements with :math:`E(V) = E_1 \cup ... \cup E_{p-1}`
 denoting the set of edges of :math:`V` if:
@@ -53,40 +64,40 @@ denoting the set of edges of :math:`V` if:
 
 
 .. figure:: images/r_vine_example.png
-   :scale: 100 %
-   :align: center
-   :alt: Vine Example
+    :scale: 100 %
+    :align: center
+    :alt: Vine Example
 
-   Graphical representation of an R-vine (courtesy of Zhu and Welsch (2018)).
+    Graphical representation of an R-vine (courtesy of Zhu and Welsch (2018)).
 
 C-Vines
--------
+*******
 
 An R-vine is considered a C-vine if each tree :math:`T_i` has a unique node of degree :math:`p-i`
 for :math:`i = 1, ..., p-2`.
 
 
 .. figure:: images/c_vine_example.png
-   :scale: 100 %
-   :align: center
-   :alt: Vine Example
+    :scale: 100 %
+    :align: center
+    :alt: Vine Example
 
-   Graphical representation of an C-vine (courtesy of Zhu and Welsch (2018)).
+    Graphical representation of an C-vine (courtesy of Zhu and Welsch (2018)).
 
 D-Vines
--------
+*******
 
 An R-vine is considered a D-vine if each node in :math:`T_1` has a degree of at most 2.
 
 .. figure:: images/d_vine_example.png
-   :scale: 100 %
-   :align: center
-   :alt: Vine Example
+    :scale: 100 %
+    :align: center
+    :alt: Vine Example
 
-   Graphical representation of an D-vine (courtesy of Zhu and Welsch (2018)).
+    Graphical representation of an D-vine (courtesy of Zhu and Welsch (2018)).
 
 Partial Correlation Vines
--------------------------
+*************************
 
 Partial correlation measures the degree of association between two random variables while controlling for a third random variable.
 It is used to find the variance between two variables while eliminating the variance from the third variable.
@@ -96,7 +107,7 @@ is identified with a partial correlation coefficient. Thus each edge in :math:`V
 :math:`V` specifies :math:`{d \choose 2}` standard and partial correlations.
 
 Correlation Matrices Generation
--------------------------------
+*******************************
 
 In his work, Joe shows that by using a D-vine, we can generate a :math:`d`-dimensional random positive definite correlation matrix :math:`R = (\rho_{i, j})` by
 choosing independent distributions :math:`F_{i, j}, 1 \leq i < j \leq d`, for these :math:`{d \choose 2}` parameters.
@@ -122,7 +133,7 @@ for :math:`\alpha_1 = \eta+ (d-1)/2, ..., \alpha_{d-2}, \alpha_{d-1}` Where
 :math:`\alpha_{d-1} = \alpha_{d-2} - 1/2`
 
 Implementation
---------------
+**************
 
 .. py:currentmodule:: mlfinlab.data_generation.vines
 
@@ -152,33 +163,34 @@ Where :math:`\textbf{r}_k` is an :math:`k \times k` correlation matrix and :math
 
 
 Implementation
---------------
+**************
 
 .. py:currentmodule:: mlfinlab.data_generation.vines
 
 .. autofunction:: sample_from_ext_onion
 
 
-Examples
-########
+Example
+#######
 
 Here we show the correlation matrix generated for each method.
 
 .. figure:: images/result_matrices.png
-   :scale: 100 %
-   :align: center
-   :alt: Generated Matrices
+    :scale: 100 %
+    :align: center
+    :alt: Generated Matrices
 
-   Plot of a sample generated correlation matrix using each method.
+    Plot of a sample generated correlation matrix using each method.
 
 .. code-block::
 
-    from mlfinlab.data_generation.vines import (sample_from_cvine,
-                                                sample_from_dvine, sample_from_ext_onion)
     import matplotlib.pyplot as plt
 
-    # Sample a correlation matrix from each method. Matrix has shape (n_samples, dim, dim).
-    # For this example it corresponds to (1, 100, 100).
+    from mlfinlab.data_generation.vines import (sample_from_cvine,
+                                                sample_from_dvine, sample_from_ext_onion)
+
+    # Sample a correlation matrix from each method. Matrix has shape (n_samples, dim, dim)
+    # For this example it corresponds to (1, 100, 100)
     dim = 100
     n_samples = 1
     fig, axes = plt.subplots(3, figsize=(3.5, 7.8))
@@ -189,7 +201,7 @@ Here we show the correlation matrix generated for each method.
         else:
             corr_mats = func(dim=dim, eta=2, n_samples=n_samples)
 
-        # Plots the correlation matrices generated in a pseudocolor plot.
+        # Plots the correlation matrices generated in a pseudocolor plot
         a = axes[i].pcolormesh(corr_mats[0][:, :], cmap='viridis')
         fig.colorbar(a, ax=axes[i])
         if i == 0:
@@ -207,20 +219,21 @@ can generate stronger correlations matrices. For a beta distribution :math:`Beta
 matrix has stronger positive correlations. If :math:`\alpha \ll \beta`, the resulting correlation matrix has stronger negative correlations.
 
 .. figure:: images/result_strong_matrices.png
-   :scale: 100 %
-   :align: center
-   :alt: Generated Matrices
+    :scale: 100 %
+    :align: center
+    :alt: Generated Matrices
 
-   Plot of a sample generated correlation matrix using skewed beta distributions for stronger correlations.
+    Plot of a sample generated correlation matrix using skewed beta distributions for stronger correlations.
 
 .. code-block::
 
-    from mlfinlab.data_generation.vines import (sample_from_cvine,
-                                                sample_from_dvine, sample_from_ext_onion)
     import matplotlib.pyplot as plt
 
+    from mlfinlab.data_generation.vines import (sample_from_cvine,
+                                                sample_from_dvine, sample_from_ext_onion)
+
     # Sample a correlation matrix from C-vine and D-vine methods, setting the beta parameters
-    # manually.
+    # manually
     dim = 100
     n_samples = 1
     beta_params = [(30, 4), (4, 30)]
@@ -252,18 +265,13 @@ Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following research notebook can be used to better understand the Vines and Extended Onion methods.
-
-* `Generating Correlation Matrices using the Vines and Extended Onion Methods`_
-
-.. _`Generating Correlation Matrices using the Vines and Extended Onion Methods`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Data%20Generation/Vines/vines.ipynb
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 References
 ##########
 
-Zhu, Z. and Welsch, R.E., 2018. Robust dependence modeling for high-dimensional covariance matrices with financial applications. The Annals of Applied Statistics, 12(2), pp.1228-1249.
-
-Ghosh, S. and Henderson, S.G., 2003. Behavior of the NORTA method for correlated random vector generation as the dimension increases. ACM Transactions on Modeling and Computer Simulation (TOMACS), 13(3), pp.276-294.
+* `Lewandowski, D., Kurowicka, D. and Joe, H., 2009. Generating random correlation matrices based on vines and extended onion method. Journal of multivariate analysis, 100(9), pp.1989-2001. <https://www.sciencedirect.com/science/article/pii/S0047259X09000876>`_
+* `Joe, H., 2006. Generating random correlation matrices based on partial correlations. Journal of Multivariate Analysis, 97(10), pp.2177-2189. <https://www.sciencedirect.com/science/article/pii/S0047259X05000886>`_
+* `Zhu, Z. and Welsch, R.E., 2018. Robust dependence modeling for high-dimensional covariance matrices with financial applications. Annals of Applied Statistics, 12(2), pp.1228-1249. <https://www.semanticscholar.org/paper/Robust-dependence-modeling-for-high-dimensional-Zhu-Welsch/9c8d214a91833e4f8727050f6af783a578f9f6e7>`_
+* `Ghosh, S. and Henderson, S.G., 2003. Behavior of the NORTA method for correlated random vector generation as the dimension increases. ACM Transactions on Modeling and Computer Simulation (TOMACS), 13(3), pp.276-294. <https://ecommons.cornell.edu/bitstream/handle/1813/9249/TR001372.pdf>`_

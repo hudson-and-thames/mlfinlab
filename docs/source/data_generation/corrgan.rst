@@ -1,12 +1,15 @@
 .. _data_generation-corrgan:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 .. note::
    The following implementation and documentation closely follow the work of Gautier Marti:
-   `CorrGAN: Sampling Realistic Financial Correlation Matrices using Generative Adversarial Networks <https://arxiv.org/pdf/1910.09504.pdf>`_.
+   `CorrGAN: Sampling Realistic Financial Correlation Matrices using Generative Adversarial Networks <https://arxiv.org/pdf/1910.09504.pdf>`__.
+
+.. warning::
+   In order to use this module, you should additionally install *TensorFlow* For more details, visit our :ref:`MlFinLab installation guide <getting_started-installation>`.
 
 =======
 CorrGAN
@@ -19,11 +22,11 @@ It was trained on approximately 10,000 empirical correlation matrices estimated 
 algorithm.
 
 .. figure:: images/sample_corrmat.png
-   :scale: 100 %
-   :align: center
-   :alt: Empirical vs Generated Correlation Matrices
+    :scale: 100 %
+    :align: center
+    :alt: Empirical vs Generated Correlation Matrices
 
-   (Left) Empirical correlation matrix estimated on stocks returns; (Right) GAN-generated correlation matrix. (Courtesy of `marti.ai <https://marti.ai/ml/2019/10/13/tf-dcgan-financial-correlation-matrices.html>`_)
+    (Left) Empirical correlation matrix estimated on stocks returns; (Right) GAN-generated correlation matrix. (Courtesy of `marti.ai <https://marti.ai/ml/2019/10/13/tf-dcgan-financial-correlation-matrices.html>`_)
 
 Gautier Marti found that previous methods for generating realistic correlation matrices were lacking. Other authors found as well that
 "there is no algorithm available for the generation of reasonably random financial correlation matrices with the Perron-Frobenius property. [...] we expect
@@ -40,6 +43,13 @@ CorrGAN generates correlation matrices that have many "stylized facts" seen in e
 4. Perron-Frobenius property (first eigenvector has positive entries).
 5. Hierarchical structure of correlations.
 6. Scale-free property of the corresponding Minimum Spanning Tree (MST).
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `CorrGAN: Sampling Realistic Financial Correlation Matrices using Generative Adversarial Networks <https://arxiv.org/pdf/1910.09504.pdf>`__ *by* Gautier Marti.
 
 
 Implementation
@@ -64,8 +74,9 @@ Example
 
 .. code-block::
 
-    from mlfinlab.data_generation.corrgan import sample_from_corrgan
     import matplotlib.pyplot as plt
+
+    from mlfinlab.data_generation.corrgan import sample_from_corrgan
 
     # Sample from CorrGAN has shape (n_samples, dim, dim).
     # For this example it corresponds to (4, 100, 100).
@@ -83,11 +94,11 @@ Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
-The following research notebook can be used to better understand the sampled correlation matrices.
 
-* `CorrGAN - Realistic Financial Correlation Matrices`_
+References
+##########
 
-.. _`CorrGAN - Realistic Financial Correlation Matrices`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Data%20Generation/CorrGAN/corrgan.ipynb
+* `Marti, G., 2020, May. Corrgan: Sampling realistic financial correlation matrices using generative adversarial networks. In ICASSP 2020-2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) (pp. 8459-8463). IEEE. <https://arxiv.org/pdf/1910.09504.pdf>`_

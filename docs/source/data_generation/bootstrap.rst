@@ -1,22 +1,26 @@
 .. _data_generation-bootstrapping:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 =============
 Bootstrapping
 =============
-
-.. note::
-   The following implementation and documentation is based on the work of F. Musciotto, L. Marotta, S. Miccichè, and R. N. Mantegna
-   `Bootstrap validation of links of a minimum spanning tree <https://arxiv.org/pdf/1802.03395.pdf>`_.
 
 Bootstrapping is a statistical method used to resample a dataset with replacement to estimate its population statistics (such as
 mean, median, standard deviation, etc.) In machine learning applications, bootstrap sampling usually leads to less overfitting and
 improvement of the stability of our models.
 Bootstrap methods draw small samples (with replacement) from a large dataset one at a time, and organizing them to construct
 a new dataset. Here we examine three bootstrap methods. Row, Pair, and Block Bootstrap.
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `Bootstrap validation of links of a minimum spanning tree <https://arxiv.org/pdf/1802.03395.pdf>`__ *by* Musciotto, F., Marotta, L., Miccichè, S. and Mantegna, R.N.
+
 
 Row Bootstrap
 #############
@@ -27,11 +31,11 @@ a new matrix of the same size, we sample with replacement :math:`T` rows to form
 repeated data from the original dataset.
 
 .. figure:: images/row_bootstrap.png
-   :scale: 75 %
-   :align: center
-   :alt: Row Bootstrap Generation
+    :scale: 75 %
+    :align: center
+    :alt: Row Bootstrap Generation
 
-   (Left) Original dataset of size :math:`T \times n`. (Right) Row bootstrap dataset of size :math:`T \times n`.
+    (Left) Original dataset of size :math:`T \times n`. (Right) Row bootstrap dataset of size :math:`T \times n`.
 
 Implementation
 **************
@@ -41,23 +45,24 @@ Implementation
 .. autofunction:: row_bootstrap
 
 
-Examples
-********
+Example
+*******
 
 .. code-block::
 
-    from mlfinlab.data_generation.bootstrap import row_bootstrap
     import seaborn as sns
     import numpy as np
     import matplotlib.pyplot as plt
 
-    # Create random matrix.
+    from mlfinlab.data_generation.bootstrap import row_bootstrap
+
+    # Create random matrix
     original_dataset = np.random.rand(15, 6)
 
-    # Generate a row bootstrap matrix.
+    # Generate a row bootstrap matrix
     bootstrap_dataset = row_bootstrap(original_dataset, n_samples=1)
 
-    # Plot them.
+    # Plot them
     fig, axes = plt.subplots(1, 2)
     sns.heatmap(original_dataset, annot=True, fmt=".2f", ax=axes[0])
     axes[0].set_title("Original Dataset")
@@ -76,11 +81,11 @@ matrix. For each index, we sample with replacement 2 columns and all their rows.
 index of the correlation matrix. We repeat this process until we fill the correlation matrix.
 
 .. figure:: images/pair_bootstrap.png
-   :scale: 75 %
-   :align: center
-   :alt: Pair Bootstrap Generation
+    :scale: 75 %
+    :align: center
+    :alt: Pair Bootstrap Generation
 
-   (Left) Original dataset of size :math:`T \times n`. (Right) Row bootstrap dataset, each of size :math:`T \times 2`. Each pair dataset can be used to generate a dependence matrix (e.g. correlation matrix).
+    (Left) Original dataset of size :math:`T \times n`. (Right) Row bootstrap dataset, each of size :math:`T \times 2`. Each pair dataset can be used to generate a dependence matrix (e.g. correlation matrix).
 
 
 Implementation
@@ -89,23 +94,24 @@ Implementation
 .. autofunction:: pair_bootstrap
 
 
-Examples
-********
+Example
+*******
 
 .. code-block::
 
-    from mlfinlab.data_generation.bootstrap import pair_bootstrap
     import seaborn as sns
     import numpy as np
     import matplotlib.pyplot as plt
 
-    # Create random matrix.
+    from mlfinlab.data_generation.bootstrap import pair_bootstrap
+
+    # Create random matrix
     original_dataset = np.random.rand(50, 10)
 
-    # Generate a pair bootstrap correlation matrix.
+    # Generate a pair bootstrap correlation matrix
     bootstrap_corr_matrix = pair_bootstrap(original_dataset, n_samples=1)
 
-    # Plot them.
+    # Plot them
     fig, axes = plt.subplots(1, 2)
     sns.heatmap(pd.DataFrame(original_dataset).corr(), ax=axes[0])
     axes[0].set_title("Original Dataset")
@@ -124,11 +130,11 @@ Their ideal size depends on the data and its application. For example, for a dat
 we sample as many blocks as needed to fill the bootstrapped matrix.
 
 .. figure:: images/block_bootstrap.png
-   :scale: 75 %
-   :align: center
-   :alt: Block Bootstrap Generation
+    :scale: 75 %
+    :align: center
+    :alt: Block Bootstrap Generation
 
-   (Left) Original dataset of size :math:`T \times n`. (Right) Block bootstrap dataset of size :math:`T \times n` created with blocks of size :math:`2 \times 2`.
+    (Left) Original dataset of size :math:`T \times n`. (Right) Block bootstrap dataset of size :math:`T \times n` created with blocks of size :math:`2 \times 2`.
 
 Implementation
 **************
@@ -136,23 +142,24 @@ Implementation
 .. autofunction:: block_bootstrap
 
 
-Examples
-********
+Example
+*******
 
 .. code-block::
 
-    from mlfinlab.data_generation.bootstrap import block_bootstrap
     import seaborn as sns
     import numpy as np
     import matplotlib.pyplot as plt
 
-    # Create random matrix.
+    from mlfinlab.data_generation.bootstrap import block_bootstrap
+
+    # Create random matrix
     original_dataset = np.random.rand(14, 9)
 
-    # Generate a block bootstrap matrix.
+    # Generate a block bootstrap matrix
     bootstrap_dataset = block_bootstrap(original_dataset, n_samples=1, block_size=(2, 3))
 
-    # Plot them.
+    # Plot them
     fig, axes = plt.subplots(1, 2, figsize=(9, 5))
     sns.heatmap(original_dataset, annot=True, fmt=".2f", ax=axes[0])
     axes[0].set_title("Original Dataset")
@@ -166,16 +173,10 @@ Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following research notebook can be used to better understand the bootstrap methods.
-
-* `Generating Matrices using Bootstrap Methods`_
-
-.. _`Generating Matrices using Bootstrap Methods`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Data%20Generation/Bootstrap/bootstrap.ipynb
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 References
 ##########
 
-Musciotto, F., Marotta, L., Miccichè, S. and Mantegna, R.N., 2018. Bootstrap validation of links of a minimum spanning tree. Physica A: Statistical Mechanics and its Applications, 512, pp.1032-1043.
+* `Musciotto, F., Marotta, L., Miccichè, S. and Mantegna, R.N., 2018. Bootstrap validation of links of a minimum spanning tree. Physica A: Statistical Mechanics and its Applications, 512, pp.1032-1043. <https://arxiv.org/pdf/1802.03395.pdf>`_

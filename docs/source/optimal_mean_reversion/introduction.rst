@@ -20,15 +20,7 @@ after making the first trade? All these questions lead us to the investigation o
 of trades.
 
 In this module, we will be formalizing the optimal stopping problem for assets or portfolios that have mean-reverting
-dynamics and providing the solutions based on three mean-reverting models:
-
-* Ornstein-Uhlenbeck (OU)
-* Exponential Ornstein-Uhlenbeck (XOU)
-* Cox-Ingersoll-Ross (CIR)
-
-
-Naturally, the module is divided into three submodules for approaches to creating an optimal mean-reverting
-strategy: ``OrnsteinUhlenbeck``, ``ExponentialOrnsteinUhlenbeck`` and ``CoxIngersollRoss``.
+dynamics and providing the solutions based on the Ornstein-Uhlenbeck (OU) mean-reverting model.
 
 .. note::
    We are solving the optimal stopping problem for a mean-reverting portfolio that is constructed by holding :math:`\alpha`
@@ -41,5 +33,3 @@ strategy: ``OrnsteinUhlenbeck``, ``ExponentialOrnsteinUhlenbeck`` and ``CoxInger
    More information regarding this problem can be found in the following publication:
 
    `Optimal Mean reversion Trading: Mathematical Analysis and Practical Applications by Tim Leung and Xin Li <https://www.amazon.com/Optimal-Mean-Reversion-Trading-Mathematical/dp/9814725919>`_ (p. 16)
-
-

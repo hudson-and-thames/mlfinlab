@@ -1,8 +1,8 @@
 .. _optimal_mean_reverting_strategies-ou_model:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 .. note::
    The following implementations and documentation closely follow the work of Tim Leung:
@@ -12,6 +12,7 @@
 ==========================================
 Trading Under the Ornstein-Uhlenbeck Model
 ==========================================
+
 .. warning::
 
     Alongside with Leung's research we are using :math:`\theta` for mean and :math:`\mu` for mean-reversion
@@ -22,19 +23,16 @@ Model fitting
 #############
 
 .. note::
-   We are solving the optimal stopping problem for a mean-reverting portfolio that is constructed by holding
-   :math:`\alpha = \frac{A}{S_0^{(1)}}` of a risky asset :math:`S^{(1)}` and shorting
-   :math:`\beta = \frac{B}{S_0^{(2)}}` of another risky asset :math:`S^{(2)}`, yielding a portfolio value:
+    We are solving the optimal stopping problem for a mean-reverting portfolio that is constructed by holding
+    :math:`\alpha = \frac{A}{S_0^{(1)}}` of a risky asset :math:`S^{(1)}` and shorting
+    :math:`\beta = \frac{B}{S_0^{(2)}}` of another risky asset :math:`S^{(2)}`, yielding a portfolio value:
 
-   .. math::
-      X_t^{\alpha,\beta} = \alpha S^{(1)} - \beta S^{(2)}, t \geq 0
+    .. math::
+        X_t^{\alpha,\beta} = \alpha S^{(1)} - \beta S^{(2)}, t \geq 0
 
-   Since in terms of mean-reversion we care only about the ratio between :math:`\alpha` and :math:`\beta`, without the
-   loss of generality we can set :math:`\alpha = const` and A = $1, while varying :math:`\beta` to find the optimal strategy
-   :math:`(\alpha,\beta^*)`
-
-
-
+    Since in terms of mean-reversion we care only about the ratio between :math:`\alpha` and :math:`\beta`, without the
+    loss of generality we can set :math:`\alpha = const` and A = $1, while varying :math:`\beta` to find the optimal strategy
+    :math:`(\alpha,\beta^*)`
 
 We establish **Ornstein-Uhlenbeck process** driven by the SDE:
 
@@ -51,15 +49,11 @@ We establish **Ornstein-Uhlenbeck process** driven by the SDE:
     B\ -\text{a standard Brownian motion}
     \end{gather*}
 
-
-
 * :math:`\theta` − long term mean level, all future trajectories of 𝑋 will evolve around a mean level 𝜃 in the long run.
 
 * :math:`\mu` - speed of reversion, characterizes the velocity at which such trajectories will regroup around :math:`\theta` in time.
 
 * :math:`\sigma` - instantaneous volatility, measures instant by instant the amplitude of randomness entering the system. Higher values imply more randomness.
-
-
 
 Under the OU model the probability density function of :math:`X_t` with increment  :math:`\delta t = t_i
 - t_{i-1}` is:
@@ -78,7 +72,6 @@ We observe the resulting portfolio values :math:`(x_i^\beta)_{i = 0,1,\cdots,n}`
 realized over an *n*-day period. To fit the model to our data and find optimal parameters we define the average
 log-likelihood function:
 
-
 .. math::
     :nowrap:
 
@@ -89,7 +82,6 @@ log-likelihood function:
     = -\frac{1}{2} ln(2 \pi) - ln(\tilde{\sigma}) - \frac{1}{2\pi\tilde{\sigma}^2}\sum_{i=1}^{n} [x_i^{\alpha\beta}
     - x_{i-1}^{\alpha\beta} e^{-\mu \Delta t} - \theta (1 - e^{-\mu \Delta t})]^2
     \end{gather*}
-
 
 Then, maximizing the log-likelihood function by applying maximum likelihood estimation(MLE) we are able to determine
 the parameters of the model and fit the observed portfolio prices to an OU process. Let's denote the maximized average
@@ -172,7 +164,6 @@ Theorem 2.6 (p.23):
 
 **The optimal liquidation problem admits the solution:**
 
-
 .. math::
     :nowrap:
 
@@ -216,7 +207,6 @@ Where ":math:`\hat{\ }`" represents the use of transaction cost and discount rat
 Optimal stopping problem with stop-loss
 ***************************************
 
-
 When we include the stop-loss in our optimal stopping problems the theorems we use to find the solution
 are:
 
@@ -251,7 +241,6 @@ Corresponding optimal liquidation time is given by
 
    	\tau^* = inf [t\geq0:X_t \geq b^*]
 
-
 Helper functions C and D defined as following:
 
 .. math::
@@ -259,7 +248,6 @@ Helper functions C and D defined as following:
     C = \frac{(b_L^* - c_s) G(L) - ( L - c_s) G(b^*)}{F(b_L^*)G(L) - F(L)G(b_L^*)}
 
     D = \frac{(L - c_s) F(L) - ( b_L^* - c_s) F(b^*)}{F(b_L^*)G(L) - F(L)G(b_L^*)}
-
 
 Theorem 2.42 (p.35):
 
@@ -417,6 +405,7 @@ As data we will use downloaded GLD and GDX tickers from Yahoo Finance.
 
 .. code-block::
 
+    # Import packages
     import numpy as np
     import pandas as pd
     import yfinance as yf
@@ -604,16 +593,15 @@ isn't included. We also calculate an additional OU-model parameter - half-life.
 
     print("half-life: ",h)
 
-
 Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
-The following research notebook can be used to better understand the concepts of trading under the Ornstein-Uhlenbeck Model.
 
-* `Trading Under the Ornstein-Uhlenbeck Model`_
+References
+##########
 
-.. _`Trading Under the Ornstein-Uhlenbeck Model`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Optimal%20Mean%20Reversion/ou_model.ipynb
+* `Leung, T.S.T. and Li, X., 2015. Optimal mean reversion trading: Mathematical analysis and practical applications (Vol. 1). World Scientific. <https://www.amazon.com/Optimal-Mean-Reversion-Trading-Mathematical/dp/9814725919>`_.

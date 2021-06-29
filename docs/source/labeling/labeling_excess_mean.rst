@@ -1,11 +1,19 @@
-.. _implementations-labeling_excess_mean:
+.. _labeling-labeling_excess_mean:
 
 ===================
 Excess Over Mean 🔒
 ===================
 
-This documentation and accompanying Jupyter Notebook Tutorials are now available via the respective tiers on
-`Patreon <https://www.patreon.com/HudsonThames>`_.
+This documentation and accompanying Jupyter Notebook Tutorials are now available via
+`H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `Machine Learning for Factor Investing <http://www.mlfactor.com/>`__, Chapter 5.5.1 *by* Coqueret, G. and Guida, T.
+
 
 Implementation
 ##############
@@ -13,12 +21,11 @@ Implementation
 Example
 ########
 
+Research Notebook
+#################
 
-Research Notebooks
-##################
 
-The following research notebooks can be used to better understand labeling excess over mean.
+References
+##########
 
-* `Excess Over Mean Example`_
-
-.. _`Excess Over Mean Example`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Labeling/Labels%20Excess%20Over%20Mean/excess_over_mean.ipynb
+* `Coqueret, G. and Guida, T., 2020. Machine Learning for Factor Investing. CRC Press. <http://www.mlfactor.com/>`_

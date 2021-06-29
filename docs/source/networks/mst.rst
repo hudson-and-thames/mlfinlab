@@ -1,8 +1,8 @@
 .. _networks-minimum_spanning_tree:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 .. note::
 
@@ -18,9 +18,10 @@ Minimum Spanning Tree (MST)
 
 Network analysis can provide interesting insights into the dynamics of the market, and the continually changing behaviour.
 
-A Minimum Spanning Trees (MST) is a useful method of analyzing complex networks, for aspects such as risk management, portfolio design, trading strategies.
-For example Onnela et al. (2003) notices that the optimal Markowitz portfolio is found at the outskirts of the tree .
-Analysing the Tree structure, as a representation of the market, can give us an idea about the stability and state of the market and predict how shocks will propagate through a network.
+A Minimum Spanning Trees (MST) is a useful method of analyzing complex networks, for aspects such as risk management,
+portfolio design, trading strategies. For example Onnela et al. (2003) notices that the optimal Markowitz portfolio is
+found at the outskirts of the tree. Analysing the Tree structure, as a representation of the market, can give us an idea
+about the stability and state of the market and predict how shocks will propagate through a network.
 
 A Minimum Spanning Tree (MST) is a graph consisting of the fewest number of edges needed for all nodes to be connected by
 some path - where the combination of edge weights sum to the smallest total possible.
@@ -51,8 +52,7 @@ Due to the nature of the respective algorithms,
 Prim's is recommended for sample sizes larger than 100, and Kruskal's for small sample sizes or when space complexity
 is more important (Huang et al. 2009).
 
-The ``MST`` class uses wrappers for `NetworkX library's
-<https://networkx.github.io/>`_ functions for MST methods.
+The ``MST`` class uses wrappers for `NetworkX library's <https://networkx.github.io/>`_ functions for MST methods.
 
 ----
 
@@ -68,7 +68,7 @@ The steps of Kruskal's algorithm:
 2. Add the smallest edge to the final spanning tree. If adding the edge creates a cycle, move onto the next edge.
 3. Keep adding all edges until all the nodes are a part of the tree.
 
-.. figure:: images/data/KruskalDemo.gif
+.. figure:: networks_images/KruskalDemo.gif
     :align: center
 
     Kruskal's algorithm `by Shiyu Ji - Own work, CC BY-SA 4.0, <https://commons.wikimedia.org/w/index.php?curid=54420893>`_.
@@ -97,7 +97,8 @@ Kruskal's algorithm is commonly implemented with a disjoint set data structure:
 
     return A
 
-More information on Kruskal's and Prim's algorthms can be found in the book "Introduction to algorithms" (2009) by Cormen, Leiserson, Rivest and Stein.
+More information on Kruskal's and Prim's algorthms can be found in the book "Introduction to algorithms" (2009) by
+Cormen, Leiserson, Rivest and Stein.
 
 Prim's Algorithm
 ****************
@@ -108,14 +109,14 @@ The steps for Prim's algorithm are:
 2. Of all the edges from visited, pick the smallest and add the edge to the tree.
 3. Keep adding edges, until all nodes are visited.
 
-.. figure:: images/data/PrimAlgDemo.gif
+.. figure:: networks_images/PrimAlgDemo.gif
     :align: center
 
     Prim's algorithm by `Shiyu Ji - Own work, CC BY-SA 4.0, <https://commons.wikimedia.org/w/index.php?curid=54420894>`_.
 
 Prim's algorithm is recommended from a 100 vertices upwards for better time complexity (Huang et al 2009).
-Compared to Kruskal's, Prim's does not calculate all the edges from shortest to largest, instead growing from a starting node, making it more
-time-efficient for bigger data sets.
+Compared to Kruskal's, Prim's does not calculate all the edges from shortest to largest, instead growing from a starting node,
+making it more time-efficient for bigger data sets.
 
 .. code-block::
 
@@ -167,7 +168,8 @@ Kruskal's algorithms is used as a default.
 
     mst_graph = MST(custom_matrix, 'custom')
 
-To use Prim's algorithm, pass the string 'prim'. Take a look below at the initialization method `__init__` to see how the algorithm is set.
+To use Prim's algorithm, pass the string 'prim'. Take a look below at the initialization method `__init__` to see
+how the algorithm is set.
 
 .. code-block::
 
@@ -178,6 +180,7 @@ Example Code
 
 .. code-block::
 
+    # Import packages
     import pandas as pd
 
     # Import MST class
@@ -243,11 +246,13 @@ Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
-The following notebook provides a more detailed exploration of the MST creation.
 
-* `MST visualisation`_
+References
+##########
 
-.. _`MST visualisation`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Networks/mst.ipynb
+* `Huang, Feixue, Pengfei Gao, and Yu Wang. "Comparison of Prim and Kruskal on Shanghai and Shenzhen 300 Index hierarchical structure tree." 2009 International Conference on Web Information Systems and Mining. IEEE, 2009. <https://ieeexplore.ieee.org/abstract/document/5369459/>`_
+* `Marti, Gautier, et al. "A review of two decades of correlations, hierarchies, networks and clustering in financial markets." (2017). <https://arxiv.org/abs/1703.00485>`_
+* `Onnela, J-P., et al. "Dynamics of market correlations: Taxonomy and portfolio analysis." (2003) <https://www.researchgate.net/publication/8952753_Dynamics_of_Market_Correlations_Taxonomy_and_Portfolio_Analysis>`_

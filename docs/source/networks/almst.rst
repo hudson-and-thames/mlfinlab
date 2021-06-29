@@ -1,23 +1,28 @@
 .. _networks-almst:
 
-.. note::
-
-   The following source elaborates extensively on the topic:
-
-   `M. Tumminello, C. Coronnello, F. Lillo, S. Micciche, R. N. Mantegna, Spanning trees and bootstrap reliability estimation in correlation-based networks, International Journal of Bifurcation and Chaos 17 (2007) 2319–2329. <https://arxiv.org/pdf/physics/0605116.pdf>`_
-
 =============================================
 Average Linkage Minimum Spanning Tree (ALMST)
 =============================================
 
-Average Linkage Minimum Spanning Tree (ALMST) shows better results in recognising the economic sectors and sub-sectors than the  Minimum Spanning Tree (Tumminello et al. 2007).
+Average Linkage Minimum Spanning Tree (ALMST) shows better results in recognising the economic sectors and sub-sectors
+than the  Minimum Spanning Tree (Tumminello et al. 2007).
 The ALMST, as defined by `Tumminello et al. (2007), <https://arxiv.org/pdf/physics/0605116.pdf>`_ is a variation of the MST.
 
-Just as the MST is associated with the Single Linkage Clustering Algorithm (SCLA), the ALMST is based on the UPGMA (unweighted pair group method with arithmetic mean) algorithm for hierarchal clustering.
-This is also known as Average Linkage Cluster Algorithm (ALCA) method. The UPGMA method is frequently used in biology for phylogenetic tree as a diagrammatic representation of the evolutionary relatedness between organisms.
+Just as the MST is associated with the Single Linkage Clustering Algorithm (SCLA), the ALMST is based on the UPGMA
+(unweighted pair group method with arithmetic mean) algorithm for hierarchal clustering.
+This is also known as Average Linkage Cluster Algorithm (ALCA) method. The UPGMA method is frequently used in biology for
+phylogenetic tree as a diagrammatic representation of the evolutionary relatedness between organisms.
 A step by step example of UPGMA or ALCA method for trees can be found `here. <https://en.wikipedia.org/wiki/UPGMA>`_
 
 ----
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources describe this method in more detail:
+
+    - `Spanning trees and bootstrap reliability estimation in correlation-based networks <https://arxiv.org/pdf/physics/0605116.pdf>`__ *by* M. Tumminello, C. Coronnello, F. Lillo, S. Micciche, R. N. Mantegna.
+
 
 ALMST
 #####
@@ -25,10 +30,12 @@ ALMST
 ALMST vs. MST
 *************
 
-Instead of choosing the next edge by the minimum edge (distance based MST), the next edge is chosen by the minimum *average* distance between two existing clusters.
-Tumminello et al. (2007) give an example MST algorithm to show how the ALMST algorithm differs from the MST algorithm.
+Instead of choosing the next edge by the minimum edge (distance based MST), the next edge is chosen by the minimum *average*
+distance between two existing clusters. Tumminello et al. (2007) give an example MST algorithm to show how the ALMST
+algorithm differs from the MST algorithm.
 
-Where :math:`g` is the graph, :math:`S_{i}` is the set of vertices, :math:`n` is the number of elements, :math:`C` is the correlation matrix of elements :math:`ρ_{ij}`, connected component of a graph :math:`g` containing a given vertex :math:`i`.
+Where :math:`g` is the graph, :math:`S_{i}` is the set of vertices, :math:`n` is the number of elements, :math:`C` is
+the correlation matrix of elements :math:`ρ_{ij}`, connected component of a graph :math:`g` containing a given vertex :math:`i`.
 The starting point of the procedure is an empty graph :math:`g` with :math:`n` vertices.
 
 1. Set :math:`Q` as the matrix of elements :math:`q_{ij}` such that :math:`Q = C`, where :math:`C` is
@@ -84,8 +91,9 @@ User Interface
 **************
 
 The ALMST can be generated in the same way as the MST, but by creating an `ALMST` class object instead.
-Since `MST` and `ALMST` are both subclasses of `Graph`, `MST` and `ALMST` are the input to the initialisation method of class `Dash`.
-However, the recommended way to create visualisations, is to use the methods from `visualisations` file, unless you would like to input a custom matrix.
+Since `MST` and `ALMST` are both subclasses of `Graph`, `MST` and `ALMST` are the input to the initialisation method
+of class `Dash`. However, the recommended way to create visualisations, is to use the methods from `visualisations` file,
+unless you would like to input a custom matrix.
 
 Creating the `ALMST` visualisation is a similar process to creating the `MST`. You can replace:
 
@@ -99,7 +107,8 @@ With:
 
     almst = ALMST(input_matrix, 'input matrix type')
 
-This creates the ALMST object containing `self.graph` as the graph of the ALMST. The `ALMST` object can then be inputted to the Dash interface.
+This creates the ALMST object containing `self.graph` as the graph of the ALMST. The `ALMST` object can then be inputted
+to the Dash interface.
 
 Implementation
 **************
@@ -133,6 +142,7 @@ Example Code
 
 .. code-block::
 
+    # Import packages
     import pandas as pd
 
     # Import ALMST class
@@ -196,7 +206,7 @@ Comparison Interface
 ####################
 
 .. figure::
-    images/data/dualinterface.png
+    networks_images/dualinterface.png
 
 ALMST and MST can be compared easily using the `DualDashGraph` interface, where you can see the MST and ALMST side by side.
 You can also create the dual interface using `generate_mst_almst_comparison` method in the :ref:`Visualisations <networks-visualisations>` section.
@@ -213,3 +223,9 @@ This is the recommended way as it reduces the number of steps needed to create t
     # Get DualDash server
     server = DualDashGraph(mst, almst)
     server.run_server()
+
+
+References
+##########
+
+* `Tumminello, M., Coronnello, C., Lillo, F., Micciche, S. and Mantegna, R.N., 2007. Spanning trees and bootstrap reliability estimation in correlation-based networks. International Journal of Bifurcation and Chaos, 17(07), pp.2319-2329. <https://arxiv.org/pdf/physics/0605116.pdf>`_

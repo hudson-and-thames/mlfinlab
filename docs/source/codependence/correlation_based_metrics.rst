@@ -1,12 +1,24 @@
 .. _codependence-correlation_based_metrics:
 
 .. note::
-   The following implementations and documentation, closely follows the lecture notes from Cornell University, by Marcos Lopez de Prado:
-   `Codependence (Presentation Slides) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_.
+    The following implementations and documentation, closely follows the lecture notes from Cornell University, by Marcos Lopez de Prado:
+    `Codependence (Presentation Slides) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_.
 
 =========================
 Correlation-Based Metrics
 =========================
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `Codependence (Presentation Slides) <https://ssrn.com/abstract=3512994>`__ *by* Marcos Lopez de Prado.
+    - `Measuring and testing dependence by correlation of distances <https://projecteuclid.org/download/pdfview_1/euclid.aos/1201012979>`__ *by* Székely, G.J., Rizzo, M.L. and Bakirov, N.K.
+    - `Introducing the discussion paper by Székely and Rizzo <https://arxiv.org/pdf/1010.3575.pdf>`__ *by* Michael A. Newton.
+    - `Building Diversified Portfolios that Outperform Out-of-Sample <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_ *by* Marcos Lopez de Prado.
+    - `Kullback-Leibler distance as a measure of the information filtered from multivariate data. <https://arxiv.org/pdf/0706.0168.pdf>`__ *by* Tumminello, M., Lillo, F. and Mantegna, R.N.
+
 
 Distance Correlation
 ####################
@@ -83,12 +95,12 @@ Values of standard angular distance fall in the range:
     d_\rho[X, Y] \in [0, 1]
 
 .. figure:: images/angular_distance.png
-   :scale: 70 %
-   :align: center
-   :figclass: align-center
-   :alt: Angular Distance
+    :scale: 70 %
+    :align: center
+    :figclass: align-center
+    :alt: Angular Distance
 
-   The angular distance satisfies all the conditions of a true metric, (Lopez de Prado, 2020.)
+    The angular distance satisfies all the conditions of a true metric, (Lopez de Prado, 2020.)
 
 Implementation
 **************
@@ -117,13 +129,13 @@ Values of absolute angular distance fall in the range:
     d_{|\rho|}[X, Y] \in [0, 1]
 
 .. figure:: images/modified_angular_distance.png
-   :scale: 70 %
-   :align: center
-   :figclass: align-center
-   :alt: Modified Angular Distance
+    :scale: 70 %
+    :align: center
+    :figclass: align-center
+    :alt: Modified Angular Distance
 
-   In some financial applications, it makes more sense to apply a modified definition of angular distance, such that the
-   sign of the correlation is ignored, (Lopez de Prado, 2020)
+    In some financial applications, it makes more sense to apply a modified definition of angular distance, such that the
+    sign of the correlation is ignored, (Lopez de Prado, 2020)
 
 Implementation
 **************
@@ -149,10 +161,10 @@ Values of squared angular distance fall in the range:
     d_{\rho^2}[X, Y] \in [0, 1]
 
 .. figure:: images/modified_angular_distance.png
-   :scale: 70 %
-   :align: center
-   :figclass: align-center
-   :alt: Modified Angular Distance
+    :scale: 70 %
+    :align: center
+    :figclass: align-center
+    :alt: Modified Angular Distance
 
 Implementation
 **************
@@ -216,9 +228,8 @@ Implementation
 
 .. autofunction:: norm_distance
 
-
-Examples
-########
+Example
+#######
 
 The following examples show how the described above correlation-based metrics can be used on real data:
 
@@ -227,10 +238,11 @@ The following examples show how the described above correlation-based metrics ca
 
     import pandas as pd
     import numpy as np
+
     from mlfinlab.codependence import (distance_correlation, angular_distance,
-                                      absolute_angular_distance, squared_angular_distance,
-                                      kullback_leibler_distance, norm_distance,
-                                      get_dependence_matrix)
+                                       absolute_angular_distance, squared_angular_distance,
+                                       kullback_leibler_distance, norm_distance,
+                                       get_dependence_matrix)
 
     # Import dataframe of returns for assets in a portfolio
     asset_returns = pd.read_csv(DATA_PATH, index_col='Date', parse_dates=True)
@@ -262,3 +274,13 @@ The following examples show how the described above correlation-based metrics ca
 
     # Calculate the Norm distance between two correlation matrices
     dist = norm_distance(corr_18, corr_19)
+
+
+References
+##########
+
+* `Lopez de Prado, M., 2020. Codependence (Presentation Slides). Available at SSRN 3512994. <https://ssrn.com/abstract=3512994>`_
+* `Székely, G.J., Rizzo, M.L. and Bakirov, N.K., 2007. Measuring and testing dependence by correlation of distances. The annals of statistics, 35(6), pp.2769-2794. <https://projecteuclid.org/download/pdfview_1/euclid.aos/1201012979>`_
+* `Newton, M.A., 2009. Introducing the discussion paper by Székely and Rizzo. The Annals of Applied Statistics, 3(4), pp.1233-1235. <https://arxiv.org/pdf/1010.3575.pdf>`_
+* `De Prado, M.L., 2016. Building diversified portfolios that outperform out of sample. The Journal of Portfolio Management, 42(4), pp.59-69. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_
+* `Tumminello, M., Lillo, F. and Mantegna, R.N., 2007. Kullback-Leibler distance as a measure of the information filtered from multivariate data. Physical Review E, 76(3), p.031123. <https://arxiv.org/pdf/0706.0168.pdf>`_

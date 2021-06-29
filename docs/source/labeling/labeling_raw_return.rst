@@ -1,8 +1,8 @@
-.. _implementations-labeling_raw_return:
+.. _labeling-labeling_raw_return:
 
 .. note::
-    This section includes an accompanying Jupyter Notebook Tutorial that is now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
 
 ===========
 Raw Returns
@@ -27,16 +27,16 @@ And the logarithmic return is:
 
 The label :math:`L_t` is simply equal to :math:`r_t`, or to the sign of :math:`r_t`, if binary labeling is desired.
 
- .. math::
-     \begin{equation}
-     \begin{split}
-       L_{t} = \begin{cases}
-       -1 &\ \text{if} \ \ r_t < 0\\
-       0 &\ \text{if} \ \ r_t = 0\\
-       1 &\ \text{if} \ \ r_t > 0
-       \end{cases}
-     \end{split}
-     \end{equation}
+.. math::
+    \begin{equation}
+    \begin{split}
+        L_{t} = \begin{cases}
+        -1 &\ \text{if} \ \ r_t < 0\\
+        0 &\ \text{if} \ \ r_t = 0\\
+        1 &\ \text{if} \ \ r_t > 0
+        \end{cases}
+    \end{split}
+    \end{equation}
 
 If desired, the user can specify a resampling period to apply to the price data prior to calculating returns. The user
 can also lag the returns to make them forward-looking.
@@ -45,27 +45,32 @@ The following shows the distribution of logarithmic daily returns on Microsoft s
 2010 and May 2020.
 
 .. figure:: labeling_images/Raw_returns_distribution.png
-   :scale: 90 %
-   :align: center
-   :figclass: align-center
-   :alt: raw returns image
+    :scale: 90 %
+    :align: center
+    :figclass: align-center
+    :alt: raw returns image
 
-   Distribution of logarithmic returns on MSFT.
+    Distribution of logarithmic returns on MSFT.
 
 Implementation
 ##############
 
 .. py:currentmodule:: mlfinlab.labeling.raw_return
+
 .. automodule:: mlfinlab.labeling.raw_return
    :members:
 
 Example
 ########
+
 Below is an example on how to use the raw returns labeling method.
 
 .. code-block::
 
+    # Import packages
     import pandas as pd
+
+    # Import MlFinLab tools
     from mlfinlab.labeling import raw_return
 
     # Import price data
@@ -77,18 +82,12 @@ Below is an example on how to use the raw returns labeling method.
     # Create labels categorically based on logarithmic returns
     returns = raw_returns(prices=data, binary=True, logarithmic=True, lag=True)
 
-    # Create labels categorically on weekly data with forward looking log returns.
+    # Create labels categorically on weekly data with forward looking log returns
     returns = raw_returns(prices=data, binary=True, logarithmic=True, resample_by='W', lag=True)
 
 Research Notebook
 #################
 
 .. note::
-    This and other accompanying Jupyter Notebook Tutorials are now available via the respective tier on
-    `Patreon <https://www.patreon.com/HudsonThames>`_.
-
-The following research notebook can be used to better understand the raw return labeling technique.
-
-* `Raw Return Example`_
-
-.. _`Raw Return Example`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Labeling/Labels%20Raw%20Return/Raw%20Return.ipynb
+    This section includes an accompanying Jupyter Notebook Tutorial that is now available via
+    `H&T Client Portal <https://portal.hudsonthames.org/dashboard/product/LFKd0IJcZa91PzVhALlJ>`__.
