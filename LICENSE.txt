@@ -2,7 +2,8 @@ Copyright 2019, Hudson and Thames Quantitative Research
 
 Copyright Protection Notice and Licensing Agreement
 
-LAST UPDATED May 2021
+STUDENT LICENSE (Non-commercial)
+LAST UPDATED June 2021
 
 IMPORTANT NOTICE! THE USER OF THIS CODEBASE IS SUBJECT TO ALL THE TERMS AND CONDITIONS IN THIS AGREEMENT. THEREFORE, PLEASE SCROLL THROUGH AND READ ALL OF THE TERMS AND CONDITIONS IN THIS AGREEMENT CAREFULLY BEFORE MAKING USE THEREOF. THIS DOCUMENT IS A LEGALLY BINDING AGREEMENT BETWEEN YOU AND HUDSON AND THAMES FOR YOUR CONTINUED USE OF THE CODEBASE. 
 
@@ -18,6 +19,7 @@ AS THIS IS A PERPETUAL LICENSE AGREEMENT, HUDSON AND THAMES MAY UPDATE THE LICEN
  
 HUDSON AND THAMES WILL MAKE REASONABLE EFFORTS TO COMMUNICATE ANY CHANGES TO THIS AGREEMENT BY SENDING AN EMAIL TO YOUR USER ADDRESS OR BY NOTICE ON ITS WEBSITE. THE ONUS HOWEVER REMAINS ON THE USER TO ENSURE THAT THEY REGULARLY CHECK, READ, UNDERSTAND AND AGREE TO THE MOST RECENT VERSION OF THE LICENSE AGREEMENT AS THEY WILL BE DEEMED TO ACCEPT ANY SUBSEQUENT AMENDMENTS TO IT IF THEY CONTINUE TO ACCESS AND USE THE CODEBASE.
 
+Please note that a business or enterprise license agreement overrides this agreement but this license is the default for non business license and enterprise license holders. These licenses can be purchased from Hudson and Thames Quantitative Research.
 
 DEFINITIONS
 In this agreement, unless otherwise specified, the words hereunder shall have the following meaning:
@@ -151,6 +153,8 @@ The Users will, at their own expense, indemnify and hold Licensor, and its affil
 11.5	The Users acknowledge that once the Licensor shares any personal information with any parties above, the Licensor shall not have any control over this personal information once shared and will not be responsible for the security of any personal information after that. 
  
 11.6	The Licensor confirms compliance with the relevant and necessary data protection laws applicable to the Country from time to time and commits to applying all safety and security measures whilst this information is under the Licensor’s control.
+
+11.7    MlFinLab, PortfolioLab, and ArbitrageLab libraries track the following data based on a device: MAC address, country code, region, city, city geographic coordinates, function calls, and time stamps.
 
 12. JURISDICTION OF COURTS AND GOVERNING LAWS
 This agreement and any dispute, action or claim of whatever nature arising out of this agreement shall be governed by and construed under English law.

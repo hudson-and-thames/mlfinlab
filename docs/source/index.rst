@@ -52,10 +52,18 @@ Looking forward to hearing from you!
 License
 #######
 
-This project is licensed under an all rights reserved licence and is NOT open-source.
+This project is licensed under an all rights reserved licence and is NOT open-source, and may not be used for commercial purposes without a commercial license which may be purchased from Hudson and Thames Quantitative Research.
 
 `LICENSE.txt <https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt>`_ file for details.
 
+.. toctree::
+    :maxdepth: 2
+    :caption: Legal
+    :hidden:
+
+    additional_information/license
+    additional_information/analytics
+    additional_information/privacy_gdpr
 
 
 .. toctree::
@@ -69,7 +77,6 @@ This project is licensed under an all rights reserved licence and is NOT open-so
     getting_started/researcher
     getting_started/datasets
     getting_started/research_tools
-    getting_started/research_notebooks
     getting_started/special_mention
     getting_started/portfoliolab
     getting_started/arbitragelab
@@ -211,5 +218,3 @@ This project is licensed under an all rights reserved licence and is NOT open-so
     :hidden:
 
     additional_information/contributing
-    additional_information/analytics
-    additional_information/license
