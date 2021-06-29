@@ -235,6 +235,14 @@ This project is licensed under an all rights reserved licence.
 
 `LICENSE.txt <https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt>`_ file for details.
 
+.. toctree::
+    :maxdepth: 2
+    :caption: Legal
+    :hidden:
+
+    additional_information/license
+    additional_information/analytics
+    additional_information/privacy_gdpr
 
 
 .. toctree::
@@ -406,11 +414,3 @@ This project is licensed under an all rights reserved licence.
 
     optimal_mean_reversion/introduction
     optimal_mean_reversion/ou_model
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Additional Information
-    :hidden:
-
-    additional_information/contributing
-    additional_information/license
