@@ -25,5 +25,4 @@ import mlfinlab.backtest_statistics.backtests as backtests
 import mlfinlab.backtest_statistics.statistics as backtest_statistics
 import mlfinlab.networks as networks
 import mlfinlab.data_generation as data_generation
-import mlfinlab.optimal_mean_reversion as optimal_mean_reversion
 import mlfinlab.regression as regression

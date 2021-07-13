@@ -10,6 +10,12 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :release:`1.3.0 <2021-07-09>`
+* :feature:`69` Added support for Python 3.6 and Python 3.7.
+* :feature:`69` Requirements versions are now non-fixed.
+* :support:`69` Migrated Optimal Mean Reversion Module from MlFinLab to ArbitrageLab.
+* :support:`69` Reflected Optimal Mean Reversion Module migration in the documentation.
+
 * :release:`1.2.0 <2021-06-23>`
 * :support:`64` Updated references in documentation.
 * :support:`63` Updated documentation theme to hudsonthames-sphinx-docs.

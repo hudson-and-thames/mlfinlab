@@ -195,7 +195,6 @@ This project is licensed under an all rights reserved licence and is NOT open-so
     :caption: Optimal Mean Reversion
     :hidden:
 
-    optimal_mean_reversion/introduction
     optimal_mean_reversion/ou_model
     
 .. toctree::
