@@ -36,7 +36,7 @@ Mac OS X and Ubuntu Linux
 
    .. code-block::
 
-      pip install mlfinlab
+      pip install git+https://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@github.com/hudson-and-thames-clients/mlfinlab.git
 
 6. (Optional) **Only if you want to use the CorrGAN from the Data Generation Module**, install the TensorFlow package.
    Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow version is "tensorflow==2.2.1".
@@ -90,7 +90,7 @@ Windows
 
    .. code-block::
 
-      pip install mlfinlab
+      pip install git+https://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@github.com/hudson-and-thames-clients/mlfinlab.git
 
 **Option B (with command prompt)**
 
@@ -126,7 +126,7 @@ Windows
 
    .. code-block::
 
-      pip install mlfinlab
+      pip install git+https://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@github.com/hudson-and-thames-clients/mlfinlab.git
 
    .. Note::
 
