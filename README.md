@@ -97,7 +97,7 @@ Alternatively you can email us at: research@hudsonthames.org.
 
 
 ## Who is Hudson & Thames?
-Hudson and Thames Quantitative Research is a company with a goal of brodging the gap between the advanced research developed in 
+Hudson and Thames Quantitative Research is a company with a goal of bridging the gap between the advanced research developed in 
 quantitative finance and its practical application. We have created three premium python libraries so you can effortlessly access the
 latest techniques and focus on what matters most: **creating your own winning strategy**.
 
