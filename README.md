@@ -40,7 +40,7 @@ importing the libraries and ending with strategy performance metrics so you can 
 
 
 <div align="left">
-   <a href="https://portal.hudsonthames.org/dashboard/overview">
+   <a href="https://portal.hudsonthames.org/sign-in">
    <img src="https://hudsonthames.org/wp-content/uploads/2021/11/purchase_mlfinlab_v2.png" height="100px" 
    style="margin-left: auto; margin-right: auto; display:inline-block;">
    </a>
