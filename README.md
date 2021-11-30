@@ -1,43 +1,105 @@
------------------
-# Machine Learning Financial Laboratory (MlFinLab)
-MlFinlab is a python package which helps portfolio managers and traders who want to leverage the power of machine learning by providing reproducible, interpretable, and easy to use tools. 
+<div align="center">
+   <a href="https://hudsonthames.org/mlfinlab">
+   <img src="https://hudsonthames.org/wp-content/uploads/2021/11/mlfinlab_github_header.jpg" width="100%" 
+   style="margin-left: auto; margin-right: auto; display:block;">
+   
+   </a>
+  </br>
+</div>
 
-**This repo is public facing and exists for the sole purpose of providing users with an easy way to raise bugs, feature requests, and other issues.**
+# Welcome to Machine Learning Financial Laboratory! 
 
-> **pip install mlfinlab**
+<div align="center">
+    <br>
+</div>
 
-For a detailed installation guide for MacOS, Linux, and Windows please visit [this link](https://mlfinlab.readthedocs.io/en/latest/getting_started/installation.html).
+>This repo is public facing and exists for the sole purpose of providing users with an easy way to raise bugs, feature requests, and other issues.
 
-## Documentation, Tutorials, Videos, and Source Code
+<div align="center">
+    <br>
+</div>
 
-We lower barriers to entry for all users by providing extensive [documentation](https://mlfinlab.readthedocs.io/en/latest/) 
-and tutorial notebooks, with code examples.
-
-## Who is Hudson & Thames?
-Hudson and Thames Quantitative Research is a company with a focus on implementing the most cutting edge algorithms in 
-quantitative finance. We productionalize all our tools in the form of libraries and provide capability to our clients.
-
-Adding our libraries to your company’s pipeline is like adding a department of PhD researchers.
-
-* [Website](https://hudsonthames.org/)
-* [Github Group](https://github.com/hudson-and-thames)
-* [MlFinLab Documentation](https://mlfinlab.readthedocs.io/en/latest/)
+## What is MlFinLab?
+MlFinlab python library is a perfect toolbox that every financial machine learning researcher needs. 
 
 
-## Contact us
-The best place to contact the team is via the Slack channel. Alternatively you can email us at: research@hudsonthames.org.
+It covers every step of the ML strategy creation starting from data structures generation and finishing with backtest statistics.
+We pride ourselves in the robustness of our codebase - every line of code existing in the modules is extensively tested and 
+documented.
 
-Looking forward to hearing from you!
 
-## License
+## Documentation, Example Notebooks and Lecture Videos
+For every technique present in the library we not only provide extensive documentation, with both theoretical explanations
+ and detailed descriptions of available functions, but also supplement the modules with ever-growing array of lecture videos and slides 
+ on the implemented methods.
+ 
+We want you to be able to use the tools right away. To achieve that, every module comes with a number of example notebooks 
+which include detailed examples of the usage of the algorithms. Our goal is show you the whole pipeline, starting from 
+importing the libraries and ending with strategy performance metrics so you can get the added value from the get-go.
+
+
+
+<div align="left">
+   <a href="https://portal.hudsonthames.org/dashboard/overview">
+   <img src="https://hudsonthames.org/wp-content/uploads/2021/11/purchase_mlfinlab_v2.png" height="100px" 
+   style="margin-left: auto; margin-right: auto; display:inline-block;">
+   </a>
+   <a href="https://hudsonthames.org/">
+   <img src="https://hudsonthames.org/wp-content/uploads/2021/11/website_link_m.png" height="100px">
+   </a>
+   <a href="https://www.youtube.com/channel/UC8hI87gt0dmTAIEupEcsckA">
+   <img src="https://hudsonthames.org/wp-content/uploads/2021/11/youtube_mlfinlab.png" height="100px">
+   </a>
+</div>
+
+### Included modules:
+
+- Backtest Overfitting Tools
+- Exploratory Data Analysis
+- Data Structures
+- Labeling
+- Sampling
+- Feature Engineering
+- Models
+- Clustering
+- Cross-Validation
+- Hyper-Parameter Tuning
+- Feature Importance
+- Bet Sizing
+- Synthetic Data Generation
+- Networks
+- Measures of Codependence
+- Useful Financial Features
+
+
+## Licensing options
 This project is licensed under an all rights reserved [licence](https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt).
 
-We offer 3 tiers:
 
-* Professional
 * Business
 * Enterprise
 
-## Note
 
-* This Public MlFinLab repo, houses our documentation and doesn't contain the source code.
+## Community
+With the purchase of the library our clients get the access to the Hudson & Thames Slack community, where our engeniers and other quants 
+are always ready to answer your questions.
+
+Alternatively you can email us at: research@hudsonthames.org.
+
+
+<div align="center">
+   <a>
+   <img src="https://hudsonthames.org/wp-content/uploads/2021/11/header_github_ht.jpg" width="100%" 
+   style="margin-left: auto; margin-right: auto; display:block;">
+   </a>
+</div>
+
+
+
+## Who is Hudson & Thames?
+Hudson and Thames Quantitative Research is a company with a goal of brodging the gap between the advanced research developed in 
+quantitative finance and its practical application. We have created three premium python libraries so you can effortlessly access the
+latest techniques and focus on what matters most: **creating your own winning strategy**.
+
+
+### What was only possible with the help of huge R&D teams is now at your disposal, anywhere, anytime.
