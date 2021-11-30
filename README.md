@@ -1,6 +1,6 @@
 <div align="center">
    <a href="https://hudsonthames.org/mlfinlab">
-   <img src="https://hudsonthames.org/wp-content/uploads/2021/11/mlfinlab_github_header.jpg" width="100%" 
+   <img src="https://hudsonthames.org/wp-content/uploads/2021/11/mlfinlab_github_header_v2.jpg" width="100%" 
    style="margin-left: auto; margin-right: auto; display:block;">
    
    </a>
