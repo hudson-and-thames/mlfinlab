@@ -7,6 +7,7 @@
   </br>
 </div>
 
+
 # Welcome to Machine Learning Financial Laboratory! 
 
 <div align="center">
@@ -22,22 +23,19 @@
 ## What is MlFinLab?
 MlFinlab python library is a perfect toolbox that every financial machine learning researcher needs. 
 
-
-It covers every step of the ML strategy creation starting from data structures generation and finishing with backtest statistics.
+It covers every step of the ML strategy creation, starting from data structures generation and finishing with backtest statistics.
 We pride ourselves in the robustness of our codebase - every line of code existing in the modules is extensively tested and 
 documented.
 
 
 ## Documentation, Example Notebooks and Lecture Videos
 For every technique present in the library we not only provide extensive documentation, with both theoretical explanations
- and detailed descriptions of available functions, but also supplement the modules with ever-growing array of lecture videos and slides 
- on the implemented methods.
+and detailed descriptions of available functions, but also supplement the modules with ever-growing array of lecture videos and slides 
+on the implemented methods.
  
 We want you to be able to use the tools right away. To achieve that, every module comes with a number of example notebooks 
-which include detailed examples of the usage of the algorithms. Our goal is show you the whole pipeline, starting from 
+which include detailed examples of the usage of the algorithms. Our goal is to show you the whole pipeline, starting from 
 importing the libraries and ending with strategy performance metrics so you can get the added value from the get-go.
-
-
 
 <div align="left">
    <a href="https://portal.hudsonthames.org/sign-in">
@@ -52,10 +50,10 @@ importing the libraries and ending with strategy performance metrics so you can 
    </a>
 </div>
 
+
 ### Included modules:
 
 - Backtest Overfitting Tools
-- Exploratory Data Analysis
 - Data Structures
 - Labeling
 - Sampling
@@ -75,17 +73,15 @@ importing the libraries and ending with strategy performance metrics so you can 
 ## Licensing options
 This project is licensed under an all rights reserved [licence](https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt).
 
-
 * Business
 * Enterprise
 
 
 ## Community
-With the purchase of the library our clients get the access to the Hudson & Thames Slack community, where our engeniers and other quants 
+With the purchase of the library, our clients get access to the Hudson & Thames Slack community, where our engineers and other quants 
 are always ready to answer your questions.
 
-Alternatively you can email us at: research@hudsonthames.org.
-
+Alternatively, you can email us at: research@hudsonthames.org.
 
 <div align="center">
    <a>
@@ -95,9 +91,8 @@ Alternatively you can email us at: research@hudsonthames.org.
 </div>
 
 
-
 ## Who is Hudson & Thames?
-Hudson and Thames Quantitative Research is a company with a goal of bridging the gap between the advanced research developed in 
+Hudson and Thames Quantitative Research is a company with the goal of bridging the gap between the advanced research developed in 
 quantitative finance and its practical application. We have created three premium python libraries so you can effortlessly access the
 latest techniques and focus on what matters most: **creating your own winning strategy**.
 
