@@ -26,6 +26,6 @@ codecov==2.1.11
 coverage==5.4
 pylint==2.6.0
 sphinx==3.4.3 # Docs
-hudsonthames-sphinx-theme==0.1.3 # Docs
+hudsonthames-sphinx-theme==0.1.5 # Docs
 sphinx-rtd-theme==0.5.2 # Docs
 releases==1.6.3 # Docs
