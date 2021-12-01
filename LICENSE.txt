@@ -2,162 +2,405 @@ Copyright 2019, Hudson and Thames Quantitative Research
 
 Copyright Protection Notice and Licensing Agreement
 
-STUDENT LICENSE (Non-commercial)
-LAST UPDATED June 2021
+LAST UPDATED November 2021
 
-IMPORTANT NOTICE! THE USER OF THIS CODEBASE IS SUBJECT TO ALL THE TERMS AND CONDITIONS IN THIS AGREEMENT. THEREFORE, PLEASE SCROLL THROUGH AND READ ALL OF THE TERMS AND CONDITIONS IN THIS AGREEMENT CAREFULLY BEFORE MAKING USE THEREOF. THIS DOCUMENT IS A LEGALLY BINDING AGREEMENT BETWEEN YOU AND HUDSON AND THAMES FOR YOUR CONTINUED USE OF THE CODEBASE. 
+IMPORTANT NOTICE! THE USER OF THIS CODEBASE IS SUBJECT TO ALL THE TERMS AND CONDITIONS IN THIS AGREEMENT. THEREFORE,
+PLEASE SCROLL THROUGH AND READ ALL OF THE TERMS AND CONDITIONS IN THIS AGREEMENT CAREFULLY BEFORE MAKING USE THEREOF.
+THIS DOCUMENT IS A LEGALLY BINDING AGREEMENT BETWEEN YOU AND HUDSON AND THAMES FOR YOUR CONTINUED USE OF THE CODEBASE.
 
-YOU WILL INDICATE YOUR ACCEPTANCE OF THIS AGREEMENT, INCLUDING ANY TERMS AND CONDITIONS, BY DOING ONE OR MORE OF THE FOLLOWING. OR ALLOWING OR AUTHORISING A THIRD PARTY TO DO ONE OR MORE OF THE FOLLOWING FOR YOU: 
+YOU WILL INDICATE YOUR ACCEPTANCE OF THIS AGREEMENT, INCLUDING ANY TERMS AND CONDITIONS, BY DOING ONE OR MORE OF THE
+FOLLOWING. OR ALLOWING OR AUTHORISING A THIRD PARTY TO DO ONE OR MORE OF THE FOLLOWING FOR YOU:
 
-* CLICKING “I AGREE” OR A SIMILAR AFFIRMATION AS APPLICABLE WHICH APPEARS DURING THE ACTIVATION OR INSTALLATION OF THE CODEBASE, OR 
-* ACCESSING, INSTALLING OR USING THE CODEBASE, OR 
-* SIGNING UP TO ANY SUBSCRIPTION BASED LICENSE CONCERNING THE CODEBASE. 
+* CLICKING “I AGREE” OR A SIMILAR AFFIRMATION AS APPLICABLE WHICH APPEARS DURING THE ACTIVATION OR INSTALLATION OF THE CODEBASE, OR
+* ACCESSING, INSTALLING OR USING THE CODEBASE, OR
+* SIGNING UP TO ANY SUBSCRIPTION BASED LICENSE CONCERNING THE CODEBASE.
 
-IF YOU DISAGREE TO BE LEGALLY BOUND BY THE TERMS OF THIS AGREEMENT, THEN YOU SHOULD IMMEDIATELY CEASE MAKING USE OF THE CODEBASE IN ANY WAY AFTER THAT. 
+IF YOU DISAGREE TO BE LEGALLY BOUND BY THE TERMS OF THIS AGREEMENT, THEN YOU SHOULD IMMEDIATELY CEASE MAKING USE OF THE
+CODEBASE IN ANY WAY AFTER THAT.
 
-AS THIS IS A PERPETUAL LICENSE AGREEMENT, HUDSON AND THAMES MAY UPDATE THE LICENSE AGREEMENT TERMS AT ANY TIME. THE MOST RECENT VERSION OF THIS AGREEMENT CAN BE ACCESSED ON THE HUDSON AND THAMES WEBSITE.
- 
-HUDSON AND THAMES WILL MAKE REASONABLE EFFORTS TO COMMUNICATE ANY CHANGES TO THIS AGREEMENT BY SENDING AN EMAIL TO YOUR USER ADDRESS OR BY NOTICE ON ITS WEBSITE. THE ONUS HOWEVER REMAINS ON THE USER TO ENSURE THAT THEY REGULARLY CHECK, READ, UNDERSTAND AND AGREE TO THE MOST RECENT VERSION OF THE LICENSE AGREEMENT AS THEY WILL BE DEEMED TO ACCEPT ANY SUBSEQUENT AMENDMENTS TO IT IF THEY CONTINUE TO ACCESS AND USE THE CODEBASE.
+AS THIS IS A PERPETUAL LICENSE AGREEMENT, HUDSON AND THAMES MAY UPDATE THE LICENSE AGREEMENT TERMS AT ANY TIME. THE MOST
+RECENT VERSION OF THIS AGREEMENT CAN BE ACCESSED ON THE HUDSON AND THAMES WEBSITE.
 
-Please note that a business or enterprise license agreement overrides this agreement but this license is the default for non business license and enterprise license holders. These licenses can be purchased from Hudson and Thames Quantitative Research.
+HUDSON AND THAMES WILL MAKE REASONABLE EFFORTS TO COMMUNICATE ANY CHANGES TO THIS AGREEMENT BY SENDING AN EMAIL TO YOUR
+USER ADDRESS OR BY NOTICE ON ITS WEBSITE. THE ONUS HOWEVER REMAINS ON THE USER TO ENSURE THAT THEY REGULARLY CHECK, READ,
+UNDERSTAND AND AGREE TO THE MOST RECENT VERSION OF THE LICENSE AGREEMENT AS THEY WILL BE DEEMED TO ACCEPT ANY SUBSEQUENT
+AMENDMENTS TO IT IF THEY CONTINUE TO ACCESS AND USE THE CODEBASE.
+
+PLEASE NOTE THAT A BUSINESS OR ENTERPRISE LICENSE AGREEMENT OVERRIDES THIS AGREEMENT BUT THIS LICENSE IS THE DEFAULT FOR
+NON BUSINESS LICENSE AND ENTERPRISE LICENSE HOLDERS. THESE LICENSES CAN BE PURCHASED FROM HUDSON AND THAMES QUANTITATIVE
+RESEARCH.
+
 
 DEFINITIONS
+
 In this agreement, unless otherwise specified, the words hereunder shall have the following meaning:
 
-1.1 “Agreement” means this license agreement as well as any future revised and published versions hereof.
-1.2 “Codebase” means the MlFinLab, PortfolioLab, or ArbitrageLab Python libraries (including the source code) comprising a collection of production-ready algorithms.
-1.3 “Commencement Date” means the date the Users install the codebase and accept the terms of this agreement.
-1.4 “Derivative work” means an expressive creation that includes major copyrightable elements of the original codebase. 
-1.5 “Documentation” means any official Licensors documentation detailing the appropriate use or operation of the codebase.
-1.6 “Licensee(s)” means the Users who install and make use of the Licensors codebase. 
-1.7 “Licensor” means Hudson and Thames Quantitative Research.
-1.8 “Modification” means a change to the delivered codebase or data; or any development, enhancement or change made to the existing functionality of the codebase including, but not limited to, the creation of any new libraries or derivative works or the extension of the Licensors data structures; or any other change to the codebase utilising or incorporating any of the Licensors Proprietary information and copyright materials.
-1.9 “Termination Date” means the date the license is terminated as per paragraph 2 hereof; alternatively, the date the User uninstalls or destroys the installed copy of the codebase from their devices or any devices under their control.
-1.10 “Users” means the End Users of the codebase.
+1.1	"Addendum" means any other Agreement signed by both parties and made part of this Agreement.
+
+1.2	"Add-on" means any development that adds new and independent functionality but does not modify existing License
+Material functionality developed by the Company.
+
+1.3	"Affiliate" means, depending on the context, any legal entity connected with or controlled by the Company or the
+Licensee as the case may be.
+
+1.4	"Agreement" means ArbitrageLab Business License Agreement as well as any Addendums hereto.
+
+1.5	"Breach" means a breach of this Agreement, which within context could refer to a breach by the Licensee or the
+Company.
+
+1.6	"Business Day" means Monday to Friday excluding Saturday, Sunday, or any other official public holiday of the
+Country.
+
+1.7	"Business Environment" means all internal and external factors of the Licensee's or Company's businesses, such
+as the business's premises, operations, employees, management, and owners.
+
+1.8	"Company" means Hudson and Thames Quantitative Research.
+
+1.9	"Country" means the Country of jurisdiction and whose laws apply to the Agreement as per clause 1.3.8.
+
+1.10	"Documentation" means any official Company documentation detailing the appropriate use or operation of the
+Licensed Materials.
+
+1.11	"Effective Date" means the commencement date of this Agreement as specified in clause 1.3.3.
+
+1.12	"Expiry Date" means the date the license expires as per clause 1.3.4; alternatively, the date either party
+cancels the Agreement in
+
+terms of their rights in this Agreement, alternatively, any legislation.
+
+1.13	"License Fees" means the license fees payable by the Licensee to the Company as referred to in clause 1.3.7.
+
+1.14	"Licensed Materials" means the ArbitrageLab Python library (including source code) comprising a collection of
+production-ready algorithms.
+
+1.15	"Licensee(s)" means the party specified in clause 1.2 hereof.
+
+1.16	"Modification" means a change to the delivered source code or data; or any development, other than a change
+to the provided source code that customises, enhances, or changes existing functionality of the Licensed Materials
+including, but not limited to, the creation of any new libraries or the extension of the Company's data structures;
+or any other change to the Licensed Materials (other than an Add-on) utilising or incorporating any of the Company's
+Licensed Materials.
+
+1.17	"Month" means a full calendar month beginning on the 1st day and ending on the last day of the particular month.
+
+1.18	"Notice Address" means the chosen address where all notices, including Legal notices, are served in the event
+of service of such notices are necessary.
+
+1.19	"Parties" means the Company and the Licensee to this Agreement.
+
+1.20	"User" means the End User of the Licensed Materials referred in the Agreement as the "End-User".
+
+1.21	"VAT" means the Value Added Tax rates for goods and services applicable.
+
+1.22	"Webhooks" means an HTTP callback triggered within the Licensed Material when a specific event has occurred.
 
 
-PREAMBLE
-The codebase is NOT open-source. All proprietary rights are reserved under the Hudson and Thames Quantitative Research copyright. The student license does NOT allow for use of the code base for any commercial purposes, it may not be reverse engineered or used to create a competitor product.
+INTERPRETATION
 
-For the Licensors and authors’ protection, the Users acknowledge that there are no warranties for this codebase.
+3.1	Any reference to the singular shall be deemed to include a reference to the plural, and the other way around.
 
-If the user wants to use the code base for commercial purposes then they will need to purchase a commercial license. 
+3.2	Any reference to a natural person shall include a reference to a legal person/juristic entity (Company,
+corporation, or trust) and the other way around where relevant.
 
+3.3	A reference to a clause in this Agreement shall refer to the specific numbered clause referred to and contained
+within this Agreement, or any Addendum forming part of this Agreement.
 
-GENERAL 
-Any reference to the singular shall be deemed to include a reference to the plural and the other way around.
+3.4	Paragraph headings are for reference purposes only.
 
-Any reference to a natural person shall include a reference to a legal person/juristic entity (company, corporation, or trust) and the other way around where relevant.
-A reference to a paragraph in this agreement shall refer to the specific numbered paragraph referred to and contained within this Agreement or any Addendum forming part of this agreement.
-
-Paragraph headings are for reference purposes only.
-
-
-1. GRANT OF LICENSE
-
-1.1 All rights granted under this license are given under the Licensors proprietary rights in the codebase and are provided on acknowledging that the terms and conditions of this agreement are met. This license explicitly affirms the Users’ permission to use the unmodified codebase for research and training purposes. 
-
-1.2 The Licensor hereby grants the Users a non-exclusive and non-transferable license, without rights to sublicense, to use the codebase subject to compliance with all of the terms and conditions hereof.
-
-1.3 The User may use the codebase for research purposes in quantitative finance and machine learning, and under no circumstances may the codebase be used for any commercial purposes.
-
-1.4 The license to use the codebase shall be revocable by the Licensor upon notice to the User. This license shall automatically terminate upon any violation of the terms and conditions hereof or use of the codebase beyond the scope and purposes for which the license is intended.  Use beyond the scope of this license shall constitute copyright infringement.
-
-1.5 The Licensor will not provide the Users with any support services for the codebase under this agreement, save for instances where such support services are specifically agreed or purchased from the Licensor.
+3.5	Any reference to "writing" or "written" in this Agreement shall be viewed to include a reference to any letter,
+email, or other electronically delivered messages (such as SMS or other electronic messaging services) where receipt
+has been acknowledged by the recipient, alternatively proof of receipt offered by the sender.
 
 
-2. TERM AND TERMINATION
+INTRODUCTION
 
-2.1	The term of this agreement (“Term”) shall begin when the User installs the codebase and will run in perpetuity unless terminated in terms of the provisions stipulated herein.
+4.1	Whereas the Company is in the business of implementing algorithms in quantitative finance and developing various
+libraries used by its client base worldwide. These algorithms are created using several graduate-level textbooks and
+dozens of papers from several of the world's leading academic journals.
 
-2.2	Without prejudice to any other rights, this agreement will terminate automatically if the Users fail to comply with any of the limitations or other requirements described herein. 
+4.2	Whereas the Company has compiled, collected, and assembled the collection of algorithms into Python libraries which
+is accessible via a Python package install command. These library collections are referred to as ArbitrageLab.
 
-2.3	Upon any termination or expiration of this agreement, the Users must immediately cease using the codebase and permanently destroy or delete all copies thereof in their possession or under their control. 
+4.2	Whereas the Licensee is desirous of using the Company's ArbitrageLab algorithms within its internal Business
+Environment.
 
+4.3	Whereas the Company is desirous of granting the Licensee a non-exclusive license to have access to the Company's
+ArbitrageLab libraries.
 
-3. RESTRICTIONS
-
-3.1	Under no circumstances may the Users sell, rent, lease, loan, license, sublicense, publish, display, distribute, or otherwise transfer to a third party the codebase, any copy or use thereof, in whole or in part, without the Licensor’s prior written consent.
-
-3.2	Except as otherwise explicitly provided for in this agreement, the Users may not use, copy, emulate, clone, rent, lease, sell, modify, decompile, disassemble, otherwise reverse engineer, or otherwise reduce any part of the codebase to human-readable form or transfer the licensed codebase, or any subset of the licensed codebase, nor permit any third party to do so, except to the extent to which applicable laws expressly prohibit the preceding restriction in the Users jurisdiction. 
-
-3.3	The Users may not create derivative works based upon the codebase in whole or in part. Any such unauthorised use shall result in immediate and automatic termination of this agreement and the license granted hereunder and may result in criminal or civil prosecution. Neither the codebase binary code nor the source code may be used or reverse engineered to re-create the program algorithm, which is proprietary, without the Licensor’s written permission. All rights not expressly granted here are reserved by Licensor or its suppliers and licensors, as applicable. 
-
-3.4	The Users may not give, make available, give away, sell or otherwise transfer workstations with a retained copy of the codebase or any backup copy thereof to a third party. Codebase Licenses may not be distributed, except as provided herein, outside of the legal control area of the person or persons who are licensed to make use of the codebase without written permission of the Licensor. Doing so will result in an infringement of copyright. The Licensor retains the right to claim compensation regarding damages that occur resulting from such copyright infringement. This claim shall also extend to all costs which the Licensor or its licensors incur in defending themselves.
-
-3.5	The Users agree that in using the codebase and using any report or information derived from the use thereof, they will comply with all applicable international, national, state, regional, and local laws and regulations without limitation.
-
-3.6	Except as otherwise explicitly provided herein, the Users may not transfer or assign any of the rights granted to them under this agreement or any of their obligations pursuant hereto. 
+4.4	Whereas the Licensee agrees as from the effective date of this Agreement, to enjoy the non-exclusive right to use
+the Licensed Material on the terms and conditions set out in this Agreement.
 
 
-4. COPYRIGHT AND PROPRIETARY INFORMATION
+GRANT OF LICENSE
 
-4.1	The Users acknowledge that the codebase is proprietary to the Licensor and constitutes the Licensor’s trade secrets. Any enhancements or improvements made to the codebase will automatically be part of the Licensor’s proprietary property.
-
-4.2	The Users may not remove or alter copyright notices or other proprietary notices on any copies of the codebase. 
-
-4.3	The Users may move the codebase to different user devices in their control; such transfer may require the Users to contact Licensor to effectuate such transfer. After any transfer, the Users must altogether remove the codebase from the former user device. 
-
-4.4	To prevent unlicensed use of the codebase, the Licensor may include in the codebase technological measures designed to prevent unlicensed use. The Licensor may use this technology to confirm that the users have a licensed copy of the codebase. The update of these technological measures may occur through the installation of the updates.
+5.1	Subject to the terms and conditions hereof, the Company hereby grants to the Licensee a non-exclusive license
+to use, access, inspect, install and implement the Licensed Materials in the Licensees internal Business Environment,
+unless terminated or withdrawn under the terms of this Agreement.
 
 
-5. MATERIAL TERMS
-The Users expressly agree that each of the terms and conditions of paragraph 3 and 4 are material. The Users’ failure to comply with these terms and conditions shall constitute sufficient cause for Licensor to immediately terminate this Agreement and the License granted under this agreement. The presence of this Section 3 and 4 shall not be relevant in determining the materiality of any other provision or breach of this agreement by either party hereto.
+TERMS OF USE OF LICENSE
+
+6.1	The Licensee may use the Licensed Material in furtherance of its permitted use under this Agreement and shall be
+allowed to use the Licensed Material under the provisions of this clause 6 hereof unless otherwise set out in this
+Agreement.
+
+6.2	The Licensed Material may only be used and adapted by the Licensee Users within their internal Business Environment,
+including the licensees' projects and applications. The Licensee shall not use the Licensed Materials to provide
+information or services to third parties other than affiliated or authorised persons within its Business Environment
+(i.e., traders).
+
+6.3	The Licensee acknowledges the Company's proprietary rights in the Licensed Material, and that the copying, or even
+observation by un-related parties of the Licensed Material for any reason other than the intended use thereof within
+its Business Environment, or without the explicit written consent by the Company, is prohibited.
+
+6.4	The Licensee is not permitted to create API endpoints or create data or forecast services using the Licensed
+Material without the Company's explicit written authorization, other than solely for Licensee’s internal business
+activities (which expressly excludes dissemination or provision of access to the Licensed Material to any third party).
+
+6.6	The Licensee shall not lease, loan, resell, sublicense or otherwise distribute the Licensed Materials to any other
+party or distribute or publish the source code or perform any acts concerning the Licensed Materials other than as
+expressly permitted under the terms of this Agreement.
+
+6.7	The Licensee and its Users undertake not to reverse engineer the Licensed Materials and agrees not to set up in
+business as a direct competitor of the Company using the Company's Proprietary Information. The Licensee will be
+responsible for damages suffered by the Company for any violation of this paragraph if it is proved or admitted.
+
+6.8	The Licensee agrees to install the Licensed Materials only on the maximum number of designated Users as specified
+in clause 1.3.6 hereof and on devices which may be located in the business premises of a User or be in the Users'
+direct possession. The Licensee shall not install the Licensed Materials on any other third-party workstations
+operating outside of the Licensees Business Environment.
+
+6.9	The Licensed Material may be installed by way of a package installer for Python on the Licensees preferred
+interface or any other system within the Licensees Business Environment.
 
 
-6. DISCLOSURE
-The Users acknowledge that they will immediately and without delay disclose any improvements, enhancements or modifications (whether in source or binary form) made to the codebase. The Users acknowledges that they are not entitled to withhold from the Licensor any improvements, enhancements or modifications made by them to the codebase. The Licensors proprietary rights as stipulated in section 4.1 shall apply to any improvements, enhancements or modifications made to the codebase, whether having been disclosed to the Licensor or not.
+COMPANY WARRANTY
+
+7.1	The Company warrants that the Licensed Material will be available and substantially conform to the standards
+required for an Integrated Development Environment Python Deployment Package for the license term's duration.
+
+7.2	The Company warrants that the source code will be protected by sound source control principles and changelog
+indexes for all tools, allowing for protection against any breaking changes in the source code and reverting to the
+software's previous version, should the need arise.
+
+7.3	The warranty does not apply:
+
+    7.3.1	if the Licensed Material is not used under the Documentation or Tutorials provided by the Company;
+
+    7.3.2	if the nonconformance of the Licensed Material is caused by any Modification or Add-on (other than any
+    Modifications, updates, or Add-ons made by the Company provided through the Company's package update or support
+    system), the Licensee, another third party, third- party software, third party database or any other software or
+    system not affiliated to the Company;
+
+7.4	The Company does not warrant that the Licensed Materials will be free from minor defects or errors that do not
+materially affect its performance, or that the libraries and documentation contained in the Licensed Materials are
+designed to meet all of Licensee's business requirements.
+
+7.5	The Licensee undertakes to notify the Company in writing with a specific description of the Licensed Materials
+errors during the terms of the license. If the Company confirms the existence of such errors, the Company will, to its
+best endeavours, repair or replace the Licensed Materials within 14 (fourteen) days from date of such confirmation.
+
+7.6	The Licensee's written notification of any software bugs must include sufficient detail for the Company to analyse
+the alleged nonconformance. Licensee must also provide all reasonable assistance to the Company to diagnose and remedy
+any Licensed Materials' nonconformance.
 
 
-7. LICENSORS RIGHT TO AUDIT AND EXAMINE
-The Licensor may, with or without written notice to Users, examine or audit the codebase by making use of any technological measures at their disposal. The purpose of such an audit would be to examine any unauthorised use or modifications made to the codebase. If any examination or audit should reveal unlicensed or unauthorised use restricted explicitly in terms of this agreement, the Licensor reserves the right, along with any other remedies available in law, to terminate the license forthwith and  demand such User to uninstall and cease making use of the codebase.
+LIMITATION OF LIABILITY
 
-8. NO WARRANTIES
-Except for any Warranty, the extent of which cannot be excluded or limited by any applicable law in the Users jurisdiction, the codebase is provided “AS IS” and without any warranty whatsoever. The Licensor makes no commitment, representation or warranty, whether expressed or implied, regarding or relating to the codebase and content therein or to any other material provided to the Users according to this agreement or otherwise.
- 
-The Users acknowledge and assume all risk and responsibilities for selecting the codebase to achieve the intended results required by them, the use thereof and the results obtained from the codebase. The Licensor makes no warranty that the software will be free of errors or defects or that it may be compatible with any particular hardware or software
- 
-To the maximum extent permitted by any applicable law, the Licensor disclaims all warranties, either express or implied, including but not limited to implied warranties, non-infringement of third party rights, integration, satisfactory quality or for any particular purpose concerning the codebase and accompanying written materials for the use thereof. Some jurisdictions may not allow such limitations to implied warranties, and if this is the case, such limitations may not apply to the Users. 
- 
-The User acknowledges that the codebase may not, at all times, be or become available due to any number of reasons, including without limitation, periodic maintenance, acts of god, technical failures, telecommunication infrastructure or delay or disruption attributed to computer viruses or malware, denial of service attacks, increased or fluctuating infrastructural demand or any acts or omissions of third parties. Therefore, the Licensor disclaims all warranties, either express or implied, to the availability, accessibility, or performance of the codebases. Licensor disclaims all liability for the loss of data during any communication and any liability arising from there.
+8.1	The Company shall not be responsible under this Agreement
+
+    8.1.1	if the Licensed Material is not used as per the documentation and tutorials provided;
+
+    8.1.2	if the nonconformance of the Licensed Material is caused by any Modification or Add-on (other than any
+    Modifications, updates or Add-ons made by the Company provided through the Company's package update or support
+    system), the Licensee, another third party, third- party software, third party database or any other software or
+    system not affiliated to the Company;
+
+8.2	Subject to the provisions of clause 8.3 and 8.4 below and regardless of the basis of liability (whether arising out
+of liability under breach of contract, damages (including gross negligence), misrepresentations, breach of warranty,
+or claims by any unrelated parties arising from any breach of this Agreement) neither the Company nor Licensee shall
+be liable to each other or any other party for any loss or damages arising concerning this Agreement to the extent
+that such loss or damage is:
+
+    8.2.1	loss of profits or revenue, loss of business, loss of or damage to data, loss of goodwill, losses from
+    computer failure or malfunction, legal fees, loss of anticipated profits or savings, and regardless of whether any
+    such loss or damage listed in this sub-section is direct, indirect, special, incidental or consequential;
+
+    8.2.2	is indirect, special, incidental, or consequential and whether or not the other party is advised of the
+    possibility of such loss or damage;
+
+8.3	Subject to the provisions of clause 8.2 above and regardless of the basis of liability (whether arising out of
+liability under breach of contract, damages (including gross negligence), misrepresentations, breach of warranty,
+or claims by any unrelated parties arising from any breach of this Agreement) the aggregate liability of each party
+to the other or any other party for any loss or damage arising under or concerning this Agreement shall not exceed the
+license fees paid to the Company in respect of this Agreement.
+
+8.4	Nothing in this Agreement shall exclude or limit either party's liability which cannot be excluded or limited by
+any applicable law in the Country of Jurisdiction.
+
+8.5	Any limitations to the Company's liability and obligations according to this clause 8 will also apply for the
+benefit of any member or affiliate of the Company and their respective licensors.
 
 
-9. LIMITED LIABILITY  
-The Users assume the entire cost of any damages resulting from the use of the codebase and the information contained in the codebase, as well as the interaction of the codebase with any other hardware or software. To the maximum extent permitted in law and under no circumstances will the Licensor be liable for any damages (including without limitation, damages for loss of business profits, business interruption, loss of business information, loss of goodwill, software of hardware disruption, repair costs or costs of procuring support services) arising out of the use or inability to use the software or the incompatibility of the codebase with any hardware or software.
+BREACH OF CONTRACT BY THE LICENSEE
+
+9.1	If the Licensee:
+
+    9.1.1	fails to pay any fees due in terms of this Agreement on the due date thereof; or
+
+    9.1.2	breaches this Agreement in any other way;
+
+and fails to remedy such breach within 5 (Five) days after service of a written notice to the Licensee calling for such
+remedy, alternatively
+
+    9.1.3	is placed under provisional or final sequestration during the term of this Agreement;
+
+    9.1.4	commits any unlawful act, or is found guilty of a crime in any country anywhere in the world,
 
 
-10. INDEMNIFICATION 
-The Users will, at their own expense, indemnify and hold Licensor, and its affiliates and suppliers, and all officers, directors, and employees thereof, harmless from and against all claims, actions, liabilities, losses, damages, judgments, grants, costs, and expenses, including reasonable attorneys’ fees (collectively, “Claims”), arising out of any use of the codebase.
+the Company shall have the right, without prejudice to any alternative or additional right of action or remedy
+available to the Company under the circumstances (including the right to claim specific performance), to
+
+    9.1.5	cancel this Agreement and forthwith.
+
+9.2	Any termination or declaration of termination of this Agreement shall not have the effect of cancelling any of the
+Company's rights that accrued before the termination or any other obligation of the Licensee which arises on termination
+of this Agreement.
 
 
-11. CONSENT AND THE PROTECTION OF PERSONAL INFORMATION
+BREACH OF CONTRACT BY THE COMPANY
 
-11.1 	Consent, acknowledgement, and acceptance is given to the Licensor by the Users for the following conditions of personal information usage.
- 
-11.2	The Licensor will only, with the explicit consent of the Users (either submitted electronically, verbally, or in writing), share the personal information of the Users or individual Users with any employees and personnel, selected partners, subsidiaries, and contracted third parties. The consent provided may be used to: 
- 
-11.2.1	share personal contact information electronically with the parties aforementioned;
- 
-11.2.2	store personal information in secure storage (either on-site or online) for record-keeping purposes;
- 
-11.2.3	use personal information for the purposes recording same into the Licensor’s software systems for the purposes required to run and manage any aspect of its business activities, including but not limited to user registrations and User identifiers;
- 
-11.2.4	use personal information for marketing purposes;
- 
-11.2.5	retain personal information for the required periods as required by the applicable laws at the time;
- 
-11.3	The Users information may be electronically transferred and shared with the parties above who will access, view, and store this personal information. 
- 
-11.4	Although the Licensor undertakes to take all reasonable steps to protect this personal information and maintain the Users information confidentiality, the Licensor cannot guarantee the security or integrity of any information transmitted (either electronically, verbally, or in writing) and that any information so submitted shall be at the Users own risk.
- 
-11.5	The Users acknowledge that once the Licensor shares any personal information with any parties above, the Licensor shall not have any control over this personal information once shared and will not be responsible for the security of any personal information after that. 
- 
-11.6	The Licensor confirms compliance with the relevant and necessary data protection laws applicable to the Country from time to time and commits to applying all safety and security measures whilst this information is under the Licensor’s control.
+10.1	If the Company commits any breach of contract and fails to remedy the breach within 5 (Five) days after
+receiving notice by the Licensee at the chosen notice address, the Licensee shall have the right to:
 
-11.7    MlFinLab, PortfolioLab, and ArbitrageLab libraries track the following data based on a device: MAC address, country code, region, city, city geographic coordinates, function calls, and time stamps.
+    10.1.1	terminate this Agreement without any liability for early termination;
 
-12. JURISDICTION OF COURTS AND GOVERNING LAWS
-This agreement and any dispute, action or claim of whatever nature arising out of this agreement shall be governed by and construed under English law.
+10.2	Notwithstanding the provisions stipulated in clause 10.1, the Licensee shall remain liable for any fees which
+may be due as at the date of terminating this Agreement in terms thereof.
 
-13. NON-WAIVER
-No relaxation or indulgence which the Licensor may show to the Users, or any failure by the Licensor to enforce any rights hereunder or its copyright in the codebase, shall not be construed as amending this agreement or waiving any of Licensor’s rights hereof.
+
+NOTICES BETWEEN PARTIES
+
+11.1	Any notice required to be sent to either party shall be delivered to either party in writing to their respective
+physical addresses (as set out in 1.1 and 1.2 hereof) alternatively transmitted by electronic email to the specified
+email address stipulated in this Agreement.
+
+11.2	Any notice, order, acceptance, demand, or other communication addressed by either party to this Agreement to
+the other party at its notice address or email address in terms hereof for the time being shall be deemed received by
+the addressee:
+
+    11.2.1	on the date of receipt of service of the notice if the notice is served by hand;
+
+    11.2.2	on the 5th Business Day after dispatching the notice by prepaid registered post;
+
+    11.2.3	on the date of transmission of the notice if electronically transmitted by email;
+
+11.3	This provision shall not be construed as precluding the other party using any other delivery methods of notices,
+orders, acceptances, demands, and other communications that the parties can prove.
+
+11.4	All legal processes shall be regarded as validly served if served at a party's notice address, whether the party
+is present at the notice address at the time of service or not.
+
+
+JURISDICTION OF COURTS AND GOVERNING LAWS
+
+12.1	This Agreement is governed by the laws of the Country specified in clause 1.3.8.
+
+
+CONSENT AND THE PROTECTION OF PERSONAL INFORMATION
+
+13.1	Consent, Acknowledgment, and acceptance is given to the Company by the Licensee for the following conditions of
+personal information usage.
+
+13.2	The Company will only with the explicit consent of the Licensee or that of the individual Users (either
+submitted electronically, verbally, or in writing) share the personal information of the Licensee or individual
+Users with any employees and personnel, selected partners, subsidiaries, and contracted third parties. The consent
+provided may be used to:
+
+    13.2.1	share personal contact information electronically with the parties aforementioned;
+
+    13.2.2	store personal information in secure storage (either on-site or online) for record-keeping purposes;
+
+    13.2.3	use personal information for the purposes recording same into the Company's software systems for the purposes
+    required to run and manage any aspect of its business activities, including but not limited to user registrations and
+    User identifiers;
+
+    13.2.4	use personal information for marketing purposes;
+
+    13.2.5	retain personal information for the required periods as required by the applicable laws at the time;
+
+
+13.3	The Licensee and User information may be electronically transferred and shared with the parties above who will
+access, view, and store this personal information.
+
+13.4	Although the Company undertakes to take all reasonable steps to protect this personal information and maintain
+the Licensee and User information confidentiality, the Company cannot guarantee the security or integrity of any information transmitted (either electronically, verbally, or in writing) and that any information so submitted shall be at the Licensee and Users own risk.
+
+13.5	The Licensee acknowledges that once the Company shares any personal information to any parties above (as per
+clause 13.2 hereof), the Company shall not have any control over this personal information once shared and will not be
+responsible for the security of any personal information after that.
+
+13.6	The Company confirms compliance with the relevant and necessary data protection laws applicable to the Country
+from time to time commit to applying all safety and security measures whilst this information is under the Company's
+control.
+
+
+PROPRIETARY INFORMATION
+
+14.1	This Agreement creates a relationship of confidence and trust between the Licensee, the Users, and the Company
+relating to information which may be made known, presented or accessed by the Licensee and its Users during the term of
+this Agreement.
+
+14.2	The Company possesses information that has been created, researched, or developed by the Company (including
+information created, researched or developed or made known to the Licensee during the term of this Agreement or in which
+intellectual property rights may have been assigned to the Company from other sources), which information has commercial
+value to the business in which the Company is engaged and is treated by the Company as confidential. All such
+information referred to as "Proprietary Information". This term shall also include systems, algorithms, data, source
+code, computer programs, improvements, discoveries, developments, techniques, new products, and licenses; The term
+"Proprietary Information" does not include any of the information herein that is already part of the public domain.
+
+14.3	All Proprietary Information herein shall be the Company's property and its assigns, who shall remain the sole
+owner of all rights, including any patents, copyrights, trademarks, and other rights obtained in connection therewith.
+
+Unauthorised use
+
+14.4	Having regard to the terms of use of the Licensed Material as per clause 6 hereof as well as clause 14.1,
+14.2, and 14.3 hereof, and subject to the provisions of clause 9 and 10 hereof, the Licensee acknowledges that it may
+make any modifications or alterations to the Source Code at their discretion; however, such right does not include the
+right to distribute or create other commercially available products containing substantial portions of the original
+Licensed Materials of the Company.
+
+14.5	The Licensee agrees not to lease, loan, resell, sublicense or otherwise distribute any software or product
+based on improvements or alterations made to the Licensed Materials to any other party or distribute or publish the
+source code or perform any acts concerning improvements containing substantial portions of the original Licensed
+Materials of the Company.
+
+Webhooks
+
+14.6	The Licensee acknowledges that the Company has created webhooks to verify Licensee and user authentications,
+user, installations, daily usage information, and track function calls and source code modifications.
+
+14.7	Webhooks trigger upon installation of the Licensed Material and during specific function calls. During these
+events, no proprietary data from the Licensee passes through any of the Company Servers.
+
+14.8	The Webhooks are contained in the Licensed Material source code and can be inspected to analyse where the
+Company uses analytics, tracks function calls.
+
+
+NON-WAIVER
+
+15.1	No relaxation or indulgence which the Company may show to the Licensee shall in any way prejudice their rights
+hereunder.
+
+
+SEVERABILITY
+
+If any provision of this Agreement is unenforceable for whatever reason, the Company shall be entitled to elect, at any
+time, that such provision is severed from the remaining provisions of this Agreement, the result of which shall not
+affect the remaining provisions of this Agreement which shall remain of full force and effect.
+
+
+WHOLE AGREEMENT
+
+This Agreement constitutes the entire Agreement between the parties. No modification, variation, alteration, or
+consensual cancellation shall be of any force or effect unless reduced to writing and signed by the parties.
